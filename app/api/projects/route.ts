@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { createProjectSchema } from '@/lib/validations/project-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/projects
@@ -78,10 +79,12 @@ export async function GET(req: NextRequest) {
     // Get projects from service
     const projects = await projectsOnlyService.getProjects(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: projects,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: projects,
+      })
+    );
   } catch (error) {
     logger.error('[API] /api/projects GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

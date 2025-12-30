@@ -710,63 +710,76 @@ export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<E
 
 
 /**
- * Send multiple emails in batch (for digest processing)
+ * Send a single email based on type
+ * Note: Using 'any' for data to match the batch API signature - type safety is enforced at call site
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
+  switch (type) {
+    case 'task':
+      return sendTaskAssignmentEmail(data);
+    case 'event':
+      return sendEventReminderEmail(data);
+    case 'message':
+      return sendNewMessageEmail(data);
+    case 'shopping':
+      return sendShoppingListEmail(data);
+    case 'meal':
+      return sendMealReminderEmail(data);
+    case 'reminder':
+      return sendGeneralReminderEmail(data);
+    case 'invitation':
+      return sendSpaceInvitationEmail(data);
+    case 'password-reset':
+      return sendPasswordResetEmail(data);
+    case 'magic-link':
+      return sendMagicLinkEmail(data);
+    case 'email-verification':
+      return sendEmailVerificationEmail(data);
+    default:
+      return { success: false, error: 'Unknown email type' };
+  }
+}
+
+/**
+ * Send multiple emails in batch with parallel processing
+ * PERFORMANCE: Processes emails in parallel batches of 10 instead of sequential
+ * This reduces 100 emails from ~10s to ~1s
  */
 export async function sendBatchEmails(emails: Array<{
   type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation' | 'password-reset' | 'magic-link' | 'email-verification';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 }>): Promise<{ success: number; failed: number; results: EmailResult[] }> {
   const results: EmailResult[] = [];
   let success = 0;
   let failed = 0;
 
-  for (const email of emails) {
-    let result: EmailResult;
+  // Process emails in parallel batches of 10
+  const BATCH_SIZE = 10;
 
-    switch (email.type) {
-      case 'task':
-        result = await sendTaskAssignmentEmail(email.data);
-        break;
-      case 'event':
-        result = await sendEventReminderEmail(email.data);
-        break;
-      case 'message':
-        result = await sendNewMessageEmail(email.data);
-        break;
-      case 'shopping':
-        result = await sendShoppingListEmail(email.data);
-        break;
-      case 'meal':
-        result = await sendMealReminderEmail(email.data);
-        break;
-      case 'reminder':
-        result = await sendGeneralReminderEmail(email.data);
-        break;
-      case 'invitation':
-        result = await sendSpaceInvitationEmail(email.data);
-        break;
-      case 'password-reset':
-        result = await sendPasswordResetEmail(email.data);
-        break;
-      case 'magic-link':
-        result = await sendMagicLinkEmail(email.data);
-        break;
-      case 'email-verification':
-        result = await sendEmailVerificationEmail(email.data);
-        break;
-      default:
-        result = { success: false, error: 'Unknown email type' };
+  for (let i = 0; i < emails.length; i += BATCH_SIZE) {
+    const batch = emails.slice(i, i + BATCH_SIZE);
+
+    // Process batch in parallel
+    const batchResults = await Promise.all(
+      batch.map(email => sendEmailByType(email.type, email.data))
+    );
+
+    // Collect results
+    for (const result of batchResults) {
+      results.push(result);
+      if (result.success) {
+        success++;
+      } else {
+        failed++;
+      }
     }
 
-    results.push(result);
-    if (result.success) {
-      success++;
-    } else {
-      failed++;
+    // Small delay between batches to respect rate limits (not between individual emails)
+    if (i + BATCH_SIZE < emails.length) {
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
-
-    // Add a small delay between emails to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   return { success, failed, results };

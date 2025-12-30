@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { createCalendarEventSchema } from '@/lib/validations/calendar-event-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/calendar
@@ -66,10 +67,13 @@ export async function GET(req: NextRequest) {
     // Get calendar events from service
     const events = await calendarService.getEvents(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: events,
-    });
+    // Add cache headers for browser caching
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: events,
+      })
+    );
   } catch (error) {
     Sentry.captureException(error, {
       tags: {

@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { createReminderSchema } from '@/lib/validations/reminder-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/reminders
@@ -71,10 +72,12 @@ export async function GET(req: NextRequest) {
     // Get reminders from service
     const reminders = await remindersService.getReminders(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: reminders,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: reminders,
+      })
+    );
   } catch (error) {
     Sentry.captureException(error, {
       tags: {

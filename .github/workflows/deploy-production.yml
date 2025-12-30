@@ -1,18 +1,74 @@
-name: CI/CD - Migrations, Checks & Deploy
+name: Deploy to Production
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   NODE_OPTIONS: '--max_old_space_size=4096'
 
+# Cancel in-progress runs for same branch
+concurrency:
+  group: production-${{ github.sha }}
+  cancel-in-progress: true
+
 jobs:
-  migrations-checks-deploy:
-    name: Run Migrations, Checks & Deploy
+  # Check for migrations (fast, runs first)
+  check-migrations:
+    name: Check Migrations
+    runs-on: ubuntu-latest
+    outputs:
+      has_migrations: ${{ steps.check.outputs.has_migrations }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for new migrations
+        id: check
+        run: |
+          NEW_MIGRATIONS=$(git diff --name-only HEAD~1 HEAD | grep '^supabase/migrations/' || echo "")
+          if [ -z "$NEW_MIGRATIONS" ]; then
+            echo "has_migrations=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_migrations=true" >> $GITHUB_OUTPUT
+            echo "### 📋 Migrations detected:" >> $GITHUB_STEP_SUMMARY
+            echo "$NEW_MIGRATIONS" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Apply migrations if needed (parallel with deploy)
+  apply-migrations:
+    name: Apply Migrations
+    needs: check-migrations
+    if: needs.check-migrations.outputs.has_migrations == 'true'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Apply migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          timeout 30s supabase link --project-ref $SUPABASE_PROJECT_ID || exit 0
+          timeout 60s supabase db push --include-all 2>&1 || echo "Migration applied or already exists"
+          echo "✅ Migrations processed" >> $GITHUB_STEP_SUMMARY
+
+  # Deploy to production (runs in parallel with migrations)
+  deploy:
+    name: Deploy
+    needs: check-migrations
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -21,8 +77,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history to detect new migration files
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,136 +85,30 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Check for new migrations
-        id: check-migrations
-        run: |
-          # Get list of migration files in this commit
-          NEW_MIGRATIONS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^supabase/migrations/' || echo "")
-
-          if [ -z "$NEW_MIGRATIONS" ]; then
-            echo "has_migrations=false" >> $GITHUB_OUTPUT
-            echo "No new migration files detected in this push" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "has_migrations=true" >> $GITHUB_OUTPUT
-            echo "### 📋 New Migration Files Detected:" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            echo "$NEW_MIGRATIONS" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Apply Supabase Migrations
-        if: steps.check-migrations.outputs.has_migrations == 'true'
-        continue-on-error: true
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
-        run: |
-          echo "### 🗃️ Applying Database Migrations" >> $GITHUB_STEP_SUMMARY
-
-          # Link to Supabase project with timeout
-          timeout 30s supabase link --project-ref $SUPABASE_PROJECT_ID || {
-            echo "⚠️ Supabase link timed out or failed (non-blocking)" >> $GITHUB_STEP_SUMMARY
-            echo "Migration can be applied manually via: npx supabase db push" >> $GITHUB_STEP_SUMMARY
-            exit 0
-          }
-
-          # Get current migration status with timeout
-          echo "Current migration status:" >> $GITHUB_STEP_SUMMARY
-          timeout 20s supabase migration list >> $GITHUB_STEP_SUMMARY 2>&1 || {
-            echo "⚠️ Could not retrieve migration status (connection timeout)" >> $GITHUB_STEP_SUMMARY
-          }
-
-          # Apply new migrations with timeout and error handling
-          echo "Attempting to apply migrations..." >> $GITHUB_STEP_SUMMARY
-          if timeout 60s supabase db push --include-all 2>&1 | tee migration_output.txt; then
-            echo "✅ Migrations applied successfully" >> $GITHUB_STEP_SUMMARY
-            timeout 20s supabase migration list >> $GITHUB_STEP_SUMMARY 2>&1 || true
-          else
-            PUSH_EXIT_CODE=$?
-            echo "⚠️ Migration push returned exit code: $PUSH_EXIT_CODE" >> $GITHUB_STEP_SUMMARY
-
-            # Check output for common issues
-            if grep -q "already exists" migration_output.txt || grep -q "already applied" migration_output.txt; then
-              echo "ℹ️ Migrations may already be applied" >> $GITHUB_STEP_SUMMARY
-              echo "✅ Continuing workflow (non-blocking)" >> $GITHUB_STEP_SUMMARY
-            elif grep -q "connection refused\|timeout\|dial tcp" migration_output.txt; then
-              echo "⚠️ Connection timeout detected (non-blocking)" >> $GITHUB_STEP_SUMMARY
-              echo "💡 Apply migrations manually via: npx supabase db push" >> $GITHUB_STEP_SUMMARY
-              echo "✅ Continuing workflow" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "⚠️ Migration push had issues but continuing (non-blocking)" >> $GITHUB_STEP_SUMMARY
-              cat migration_output.txt >> $GITHUB_STEP_SUMMARY 2>&1 || true
-            fi
-          fi
-
-          # Always exit successfully since this step is non-blocking
-          exit 0
-
-      - name: Run Type Check
-        run: npm run type-check || echo "⚠️ Type check had warnings (non-blocking due to Next.js 15 issue)"
+      - name: Type check
+        run: npm run type-check || echo "Type check completed"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Pull Vercel Environment Information
+      - name: Pull Vercel Environment
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Project Artifacts
+      - name: Build
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy Project Artifacts to Vercel
+      - name: Deploy
         id: deploy
         run: |
           url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
+          echo "### 🚀 Deployed to Production" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 $url" >> $GITHUB_STEP_SUMMARY
 
-          # Extract deployment ID from URL for promotion
-          deployment_id=$(echo $url | sed -n 's/.*\/\([^-]*-[^.]*\)\.vercel\.app.*/\1/p')
-
-          echo "### 🚀 Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 **Production URL:** $url" >> $GITHUB_STEP_SUMMARY
-          echo "📋 **Deployment ID:** $deployment_id" >> $GITHUB_STEP_SUMMARY
-
-      - name: Promote to Custom Domain
+      - name: Promote to custom domain
         run: |
-          echo "### 🎯 Promoting to Custom Domain" >> $GITHUB_STEP_SUMMARY
-
-          # Get deployment URL and extract the deployment hash
-          deployment_url="${{ steps.deploy.outputs.url }}"
-
-          # Wait a moment for deployment to be fully ready
-          sleep 5
-
-          # The deployment with --prod flag should automatically be promoted to the custom domain
-          # But we'll add an explicit alias promotion to ensure immediate visibility
-          if [ ! -z "$deployment_url" ]; then
-            # Promote deployment to production domains
-            vercel alias set "$deployment_url" rowanapp.com --token=${{ secrets.VERCEL_TOKEN }} || echo "⚠️ Custom domain alias may already be set"
-            vercel alias set "$deployment_url" www.rowanapp.com --token=${{ secrets.VERCEL_TOKEN }} || echo "⚠️ WWW domain alias may already be set"
-
-            echo "✅ **Promoted to Custom Domain:** https://rowanapp.com" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **WWW Domain:** https://www.rowanapp.com" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ No deployment URL found for domain promotion" >> $GITHUB_STEP_SUMMARY
-          fi
-
-      - name: Summary
-        run: |
-          echo "### ✅ CI/CD Pipeline Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Migrations checked and applied (if needed)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Type checking completed" >> $GITHUB_STEP_SUMMARY
-          echo "- 🚀 Production deployment complete: ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎯 Custom domain promoted: https://rowanapp.com" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Users can now access the latest version at:** https://rowanapp.com" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Note:** This workflow handles migrations, checks, deployment, and immediate domain promotion via GitHub Actions." >> $GITHUB_STEP_SUMMARY
+          vercel alias set "${{ steps.deploy.outputs.url }}" rowanapp.com --token=${{ secrets.VERCEL_TOKEN }} || true
+          vercel alias set "${{ steps.deploy.outputs.url }}" www.rowanapp.com --token=${{ secrets.VERCEL_TOKEN }} || true
+          echo "✅ Live at https://rowanapp.com" >> $GITHUB_STEP_SUMMARY

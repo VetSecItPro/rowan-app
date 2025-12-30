@@ -1,0 +1,2 @@
+app/layout.tsx:88:          SECURITY: This dangerouslySetInnerHTML usage is SAFE because:
+app/layout.tsx:94:          dangerouslySetInnerHTML={{

@@ -9,6 +9,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { withDynamicDataCache } from '@/lib/utils/cache-headers';
 
 // Zod schemas for validation
 const GetMessagesQuerySchema = z.object({
@@ -74,10 +75,13 @@ export async function GET(req: NextRequest) {
     // Get messages from service
     const messages = await messagesService.getMessages(conversationId);
 
-    return NextResponse.json({
-      success: true,
-      data: messages,
-    });
+    // Use shorter cache for real-time messaging data
+    return withDynamicDataCache(
+      NextResponse.json({
+        success: true,
+        data: messages,
+      })
+    );
   } catch (error) {
     Sentry.captureException(error, {
       tags: {

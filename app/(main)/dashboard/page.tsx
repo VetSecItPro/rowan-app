@@ -716,15 +716,18 @@ export default function DashboardPage() {
     const channels: any[] = [];
 
     // Only subscribe if we have a space
+    // Channel names include space_id to ensure proper isolation when switching spaces
     if (currentSpace) {
+      const spaceId = currentSpace.id;
+
       // Tasks subscription
       const tasksChannel = supabase
-        .channel('dashboard_tasks')
+        .channel(`dashboard_tasks:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'tasks',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats(); // Reload stats on any task change
         })
@@ -733,12 +736,12 @@ export default function DashboardPage() {
 
       // Events subscription
       const eventsChannel = supabase
-        .channel('dashboard_events')
+        .channel(`dashboard_events:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'calendar_events',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -747,12 +750,12 @@ export default function DashboardPage() {
 
       // Reminders subscription
       const remindersChannel = supabase
-        .channel('dashboard_reminders')
+        .channel(`dashboard_reminders:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'reminders',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -761,12 +764,12 @@ export default function DashboardPage() {
 
       // Messages subscription
       const messagesChannel = supabase
-        .channel('dashboard_messages')
+        .channel(`dashboard_messages:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'messages',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -775,12 +778,12 @@ export default function DashboardPage() {
 
       // Shopping subscription
       const shoppingChannel = supabase
-        .channel('dashboard_shopping')
+        .channel(`dashboard_shopping:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'shopping_lists',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -789,12 +792,12 @@ export default function DashboardPage() {
 
       // Meals subscription
       const mealsChannel = supabase
-        .channel('dashboard_meals')
+        .channel(`dashboard_meals:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'meal_plans',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -803,12 +806,12 @@ export default function DashboardPage() {
 
       // Chores subscription
       const choresChannel = supabase
-        .channel('dashboard_chores')
+        .channel(`dashboard_chores:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'household_chores',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -817,12 +820,12 @@ export default function DashboardPage() {
 
       // Goals subscription
       const goalsChannel = supabase
-        .channel('dashboard_goals')
+        .channel(`dashboard_goals:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'goals',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -831,12 +834,12 @@ export default function DashboardPage() {
 
       // Projects subscription
       const projectsChannel = supabase
-        .channel('dashboard_projects')
+        .channel(`dashboard_projects:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'projects',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })
@@ -845,12 +848,12 @@ export default function DashboardPage() {
 
       // Expenses subscription
       const expensesChannel = supabase
-        .channel('dashboard_expenses')
+        .channel(`dashboard_expenses:${spaceId}`)
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
           table: 'expenses',
-          filter: `space_id=eq.${currentSpace.id}`,
+          filter: `space_id=eq.${spaceId}`,
         }, () => {
           loadAllStats();
         })

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useDebounce } from 'use-debounce';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +48,7 @@ export function ReceiptLibrary({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -72,17 +74,17 @@ export function ReceiptLibrary({
     loadReceipts();
   }, [currentSpace]);
 
-  // Filter and sort receipts
+  // Filter and sort receipts - using debounced search to prevent excessive filtering
   useEffect(() => {
     let filtered = [...receipts];
 
     // Search filter
-    if (searchQuery) {
+    if (debouncedSearchQuery) {
       filtered = filtered.filter(receipt => {
         const merchantName = receipt.extracted_data?.merchant_name?.toLowerCase() || '';
         const amount = receipt.extracted_data?.total_amount?.toString() || '';
-        return merchantName.includes(searchQuery.toLowerCase()) ||
-               amount.includes(searchQuery);
+        return merchantName.includes(debouncedSearchQuery.toLowerCase()) ||
+               amount.includes(debouncedSearchQuery);
       });
     }
 
@@ -112,7 +114,7 @@ export function ReceiptLibrary({
     });
 
     setFilteredReceipts(filtered);
-  }, [receipts, searchQuery, statusFilter, sortBy]);
+  }, [receipts, debouncedSearchQuery, statusFilter, sortBy]);
 
   const handleDeleteReceipt = async (receiptId: string) => {
     try {

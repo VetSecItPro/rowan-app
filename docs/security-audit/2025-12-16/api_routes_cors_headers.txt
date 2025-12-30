@@ -1,0 +1,1 @@
+app/api/ocr/scan-receipt/route.ts:211:      'Access-Control-Allow-Origin': '*',

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client';
 import { checkAndAwardBadges } from './achievement-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { logger } from '@/lib/logger';
+import { cacheAside, cacheKeys, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
 
 export interface Milestone {
   id: string;
@@ -398,6 +399,12 @@ export const goalsService = {
       .single();
 
     if (error) throw error;
+
+    // Invalidate goal stats cache (fire-and-forget)
+    if (input.space_id) {
+      deleteCachePattern(`${CACHE_PREFIXES.GOAL_STATS}${input.space_id}*`).catch(() => {});
+    }
+
     return data;
   },
 
@@ -462,6 +469,11 @@ export const goalsService = {
       } catch (error) {
         logger.error('Failed to check for achievement badges or send notifications:', error, { component: 'lib-goals-service', action: 'service_call' });
       }
+    }
+
+    // Invalidate goal stats cache (fire-and-forget)
+    if (data.space_id) {
+      deleteCachePattern(`${CACHE_PREFIXES.GOAL_STATS}${data.space_id}*`).catch(() => {});
     }
 
     return data;
@@ -600,25 +612,32 @@ export const goalsService = {
   },
 
   async getGoalStats(spaceId: string): Promise<GoalStats> {
-    const supabase = createClient();
-    const goals = await this.getGoals(spaceId);
+    const cacheKey = cacheKeys.goalStats(spaceId);
 
-    let completedMilestones = 0;
-    goals.forEach(goal => {
-      if (goal.milestones) {
-        completedMilestones += goal.milestones.filter(m => m.completed).length;
-      }
-    });
+    return cacheAside(
+      cacheKey,
+      async () => {
+        const goals = await this.getGoals(spaceId);
 
-    const completedGoals = goals.filter(g => g.status === 'completed').length;
-    const totalCompleted = completedGoals + completedMilestones;
+        let completedMilestones = 0;
+        goals.forEach(goal => {
+          if (goal.milestones) {
+            completedMilestones += goal.milestones.filter(m => m.completed).length;
+          }
+        });
 
-    return {
-      active: goals.filter(g => g.status === 'active').length,
-      completed: totalCompleted,
-      inProgress: goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
-      milestonesReached: completedMilestones,
-    };
+        const completedGoals = goals.filter(g => g.status === 'completed').length;
+        const totalCompleted = completedGoals + completedMilestones;
+
+        return {
+          active: goals.filter(g => g.status === 'active').length,
+          completed: totalCompleted,
+          inProgress: goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
+          milestonesReached: completedMilestones,
+        };
+      },
+      CACHE_TTL.MEDIUM // 5 minutes - goal stats don't change very frequently
+    );
   },
 
   // Collaboration methods

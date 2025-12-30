@@ -1,0 +1,7 @@
+app/api/admin/logs/route.ts
+app/api/auth/cleanup-orphaned-user/route.ts
+app/api/cron/beta-expiration-emails/route.ts
+app/api/messages/mark-conversation-read/route.ts
+lib/supabase-server.ts
+lib/supabase/admin.ts
+lib/utils/monetization-logger.ts

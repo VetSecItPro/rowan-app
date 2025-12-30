@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { createMealSchema } from '@/lib/validations/meal-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/meals
@@ -78,10 +79,12 @@ export async function GET(req: NextRequest) {
     // Get meals from service
     const meals = await mealsService.getMeals(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: meals,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: meals,
+      })
+    );
   } catch (error) {
     logger.error('[API] /api/meals GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -7,7 +6,9 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { validateEmail } from '@/lib/utils/email-validation';
 import { Resend } from 'resend';
+import { render } from '@react-email/components';
 import { z } from 'zod';
+import BetaInviteEmail from '@/lib/emails/templates/BetaInviteEmail';
 
 // Beta program configuration
 const MAX_BETA_USERS = 100;
@@ -132,9 +133,11 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Resend the existing code
+      // Resend the existing code (non-blocking for fast response)
       if (resend) {
-        await sendBetaInviteEmail(normalizedEmail, existingCode.code, name);
+        sendBetaInviteEmail(normalizedEmail, existingCode.code, name).catch((err) => {
+          console.error('Failed to resend beta invite email:', err);
+        });
       }
 
       return NextResponse.json({
@@ -196,18 +199,16 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     });
 
-    // Send the invite email
+    // Send the invite email (non-blocking for fast response)
     if (resend) {
-      const emailResult = await sendBetaInviteEmail(normalizedEmail, inviteCode, name);
-      if (!emailResult.success) {
-        // Log email failure but don't fail the request
-        console.error('Failed to send beta invite email:', emailResult.error);
-      }
+      sendBetaInviteEmail(normalizedEmail, inviteCode, name).catch((err) => {
+        console.error('Failed to send beta invite email:', err);
+      });
     }
 
-    // Increment daily analytics
+    // Increment daily analytics (non-blocking)
     const today = new Date().toISOString().split('T')[0];
-    await supabaseAdmin.rpc('increment_beta_requests', { target_date: today });
+    Promise.resolve(supabaseAdmin.rpc('increment_beta_requests', { target_date: today })).catch(() => {});
 
     return NextResponse.json({
       success: true,
@@ -232,7 +233,7 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Send beta invite email via Resend
+ * Send beta invite email via Resend using React Email template
  */
 async function sendBetaInviteEmail(
   email: string,
@@ -243,98 +244,26 @@ async function sendBetaInviteEmail(
     return { success: false, error: 'Email service not configured' };
   }
 
-  const signupUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://rowan.app'}/signup?beta_code=${inviteCode}`;
+  const signupUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com'}/signup?beta_code=${inviteCode}`;
 
   try {
+    // Render the React Email template to HTML
+    const emailHtml = await render(
+      BetaInviteEmail({
+        recipientEmail: email,
+        recipientName: name,
+        inviteCode,
+        signupUrl,
+        expiresAt: 'February 15, 2026',
+      })
+    );
+
     await resend.emails.send({
-      from: 'Rowan <hello@rowan.app>',
+      from: 'Rowan <notifications@rowanapp.com>',
+      replyTo: 'support@rowanapp.com',
       to: email,
       subject: "You're invited to Rowan Beta! 🌳",
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Rowan Beta</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <!-- Header -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%); padding: 40px 40px 30px; text-align: center;">
-              <img src="${process.env.NEXT_PUBLIC_APP_URL || 'https://rowan.app'}/rowan-logo.png" alt="Rowan" width="80" height="80" style="margin-bottom: 16px;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Welcome to Rowan Beta!</h1>
-            </td>
-          </tr>
-
-          <!-- Body -->
-          <tr>
-            <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #374151; font-size: 16px; line-height: 1.6;">
-                ${name ? `Hi ${name},` : 'Hi there,'}
-              </p>
-              <p style="margin: 0 0 20px; color: #374151; font-size: 16px; line-height: 1.6;">
-                You're one of only <strong>100 people</strong> invited to test Rowan before anyone else. Thank you for joining us on this journey!
-              </p>
-
-              <!-- Invite Code Box -->
-              <div style="background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center;">
-                <p style="margin: 0 0 8px; color: #6b7280; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Your Invite Code</p>
-                <p style="margin: 0; color: #1e40af; font-size: 32px; font-weight: 700; font-family: 'SF Mono', Monaco, 'Courier New', monospace; letter-spacing: 2px;">
-                  ${inviteCode}
-                </p>
-              </div>
-
-              <!-- CTA Button -->
-              <div style="text-align: center; margin: 32px 0;">
-                <a href="${signupUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 16px; font-weight: 600;">
-                  Create Your Account →
-                </a>
-              </div>
-
-              <!-- What to expect -->
-              <div style="background-color: #f9fafb; border-radius: 12px; padding: 24px; margin: 24px 0;">
-                <h3 style="margin: 0 0 16px; color: #111827; font-size: 16px; font-weight: 600;">What to expect:</h3>
-                <ul style="margin: 0; padding: 0 0 0 20px; color: #4b5563; font-size: 14px; line-height: 1.8;">
-                  <li>Full access to all features until <strong>February 15, 2026</strong></li>
-                  <li>Your feedback directly shapes the final product</li>
-                  <li>Exclusive beta tester badge</li>
-                  <li>Special pricing when we launch</li>
-                </ul>
-              </div>
-
-              <p style="margin: 24px 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
-                Questions? Just reply to this email – we read every message.
-              </p>
-
-              <p style="margin: 24px 0 0; color: #374151; font-size: 16px;">
-                — The Rowan Team
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #f9fafb; padding: 24px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
-              <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                © 2025 Rowan • Veteran Owned Business
-              </p>
-              <p style="margin: 8px 0 0; color: #9ca3af; font-size: 12px;">
-                This code expires on February 15, 2026
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-      `,
+      html: emailHtml,
       text: `
 Welcome to Rowan Beta!
 
@@ -359,6 +288,10 @@ Questions? Just reply to this email – we read every message.
 © 2025 Rowan • Veteran Owned Business
 This code expires on February 15, 2026
       `,
+      tags: [
+        { name: 'category', value: 'beta-invite' },
+        { name: 'invite_code', value: inviteCode },
+      ],
     });
 
     return { success: true };
