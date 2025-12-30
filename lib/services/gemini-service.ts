@@ -69,6 +69,7 @@ export interface BatchDigestResponse {
 export const geminiService = {
   /**
    * Generate a single daily digest email using Gemini
+   * OPTIMIZATION: 30-second timeout with fallback to template
    */
   async generateDigest(userData: DigestData): Promise<DigestEmailContent> {
     try {
@@ -76,9 +77,18 @@ export const geminiService = {
 
       const prompt = this.buildDigestPrompt(userData);
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const generatedContent = response.text();
+      // Add 30-second timeout to prevent hanging requests
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Gemini request timeout')), 30000);
+      });
+
+      const generatePromise = (async () => {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+      })();
+
+      const generatedContent = await Promise.race([generatePromise, timeoutPromise]);
 
       // Parse the generated content
       const parsed = this.parseGeneratedDigest(generatedContent, userData.userName);

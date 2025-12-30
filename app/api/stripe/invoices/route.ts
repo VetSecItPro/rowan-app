@@ -2,6 +2,8 @@
  * Stripe Invoices API
  * Returns recent invoices for display in subscription settings
  * Users can see their billing history without leaving the app
+ *
+ * OPTIMIZATION: 30-minute Redis cache for invoice list
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,6 +12,7 @@ import { getStripeClient } from '@/lib/stripe/client';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
 interface InvoiceData {
   id: string;
@@ -20,6 +23,12 @@ interface InvoiceData {
   status: string;
   pdfUrl: string | null;
   hostedUrl: string | null;
+}
+
+interface InvoiceResponse {
+  invoices: InvoiceData[];
+  hasMore: boolean;
+  message?: string;
 }
 
 export async function GET(request: NextRequest) {
@@ -48,34 +57,47 @@ export async function GET(request: NextRequest) {
     if (!subscription?.stripe_customer_id) {
       return NextResponse.json({
         invoices: [],
+        hasMore: false,
         message: 'No billing history available'
       });
     }
 
-    const stripe = getStripeClient();
+    // Use Redis cache for invoice data (30-minute TTL)
+    // Invoices don't change frequently, so aggressive caching is safe
+    const cacheKey = cacheKeys.invoices(subscription.stripe_customer_id);
 
-    // Fetch last 5 invoices from Stripe
-    const invoices = await stripe.invoices.list({
-      customer: subscription.stripe_customer_id,
-      limit: 5,
-    });
+    const invoiceResponse = await cacheAside<InvoiceResponse>(
+      cacheKey,
+      async () => {
+        const stripe = getStripeClient();
 
-    // Transform to our format
-    const invoiceData: InvoiceData[] = invoices.data.map((invoice) => ({
-      id: invoice.id,
-      number: invoice.number,
-      date: new Date(invoice.created * 1000).toISOString(),
-      amount: (invoice.amount_paid || invoice.amount_due) / 100,
-      currency: invoice.currency.toUpperCase(),
-      status: invoice.status || 'unknown',
-      pdfUrl: invoice.invoice_pdf ?? null,
-      hostedUrl: invoice.hosted_invoice_url ?? null,
-    }));
+        // Fetch last 5 invoices from Stripe
+        const invoices = await stripe.invoices.list({
+          customer: subscription.stripe_customer_id,
+          limit: 5,
+        });
 
-    return NextResponse.json({
-      invoices: invoiceData,
-      hasMore: invoices.has_more,
-    });
+        // Transform to our format
+        const invoiceData: InvoiceData[] = invoices.data.map((invoice) => ({
+          id: invoice.id,
+          number: invoice.number,
+          date: new Date(invoice.created * 1000).toISOString(),
+          amount: (invoice.amount_paid || invoice.amount_due) / 100,
+          currency: invoice.currency.toUpperCase(),
+          status: invoice.status || 'unknown',
+          pdfUrl: invoice.invoice_pdf ?? null,
+          hostedUrl: invoice.hosted_invoice_url ?? null,
+        }));
+
+        return {
+          invoices: invoiceData,
+          hasMore: invoices.has_more,
+        };
+      },
+      CACHE_TTL.VERY_LONG / 2 // 30 minutes (half of 1 hour)
+    );
+
+    return NextResponse.json(invoiceResponse);
 
   } catch (error) {
     logger.error('Error fetching invoices:', error, { component: 'api-route', action: 'api_request' });
