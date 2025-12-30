@@ -120,20 +120,20 @@ export default function LoginPage() {
             </h1>
           </div>
 
-          <p className="text-lg xl:text-xl text-purple-100 dark:text-purple-200 mb-8 text-center px-4">
+          <p className="text-lg xl:text-xl text-emerald-100 dark:text-emerald-200 mb-8 text-center px-4">
             Collaborative life management for couples and families
           </p>
-          <div className="space-y-4 text-lg text-purple-100 dark:text-purple-200 max-w-md mx-auto">
+          <div className="space-y-4 text-lg text-emerald-100 dark:text-emerald-200 max-w-md mx-auto">
             <p className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Shared calendars & task management
             </p>
             <p className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Shopping lists & meal planning
             </p>
             <p className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-purple-300 rounded-full flex-shrink-0"></span>
+              <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Goal tracking & household management
             </p>
           </div>
