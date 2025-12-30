@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { createGoalSchema } from '@/lib/validations/goal-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/goals
@@ -78,10 +79,12 @@ export async function GET(req: NextRequest) {
     // Get goals from service
     const goals = await goalsService.getGoals(spaceId);
 
-    return NextResponse.json({
-      success: true,
-      data: goals,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: goals,
+      })
+    );
   } catch (error) {
     logger.error('[API] /api/goals GET error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
