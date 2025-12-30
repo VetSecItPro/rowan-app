@@ -12,8 +12,8 @@ if (isBrowser && isProduction && hasDSN) {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-    // Set tracesSampleRate to capture 10% of transactions in production
-    tracesSampleRate: 0.1,
+    // OPTIMIZATION: Dynamic sampling - 50% errors, 5% success transactions
+    tracesSampleRate: 0.05, // 5% of successful transactions
 
     // Capture Replay for 10% of all sessions,
     // plus 100% of sessions with an error
@@ -51,13 +51,31 @@ if (isBrowser && isProduction && hasDSN) {
       }),
     ],
 
-    // Performance monitoring options
+    // OPTIMIZATION: Dynamic error sampling - 50% of errors
+    beforeSend(event) {
+      // Sample 50% of error events
+      if (Math.random() > 0.5) {
+        return null;
+      }
+      return event;
+    },
+
+    // Performance monitoring options - filter non-useful transactions
     beforeSendTransaction(event) {
-      // Filter out transactions that aren't useful
+      // Filter out Next.js internal transactions
       if (event.transaction?.includes('/_next/')) {
         return null;
       }
+      // Filter out auth-related transactions (high volume, low value)
       if (event.transaction?.includes('/api/auth/')) {
+        return null;
+      }
+      // Filter out health check endpoints
+      if (event.transaction?.includes('/api/health')) {
+        return null;
+      }
+      // Filter out static asset requests
+      if (event.transaction?.match(/\.(js|css|png|jpg|svg|ico|woff|woff2)$/)) {
         return null;
       }
       return event;

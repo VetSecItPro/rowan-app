@@ -35,6 +35,8 @@ export const CACHE_PREFIXES = {
   ACTIVITY_FEED: 'activity:feed:',
   CONVERSATIONS: 'conversations:',
   GOAL_STATS: 'goal:stats:',
+  SUBSCRIPTION: 'subscription:',
+  INVOICES: 'invoices:',
 } as const;
 
 // Default TTL values (in seconds)
@@ -201,6 +203,8 @@ export const cacheKeys = {
   activityFeed: (spaceId: string, limit: number) => `${CACHE_PREFIXES.ACTIVITY_FEED}${spaceId}:${limit}`,
   conversations: (spaceId: string, userId: string) => `${CACHE_PREFIXES.CONVERSATIONS}${spaceId}:${userId}`,
   goalStats: (spaceId: string) => `${CACHE_PREFIXES.GOAL_STATS}${spaceId}`,
+  subscription: (userId: string) => `${CACHE_PREFIXES.SUBSCRIPTION}${userId}`,
+  invoices: (customerId: string) => `${CACHE_PREFIXES.INVOICES}${customerId}`,
 };
 
 /**
