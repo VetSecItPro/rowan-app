@@ -65,7 +65,15 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
         throw new Error(result.error || 'Failed to send invitation');
       }
 
-      toast.success('Invitation sent successfully');
+      // Show appropriate message based on email status
+      if (result.data.email_sent) {
+        toast.success('Invitation sent successfully!');
+      } else {
+        // Email failed but invitation was created - show warning
+        toast.warning('Invitation created, but email delivery failed. Share the link directly.', {
+          duration: 5000,
+        });
+      }
       setInvitationUrl(result.data.invitation_url);
     } catch (error) {
       logger.error('Error sending invitation:', error, { component: 'InvitePartnerModal', action: 'component_action' });

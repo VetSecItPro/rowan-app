@@ -103,37 +103,50 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date(result.data.expires_at);
     const expirationText = `${Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days`;
 
-    // Send invitation email in background (don't block response)
-    // This makes the API respond instantly while email sends asynchronously
-    sendSpaceInvitationEmail({
+    // Send invitation email with retry mechanism
+    // Await the result to ensure email is sent before responding
+    const emailResult = await sendSpaceInvitationEmail({
       recipientEmail: validatedData.email,
       inviterName: inviterData?.name || 'Someone',
       spaceName: spaceData?.name || 'a workspace',
       invitationUrl,
       expiresAt: expirationText,
-    }).then((emailResult) => {
-      if (!emailResult.success) {
-        logger.error('Failed to send invitation email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
-        Sentry.captureException(new Error(`Invitation email failed: ${emailResult.error}`), {
-          tags: { feature: 'space-invitation', email_error: true },
-          extra: {
-            recipientEmail: validatedData.email.replace(/(.{2}).*(@.*)/, '$1***$2'),
-            spaceId: validatedData.space_id,
-            timestamp: new Date().toISOString(),
-          },
-        });
-      }
-    }).catch((error) => {
-      logger.error('Email send threw exception:', error, { component: 'api-route', action: 'api_request' });
-      Sentry.captureException(error);
     });
+
+    if (!emailResult.success) {
+      logger.error('Failed to send invitation email:', undefined, {
+        component: 'api-route',
+        action: 'api_request',
+        details: emailResult.error
+      });
+      Sentry.captureException(new Error(`Invitation email failed: ${emailResult.error}`), {
+        tags: { feature: 'space-invitation', email_error: true },
+        extra: {
+          recipientEmail: validatedData.email.replace(/(.{2}).*(@.*)/, '$1***$2'),
+          spaceId: validatedData.space_id,
+          timestamp: new Date().toISOString(),
+        },
+      });
+
+      // Still return success for invitation creation, but indicate email status
+      return NextResponse.json({
+        success: true,
+        data: {
+          ...result.data,
+          invitation_url: invitationUrl,
+          email_sent: false,
+          email_error: 'Failed to send email. You can share the invitation link directly.',
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         ...result.data,
         invitation_url: invitationUrl,
-        email_sent: true, // Email is being sent asynchronously
+        email_sent: true,
+        message_id: emailResult.messageId,
       },
     });
   } catch (error) {

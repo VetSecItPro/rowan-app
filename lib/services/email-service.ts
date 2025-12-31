@@ -503,6 +503,7 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
 
 /**
  * Send a space invitation email notification
+ * OPTIMIZED: Uses retry mechanism for better delivery reliability
  */
 export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promise<EmailResult> {
   try {
@@ -511,26 +512,34 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
       return { success: false, error: 'Email service not configured' };
     }
 
+    // Pre-render email HTML before retry loop for efficiency
     const emailHtml = await render(SpaceInvitationEmail(data));
 
-    const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [data.recipientEmail],
-      subject: `You're invited to join "${data.spaceName}" on Rowan`,
-      html: emailHtml,
-      replyTo: REPLY_TO_EMAIL,
-      tags: [
-        { name: 'category', value: 'space-invitation' },
-        { name: 'inviter', value: data.inviterName },
-        { name: 'space_name', value: data.spaceName }
-      ]
-    });
+    // Use retry mechanism for better delivery reliability
+    const result = await withRetry(
+      async () => {
+        const response = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [data.recipientEmail],
+          subject: `You're invited to join "${data.spaceName}" on Rowan`,
+          html: emailHtml,
+          replyTo: REPLY_TO_EMAIL,
+          tags: [
+            { name: 'category', value: 'space-invitation' },
+            { name: 'inviter', value: data.inviterName },
+            { name: 'space_name', value: data.spaceName }
+          ]
+        });
+        if (response.error) {
+          throw new Error(response.error.message);
+        }
+        return response.data;
+      },
+      3, // max 3 retries
+      500 // start with 500ms delay (faster initial retry)
+    );
 
-    if (error) {
-      logger.error('Failed to send space invitation email:', error, { component: 'lib-email-service', action: 'service_call' });
-      return { success: false, error: error.message };
-    }
-
+    logger.info(`Space invitation email sent successfully to ${data.recipientEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`, { component: 'lib-email-service' });
     return { success: true, messageId: result?.id };
   } catch (error) {
     logger.error('Error sending space invitation email:', error, { component: 'lib-email-service', action: 'service_call' });
