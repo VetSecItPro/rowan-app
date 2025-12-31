@@ -25,10 +25,10 @@ export const apiRateLimit = redis ? new Ratelimit({
   prefix: 'rowan:api',
 }) : null;
 
-// Rate limit for authentication: 5 requests per hour (stricter)
+// Rate limit for authentication: 10 requests per hour
 export const authRateLimit = redis ? new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, '1 h'),
+  limiter: Ratelimit.slidingWindow(10, '1 h'),
   analytics: true,
   prefix: 'rowan:auth',
 }) : null;
@@ -97,10 +97,10 @@ export async function checkApiRateLimit(ip: string): Promise<{ success: boolean 
 }
 
 /**
- * Authentication rate limit: 5 requests per hour
+ * Authentication rate limit: 10 requests per hour
  */
 export async function checkAuthRateLimit(ip: string): Promise<{ success: boolean }> {
-  return checkRateLimit(ip, authRateLimit, 5, 3600000); // 1 hour = 3600000ms
+  return checkRateLimit(ip, authRateLimit, 10, 3600000); // 1 hour = 3600000ms
 }
 
 /**
