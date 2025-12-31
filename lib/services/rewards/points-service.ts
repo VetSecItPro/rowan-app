@@ -46,7 +46,7 @@ export const pointsService = {
 
     // Log fetch error if it's not just "no rows"
     if (fetchError) {
-      logger.warn('Error fetching points record:', fetchError, { component: 'points-service', action: 'service_call' });
+      logger.warn('Error fetching points record: ' + fetchError.message, { component: 'points-service', action: 'service_call' });
     }
 
     // Create new record if not exists
