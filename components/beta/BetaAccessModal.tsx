@@ -139,7 +139,8 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
       }
 
       if (data.success) {
-        onSuccess(data.invite_code_id);
+        // Pass the actual invite code (not just the ID) so it can be used in signup URL
+        onSuccess(inviteCode);
         onClose();
       } else {
         setError(data.error || 'Invalid invite code');

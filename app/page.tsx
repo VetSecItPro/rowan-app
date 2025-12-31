@@ -180,8 +180,12 @@ export default function HomePage() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
-  const handleBetaSuccess = () => {
-    router.push('/signup?beta=true');
+  const handleBetaSuccess = (inviteCode?: string) => {
+    if (inviteCode) {
+      router.push(`/signup?beta_code=${encodeURIComponent(inviteCode)}`);
+    } else {
+      router.push('/signup');
+    }
   };
 
   return (
