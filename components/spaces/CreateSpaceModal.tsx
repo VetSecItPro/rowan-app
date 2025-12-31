@@ -82,9 +82,9 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
             <button
               onClick={onClose}
               aria-label="Close modal"
-              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
+              className="p-1 flex items-center justify-center hover:opacity-70 transition-opacity"
             >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>

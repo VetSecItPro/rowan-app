@@ -46,7 +46,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Users and spaces
     maxUsers: 2,
-    maxSpaces: 1,
+    maxSpaces: 1,  // Free tier: 1 space
 
     // Storage
     storageGB: 0.5,
@@ -90,7 +90,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Users and spaces
     maxUsers: 2,
-    maxSpaces: 1,
+    maxSpaces: 2,  // Pro tier: 2 spaces
 
     // Storage
     storageGB: 2,
@@ -134,7 +134,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Users and spaces
     maxUsers: 6,
-    maxSpaces: 1,
+    maxSpaces: 3,  // Family tier: 3 spaces
 
     // Storage
     storageGB: 5,

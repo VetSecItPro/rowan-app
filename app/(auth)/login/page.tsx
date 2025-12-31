@@ -76,16 +76,22 @@ export default function LoginPage() {
             setShowRestoreModal(true);
             setIsLoading(false);
           } else {
-            // Account is not marked for deletion - proceed to dashboard
+            // Account is not marked for deletion - proceed to redirect or dashboard
             setTimeout(() => {
-              window.location.href = '/dashboard';
+              // Check for redirect parameter (e.g., from invitation signup flow)
+              const redirectTo = params?.redirect ? decodeURIComponent(params.redirect) : '/dashboard';
+              // Validate redirect is internal (security: prevent open redirect)
+              const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
+              window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
             }, 500);
           }
         } catch (checkError) {
           logger.error('Error checking deletion status:', checkError, { component: 'page', action: 'execution' });
-          // If check fails, proceed to dashboard anyway (don't block login)
+          // If check fails, proceed to redirect or dashboard anyway (don't block login)
           setTimeout(() => {
-            window.location.href = '/dashboard';
+            const redirectTo = params?.redirect ? decodeURIComponent(params.redirect) : '/dashboard';
+            const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
+            window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
           }, 500);
         }
       }

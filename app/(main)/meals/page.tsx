@@ -139,13 +139,13 @@ const CalendarDayCell = memo(({
             </button>
           );
         })}
-        {dayMeals.length === 0 && isCurrentMonth && (
-          <div className="flex justify-center">
+        {isCurrentMonth && (
+          <div className="flex justify-center mt-1">
             <button
               onClick={onAddClick}
-              className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-[9px] rounded transition-all shadow-sm"
+              className="px-2 py-1 text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-[10px] rounded transition-all"
             >
-              Add Meal
+              + Add Meal
             </button>
           </div>
         )}
@@ -1114,7 +1114,7 @@ export default function MealsPage() {
               </div>
             )}
 
-            <div className={viewMode === 'calendar' ? 'h-[600px] overflow-y-auto' : 'max-h-[600px] overflow-y-auto'}>
+            <div>
               {loading ? (
                 viewMode === 'recipes' ? (
                   /* Loading Skeletons for Recipes */

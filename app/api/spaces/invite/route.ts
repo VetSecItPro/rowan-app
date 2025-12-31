@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
       logger.info('Could not fetch inviter name due to permissions, using fallback', { component: 'api-route' });
     }
 
+    // Invitation URL - the token itself serves as signup authorization for invited users
     const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
 
     // Format expiration date for email

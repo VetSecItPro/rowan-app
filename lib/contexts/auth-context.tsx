@@ -41,7 +41,7 @@ interface AuthContextType {
   error: string | null;
 
   // Authentication methods
-  signUp: (email: string, password: string, profile: any, betaCode?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, profile: any, betaCode?: string, inviteToken?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -80,7 +80,7 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   }, [handleAuthStateChange]);
 
   // Authentication methods
-  const signUp = async (email: string, password: string, profile: any, betaCode?: string) => {
+  const signUp = async (email: string, password: string, profile: any, betaCode?: string, inviteToken?: string) => {
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -92,7 +92,9 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
           password,
           profile,
           // Include beta_code if provided (marks code as used after successful signup)
-          ...(betaCode && { beta_code: betaCode })
+          ...(betaCode && { beta_code: betaCode }),
+          // Include invite_token for users signing up via space invitation
+          ...(inviteToken && { invite_token: inviteToken })
         })
       });
 

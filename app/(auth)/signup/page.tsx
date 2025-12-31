@@ -28,16 +28,22 @@ export default function SignUpPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get beta code from URL params (e.g., /signup?beta_code=XXXX-XXXX-XXXX)
+  // Get beta code OR invite token from URL params
+  // beta_code: /signup?beta_code=XXXX-XXXX-XXXX (original beta users)
+  // invite_token: /signup?invite_token=xyz (users invited to a space)
   const betaCode = searchParams.get('beta_code');
+  const inviteToken = searchParams.get('invite_token');
 
-  // BETA PERIOD: Redirect to landing page if no beta code provided
-  // Users must have a valid invite code to access signup
+  // Either beta_code or invite_token is valid for signup
+  const hasValidAuth = !!(betaCode || inviteToken);
+
+  // BETA PERIOD: Redirect to landing page if no valid authorization
+  // Users must have either a beta code OR an invitation token
   useEffect(() => {
-    if (!betaCode) {
+    if (!hasValidAuth) {
       router.replace('/?error=beta_required');
     }
-  }, [betaCode, router]);
+  }, [hasValidAuth, router]);
 
   // Smooth fade-in animation on mount
   useEffect(() => {
@@ -45,8 +51,8 @@ export default function SignUpPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Don't render form if no beta code (redirect will happen)
-  if (!betaCode) {
+  // Don't render form if no authorization (redirect will happen)
+  if (!hasValidAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
@@ -168,7 +174,9 @@ export default function SignUpPage() {
 
     setIsLoading(true);
 
-    // Pass beta code if present (from URL params) - marks code as used after successful signup
+    // Pass beta code OR invite token (from URL params)
+    // - beta_code: for original beta users (marks code as used)
+    // - invite_token: for users invited to a space (validates against space_invitations)
     const { error } = await signUp(
       email,
       password,
@@ -178,7 +186,8 @@ export default function SignUpPage() {
         space_name: spaceName,
         marketing_emails_enabled: emailOptIn,
       },
-      betaCode || undefined
+      betaCode || undefined,
+      inviteToken || undefined
     );
 
     if (error) {
@@ -206,8 +215,17 @@ export default function SignUpPage() {
       setTimeout(async () => {
         // Sign out the user to force them to log in again (bot prevention)
         await signOut();
-        // Redirect to login page
-        router.push('/login?registered=true');
+
+        // If user signed up via invitation, redirect to login with a hint to accept invitation
+        // The invitation will be accepted after they log in
+        // NOTE: The redirect URL must be URL-encoded to preserve the token parameter
+        if (inviteToken) {
+          const redirectUrl = `/invitations/accept?token=${encodeURIComponent(inviteToken)}`;
+          router.push(`/login?registered=true&redirect=${encodeURIComponent(redirectUrl)}`);
+        } else {
+          // Regular signup - just go to login
+          router.push('/login?registered=true');
+        }
       }, 2000);
     }
   };

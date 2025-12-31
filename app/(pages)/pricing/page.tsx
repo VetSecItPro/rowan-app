@@ -164,6 +164,7 @@ export default function PricingPage() {
                 'Photo uploads (trial)',
                 'Meal planning (trial)',
                 'Goals & milestones (trial)',
+                '1 space',
                 '2 household members',
                 'Falls back to free tier after trial',
               ]}
@@ -190,6 +191,7 @@ export default function PricingPage() {
                 'Goals & milestones',
                 'Household management',
                 'Real-time collaboration',
+                '2 spaces',
                 '2 household members',
               ]}
               cta="Upgrade to Pro"
@@ -209,6 +211,7 @@ export default function PricingPage() {
               period={period}
               features={[
                 'Everything in Pro, plus:',
+                '3 spaces (vs 2)',
                 '6 household members (vs 2)',
                 '5GB storage (vs 2GB)',
                 'AI features',
