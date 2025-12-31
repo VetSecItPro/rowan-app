@@ -31,11 +31,31 @@ export default function SignUpPage() {
   // Get beta code from URL params (e.g., /signup?beta_code=XXXX-XXXX-XXXX)
   const betaCode = searchParams.get('beta_code');
 
+  // BETA PERIOD: Redirect to landing page if no beta code provided
+  // Users must have a valid invite code to access signup
+  useEffect(() => {
+    if (!betaCode) {
+      router.replace('/?error=beta_required');
+    }
+  }, [betaCode, router]);
+
   // Smooth fade-in animation on mount
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  // Don't render form if no beta code (redirect will happen)
+  if (!betaCode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   const colorThemes = [
     { value: 'emerald', label: 'Emerald' },
@@ -193,8 +213,28 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex transition-all duration-500">
-      {/* Left side - Branding */}
+    <div className="min-h-screen flex flex-col lg:flex-row transition-all duration-500">
+      {/* Mobile Header - Green section with logo */}
+      <div
+        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${
+          mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+        }`}
+      >
+        <Link href="/" className="flex flex-col items-center group">
+          <Image
+            src="/rowan-logo.png"
+            alt="Rowan Logo"
+            width={72}
+            height={72}
+            className="w-18 h-18 drop-shadow-2xl group-hover:scale-105 transition-transform duration-200"
+          />
+          <span className="mt-2 text-2xl font-bold text-white drop-shadow-lg">
+            Rowan
+          </span>
+        </Link>
+      </div>
+
+      {/* Desktop Left side - Branding */}
       <div
         className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${
           mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
@@ -203,19 +243,19 @@ export default function SignUpPage() {
 
         {/* Logo and branding */}
         <div className="relative z-10 text-center">
-          {/* Logo and Rowan inline */}
-          <div className="flex items-center justify-center gap-4 mb-8">
+          {/* Logo and Rowan inline - Clickable to homepage */}
+          <Link href="/" className="flex items-center justify-center gap-4 mb-8 group">
             <Image
               src="/rowan-logo.png"
               alt="Rowan Logo"
               width={120}
               height={120}
-              className="w-28 h-28 drop-shadow-2xl"
+              className="w-28 h-28 drop-shadow-2xl group-hover:scale-105 transition-transform duration-200"
             />
-            <h1 className="text-6xl xl:text-7xl font-bold text-white drop-shadow-lg">
+            <h1 className="text-6xl xl:text-7xl font-bold text-white drop-shadow-lg group-hover:scale-105 transition-transform duration-200">
               Rowan
             </h1>
-          </div>
+          </Link>
           <p className="text-lg xl:text-xl text-emerald-100 dark:text-emerald-200 mb-8 text-center px-4">
             Collaborative life management for couples and families
           </p>
@@ -238,25 +278,11 @@ export default function SignUpPage() {
 
       {/* Right side - Sign up form */}
       <div
-        className={`w-full lg:w-1/2 bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 sm:p-8 overflow-y-auto transform transition-all duration-700 ${
+        className={`flex-1 lg:w-1/2 bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 sm:p-8 overflow-y-auto transform transition-all duration-700 ${
           mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
         }`}
       >
         <div className="w-full max-w-md py-8">
-          {/* Mobile logo with link to homepage */}
-          <Link href="/" className="lg:hidden flex flex-col items-center mb-8 group">
-            <Image
-              src="/rowan-logo.png"
-              alt="Rowan Logo"
-              width={64}
-              height={64}
-              className="w-16 h-16 group-hover:scale-105 transition-transform duration-200"
-            />
-            <span className="mt-2 text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-              Rowan
-            </span>
-          </Link>
-
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

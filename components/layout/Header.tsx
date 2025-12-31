@@ -14,17 +14,28 @@ import { useSpaces } from '@/lib/contexts/spaces-context';
 import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus, TestTube } from 'lucide-react';
 import { hasAdminAccess } from '@/lib/utils/admin-utils';
 
+// Beta period end date - Feb 15, 2026
+const BETA_END_DATE = new Date('2026-02-15T23:59:59Z');
+
 // Helper to check beta tester status
+// All users created before Feb 15, 2026 are beta testers
 const isBetaTester = (user: {
   is_beta_tester?: boolean;
   beta_status?: string;
   beta_invite_code_id?: string;
   beta_ends_at?: string;
+  created_at?: string;
 } | null) => {
   if (!user) return false;
-  // Check legacy flag
+
+  // BETA PERIOD: All users created before Feb 15, 2026 are beta testers
+  if (user.created_at) {
+    const createdAt = new Date(user.created_at);
+    if (createdAt < BETA_END_DATE) return true;
+  }
+
+  // Legacy checks (for backward compatibility)
   if (user.is_beta_tester && user.beta_status === 'approved') return true;
-  // Check new invite code system - has valid beta access
   if (user.beta_invite_code_id && user.beta_ends_at) {
     const endsAt = new Date(user.beta_ends_at);
     return endsAt > new Date();
@@ -196,7 +207,7 @@ export function Header() {
             {user ? (
               <Link
                 href="/dashboard"
-                className={`hidden md:flex items-center gap-2 px-4 py-2 ${user.color_theme ? `shimmer-theme-${user.color_theme}` : 'shimmer-bg'} text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95`}
+                className="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded-full transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -206,26 +217,26 @@ export function Header() {
             ) : (
               <Link
                 href="/signup"
-                className="hidden md:flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full hover:opacity-90 transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
+                className="hidden md:flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
               >
                 Create Your Account
               </Link>
             )}
 
-            {/* Admin/Beta Tester Badge - inline in header */}
+            {/* Admin/Beta Tester Badge - visible on all screen sizes */}
             {user && (hasAdminAccess(user) || isBetaTester(user)) && (
-              <div className="hidden sm:flex">
+              <div className="flex">
                 {hasAdminAccess(user) ? (
                   <Link
                     href="/admin/dashboard"
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 rounded-full text-xs font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+                    className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 rounded-full text-[10px] sm:text-xs font-medium hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
                   >
-                    <Shield className="w-3 h-3" />
-                    <span>Admin</span>
+                    <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                    <span className="hidden sm:inline">Admin</span>
                   </Link>
                 ) : (
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium">
-                    <TestTube className="w-3 h-3" />
+                  <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-full text-[10px] sm:text-xs font-medium">
+                    <TestTube className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                     <span>Beta</span>
                   </div>
                 )}
@@ -238,7 +249,7 @@ export function Header() {
                 <button
                   ref={buttonRef}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full text-white font-semibold transition-all hover:opacity-90 active:scale-95 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'
                   }`}
                 >
@@ -248,17 +259,17 @@ export function Header() {
                       alt={user.name || 'User'}
                       width={24}
                       height={24}
-                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-white/20"
-                      sizes="28px"
+                      className="w-6 h-6 rounded-full object-cover border border-white/20"
+                      sizes="24px"
                       priority
                     />
                   ) : (
-                    <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
+                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
                       {(user.name || 'U').charAt(0).toUpperCase()}
                     </div>
                   )}
                   <span className="hidden sm:inline text-sm truncate max-w-[100px]">{user.name}</span>
-                  <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu - Rendered via portal for proper positioning on mobile */}

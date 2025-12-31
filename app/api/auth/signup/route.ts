@@ -65,11 +65,10 @@ export async function POST(request: NextRequest) {
             .trim(),
           marketing_emails_enabled: z.boolean().optional(),
         }),
-        // Beta invite code - optional, used during beta period
+        // Beta invite code - REQUIRED during beta period (until Feb 15, 2026)
         beta_code: z.string()
-          .min(8, 'Invalid beta code')
-          .max(20, 'Invalid beta code')
-          .optional(),
+          .min(8, 'A valid beta invite code is required to sign up')
+          .max(20, 'Invalid beta code format'),
       });
     }
 
@@ -111,6 +110,47 @@ export async function POST(request: NextRequest) {
       name: sanitizePlainText(validated.profile.name),
       space_name: validated.profile.space_name ? sanitizePlainText(validated.profile.space_name) : undefined,
     };
+
+    // BETA PERIOD: Validate beta invite code BEFORE creating user
+    // This ensures only users with valid invite codes can sign up
+    const normalizedBetaCode = validated.beta_code.replace(/-/g, '').toUpperCase().trim();
+
+    const { data: betaCodeData, error: betaCodeError } = await supabaseServerClient
+      .from('beta_invite_codes')
+      .select('id, code, used_by, expires_at, is_active')
+      .or(`code.eq.${validated.beta_code},code.eq.${normalizedBetaCode}`)
+      .single();
+
+    if (betaCodeError || !betaCodeData) {
+      return NextResponse.json(
+        { error: 'Invalid beta invite code. Please check your code and try again.' },
+        { status: 400 }
+      );
+    }
+
+    // Check if code is already used
+    if (betaCodeData.used_by) {
+      return NextResponse.json(
+        { error: 'This beta invite code has already been used.' },
+        { status: 400 }
+      );
+    }
+
+    // Check if code is active
+    if (!betaCodeData.is_active) {
+      return NextResponse.json(
+        { error: 'This beta invite code is no longer active.' },
+        { status: 400 }
+      );
+    }
+
+    // Check if code has expired
+    if (betaCodeData.expires_at && new Date(betaCodeData.expires_at) < new Date()) {
+      return NextResponse.json(
+        { error: 'This beta invite code has expired.' },
+        { status: 400 }
+      );
+    }
 
     // Create Supabase client (runtime only)
     let supabase;
