@@ -98,11 +98,14 @@ export async function GET(req: NextRequest) {
     }
 
     // Create a map of user_id to user details
-    const userMap = new Map((users || []).map((u: any) => [u.id, u]));
+    type UserDetails = { id: string; name: string | null; email: string | null; color_theme: string | null };
+    const userMap = new Map<string, UserDetails>(
+      (users || []).map((u: UserDetails) => [u.id, u])
+    );
 
     // Transform data for frontend
     // Use user_id as the identifier since space_members has no id column
-    const transformedMembers = members.map((member: any) => {
+    const transformedMembers = members.map((member: { user_id: string; role: string; joined_at: string }) => {
       const user = userMap.get(member.user_id);
       return {
         id: member.user_id, // Use user_id as identifier for frontend compatibility
