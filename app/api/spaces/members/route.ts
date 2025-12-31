@@ -166,7 +166,7 @@ export async function PUT(req: NextRequest) {
 
     if (!validated.success) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: validated.error.errors },
+        { error: 'Invalid request data', details: validated.error.issues },
         { status: 400 }
       );
     }
@@ -281,7 +281,7 @@ export async function DELETE(req: NextRequest) {
 
     if (!validated.success) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: validated.error.errors },
+        { error: 'Invalid request data', details: validated.error.issues },
         { status: 400 }
       );
     }
