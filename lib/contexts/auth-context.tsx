@@ -41,7 +41,7 @@ interface AuthContextType {
   error: string | null;
 
   // Authentication methods
-  signUp: (email: string, password: string, profile: any) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, profile: any, betaCode?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -80,14 +80,20 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   }, [handleAuthStateChange]);
 
   // Authentication methods
-  const signUp = async (email: string, password: string, profile: any) => {
+  const signUp = async (email: string, password: string, profile: any, betaCode?: string) => {
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password, profile })
+        body: JSON.stringify({
+          email,
+          password,
+          profile,
+          // Include beta_code if provided (marks code as used after successful signup)
+          ...(betaCode && { beta_code: betaCode })
+        })
       });
 
       const data = await response.json();

@@ -65,6 +65,11 @@ export async function POST(request: NextRequest) {
             .trim(),
           marketing_emails_enabled: z.boolean().optional(),
         }),
+        // Beta invite code - optional, used during beta period
+        beta_code: z.string()
+          .min(8, 'Invalid beta code')
+          .max(20, 'Invalid beta code')
+          .optional(),
       });
     }
 
@@ -330,6 +335,28 @@ export async function POST(request: NextRequest) {
       // Non-critical - don't fail signup if linking fails
     } catch {
       // Non-critical - beta access linking is optional
+    }
+
+    // Mark beta invite code as used (only after ALL signup steps complete successfully)
+    // This ensures the code isn't wasted if signup fails partway through
+    if (validated.beta_code) {
+      try {
+        // Normalize the code (remove dashes, uppercase) to match stored format
+        const normalizedCode = validated.beta_code.replace(/-/g, '').toUpperCase().trim();
+
+        await supabaseServerClient
+          .from('beta_invite_codes')
+          .update({
+            used_by: userId,
+            used_at: new Date().toISOString(),
+          })
+          .or(`code.eq.${validated.beta_code},code.eq.${normalizedCode}`)
+          .is('used_by', null); // Only update if not already used
+
+        // Non-critical - don't fail signup if code marking fails
+      } catch {
+        // Non-critical - beta code marking is optional
+      }
     }
 
     // Success response

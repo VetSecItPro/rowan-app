@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -26,6 +26,10 @@ export default function SignUpPage() {
   const [emailOptIn, setEmailOptIn] = useState(false);
   const { signUp, signOut } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get beta code from URL params (e.g., /signup?beta_code=XXXX-XXXX-XXXX)
+  const betaCode = searchParams.get('beta_code');
 
   // Smooth fade-in animation on mount
   useEffect(() => {
@@ -144,12 +148,18 @@ export default function SignUpPage() {
 
     setIsLoading(true);
 
-    const { error } = await signUp(email, password, {
-      name,
-      color_theme: colorTheme,
-      space_name: spaceName,
-      marketing_emails_enabled: emailOptIn,
-    });
+    // Pass beta code if present (from URL params) - marks code as used after successful signup
+    const { error } = await signUp(
+      email,
+      password,
+      {
+        name,
+        color_theme: colorTheme,
+        space_name: spaceName,
+        marketing_emails_enabled: emailOptIn,
+      },
+      betaCode || undefined
+    );
 
     if (error) {
       // Handle specific error cases with user-friendly messages
