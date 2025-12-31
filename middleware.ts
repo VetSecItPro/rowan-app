@@ -394,7 +394,7 @@ export async function middleware(req: NextRequest) {
     response.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com; " +
       "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
       "img-src 'self' data: https: blob:; " +
       "font-src 'self' data: https:; " +
