@@ -301,9 +301,9 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                     <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">No meals planned</p>
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="px-4 py-2 text-orange-600 dark:text-orange-400 border border-orange-300 dark:border-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 text-sm font-medium rounded-lg transition-all"
+                      className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-sm font-medium rounded-lg transition-all"
                     >
-                      Add Meal
+                      + Add Meal
                     </button>
                   </div>
                 )}
@@ -396,9 +396,9 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                   <div className="flex flex-col items-center justify-center py-8 text-center">
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="px-3 py-1.5 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 text-xs rounded-lg transition-all"
+                      className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-xs rounded-lg transition-all"
                     >
-                      Add Meal
+                      + Add Meal
                     </button>
                   </div>
                 )}
@@ -408,9 +408,9 @@ export const WeekCalendarView = memo(function WeekCalendarView({
               {dayMeals.length > 0 && (
                 <button
                   onClick={() => onAddMeal(day)}
-                  className="w-full mt-2 py-1.5 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all flex items-center justify-center"
+                  className="w-full mt-2 py-1.5 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-400 dark:text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all flex items-center justify-center"
                 >
-                  Add Meal
+                  + Add
                 </button>
               )}
             </div>

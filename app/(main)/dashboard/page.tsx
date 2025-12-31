@@ -1613,32 +1613,32 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Mode Toggle - Matches Tasks Page Pattern */}
-                <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-1.5 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-lg sm:rounded-xl border border-pink-200 dark:border-pink-700">
+                {/* Mode Toggle - Compact Pill Design */}
+                <div className="flex items-center gap-0.5 p-0.5 bg-gray-100 dark:bg-gray-800/50 rounded-full border border-gray-200 dark:border-gray-700">
                   <Tooltip content="Record your mood and share highlights">
                     <button
                       onClick={() => setViewMode('checkin')}
-                      className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
+                      className={`px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all text-xs font-medium ${
                         viewMode === 'checkin'
-                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                       }`}
                     >
-                      <Heart className="w-4 h-4" />
-                      <span className="text-xs sm:text-sm">Check In</span>
+                      <Heart className="w-3 h-3" />
+                      <span>Check In</span>
                     </button>
                   </Tooltip>
                   <Tooltip content="View your mood history and insights">
                     <button
                       onClick={() => setViewMode('journal')}
-                      className={`px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-all font-medium ${
+                      className={`px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all text-xs font-medium ${
                         viewMode === 'journal'
-                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-sm'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                       }`}
                     >
-                      <Sparkles className="w-4 h-4" />
-                      <span className="text-xs sm:text-sm">Journal</span>
+                      <Sparkles className="w-3 h-3" />
+                      <span>Journal</span>
                     </button>
                   </Tooltip>
                 </div>
@@ -1665,9 +1665,9 @@ export default function DashboardPage() {
                       </Tooltip>
                     ) : (
                       <Tooltip content="Start your check-in streak today!">
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
-                          <Zap className="w-3.5 h-3.5 text-orange-500" />
-                          <span className="text-xs text-gray-600 dark:text-gray-400">start streak</span>
+                        <div className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help whitespace-nowrap">
+                          <Zap className="w-3 h-3 text-orange-500 flex-shrink-0" />
+                          <span className="text-xs text-gray-600 dark:text-gray-400">Start Streak</span>
                         </div>
                       </Tooltip>
                     )}

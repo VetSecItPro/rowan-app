@@ -39,7 +39,7 @@ const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseEventProposals: false,
     realtimeSyncDelay: 5000,
     maxUsers: 2,
-    maxSpaces: 1,
+    maxSpaces: 1,  // Free tier: 1 space
   },
   pro: {
     maxActiveTasks: Infinity,
@@ -61,7 +61,7 @@ const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseEventProposals: true,
     realtimeSyncDelay: 0,
     maxUsers: 2,
-    maxSpaces: 1,
+    maxSpaces: 2,  // Pro tier: 2 spaces
     storageGB: 5,
   },
   family: {
@@ -84,7 +84,7 @@ const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseEventProposals: true,
     realtimeSyncDelay: 0,
     maxUsers: 6,
-    maxSpaces: 3,
+    maxSpaces: 3,  // Family tier: 3 spaces
     storageGB: 15,
     prioritySupport: true,
   },

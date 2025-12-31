@@ -8,12 +8,12 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Check, X, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
-import { useValidatedSearchParams, TokenParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
+import { useValidatedSearchParams, InvitationAcceptParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { logger } from '@/lib/logger';
 
 function AcceptInvitationContent() {
   const router = useRouter();
-  const { params, error: validationError } = useValidatedSearchParams(TokenParamsSchema);
+  const { params, error: validationError } = useValidatedSearchParams(InvitationAcceptParamsSchema);
   const token = params?.token;
 
   const [loading, setLoading] = useState(true);
@@ -42,8 +42,9 @@ function AcceptInvitationContent() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        // Redirect to login with return URL
-        router.push(`/login?redirect=/invitations/accept?token=${token}`);
+        // Redirect to signup with invitation token - this allows new users to sign up
+        // The invite_token serves as authorization instead of requiring a beta code
+        router.push(`/signup?invite_token=${encodeURIComponent(token)}`);
         return;
       }
 
