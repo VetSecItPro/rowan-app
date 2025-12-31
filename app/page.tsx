@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { CheckSquare, Calendar, Bell, MessageCircle, ShoppingCart, UtensilsCrossed, Home, Target, ArrowRight, Sparkles, Users, Zap, Shield, Sun, Download, Smartphone, Monitor, Share, Plus } from 'lucide-react';
+import { CheckSquare, Calendar, Bell, MessageCircle, ShoppingCart, UtensilsCrossed, Home, Target, ArrowRight, Compass, Users, Zap, Shield, Sun, Download, Smartphone, Monitor, Share, Plus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -106,7 +106,7 @@ const benefits = [
     gradient: "from-purple-500 to-violet-500"
   },
   {
-    icon: Sparkles,
+    icon: Compass,
     title: "Beautifully Simple",
     description: "Intuitive design that makes managing life feel effortless",
     gradient: "from-orange-500 to-amber-500"
@@ -180,8 +180,12 @@ export default function HomePage() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
-  const handleBetaSuccess = () => {
-    router.push('/signup?beta=true');
+  const handleBetaSuccess = (inviteCode?: string) => {
+    if (inviteCode) {
+      router.push(`/signup?beta_code=${encodeURIComponent(inviteCode)}`);
+    } else {
+      router.push('/signup');
+    }
   };
 
   return (
@@ -253,7 +257,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6 }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 border border-blue-500/20 dark:border-blue-500/30"
               >
-                <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
                   Your Life Management Hub
                 </span>
@@ -315,7 +319,7 @@ export default function HomePage() {
                 </button>
                 <button
                   onClick={() => setIsLaunchModalOpen(true)}
-                  className="px-6 sm:px-8 py-3.5 sm:py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 text-gray-900 dark:text-white rounded-full font-semibold text-sm sm:text-base transition-all border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:scale-105 active:scale-95 text-center"
+                  className="px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white rounded-full font-semibold text-sm sm:text-base transition-all shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:scale-105 active:scale-95 text-center"
                 >
                   Get Notified on Launch
                 </button>

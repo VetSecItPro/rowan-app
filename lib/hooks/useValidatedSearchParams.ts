@@ -71,6 +71,22 @@ export const TokenParamsSchema = z.object({
 });
 
 /**
+ * Schema for invitation accept page
+ * Includes both the invitation token and optional beta code for new user signup
+ */
+export const InvitationAcceptParamsSchema = z.object({
+  token: z.string()
+    .min(1, 'Token is required')
+    .max(500, 'Token too long')
+    .regex(/^[a-zA-Z0-9_\-\.]+$/, 'Invalid token format')
+    .optional(),
+  code: z.string()
+    .max(50, 'Code too long')
+    .regex(/^[a-zA-Z0-9\-]+$/, 'Invalid code format')
+    .optional(),
+});
+
+/**
  * Schema for OAuth/auth callback pages
  * Used by: reset-password, magic link
  */
@@ -152,6 +168,7 @@ export const UpgradeParamsSchema = z.object({
 
 // Type exports for convenience
 export type TokenParams = z.infer<typeof TokenParamsSchema>;
+export type InvitationAcceptParams = z.infer<typeof InvitationAcceptParamsSchema>;
 export type AuthCallbackParams = z.infer<typeof AuthCallbackParamsSchema>;
 export type LoginParams = z.infer<typeof LoginParamsSchema>;
 export type PaymentSuccessParams = z.infer<typeof PaymentSuccessParamsSchema>;

@@ -56,6 +56,14 @@ export function TrialStatusBanner({
     onDismiss?.();
   };
 
+  // BETA PERIOD: Hide trial banner entirely until Feb 15, 2026
+  // All users during beta have full access - no upgrade pressure needed
+  const BETA_END_DATE = new Date('2026-02-15T23:59:59Z');
+  const isInBetaPeriod = new Date() < BETA_END_DATE;
+  if (isInBetaPeriod) {
+    return null;
+  }
+
   // Don't show if loading, beta tester, user has paid subscription, or dismissed
   // Beta testers have access until Feb 15, 2026 - no upgrade pressure needed
   if (isLoading || isBetaTester || tier === 'pro' || tier === 'family' || isDismissed) {
@@ -225,6 +233,14 @@ export function TrialBadge() {
   }
 
   const { isInTrial, trialDaysRemaining, hasTrialExpired, tier, isLoading, isBetaTester } = subscription;
+
+  // BETA PERIOD: Hide trial badge entirely until Feb 15, 2026
+  // All users during beta have full access - no upgrade pressure needed
+  const BETA_END_DATE = new Date('2026-02-15T23:59:59Z');
+  const isInBetaPeriod = new Date() < BETA_END_DATE;
+  if (isInBetaPeriod) {
+    return null;
+  }
 
   // Beta testers have access until Feb 15, 2026 - no upgrade badge needed
   if (isLoading || isBetaTester || tier === 'pro' || tier === 'family') {

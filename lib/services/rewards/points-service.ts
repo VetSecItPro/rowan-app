@@ -32,16 +32,21 @@ export const pointsService = {
   async getOrCreatePointsRecord(userId: string, spaceId: string): Promise<RewardPoints> {
     const supabase = createClient();
 
-    // Try to get existing record
+    // Try to get existing record (use maybeSingle to avoid 406 error when no rows)
     const { data: existing, error: fetchError } = await supabase
       .from('reward_points')
       .select('*')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
-      .single();
+      .maybeSingle();
 
-    if (existing && !fetchError) {
+    if (existing) {
       return existing;
+    }
+
+    // Log fetch error if it's not just "no rows"
+    if (fetchError) {
+      logger.warn('Error fetching points record: ' + fetchError.message, { component: 'points-service', action: 'service_call' });
     }
 
     // Create new record if not exists
@@ -434,13 +439,13 @@ export const pointsService = {
     for (const member of members) {
       const user = member.users as { id: string; name: string; avatar_url: string | null };
 
-      // Get points record
+      // Get points record (use maybeSingle to handle users without records)
       const { data: pointsRecord } = await supabase
         .from('reward_points')
         .select('*')
         .eq('user_id', user.id)
         .eq('space_id', spaceId)
-        .single();
+        .maybeSingle();
 
       // Get period transactions
       const { data: periodTx } = await supabase

@@ -235,8 +235,12 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith(path)
   );
 
+  // Exception: /invitations/accept must be accessible to unauthenticated users
+  // so the page can redirect them to signup with their invite_token
+  const isInvitationAcceptPath = req.nextUrl.pathname === '/invitations/accept';
+
   // Redirect to login if accessing protected route without session
-  if (isProtectedPath && !session) {
+  if (isProtectedPath && !session && !isInvitationAcceptPath) {
     const redirectUrl = new URL('/login', req.url);
     redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
