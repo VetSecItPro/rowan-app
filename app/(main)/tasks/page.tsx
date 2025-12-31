@@ -241,21 +241,16 @@ export default function TasksPage() {
       // Get tasks from realtime hook for shopping list integration
       const tasksData = realtimeTasks;
 
-      // Load linked shopping lists for tasks
-      const linkedListsMap: Record<string, any> = {};
-      await Promise.all(
-        tasksData.map(async (task) => {
-          try {
-            const linkedLists = await shoppingIntegrationService.getShoppingListsForTask(task.id);
-            if (linkedLists && linkedLists.length > 0) {
-              linkedListsMap[task.id] = linkedLists[0]; // For now, just take the first linked list
-            }
-          } catch (error) {
-            logger.error(`Failed to load shopping list for task ${task.id}`, error, { component: 'page', action: 'load_shopping_lists' });
-          }
-        })
-      );
-      setLinkedShoppingLists(linkedListsMap);
+      // Load linked shopping lists for all tasks in a single batch query
+      // This replaces N individual queries with 1 query
+      try {
+        const taskIds = tasksData.map(task => task.id);
+        const linkedListsMap = await shoppingIntegrationService.getShoppingListsForTasks(taskIds);
+        setLinkedShoppingLists(linkedListsMap);
+      } catch (error) {
+        logger.error('Failed to load shopping lists for tasks', error, { component: 'page', action: 'load_shopping_lists' });
+        setLinkedShoppingLists({});
+      }
 
     } catch (error) {
       logger.error('Failed to load data', error, { component: 'page', action: 'load_data' });
