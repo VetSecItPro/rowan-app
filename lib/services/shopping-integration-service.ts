@@ -113,6 +113,42 @@ export const shoppingIntegrationService = {
     }));
   },
 
+  /**
+   * Batch fetch shopping lists for multiple tasks in a single query
+   * This replaces N individual queries with 1 query using .in() filter
+   * @param taskIds Array of task IDs to fetch linked shopping lists for
+   * @returns Map of taskId -> first linked shopping list (or undefined)
+   */
+  async getShoppingListsForTasks(taskIds: string[]): Promise<Record<string, { id: string; title: string; items_count: number } | undefined>> {
+    if (taskIds.length === 0) {
+      return {};
+    }
+
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('shopping_tasks')
+      .select('task_id, list_id, list:shopping_lists(id, title, items:shopping_items(id))')
+      .in('task_id', taskIds);
+
+    if (error) throw error;
+
+    // Group by task_id and take first linked list for each task
+    const result: Record<string, { id: string; title: string; items_count: number } | undefined> = {};
+
+    (data || []).forEach((item: any) => {
+      // Only set if we haven't seen this task yet (take first list)
+      if (item.task_id && !result[item.task_id] && item.list) {
+        result[item.task_id] = {
+          id: item.list.id,
+          title: item.list.title,
+          items_count: item.list.items?.length || 0,
+        };
+      }
+    });
+
+    return result;
+  },
+
   // Reminders Integration
   async linkToReminder(reminderId: string, listId?: string, itemId?: string, triggerType: 'time' | 'location' = 'time') {
     const supabase = createClient();

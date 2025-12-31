@@ -635,6 +635,63 @@ export async function deleteWebhookSubscription(
 // =============================================================================
 
 /**
+ * Convert Outlook event to Rowan event data format
+ */
+function mapOutlookEventToRowan(
+  event: OutlookCalendarEvent,
+  spaceId: string
+): {
+  space_id: string;
+  title: string;
+  description: string | null;
+  start_time: string;
+  end_time: string;
+  location: string | null;
+  all_day: boolean;
+  timezone: string | null;
+  is_recurring: boolean;
+  recurrence_pattern: string | null;
+  external_source: 'outlook';
+  sync_locked: boolean;
+  last_external_sync: string;
+} {
+  // Convert Outlook recurrence to Rowan pattern string
+  let recurrencePattern: string | null = null;
+  if (event.recurrence) {
+    const pattern = event.recurrence.pattern;
+    const range = event.recurrence.range;
+    // Store as JSON for flexibility
+    recurrencePattern = JSON.stringify({
+      type: pattern.type,
+      interval: pattern.interval,
+      daysOfWeek: pattern.daysOfWeek,
+      dayOfMonth: pattern.dayOfMonth,
+      month: pattern.month,
+      rangeType: range.type,
+      startDate: range.startDate,
+      endDate: range.endDate,
+      numberOfOccurrences: range.numberOfOccurrences,
+    });
+  }
+
+  return {
+    space_id: spaceId,
+    title: event.subject || 'Untitled Event',
+    description: event.body?.content || null,
+    start_time: event.start.dateTime,
+    end_time: event.end.dateTime,
+    location: event.location?.displayName || null,
+    all_day: event.isAllDay,
+    timezone: event.start.timeZone || null,
+    is_recurring: event.type === 'seriesMaster',
+    recurrence_pattern: recurrencePattern,
+    external_source: 'outlook',
+    sync_locked: true, // Prevent local edits from conflicting
+    last_external_sync: new Date().toISOString(),
+  };
+}
+
+/**
  * Perform a full or incremental sync of calendar events
  */
 export async function syncCalendar(
@@ -715,12 +772,56 @@ export async function syncCalendar(
 
           if (existingMapping) {
             // Update existing event
-            // TODO: Implement event update logic
-            eventsUpdated++;
+            const eventData = mapOutlookEventToRowan(event, connection.space_id);
+            const { error: updateError } = await supabase
+              .from('events')
+              .update({
+                title: eventData.title,
+                description: eventData.description,
+                start_time: eventData.start_time,
+                end_time: eventData.end_time,
+                location: eventData.location,
+                all_day: eventData.all_day,
+                timezone: eventData.timezone,
+                is_recurring: eventData.is_recurring,
+                recurrence_pattern: eventData.recurrence_pattern,
+                last_external_sync: eventData.last_external_sync,
+              })
+              .eq('id', existingMapping.rowan_event_id);
+
+            if (!updateError) {
+              // Update mapping with new etag
+              await supabase
+                .from('calendar_event_mappings')
+                .update({
+                  external_etag: event.changeKey,
+                  last_synced_at: new Date().toISOString(),
+                })
+                .eq('id', existingMapping.id);
+              eventsUpdated++;
+            }
           } else {
             // Create new event
-            // TODO: Implement event creation logic
-            eventsCreated++;
+            const eventData = mapOutlookEventToRowan(event, connection.space_id);
+            const { data: newEvent, error: createError } = await supabase
+              .from('events')
+              .insert(eventData)
+              .select('id')
+              .single();
+
+            if (!createError && newEvent) {
+              // Create mapping record
+              await supabase.from('calendar_event_mappings').insert({
+                rowan_event_id: newEvent.id,
+                connection_id: connectionId,
+                external_event_id: event.id,
+                external_calendar_id: connection.provider_calendar_id || 'primary',
+                sync_direction: connection.sync_direction,
+                external_etag: event.changeKey,
+                last_synced_at: new Date().toISOString(),
+              });
+              eventsCreated++;
+            }
           }
         }
       }
