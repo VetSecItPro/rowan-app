@@ -61,6 +61,16 @@ const FEATURE_MESSAGES: Record<string, { title: string; description: string; ico
     description: 'Create and manage calendar events for your family.',
     icon: <Lock className="h-6 w-6" />,
   },
+  spaces: {
+    title: 'More Spaces',
+    description: 'Create additional spaces for work, extended family, or different projects.',
+    icon: <Lock className="h-6 w-6" />,
+  },
+  maxSpaces: {
+    title: 'More Spaces',
+    description: 'Create additional spaces for work, extended family, or different projects.',
+    icon: <Lock className="h-6 w-6" />,
+  },
 };
 
 const PRO_FEATURES = [
@@ -71,11 +81,13 @@ const PRO_FEATURES = [
   'Household management',
   'Real-time collaboration',
   'Unlimited messages',
+  '2 spaces',
 ];
 
 const FAMILY_EXTRAS = [
   'AI-powered features',
   'External integrations',
+  '3 spaces (vs 2)',
   'Up to 6 family members',
   '5GB storage',
   'Priority support',

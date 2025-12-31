@@ -28,6 +28,7 @@ import { SubscriptionSettings } from '@/components/settings/SubscriptionSettings
 import { CalendarConnections } from '@/components/calendar/CalendarConnections';
 import { Toggle } from '@/components/ui/Toggle';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+import { useNumericLimit } from '@/lib/hooks/useFeatureGate';
 import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
@@ -90,6 +91,7 @@ interface SpaceMember {
   email: string;
   role: UserRole;
   avatar?: string;
+  color_theme?: string;
   isCurrentUser?: boolean;
 }
 
@@ -114,20 +116,20 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const MIN_IMAGE_DIMENSION = 100;
 const MAX_IMAGE_DIMENSION = 2000;
 
-// Mock data for space members
-const mockSpaceMembers: SpaceMember[] = [
-  { id: '1', name: 'Alex Johnson', email: 'alex@example.com', role: 'Admin', isCurrentUser: true },
-  { id: '2', name: 'Jordan Smith', email: 'jordan@example.com', role: 'Admin' },
-  { id: '3', name: 'Taylor Brown', email: 'taylor@example.com', role: 'Member' },
-  { id: '4', name: 'Casey Wilson', email: 'casey@example.com', role: 'Viewer' },
-];
+// Space members are now fetched from the API - see fetchSpaceMembers()
 
 // Active sessions will be fetched from API
 
-// Mock pending invitations
-const mockPendingInvitations = [
-  { email: 'newuser@example.com', role: 'Member', sentAt: '2 days ago' },
-];
+// Pending invitation type
+interface PendingInvitation {
+  id: string;
+  email: string;
+  role: string;
+  created_at: string;
+  expires_at: string;
+  invitation_url: string;
+  token: string;
+}
 
 // Documentation features array - organized by category
 // Search keywords map for natural language search
@@ -328,6 +330,11 @@ export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Space creation limit based on subscription tier
+  const { limit: maxSpaces, promptIfExceeded: promptSpaceUpgrade } = useNumericLimit('maxSpaces');
+  // Count spaces where user is owner (not just member)
+  const ownedSpacesCount = spaces?.filter(s => s.role === 'owner').length || 0;
+
   // Get initial tab from URL or default to 'profile'
   const initialTab = (searchParams?.get('tab') as SettingsTab) || 'profile';
   const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab);
@@ -376,17 +383,19 @@ export default function SettingsPage() {
   const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
 
   // Invite modal state
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<UserRole>('Member');
-  const [isSendingInvite, setIsSendingInvite] = useState(false);
 
   // Documentation search state
   const [docSearchQuery, setDocSearchQuery] = useState('');
 
 
   // Space members state
-  const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>(mockSpaceMembers);
-  const [pendingInvitations, setPendingInvitations] = useState(mockPendingInvitations);
+  const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>([]);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+  const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([]);
+  const [isLoadingInvitations, setIsLoadingInvitations] = useState(false);
+  const [copiedInvitationId, setCopiedInvitationId] = useState<string | null>(null);
+  const [resendingInvitationId, setResendingInvitationId] = useState<string | null>(null);
+  const [cancellingInvitationId, setCancellingInvitationId] = useState<string | null>(null);
 
   // Create space state
   const [newSpaceName, setNewSpaceName] = useState('');
@@ -550,33 +559,52 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSendInvite = async () => {
-    if (!inviteEmail) {
-      alert('Please enter an email address');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(inviteEmail)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-
-    setIsSendingInvite(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    setPendingInvitations([...pendingInvitations, { email: inviteEmail, role: inviteRole, sentAt: 'Just now' }]);
-
-    setInviteEmail('');
-    setInviteRole('Member');
-    setIsSendingInvite(false);
+  // Callback to refresh invitations and members after modal closes
+  const handleInviteModalClose = () => {
     setShowInviteModal(false);
+    // Refresh pending invitations to show the newly created one
+    fetchPendingInvitations();
+    // Also refresh members in case someone just accepted an invitation
+    fetchSpaceMembers();
   };
 
+  const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
+  const [isRemovingMember, setIsRemovingMember] = useState(false);
+
   const handleUpdateMemberRole = async (memberId: string, newRole: UserRole) => {
-    setSpaceMembers(spaceMembers.map(member =>
-      member.id === memberId ? { ...member, role: newRole } : member
-    ));
+    if (!spaceId) return;
+
+    // Map frontend role names to backend role names
+    const backendRole = newRole === 'Admin' ? 'admin' : 'member';
+
+    try {
+      setIsUpdatingRole(memberId);
+      const response = await fetch('/api/spaces/members', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: memberId, // memberId is the user_id from API response
+          space_id: spaceId,
+          new_role: backendRole,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local state
+        setSpaceMembers(spaceMembers.map(member =>
+          member.id === memberId ? { ...member, role: newRole } : member
+        ));
+      } else {
+        alert(result.error || 'Failed to update role');
+      }
+    } catch (error) {
+      logger.error('Error updating member role:', error, { component: 'page', action: 'execution' });
+      alert('Failed to update member role');
+    } finally {
+      setIsUpdatingRole(null);
+    }
   };
 
   const handleRemoveMember = async (memberId: string) => {
@@ -599,10 +627,34 @@ export default function SettingsPage() {
   };
 
   const confirmRemoveMember = async () => {
-    if (!memberToRemove) return;
-    setSpaceMembers(spaceMembers.filter(m => m.id !== memberToRemove));
-    setShowRemoveMemberConfirm(false);
-    setMemberToRemove(null);
+    if (!memberToRemove || !spaceId) return;
+
+    try {
+      setIsRemovingMember(true);
+      const response = await fetch('/api/spaces/members', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: memberToRemove, // memberToRemove is the user_id from API response
+          space_id: spaceId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSpaceMembers(spaceMembers.filter(m => m.id !== memberToRemove));
+      } else {
+        alert(result.error || 'Failed to remove member');
+      }
+    } catch (error) {
+      logger.error('Error removing member:', error, { component: 'page', action: 'execution' });
+      alert('Failed to remove member');
+    } finally {
+      setIsRemovingMember(false);
+      setShowRemoveMemberConfirm(false);
+      setMemberToRemove(null);
+    }
   };
 
   const handleLeaveSpace = async () => {
@@ -783,6 +835,117 @@ export default function SettingsPage() {
     }
   }, [activeTab]);
 
+  // Fetch space members and pending invitations when profile tab is active and space is selected
+  // OPTIMIZATION: Fetch both in parallel for faster loading
+  useEffect(() => {
+    if (activeTab === 'profile' && spaceId) {
+      Promise.all([fetchSpaceMembers(), fetchPendingInvitations()]);
+    }
+  }, [activeTab, spaceId]);
+
+  const fetchSpaceMembers = async () => {
+    if (!spaceId) return;
+
+    try {
+      setIsLoadingMembers(true);
+      const response = await fetch(`/api/spaces/members?space_id=${spaceId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setSpaceMembers(result.data);
+      } else {
+        logger.error('Failed to load space members:', undefined, { component: 'page', action: 'execution', details: result.error });
+      }
+    } catch (error) {
+      logger.error('Error loading space members:', error, { component: 'page', action: 'execution' });
+    } finally {
+      setIsLoadingMembers(false);
+    }
+  };
+
+  const fetchPendingInvitations = async () => {
+    if (!spaceId) return;
+
+    try {
+      setIsLoadingInvitations(true);
+      const response = await fetch(`/api/spaces/invitations?space_id=${spaceId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setPendingInvitations(result.data);
+      } else {
+        logger.error('Failed to load invitations:', undefined, { component: 'page', action: 'execution', details: result.error });
+      }
+    } catch (error) {
+      logger.error('Error loading invitations:', error, { component: 'page', action: 'execution' });
+    } finally {
+      setIsLoadingInvitations(false);
+    }
+  };
+
+  const handleCopyInvitationUrl = async (invitationId: string, url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedInvitationId(invitationId);
+      setTimeout(() => setCopiedInvitationId(null), 2000);
+    } catch (error) {
+      logger.error('Failed to copy invitation URL:', error, { component: 'page', action: 'execution' });
+    }
+  };
+
+  const handleResendInvitation = async (invitationId: string) => {
+    try {
+      setResendingInvitationId(invitationId);
+      const response = await fetch('/api/spaces/invitations', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitation_id: invitationId, space_id: spaceId }),
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        // Refresh the list
+        await fetchPendingInvitations();
+        if (result.data.email_sent) {
+          alert('Invitation resent successfully!');
+        } else {
+          alert('Invitation renewed but email failed. Share the link directly.');
+        }
+      } else {
+        alert(result.error || 'Failed to resend invitation');
+      }
+    } catch (error) {
+      logger.error('Error resending invitation:', error, { component: 'page', action: 'execution' });
+      alert('Failed to resend invitation');
+    } finally {
+      setResendingInvitationId(null);
+    }
+  };
+
+  const handleCancelInvitation = async (invitationId: string) => {
+    if (!confirm('Are you sure you want to cancel this invitation?')) return;
+
+    try {
+      setCancellingInvitationId(invitationId);
+      const response = await fetch('/api/spaces/invitations', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitation_id: invitationId }),
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setPendingInvitations(prev => prev.filter(inv => inv.id !== invitationId));
+      } else {
+        alert(result.error || 'Failed to cancel invitation');
+      }
+    } catch (error) {
+      logger.error('Error cancelling invitation:', error, { component: 'page', action: 'execution' });
+      alert('Failed to cancel invitation');
+    } finally {
+      setCancellingInvitationId(null);
+    }
+  };
 
   const fetchActiveSessions = async () => {
     try {
@@ -862,10 +1025,10 @@ export default function SettingsPage() {
     { id: 'subscription' as SettingsTab, name: 'Subscription', icon: Crown, description: 'Manage your plan and billing' },
     { id: 'security' as SettingsTab, name: 'Security', icon: Shield, description: 'Password and authentication' },
     { id: 'notifications' as SettingsTab, name: 'Notifications', icon: Bell, description: 'Email and in-app notification preferences' },
-    { id: 'privacy-data' as SettingsTab, name: 'Privacy & Compliance', icon: Lock, description: 'Privacy settings and compliance' },
+    { id: 'privacy-data' as SettingsTab, name: 'Privacy & Compliance', icon: Eye, description: 'Privacy settings and compliance' },
     { id: 'data-management' as SettingsTab, name: 'Data Management', icon: Database, description: 'Storage usage and file management' },
     { id: 'integrations' as SettingsTab, name: 'Integrations', icon: Link2, description: 'Connect external calendars' },
-    { id: 'documentation' as SettingsTab, name: 'Documentation', icon: BookOpen, description: 'Browse our guides and tutorials' },
+    { id: 'documentation' as SettingsTab, name: 'Feature Manuals', icon: BookOpen, description: 'Browse our guides and tutorials' },
     { id: 'analytics' as SettingsTab, name: 'Analytics', icon: BarChart3, description: 'Track productivity trends' },
   ];
 
@@ -1010,12 +1173,12 @@ export default function SettingsPage() {
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-6 sm:pt-8">
                       <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">Your Spaces</h3>
 
-                      {/* All Spaces */}
-                      <div className="mb-6">
-                        <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">Switch Space</h4>
-                        <div className="space-y-3">
-                          {spaces && spaces.length > 0 ? (
-                            spaces.map((space) => (
+                      {/* Switch Space - Only show when user has multiple spaces */}
+                      {spaces && spaces.length > 1 && (
+                        <div className="mb-6">
+                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">Switch Space</h4>
+                          <div className="space-y-3">
+                            {spaces.map((space) => (
                               <div
                                 key={space.id}
                                 className={`btn-touch p-4 rounded-xl border transition-all cursor-pointer active:scale-95 ${
@@ -1043,14 +1206,10 @@ export default function SettingsPage() {
                                   )}
                                 </div>
                               </div>
-                            ))
-                          ) : (
-                            <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center">
-                              <p className="text-sm text-gray-600 dark:text-gray-400">No spaces yet. Create your first space to get started.</p>
-                            </div>
-                          )}
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Current Space Actions */}
                       {currentSpace && (
@@ -1124,14 +1283,18 @@ export default function SettingsPage() {
                             </div>
                           ) : (
                             <div className="flex gap-2 flex-wrap">
-                              <button
-                                onClick={() => setShowInviteModal(true)}
-                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
-                              >
-                                <UserPlus className="w-4 h-4" />
-                                Invite Members
-                              </button>
-                              {currentSpace?.role === 'owner' && (
+                              {/* Only owners and admins can invite members */}
+                              {(currentSpace?.role === 'owner' || currentSpace?.role === 'admin') && (
+                                <button
+                                  onClick={() => setShowInviteModal(true)}
+                                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
+                                >
+                                  <UserPlus className="w-4 h-4" />
+                                  Invite Members
+                                </button>
+                              )}
+                              {/* Owners and admins can delete spaces */}
+                              {(currentSpace?.role === 'owner' || currentSpace?.role === 'admin') && (
                                 <button
                                   onClick={() => setShowDeleteSpaceModal(true)}
                                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
@@ -1145,13 +1308,233 @@ export default function SettingsPage() {
                         </div>
                       )}
 
+                      {/* Pending Invitations - Only visible to owners and admins */}
+                      {spaceId && (currentSpace?.role === 'owner' || currentSpace?.role === 'admin') && (
+                        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-purple-600" />
+                            Pending Invitations
+                            {pendingInvitations.length > 0 && (
+                              <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs rounded-full">
+                                {pendingInvitations.length}
+                              </span>
+                            )}
+                          </h4>
+
+                          {isLoadingInvitations ? (
+                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 py-4">
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span className="text-sm">Loading invitations...</span>
+                            </div>
+                          ) : pendingInvitations.length === 0 ? (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                              No pending invitations. Use the button above to invite members.
+                            </p>
+                          ) : (
+                            <div className="space-y-3 mt-3">
+                              {pendingInvitations.map((invitation) => {
+                                const expiresAt = new Date(invitation.expires_at);
+                                const daysLeft = Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+
+                                return (
+                                  <div
+                                    key={invitation.id}
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+                                  >
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        {invitation.email}
+                                      </p>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                                          {invitation.role}
+                                        </span>
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                          Expires in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      {/* Copy URL Button */}
+                                      <button
+                                        onClick={() => handleCopyInvitationUrl(invitation.id, invitation.invitation_url)}
+                                        className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                                        title="Copy invitation link"
+                                      >
+                                        {copiedInvitationId === invitation.id ? (
+                                          <Check className="w-4 h-4 text-green-600" />
+                                        ) : (
+                                          <Copy className="w-4 h-4" />
+                                        )}
+                                      </button>
+
+                                      {/* Resend Button */}
+                                      <button
+                                        onClick={() => handleResendInvitation(invitation.id)}
+                                        disabled={resendingInvitationId === invitation.id}
+                                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                        title="Resend invitation"
+                                      >
+                                        {resendingInvitationId === invitation.id ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <Mail className="w-4 h-4" />
+                                        )}
+                                      </button>
+
+                                      {/* Cancel Button */}
+                                      <button
+                                        onClick={() => handleCancelInvitation(invitation.id)}
+                                        disabled={cancellingInvitationId === invitation.id}
+                                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                        title="Cancel invitation"
+                                      >
+                                        {cancellingInvitationId === invitation.id ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <X className="w-4 h-4" />
+                                        )}
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Space Members */}
+                      {spaceId && (currentSpace?.role === 'owner' || spaceMembers.some(m => m.isCurrentUser && m.role === 'Admin')) && (
+                        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-purple-600" />
+                            Space Members
+                            {spaceMembers.length > 0 && (
+                              <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs rounded-full">
+                                {spaceMembers.length}
+                              </span>
+                            )}
+                          </h4>
+
+                          {isLoadingMembers ? (
+                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 py-4">
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span className="text-sm">Loading members...</span>
+                            </div>
+                          ) : spaceMembers.length === 0 ? (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                              No members yet. Invite someone to join your space!
+                            </p>
+                          ) : (
+                            <div className="space-y-3 mt-3">
+                              {spaceMembers.map((member) => (
+                                <div
+                                  key={member.id}
+                                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border transition-all ${
+                                    member.isCurrentUser
+                                      ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800'
+                                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 ${
+                                      member.color_theme === 'blue' ? 'bg-gradient-to-br from-blue-500 to-blue-600' :
+                                      member.color_theme === 'green' ? 'bg-gradient-to-br from-green-500 to-green-600' :
+                                      member.color_theme === 'pink' ? 'bg-gradient-to-br from-pink-500 to-pink-600' :
+                                      member.color_theme === 'orange' ? 'bg-gradient-to-br from-orange-500 to-orange-600' :
+                                      member.color_theme === 'teal' ? 'bg-gradient-to-br from-teal-500 to-teal-600' :
+                                      'bg-gradient-to-br from-purple-500 to-purple-600'
+                                    }`}>
+                                      {member.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
+                                        {member.name}
+                                        {member.isCurrentUser && (
+                                          <span className="text-xs px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded">
+                                            You
+                                          </span>
+                                        )}
+                                        {member.role === 'Admin' && (
+                                          <Crown className="w-3.5 h-3.5 text-amber-500" />
+                                        )}
+                                      </p>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        {member.email}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Role and Actions */}
+                                  <div className="flex items-center gap-2">
+                                    {/* Role selector - only for non-owners and not current user */}
+                                    {!member.isCurrentUser && member.role !== 'Admin' && currentSpace?.role === 'owner' && (
+                                      <>
+                                        <select
+                                          value={member.role}
+                                          onChange={(e) => handleUpdateMemberRole(member.id, e.target.value as UserRole)}
+                                          disabled={isUpdatingRole === member.id}
+                                          className="text-xs px-2 py-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                                        >
+                                          <option value="Member">Member</option>
+                                          <option value="Admin">Admin</option>
+                                        </select>
+                                        {isUpdatingRole === member.id && (
+                                          <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                                        )}
+                                      </>
+                                    )}
+
+                                    {/* Static role badge for owners or when not editable */}
+                                    {(member.role === 'Admin' || member.isCurrentUser || currentSpace?.role !== 'owner') && (
+                                      <span className={`text-xs px-2 py-1 rounded ${
+                                        member.role === 'Admin'
+                                          ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                      }`}>
+                                        {member.role}
+                                      </span>
+                                    )}
+
+                                    {/* Remove member button */}
+                                    {!member.isCurrentUser && member.role !== 'Admin' && currentSpace?.role === 'owner' && (
+                                      <button
+                                        onClick={() => handleRemoveMember(member.id)}
+                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                        title="Remove member"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Create New Space */}
                       <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
                         <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Create New Space</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Start a new space for another family or team</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          Start a new space for work or a different purpose
+                          {maxSpaces !== Infinity && (
+                            <span className="ml-2 text-xs text-gray-500">
+                              ({ownedSpacesCount}/{maxSpaces} spaces used)
+                            </span>
+                          )}
+                        </p>
                         <button
-                          onClick={() => setShowCreateSpaceModal(true)}
-                          className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:opacity-90 transition-colors text-sm flex items-center gap-2 hover:shadow-lg"
+                          onClick={() => {
+                            // Check if user has reached their space limit
+                            if (promptSpaceUpgrade(ownedSpacesCount)) {
+                              setShowCreateSpaceModal(true);
+                            }
+                          }}
+                          className="px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-lg transition-all text-sm flex items-center gap-2 shadow-lg shadow-teal-500/25 hover:shadow-xl"
                         >
                           <UserPlus className="w-4 h-4" />
                           New Space
@@ -1549,11 +1932,11 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Documentation Tab - Direct Feature Cards */}
+                {/* Feature Manuals Tab - Direct Feature Cards */}
                 {activeTab === 'documentation' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Documentation</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Feature Manuals</h2>
                       <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
                     </div>
 
@@ -1562,7 +1945,7 @@ export default function SettingsPage() {
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                       <input
                         type="text"
-                        placeholder="Search documentation... (e.g., 'expenses', 'billing', 'meal planning')"
+                        placeholder="Search feature manuals... (e.g., 'expenses', 'billing', 'meal planning')"
                         value={docSearchQuery}
                         onChange={(e) => setDocSearchQuery(e.target.value)}
                         className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-colors"
@@ -1662,7 +2045,7 @@ export default function SettingsPage() {
       {spaceId && currentSpace && (
         <InvitePartnerModal
           isOpen={showInviteModal}
-          onClose={() => setShowInviteModal(false)}
+          onClose={handleInviteModalClose}
           spaceId={spaceId}
           spaceName={currentSpace.name}
         />
@@ -1846,7 +2229,7 @@ export default function SettingsPage() {
       {spaceId && (
         <InvitePartnerModal
           isOpen={showInviteModal}
-          onClose={() => setShowInviteModal(false)}
+          onClose={handleInviteModalClose}
           spaceId={spaceId}
           spaceName={currentSpace?.name || ''}
         />

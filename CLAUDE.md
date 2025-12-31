@@ -2,6 +2,8 @@
 
 > **CRITICAL**: All code must be correct on first attempt. Security is foundational.
 
+> **CRITICAL - GIT WORKFLOW**: NEVER push or commit code to GitHub unless explicitly instructed by the user. You may suggest committing or pushing, but NEVER execute git commit, git push, or any GitHub operations without explicit user approval. GitHub Actions workflows have costs - work on features and fixes locally, validate on localhost first, then push to GitHub only when the user says so.
+
 ## Development Philosophy (MAIN MANDATE)
 
 **Work slowly, safely, strategically, and comprehensively.**

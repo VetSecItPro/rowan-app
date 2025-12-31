@@ -65,12 +65,20 @@ export async function POST(request: NextRequest) {
             .trim(),
           marketing_emails_enabled: z.boolean().optional(),
         }),
-        // Beta invite code - optional, used during beta period
+        // Beta invite code - optional when invite_token is provided
         beta_code: z.string()
-          .min(8, 'Invalid beta code')
-          .max(20, 'Invalid beta code')
+          .min(8, 'A valid beta invite code is required to sign up')
+          .max(20, 'Invalid beta code format')
           .optional(),
-      });
+        // Invitation token - for users invited to a space (alternative to beta_code)
+        invite_token: z.string()
+          .min(1, 'Invalid invitation token')
+          .max(500, 'Invalid invitation token')
+          .optional(),
+      }).refine(
+        (data) => data.beta_code || data.invite_token,
+        { message: 'Either a beta invite code or an invitation token is required to sign up' }
+      );
     }
 
     // Extract IP for rate limiting (deployment fix)
@@ -111,6 +119,105 @@ export async function POST(request: NextRequest) {
       name: sanitizePlainText(validated.profile.name),
       space_name: validated.profile.space_name ? sanitizePlainText(validated.profile.space_name) : undefined,
     };
+
+    // BETA PERIOD: Validate authorization BEFORE creating user
+    // Users can sign up with either:
+    // 1. A beta invite code (original 100 beta users)
+    // 2. An invitation token (users invited to a space by existing members)
+    let authorizationType: 'beta_code' | 'invite_token' = 'beta_code';
+    let betaCodeData: { id: string; code: string; used_by: string | null; expires_at: string | null; is_active: boolean } | null = null;
+    let invitationData: { id: string; space_id: string; email: string; status: string; expires_at: string } | null = null;
+
+    if (validated.beta_code) {
+      // Validate beta invite code
+      const normalizedBetaCode = validated.beta_code.replace(/-/g, '').toUpperCase().trim();
+
+      const { data, error: betaCodeError } = await supabaseServerClient
+        .from('beta_invite_codes')
+        .select('id, code, used_by, expires_at, is_active')
+        .or(`code.eq.${validated.beta_code},code.eq.${normalizedBetaCode}`)
+        .single();
+
+      if (betaCodeError || !data) {
+        return NextResponse.json(
+          { error: 'Invalid beta invite code. Please check your code and try again.' },
+          { status: 400 }
+        );
+      }
+
+      // Check if code is already used
+      if (data.used_by) {
+        return NextResponse.json(
+          { error: 'This beta invite code has already been used.' },
+          { status: 400 }
+        );
+      }
+
+      // Check if code is active
+      if (!data.is_active) {
+        return NextResponse.json(
+          { error: 'This beta invite code is no longer active.' },
+          { status: 400 }
+        );
+      }
+
+      // Check if code has expired
+      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+        return NextResponse.json(
+          { error: 'This beta invite code has expired.' },
+          { status: 400 }
+        );
+      }
+
+      betaCodeData = data;
+      authorizationType = 'beta_code';
+
+    } else if (validated.invite_token) {
+      // Validate invitation token - users invited to a space don't need a beta code
+      const { data, error: inviteError } = await supabaseServerClient
+        .from('space_invitations')
+        .select('id, space_id, email, status, expires_at')
+        .eq('token', validated.invite_token)
+        .single();
+
+      if (inviteError || !data) {
+        return NextResponse.json(
+          { error: 'Invalid invitation link. Please ask for a new invitation.' },
+          { status: 400 }
+        );
+      }
+
+      // Check if invitation has already been used
+      if (data.status !== 'pending') {
+        return NextResponse.json(
+          { error: `This invitation has already been ${data.status}.` },
+          { status: 400 }
+        );
+      }
+
+      // Check if invitation has expired
+      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+        // Update status to expired
+        await supabaseServerClient
+          .from('space_invitations')
+          .update({ status: 'expired' })
+          .eq('id', data.id);
+
+        return NextResponse.json(
+          { error: 'This invitation has expired. Please ask for a new invitation.' },
+          { status: 400 }
+        );
+      }
+
+      invitationData = data;
+      authorizationType = 'invite_token';
+    } else {
+      // This shouldn't happen due to schema validation, but just in case
+      return NextResponse.json(
+        { error: 'A beta invite code or invitation is required to sign up.' },
+        { status: 400 }
+      );
+    }
 
     // Create Supabase client (runtime only)
     let supabase;
@@ -243,6 +350,7 @@ export async function POST(request: NextRequest) {
 
     // Check if workspace was already created by database trigger
     // The trigger on public.users automatically provisions a workspace
+    // For invited users, the trigger adds them to the invited space instead
     const { data: existingMembership } = await supabaseServerClient
       .from('space_members')
       .select('space_id')
@@ -250,54 +358,88 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingMembership) {
-      // Workspace already created by trigger - we're done
+      // Workspace already handled by trigger - we're done
+      // For invited users: trigger added them to the invited space
+      // For regular users: trigger created their default space
     } else {
-      // Fallback: Create the initial space manually (trigger may not have fired)
-      const { data: newSpace, error: spaceError } = await supabaseServerClient
-        .from('spaces')
-        .insert({
-          name: spaceName,
-          is_personal: true,
-          auto_created: true,
-          user_id: userId
-        })
-        .select('id')
-        .single();
+      // Fallback: Trigger may not have fired - handle manually
+      if (invitationData) {
+        // INVITED USER: Add to the invited space (don't create a new space)
+        const { error: memberError } = await supabaseServerClient
+          .from('space_members')
+          .insert({
+            space_id: invitationData.space_id,
+            user_id: userId,
+            role: 'member',  // Invited users start as members
+          });
 
-      if (spaceError || !newSpace) {
-        // Clean up the auth user to avoid orphaned accounts
-        try {
-          await supabaseServerClient.auth.admin.deleteUser(userId);
-        } catch {
-          // Cleanup failed - orphaned auth user may exist
+        if (memberError) {
+          try {
+            await supabaseServerClient.auth.admin.deleteUser(userId);
+          } catch {
+            // Cleanup failed
+          }
+
+          return NextResponse.json(
+            { error: 'Failed to join the invited space. Please try again.' },
+            { status: 500 }
+          );
         }
 
-        return NextResponse.json(
-          { error: 'Failed to create initial space. Please try again.' },
-          { status: 500 }
-        );
-      }
+        // Mark invitation as accepted
+        await supabaseServerClient
+          .from('space_invitations')
+          .update({ status: 'accepted', accepted_at: new Date().toISOString() })
+          .eq('id', invitationData.id);
 
-      const { error: memberError } = await supabaseServerClient
-        .from('space_members')
-        .insert({
-          space_id: newSpace.id,
-          user_id: userId,
-          role: 'owner',
-        });
+      } else {
+        // REGULAR USER: Create the initial space manually
+        const { data: newSpace, error: spaceError } = await supabaseServerClient
+          .from('spaces')
+          .insert({
+            name: spaceName,
+            is_personal: true,
+            auto_created: true,
+            user_id: userId
+          })
+          .select('id')
+          .single();
 
-      if (memberError) {
-        try {
-          await supabaseServerClient.from('spaces').delete().eq('id', newSpace.id);
-          await supabaseServerClient.auth.admin.deleteUser(userId);
-        } catch {
-          // Cleanup failed
+        if (spaceError || !newSpace) {
+          // Clean up the auth user to avoid orphaned accounts
+          try {
+            await supabaseServerClient.auth.admin.deleteUser(userId);
+          } catch {
+            // Cleanup failed - orphaned auth user may exist
+          }
+
+          return NextResponse.json(
+            { error: 'Failed to create initial space. Please try again.' },
+            { status: 500 }
+          );
         }
 
-        return NextResponse.json(
-          { error: 'Failed to finalize account setup. Please try again.' },
-          { status: 500 }
-        );
+        const { error: memberError } = await supabaseServerClient
+          .from('space_members')
+          .insert({
+            space_id: newSpace.id,
+            user_id: userId,
+            role: 'owner',
+          });
+
+        if (memberError) {
+          try {
+            await supabaseServerClient.from('spaces').delete().eq('id', newSpace.id);
+            await supabaseServerClient.auth.admin.deleteUser(userId);
+          } catch {
+            // Cleanup failed
+          }
+
+          return NextResponse.json(
+            { error: 'Failed to finalize account setup. Please try again.' },
+            { status: 500 }
+          );
+        }
       }
     }
 
@@ -317,24 +459,40 @@ export async function POST(request: NextRequest) {
       // Non-critical - subscription will be created on first access if needed
     }
 
-    // CRITICAL: Link user to beta_access_requests for tracking
-    // Find the most recent successful beta access request (with no user_id yet)
-    // and link it to this new user
-    try {
-      await supabaseServerClient
-        .from('beta_access_requests')
-        .update({
-          user_id: userId,
-          email: validated.email,
-          approved_at: new Date().toISOString()
-        })
-        .eq('access_granted', true)
-        .is('user_id', null)
-        .order('created_at', { ascending: false })
-        .limit(1);
-      // Non-critical - don't fail signup if linking fails
-    } catch {
-      // Non-critical - beta access linking is optional
+    // CRITICAL: Grant beta access based on authorization type
+    if (authorizationType === 'invite_token') {
+      // Invited users get beta access automatically (doesn't count against 100 beta codes)
+      try {
+        await supabaseServerClient
+          .from('beta_access_requests')
+          .insert({
+            email: validated.email,
+            user_id: userId,
+            access_granted: true,
+            access_granted_at: new Date().toISOString(),
+            source: 'space_invitation',
+            notes: 'Granted via space invitation'
+          });
+      } catch {
+        // Non-critical - don't fail signup if beta access creation fails
+      }
+    } else {
+      // Beta code users - link to existing beta_access_requests record
+      try {
+        await supabaseServerClient
+          .from('beta_access_requests')
+          .update({
+            user_id: userId,
+            email: validated.email,
+            approved_at: new Date().toISOString()
+          })
+          .eq('access_granted', true)
+          .is('user_id', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
+      } catch {
+        // Non-critical - beta access linking is optional
+      }
     }
 
     // Mark beta invite code as used (only after ALL signup steps complete successfully)

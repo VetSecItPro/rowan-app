@@ -503,6 +503,7 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
 
 /**
  * Send a space invitation email notification
+ * OPTIMIZED: Uses retry mechanism for better delivery reliability
  */
 export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promise<EmailResult> {
   try {
@@ -511,30 +512,72 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
       return { success: false, error: 'Email service not configured' };
     }
 
-    const emailHtml = await render(SpaceInvitationEmail(data));
-
-    const { data: result, error } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [data.recipientEmail],
-      subject: `You're invited to join "${data.spaceName}" on Rowan`,
-      html: emailHtml,
-      replyTo: REPLY_TO_EMAIL,
-      tags: [
-        { name: 'category', value: 'space-invitation' },
-        { name: 'inviter', value: data.inviterName },
-        { name: 'space_name', value: data.spaceName }
-      ]
+    // Log incoming data for debugging
+    logger.info('Attempting to send space invitation email', {
+      component: 'lib-email-service',
+      data: {
+        recipientEmail: data.recipientEmail?.replace(/(.{2}).*(@.*)/, '$1***$2'),
+        inviterName: data.inviterName,
+        spaceName: data.spaceName,
+        hasInvitationUrl: !!data.invitationUrl,
+        expiresAt: data.expiresAt
+      }
     });
 
-    if (error) {
-      logger.error('Failed to send space invitation email:', error, { component: 'lib-email-service', action: 'service_call' });
-      return { success: false, error: error.message };
+    // Pre-render email HTML before retry loop for efficiency
+    let emailHtml: string;
+    try {
+      emailHtml = await render(SpaceInvitationEmail(data));
+      logger.info('Email template rendered successfully', { component: 'lib-email-service' });
+    } catch (renderError) {
+      logger.error('Failed to render SpaceInvitationEmail template', {
+        component: 'lib-email-service',
+        error: renderError instanceof Error ? renderError.message : String(renderError)
+      });
+      return { success: false, error: 'Failed to render email template' };
     }
 
+    // Use retry mechanism for better delivery reliability
+    logger.info('Calling Resend API...', { component: 'lib-email-service' });
+    const result = await withRetry(
+      async () => {
+        logger.info('Resend API attempt starting', { component: 'lib-email-service' });
+        // Sanitize tag values - Resend only allows ASCII letters, numbers, underscores, dashes
+        const sanitizeTag = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+        const response = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [data.recipientEmail],
+          subject: `You're invited to join "${data.spaceName}" on Rowan`,
+          html: emailHtml,
+          replyTo: REPLY_TO_EMAIL,
+          tags: [
+            { name: 'category', value: 'space-invitation' },
+            { name: 'inviter', value: sanitizeTag(data.inviterName) },
+            { name: 'space_name', value: sanitizeTag(data.spaceName) }
+          ]
+        });
+        if (response.error) {
+          throw new Error(response.error.message);
+        }
+        return response.data;
+      },
+      3, // max 3 retries
+      500 // start with 500ms delay (faster initial retry)
+    );
+
+    logger.info(`Space invitation email sent successfully to ${data.recipientEmail.replace(/(.{2}).*(@.*)/, '$1***$2')}`, { component: 'lib-email-service' });
     return { success: true, messageId: result?.id };
   } catch (error) {
-    logger.error('Error sending space invitation email:', error, { component: 'lib-email-service', action: 'service_call' });
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    // Extract meaningful error information for debugging
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorDetails = {
+      message: errorMessage,
+      name: error instanceof Error ? error.name : 'Unknown',
+      // Resend errors often have additional properties
+      ...(typeof error === 'object' && error !== null ? { raw: JSON.stringify(error) } : {})
+    };
+    logger.error('Error sending space invitation email:', errorDetails, { component: 'lib-email-service', action: 'service_call' });
+    return { success: false, error: errorMessage };
   }
 }
 
