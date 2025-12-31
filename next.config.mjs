@@ -129,6 +129,7 @@ const nextConfig = {
       "https://www.googletagmanager.com",
       "https://www.google-analytics.com",
       "https://cdnjs.cloudflare.com",
+      "https://static.cloudflareinsights.com",
       "https://unpkg.com",
       "https://cdn.jsdelivr.net",
       // Browser extension support for users
