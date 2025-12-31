@@ -109,7 +109,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-blue-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/20 rounded-lg">
@@ -117,13 +117,13 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               </div>
               <div>
                 <h2 className="text-lg sm:text-xl font-bold">Invite to Space</h2>
-                <p className="text-purple-100 text-sm mt-1">{spaceName}</p>
+                <p className="text-blue-100 text-sm mt-1">{spaceName}</p>
               </div>
             </div>
             <button
               onClick={handleClose}
               aria-label="Close modal"
-              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
+              className="text-white/80 hover:text-white transition-colors"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
@@ -147,7 +147,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   id="field-1"
               onChange={(e) =>  setEmail(e.target.value)}
                   placeholder="partner@example.com"
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
                   disabled={loading}
                 />
               </div>
@@ -164,7 +164,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as 'member' | 'admin')}
-                className="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white appearance-none relative z-50"
+                className="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white appearance-none relative z-50"
                 disabled={loading}
                 id="role-select"
                 style={{
@@ -198,7 +198,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/25 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending...' : 'Send Invitation'}
               </button>
@@ -234,7 +234,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 <button
                   type="button"
                   onClick={handleCopyUrl}
-                  className="px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
+                  className="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
                   title="Copy link"
                 >
                   {copied ? (
@@ -253,7 +253,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
             <button
               type="button"
               onClick={handleClose}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-purple-500/25 font-medium"
+              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium"
             >
               Done
             </button>
