@@ -315,7 +315,7 @@ export default function HomePage() {
                 </button>
                 <button
                   onClick={() => setIsLaunchModalOpen(true)}
-                  className="px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white rounded-full font-semibold text-sm sm:text-base transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105 active:scale-95 text-center"
+                  className="px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white rounded-full font-semibold text-sm sm:text-base transition-all shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 hover:scale-105 active:scale-95 text-center"
                 >
                   Get Notified on Launch
                 </button>
