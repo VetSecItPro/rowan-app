@@ -174,20 +174,20 @@ export async function GET(req: NextRequest) {
         }
       })(),
 
-      // Memory usage (simulated - would need actual metrics in production)
+      // Memory usage against Vercel function limit (1024MB default)
       (async (): Promise<HealthMetric> => {
         try {
-          // Simulate memory check based on process usage
           const memoryUsage = process.memoryUsage();
           const heapUsedMB = Math.round(memoryUsage.heapUsed / 1024 / 1024);
-          const heapTotalMB = Math.round(memoryUsage.heapTotal / 1024 / 1024);
-          const usage = Math.round((heapUsedMB / heapTotalMB) * 100);
+          const rssMB = Math.round(memoryUsage.rss / 1024 / 1024); // Total memory allocated
+          const VERCEL_MEMORY_LIMIT_MB = 1024; // Vercel serverless function limit
+          const usage = Math.round((rssMB / VERCEL_MEMORY_LIMIT_MB) * 100);
 
           return {
             name: 'Memory Usage',
-            status: usage < 70 ? 'healthy' : usage < 85 ? 'warning' : 'critical',
+            status: usage < 50 ? 'healthy' : usage < 80 ? 'warning' : 'critical',
             value: `${usage}%`,
-            description: `${heapUsedMB}MB / ${heapTotalMB}MB heap used`,
+            description: `${rssMB}MB / ${VERCEL_MEMORY_LIMIT_MB}MB function limit`,
             lastChecked: now,
           };
         } catch (error) {
