@@ -58,14 +58,16 @@ function getEncryptionKey(): Uint8Array {
 
 /**
  * Import key for Web Crypto API
+ * Note: Pass Uint8Array directly - do NOT wrap in ArrayBuffer
+ * See: https://github.com/vercel/edge-runtime/issues/813
  */
 async function importKey(keyData: Uint8Array): Promise<CryptoKey> {
-  // Create a new ArrayBuffer copy to ensure compatibility with Web Crypto API
-  const buffer = new ArrayBuffer(keyData.length);
-  new Uint8Array(buffer).set(keyData);
+  // Pass Uint8Array directly - ArrayBuffer fails in Vercel Edge Runtime
+  // due to cross-realm ArrayBuffer.prototype mismatch
+  // Use new Uint8Array() to ensure proper typing for BufferSource
   return await crypto.subtle.importKey(
     'raw',
-    buffer,
+    new Uint8Array(keyData),
     { name: 'AES-GCM' },
     false,
     ['encrypt', 'decrypt']
@@ -89,19 +91,16 @@ export async function encryptSessionData(data: object): Promise<string> {
 
     // Encrypt the data
     const plaintext = stringToBytes(JSON.stringify(data));
-    // Create new ArrayBuffer copies for Web Crypto API compatibility
-    const ivBuffer = new ArrayBuffer(iv.length);
-    new Uint8Array(ivBuffer).set(iv);
-    const plaintextBuffer = new ArrayBuffer(plaintext.length);
-    new Uint8Array(plaintextBuffer).set(plaintext);
+    // Pass Uint8Array directly - ArrayBuffer fails in Vercel Edge Runtime
+    // Use new Uint8Array() to ensure proper typing for BufferSource
     const encrypted = await crypto.subtle.encrypt(
       {
         name: 'AES-GCM',
-        iv: ivBuffer,
+        iv: new Uint8Array(iv),
         tagLength: 128, // 16 bytes auth tag
       },
       key,
-      plaintextBuffer
+      new Uint8Array(plaintext)
     );
 
     // Combine version + iv + encrypted data (includes auth tag)
@@ -149,19 +148,16 @@ export async function decryptSessionData(encryptedData: string): Promise<object>
     const keyData = getEncryptionKey();
     const key = await importKey(keyData);
 
-    // Decrypt - create new ArrayBuffer copies for Web Crypto API compatibility
-    const ivBuffer = new ArrayBuffer(iv.length);
-    new Uint8Array(ivBuffer).set(iv);
-    const encryptedBuffer = new ArrayBuffer(encrypted.length);
-    new Uint8Array(encryptedBuffer).set(encrypted);
+    // Pass Uint8Array directly - ArrayBuffer fails in Vercel Edge Runtime
+    // Use new Uint8Array() to ensure proper typing for BufferSource
     const decrypted = await crypto.subtle.decrypt(
       {
         name: 'AES-GCM',
-        iv: ivBuffer,
+        iv: new Uint8Array(iv),
         tagLength: 128,
       },
       key,
-      encryptedBuffer
+      new Uint8Array(encrypted)
     );
 
     const decryptedBytes = new Uint8Array(decrypted);
