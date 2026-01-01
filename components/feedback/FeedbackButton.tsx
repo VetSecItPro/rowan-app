@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { MessageSquare, Plus, List } from 'lucide-react';
+import { Plus, List } from 'lucide-react';
 import { FeedbackModal } from './FeedbackModal';
 
 export function FeedbackButton() {
@@ -34,18 +34,11 @@ export function FeedbackButton() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="btn-touch px-4 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-medium transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg relative group"
-          aria-label="Feedback Menu"
-          title="Feedback Menu"
+          className="btn-touch px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-full transition-all shadow-sm hover:shadow-md active:scale-95"
+          aria-label="Beta Feedback"
+          title="Beta Feedback"
         >
-          <MessageSquare className="w-4 h-4" />
-          <span className="text-sm">Beta Feedback</span>
-
-          {/* Beta pulse indicator */}
-          <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-200"></span>
-          </span>
+          Beta Feedback
         </button>
 
         {/* Dropdown Menu */}
