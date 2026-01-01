@@ -94,7 +94,7 @@ const NavItemComponent = memo(function NavItemComponent({
 });
 
 export function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(true); // Start expanded by default for new users
+  const [isExpanded, setIsExpanded] = useState(false); // Start collapsed, hover to expand
   const [isHoverExpanded, setIsHoverExpanded] = useState(false); // Temporary expansion on hover
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -106,36 +106,21 @@ export function Sidebar() {
   // Effective expanded state (either pinned or hover-expanded)
   const effectivelyExpanded = isExpanded || isHoverExpanded;
 
-  // Load saved state from localStorage, with responsive defaults
+  // Load saved state from localStorage - default collapsed on all screen sizes
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-    const isTablet = window.innerWidth < 1280; // xl breakpoint
 
     if (saved !== null) {
-      // On tablets, always start collapsed regardless of saved state
-      // On desktop, use saved preference
-      setIsExpanded(isTablet ? false : saved === 'true');
+      // Use saved preference
+      setIsExpanded(saved === 'true');
     } else {
-      // First time user - collapsed on tablet, expanded on desktop
-      const defaultExpanded = !isTablet;
-      setIsExpanded(defaultExpanded);
-      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(defaultExpanded));
+      // First time user - start collapsed, hover to expand
+      setIsExpanded(false);
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
     }
   }, []);
 
-  // Auto-collapse on resize to tablet size
-  useEffect(() => {
-    const handleResize = () => {
-      const isTablet = window.innerWidth < 1280;
-      if (isTablet && isExpanded) {
-        setIsExpanded(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isExpanded]);
 
   // Keyboard toggle with [ key
   useEffect(() => {
