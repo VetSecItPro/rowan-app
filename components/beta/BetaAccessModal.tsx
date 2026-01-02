@@ -245,6 +245,14 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             </p>
           </div>
 
+          {/* Spam folder notice */}
+          <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg flex items-start gap-3">
+            <span className="text-amber-500 text-lg">📬</span>
+            <div className="text-sm text-amber-800 dark:text-amber-200">
+              <span className="font-medium">Can't find it?</span> Check your spam or junk folder. Emails sometimes end up there by mistake.
+            </div>
+          </div>
+
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-left">
             <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
               What's next:

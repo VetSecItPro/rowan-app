@@ -18,7 +18,7 @@ interface BetaRequestsTableProps {
 
 export function BetaRequestsTable({ betaRequests, isLoading, searchTerm }: BetaRequestsTableProps) {
   const filteredBetaRequests = betaRequests.filter(request =>
-    request.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (request.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatDate = (dateString: string | null) => {

@@ -167,7 +167,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
   // Apply search
   if (searchTerm) {
     filteredFeedback = filteredFeedback.filter(f =>
-      f.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (f.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       f.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       f.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       f.feature_name?.toLowerCase().includes(searchTerm.toLowerCase())
