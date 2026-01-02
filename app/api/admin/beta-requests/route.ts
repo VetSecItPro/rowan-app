@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
         let query = supabaseAdmin
           .from('beta_access_requests')
           .select('*', { count: 'exact' })
+          .not('email', 'is', null) // Only show requests with actual email addresses
           .order('created_at', { ascending: false });
 
         // Apply status filter
@@ -121,13 +122,14 @@ export async function GET(req: NextRequest) {
           notes: request.notes,
         }));
 
-        // Get summary statistics
+        // Get summary statistics (only for actual requests with emails)
         const { data: stats, error: statsError } = await supabaseAdmin
           .from('beta_access_requests')
           .select(`
             access_granted,
             user_id
-          `);
+          `)
+          .not('email', 'is', null);
 
         let summary = {
           total: 0,

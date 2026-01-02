@@ -92,7 +92,7 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
 
   // Filter by search term
   const filteredNotifications = notifications.filter(notif =>
-    notif.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (notif.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (notif.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
