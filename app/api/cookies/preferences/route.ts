@@ -22,15 +22,15 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
 
     // Check authentication
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session?.user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Rate limiting
     const identifier = `cookie-preferences-get-${userId}`;
@@ -100,15 +100,15 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Check authentication
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session?.user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Rate limiting
     const identifier = `cookie-preferences-post-${userId}`;
@@ -226,15 +226,15 @@ export async function DELETE(request: NextRequest) {
     const supabase = await createClient();
 
     // Check authentication
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session?.user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Rate limiting
     const identifier = `cookie-preferences-delete-${userId}`;

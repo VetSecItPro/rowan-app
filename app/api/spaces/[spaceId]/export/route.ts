@@ -27,9 +27,9 @@ export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: 
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: 
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const { spaceId } = params;
 
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: 
     }
 
     // Get export summary
-    const result = await getSpaceExportSummary(spaceId, session.user.id);
+    const result = await getSpaceExportSummary(spaceId, user.id);
 
     if (!result.success) {
       return NextResponse.json(
@@ -104,9 +104,9 @@ export async function POST(req: NextRequest, props: { params: Promise<{ spaceId:
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ spaceId:
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const { spaceId } = params;
 
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ spaceId:
     }
 
     // Export space data
-    const result = await exportSpaceData(spaceId, session.user.id, format);
+    const result = await exportSpaceData(spaceId, user.id, format);
 
     if (!result.success) {
       return NextResponse.json(

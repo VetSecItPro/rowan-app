@@ -32,9 +32,9 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -42,7 +42,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const { spaceId } = params;
 
@@ -94,7 +94,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
       .from('space_members')
       .select('role')
       .eq('space_id', spaceId)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (memberError || !membership) {
@@ -121,7 +121,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
     }
 
     // Delete the space using service layer
-    const result = await deleteSpace(spaceId, session.user.id);
+    const result = await deleteSpace(spaceId, user.id);
 
     if (!result.success) {
       return NextResponse.json(
@@ -137,7 +137,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
       data: {
         spaceId,
         spaceName: space.name,
-        userId: session.user.id,
+        userId: user.id,
         timestamp: new Date().toISOString(),
       },
     });

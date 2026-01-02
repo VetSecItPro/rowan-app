@@ -31,9 +31,9 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get goal
     const goal = await goalsService.getGoalById(params.id);
@@ -56,11 +56,11 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Verify user has access to goal's space
     try {
-      await verifyResourceAccess(session.user.id, goal);
+      await verifyResourceAccess(user.id, goal);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {
@@ -111,9 +111,9 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -122,7 +122,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get existing goal first
     const existingGoal = await goalsService.getGoalById(params.id);
@@ -136,11 +136,11 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Verify user has access to goal's space
     try {
-      await verifyResourceAccess(session.user.id, existingGoal);
+      await verifyResourceAccess(user.id, existingGoal);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {
@@ -214,9 +214,9 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -225,7 +225,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get existing goal first
     const existingGoal = await goalsService.getGoalById(params.id);
@@ -239,11 +239,11 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Verify user has access to goal's space
     try {
-      await verifyResourceAccess(session.user.id, existingGoal);
+      await verifyResourceAccess(user.id, existingGoal);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {

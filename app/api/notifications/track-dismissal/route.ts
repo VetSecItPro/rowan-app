@@ -50,9 +50,9 @@ export async function POST(req: NextRequest) {
 
     // Try to get session (may not always be available from SW)
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    const effectiveUserId = user_id || session?.user?.id;
+    const effectiveUserId = user_id || user?.id;
 
     // Log the dismissal/interaction to notification_log
     const { error: logError } = await supabase

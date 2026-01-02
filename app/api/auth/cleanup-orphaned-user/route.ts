@@ -22,9 +22,9 @@ export async function POST(req: Request) {
 
     // SECURITY: Verify authentication
     const supabase = await createServerClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const { userId } = await req.json();
 
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
     // SECURITY: Only allow users to delete their own orphaned user
     // (This endpoint should only be called during signup errors)
-    if (userId !== session.user.id) {
+    if (userId !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized to delete this user' },
         { status: 403 }
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
     }
 
     // SECURITY: Audit log for user deletion
-    logger.info(`[AUDIT] User ${session.user.id} successfully deleted orphaned user ${userId}`, { component: 'api-route' });
+    logger.info(`[AUDIT] User ${user.id} successfully deleted orphaned user ${userId}`, { component: 'api-route' });
 
     return NextResponse.json({ success: true });
   } catch (error) {

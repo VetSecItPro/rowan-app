@@ -70,17 +70,17 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
-    const callerId = session.user.id;
+    setSentryUser(user);
+    const callerId = user.id;
 
     // Check if VAPID is configured
     if (!vapidPublicKey || !vapidPrivateKey) {

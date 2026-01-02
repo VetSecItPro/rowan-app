@@ -31,9 +31,9 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse and validate request body with Zod
     const body = await req.json();
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     // SECURITY: Verify user is member of space before creating invitation
     try {
-      await verifySpaceAccess(session.user.id, validatedData.space_id);
+      await verifySpaceAccess(user.id, validatedData.space_id);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have permission to invite users to this space' },
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     const result = await createInvitation(
       validatedData.space_id,
       validatedData.email,
-      session.user.id,
+      user.id,
       validatedData.role
     );
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     // Get space name and inviter name in parallel for speed
     const [spaceResult, userResult] = await Promise.all([
       supabase.from('spaces').select('name').eq('id', validatedData.space_id).single(),
-      supabase.from('users').select('name').eq('id', session.user.id).single(),
+      supabase.from('users').select('name').eq('id', user.id).single(),
     ]);
 
     const spaceData = spaceResult.data;

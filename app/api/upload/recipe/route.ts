@@ -28,16 +28,16 @@ export async function POST(req: NextRequest) {
     // Verify authentication
     const supabase = await createClient();
     const {
-      data: { session },
+      data: { user },
       error: authError,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse multipart form data
     const formData = await req.formData();
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Upload recipe image using storage service
-    const result = await uploadRecipeImage(file, session.user.id);
+    const result = await uploadRecipeImage(file, user.id);
 
     if (!result.success) {
       return NextResponse.json(
