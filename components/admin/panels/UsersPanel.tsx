@@ -14,6 +14,7 @@ import {
   Calendar,
   Eye,
   RefreshCw,
+  Clock,
 } from 'lucide-react';
 
 interface User {
@@ -238,10 +239,10 @@ export const UsersPanel = memo(function UsersPanel() {
                   <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
                           <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {user.email}
                         </span>
                       </div>
@@ -282,19 +283,20 @@ export const UsersPanel = memo(function UsersPanel() {
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Code Status</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Conversion</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Requested</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredBetaRequests.slice(0, 10).map((request) => (
+                {filteredBetaRequests.slice(0, 20).map((request) => (
                   <tr key={request.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center flex-shrink-0">
                           <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {request.email}
                         </span>
                       </div>
@@ -302,17 +304,32 @@ export const UsersPanel = memo(function UsersPanel() {
                     <td className="px-4 py-3">
                       {request.access_granted ? (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                          <UserCheck className="w-3 h-3 mr-1" />
-                          Approved
+                          <Mail className="w-3 h-3 mr-1" />
+                          Code Sent
                         </span>
                       ) : (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                          <Mail className="w-3 h-3 mr-1" />
+                          <Clock className="w-3 h-3 mr-1" />
                           Pending
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                    <td className="px-4 py-3">
+                      {request.user_id ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                          <UserCheck className="w-3 h-3 mr-1" />
+                          Signed Up
+                        </span>
+                      ) : request.access_granted ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Pending Signup
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
                       {formatDate(request.created_at)}
                     </td>
                   </tr>
@@ -325,9 +342,9 @@ export const UsersPanel = memo(function UsersPanel() {
                 <p>No beta requests found</p>
               </div>
             )}
-            {filteredBetaRequests.length > 10 && (
+            {filteredBetaRequests.length > 20 && (
               <div className="p-3 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
-                Showing 10 of {filteredBetaRequests.length} requests
+                Showing 20 of {filteredBetaRequests.length} requests
               </div>
             )}
           </div>
