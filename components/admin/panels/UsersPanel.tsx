@@ -114,13 +114,21 @@ export const UsersPanel = memo(function UsersPanel() {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
+  // State to force cache refresh
+  const [forceRefresh, setForceRefresh] = useState(false);
+
   // React Query for beta requests with caching
   const { data: betaData, isLoading: betaLoading, refetch: refetchBeta } = useQuery({
-    queryKey: ['admin-beta-requests', timeRange],
+    queryKey: ['admin-beta-requests', timeRange, forceRefresh],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/beta-requests?range=${timeRange}`);
+      const url = forceRefresh
+        ? `/api/admin/beta-requests?refresh=true`
+        : `/api/admin/beta-requests`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch beta requests');
       const data = await response.json();
+      // Reset force refresh after successful fetch
+      if (forceRefresh) setForceRefresh(false);
       return data.requests || [];
     },
     staleTime: 2 * 60 * 1000,
@@ -132,6 +140,7 @@ export const UsersPanel = memo(function UsersPanel() {
   const isLoading = usersLoading || betaLoading;
 
   const fetchData = useCallback(() => {
+    setForceRefresh(true);
     refetchUsers();
     refetchBeta();
   }, [refetchUsers, refetchBeta]);
