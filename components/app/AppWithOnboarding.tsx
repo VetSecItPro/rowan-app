@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { DashboardSkeleton, SpacesLoadingState } from '@/components/ui/LoadingStates';
-import { BetaFeedbackButton } from '@/components/beta/BetaFeedbackButton';
 import { SubscriptionProvider } from '@/lib/contexts/subscription-context';
 import { UpgradeModal } from '@/components/subscription';
 import { logger } from '@/lib/logger';
@@ -92,7 +91,6 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
   return (
     <SubscriptionProvider>
       {children}
-      <BetaFeedbackButton />
     </SubscriptionProvider>
   );
 }

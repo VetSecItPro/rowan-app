@@ -1597,8 +1597,9 @@ select:focus,
   /* Stats cards mobile grid - equal height cards per row */
   /* Note: display:grid is NOT included here - it must be set via utility classes */
   /* This allows the grid to be hidden/shown with hidden/grid classes */
+  /* Responsive: 1 col (mobile) → 2 cols (480px+) → 2 cols (all tablets) → 4 cols (desktop 1280px+) */
   .stats-grid-mobile {
-    @apply grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6;
+    @apply grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 xl:gap-6;
   }
 
   /* Ensure grid children stretch to match row height */

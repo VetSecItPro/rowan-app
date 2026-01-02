@@ -22,6 +22,11 @@ import {
   UserPlus,
   HeartPulse,
   Download,
+  GitBranch,
+  LayoutDashboard,
+  Zap,
+  DollarSign,
+  Settings,
   type LucideIcon
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
@@ -29,14 +34,13 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 // Import content panels for tabbed management console
 import {
   UsersPanel,
-  BetaProgramPanel,
-  AnalyticsPanel,
-  FeatureUsagePanel,
-  SubscriptionsPanel,
+  OverviewPanel,
+  GrowthPanel,
+  EngagementPanel,
+  RetentionPanel,
+  RevenuePanel,
+  SystemPanel,
   BetaFeedbackPanel,
-  NotificationsPanel,
-  HealthPanel,
-  ExportPanel,
 } from '@/components/admin/panels';
 
 interface DashboardStats {
@@ -57,25 +61,25 @@ interface ActivityItem {
   email?: string;
 }
 
-type TabId = 'users' | 'beta' | 'notifications' | 'analytics' | 'subscriptions' | 'features' | 'feedback' | 'health' | 'export';
+type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'feedback' | 'system';
 
 interface Tab {
   id: TabId;
   label: string;
   icon: LucideIcon;
   color: string;
+  description?: string;
 }
 
 const TABS: Tab[] = [
-  { id: 'users', label: 'Users', icon: Users, color: 'text-blue-500' },
-  { id: 'beta', label: 'Beta Program', icon: Shield, color: 'text-purple-500' },
-  { id: 'notifications', label: 'Launch Signups', icon: Mail, color: 'text-green-500' },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3, color: 'text-cyan-500' },
-  { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, color: 'text-emerald-500' },
-  { id: 'features', label: 'Features', icon: Layers, color: 'text-amber-500' },
-  { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-pink-500' },
-  { id: 'health', label: 'Health', icon: HeartPulse, color: 'text-red-500' },
-  { id: 'export', label: 'Export', icon: Download, color: 'text-gray-500' },
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard, color: 'text-blue-500', description: 'Key metrics at a glance' },
+  { id: 'users', label: 'Users', icon: Users, color: 'text-indigo-500', description: 'User management' },
+  { id: 'growth', label: 'Growth', icon: TrendingUp, color: 'text-green-500', description: 'Acquisition & funnel' },
+  { id: 'engagement', label: 'Engagement', icon: Zap, color: 'text-cyan-500', description: 'Traffic & features' },
+  { id: 'retention', label: 'Retention', icon: Activity, color: 'text-purple-500', description: 'DAU/MAU & cohorts' },
+  { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-orange-500', description: 'Subscriptions & MRR' },
+  { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-pink-500', description: 'Beta user feedback' },
+  { id: 'system', label: 'System', icon: Settings, color: 'text-gray-500', description: 'Health & settings' },
 ];
 
 // Memoized StatCard component
@@ -216,10 +220,10 @@ function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get initial tab from URL or default to null (no default tab)
+  // Get initial tab from URL or default to 'overview'
   const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const validTabs: TabId[] = ['users', 'beta', 'notifications', 'analytics', 'subscriptions', 'features', 'feedback', 'health', 'export'];
-  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : null;
+  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'feedback', 'system'];
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'overview';
 
   const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
 
@@ -307,40 +311,25 @@ function AdminDashboardContent() {
 
   // Render the active panel content
   const renderPanel = () => {
-    // If no tab is selected, show a welcome/select message
-    if (!activeTab) {
-      return (
-        <div className="flex flex-col items-center justify-center py-12 text-center h-full">
-          <Layers className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Management Console</h3>
-          <p className="text-gray-500 dark:text-gray-400 max-w-md">
-            Select a tab above to manage users, view analytics, handle feedback, and more.
-          </p>
-        </div>
-      );
-    }
-
     switch (activeTab) {
+      case 'overview':
+        return <OverviewPanel />;
       case 'users':
         return <UsersPanel />;
-      case 'beta':
-        return <BetaProgramPanel />;
-      case 'notifications':
-        return <NotificationsPanel />;
-      case 'analytics':
-        return <AnalyticsPanel />;
-      case 'subscriptions':
-        return <SubscriptionsPanel />;
-      case 'features':
-        return <FeatureUsagePanel />;
+      case 'growth':
+        return <GrowthPanel />;
+      case 'engagement':
+        return <EngagementPanel />;
+      case 'retention':
+        return <RetentionPanel />;
+      case 'revenue':
+        return <RevenuePanel />;
       case 'feedback':
         return <BetaFeedbackPanel />;
-      case 'health':
-        return <HealthPanel />;
-      case 'export':
-        return <ExportPanel />;
+      case 'system':
+        return <SystemPanel />;
       default:
-        return null;
+        return <OverviewPanel />;
     }
   };
 
@@ -360,7 +349,7 @@ function AdminDashboardContent() {
               </Link>
               <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 hidden sm:block" />
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Shield className="w-4 h-4 text-white" />
                 </div>
                 <div>
@@ -394,51 +383,51 @@ function AdminDashboardContent() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <StatCard
               title="Total Users"
-              value={stats.totalUsers}
+              value={stats.totalUsers ?? 0}
               icon={Users}
               color="blue"
-              trend={stats.totalUsers > 0 ? "up" : undefined}
-              trendValue={stats.totalUsers > 0 ? "Growing" : undefined}
+              trend={(stats.totalUsers ?? 0) > 0 ? "up" : undefined}
+              trendValue={(stats.totalUsers ?? 0) > 0 ? "Growing" : undefined}
             />
             <StatCard
               title="Active Users"
-              value={stats.activeUsers}
+              value={stats.activeUsers ?? 0}
               icon={UserCheck}
               color="green"
-              trend={stats.activeUsers > 0 ? "up" : undefined}
-              trendValue={stats.activeUsers > 0 ? "Active" : undefined}
+              trend={(stats.activeUsers ?? 0) > 0 ? "up" : undefined}
+              trendValue={(stats.activeUsers ?? 0) > 0 ? "Active" : undefined}
             />
             <StatCard
               title="Beta Users"
-              value={`${stats.betaUsers}/100`}
+              value={`${stats.betaUsers ?? 0}/100`}
               icon={Shield}
               color="purple"
-              trend={stats.betaUsers > 0 ? "up" : undefined}
-              trendValue={stats.betaUsers < 100 ? `${100 - stats.betaUsers} slots left` : "Full"}
+              trend={(stats.betaUsers ?? 0) > 0 ? "up" : undefined}
+              trendValue={(stats.betaUsers ?? 0) < 100 ? `${100 - (stats.betaUsers ?? 0)} slots left` : "Full"}
             />
             <StatCard
               title="Launch Signups"
-              value={stats.launchSignups}
+              value={stats.launchSignups ?? 0}
               icon={Mail}
               color="orange"
-              trend={stats.launchSignups > 0 ? "up" : undefined}
-              trendValue={stats.launchSignups > 0 ? "Interested" : undefined}
+              trend={(stats.launchSignups ?? 0) > 0 ? "up" : undefined}
+              trendValue={(stats.launchSignups ?? 0) > 0 ? "Interested" : undefined}
             />
             <StatCard
               title="Beta Requests"
-              value={stats.betaRequestsToday}
+              value={stats.betaRequestsToday ?? 0}
               icon={Activity}
               color="red"
-              trend={stats.betaRequestsToday > 0 ? "neutral" : undefined}
-              trendValue={stats.betaRequestsToday > 0 ? "Today" : undefined}
+              trend={(stats.betaRequestsToday ?? 0) > 0 ? "neutral" : undefined}
+              trendValue={(stats.betaRequestsToday ?? 0) > 0 ? "Today" : undefined}
             />
             <StatCard
               title="Signups Today"
-              value={stats.signupsToday}
+              value={stats.signupsToday ?? 0}
               icon={TrendingUp}
               color="gray"
-              trend={stats.signupsToday > 0 ? "up" : undefined}
-              trendValue={stats.signupsToday > 0 ? "Today" : undefined}
+              trend={(stats.signupsToday ?? 0) > 0 ? "up" : undefined}
+              trendValue={(stats.signupsToday ?? 0) > 0 ? "Today" : undefined}
             />
           </div>
         )}
@@ -451,7 +440,7 @@ function AdminDashboardContent() {
               System Status
             </h3>
             <button
-              onClick={() => setActiveTab('health')}
+              onClick={() => setActiveTab('system')}
               className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
             >
               View Details
@@ -525,10 +514,17 @@ function AdminDashboardContent() {
 
         {/* Row 4: Management Console (Tabbed Content Area) - Fills remaining space */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex-1 flex flex-col">
-          {/* Tab Navigation - Horizontal Scrollable */}
+          {/* Console Header */}
+          <div className="bg-indigo-600 dark:bg-indigo-700 px-4 py-3">
+            <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+              <Layers className="w-4 h-4" />
+              Management Console
+            </h2>
+          </div>
+          {/* Tab Navigation - Centered */}
           <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-2 py-2">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {TABS.map((tab) => (
                   <TabButton
                     key={tab.id}
