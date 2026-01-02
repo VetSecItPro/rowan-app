@@ -15,6 +15,9 @@ import {
   Eye,
   RefreshCw,
   Clock,
+  Send,
+  Check,
+  Loader2,
 } from 'lucide-react';
 
 interface User {
@@ -68,6 +71,35 @@ export const UsersPanel = memo(function UsersPanel() {
   const [filter, setFilter] = useState<'all' | 'beta' | 'active' | 'inactive'>('all');
   const [activeTab, setActiveTab] = useState<'users' | 'beta'>('users');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
+  const [resendingEmail, setResendingEmail] = useState<string | null>(null);
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
+
+  // Handle resend invite email
+  const handleResendInvite = useCallback(async (email: string) => {
+    setResendingEmail(email);
+    setResendSuccess(null);
+    try {
+      const response = await fetch('/api/admin/beta/resend-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to resend invite');
+      }
+
+      setResendSuccess(email);
+      // Clear success state after 3 seconds
+      setTimeout(() => setResendSuccess(null), 3000);
+    } catch (error) {
+      console.error('Resend invite error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to resend invite');
+    } finally {
+      setResendingEmail(null);
+    }
+  }, []);
 
   // React Query for users with caching
   const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = useQuery({
@@ -286,6 +318,7 @@ export const UsersPanel = memo(function UsersPanel() {
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Code Status</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Conversion</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Requested</th>
+                  <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -331,6 +364,38 @@ export const UsersPanel = memo(function UsersPanel() {
                     </td>
                     <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
                       {formatDate(request.created_at)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {request.user_id ? (
+                        <span className="text-xs text-gray-400">—</span>
+                      ) : (
+                        <button
+                          onClick={() => handleResendInvite(request.email)}
+                          disabled={resendingEmail === request.email}
+                          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                            resendSuccess === request.email
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/40'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          {resendingEmail === request.email ? (
+                            <>
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              Sending...
+                            </>
+                          ) : resendSuccess === request.email ? (
+                            <>
+                              <Check className="w-3 h-3" />
+                              Sent!
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3 h-3" />
+                              Resend
+                            </>
+                          )}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
