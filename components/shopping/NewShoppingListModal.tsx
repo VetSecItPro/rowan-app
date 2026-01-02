@@ -76,7 +76,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
             users:user_id (
               id,
               email,
-              display_name
+              name
             )
           `)
           .eq('space_id', spaceId)
@@ -85,7 +85,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
         if (!error && data) {
           setSpaceMembers(data.map((member: any) => ({
             user_id: member.user_id,
-            display_name: member.users?.display_name,
+            display_name: member.users?.name,
             email: member.users?.email,
             role: member.role,
           })));

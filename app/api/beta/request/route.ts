@@ -32,7 +32,8 @@ const resend = process.env.RESEND_API_KEY
 // Request validation schema
 const requestSchema = z.object({
   email: z.string().email('Invalid email address'),
-  name: z.string().min(1, 'Name is required').max(100).optional(),
+  firstName: z.string().min(1, 'First name is required').max(50),
+  lastName: z.string().min(1, 'Last name is required').max(50),
 });
 
 /**
@@ -69,7 +70,8 @@ export async function POST(req: NextRequest) {
 
     // Parse and validate request body
     const body = await req.json();
-    const { email, name } = requestSchema.parse(body);
+    const { email, firstName, lastName } = requestSchema.parse(body);
+    const fullName = `${firstName} ${lastName}`.trim();
 
     // Validate email (format + disposable domain check)
     const emailValidation = validateEmail(email, {
@@ -135,7 +137,7 @@ export async function POST(req: NextRequest) {
 
       // Resend the existing code (non-blocking for fast response)
       if (resend) {
-        sendBetaInviteEmail(normalizedEmail, existingCode.code, name).catch((err) => {
+        sendBetaInviteEmail(normalizedEmail, existingCode.code, fullName).catch((err) => {
           console.error('Failed to resend beta invite email:', err);
         });
       }
@@ -180,12 +182,14 @@ export async function POST(req: NextRequest) {
 
     const inviteCode = newCodes[0].code;
 
-    // Update the invite code with the email
+    // Update the invite code with the email and name
     await supabaseAdmin
       .from('beta_invite_codes')
       .update({
         email: normalizedEmail,
-        notes: name ? `Requested by: ${name}` : 'Email request',
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        notes: `Requested by: ${fullName}`,
       })
       .eq('code', inviteCode);
 
@@ -201,7 +205,7 @@ export async function POST(req: NextRequest) {
 
     // Send the invite email (non-blocking for fast response)
     if (resend) {
-      sendBetaInviteEmail(normalizedEmail, inviteCode, name).catch((err) => {
+      sendBetaInviteEmail(normalizedEmail, inviteCode, fullName).catch((err) => {
         console.error('Failed to send beta invite email:', err);
       });
     }
@@ -279,7 +283,7 @@ What to expect:
 • Full access to all features until February 15, 2026
 • Your feedback directly shapes the final product
 • Exclusive beta tester badge
-• Special pricing when we launch
+• 20% lifetime discount when you convert to a paid plan
 
 Questions? Just reply to this email – we read every message.
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, memo, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
 import { useAdmin } from '@/hooks/useAdmin';
@@ -12,20 +12,27 @@ const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
 const HOVER_DELAY = 200; // ms delay before hover expand
 const HOVER_COLLAPSE_DELAY = 300; // ms delay before hover collapse
 
-// Memoized nav item for performance
+// Memoized nav item for performance with aggressive prefetching
 const NavItemComponent = memo(function NavItemComponent({
   item,
   isActive,
   isExpanded,
+  onPrefetch,
 }: {
   item: NavItem;
   isActive: boolean;
   isExpanded: boolean;
+  onPrefetch: (href: string) => void;
 }) {
   const Icon = item.icon;
 
+  // Prefetch on mouse enter for instant navigation
+  const handleMouseEnter = useCallback(() => {
+    onPrefetch(item.href);
+  }, [item.href, onPrefetch]);
+
   return (
-    <li>
+    <li onMouseEnter={handleMouseEnter}>
       <Link
         href={item.href}
         prefetch={true}
@@ -98,13 +105,41 @@ export function Sidebar() {
   const [isHoverExpanded, setIsHoverExpanded] = useState(false); // Temporary expansion on hover
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { isAdmin } = useAdmin();
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+  const prefetchedRoutesRef = useRef<Set<string>>(new Set());
 
   // Effective expanded state (either pinned or hover-expanded)
   const effectivelyExpanded = isExpanded || isHoverExpanded;
+
+  // Prefetch a route (with deduplication)
+  const prefetchRoute = useCallback((href: string) => {
+    if (!prefetchedRoutesRef.current.has(href)) {
+      prefetchedRoutesRef.current.add(href);
+      router.prefetch(href);
+    }
+  }, [router]);
+
+  // Prefetch all navigation routes on mount for instant loading
+  useEffect(() => {
+    if (mounted) {
+      // Prefetch all feature routes after a short delay to not block initial render
+      const timer = setTimeout(() => {
+        NAVIGATION_ITEMS.forEach(item => {
+          prefetchRoute(item.href);
+        });
+        // Also prefetch admin route if admin
+        if (isAdmin) {
+          prefetchRoute('/admin/dashboard');
+        }
+      }, 1000); // Wait 1 second after mount to prefetch
+
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, isAdmin, prefetchRoute]);
 
   // Load saved state from localStorage - default collapsed on all screen sizes
   useEffect(() => {
@@ -251,6 +286,7 @@ export function Sidebar() {
                 item={item}
                 isActive={activeStates[index] ?? false}
                 isExpanded={effectivelyExpanded}
+                onPrefetch={prefetchRoute}
               />
             ))}
           </ul>
@@ -276,6 +312,7 @@ export function Sidebar() {
               }}
               isActive={pathname === '/admin/dashboard' || (pathname?.startsWith('/admin/dashboard') ?? false)}
               isExpanded={effectivelyExpanded}
+              onPrefetch={prefetchRoute}
             />
           </ul>
         </div>

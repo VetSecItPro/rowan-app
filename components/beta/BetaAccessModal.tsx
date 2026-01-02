@@ -7,7 +7,7 @@ import { Users, Calendar, Ticket, Mail, ArrowLeft, CheckCircle } from 'lucide-re
 interface BetaAccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (inviteCodeId?: string) => void;
+  onSuccess: (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => void;
   onSwitchToLaunch?: () => void;
 }
 
@@ -26,7 +26,8 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
   const [viewMode, setViewMode] = useState<ViewMode>('choice');
   const [inviteCode, setInviteCode] = useState('');
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [betaStatus, setBetaStatus] = useState<BetaStatus | null>(null);
@@ -84,7 +85,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, name: name || undefined }),
+        body: JSON.stringify({ email, firstName, lastName }),
       });
 
       const data = await response.json();
@@ -139,9 +140,9 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
       }
 
       if (data.success) {
-        // Pass the actual invite code (not just the ID) so it can be used in signup URL
-        onSuccess(inviteCode);
-        onClose();
+        // Pass the invite code, email, and name to navigate directly to signup
+        // Don't call onClose() - we're navigating away, and closing the modal first causes a flash
+        onSuccess(inviteCode, data.email, data.first_name, data.last_name);
       } else {
         setError(data.error || 'Invalid invite code');
       }
@@ -155,7 +156,8 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
   const handleClose = () => {
     setInviteCode('');
     setEmail('');
-    setName('');
+    setFirstName('');
+    setLastName('');
     setError('');
     setIsLoading(false);
     setViewMode('choice');
@@ -418,26 +420,44 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             </div>
 
             <form onSubmit={handleEmailRequest} className="space-y-4">
-              {/* Name Field (optional) */}
-              <div>
-                <label htmlFor="beta-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  First Name <span className="text-gray-400">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  id="beta-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your first name"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
-                  disabled={isLoading}
-                />
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="beta-first-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="beta-first-name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="beta-last-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="beta-last-name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Email Field */}
               <div>
                 <label htmlFor="beta-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -481,7 +501,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading || !email.trim()}
+                  disabled={isLoading || !email.trim() || !firstName.trim() || !lastName.trim()}
                   className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isLoading ? (

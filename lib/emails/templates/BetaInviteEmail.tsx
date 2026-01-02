@@ -126,7 +126,7 @@ const BetaInviteEmail = ({
               <Column style={expectItem}>
                 <Text style={expectIcon}>💰</Text>
                 <Text style={expectText}>
-                  <strong>Special pricing</strong> - early supporter discounts when we launch
+                  <strong>20% lifetime discount</strong> - exclusive pricing for beta testers when you convert to a paid plan
                 </Text>
               </Column>
             </Row>

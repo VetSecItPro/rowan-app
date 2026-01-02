@@ -180,9 +180,20 @@ export default function HomePage() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
-  const handleBetaSuccess = (inviteCode?: string) => {
+  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
     if (inviteCode) {
-      router.push(`/signup?beta_code=${encodeURIComponent(inviteCode)}`);
+      const params = new URLSearchParams();
+      params.set('beta_code', inviteCode);
+      if (email) {
+        params.set('email', email);
+      }
+      if (firstName) {
+        params.set('first_name', firstName);
+      }
+      if (lastName) {
+        params.set('last_name', lastName);
+      }
+      router.push(`/signup?${params.toString()}`);
     } else {
       router.push('/signup');
     }
