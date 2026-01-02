@@ -135,4 +135,6 @@ export const ADMIN_CACHE_KEYS = {
   subscriptionEvents: (eventType: string | null, limit: number, offset: number) =>
     `subscriptions:events:${eventType || 'all'}:${limit}:${offset}`,
   dailyRevenue: (days: number) => `subscriptions:revenue:${days}d`,
+  retention: (range: string) => `retention:${range}`,
+  acquisition: (range: string) => `acquisition:${range}`,
 } as const;

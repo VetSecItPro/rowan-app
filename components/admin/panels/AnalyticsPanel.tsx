@@ -6,12 +6,50 @@ import {
   BarChart3,
   TrendingUp,
   Users,
-  Shield,
-  Mail,
-  Target,
+  Eye,
+  Clock,
+  Monitor,
+  Globe,
   RefreshCw,
   Activity,
+  MousePointer,
+  Layers,
 } from 'lucide-react';
+
+interface TrafficMetrics {
+  totalPageViews: number;
+  totalEventsAllTime: number;
+  uniqueSessions: number;
+  uniqueUsers: number;
+  avgPagesPerSession: number;
+}
+
+interface DeviceBreakdown {
+  [key: string]: string | number;
+  device: string;
+  count: number;
+  percentage: number;
+}
+
+interface BrowserBreakdown {
+  [key: string]: string | number;
+  browser: string;
+  count: number;
+  percentage: number;
+}
+
+interface OsBreakdown {
+  [key: string]: string | number;
+  os: string;
+  count: number;
+  percentage: number;
+}
+
+interface TopPage {
+  page: string;
+  views: number;
+  percentage: number;
+}
 
 interface AnalyticsData {
   summary: {
@@ -21,7 +59,16 @@ interface AnalyticsData {
     activeBetaUsers: number;
     growthRate: number;
     churnRate: number;
+    totalPageViews: number;
+    uniqueVisitors: number;
   };
+  trafficMetrics: TrafficMetrics;
+  trafficTrends: Array<{ date: string; pageViews: number }>;
+  deviceBreakdown: DeviceBreakdown[];
+  browserBreakdown: BrowserBreakdown[];
+  osBreakdown: OsBreakdown[];
+  topPages: TopPage[];
+  hourlyActivity: number[];
   betaMetrics: {
     conversionRate: number;
     approvalRate: number;
@@ -31,116 +78,233 @@ interface AnalyticsData {
   userGrowth: Array<{ date: string; users: number }>;
 }
 
+// Metric Card Component
 const MetricCard = memo(function MetricCard({
   title,
   value,
-  change,
-  color = 'blue'
+  subtitle,
+  icon: Icon,
+  color = 'cyan'
 }: {
   title: string;
   value: string | number;
-  change?: string;
-  color?: 'blue' | 'green' | 'purple' | 'orange';
+  subtitle?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color?: 'cyan' | 'blue' | 'green' | 'purple' | 'orange' | 'pink';
+}) {
+  const colorClasses: Record<string, { bg: string; icon: string }> = {
+    cyan: { bg: 'bg-cyan-500', icon: 'text-cyan-500' },
+    blue: { bg: 'bg-blue-500', icon: 'text-blue-500' },
+    green: { bg: 'bg-green-500', icon: 'text-green-500' },
+    purple: { bg: 'bg-purple-500', icon: 'text-purple-500' },
+    orange: { bg: 'bg-orange-500', icon: 'text-orange-500' },
+    pink: { bg: 'bg-pink-500', icon: 'text-pink-500' },
+  };
+
+  return (
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{title}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+          {subtitle && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{subtitle}</p>
+          )}
+        </div>
+        <div className={`w-10 h-10 ${colorClasses[color].bg} rounded-lg flex items-center justify-center flex-shrink-0 opacity-80`}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Traffic Chart Component
+const TrafficChart = memo(function TrafficChart({
+  data
+}: {
+  data: Array<{ date: string; pageViews: number }>
+}) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-32 flex items-center justify-center text-gray-400 text-sm">
+        No traffic data available
+      </div>
+    );
+  }
+
+  const maxViews = Math.max(...data.map(d => d.pageViews), 1);
+  const totalViews = data.reduce((sum, d) => sum + d.pageViews, 0);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+        <span>Page views over time</span>
+        <span className="font-medium">{totalViews} total</span>
+      </div>
+      <div className="h-24 flex items-end gap-1">
+        {data.slice(-14).map((day, i) => {
+          const height = (day.pageViews / maxViews) * 100;
+          return (
+            <div
+              key={i}
+              className="flex-1 flex flex-col items-center gap-1"
+              title={`${day.date}: ${day.pageViews} views`}
+            >
+              <div
+                className="w-full bg-cyan-500 rounded-t transition-all duration-300 min-h-[2px]"
+                style={{ height: `${Math.max(height, 2)}%` }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between text-[10px] text-gray-400">
+        <span>{data.slice(-14)[0]?.date.slice(5)}</span>
+        <span>{data[data.length - 1]?.date.slice(5)}</span>
+      </div>
+    </div>
+  );
+});
+
+// Generic breakdown item type
+interface BreakdownItem {
+  [key: string]: string | number;
+  count: number;
+  percentage: number;
+}
+
+// Horizontal Bar Chart for breakdowns
+const HorizontalBarChart = memo(function HorizontalBarChart({
+  data,
+  labelKey,
+  valueKey,
+  color = 'cyan',
+  maxItems = 5,
+}: {
+  data: BreakdownItem[];
+  labelKey: string;
+  valueKey: string;
+  color?: 'cyan' | 'blue' | 'green' | 'purple' | 'orange';
+  maxItems?: number;
 }) {
   const colorClasses: Record<string, string> = {
+    cyan: 'bg-cyan-500',
     blue: 'bg-blue-500',
     green: 'bg-green-500',
     purple: 'bg-purple-500',
     orange: 'bg-orange-500',
   };
 
-  return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{title}</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
-          {change && (
-            <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{change}</p>
-          )}
-        </div>
-        <div className={`w-10 h-10 ${colorClasses[color]} rounded-lg flex items-center justify-center opacity-80`}>
-          {color === 'blue' && <Users className="w-5 h-5 text-white" />}
-          {color === 'green' && <Mail className="w-5 h-5 text-white" />}
-          {color === 'purple' && <Shield className="w-5 h-5 text-white" />}
-          {color === 'orange' && <Target className="w-5 h-5 text-white" />}
-        </div>
-      </div>
-    </div>
-  );
-});
+  const slicedData = data.slice(0, maxItems);
+  const maxValue = Math.max(...slicedData.map(d => d[valueKey] as number), 1);
 
-const ProgressBar = memo(function ProgressBar({
-  label,
-  value,
-  color = 'blue'
-}: {
-  label: string;
-  value: number;
-  color?: 'blue' | 'green' | 'purple';
-}) {
-  const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    purple: 'bg-purple-500',
-  };
-
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-600 dark:text-gray-400">{label}</span>
-        <span className="font-medium text-gray-900 dark:text-white">{value}%</span>
-      </div>
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-        <div
-          className={`h-2 rounded-full transition-all duration-500 ${colorClasses[color]}`}
-          style={{ width: `${Math.min(value, 100)}%` }}
-        />
-      </div>
-    </div>
-  );
-});
-
-// Simple mini line chart
-const MiniChart = memo(function MiniChart({ data }: { data: Array<{ date: string; users: number }> }) {
-  if (!data || data.length === 0) {
+  if (slicedData.length === 0) {
     return (
-      <div className="h-20 flex items-center justify-center text-gray-400 text-sm">
-        No data available
-      </div>
+      <div className="text-sm text-gray-400 text-center py-4">No data</div>
     );
   }
 
-  const maxUsers = Math.max(...data.map(d => d.users));
-  const minUsers = Math.min(...data.map(d => d.users));
-  const range = maxUsers - minUsers || 1;
+  return (
+    <div className="space-y-2">
+      {slicedData.map((item, i) => (
+        <div key={i} className="space-y-1">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-gray-700 dark:text-gray-300 truncate max-w-[120px]">
+              {item[labelKey]}
+            </span>
+            <span className="text-gray-500 dark:text-gray-400 font-medium">
+              {item[valueKey]} ({item.percentage}%)
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+            <div
+              className={`h-1.5 rounded-full transition-all duration-500 ${colorClasses[color]}`}
+              style={{ width: `${((item[valueKey] as number) / maxValue) * 100}%` }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
 
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * 100;
-    const y = 100 - ((d.users - minUsers) / range) * 100;
-    return `${x},${y}`;
-  }).join(' ');
+// Top Pages Component
+const TopPagesChart = memo(function TopPagesChart({ pages }: { pages: TopPage[] }) {
+  if (pages.length === 0) {
+    return (
+      <div className="text-sm text-gray-400 text-center py-4">No page data</div>
+    );
+  }
+
+  const maxViews = Math.max(...pages.map(p => p.views), 1);
 
   return (
-    <svg className="w-full h-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <polygon
-        points={`0,100 ${points} 100,100`}
-        fill="url(#chartGradient)"
-      />
-      <polyline
-        fill="none"
-        stroke="#3B82F6"
-        strokeWidth="2"
-        points={points}
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
+    <div className="space-y-2">
+      {pages.slice(0, 6).map((page, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <div className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-xs font-medium text-cyan-700 dark:text-cyan-400">
+            {i + 1}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                {page.page}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                {page.views} views
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 mt-1">
+              <div
+                className="h-1 rounded-full bg-cyan-500 transition-all duration-500"
+                style={{ width: `${(page.views / maxViews) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// Hourly Activity Component
+const HourlyActivityChart = memo(function HourlyActivityChart({
+  data
+}: {
+  data: number[]
+}) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="text-sm text-gray-400 text-center py-4">No activity data</div>
+    );
+  }
+
+  const maxActivity = Math.max(...data, 1);
+
+  return (
+    <div className="space-y-2">
+      <div className="h-16 flex items-end gap-[2px]">
+        {data.map((count, hour) => {
+          const height = (count / maxActivity) * 100;
+          return (
+            <div
+              key={hour}
+              className="flex-1 bg-purple-500 rounded-t transition-all duration-300 opacity-70 hover:opacity-100"
+              style={{ height: `${Math.max(height, 4)}%` }}
+              title={`${hour}:00 - ${count} events`}
+            />
+          );
+        })}
+      </div>
+      <div className="flex justify-between text-[10px] text-gray-400">
+        <span>12am</span>
+        <span>6am</span>
+        <span>12pm</span>
+        <span>6pm</span>
+        <span>11pm</span>
+      </div>
+    </div>
   );
 });
 
@@ -155,7 +319,22 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       activeBetaUsers: 0,
       growthRate: 0,
       churnRate: 0,
+      totalPageViews: 0,
+      uniqueVisitors: 0,
     },
+    trafficMetrics: {
+      totalPageViews: 0,
+      totalEventsAllTime: 0,
+      uniqueSessions: 0,
+      uniqueUsers: 0,
+      avgPagesPerSession: 0,
+    },
+    trafficTrends: [],
+    deviceBreakdown: [],
+    browserBreakdown: [],
+    osBreakdown: [],
+    topPages: [],
+    hourlyActivity: [],
     betaMetrics: {
       conversionRate: 0,
       approvalRate: 0,
@@ -165,7 +344,6 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
     userGrowth: [],
   };
 
-  // React Query for analytics with caching
   const { data: analyticsData, isLoading, refetch } = useQuery({
     queryKey: ['admin-analytics', timeRange],
     queryFn: async () => {
@@ -180,7 +358,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
 
   const data: AnalyticsData = analyticsData || defaultData;
 
-  const fetchData = useCallback(() => {
+  const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
 
@@ -195,7 +373,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
 
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0 overflow-auto">
-      {/* Header */}
+      {/* Header with time range selector */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {(['7d', '30d', '90d'] as const).map((range) => (
@@ -213,7 +391,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
           ))}
         </div>
         <button
-          onClick={fetchData}
+          onClick={handleRefresh}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
@@ -221,76 +399,157 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
         </button>
       </div>
 
-      {/* Summary Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <MetricCard
-          title="Total Users"
-          value={data.summary.totalUsers}
-          change={data.summary.growthRate > 0 ? `+${data.summary.growthRate}% growth` : undefined}
-          color="blue"
-        />
-        <MetricCard
-          title="Notification Signups"
-          value={data.summary.totalNotifications}
-          color="green"
-        />
-        <MetricCard
-          title="Beta Users"
-          value={data.summary.activeBetaUsers}
-          color="purple"
-        />
-        <MetricCard
-          title="Conversion Rate"
-          value={`${data.betaMetrics.conversionRate}%`}
-          color="orange"
-        />
+      {/* Traffic Overview KPIs */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Eye className="w-4 h-4 text-cyan-500" />
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Traffic Overview</h3>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard
+            title="Page Views"
+            value={data.trafficMetrics?.totalPageViews || 0}
+            subtitle={`${data.trafficMetrics?.totalEventsAllTime || 0} all time`}
+            icon={Eye}
+            color="cyan"
+          />
+          <MetricCard
+            title="Unique Visitors"
+            value={data.trafficMetrics?.uniqueSessions || 0}
+            subtitle="By session"
+            icon={Users}
+            color="blue"
+          />
+          <MetricCard
+            title="Active Users"
+            value={data.trafficMetrics?.uniqueUsers || 0}
+            subtitle="Logged in"
+            icon={Activity}
+            color="green"
+          />
+          <MetricCard
+            title="Pages/Session"
+            value={data.trafficMetrics?.avgPagesPerSession || 0}
+            subtitle="Average"
+            icon={Layers}
+            color="purple"
+          />
+        </div>
       </div>
 
-      {/* User Growth Chart */}
+      {/* Traffic Chart */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-blue-500" />
-            <span className="text-sm font-medium text-gray-900 dark:text-white">User Growth</span>
-          </div>
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="w-4 h-4 text-cyan-500" />
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Traffic Trends</h3>
         </div>
-        <MiniChart data={data.userGrowth} />
+        <TrafficChart data={data.trafficTrends || []} />
       </div>
 
-      {/* Beta Metrics */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
-        <div className="flex items-center gap-2 mb-2">
-          <Activity className="w-4 h-4 text-purple-500" />
-          <span className="text-sm font-medium text-gray-900 dark:text-white">Beta Program Metrics</span>
+      {/* Two Column Layout for breakdowns */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Top Pages */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <MousePointer className="w-4 h-4 text-cyan-500" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Pages</h3>
+          </div>
+          <TopPagesChart pages={data.topPages || []} />
         </div>
-        <ProgressBar label="Approval Rate" value={data.betaMetrics.approvalRate} color="green" />
-        <ProgressBar label="Retention Rate" value={data.betaMetrics.retentionRate} color="blue" />
-        <ProgressBar label="Activity Score" value={(data.betaMetrics.averageActivityScore / 10) * 100} color="purple" />
+
+        {/* Hourly Activity */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="w-4 h-4 text-purple-500" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Activity by Hour</h3>
+          </div>
+          <HourlyActivityChart data={data.hourlyActivity || []} />
+        </div>
       </div>
 
-      {/* Insights */}
-      {data.summary.totalUsers > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200">Growth</h4>
-            <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-              Tracking user growth patterns
-            </p>
+      {/* Three Column Layout for device/browser/OS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Device Breakdown */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Monitor className="w-4 h-4 text-blue-500" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Devices</h3>
           </div>
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <h4 className="text-sm font-medium text-green-900 dark:text-green-200">Beta Program</h4>
-            <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-              Monitoring beta engagement
-            </p>
+          <HorizontalBarChart
+            data={data.deviceBreakdown || []}
+            labelKey="device"
+            valueKey="count"
+            color="blue"
+          />
+        </div>
+
+        {/* Browser Breakdown */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe className="w-4 h-4 text-green-500" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Browsers</h3>
           </div>
-          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-            <h4 className="text-sm font-medium text-orange-900 dark:text-orange-200">Data Collection</h4>
-            <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">
-              Building analytics foundation
+          <HorizontalBarChart
+            data={data.browserBreakdown || []}
+            labelKey="browser"
+            valueKey="count"
+            color="green"
+          />
+        </div>
+
+        {/* OS Breakdown */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Layers className="w-4 h-4 text-orange-500" />
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Operating Systems</h3>
+          </div>
+          <HorizontalBarChart
+            data={data.osBreakdown || []}
+            labelKey="os"
+            valueKey="count"
+            color="orange"
+          />
+        </div>
+      </div>
+
+      {/* Beta Program Summary */}
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <BarChart3 className="w-4 h-4 text-pink-500" />
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Beta Program Summary</h3>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {data.summary.totalBetaRequests}
             </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Beta Requests</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {data.summary.activeBetaUsers}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Active Users</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {data.betaMetrics.approvalRate}%
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Approval Rate</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {data.betaMetrics.conversionRate}%
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Conversion Rate</p>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Data Note */}
+      <div className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
+        Analytics data is cached for 15 minutes. Click refresh to get latest data.
+      </div>
     </div>
   );
 });

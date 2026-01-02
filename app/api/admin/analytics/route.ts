@@ -89,6 +89,13 @@ export async function GET(req: NextRequest) {
           launchNotificationsResult,
           usersResult,
           betaUsersResult,
+          // Feature events for traffic analytics
+          featureEventsResult,
+          featureEventsTotalResult,
+          deviceBreakdownResult,
+          browserBreakdownResult,
+          topPagesResult,
+          hourlyActivityResult,
         ] = await Promise.allSettled([
           // Beta requests over time (using admin client to bypass RLS)
           supabaseAdmin
@@ -118,6 +125,45 @@ export async function GET(req: NextRequest) {
             .select('user_id, email, created_at, approved_at')
             .eq('access_granted', true)
             .not('user_id', 'is', null),
+
+          // Feature events for page view tracking
+          supabaseAdmin
+            .from('feature_events')
+            .select('feature, action, device_type, browser, os, session_id, created_at')
+            .gte('created_at', startDate.toISOString())
+            .order('created_at', { ascending: true }),
+
+          // Total feature events count (all time)
+          supabaseAdmin
+            .from('feature_events')
+            .select('*', { count: 'exact', head: true }),
+
+          // Device type breakdown
+          supabaseAdmin
+            .from('feature_events')
+            .select('device_type')
+            .gte('created_at', startDate.toISOString())
+            .not('device_type', 'is', null),
+
+          // Browser breakdown
+          supabaseAdmin
+            .from('feature_events')
+            .select('browser, os')
+            .gte('created_at', startDate.toISOString())
+            .not('browser', 'is', null),
+
+          // Top pages (features)
+          supabaseAdmin
+            .from('feature_events')
+            .select('feature')
+            .eq('action', 'page_view')
+            .gte('created_at', startDate.toISOString()),
+
+          // Hourly activity pattern
+          supabaseAdmin
+            .from('feature_events')
+            .select('created_at')
+            .gte('created_at', startDate.toISOString()),
         ]);
 
         // Process beta requests data
@@ -125,6 +171,95 @@ export async function GET(req: NextRequest) {
         const launchNotifications = launchNotificationsResult.status === 'fulfilled' ? (launchNotificationsResult.value.data || []) : [];
         const userRegistrations = usersResult.status === 'fulfilled' ? (usersResult.value.data || []) : [];
         const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.data || []) : [];
+
+        // Process feature events data
+        const featureEvents = featureEventsResult.status === 'fulfilled' ? (featureEventsResult.value.data || []) : [];
+        const totalEventsAllTime = featureEventsTotalResult.status === 'fulfilled' ? (featureEventsTotalResult.value.count || 0) : 0;
+        const deviceEvents = deviceBreakdownResult.status === 'fulfilled' ? (deviceBreakdownResult.value.data || []) : [];
+        const browserEvents = browserBreakdownResult.status === 'fulfilled' ? (browserBreakdownResult.value.data || []) : [];
+        const pageViewEvents = topPagesResult.status === 'fulfilled' ? (topPagesResult.value.data || []) : [];
+        const hourlyEvents = hourlyActivityResult.status === 'fulfilled' ? (hourlyActivityResult.value.data || []) : [];
+
+        // Define type for feature events
+        type FeatureEvent = {
+          feature: string;
+          action: string;
+          device_type: string | null;
+          browser: string | null;
+          os: string | null;
+          session_id: string | null;
+          created_at: string;
+        };
+
+        // Calculate traffic metrics
+        const totalPageViews = featureEvents.filter((e: FeatureEvent) => e.action === 'page_view').length;
+        const uniqueSessions = new Set(featureEvents.map((e: FeatureEvent) => e.session_id).filter(Boolean)).size;
+        // For unique users, we count by session since feature_events doesn't have user_id in this query
+        const uniqueUsers = uniqueSessions;
+
+        // Device breakdown
+        const deviceCounts: Record<string, number> = {};
+        deviceEvents.forEach((e: { device_type: string }) => {
+          const device = e.device_type || 'unknown';
+          deviceCounts[device] = (deviceCounts[device] || 0) + 1;
+        });
+        const deviceBreakdown = Object.entries(deviceCounts).map(([device, count]) => ({
+          device: device.charAt(0).toUpperCase() + device.slice(1),
+          count,
+          percentage: deviceEvents.length > 0 ? Math.round((count / deviceEvents.length) * 100) : 0,
+        })).sort((a, b) => b.count - a.count);
+
+        // Browser breakdown
+        const browserCounts: Record<string, number> = {};
+        browserEvents.forEach((e: { browser: string }) => {
+          const browser = e.browser || 'unknown';
+          browserCounts[browser] = (browserCounts[browser] || 0) + 1;
+        });
+        const browserBreakdown = Object.entries(browserCounts).map(([browser, count]) => ({
+          browser: browser.charAt(0).toUpperCase() + browser.slice(1),
+          count,
+          percentage: browserEvents.length > 0 ? Math.round((count / browserEvents.length) * 100) : 0,
+        })).sort((a, b) => b.count - a.count);
+
+        // OS breakdown
+        const osCounts: Record<string, number> = {};
+        browserEvents.forEach((e: { os: string }) => {
+          const os = e.os || 'unknown';
+          osCounts[os] = (osCounts[os] || 0) + 1;
+        });
+        const osBreakdown = Object.entries(osCounts).map(([os, count]) => ({
+          os: os.charAt(0).toUpperCase() + os.slice(1),
+          count,
+          percentage: browserEvents.length > 0 ? Math.round((count / browserEvents.length) * 100) : 0,
+        })).sort((a, b) => b.count - a.count);
+
+        // Top pages
+        const pageCounts: Record<string, number> = {};
+        pageViewEvents.forEach((e: { feature: string }) => {
+          const page = e.feature || 'unknown';
+          pageCounts[page] = (pageCounts[page] || 0) + 1;
+        });
+        const topPages = Object.entries(pageCounts).map(([page, views]) => ({
+          page: page.charAt(0).toUpperCase() + page.slice(1),
+          views,
+          percentage: pageViewEvents.length > 0 ? Math.round((views / pageViewEvents.length) * 100) : 0,
+        })).sort((a, b) => b.views - a.views).slice(0, 10);
+
+        // Hourly activity pattern (0-23 hours)
+        const hourlyActivity: number[] = new Array(24).fill(0);
+        hourlyEvents.forEach((e: { created_at: string }) => {
+          const hour = new Date(e.created_at).getHours();
+          hourlyActivity[hour]++;
+        });
+
+        // Daily page views for chart
+        const dailyPageViews: Record<string, number> = {};
+        featureEvents.forEach((e: { action: string; created_at: string }) => {
+          if (e.action === 'page_view') {
+            const dateStr = e.created_at.split('T')[0];
+            dailyPageViews[dateStr] = (dailyPageViews[dateStr] || 0) + 1;
+          }
+        });
 
         // Generate daily data points for line charts
         const days = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -147,11 +282,15 @@ export async function GET(req: NextRequest) {
             user.approved_at && user.approved_at.startsWith(dateStr)
           ).length;
 
+          // Page views for this day
+          const pageViewsCount = dailyPageViews[dateStr] || 0;
+
           dailyData.push({
             date: dateStr,
             betaRequests: betaRequestsCount,
             launchNotifications: launchNotificationsCount,
             userRegistrations: userRegistrationsCount,
+            pageViews: pageViewsCount,
           });
         }
 
@@ -203,12 +342,31 @@ export async function GET(req: NextRequest) {
             signups: day.userRegistrations,
             notifications: day.launchNotifications,
           })),
+          // Traffic analytics (page views over time)
+          trafficTrends: dailyData.map(day => ({
+            date: day.date,
+            pageViews: day.pageViews,
+          })),
           betaMetrics: {
             conversionRate: betaSignupRate,
             approvalRate: betaApprovalRate,
             retentionRate: activeBetaUsers > 0 ? Math.min(100, (activeBetaUsers / betaCapacity) * 100) : 0,
             averageActivityScore: activeBetaUsers > 0 ? Math.min(10, (activeBetaUsers / 30) * 10) : 0,
           },
+          // Traffic metrics
+          trafficMetrics: {
+            totalPageViews,
+            totalEventsAllTime,
+            uniqueSessions,
+            uniqueUsers,
+            avgPagesPerSession: uniqueSessions > 0 ? Math.round((totalPageViews / uniqueSessions) * 10) / 10 : 0,
+          },
+          // Breakdowns
+          deviceBreakdown,
+          browserBreakdown,
+          osBreakdown,
+          topPages,
+          hourlyActivity,
           sourceDistribution: Object.entries(sourceDistribution).map(([source, count]) => ({
             source: source.charAt(0).toUpperCase() + source.slice(1),
             count: count as number,
@@ -217,7 +375,7 @@ export async function GET(req: NextRequest) {
           activityHeatmap: dailyData.map(day => ({
             hour: new Date(day.date).getDay(), // Use day of week as hour for simplification
             day: new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
-            activity: day.betaRequests + day.launchNotifications + day.userRegistrations,
+            activity: day.betaRequests + day.launchNotifications + day.userRegistrations + day.pageViews,
           })),
           summary: {
             totalUsers: totalUserRegistrations,
@@ -226,6 +384,9 @@ export async function GET(req: NextRequest) {
             activeBetaUsers: activeBetaUsers,
             growthRate: betaGrowthRate,
             churnRate: 0, // Calculate churn rate when we have retention data
+            // Traffic summary
+            totalPageViews,
+            uniqueVisitors: uniqueSessions,
           },
           // Keep the original format for other consumers
           _legacy: {
