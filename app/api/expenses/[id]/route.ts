@@ -28,9 +28,9 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const expense = await projectsService.getExpenseById(params.id);
 
@@ -52,11 +52,11 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Verify user has access to expense's space
     try {
-      await verifyResourceAccess(session.user.id, expense);
+      await verifyResourceAccess(user.id, expense);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {
@@ -107,9 +107,9 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -118,7 +118,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse request body
     const body = await req.json();
@@ -165,7 +165,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify user has access to expense's space
     try {
-      await verifyResourceAccess(session.user.id, existingExpense);
+      await verifyResourceAccess(user.id, existingExpense);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {
@@ -219,9 +219,9 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -230,7 +230,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get expense first to verify access
     const existingExpense = await projectsService.getExpenseById(params.id);
@@ -244,7 +244,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify user has access to expense's space
     try {
-      await verifyResourceAccess(session.user.id, existingExpense);
+      await verifyResourceAccess(user.id, existingExpense);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {

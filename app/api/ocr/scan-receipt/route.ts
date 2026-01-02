@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
   try {
     // Authentication check
     const supabase = await createClient();
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
 
-    if (sessionError || !session) {
+    if (sessionError || !user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }

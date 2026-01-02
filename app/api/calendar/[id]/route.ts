@@ -31,9 +31,9 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get event
     const event = await calendarService.getEventById(params.id);
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Verify user has access to event's space
     try {
-      await verifyResourceAccess(session.user.id, event);
+      await verifyResourceAccess(user.id, event);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this calendar event' },
@@ -105,9 +105,9 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -115,7 +115,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get existing event first
     const existingEvent = await calendarService.getEventById(params.id);
@@ -129,7 +129,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify user has access to event's space
     try {
-      await verifyResourceAccess(session.user.id, existingEvent);
+      await verifyResourceAccess(user.id, existingEvent);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this calendar event' },
@@ -203,9 +203,9 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -213,7 +213,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get existing event first
     const existingEvent = await calendarService.getEventById(params.id);
@@ -227,7 +227,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify user has access to event's space
     try {
-      await verifyResourceAccess(session.user.id, existingEvent);
+      await verifyResourceAccess(user.id, existingEvent);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this calendar event' },

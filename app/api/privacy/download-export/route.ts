@@ -45,14 +45,14 @@ export async function GET(request: NextRequest) {
       }
     } else {
       // Session-based access
-      const { data: { session }, error: authError } = await supabase.auth.getSession();
-      if (authError || !session?.user) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
         return NextResponse.json(
           { success: false, error: 'Authentication required' },
           { status: 401 }
         );
       }
-      userId = session.user.id;
+      userId = user.id;
     }
 
     // Rate limiting

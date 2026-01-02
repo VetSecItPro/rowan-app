@@ -26,9 +26,9 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse request body
     const body = await req.json();
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
 
     // Accept invitation using service
-    const result = await acceptInvitation(token, session.user.id);
+    const result = await acceptInvitation(token, user.id);
 
     if (!result.success) {
       return NextResponse.json(

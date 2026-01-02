@@ -41,16 +41,16 @@ export async function POST(req: NextRequest) {
     // Verify authentication
     const supabase = await createClient();
     const {
-      data: { session },
+      data: { user },
       error: authError,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse and validate request body
     const body = await req.json();
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       .from('space_members')
       .select('*')
       .eq('space_id', spaceId)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (!spaceMembership) {
@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
         space_id: spaceId,
         name: finalListName,
         description: `Generated from ${recipes.length} recipe${recipes.length > 1 ? 's' : ''}`,
-        created_by: session.user.id,
+        created_by: user.id,
         meal_ids: mealIds,
         auto_generated: true,
       })
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
           ? `From: ${ingredient.recipes.map((r) => r.name).join(', ')}`
           : ingredient.recipes[0]?.name || null,
       recipe_id: ingredient.recipes[0]?.id || null,
-      added_by: session.user.id,
+      added_by: user.id,
       is_purchased: false,
     }));
 
@@ -182,18 +182,18 @@ export async function POST(req: NextRequest) {
 
     // Send email notification
     try {
-      const { data: user } = await supabase
+      const { data: userData } = await supabase
         .from('users')
         .select('name, email')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .single();
 
-      if (user?.email) {
+      if (userData?.email) {
         await notificationService.sendShoppingListEmail(
           {
-            id: session.user.id,
-            email: user.email,
-            name: user.name,
+            id: user.id,
+            email: userData.email,
+            name: userData.name,
           },
           finalListName,
           shoppingList.id,

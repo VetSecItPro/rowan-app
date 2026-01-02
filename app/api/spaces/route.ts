@@ -27,9 +27,9 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -38,9 +38,9 @@ export async function GET(req: NextRequest) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
-    const result = await getUserSpaces(session.user.id);
+    const result = await getUserSpaces(user.id);
 
     if (!result.success) {
       return NextResponse.json(
