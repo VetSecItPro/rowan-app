@@ -158,9 +158,9 @@ export function SearchBar() {
 
     const searchTerm = debouncedQuery.toLowerCase();
     const filtered = DOCUMENTATION_INDEX.filter(item =>
-      item.title.toLowerCase().includes(searchTerm) ||
-      item.description.toLowerCase().includes(searchTerm) ||
-      item.category.toLowerCase().includes(searchTerm)
+      (item.title || '').toLowerCase().includes(searchTerm) ||
+      (item.description || '').toLowerCase().includes(searchTerm) ||
+      (item.category || '').toLowerCase().includes(searchTerm)
     ).slice(0, 8); // Limit to 8 results
 
     setResults(filtered);
