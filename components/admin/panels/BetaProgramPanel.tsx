@@ -119,7 +119,7 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
   };
 
   const filteredUsers = betaUsers.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
