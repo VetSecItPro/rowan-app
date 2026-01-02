@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       // Use admin client to bypass RLS (anonymous users can't read invite codes)
       const { data: codeData, error: codeError } = await supabaseAdmin
         .from('beta_invite_codes')
-        .select('id, code, used_by, expires_at, is_active')
+        .select('id, code, email, first_name, last_name, used_by, expires_at, is_active')
         .or(`code.eq.${inviteCode},code.eq.${normalizedCode}`)
         .single();
 
@@ -171,6 +171,9 @@ export async function POST(req: NextRequest) {
         success: true,
         message: `Welcome to Rowan Beta! You have until February 15, 2026 to explore all features.`,
         invite_code_id: codeData.id,
+        email: codeData.email || null,
+        first_name: codeData.first_name || null,
+        last_name: codeData.last_name || null,
         slots_remaining: slotsRemaining - 1,
         beta_ends_at: BETA_DEADLINE,
         current_users: MAX_BETA_USERS - slotsRemaining,

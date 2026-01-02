@@ -107,20 +107,45 @@ export async function GET(req: NextRequest) {
           throw new Error(`Failed to fetch beta requests: ${betaError.message}`);
         }
 
+        // Get all invite codes to match with names
+        const { data: inviteCodes } = await supabaseAdmin
+          .from('beta_invite_codes')
+          .select('email, first_name, last_name, code');
+
+        // Create a map of email -> name info
+        const emailToName = new Map<string, { first_name: string | null; last_name: string | null; code: string | null }>();
+        if (inviteCodes) {
+          for (const code of inviteCodes) {
+            if (code.email) {
+              emailToName.set(code.email.toLowerCase(), {
+                first_name: code.first_name,
+                last_name: code.last_name,
+                code: code.code,
+              });
+            }
+          }
+        }
+
         // Transform the data to include additional information
         // SECURITY: password_attempt intentionally excluded to prevent credential exposure
-        const requests = (betaRequests || []).map((request: any) => ({
-          id: request.id,
-          email: request.email,
-          // password_attempt removed for security - credentials should never be exposed
-          ip_address: request.ip_address,
-          user_agent: request.user_agent,
-          access_granted: request.access_granted,
-          user_id: request.user_id,
-          created_at: request.created_at,
-          approved_at: request.approved_at,
-          notes: request.notes,
-        }));
+        const requests = (betaRequests || []).map((request: any) => {
+          const nameInfo = emailToName.get((request.email || '').toLowerCase());
+          return {
+            id: request.id,
+            email: request.email,
+            first_name: nameInfo?.first_name || null,
+            last_name: nameInfo?.last_name || null,
+            invite_code: nameInfo?.code || null,
+            // password_attempt removed for security - credentials should never be exposed
+            ip_address: request.ip_address,
+            user_agent: request.user_agent,
+            access_granted: request.access_granted,
+            user_id: request.user_id,
+            created_at: request.created_at,
+            approved_at: request.approved_at,
+            notes: request.notes,
+          };
+        });
 
         // Get summary statistics (only for actual requests with emails)
         const { data: stats, error: statsError } = await supabaseAdmin

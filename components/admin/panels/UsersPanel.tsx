@@ -33,6 +33,9 @@ interface User {
 interface BetaRequest {
   id: string;
   email: string;
+  first_name: string | null;
+  last_name: string | null;
+  invite_code: string | null;
   access_granted: boolean;
   created_at: string;
   user_id: string | null;
@@ -323,6 +326,7 @@ export const UsersPanel = memo(function UsersPanel() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Code Status</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Conversion</th>
@@ -339,9 +343,14 @@ export const UsersPanel = memo(function UsersPanel() {
                           <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                         </div>
                         <span className="font-medium text-gray-900 dark:text-white">
-                          {request.email}
+                          {request.first_name && request.last_name
+                            ? `${request.first_name} ${request.last_name}`
+                            : request.first_name || '—'}
                         </span>
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                      {request.email}
                     </td>
                     <td className="px-4 py-3">
                       {request.access_granted ? (

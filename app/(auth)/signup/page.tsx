@@ -34,8 +34,26 @@ export default function SignUpPage() {
   const betaCode = searchParams.get('beta_code');
   const inviteToken = searchParams.get('invite_token');
 
+  // Get pre-fill data from URL (when coming from beta code validation)
+  const prefillEmail = searchParams.get('email');
+  const prefillFirstName = searchParams.get('first_name');
+  const prefillLastName = searchParams.get('last_name');
+
   // Either beta_code or invite_token is valid for signup
   const hasValidAuth = !!(betaCode || inviteToken);
+
+  // Pre-fill form fields from URL params (once on mount)
+  useEffect(() => {
+    if (prefillEmail) {
+      setEmail(prefillEmail);
+    }
+    if (prefillFirstName && prefillLastName) {
+      const fullName = `${prefillFirstName} ${prefillLastName}`.trim();
+      setName(fullName);
+    } else if (prefillFirstName) {
+      setName(prefillFirstName);
+    }
+  }, [prefillEmail, prefillFirstName, prefillLastName]);
 
   // BETA PERIOD: Redirect to landing page if no valid authorization
   // Users must have either a beta code OR an invitation token

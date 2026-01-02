@@ -152,6 +152,10 @@ export function Header() {
               priority
             />
             <span className="hidden sm:inline text-2xl font-semibold gradient-text">Rowan</span>
+            {/* Beta badge next to logo */}
+            <span className="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-[10px] sm:text-xs font-bold rounded uppercase tracking-wide">
+              Beta
+            </span>
           </Link>
 
           {/* Menu, Theme Toggle & Auth Buttons */}
