@@ -1073,7 +1073,7 @@ export default function DashboardPage() {
             {loading ? (
               <div className="grid stats-grid-mobile gap-4 sm:gap-6">
                 {[...Array(8)].map((_, i) => (
-                  <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
+                  <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
                     <div className="h-28 sm:h-32 bg-gray-200 dark:bg-gray-700 rounded" />
                   </div>
                 ))}
@@ -1090,7 +1090,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                   <Link
                   href="/tasks"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-3 sm:mb-4">
                     <div className="flex-1">
@@ -1105,8 +1105,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">pending</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <CheckSquare className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <CheckSquare className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1156,7 +1156,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/calendar"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1171,8 +1171,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">upcoming</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <Calendar className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Calendar className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1209,7 +1209,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/reminders"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1224,8 +1224,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <Bell className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Bell className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1270,7 +1270,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/messages"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1285,8 +1285,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">total</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <MessageCircle className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1328,7 +1328,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/shopping"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1343,8 +1343,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">remaining</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <ShoppingCart className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1382,7 +1382,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/meals"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1397,8 +1397,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">this week</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <UtensilsCrossed className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <UtensilsCrossed className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1435,7 +1435,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/projects"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1450,8 +1450,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <Home className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Home className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1499,7 +1499,7 @@ export default function DashboardPage() {
                 <motion.div variants={fadeInUp} className="h-full">
                 <Link
                   href="/goals"
-                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                  className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -1514,8 +1514,8 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
                       </div>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                      <Target className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Target className="w-5 h-5 xl:w-6 xl:h-6 text-white" />
                     </div>
                   </div>
 
@@ -1601,7 +1601,7 @@ export default function DashboardPage() {
             {/* Left: Daily Check-In */}
             <div
               id="daily-checkin"
-              className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
+              className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
             {/* Compact Header with Date, Toggle, and Streak Badge */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <div className="flex flex-col gap-1">
@@ -2283,7 +2283,7 @@ export default function DashboardPage() {
           </div>
 
             {/* Right: Activity Feed */}
-            <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 to-stone-50/50 dark:from-slate-900/10 dark:via-gray-900/10 dark:to-stone-900/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-200/20 dark:border-gray-500/20 hover:border-gray-400/50 dark:hover:border-gray-400/50 transition-all duration-300 flex flex-col">
+            <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 to-stone-50/50 dark:from-slate-900/10 dark:via-gray-900/10 dark:to-stone-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-200/20 dark:border-gray-500/20 hover:border-gray-400/50 dark:hover:border-gray-400/50 transition-all duration-300 flex flex-col">
               {/* Header */}
               <div className="flex items-center gap-2 mb-4 flex-shrink-0">
                 <Activity className="w-5 h-5 text-purple-600 dark:text-purple-400" />

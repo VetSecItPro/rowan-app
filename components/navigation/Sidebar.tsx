@@ -38,8 +38,9 @@ const NavItemComponent = memo(function NavItemComponent({
         }`}
       >
         {/* Icon with refined gradient background and shadow */}
+        {/* Responsive: md-lg (tablet) = smaller, xl (desktop 1280px+) = full size */}
         <div
-          className={`relative flex-shrink-0 w-10 h-10 rounded-lg ${item.gradient} flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110 group-hover:shadow-xl ${
+          className={`relative flex-shrink-0 w-8 h-8 xl:w-10 xl:h-10 rounded-lg ${item.gradient} flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110 group-hover:shadow-xl ${
             isActive ? 'shadow-2xl ring-2 ring-white/30 dark:ring-white/20 scale-105' : 'shadow-md'
           }`}
           style={{
@@ -48,7 +49,7 @@ const NavItemComponent = memo(function NavItemComponent({
               : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), inset 0 2px 4px 0 rgba(255, 255, 255, 0.1)'
           }}
         >
-          <Icon className="w-5 h-5 text-white drop-shadow-md" />
+          <Icon className="w-4 h-4 xl:w-5 xl:h-5 text-white drop-shadow-md" />
           {isActive && (
             <div className="absolute inset-0 rounded-xl bg-white/10 animate-pulse" />
           )}
@@ -93,7 +94,7 @@ const NavItemComponent = memo(function NavItemComponent({
 });
 
 export function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(true); // Start expanded by default for new users
+  const [isExpanded, setIsExpanded] = useState(false); // Start collapsed, hover to expand
   const [isHoverExpanded, setIsHoverExpanded] = useState(false); // Temporary expansion on hover
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -105,18 +106,21 @@ export function Sidebar() {
   // Effective expanded state (either pinned or hover-expanded)
   const effectivelyExpanded = isExpanded || isHoverExpanded;
 
-  // Load saved state from localStorage
+  // Load saved state from localStorage - default collapsed on all screen sizes
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+
     if (saved !== null) {
+      // Use saved preference
       setIsExpanded(saved === 'true');
     } else {
-      // First time user - default to expanded and save it
-      setIsExpanded(true);
-      localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+      // First time user - start collapsed, hover to expand
+      setIsExpanded(false);
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
     }
   }, []);
+
 
   // Keyboard toggle with [ key
   useEffect(() => {
