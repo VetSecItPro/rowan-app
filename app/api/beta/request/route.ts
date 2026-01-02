@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       .from('beta_invite_codes')
       .select('id, code, used_by, created_at')
       .eq('email', normalizedEmail)
-      .single();
+      .maybeSingle();
 
     if (existingCode) {
       // Email already has a code
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
       .from('users')
       .select('id, email')
       .eq('email', normalizedEmail)
-      .single();
+      .maybeSingle();
 
     if (existingUser) {
       return NextResponse.json(
