@@ -355,7 +355,7 @@ export async function POST(request: NextRequest) {
       .from('space_members')
       .select('space_id')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (existingMembership) {
       // Workspace already handled by trigger - we're done
