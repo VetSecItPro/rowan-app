@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse and validate request body with Zod
     const body = await req.json();
@@ -58,14 +58,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Check space limit based on user's subscription tier
-    const userTier = await getUserTier(session.user.id);
+    const userTier = await getUserTier(user.id);
     const maxSpaces = getFeatureLimit(userTier, 'maxSpaces') as number;
 
     // Count user's current spaces (where they are the owner)
     const { count: currentSpaceCount, error: countError } = await supabase
       .from('space_members')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .eq('role', 'owner');
 
     if (countError) {
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create space using service (pass server supabase client)
-    const result = await createSpace(validatedData.name, session.user.id, supabase);
+    const result = await createSpace(validatedData.name, user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(

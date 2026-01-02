@@ -43,9 +43,9 @@ export async function GET(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get and validate conversation_id from query params
     const { searchParams } = new URL(req.url);
@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -131,10 +131,10 @@ export async function POST(req: NextRequest) {
 
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Check daily message limit
-    const usageCheck = await checkUsageLimit(session.user.id, 'messages_sent');
+    const usageCheck = await checkUsageLimit(user.id, 'messages_sent');
     if (!usageCheck.allowed) {
       return NextResponse.json(
         {
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
 
     // Verify user has access to this space
     try {
-      await verifySpaceAccess(session.user.id, space_id);
+      await verifySpaceAccess(user.id, space_id);
     } catch (error) {
     Sentry.captureException(error, {
       tags: {
@@ -186,11 +186,11 @@ export async function POST(req: NextRequest) {
     // Create message using service with validated data
     const message = await messagesService.createMessage({
       ...validationResult.data,
-      sender_id: session.user.id,
+      sender_id: user.id,
     });
 
     // Track message usage
-    await trackUsage(session.user.id, 'messages_sent');
+    await trackUsage(user.id, 'messages_sent');
 
     return NextResponse.json({
       success: true,

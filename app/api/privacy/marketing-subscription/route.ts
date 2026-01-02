@@ -29,15 +29,15 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // Check authentication
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session?.user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Rate limiting
     const identifier = `marketing-subscription-${userId}`;
@@ -152,15 +152,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Check authentication for regular requests
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session?.user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Get marketing preferences, create default if none exist
     let { data: preferences, error: prefsError } = await supabase
