@@ -74,16 +74,16 @@ export async function GET(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse query parameters
     const { searchParams } = new URL(req.url);
@@ -108,12 +108,12 @@ export async function GET(req: NextRequest) {
 
     // Get notifications
     const notifications = await inAppNotificationsService.getUserNotifications(
-      session.user.id,
+      user.id,
       filters
     );
 
     // Get unread count
-    const unreadCount = await inAppNotificationsService.getUnreadCount(session.user.id);
+    const unreadCount = await inAppNotificationsService.getUnreadCount(user.id);
 
     return NextResponse.json({
       success: true,
@@ -151,16 +151,16 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse request body
     const body = await req.json();
@@ -220,16 +220,16 @@ export async function PATCH(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse request body
     const body = await req.json();
@@ -246,7 +246,7 @@ export async function PATCH(req: NextRequest) {
 
     if (mark_all) {
       // Mark all as read
-      const success = await inAppNotificationsService.markAllAsRead(session.user.id);
+      const success = await inAppNotificationsService.markAllAsRead(user.id);
       if (!success) {
         return NextResponse.json(
           { error: 'Failed to mark all notifications as read' },
@@ -308,16 +308,16 @@ export async function DELETE(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse query parameters
     const { searchParams } = new URL(req.url);
@@ -326,7 +326,7 @@ export async function DELETE(req: NextRequest) {
 
     if (deleteAllRead) {
       // Delete all read notifications
-      const success = await inAppNotificationsService.deleteAllRead(session.user.id);
+      const success = await inAppNotificationsService.deleteAllRead(user.id);
       if (!success) {
         return NextResponse.json(
           { error: 'Failed to delete read notifications' },

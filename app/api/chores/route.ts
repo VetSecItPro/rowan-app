@@ -38,9 +38,9 @@ export async function GET(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     // Verify user has access to this space
     try {
-      await verifySpaceAccess(session.user.id, spaceId);
+      await verifySpaceAccess(user.id, spaceId);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
@@ -150,9 +150,9 @@ export async function POST(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse and validate request body with Zod
     const body = await req.json();
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
     try {
       validatedData = createChoreSchema.parse({
         ...body,
-        created_by: session.user.id,
+        created_by: user.id,
       });
     } catch (error) {
       if (error instanceof ZodError) {
@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
 
     // Verify user has access to this space
     try {
-      await verifySpaceAccess(session.user.id, validatedData.space_id);
+      await verifySpaceAccess(user.id, validatedData.space_id);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this space' },

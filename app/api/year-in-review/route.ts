@@ -27,9 +27,9 @@ export async function GET(request: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     // Verify user has access to the space
     try {
-      await verifySpaceAccess(session.user.id, spaceId);
+      await verifySpaceAccess(user.id, spaceId);
     } catch (error) {
       Sentry.captureException(error, {
         tags: {
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     }
 
     logger.info('[API] Generating year in review', {
-      userId: session.user.id,
+      userId: user.id,
       spaceId,
       year: targetYear,
       component: 'YearInReviewAPI',
@@ -92,13 +92,13 @@ export async function GET(request: NextRequest) {
     // Generate year in review data
     const yearInReviewData = await yearInReviewService.generateYearInReview(
       supabase,
-      session.user.id,
+      user.id,
       spaceId,
       targetYear
     );
 
     logger.info('[API] Year in review generated successfully', {
-      userId: session.user.id,
+      userId: user.id,
       spaceId,
       year: targetYear,
       tasksCompleted: yearInReviewData.overview.tasksCompleted,
@@ -153,9 +153,9 @@ export async function POST(request: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const body = await request.json();
     const { space_id, year, format = 'pdf' } = body;
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
 
     // Verify user has access to the space
     try {
-      await verifySpaceAccess(session.user.id, space_id);
+      await verifySpaceAccess(user.id, space_id);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
     }
 
     logger.info('[API] Exporting year in review', {
-      userId: session.user.id,
+      userId: user.id,
       spaceId: space_id,
       year: targetYear,
       format,
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
     // Generate year in review data
     const yearInReviewData = await yearInReviewService.generateYearInReview(
       supabase,
-      session.user.id,
+      user.id,
       space_id,
       targetYear
     );

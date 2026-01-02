@@ -30,9 +30,9 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get task
     const task = await tasksService.getTaskById(params.id);
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
     // Verify user has access to task's space
     try {
-      await verifyResourceAccess(session.user.id, task);
+      await verifyResourceAccess(user.id, task);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this task' },
@@ -104,9 +104,9 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -114,7 +114,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get existing task first
     const existingTask = await tasksService.getTaskById(params.id);
@@ -128,7 +128,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 
     // Verify user has access to task's space
     try {
-      await verifyResourceAccess(session.user.id, existingTask);
+      await verifyResourceAccess(user.id, existingTask);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this task' },
@@ -209,9 +209,9 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -219,7 +219,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Set user context for Sentry error tracking
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get existing task first
     const existingTask = await tasksService.getTaskById(params.id);
@@ -233,7 +233,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
 
     // Verify user has access to task's space
     try {
-      await verifyResourceAccess(session.user.id, existingTask);
+      await verifyResourceAccess(user.id, existingTask);
     } catch (error) {
       return NextResponse.json(
         { error: 'You do not have access to this task' },

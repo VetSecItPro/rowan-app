@@ -51,9 +51,8 @@ export async function POST(request: Request) {
     // Get location information
     const locationInfo = await getLocationFromIP(ipAddress);
 
-    // Get or create session token from auth session
-    const { data: { session } } = await supabase.auth.getSession();
-    const sessionToken = session?.access_token || crypto.randomUUID();
+    // Generate a session token (user is already authenticated above)
+    const sessionToken = crypto.randomUUID();
 
     // Use upsert to handle race conditions gracefully
     const sessionData = {

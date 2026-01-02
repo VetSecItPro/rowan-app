@@ -40,9 +40,9 @@ export async function POST(request: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized. Please sign in to change your password.' },
         { status: 401 }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Set user context for Sentry
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Parse and validate request body
     const body = await request.json();
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     // Verify current password by attempting to sign in
     const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: session.user.email!,
+      email: user.email!,
       password: currentPassword,
     });
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       logger.warn('Password change failed - incorrect current password', {
         component: 'api-route',
         action: 'api_request',
-        userId: session.user.id.substring(0, 8) + '...'
+        userId: user.id.substring(0, 8) + '...'
       });
       return NextResponse.json(
         { error: 'Current password is incorrect' },
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     logger.info('Password changed successfully', {
       component: 'api-route',
       action: 'api_request',
-      userId: session.user.id.substring(0, 8) + '...'
+      userId: user.id.substring(0, 8) + '...'
     });
 
     return NextResponse.json({

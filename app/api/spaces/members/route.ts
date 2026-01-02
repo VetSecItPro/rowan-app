@@ -35,9 +35,9 @@ export async function GET(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
       .from('space_members')
       .select('role')
       .eq('space_id', spaceId)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (memberError || !membership) {
@@ -106,15 +106,15 @@ export async function GET(req: NextRequest) {
     // Transform data for frontend
     // Use user_id as the identifier since space_members has no id column
     const transformedMembers = members.map((member: { user_id: string; role: string; joined_at: string }) => {
-      const user = userMap.get(member.user_id);
+      const memberDetails = userMap.get(member.user_id);
       return {
         id: member.user_id, // Use user_id as identifier for frontend compatibility
         user_id: member.user_id,
-        name: user?.name || 'Unknown',
-        email: user?.email || '',
+        name: memberDetails?.name || 'Unknown',
+        email: memberDetails?.email || '',
         role: member.role === 'owner' ? 'Admin' : member.role === 'admin' ? 'Admin' : 'Member',
-        color_theme: user?.color_theme || 'purple',
-        isCurrentUser: member.user_id === session.user.id,
+        color_theme: memberDetails?.color_theme || 'purple',
+        isCurrentUser: member.user_id === user.id,
         joined_at: member.joined_at,
       };
     });
@@ -151,9 +151,9 @@ export async function PUT(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -178,7 +178,7 @@ export async function PUT(req: NextRequest) {
       .from('space_members')
       .select('role')
       .eq('space_id', space_id)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (memberError || !currentUserMembership) {
@@ -266,9 +266,9 @@ export async function DELETE(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -293,7 +293,7 @@ export async function DELETE(req: NextRequest) {
       .from('space_members')
       .select('role')
       .eq('space_id', space_id)
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (memberError || !currentUserMembership) {
@@ -335,7 +335,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Cannot remove yourself (use Leave Space instead)
-    if (targetMember.user_id === session.user.id) {
+    if (targetMember.user_id === user.id) {
       return NextResponse.json(
         { error: 'Cannot remove yourself. Use "Leave Space" instead.' },
         { status: 400 }

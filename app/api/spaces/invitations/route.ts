@@ -27,16 +27,16 @@ export async function GET(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     // Get space_id from query params
     const { searchParams } = new URL(req.url);
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get pending invitations
-    const result = await getPendingInvitations(spaceId, session.user.id);
+    const result = await getPendingInvitations(spaceId, user.id);
 
     if (!result.success) {
       return NextResponse.json(
@@ -98,16 +98,16 @@ export async function DELETE(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const body = await req.json();
     const { invitation_id } = body;
@@ -119,7 +119,7 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const result = await cancelInvitation(invitation_id, session.user.id);
+    const result = await cancelInvitation(invitation_id, user.id);
 
     if (!result.success) {
       return NextResponse.json(
@@ -161,16 +161,16 @@ export async function PUT(req: NextRequest) {
 
     // Verify authentication
     const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    setSentryUser(session.user);
+    setSentryUser(user);
 
     const body = await req.json();
     const { invitation_id, space_id } = body;
@@ -183,7 +183,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // Resend invitation (creates new token)
-    const result = await resendInvitation(invitation_id, session.user.id);
+    const result = await resendInvitation(invitation_id, user.id);
 
     if (!result.success) {
       return NextResponse.json(
@@ -195,7 +195,7 @@ export async function PUT(req: NextRequest) {
     // Get space name and inviter name for email
     const [spaceResult, userResult] = await Promise.all([
       supabase.from('spaces').select('name').eq('id', space_id || result.data.space_id).single(),
-      supabase.from('users').select('name').eq('id', session.user.id).single(),
+      supabase.from('users').select('name').eq('id', user.id).single(),
     ]);
 
     const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
