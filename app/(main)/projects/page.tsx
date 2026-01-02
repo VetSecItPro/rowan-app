@@ -467,8 +467,8 @@ export default function ProjectsPage() {
     if (projectFilter === 'completed') return p.status === 'completed';
     return true;
   });
-  const filteredExpenses = expenses.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredBills = bills.filter(b => b.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredExpenses = expenses.filter(e => (e.title || '').toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredBills = bills.filter(b => (b.name || '').toLowerCase().includes(searchQuery.toLowerCase()));
 
   const expenseStats = useMemo(() => {
     const totalCount = expenses.length;
