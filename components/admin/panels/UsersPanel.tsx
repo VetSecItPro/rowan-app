@@ -106,7 +106,7 @@ export const UsersPanel = memo(function UsersPanel() {
 
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
-      const matchesSearch = user.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+      const matchesSearch = (user.email || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       const matchesFilter =
         filter === 'all' ||
         (filter === 'beta' && user.is_beta) ||
@@ -118,7 +118,7 @@ export const UsersPanel = memo(function UsersPanel() {
 
   const filteredBetaRequests = useMemo(() => {
     return betaRequests.filter(request =>
-      request.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+      (request.email || '').toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
   }, [betaRequests, debouncedSearchTerm]);
 

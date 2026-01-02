@@ -247,9 +247,9 @@ export default function GoalsTimelinePage() {
     ...group,
     events: group.events.filter(event => {
       const matchesSearch = searchQuery === '' ||
-        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.goal.title.toLowerCase().includes(searchQuery.toLowerCase());
+        (event.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.goal?.title || '').toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesCategory = categoryFilter === 'all' ||
         event.goal.category === categoryFilter;

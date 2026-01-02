@@ -26,7 +26,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
   const [actionError, setActionError] = useState<string | null>(null);
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
       filter === 'all' ||
       (filter === 'beta' && user.is_beta) ||
