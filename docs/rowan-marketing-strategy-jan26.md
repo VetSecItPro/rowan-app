@@ -1,0 +1,721 @@
+# Rowan Marketing Strategy - January 2026
+
+> A comprehensive guide to growing Rowan from beta to sustainable revenue.
+
+## Table of Contents
+
+1. [Current State Assessment](#current-state-assessment)
+2. [Understanding the Landscape](#understanding-the-landscape)
+3. [Growth Channels Explained](#growth-channels-explained)
+4. [Platform Deep Dives](#platform-deep-dives)
+5. [Beta Phase Strategy](#beta-phase-strategy)
+6. [Launch Strategy](#launch-strategy)
+7. [Post-Launch Growth](#post-launch-growth)
+8. [Content Strategy](#content-strategy)
+9. [Metrics to Track](#metrics-to-track)
+10. [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+11. [Resources and Communities](#resources-and-communities)
+
+---
+
+## Current State Assessment
+
+### Where Rowan Is Today (January 2026)
+
+- **Product**: Family organization app (tasks, calendar, meals, shopping lists, reminders)
+- **Stage**: Private beta, limited to 100 users
+- **Beta Signups**: 3 approved users, 0 have completed registration
+- **Tech Stack**: Next.js PWA (Progressive Web App), Supabase backend
+- **Pricing Model**: Freemium with premium subscription tiers
+
+### Key Challenges
+
+1. Converting approved beta users to active users
+2. Building initial user base for feedback
+3. No existing audience or following
+4. Competing in a crowded family/productivity app space
+
+### Unique Advantages
+
+1. Built with modern tech (fast, works offline as PWA)
+2. Founder understands the problem (building for own use case)
+3. Can iterate quickly with AI-assisted development
+4. No investor pressure - can grow sustainably
+
+---
+
+## Understanding the Landscape
+
+### What is a SaaS Business?
+
+**SaaS** stands for "Software as a Service." Instead of selling software as a one-time purchase, you provide it as an ongoing service with a subscription fee (monthly or yearly). Examples include Netflix, Spotify, Notion, and Slack.
+
+**Key SaaS Metrics:**
+- **MRR (Monthly Recurring Revenue)**: The predictable revenue you earn each month from subscriptions. If you have 100 users paying $10/month, your MRR is $1,000.
+- **ARR (Annual Recurring Revenue)**: MRR multiplied by 12. Used for bigger-picture planning.
+- **Churn Rate**: The percentage of customers who cancel their subscription each month. A 5% monthly churn means you lose 5 out of every 100 customers per month.
+- **CAC (Customer Acquisition Cost)**: How much money you spend to acquire one new customer (ads, marketing, etc.).
+- **LTV (Lifetime Value)**: How much revenue a customer generates before they cancel. If average customer stays 10 months at $10/month, LTV is $100.
+
+### The Reality Behind "Overnight Success" Stories
+
+When you see YouTube videos of founders claiming "$30k MRR in 6 months," understand what's usually hidden:
+
+1. **Survivorship Bias**: You only see the winners. For every success story, there are hundreds of failed attempts that never get shared.
+
+2. **Prior Audience**: Many "overnight successes" had years of audience building before launching. They had 10,000+ Twitter followers, an email list, or a popular blog.
+
+3. **Multiple Failures**: Most successful founders failed 3-5 times before finding something that worked. They don't count those years in their "6 months to success" story.
+
+4. **Compressed Timelines**: A 10-minute YouTube video compresses 2 years of 60-hour weeks into an entertaining highlight reel.
+
+5. **Portfolio Approach**: Some founders run 20-30 small apps, and report combined revenue. One app might make $500/month, but 30 of them make $15,000/month.
+
+### What Actually Predicts Success
+
+Based on research from successful indie founders:
+
+1. **Solving a Real Problem**: Not a "nice to have" but a genuine pain point people will pay to solve.
+2. **Talking to Users**: Founders who interview 50+ potential customers before building have much higher success rates.
+3. **Speed of Iteration**: Launching something small, getting feedback, and improving quickly beats spending months on a "perfect" product.
+4. **Distribution Advantage**: Having a way to reach customers (audience, SEO, partnerships) matters more than having the best product.
+5. **Persistence**: Most successful founders spent 2-3 years before seeing significant traction.
+
+---
+
+## Growth Channels Explained
+
+### Organic vs. Paid Growth
+
+**Organic Growth** means acquiring users without paying for ads. This includes:
+- Word of mouth (users telling friends)
+- Search engine traffic (SEO)
+- Social media presence
+- Content marketing (blog posts, videos)
+- Community participation
+
+**Paid Growth** means spending money on advertising:
+- Google Ads
+- Facebook/Instagram Ads
+- Influencer sponsorships
+- Podcast ads
+
+**For early-stage startups like Rowan, organic growth is recommended because:**
+- No budget required
+- Builds authentic relationships
+- Creates long-term assets (content, SEO)
+- Helps you understand your customers better
+
+### The Growth Channel Hierarchy for Rowan
+
+Listed in order of priority for a family app in beta stage:
+
+| Priority | Channel | Why |
+|----------|---------|-----|
+| 1 | Word of Mouth | Free, highest trust, best retention |
+| 2 | Building in Public | Builds audience while you work |
+| 3 | SEO Content | Compounds over time, passive traffic |
+| 4 | Community Participation | Direct access to target users |
+| 5 | Product Hunt Launch | One-time spike, good for credibility |
+| 6 | Influencer Outreach | Can accelerate growth if done right |
+| 7 | Paid Ads | Only after product-market fit confirmed |
+
+---
+
+## Platform Deep Dives
+
+### Product Hunt
+
+**What it is:** Product Hunt (producthunt.com) is a website where people discover and share new technology products. Every day, makers "launch" their products, and the community votes on them. The products with the most upvotes rise to the top of the daily leaderboard.
+
+**Why it matters:**
+- Thousands of early adopters browse daily looking for new tools
+- A successful launch can bring 5,000-20,000 visitors in one day
+- Builds credibility ("Featured on Product Hunt" badge)
+- Gets you backlinks for SEO
+- Potential press coverage if you hit #1
+
+**How it works:**
+1. Create a maker account
+2. Prepare your launch (screenshots, video, description)
+3. Schedule your launch for 12:01 AM Pacific Time (when the new day starts)
+4. Rally your network to upvote and comment
+5. Engage with every comment on launch day
+6. Products are ranked by upvotes, with some algorithm weighting
+
+**Best practices for Rowan:**
+- Don't launch during beta - wait until you have a polished product
+- Build relationships on Product Hunt before launching (comment on other products)
+- Prepare a short demo video (under 2 minutes)
+- Have 10-20 friends/supporters ready to upvote at launch
+- Launch on Tuesday, Wednesday, or Thursday (highest traffic days)
+- Respond to every single comment within minutes
+
+**When to launch:** After beta, when you have at least 20 happy users who can vouch for the product.
+
+### Hacker News (HN)
+
+**What it is:** Hacker News (news.ycombinator.com) is a social news website run by Y Combinator, the famous startup accelerator. It's focused on technology, startups, and intellectual curiosity. The community is highly technical and skeptical of marketing.
+
+**Why it matters:**
+- Massive reach among tech-savvy early adopters
+- A front-page post can bring 50,000+ visitors
+- Highly influential in the startup world
+- Good for B2B products; mixed for consumer apps
+
+**How it works:**
+1. Submit a link with a title (no editorializing - just facts)
+2. Community votes; high-voted posts reach front page
+3. Comments are often brutally honest
+4. Self-promotion is allowed but must be genuine
+
+**Types of HN posts that work:**
+- "Show HN" posts: "Show HN: I built a family organization app"
+- Technical deep-dives: "How we built real-time sync for our family app"
+- Lessons learned: "What I learned building a PWA for families"
+
+**For Rowan specifically:**
+- HN audience skews technical and mostly male
+- Family apps may not resonate as strongly as developer tools
+- Better to share technical learnings than to promote the app directly
+- Wait until you have an interesting story to tell
+
+### Reddit
+
+**What it is:** Reddit is a collection of thousands of communities ("subreddits") where people discuss specific topics. Each subreddit has its own rules and culture.
+
+**Why it matters:**
+- Highly engaged, niche communities
+- Direct access to your target audience
+- Free to participate
+- Can drive significant traffic if done right
+
+**Relevant subreddits for Rowan:**
+
+| Subreddit | Members | Best Use |
+|-----------|---------|----------|
+| r/SaaS | 250k+ | Share your journey, ask for feedback |
+| r/startups | 1M+ | Startup advice, milestone sharing |
+| r/Parenting | 5M+ | Understand parent pain points |
+| r/Mommit | 500k+ | Moms discussing family life |
+| r/daddit | 800k+ | Dads discussing family life |
+| r/productivity | 2M+ | Productivity tips and tools |
+| r/getorganized | 200k+ | Organization strategies |
+| r/mealprep | 2M+ | Meal planning community |
+| r/indiehackers | Growing | Indie founder community |
+
+**Reddit rules to follow:**
+1. **Read the rules of each subreddit** - they all have different policies on self-promotion
+2. **Contribute genuinely first** - comment helpfully for days/weeks before posting about your product
+3. **Be transparent** - always disclose you're the founder
+4. **Don't spam** - one post about your product, not daily promotions
+5. **Add value** - frame posts as seeking feedback, not advertising
+
+**Example good post:**
+> "I'm a dad of 3 building an app to help our family stay organized. Looking for 5 beta testers to give honest feedback. It handles shared calendars, meal planning, and shopping lists. Anyone interested in trying it out?"
+
+**Example bad post:**
+> "Check out my new family app! It's the best way to organize your household! Link in bio!"
+
+### LinkedIn
+
+**What it is:** Professional social network, but increasingly used for content creation and thought leadership.
+
+**Why it matters for Rowan:**
+- Parents with professional jobs are your target demographic
+- Less saturated than Twitter for startup content
+- Posts can go viral with the right content
+- Good for "building in public" narrative
+
+**LinkedIn strategy:**
+1. **Personal brand focus**: Post from your personal account, not a company page
+2. **Share your journey**: "Week 3 of building a family app. Here's what I learned..."
+3. **Be vulnerable**: Share failures and challenges, not just wins
+4. **Engage with others**: Comment on posts in your niche
+5. **Post consistently**: 3-5 times per week
+
+**Content ideas:**
+- Why you started building Rowan
+- Challenges of being a parent and entrepreneur
+- Technical lessons learned (for developer audience)
+- User feedback and how you responded
+- Milestone celebrations (first user, first paying customer)
+
+### Twitter/X
+
+**What it is:** Microblogging platform popular with the tech and startup community.
+
+**Why it matters:**
+- Startup/indie hacker community is very active
+- "Build in public" movement is centered here
+- Quick feedback on ideas
+- Networking with other founders
+
+**Twitter strategy:**
+1. Follow indie hackers and startup founders
+2. Engage genuinely with their content
+3. Share your progress regularly
+4. Use relevant hashtags: #buildinpublic #indiehackers #saas
+5. Don't just broadcast - have conversations
+
+### Indie Hackers
+
+**What it is:** Indie Hackers (indiehackers.com) is an online community of founders building profitable businesses, often solo or with small teams. It was acquired by Stripe but remains independent in spirit.
+
+**Why it matters:**
+- Supportive community of people in similar situations
+- Great for getting feedback and advice
+- Milestone posts get visibility
+- Interview features for successful products
+
+**How to use it:**
+1. Create a product page for Rowan
+2. Post milestones and updates
+3. Engage in discussions
+4. Ask for and give feedback
+5. Be genuinely helpful to others
+
+---
+
+## Beta Phase Strategy
+
+### Goals of Beta Phase
+
+1. **Validate the product solves a real problem** - Do people actually use it?
+2. **Find and fix bugs** - Real users find issues you never imagined
+3. **Understand user needs** - What features do they actually want?
+4. **Build testimonials** - Happy beta users become your first advocates
+5. **Refine positioning** - How do users describe your product?
+
+### Current Beta Situation
+
+You have 3 approved beta users who haven't signed up. This is your first priority.
+
+**Action items:**
+1. Email each of them personally (not automated)
+2. Ask if they need help getting started
+3. Offer a quick 10-minute onboarding call
+4. Find out if there's a blocker preventing signup
+
+**Email template:**
+```
+Subject: Quick question about Rowan beta
+
+Hi [Name],
+
+I noticed you signed up for the Rowan beta but haven't had a chance to create your account yet.
+
+No pressure at all - I just wanted to check if you ran into any issues or if there's anything I can help with?
+
+If you're still interested, I'd love to have you try it out. I'm personally onboarding our first few users and would really value your feedback.
+
+Let me know if a quick 10-minute call would help, or if you'd prefer I just send the signup link again.
+
+Thanks,
+[Your name]
+Founder, Rowan
+```
+
+### Beta User Recruitment Strategy
+
+**Target: 20-30 active beta users before public launch**
+
+**Phase 1: Personal Network (Users 1-10)**
+- Friends and family who match your target user (parents, families)
+- Colleagues with families
+- People who've expressed interest casually
+
+**Phase 2: Warm Outreach (Users 10-20)**
+- LinkedIn connections who are parents
+- Parenting groups you're already part of
+- Reddit communities (after building credibility)
+
+**Phase 3: Community Outreach (Users 20-30)**
+- Indie Hackers posts
+- Twitter/LinkedIn "looking for beta testers" posts
+- Targeted Reddit posts in parenting subreddits
+
+### Beta Feedback Collection
+
+**What to ask beta users:**
+
+1. **Initial impression**: "What was your first thought when you saw the app?"
+2. **Use case**: "What are you primarily using Rowan for?"
+3. **Friction points**: "What's confusing or frustrating?"
+4. **Missing features**: "What's one thing you wish it could do?"
+5. **Value assessment**: "Would you pay for this? How much?"
+6. **Recommendation**: "Would you recommend this to a friend? Why or why not?"
+
+**How to collect feedback:**
+- In-app feedback button (already built)
+- Monthly email check-ins
+- Short surveys (5 questions max)
+- Occasional video calls for deep feedback
+
+---
+
+## Launch Strategy
+
+### Pre-Launch Checklist
+
+Before announcing publicly:
+
+- [ ] At least 20 active beta users
+- [ ] Core bugs fixed
+- [ ] Onboarding flow polished
+- [ ] Pricing page ready
+- [ ] Payment integration tested
+- [ ] 3-5 testimonials collected
+- [ ] Demo video created
+- [ ] Landing page optimized
+- [ ] Email list of interested people
+- [ ] Social media presence established
+
+### Launch Sequence
+
+**Week -4: Preparation**
+- Finalize landing page and messaging
+- Create Product Hunt assets (screenshots, video, description)
+- Draft launch posts for all platforms
+- Build anticipation on social media ("Launching soon...")
+
+**Week -2: Soft Launch**
+- Open signups to email waitlist
+- Remove beta restrictions
+- Monitor for issues at scale
+- Collect early testimonials
+
+**Week -1: Pre-Launch Hype**
+- Tease on Twitter/LinkedIn daily
+- Email waitlist with launch date
+- Reach out to potential supporters for Product Hunt
+- Prepare press outreach list
+
+**Launch Day:**
+- Product Hunt launch at 12:01 AM PT
+- Social media posts on all platforms
+- Email announcement to full list
+- Engage with all comments and feedback
+- Monitor for technical issues
+
+**Week +1: Follow-Up**
+- Share launch results publicly
+- Thank supporters
+- Address any issues that arose
+- Continue engaging with new users
+
+### Launch Platforms Priority
+
+1. **Product Hunt** - Main launch platform
+2. **Indie Hackers** - Post milestone/launch story
+3. **Twitter/X** - Real-time updates
+4. **LinkedIn** - Professional network
+5. **Reddit** - Strategic posts in relevant subreddits
+6. **Hacker News** - If you have a technical angle
+
+---
+
+## Post-Launch Growth
+
+### Building Word of Mouth
+
+Word of mouth is the most powerful growth channel for consumer apps. Here's how to encourage it:
+
+**1. Delight users with the product**
+- Fast, reliable, no bugs
+- Thoughtful details that surprise users
+- Solve their problem completely
+
+**2. Make sharing easy**
+- "Invite family member" feature
+- Shareable shopping lists
+- Easy onboarding for invitees
+
+**3. Ask for referrals**
+- "Know someone who'd benefit from Rowan?"
+- Referral incentives (free month for both parties)
+- Make asking a natural part of the experience
+
+**4. Encourage reviews**
+- App Store reviews (if you go native)
+- Product Hunt reviews
+- Testimonials for your website
+
+### SEO Content Strategy
+
+**SEO (Search Engine Optimization)** means optimizing your content so it appears in Google search results when people search for relevant terms.
+
+**Why SEO matters:**
+- Free, passive traffic
+- Compounds over time (a good article can bring traffic for years)
+- Attracts people actively looking for solutions
+- Builds credibility and trust
+
+**Content ideas for Rowan:**
+
+| Topic | Search Intent | Article Idea |
+|-------|---------------|--------------|
+| Meal planning | How to plan meals | "The Complete Guide to Family Meal Planning" |
+| Family calendar | Best practices | "How to Manage a Busy Family Schedule" |
+| Chore management | Solutions | "Age-Appropriate Chores for Kids (Printable Chart)" |
+| Shopping lists | Organization | "How to Create a Master Grocery List That Works" |
+| Family communication | Improvement | "5 Ways to Improve Family Communication" |
+
+**SEO basics:**
+1. Research what people search for (use tools like Ubersuggest or Ahrefs)
+2. Create genuinely helpful content that answers their questions
+3. Optimize titles and headings with keywords
+4. Build internal links between your articles
+5. Be patient - SEO takes 6-12 months to show results
+
+### Email Marketing
+
+**Building an email list:**
+- Collect emails from interested visitors (waitlist)
+- Offer something valuable (checklist, template, guide)
+- Ask beta users to opt-in to updates
+
+**Email sequences to build:**
+
+1. **Welcome sequence** (new signups)
+   - Email 1: Welcome + quick start guide
+   - Email 2: Tip for getting the most out of Rowan
+   - Email 3: Feature highlight
+   - Email 4: Ask for feedback
+
+2. **Nurture sequence** (free users)
+   - Share helpful content
+   - Highlight premium features
+   - Social proof (testimonials)
+   - Soft upgrade prompts
+
+3. **Re-engagement sequence** (inactive users)
+   - "We miss you"
+   - New feature announcements
+   - Win-back offers
+
+---
+
+## Content Strategy
+
+### Building in Public
+
+**What it means:** Sharing your journey of building a product openly - the wins, the losses, the lessons. This builds an audience who becomes invested in your success.
+
+**What to share:**
+- Weekly/monthly metrics updates
+- Challenges you're facing
+- Decisions you're making and why
+- User feedback and how you responded
+- Technical lessons learned
+- Personal reflections on the journey
+
+**Where to share:**
+- Twitter/X (best for build in public)
+- LinkedIn (more professional angle)
+- Indie Hackers (milestones and updates)
+- Personal blog (longer reflections)
+
+**Benefits:**
+- Builds an audience before you need them
+- Creates accountability
+- Attracts like-minded people (potential users, advisors, collaborators)
+- Differentiates you from competitors
+
+### Content Calendar Framework
+
+**Weekly rhythm:**
+- Monday: Share a goal for the week
+- Wednesday: Progress update or lesson learned
+- Friday: Week recap or weekend plans for the product
+
+**Monthly rhythm:**
+- Metrics review (traffic, signups, revenue)
+- Feature releases
+- User story or testimonial
+- Reflection on lessons learned
+
+---
+
+## Metrics to Track
+
+### Key Metrics for Each Stage
+
+**Beta Stage:**
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| Beta signups | 30 | Shows demand |
+| Activation rate | 70%+ | Are signups becoming users? |
+| Weekly active users | 50%+ | Are they coming back? |
+| Feedback submissions | 10+ | Are they engaged enough to give feedback? |
+| NPS score | 40+ | Would they recommend you? |
+
+**Launch Stage:**
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| Website visitors | 1000+ launch week | Awareness |
+| Signups | 100+ | Conversion |
+| Free to paid conversion | 2-5% | Monetization potential |
+| Churn rate | <10% monthly | Retention |
+
+**Growth Stage:**
+| Metric | Target | Why It Matters |
+|--------|--------|----------------|
+| MRR | Growing 10%+ monthly | Business health |
+| CAC payback | <6 months | Sustainable growth |
+| Net revenue retention | >100% | Expansion revenue |
+
+### Tools for Tracking
+
+- **Analytics**: Vercel Analytics (already integrated), Google Analytics
+- **Product analytics**: Mixpanel, Amplitude, or PostHog
+- **Email metrics**: Resend dashboard, Mailchimp
+- **Revenue metrics**: Stripe dashboard
+- **Social metrics**: Native platform analytics
+
+---
+
+## Common Mistakes to Avoid
+
+### 1. Building Too Long Before Launching
+
+**The mistake:** Spending 6+ months perfecting the product before showing it to anyone.
+
+**Why it's wrong:** You might be building something nobody wants. The longer you wait, the more attached you become to your solution.
+
+**Instead:** Launch early with a minimum viable product (MVP). Get feedback. Iterate.
+
+### 2. Focusing on Features Over Distribution
+
+**The mistake:** Believing "if we build it, they will come."
+
+**Why it's wrong:** The best product doesn't always win. The product with the best distribution wins.
+
+**Instead:** Spend 50% of your time on product, 50% on distribution from day one.
+
+### 3. Targeting Everyone
+
+**The mistake:** "Our app is for all families!"
+
+**Why it's wrong:** When you target everyone, you resonate with no one. Your messaging becomes generic.
+
+**Instead:** Start with a specific niche. "Dual-income parents with kids aged 5-12 who struggle with dinner planning."
+
+### 4. Spammy Self-Promotion
+
+**The mistake:** Joining communities just to post "check out my app!"
+
+**Why it's wrong:** You'll get banned, ignored, or develop a bad reputation.
+
+**Instead:** Contribute genuinely first. Build relationships. Share your product only when relevant and helpful.
+
+### 5. Giving Up Too Early
+
+**The mistake:** Expecting results in weeks or months.
+
+**Why it's wrong:** Most successful products took 2-3 years to find traction.
+
+**Instead:** Commit to at least 18 months. Measure progress, not just results.
+
+### 6. Ignoring Existing Users for New Users
+
+**The mistake:** Focusing all energy on acquisition while existing users churn.
+
+**Why it's wrong:** It costs 5-10x more to acquire a new user than to retain an existing one.
+
+**Instead:** Make current users so happy they never leave and tell everyone about you.
+
+---
+
+## Resources and Communities
+
+### Communities to Join
+
+| Community | Platform | Focus | Link |
+|-----------|----------|-------|------|
+| Indie Hackers | Web | Bootstrapped founders | indiehackers.com |
+| r/SaaS | Reddit | SaaS discussion | reddit.com/r/SaaS |
+| r/startups | Reddit | Startup advice | reddit.com/r/startups |
+| Vibe Code Discord | Discord | AI-assisted building | vibec0de.com |
+| SaaS Growth Hacks | Facebook | Growth tactics | Facebook group |
+| Lunadio | Discord | Early-stage founders | Discord server |
+
+### Books Worth Reading
+
+- **The Mom Test** by Rob Fitzpatrick - How to talk to customers
+- **Obviously Awesome** by April Dunford - Product positioning
+- **Traction** by Gabriel Weinberg - Growth channels
+- **The Lean Startup** by Eric Ries - Build-measure-learn
+- **Hooked** by Nir Eyal - Building habit-forming products
+
+### Newsletters to Follow
+
+- Indie Hackers Newsletter
+- Lenny's Newsletter (product and growth)
+- The Hustle (business news)
+- TLDR (tech news)
+
+### Podcasts
+
+- Indie Hackers Podcast
+- My First Million
+- How I Built This
+- The SaaS Podcast
+
+---
+
+## Action Plan: Next 30 Days
+
+### Week 1: Activate Current Beta Users
+- [ ] Email all 3 approved beta users personally
+- [ ] Offer onboarding calls
+- [ ] Set up feedback collection process
+- [ ] Join 3 relevant subreddits and start engaging
+
+### Week 2: Expand Beta
+- [ ] Post in personal network for beta testers
+- [ ] Create LinkedIn post about building Rowan
+- [ ] Start documenting journey (first "build in public" post)
+- [ ] Goal: 5 more beta signups
+
+### Week 3: Gather Feedback
+- [ ] Conduct feedback calls with active users
+- [ ] Implement top-requested improvements
+- [ ] Create simple testimonial from happy user
+- [ ] Continue community engagement
+
+### Week 4: Scale Beta
+- [ ] Post in Indie Hackers seeking beta testers
+- [ ] Reddit post in parenting subreddit (if credibility built)
+- [ ] Goal: 15 total active beta users
+- [ ] Begin planning for public launch
+
+---
+
+## Appendix: Glossary
+
+| Term | Definition |
+|------|------------|
+| ARR | Annual Recurring Revenue - MRR x 12 |
+| CAC | Customer Acquisition Cost - money spent to get one customer |
+| Churn | Percentage of customers who cancel |
+| Conversion Rate | Percentage of visitors who become users/customers |
+| Freemium | Free basic tier with paid premium features |
+| HN | Hacker News - tech community at news.ycombinator.com |
+| ICP | Ideal Customer Profile - your perfect target customer |
+| LTV | Lifetime Value - total revenue from one customer |
+| MRR | Monthly Recurring Revenue |
+| MVP | Minimum Viable Product - smallest version to test idea |
+| NPS | Net Promoter Score - would users recommend you (1-10) |
+| PLG | Product-Led Growth - product itself drives acquisition |
+| PMF | Product-Market Fit - when product meets real demand |
+| PWA | Progressive Web App - web app that works like native |
+| SaaS | Software as a Service - subscription software model |
+| SEO | Search Engine Optimization - ranking in Google |
+| WOM | Word of Mouth - users telling others |
+
+---
+
+*Document created: January 2026*
+*Last updated: January 2026*
+*Author: Rowan Founder*
