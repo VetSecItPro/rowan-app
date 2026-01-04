@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
           .toLowerCase()
           .trim(),
         password: z.string()
-          .min(12, 'Password must be at least 12 characters')
+          .min(10, 'Password must be at least 10 characters')
           .max(128, 'Password too long')
           .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
           .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
