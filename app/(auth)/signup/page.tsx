@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { UserPlus, Mail, Lock, User, Home, Eye, EyeOff, ChevronDown, Check } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Home, Eye, EyeOff, ChevronDown, Check, X } from 'lucide-react';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -117,6 +117,17 @@ export default function SignUpPage() {
     }
   }, [name, spaceTouched]);
 
+  // Password requirement checks for real-time feedback
+  const passwordChecks = {
+    length: password.length >= 10,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  };
+  const passwordStrength = Object.values(passwordChecks).filter(Boolean).length;
+  const allRequirementsMet = Object.values(passwordChecks).every(Boolean);
+
   const getColorClasses = (theme: string) => {
     switch (theme) {
       case 'emerald':
@@ -169,8 +180,8 @@ export default function SignUpPage() {
     setError('');
 
     // Frontend validation matching backend requirements
-    if (password.length < 12) {
-      setError('Password must be at least 12 characters long');
+    if (password.length < 10) {
+      setError('Password must be at least 10 characters long');
       return;
     }
     if (!/[A-Z]/.test(password)) {
@@ -416,9 +427,58 @@ export default function SignUpPage() {
                   )}
                 </button>
               </div>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Must be at least 12 characters with uppercase, lowercase, number, and special character
-              </p>
+              {/* Password Strength Indicator */}
+              {password.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {/* Strength Bar */}
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <div
+                        key={level}
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                          passwordStrength >= level
+                            ? passwordStrength <= 2
+                              ? 'bg-red-500'
+                              : passwordStrength <= 3
+                              ? 'bg-yellow-500'
+                              : passwordStrength <= 4
+                              ? 'bg-blue-500'
+                              : 'bg-emerald-500'
+                            : 'bg-gray-200 dark:bg-gray-700'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  {/* Requirements Checklist */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.length ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                      {passwordChecks.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      <span>10+ characters</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.uppercase ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                      {passwordChecks.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      <span>Uppercase (A-Z)</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.lowercase ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                      {passwordChecks.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      <span>Lowercase (a-z)</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.number ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                      {passwordChecks.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      <span>Number (0-9)</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 col-span-2 ${passwordChecks.special ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                      {passwordChecks.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                      <span>Special (!@#$%^&amp;*)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {password.length === 0 && (
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  10+ characters with uppercase, lowercase, number, and special character
+                </p>
+              )}
             </div>
 
             {/* Space Name */}
