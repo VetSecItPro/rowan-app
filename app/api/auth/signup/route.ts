@@ -569,6 +569,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Log error server-side for debugging (sanitized, not exposed to client)
+    // Uses structured logger which redacts sensitive fields (passwords, tokens, etc.)
+    const { logger } = await import('@/lib/logger');
+    logger.error(
+      'Signup failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { component: 'api-signup', action: 'signup' }
+    );
+
     // Generic error handler
     return NextResponse.json(
       { error: 'Internal server error' },
