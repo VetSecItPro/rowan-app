@@ -443,16 +443,34 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Initialize subscription with 14-day trial
-    // This calls the database function which sets up trial dates
+    // Initialize subscription based on signup type
+    // Beta users (via beta_code or invite_token during beta) get free access until Feb 15, 2026
+    // Regular users (post-beta) get 14-day trial
     try {
-      const { error: subscriptionError } = await supabaseServerClient
-        .rpc('initialize_subscription', { p_user_id: userId });
+      // During beta period, all signups get beta subscription (free until Feb 15, 2026)
+      // This includes both beta code users AND users invited to spaces by beta users
+      const isBetaPeriod = new Date() < new Date('2026-02-15T23:59:59Z');
 
-      if (!subscriptionError) {
-        // Record trial started event
-        await supabaseServerClient
-          .rpc('record_trial_started', { p_user_id: userId });
+      if (isBetaPeriod) {
+        // Beta subscription: free Pro access until Feb 15, 2026
+        const { error: subscriptionError } = await supabaseServerClient
+          .rpc('initialize_beta_subscription', { p_user_id: userId });
+
+        if (!subscriptionError) {
+          // Record beta started event
+          await supabaseServerClient
+            .rpc('record_trial_started', { p_user_id: userId });
+        }
+      } else {
+        // Post-beta: regular 14-day trial
+        const { error: subscriptionError } = await supabaseServerClient
+          .rpc('initialize_subscription', { p_user_id: userId });
+
+        if (!subscriptionError) {
+          // Record trial started event
+          await supabaseServerClient
+            .rpc('record_trial_started', { p_user_id: userId });
+        }
       }
       // Non-critical - subscription will be created on first access if needed
     } catch {
