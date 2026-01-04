@@ -27,6 +27,15 @@ const ADMIN_SESSION_DURATION = 2 * 60 * 60;
 /** Beta validation cache duration in seconds (1 hour) */
 const BETA_CACHE_DURATION = 60 * 60;
 
+/**
+ * Email verification enforcement cutoff date
+ * Users who signed up BEFORE this date are grandfathered in (no email verification required)
+ * Users who signed up ON or AFTER this date must verify their email
+ *
+ * Set to: January 4, 2026 (grandfathering all beta users before this date)
+ */
+const EMAIL_VERIFICATION_CUTOFF = new Date('2026-01-04T00:00:00Z');
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -246,6 +255,29 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Email verification enforcement for NEW users (after cutoff date)
+  // Users who signed up before EMAIL_VERIFICATION_CUTOFF are grandfathered in
+  if (isProtectedPath && session?.user) {
+    const userCreatedAt = session.user.created_at ? new Date(session.user.created_at) : null;
+    const emailConfirmedAt = session.user.email_confirmed_at;
+
+    // Only enforce email verification for users created AFTER the cutoff date
+    const isNewUser = userCreatedAt && userCreatedAt >= EMAIL_VERIFICATION_CUTOFF;
+
+    if (isNewUser && !emailConfirmedAt) {
+      // New user without verified email - redirect to verification page
+      // Allow access to verification-related pages to avoid redirect loop
+      const verificationPaths = ['/verify-email', '/api/auth/resend-verification'];
+      const isVerificationPath = verificationPaths.some(path => pathname.startsWith(path));
+
+      if (!isVerificationPath) {
+        const redirectUrl = new URL('/verify-email', req.url);
+        redirectUrl.searchParams.set('email', session.user.email || '');
+        return NextResponse.redirect(redirectUrl);
+      }
+    }
+  }
+
   // Check beta access expiration for logged-in users
   // PERFORMANCE: Use cached result from cookie to avoid RPC on every request
   if (isProtectedPath && session?.user?.email) {
@@ -451,6 +483,7 @@ export const config = {
     '/admin/:path*', // Admin routes now protected
     '/login',
     '/signup',
+    '/verify-email', // Email verification page
     // SECURITY: Include API routes for CSRF protection
     '/api/:path*',
   ],
