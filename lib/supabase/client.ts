@@ -3,16 +3,26 @@ import { createBrowserClient } from '@supabase/ssr';
 // Singleton client instance to prevent multiple GoTrueClient instances
 let supabaseClient: ReturnType<typeof createBrowserClient> | null = null;
 
+// Track whether we're using placeholder values (build time)
+let isPlaceholder = false;
+
 export const createClient = () => {
   // Return existing client if already created
   if (supabaseClient) {
     return supabaseClient;
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  // Use placeholder values during build time if env vars aren't available
+  // The client will fail at runtime if used without proper env vars,
+  // but this allows the build to succeed in CI environments
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  isPlaceholder = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // In browser context with missing vars, throw (user will see the error)
+  // During build time (server context), use placeholder to allow build to complete
+  if (isPlaceholder && typeof window !== 'undefined') {
     throw new Error('Missing Supabase environment variables');
   }
 
@@ -92,3 +102,8 @@ export const createClient = () => {
 
   return supabaseClient;
 };
+
+// Helper to check if client is properly configured (not using placeholders)
+export function isSupabaseClientConfigured(): boolean {
+  return !isPlaceholder;
+}
