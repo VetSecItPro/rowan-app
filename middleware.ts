@@ -115,7 +115,10 @@ export async function middleware(req: NextRequest) {
   const { data: { session } } = await supabase.auth.getSession();
 
   // Admin routes - Single Sign-On (no separate admin login)
-  const isAdminPath = req.nextUrl.pathname.startsWith('/admin');
+  // Handle both page routes (/admin/*) and API routes (/api/admin/*)
+  const isAdminPagePath = req.nextUrl.pathname.startsWith('/admin');
+  const isAdminApiPath = req.nextUrl.pathname.startsWith('/api/admin');
+  const isAdminPath = isAdminPagePath || isAdminApiPath;
   const isAdminLoginPath = req.nextUrl.pathname === '/admin/login';
 
   // Redirect old admin login page to regular login
@@ -134,6 +137,24 @@ export async function middleware(req: NextRequest) {
         const sessionData = await decryptSessionData(adminSessionCookie);
         if (validateSessionData(sessionData)) {
           // Valid admin session - allow access
+          // For API routes, refresh the cookie if it's getting close to expiration (within 30 min)
+          const typedSession = sessionData as { expiresAt: number; adminId: string; email: string; role?: string; permissions?: string[]; authUserId?: string };
+          const thirtyMinutes = 30 * 60 * 1000;
+          if (typedSession.expiresAt - Date.now() < thirtyMinutes) {
+            // Refresh the session
+            const newSessionData = {
+              ...typedSession,
+              expiresAt: Date.now() + (ADMIN_SESSION_DURATION * 1000),
+            };
+            const newSessionPayload = await encryptSessionData(newSessionData);
+            response.cookies.set('admin-session', newSessionPayload, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              maxAge: ADMIN_SESSION_DURATION,
+              path: '/',
+            });
+          }
           return response;
         }
       } catch {
@@ -143,7 +164,15 @@ export async function middleware(req: NextRequest) {
 
     // No valid admin session - try SSO with regular auth
     if (!session) {
-      // Not logged in at all - redirect to login
+      // Not logged in at all
+      if (isAdminApiPath) {
+        // For API routes, return 401 instead of redirect
+        return NextResponse.json(
+          { error: 'Admin authentication required' },
+          { status: 401 }
+        );
+      }
+      // For page routes, redirect to login
       const redirectUrl = new URL('/login', req.url);
       redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
@@ -154,7 +183,7 @@ export async function middleware(req: NextRequest) {
       const { data: adminData, error: adminError } = await supabase.rpc('get_admin_details');
 
       if (adminError) {
-        // RPC error - log details and redirect with specific error
+        // RPC error - log details
         logger.error('Admin RPC error', adminError, {
           component: 'middleware',
           action: 'admin_rpc_check',
@@ -162,6 +191,12 @@ export async function middleware(req: NextRequest) {
           errorCode: adminError.code,
           errorMessage: adminError.message,
         });
+        if (isAdminApiPath) {
+          return NextResponse.json(
+            { error: 'Admin verification failed' },
+            { status: 500 }
+          );
+        }
         const redirectUrl = new URL('/dashboard', req.url);
         redirectUrl.searchParams.set('error', 'admin_rpc_error');
         const res = NextResponse.redirect(redirectUrl);
@@ -170,7 +205,13 @@ export async function middleware(req: NextRequest) {
       }
 
       if (!adminData || adminData.length === 0) {
-        // Not an admin - redirect to dashboard with error
+        // Not an admin
+        if (isAdminApiPath) {
+          return NextResponse.json(
+            { error: 'Admin access required' },
+            { status: 403 }
+          );
+        }
         const redirectUrl = new URL('/dashboard', req.url);
         redirectUrl.searchParams.set('error', 'admin_required');
         const res = NextResponse.redirect(redirectUrl);
@@ -192,7 +233,20 @@ export async function middleware(req: NextRequest) {
 
       const sessionPayload = await encryptSessionData(sessionData);
 
-      // Set admin session cookie and redirect to same page (to pick up the cookie)
+      if (isAdminApiPath) {
+        // For API routes, set the cookie in the response without redirecting
+        // The API route handler will process the request normally
+        response.cookies.set('admin-session', sessionPayload, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: ADMIN_SESSION_DURATION,
+          path: '/',
+        });
+        return response;
+      }
+
+      // For page routes, redirect to pick up the cookie
       const res = NextResponse.redirect(new URL(req.nextUrl.pathname, req.url));
       res.cookies.set('admin-session', sessionPayload, {
         httpOnly: true,
@@ -206,13 +260,18 @@ export async function middleware(req: NextRequest) {
     } catch (error) {
       // SECURITY: Log admin access failures for audit trail
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const errorStack = error instanceof Error ? error.stack : '';
       logger.error('Admin SSO check failed', error, {
         component: 'middleware',
         action: 'admin_sso_check',
         path: req.nextUrl.pathname,
         errorMessage,
       });
+      if (isAdminApiPath) {
+        return NextResponse.json(
+          { error: 'Admin authentication error' },
+          { status: 500 }
+        );
+      }
       const redirectUrl = new URL('/dashboard', req.url);
       // Include error hint for debugging (sanitized, truncated)
       // Extract actual error from "Failed to encrypt session data: <actual error>"
