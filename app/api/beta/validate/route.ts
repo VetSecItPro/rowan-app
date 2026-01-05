@@ -113,16 +113,8 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (codeError || !codeData) {
-        // Log failed attempt
-        await supabase.from('beta_access_requests').insert({
-          email: null,
-          ip_address: ip,
-          user_agent: req.headers.get('user-agent') || null,
-          access_granted: false,
-          notes: `Invalid invite code: ${inviteCode.substring(0, 4)}****`,
-          created_at: new Date().toISOString(),
-        });
-
+        // Note: Don't log to beta_access_requests here - those are for actual beta requests
+        // with email addresses, not validation attempts. Failed attempts are logged via rate limiting.
         return NextResponse.json(
           { success: false, error: 'Invalid invite code. Please check your code and try again.' },
           { status: 401 }
@@ -153,15 +145,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Log successful validation
-      await supabase.from('beta_access_requests').insert({
-        email: null,
-        ip_address: ip,
-        user_agent: req.headers.get('user-agent') || null,
-        access_granted: true,
-        notes: `Valid invite code: ${codeData.code}`,
-        created_at: new Date().toISOString(),
-      });
+      // Note: Don't log to beta_access_requests here - the actual beta request
+      // was created when the invite code was generated. Linking happens at signup.
 
       // Increment daily analytics
       const today = new Date().toISOString().split('T')[0];
@@ -214,15 +199,7 @@ export async function POST(req: NextRequest) {
 
       const isValidPassword = timingSafeCompare(password, BETA_PASSWORD);
 
-      // Log the attempt
-      await supabase.from('beta_access_requests').insert({
-        email: null,
-        ip_address: ip,
-        user_agent: req.headers.get('user-agent') || null,
-        access_granted: isValidPassword,
-        notes: 'Legacy password validation',
-        created_at: new Date().toISOString(),
-      });
+      // Note: Don't log to beta_access_requests - those are for actual beta requests with emails
 
       if (!isValidPassword) {
         return NextResponse.json(
