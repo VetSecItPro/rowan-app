@@ -13,6 +13,8 @@ import { useScrollLock } from '@/lib/hooks/useScrollLock';
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
+  const [isDesktop, setIsDesktop] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -21,11 +23,31 @@ export function HamburgerMenu() {
   const { user } = useAuth();
   // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
 
-  // Mount check for portal
+  // Mount check for portal and detect desktop
   useEffect(() => {
     setMounted(true);
-    return () => setMounted(false);
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 640);
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => {
+      setMounted(false);
+      window.removeEventListener('resize', checkDesktop);
+    };
   }, []);
+
+  // Calculate menu position relative to button for desktop
+  useEffect(() => {
+    if (isOpen && buttonRef.current && isDesktop) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuStyle({
+        position: 'fixed',
+        top: rect.bottom + 8, // 8px gap below button
+        right: window.innerWidth - rect.right, // Align right edge with button's right edge
+      });
+    } else {
+      setMenuStyle({});
+    }
+  }, [isOpen, isDesktop]);
 
   // Close menu when route changes
   useEffect(() => {
@@ -84,7 +106,14 @@ export function HamburgerMenu() {
           />
 
           {/* Menu Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-gray-900 shadow-2xl z-[9999] flex flex-col sm:absolute sm:inset-auto sm:top-16 sm:right-4 sm:w-80 sm:max-w-none sm:max-h-[calc(100vh-5rem)] sm:rounded-xl sm:border sm:border-gray-200 sm:dark:border-gray-700 animate-in slide-in-from-right duration-300 sm:slide-in-from-top-2 sm:fade-in sm:duration-200">
+          <div
+            className={`bg-white dark:bg-gray-900 shadow-2xl z-[9999] flex flex-col animate-in ${
+              isDesktop
+                ? 'w-80 max-h-[calc(100vh-5rem)] rounded-xl border border-gray-200 dark:border-gray-700 slide-in-from-top-2 fade-in duration-200'
+                : 'fixed inset-y-0 right-0 w-full max-w-sm slide-in-from-right duration-300'
+            }`}
+            style={menuStyle}
+          >
             {/* Mobile Header - Sticky at top */}
             <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 sm:hidden pt-safe">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
