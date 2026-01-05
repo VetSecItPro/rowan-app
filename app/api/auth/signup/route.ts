@@ -104,14 +104,30 @@ export async function POST(request: NextRequest) {
     // ========================================================================
     if (validated.beta_code) {
       const normalizedCode = validated.beta_code.replace(/-/g, '').toUpperCase().trim();
+      const originalCode = validated.beta_code.toUpperCase().trim();
+
+      // Use .in() instead of .or() - safer for codes with special characters like hyphens
+      const codesToCheck = [originalCode];
+      if (normalizedCode !== originalCode) {
+        codesToCheck.push(normalizedCode);
+      }
 
       const { data: codeData, error: codeError } = await supabaseAdmin
         .from('beta_invite_codes')
         .select('id, code, used_by, expires_at, is_active')
-        .or(`code.eq.${validated.beta_code},code.eq.${normalizedCode}`)
+        .in('code', codesToCheck)
+        .limit(1)
         .maybeSingle();
 
-      if (codeError || !codeData) {
+      if (codeError) {
+        console.error('Beta code lookup error:', codeError);
+        return NextResponse.json(
+          { error: 'Error validating beta code. Please try again.' },
+          { status: 500 }
+        );
+      }
+
+      if (!codeData) {
         return NextResponse.json(
           { error: 'Invalid beta invite code. Please check your code and try again.' },
           { status: 400 }
