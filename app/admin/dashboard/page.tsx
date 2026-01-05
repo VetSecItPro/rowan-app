@@ -4,6 +4,7 @@ import { useState, memo, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch, AdminSessionExpiredError } from '@/lib/providers/query-client-provider';
 import {
   Users,
   UserCheck,
@@ -236,10 +237,11 @@ function AdminDashboardContent() {
   }, [router, searchParams]);
 
   // Use React Query with stale-while-revalidate for instant loading
+  // adminFetch automatically throws AdminSessionExpiredError on 401, triggering global redirect
   const { data: stats, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/dashboard/stats?t=${Date.now()}`);
+      const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}`);
       if (!response.ok) throw new Error('Failed to fetch stats');
       const data = await response.json();
       return data.stats as DashboardStats;
@@ -253,7 +255,7 @@ function AdminDashboardContent() {
   const { data: activityData } = useQuery({
     queryKey: ['admin-recent-activity'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/activity?limit=6&hours=24');
+      const response = await adminFetch('/api/admin/activity?limit=6&hours=24');
       if (!response.ok) throw new Error('Failed to fetch activity');
       const data = await response.json();
       return data.activities as ActivityItem[];
