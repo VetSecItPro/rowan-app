@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -381,7 +382,7 @@ async function generatePDFExport(userData: any): Promise<Buffer> {
 async function uploadExportFile(fileName: string, fileBuffer: Buffer, mimeType: string): Promise<string> {
   // In a real implementation, you would upload to S3, Google Cloud Storage, etc.
   // For now, we'll simulate a file URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rowan.app';
+  const baseUrl = getAppUrl();
   const fileUrl = `${baseUrl}/api/privacy/download-export?file=${encodeURIComponent(fileName)}`;
 
   logger.info(`📁 Mock upload: ${fileName} (${fileBuffer.length} bytes)`, { component: 'api-route' });
@@ -546,7 +547,7 @@ async function sendExportFailureEmail(userId: string) {
           </div>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=privacy-data"
+            <a href="${getAppUrl()}/settings?tab=privacy-data"
                style="background: #dc2626; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
               🔄 Try Again
             </a>

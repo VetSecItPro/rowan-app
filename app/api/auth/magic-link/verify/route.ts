@@ -3,6 +3,7 @@ import { checkAuthRateLimit } from '@/lib/ratelimit';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       type: 'magiclink',
       email: '', // We don't have email here, but we have user_id
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+        redirectTo: `${getAppUrl()}/dashboard`
       }
     });
 
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Authentication successful.',
-      redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
+      redirect_url: `${getAppUrl()}/dashboard`
     });
 
   } catch (error) {

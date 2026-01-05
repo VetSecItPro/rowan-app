@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -187,7 +188,7 @@ async function send7DayDeletionReminder(
   deletionDate: Date,
   requestId: string
 ) {
-  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
+  const cancelUrl = `${getAppUrl()}/settings/privacy-data?cancel-deletion=${requestId}`;
 
   if (!resend) {
     return;
@@ -252,7 +253,7 @@ async function send1DayDeletionReminder(
   deletionDate: Date,
   requestId: string
 ) {
-  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
+  const cancelUrl = `${getAppUrl()}/settings/privacy-data?cancel-deletion=${requestId}`;
 
   if (!resend) {
     return;

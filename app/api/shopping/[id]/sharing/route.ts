@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 /**
  * PATCH /api/shopping/[id]/sharing
@@ -130,7 +131,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     const responseData = {
       ...updatedList,
       shareUrl: isPublic && updatedList.share_token
-        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/shopping/share/${updatedList.share_token}`
+        ? `${getAppUrl()}/shopping/share/${updatedList.share_token}`
         : null,
     };
 
@@ -222,7 +223,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       isPublic: list.is_public || false,
       sharedAt: list.shared_at,
       shareUrl: list.is_public && list.share_token
-        ? `${process.env.NEXT_PUBLIC_APP_URL || ''}/shopping/share/${list.share_token}`
+        ? `${getAppUrl()}/shopping/share/${list.share_token}`
         : null,
     };
 

@@ -5,6 +5,7 @@ import { Redis } from '@upstash/redis';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { validateEmail } from '@/lib/utils/email-validation';
+import { buildAppUrl } from '@/lib/utils/app-url';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import { z } from 'zod';
@@ -272,12 +273,12 @@ async function sendBetaInviteEmail(
   }
 
   // Build signup URL with prefill parameters for better UX
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
-  const params = new URLSearchParams({ beta_code: inviteCode });
-  if (email) params.append('email', email);
-  if (firstName) params.append('first_name', firstName);
-  if (lastName) params.append('last_name', lastName);
-  const signupUrl = `${baseUrl}/signup?${params.toString()}`;
+  // IMPORTANT: buildAppUrl ensures production uses rowanapp.com, never vercel.app
+  const urlParams: Record<string, string> = { beta_code: inviteCode };
+  if (email) urlParams.email = email;
+  if (firstName) urlParams.first_name = firstName;
+  if (lastName) urlParams.last_name = lastName;
+  const signupUrl = buildAppUrl('/signup', urlParams);
 
   try {
     // Render the React Email template to HTML

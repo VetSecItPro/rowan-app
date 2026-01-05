@@ -8,6 +8,7 @@ import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -346,7 +347,7 @@ async function sendDeletionConfirmationEmail(
   requestId: string
 ) {
   try {
-    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/settings/privacy-data?cancel-deletion=${requestId}`;
+    const cancelUrl = `${getAppUrl()}/settings/privacy-data?cancel-deletion=${requestId}`;
 
     if (!resend) {
       logger.error('Resend API key not configured', undefined, { component: 'api-route', action: 'api_request' });
@@ -435,7 +436,7 @@ async function sendDeletionCancellationEmail(email: string, userName: string) {
           <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
 
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard"
+            <a href="${getAppUrl()}/dashboard"
                style="background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               Return to Dashboard
             </a>

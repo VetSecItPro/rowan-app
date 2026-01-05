@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 interface User {
   id: string;
@@ -232,11 +233,11 @@ export const notificationService = {
             <p><strong>${assignedBy}</strong> assigned you a new task in <strong>${spaceName}</strong>:</p>
             <div class="task-title">${taskTitle}</div>
             <p>Click below to view and manage this task:</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">View Task</a>
+            <a href="${getAppUrl()}/dashboard" class="button">View Task</a>
           </div>
           <div class="footer">
             <p>You're receiving this because you have email notifications enabled.</p>
-            <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=notifications">Manage notification preferences</a></p>
+            <p><a href="${getAppUrl()}/settings?tab=notifications">Manage notification preferences</a></p>
           </div>
         </body>
       </html>
@@ -292,11 +293,11 @@ export const notificationService = {
             <p>Your shopping list <strong>${listTitle}</strong> has been generated from your meal plan in <strong>${spaceName}</strong>.</p>
             <div class="highlight">${itemCount} items ready to shop</div>
             <p>We've automatically aggregated and organized all ingredients from your planned meals.</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/shopping" class="button">View Shopping List</a>
+            <a href="${getAppUrl()}/shopping" class="button">View Shopping List</a>
           </div>
           <div class="footer">
             <p>You're receiving this because you have shopping list notifications enabled.</p>
-            <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=notifications">Manage notification preferences</a></p>
+            <p><a href="${getAppUrl()}/settings?tab=notifications">Manage notification preferences</a></p>
           </div>
         </body>
       </html>
@@ -351,11 +352,11 @@ export const notificationService = {
             <p>You have a reminder in <strong>${spaceName}</strong>:</p>
             <div class="reminder-title">${reminderTitle}</div>
             <p><strong>Time:</strong> ${reminderTime}</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/reminders" class="button">View Reminders</a>
+            <a href="${getAppUrl()}/reminders" class="button">View Reminders</a>
           </div>
           <div class="footer">
             <p>You're receiving this because you have reminder notifications enabled.</p>
-            <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=notifications">Manage notification preferences</a></p>
+            <p><a href="${getAppUrl()}/settings?tab=notifications">Manage notification preferences</a></p>
           </div>
         </body>
       </html>
@@ -410,11 +411,11 @@ export const notificationService = {
             <p>You have an upcoming event in <strong>${spaceName}</strong>:</p>
             <div class="event-title">${eventTitle}</div>
             <p><strong>When:</strong> ${eventTime}</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/calendar" class="button">View Calendar</a>
+            <a href="${getAppUrl()}/calendar" class="button">View Calendar</a>
           </div>
           <div class="footer">
             <p>You're receiving this because you have event notifications enabled.</p>
-            <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=notifications">Manage notification preferences</a></p>
+            <p><a href="${getAppUrl()}/settings?tab=notifications">Manage notification preferences</a></p>
           </div>
         </body>
       </html>
@@ -469,11 +470,11 @@ export const notificationService = {
             <p>Time to prepare your meal in <strong>${spaceName}</strong>:</p>
             <div class="meal-name">${mealName}</div>
             <p><strong>Scheduled for:</strong> ${mealTime}</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/meals" class="button">View Recipe</a>
+            <a href="${getAppUrl()}/meals" class="button">View Recipe</a>
           </div>
           <div class="footer">
             <p>You're receiving this because you have meal reminder notifications enabled.</p>
-            <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=notifications">Manage notification preferences</a></p>
+            <p><a href="${getAppUrl()}/settings?tab=notifications">Manage notification preferences</a></p>
           </div>
         </body>
       </html>

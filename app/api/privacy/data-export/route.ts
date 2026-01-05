@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -458,14 +459,14 @@ async function uploadExportFile(
       .createSignedUrl(fileName, 24 * 60 * 60); // 24 hours
 
     return {
-      fileUrl: signedUrl?.signedUrl || `${process.env.NEXT_PUBLIC_APP_URL}/api/privacy/download/${exportId}`,
+      fileUrl: signedUrl?.signedUrl || `${getAppUrl()}/api/privacy/download/${exportId}`,
       expiresAt: expiresAt.toISOString(),
     };
   } catch (error) {
     logger.error('Error uploading export file:', error, { component: 'api-route', action: 'api_request' });
     // Fallback to API endpoint
     return {
-      fileUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/privacy/download/${exportId}`,
+      fileUrl: `${getAppUrl()}/api/privacy/download/${exportId}`,
       expiresAt: expiresAt.toISOString(),
     };
   }

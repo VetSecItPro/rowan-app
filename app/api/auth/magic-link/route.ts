@@ -5,6 +5,7 @@ import { sendMagicLinkEmail, type MagicLinkData } from '@/lib/services/email-ser
 import { z } from 'zod';
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';
+import { buildAppUrl } from '@/lib/utils/app-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
           // Still return success to prevent information leakage
         } else {
           // Send magic link email using our custom template
-          const magicLinkUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/magic?token=${magicToken}`;
+          const magicLinkUrl = buildAppUrl('/auth/magic', { token: magicToken });
           
           // Get user agent and IP for security info
           const userAgent = request.headers.get('user-agent') || 'Unknown browser';
