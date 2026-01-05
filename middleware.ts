@@ -21,8 +21,8 @@ import type { NextRequest } from 'next/server';
 import { decryptSessionData, validateSessionData, encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger-edge';
 
-/** Admin session duration in seconds (2 hours) */
-const ADMIN_SESSION_DURATION = 2 * 60 * 60;
+/** Admin session duration in seconds (24 hours) - must match login route */
+const ADMIN_SESSION_DURATION = 24 * 60 * 60;
 
 /** Beta validation cache duration in seconds (1 hour) */
 const BETA_CACHE_DURATION = 60 * 60;
@@ -155,6 +155,12 @@ export async function middleware(req: NextRequest) {
               path: '/',
             });
           }
+          // Add verified admin header for API routes
+          // SECURITY: This header confirms middleware validated the admin session
+          if (isAdminApiPath) {
+            response.headers.set('x-admin-verified', 'true');
+            response.headers.set('x-admin-id', typedSession.adminId);
+          }
           return response;
         }
       } catch {
@@ -234,8 +240,9 @@ export async function middleware(req: NextRequest) {
       const sessionPayload = await encryptSessionData(sessionData);
 
       if (isAdminApiPath) {
-        // For API routes, set the cookie in the response without redirecting
-        // The API route handler will process the request normally
+        // For API routes, set the cookie in the response AND add a header for immediate verification
+        // The cookie won't be readable by the API route on THIS request, but the header will be
+        // SECURITY: This header is only set by middleware after successful admin verification
         response.cookies.set('admin-session', sessionPayload, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -243,6 +250,10 @@ export async function middleware(req: NextRequest) {
           maxAge: ADMIN_SESSION_DURATION,
           path: '/',
         });
+        // Add verified admin header for the API route to check as fallback
+        // This is safe because only middleware can set this header (stripped from client requests)
+        response.headers.set('x-admin-verified', 'true');
+        response.headers.set('x-admin-id', admin.admin_id);
         return response;
       }
 
