@@ -250,7 +250,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
           <QuickStat label="Codes Sent" value={stats.codesSent || 0} />
           <QuickStat label="Signups" value={stats.totalUsers || 0} />
           <QuickStat label="Launch Signups" value={stats.launchSignups || 0} />
-          <QuickStat label="Approval Rate" value={`${analytics.betaMetrics?.approvalRate || 0}%`} />
+          <QuickStat label="Invite Success" value={`${analytics.betaMetrics?.approvalRate || 0}%`} />
           <QuickStat label="Unique Visitors" value={analytics.trafficMetrics?.uniqueSessions || 0} />
         </div>
       </div>

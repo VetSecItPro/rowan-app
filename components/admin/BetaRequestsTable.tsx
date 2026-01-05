@@ -78,12 +78,12 @@ export function BetaRequestsTable({ betaRequests, isLoading, searchTerm }: BetaR
                 {request.access_granted ? (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
                     <UserCheck className="w-3 h-3 mr-1" />
-                    Approved
+                    Invite Sent
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
                     <AlertTriangle className="w-3 h-3 mr-1" />
-                    Pending
+                    No Invite
                   </span>
                 )}
               </td>
