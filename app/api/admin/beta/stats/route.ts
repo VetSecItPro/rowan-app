@@ -202,14 +202,14 @@ export async function GET(req: NextRequest) {
                 type: 'approval' as const,
                 email: record.email || 'Unknown',
                 timestamp: record.approved_at || record.created_at,
-                details: 'was approved for beta access',
+                details: 'received invite code (awaiting signup)',
               };
             } else {
               return {
                 type: 'request' as const,
                 email: record.email || 'Unknown',
                 timestamp: record.created_at,
-                details: 'attempted beta access',
+                details: 'validation attempt (no invite sent)',
               };
             }
           });
