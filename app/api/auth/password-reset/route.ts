@@ -5,6 +5,7 @@ import { sendPasswordResetEmail, type PasswordResetData } from '@/lib/services/e
 import { z } from 'zod';
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';
+import { buildAppUrl } from '@/lib/utils/app-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
           // Still return success to prevent information leakage
         } else {
           // Send password reset email using our custom template
-          const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
+          const resetUrl = buildAppUrl('/reset-password', { token: resetToken });
           
           // Get user agent and IP for security info
           const userAgent = request.headers.get('user-agent') || 'Unknown browser';

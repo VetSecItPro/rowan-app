@@ -10,6 +10,7 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { spaceInviteSchema, validateAndSanitizeInvite } from '@/lib/validations/space-schemas';
+import { buildAppUrl } from '@/lib/utils/app-url';
 
 /**
  * POST /api/spaces/invite
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Invitation URL - the token itself serves as signup authorization for invited users
-    const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
+    const invitationUrl = buildAppUrl('/invitations/accept', { token: result.data.token });
 
     // Format expiration date for email
     const expiresAt = new Date(result.data.expires_at);

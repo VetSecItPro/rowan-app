@@ -5,6 +5,7 @@ import { X, Share2, Copy, Check, Eye, EyeOff, Globe, Lock } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
 import { copyToClipboard } from '@/lib/utils/share';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 interface ShareListModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
 
       // Generate share URL if list is public and has a token
       if (list.is_public && list.share_token) {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+        const baseUrl = getAppUrl();
         setShareUrl(`${baseUrl}/shopping/share/${list.share_token}`);
       } else {
         setShareUrl('');
@@ -46,7 +47,7 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
 
       // Generate new share URL if made public
       if (newPublicState && updatedList.share_token) {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+        const baseUrl = getAppUrl();
         setShareUrl(`${baseUrl}/shopping/share/${updatedList.share_token}`);
       } else {
         setShareUrl('');

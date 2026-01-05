@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { buildAppUrl } from '@/lib/utils/app-url';
 import { z } from 'zod';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const signupUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com'}/signup?beta_code=${codeData.code}`;
+    const signupUrl = buildAppUrl('/signup', { beta_code: codeData.code });
 
     // Render the React Email template to HTML
     const emailHtml = await render(

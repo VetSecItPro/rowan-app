@@ -9,6 +9,7 @@ import { getStripeClient } from './client';
 import { getPriceId } from './products';
 import type { SubscriptionTier, SubscriptionPeriod } from '../types';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 /**
  * Create a Stripe checkout session for subscription
@@ -35,7 +36,7 @@ export async function createCheckoutSession(
     const customer = await getOrCreateCustomer(email, userId);
 
     // Success and cancel URLs
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = getAppUrl();
     const successUrl = `${baseUrl}/payment/success?tier=${tier}&period=${period}`;
     const cancelUrl = `${baseUrl}/pricing`;
 

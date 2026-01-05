@@ -3,6 +3,7 @@ import { checkAndAwardBadges } from './achievement-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { logger } from '@/lib/logger';
 import { cacheAside, cacheKeys, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 export interface Milestone {
   id: string;
@@ -457,7 +458,7 @@ export const goalsService = {
               {
                 goalTitle: data.title,
                 goalId: data.id,
-                goalUrl: `${process.env.NEXT_PUBLIC_APP_URL}/goals/${data.id}?space_id=${data.space_id}`,
+                goalUrl: `${getAppUrl()}/goals/${data.id}?space_id=${data.space_id}`,
                 achievementType: 'goal_completed',
                 completedBy: userData?.name || 'Someone',
                 completionDate: finalUpdates.completed_at,
@@ -567,7 +568,7 @@ export const goalsService = {
               {
                 goalTitle: goalData.title,
                 goalId: data.goal_id,
-                goalUrl: `${process.env.NEXT_PUBLIC_APP_URL}/goals/${data.goal_id}?space_id=${data.goal.space_id}`,
+                goalUrl: `${getAppUrl()}/goals/${data.goal_id}?space_id=${data.goal.space_id}`,
                 achievementType: 'milestone_reached',
                 completedBy: userData?.name || 'Someone',
                 completionDate: finalUpdates.completed_at,

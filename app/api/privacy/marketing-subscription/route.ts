@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -230,8 +231,8 @@ export async function GET(request: NextRequest) {
         },
         subscriptionHistory: history || [],
         unsubscribeLinks: {
-          email: `${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'email')}`,
-          all: `${process.env.NEXT_PUBLIC_APP_URL}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'all')}`,
+          email: `${getAppUrl()}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'email')}`,
+          all: `${getAppUrl()}/unsubscribe?token=${await generateUnsubscribeToken(userId, 'all')}`,
         },
       },
     });

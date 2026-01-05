@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { supabaseAdmin, isSupabaseAdminConfigured } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 // Initialize Resend only if API key is available (build-time safe)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -39,7 +40,7 @@ function get7DayEmailHtml(expiryDate: string): string {
     </p>
 
     <div style="text-align: center; margin: 40px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/pricing"
+      <a href="${getAppUrl()}/pricing"
          style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
         Upgrade Your Account
       </a>
@@ -94,7 +95,7 @@ function get3DayEmailHtml(expiryDate: string): string {
     </div>
 
     <div style="text-align: center; margin: 40px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/pricing"
+      <a href="${getAppUrl()}/pricing"
          style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
         Upgrade Now
       </a>

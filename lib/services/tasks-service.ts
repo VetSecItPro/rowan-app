@@ -3,6 +3,7 @@ import { logger } from '@/lib/logger';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
+import { getAppUrl } from '@/lib/utils/app-url';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
 import type {
   Task,
@@ -317,7 +318,7 @@ export const tasksService = {
                 [task.assigned_to],
                 {
                   taskTitle: task.title,
-                  taskUrl: `${process.env.NEXT_PUBLIC_APP_URL}/tasks/${task.id}?space_id=${task.space_id}`,
+                  taskUrl: `${getAppUrl()}/tasks/${task.id}?space_id=${task.space_id}`,
                   assignedBy: creatorData?.name || 'Someone',
                   assignedTo: assigneeData?.name || 'You',
                   priority: task.priority || 'medium',
