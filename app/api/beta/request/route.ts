@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
     // Check if email already has an invite code
     const { data: existingCode } = await supabaseAdmin
       .from('beta_invite_codes')
-      .select('id, code, used_by, created_at')
+      .select('id, code, used_by, created_at, first_name, last_name')
       .eq('email', normalizedEmail)
       .maybeSingle();
 
@@ -137,7 +137,16 @@ export async function POST(req: NextRequest) {
 
       // Resend the existing code - MUST await to ensure delivery
       if (resend) {
-        const emailResult = await sendBetaInviteEmail(normalizedEmail, existingCode.code, fullName);
+        // Use stored first/last name if available, otherwise use the ones from request
+        const storedFirstName = existingCode.first_name || firstName;
+        const storedLastName = existingCode.last_name || lastName;
+        const emailResult = await sendBetaInviteEmail(
+          normalizedEmail,
+          existingCode.code,
+          `${storedFirstName} ${storedLastName}`.trim(),
+          storedFirstName,
+          storedLastName
+        );
         if (!emailResult.success) {
           // Throw so user gets a clear error and can retry
           throw new Error(`Failed to send email: ${emailResult.error}`);
@@ -209,7 +218,13 @@ export async function POST(req: NextRequest) {
     // Send the invite email - MUST await to ensure delivery
     // If this fails, throw error so user can retry (code exists, so retry will use resend path)
     if (resend) {
-      const emailResult = await sendBetaInviteEmail(normalizedEmail, inviteCode, fullName);
+      const emailResult = await sendBetaInviteEmail(
+        normalizedEmail,
+        inviteCode,
+        fullName,
+        firstName,
+        lastName
+      );
       if (!emailResult.success) {
         throw new Error(`Failed to send email: ${emailResult.error}`);
       }
@@ -248,13 +263,21 @@ export async function POST(req: NextRequest) {
 async function sendBetaInviteEmail(
   email: string,
   inviteCode: string,
-  name?: string
+  name?: string,
+  firstName?: string,
+  lastName?: string
 ): Promise<{ success: boolean; error?: string }> {
   if (!resend) {
     return { success: false, error: 'Email service not configured' };
   }
 
-  const signupUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com'}/signup?beta_code=${inviteCode}`;
+  // Build signup URL with prefill parameters for better UX
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
+  const params = new URLSearchParams({ beta_code: inviteCode });
+  if (email) params.append('email', email);
+  if (firstName) params.append('first_name', firstName);
+  if (lastName) params.append('last_name', lastName);
+  const signupUrl = `${baseUrl}/signup?${params.toString()}`;
 
   try {
     // Render the React Email template to HTML
