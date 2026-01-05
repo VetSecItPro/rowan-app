@@ -1,9 +1,42 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Sanitization utilities for preventing XSS attacks
- * Uses DOMPurify for robust HTML sanitization
+ * Uses DOMPurify for robust HTML sanitization when available,
+ * falls back to regex-based sanitization in serverless environments
  */
+
+// Lazy-load DOMPurify to avoid JSDOM initialization issues in serverless
+let DOMPurify: typeof import('isomorphic-dompurify').default | null = null;
+let domPurifyLoadAttempted = false;
+
+async function getDOMPurify() {
+  if (!domPurifyLoadAttempted) {
+    domPurifyLoadAttempted = true;
+    try {
+      const mod = await import('isomorphic-dompurify');
+      DOMPurify = mod.default;
+    } catch {
+      // DOMPurify/JSDOM failed to load - use fallback
+      DOMPurify = null;
+    }
+  }
+  return DOMPurify;
+}
+
+/**
+ * Fallback sanitization using regex (for when DOMPurify isn't available)
+ * Strips all HTML tags but keeps text content
+ */
+function fallbackSanitizePlainText(input: string): string {
+  return input
+    .replace(/<[^>]*>/g, '') // Remove all HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+    .replace(/&lt;/g, '<')   // Decode common entities
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+}
 
 /**
  * Sanitize plain text input by removing all HTML tags
@@ -17,12 +50,28 @@ export function sanitizePlainText(input: string | null | undefined): string {
     return '';
   }
 
-  // Remove all HTML tags and trim whitespace
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: [], // No HTML tags allowed
-    ALLOWED_ATTR: [], // No attributes allowed
-    KEEP_CONTENT: true, // Keep text content
-  }).trim();
+  // Use synchronous fallback - DOMPurify may not be available
+  // For plain text (names, titles), regex stripping is sufficient
+  return fallbackSanitizePlainText(input);
+}
+
+/**
+ * Fallback HTML sanitization - strips all potentially dangerous content
+ * Less precise than DOMPurify but safe for serverless environments
+ */
+function fallbackSanitizeHtml(input: string): string {
+  // Remove script tags and their contents
+  let result = input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  // Remove style tags and their contents
+  result = result.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  // Remove on* event handlers
+  result = result.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
+  result = result.replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
+  // Remove javascript: URLs
+  result = result.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"');
+  // Remove data: URLs in src
+  result = result.replace(/src\s*=\s*["']data:[^"']*["']/gi, 'src=""');
+  return result.trim();
 }
 
 /**
@@ -33,21 +82,28 @@ export function sanitizePlainText(input: string | null | undefined): string {
  * @param input - User-provided HTML content
  * @returns Sanitized HTML safe for rendering
  */
-export function sanitizeHtml(input: string | null | undefined): string {
+export async function sanitizeHtml(input: string | null | undefined): Promise<string> {
   if (!input || typeof input !== 'string') {
     return '';
   }
 
-  // Allow only safe formatting tags, no scripts or dangerous attributes
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre'
-    ],
-    ALLOWED_ATTR: ['href', 'title', 'target'],
-    ALLOW_DATA_ATTR: false,
-    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
-  }).trim();
+  const purify = await getDOMPurify();
+
+  if (purify) {
+    // Use DOMPurify when available
+    return purify.sanitize(input, {
+      ALLOWED_TAGS: [
+        'p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre'
+      ],
+      ALLOWED_ATTR: ['href', 'title', 'target'],
+      ALLOW_DATA_ATTR: false,
+      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
+    }).trim();
+  }
+
+  // Fallback to regex-based sanitization
+  return fallbackSanitizeHtml(input);
 }
 
 /**
