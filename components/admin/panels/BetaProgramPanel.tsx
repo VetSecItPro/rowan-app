@@ -199,7 +199,7 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
         <StatCard
           title="Success Rate"
           value={`${Math.round((stats.approvedRequests / Math.max(stats.totalRequests, 1)) * 100)}%`}
-          subtitle="Approved"
+          subtitle="Invites sent"
           color="red"
         />
       </div>
