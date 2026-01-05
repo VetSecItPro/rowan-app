@@ -36,9 +36,10 @@ import {
   logCheckoutSuccess,
 } from '../utils/monetization-logger';
 import { logger } from '../logger';
+import { getAppUrl } from '../utils/app-url';
 import type Stripe from 'stripe';
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://rowanapp.com';
+const BASE_URL = getAppUrl();
 
 /**
  * Verify Stripe webhook signature

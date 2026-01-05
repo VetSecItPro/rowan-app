@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 // Financial Reports Service
 // Comprehensive reporting system with PDF generation
@@ -765,7 +766,7 @@ class FinancialReportsService {
     }
 
     // Construct share URL based on your app's domain
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = getAppUrl();
     return `${baseUrl}/reports/shared/${report.share_token}`;
   }
 

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
 import { notificationService } from '@/lib/services/notification-service';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 // =============================================
 // TYPES
@@ -359,7 +360,7 @@ function generateEmailHtml(batch: CheckInNotificationBatch): string {
   </div>
 
   <div style="text-align: center; margin-top: 30px;">
-    <a href="${process.env.NEXT_PUBLIC_APP_URL}/goals" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+    <a href="${getAppUrl()}/goals" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
       Complete Your Check-Ins
     </a>
   </div>
@@ -367,7 +368,7 @@ function generateEmailHtml(batch: CheckInNotificationBatch): string {
   <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;">
     <p style="margin: 5px 0;">You're receiving this because you have goal check-in reminders enabled.</p>
     <p style="margin: 5px 0;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/settings/notifications" style="color: #6366f1; text-decoration: none;">Manage notification preferences</a>
+      <a href="${getAppUrl()}/settings/notifications" style="color: #6366f1; text-decoration: none;">Manage notification preferences</a>
     </p>
   </div>
 

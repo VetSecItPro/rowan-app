@@ -7,6 +7,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import { buildAppUrl } from '@/lib/utils/app-url';
 
 /**
  * GET /api/spaces/invitations?space_id=xxx
@@ -62,7 +63,7 @@ export async function GET(req: NextRequest) {
     // Add invitation URLs to each invitation
     const invitationsWithUrls = result.data.map((inv: any) => ({
       ...inv,
-      invitation_url: `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${inv.token}`,
+      invitation_url: buildAppUrl('/invitations/accept', { token: inv.token }),
     }));
 
     return NextResponse.json({
@@ -198,7 +199,7 @@ export async function PUT(req: NextRequest) {
       supabase.from('users').select('name').eq('id', user.id).single(),
     ]);
 
-    const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/accept?token=${result.data.token}`;
+    const invitationUrl = buildAppUrl('/invitations/accept', { token: result.data.token });
     const expiresAt = new Date(result.data.expires_at);
     const expirationText = `${Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days`;
 

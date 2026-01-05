@@ -5,6 +5,7 @@ import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 import { logger } from '@/lib/logger';
 import { cacheAside, cacheKeys, deleteCache, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 /**
  * Security: Default maximum limit for list queries to prevent unbounded data retrieval
@@ -227,7 +228,7 @@ export const messagesService = {
                 isDirectMessage: conversationData.conversation_type === 'direct',
                 messageCount: 1,
                 spaceName: spaceData?.name || 'Your Space',
-                messageUrl: `${process.env.NEXT_PUBLIC_APP_URL}/messages/${input.conversation_id}?space_id=${input.space_id}`,
+                messageUrl: `${getAppUrl()}/messages/${input.conversation_id}?space_id=${input.space_id}`,
               }
             ).catch((error) => logger.error('Caught error', error, { component: 'lib-messages-service', action: 'service_call' }));
           }

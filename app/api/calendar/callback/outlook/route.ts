@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { outlookCalendarService } from '@/lib/services/calendar';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 // Validation schema for Outlook OAuth callback
 const OutlookOAuthCallbackSchema = z.object({
@@ -26,7 +27,7 @@ const OAUTH_STATE_EXPIRATION_MS = 10 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = getAppUrl();
 
   try {
     // Parse and validate callback parameters
