@@ -135,17 +135,20 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Resend the existing code (non-blocking for fast response)
+      // Resend the existing code - MUST await to ensure delivery
       if (resend) {
-        sendBetaInviteEmail(normalizedEmail, existingCode.code, fullName).catch((err) => {
-          console.error('Failed to resend beta invite email:', err);
-        });
+        const emailResult = await sendBetaInviteEmail(normalizedEmail, existingCode.code, fullName);
+        if (!emailResult.success) {
+          // Throw so user gets a clear error and can retry
+          throw new Error(`Failed to send email: ${emailResult.error}`);
+        }
       }
 
       return NextResponse.json({
         success: true,
         message: 'We found your existing invite code and resent it to your email.',
         resent: true,
+        email_sent: true,
       });
     }
 
@@ -203,11 +206,13 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString(),
     });
 
-    // Send the invite email (non-blocking for fast response)
+    // Send the invite email - MUST await to ensure delivery
+    // If this fails, throw error so user can retry (code exists, so retry will use resend path)
     if (resend) {
-      sendBetaInviteEmail(normalizedEmail, inviteCode, fullName).catch((err) => {
-        console.error('Failed to send beta invite email:', err);
-      });
+      const emailResult = await sendBetaInviteEmail(normalizedEmail, inviteCode, fullName);
+      if (!emailResult.success) {
+        throw new Error(`Failed to send email: ${emailResult.error}`);
+      }
     }
 
     // Increment daily analytics (non-blocking)
@@ -217,6 +222,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Check your email! Your beta invite code is on its way.',
+      email_sent: true,
       slots_remaining: slotsRemaining - 1,
     });
   } catch (error) {
@@ -262,7 +268,8 @@ async function sendBetaInviteEmail(
       })
     );
 
-    await resend.emails.send({
+    // Resend returns { data, error } - must check error explicitly
+    const { error: emailError } = await resend.emails.send({
       from: 'Rowan <notifications@rowanapp.com>',
       replyTo: 'support@rowanapp.com',
       to: email,
@@ -298,8 +305,18 @@ This code expires on February 15, 2026
       ],
     });
 
+    // Check for Resend API errors (returned in response, not thrown)
+    if (emailError) {
+      console.error('Resend API error:', emailError);
+      return {
+        success: false,
+        error: emailError.message || 'Resend API error',
+      };
+    }
+
     return { success: true };
   } catch (error) {
+    // Catch network errors or other exceptions
     console.error('Resend email error:', error);
     return {
       success: false,
