@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { isAdmin } from '@/lib/utils/admin-check';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
-import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { logger } from '@/lib/logger';
 
 // Force dynamic rendering for admin authentication
@@ -59,29 +57,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    // Check admin authentication using secure AES-256-GCM encryption
-    const cookieStore = await safeCookiesAsync();
-    const adminSession = cookieStore.get('admin-session');
-
-    if (!adminSession) {
+    // Verify admin authentication (checks both middleware header and cookie)
+    const auth = await verifyAdminAuth(request);
+    if (!auth.isValid) {
       return NextResponse.json(
-        { error: 'Admin authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Decrypt and validate admin session
-    try {
-      const sessionData = await decryptSessionData(adminSession.value);
-      if (!validateSessionData(sessionData)) {
-        return NextResponse.json(
-          { error: 'Invalid or expired session' },
-          { status: 401 }
-        );
-      }
-    } catch {
-      return NextResponse.json(
-        { error: 'Invalid session' },
+        { error: auth.error || 'Admin authentication required' },
         { status: 401 }
       );
     }
