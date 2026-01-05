@@ -3,8 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
-import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -36,33 +35,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Check admin authentication
-    const cookieStore = await safeCookiesAsync();
-    const adminSession = cookieStore.get('admin-session');
-
-    if (!adminSession) {
+    // Verify admin authentication (checks both middleware header and cookie)
+    const auth = await verifyAdminAuth(req);
+    if (!auth.isValid) {
       return NextResponse.json(
-        { error: 'Admin authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Decrypt and validate admin session
-    let sessionData: any;
-    try {
-      sessionData = await decryptSessionData(adminSession.value);
-
-      // Validate session data and check expiration
-      if (!validateSessionData(sessionData)) {
-        return NextResponse.json(
-          { error: 'Session expired or invalid' },
-          { status: 401 }
-        );
-      }
-    } catch (error) {
-      logger.error('Admin session decryption failed:', error, { component: 'api-route', action: 'api_request' });
-      return NextResponse.json(
-        { error: 'Invalid session' },
+        { error: auth.error || 'Admin authentication required' },
         { status: 401 }
       );
     }
