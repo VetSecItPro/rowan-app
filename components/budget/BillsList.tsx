@@ -166,7 +166,7 @@ export function BillsList({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
         <span className="ml-3 text-gray-600 dark:text-gray-400">Loading bills...</span>
       </div>
     );
@@ -182,7 +182,7 @@ export function BillsList({
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchBills}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
           >
             Try Again
           </button>
@@ -202,7 +202,7 @@ export function BillsList({
             placeholder="Search bills by name, payee, or category..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border-2 border-amber-300 dark:border-amber-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           />
         </div>
 
@@ -221,7 +221,7 @@ export function BillsList({
                   onClick={() => setStatusFilter(option.value)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     statusFilter === option.value
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-amber-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -241,7 +241,7 @@ export function BillsList({
                 onClick={() => toggleSort('due_date')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                   sortBy === 'due_date'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-amber-500 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
@@ -258,7 +258,7 @@ export function BillsList({
                 onClick={() => toggleSort('amount')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                   sortBy === 'amount'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-amber-500 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
@@ -275,7 +275,7 @@ export function BillsList({
                 onClick={() => toggleSort('name')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                   sortBy === 'name'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-amber-500 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
@@ -309,7 +309,7 @@ export function BillsList({
           {onCreateNew && statusFilter === 'all' && !searchQuery && (
             <button
               onClick={onCreateNew}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium"
             >
               <Plus className="w-5 h-5" />
               Add Your First Bill
