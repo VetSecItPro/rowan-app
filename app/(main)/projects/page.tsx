@@ -3,7 +3,7 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
@@ -39,32 +39,45 @@ import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/
 
 type TabType = 'projects' | 'budgets' | 'expenses' | 'bills' | 'receipts';
 
+// Constant array - defined outside component to prevent recreation on every render (avoids flicker)
+const VALID_TABS: TabType[] = ['projects', 'budgets', 'bills', 'expenses', 'receipts'];
+
 export default function ProjectsPage() {
   const { currentSpace, user } = useAuthWithSpaces();
   const searchParams = useSearchParams();
   const router = useRouter();
 
   // Get tab from URL or default to first tab in array
-  const validTabs: TabType[] = ['projects', 'budgets', 'bills', 'expenses', 'receipts'];
   const tabFromUrl = searchParams?.get('tab') as TabType | null;
-  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : validTabs[0];
+  const initialTab = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : VALID_TABS[0];
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  // Track if we're currently handling a user-initiated tab change to prevent sync conflicts
+  const isUserTabChange = useRef(false);
 
   // Update URL when tab changes (without full page reload)
   const handleTabChange = useCallback((tab: TabType) => {
+    isUserTabChange.current = true;
     setActiveTab(tab);
     const params = new URLSearchParams(searchParams?.toString() ?? '');
     params.set('tab', tab);
     router.replace(`/projects?${params.toString()}`, { scroll: false });
+    // Reset after a short delay to allow URL to update
+    setTimeout(() => {
+      isUserTabChange.current = false;
+    }, 100);
   }, [searchParams, router]);
 
-  // Sync tab state when URL changes (e.g., back/forward navigation)
+  // Sync tab state when URL changes (e.g., back/forward navigation only)
   useEffect(() => {
+    // Skip if this is a user-initiated change (we already set the state)
+    if (isUserTabChange.current) return;
+
     const tabParam = searchParams?.get('tab') as TabType | null;
-    if (tabParam && validTabs.includes(tabParam) && tabParam !== activeTab) {
+    if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== activeTab) {
       setActiveTab(tabParam);
     }
-  }, [searchParams, activeTab, validTabs]);
+  }, [searchParams, activeTab]);
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -601,47 +614,53 @@ export default function ProjectsPage() {
             </CollapsibleStatsGrid>
           )}
 
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="apple-search-container projects-search">
-              <Search className="apple-search-icon" />
-              <input
-                type="search"
-                placeholder={`Search ${activeTab}...`}
-                value={searchQuery}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSearchQuery(value);
+          {/* Search box - hidden for bills/receipts tabs which have their own search */}
+          {activeTab !== 'bills' && activeTab !== 'receipts' ? (
+            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <div className="apple-search-container projects-search">
+                <Search className="apple-search-icon" />
+                <input
+                  type="search"
+                  placeholder={`Search ${activeTab}...`}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchQuery(value);
 
-                  // Handle typing animation
-                  if (value.length > 0) {
-                    setIsSearchTyping(true);
-                    const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
-                    return () => clearTimeout(timeoutId);
-                  } else {
-                    setIsSearchTyping(false);
-                  }
-                }}
-                className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setIsSearchTyping(false);
+                    // Handle typing animation
+                    if (value.length > 0) {
+                      setIsSearchTyping(true);
+                      const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
+                      return () => clearTimeout(timeoutId);
+                    } else {
+                      setIsSearchTyping(false);
+                    }
                   }}
-                  className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
+                  className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchTyping(false);
+                    }}
+                    className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
+                    aria-label="Clear search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Spacer to maintain layout when search is hidden */
+            <div className="h-[58px]" />
+          )}
 
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-xl p-6 overflow-visible min-h-content-panel">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 overflow-visible min-h-content-panel">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-amber-900 dark:text-amber-100">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
                   {activeTab === 'budgets' && 'Budget Overview'}
                   {activeTab === 'bills' && `All Bills (${filteredBills.length})`}
