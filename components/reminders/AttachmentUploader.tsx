@@ -6,6 +6,8 @@ import { reminderAttachmentsService } from '@/lib/services/reminder-attachments-
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+
 interface AttachmentUploaderProps {
   reminderId: string;
   onUploadComplete: () => void;
@@ -64,6 +66,14 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
   // Upload files
   const uploadFiles = async (files: File[]) => {
     if (!user) return;
+
+    // Validate file sizes
+    const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      const names = oversizedFiles.map(f => f.name).join(', ');
+      alert(`Files exceed 2MB limit: ${names}`);
+      return;
+    }
 
     setIsUploading(true);
 
@@ -153,7 +163,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
                 </button>
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-500">
-                Max 10MB • Images, PDFs, Documents, Text files
+                Max 2MB • Images, PDFs, Documents
               </p>
             </>
           )}

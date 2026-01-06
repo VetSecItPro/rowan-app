@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, ChevronDown, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -39,11 +39,11 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
-import { useFeatureAccess } from '@/lib/contexts/subscription-context';
+import { useFeatureAccessSafe } from '@/lib/contexts/subscription-context';
 import { CalendarDaySkeleton } from '@/components/ui/Skeleton';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, addWeeks, subWeeks } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, subDays, addWeeks, subWeeks } from 'date-fns';
 
 type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
 
@@ -119,7 +119,7 @@ function safeGetLocalStorageString(
 
 export default function CalendarPage() {
   const { currentSpace, user } = useAuthWithSpaces();
-  const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccess('canUseEventProposals');
+  const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccessSafe('canUseEventProposals');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -138,6 +138,8 @@ export default function CalendarPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
   const [isBulkManagerOpen, setIsBulkManagerOpen] = useState(false);
+  const [mobileStatsCollapsed, setMobileStatsCollapsed] = useState(true); // Collapsed by default on mobile
+  const [viewModeLoaded, setViewModeLoaded] = useState(false); // Track if view mode has been loaded from localStorage
 
   // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
   const [selectedUnifiedItem, setSelectedUnifiedItem] = useState<UnifiedCalendarItem | null>(null);
@@ -547,6 +549,15 @@ export default function CalendarPage() {
     setCurrentMonth(prev => addWeeks(prev, 1));
   }, []);
 
+  // Stable callback for day navigation
+  const handlePrevDay = useCallback(() => {
+    setCurrentMonth(prev => subDays(prev, 1));
+  }, []);
+
+  const handleNextDay = useCallback(() => {
+    setCurrentMonth(prev => addDays(prev, 1));
+  }, []);
+
   const handleJumpToToday = useCallback(() => {
     setCurrentMonth(new Date());
   }, []);
@@ -747,15 +758,16 @@ export default function CalendarPage() {
       if (savedViewMode && ['day', 'week', 'month', 'agenda', 'timeline', 'proposal', 'list'].includes(savedViewMode)) {
         setViewMode(savedViewMode as ViewMode);
       }
+      setViewModeLoaded(true);
     }
   }, [currentSpace?.id]);
 
-  // Save view mode to localStorage whenever it changes
+  // Save view mode to localStorage whenever it changes (only after initial load)
   useEffect(() => {
-    if (currentSpace?.id) {
+    if (currentSpace?.id && viewModeLoaded) {
       localStorage.setItem(`calendar-view-${currentSpace.id}`, viewMode);
     }
-  }, [viewMode, currentSpace?.id]);
+  }, [viewMode, currentSpace?.id, viewModeLoaded]);
 
   // Fetch user's location for weather display
   useEffect(() => {
@@ -866,7 +878,7 @@ export default function CalendarPage() {
               <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-0.5 flex-wrap sm:flex-nowrap">
                 <button
                   onClick={() => setActiveAction('quick-add')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] focus:outline-none ${
                     activeAction === 'quick-add'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -877,7 +889,7 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('templates')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] focus:outline-none ${
                     activeAction === 'templates'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -888,7 +900,7 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('propose')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[115px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[115px] focus:outline-none ${
                     activeAction === 'propose'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -899,13 +911,13 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('new-event')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] ${
+                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] focus:outline-none ${
                     activeAction === 'new-event'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <CalendarIcon className="w-3.5 h-3.5" />
                   <span>New Event</span>
                 </button>
               </div>
@@ -918,7 +930,7 @@ export default function CalendarPage() {
                   else if (activeAction === 'propose') setIsProposalModalOpen(true);
                   else setIsModalOpen(true);
                 }}
-                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px] bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px] bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 focus:outline-none"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
                   activeAction === 'templates' ? 'Create from template' :
@@ -940,8 +952,28 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Stats Dashboard */}
-          <div className="grid stats-grid-mobile gap-4 sm:gap-6">
+          {/* Stats Dashboard - Collapsible on mobile */}
+          <div className="space-y-2 sm:space-y-0">
+            {/* Mobile toggle button - compact pill style */}
+            <button
+              onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
+              className="sm:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full active:scale-[0.98] transition-all"
+              aria-expanded={!mobileStatsCollapsed}
+              aria-label={mobileStatsCollapsed ? 'Expand Stats Overview' : 'Collapse Stats Overview'}
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-calendar rounded-full flex items-center justify-center">
+                  <CalendarIcon className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  {stats.today} today • {stats.thisWeek} this week • {stats.total} total
+                </span>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${mobileStatsCollapsed ? '' : 'rotate-180'}`} />
+            </button>
+
+            {/* Stats cards - hidden on mobile when collapsed, always visible on desktop */}
+            <div className={`stats-grid-mobile gap-4 sm:gap-6 ${mobileStatsCollapsed ? 'hidden sm:grid' : 'grid'}`}>
             <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Today</h3>
@@ -1014,6 +1046,7 @@ export default function CalendarPage() {
               </div>
             </div>
           </div>
+          </div>
 
           {/* Search Bar */}
           <div className="relative">
@@ -1039,14 +1072,8 @@ export default function CalendarPage() {
                   setTimeout(() => setIsSearchTyping(false), 300);
                 }}
                 className={`w-full px-4 py-3 bg-white dark:bg-gray-800 border-2 rounded-lg focus:outline-none transition-colors ${
-                  !searchQuery
-                    ? 'pl-12 border-gray-200 dark:border-gray-700'
-                    : 'pr-12 border-purple-500 dark:border-purple-500'
-                } ${
-                  searchQuery
-                    ? 'border-purple-500 dark:border-purple-500'
-                    : 'border-gray-200 dark:border-gray-700 focus:border-purple-500 dark:focus:border-purple-500'
-                } text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+                  !searchQuery ? 'pl-12' : 'pr-12'
+                } border-purple-500 dark:border-purple-400 focus:border-purple-600 dark:focus:border-purple-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
                 title="Search events (Press / to focus)"
               />
 
@@ -1083,9 +1110,9 @@ export default function CalendarPage() {
               {/* View Mode Toggle and Today Button */}
               <div className="flex items-center gap-2">
 
-                {/* Sync Button - Show if connected (from cache or API) */}
+                {/* Sync Button - Show if connected (from cache or API), hidden on mobile */}
                 {hasCalendarConnection && (
-                  <div className="relative">
+                  <div className="relative hidden sm:block">
                     <button
                       onClick={handleSyncCalendar}
                       disabled={isSyncing || calendarConnections.length === 0}
@@ -1130,29 +1157,73 @@ export default function CalendarPage() {
                   </div>
                 )}
 
-                {/* Today Button - Only show for calendar views */}
+                {/* Today Button - Only show for calendar views, hidden on mobile */}
                 {viewMode !== 'proposal' && viewMode !== 'list' && (
                   <button
                     onClick={handleJumpToToday}
-                    className="px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                    className="hidden sm:block px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
                     title="Jump to today (T)"
                   >
                     Today
                   </button>
                 )}
 
-                {/* Manage Events Button - Bulk delete & trash */}
+                {/* Manage Events Button - Hidden on mobile */}
                 <button
                   onClick={() => setIsBulkManagerOpen(true)}
-                  className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-1.5"
+                  className="hidden sm:flex px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors items-center gap-1.5"
                   title="Manage events (bulk delete, trash)"
                 >
                   <Archive className="w-3.5 h-3.5" />
                   Manage
                 </button>
 
-                {/* View Mode Toggle - Scrollable on mobile */}
-                <div className="bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 flex gap-0.5 overflow-x-auto max-w-[calc(100vw-2rem)] sm:max-w-none scrollbar-hide">
+                {/* View Mode Toggle - Compact on mobile, full on desktop */}
+                {/* Mobile: Show only 4 key views */}
+                <div className="sm:hidden bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 flex gap-0.5">
+                  <button
+                    onClick={() => setViewMode('day')}
+                    className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                      viewMode === 'day'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    Day
+                  </button>
+                  <button
+                    onClick={() => setViewMode('week')}
+                    className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                      viewMode === 'week'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    Week
+                  </button>
+                  <button
+                    onClick={() => setViewMode('month')}
+                    className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                      viewMode === 'month'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    Month
+                  </button>
+                  <button
+                    onClick={() => setViewMode('agenda')}
+                    className={`px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                      viewMode === 'agenda'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    List
+                  </button>
+                </div>
+                {/* Desktop: Full view mode toggle */}
+                <div className="hidden sm:flex bg-gray-100 dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg p-0.5 gap-0.5">
                   <button
                     onClick={() => setViewMode('day')}
                     className={`px-2 py-1.5 rounded text-xs font-medium transition-colors flex-shrink-0 ${
@@ -1240,9 +1311,9 @@ export default function CalendarPage() {
                   </button>
                 </div>
 
-                {/* Status Filter - Available for all views except proposal */}
+                {/* Status Filter - Available for all views except proposal, hidden on mobile */}
                 {viewMode !== 'proposal' && (
-                  <div className="flex items-center gap-2">
+                  <div className="hidden sm:flex items-center gap-2">
                     <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Filter:</span>
                     <div className="flex gap-1">
                       <button
@@ -1292,8 +1363,9 @@ export default function CalendarPage() {
             </div>
 
             {/* Phase 9: Unified Calendar Filters - Toggle visibility of tasks, meals, reminders */}
+            {/* Show on Calendar filters - hidden on mobile for cleaner view */}
             {viewMode !== 'proposal' && (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="hidden sm:flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Show on Calendar:</span>
                   <UnifiedCalendarLegendCompact className="ml-2" />
@@ -1357,20 +1429,46 @@ export default function CalendarPage() {
               <div ref={calendarContentRef} className="flex-1 min-w-0 min-h-[600px] touch-pan-y">
               {loading ? (
                 <div>
-                  <div className="flex items-center justify-center mb-6">
-                    <h3 className="text-lg font-semibold text-gray-400">Loading calendar...</h3>
+                  {/* Month header skeleton */}
+                  <div className="flex items-center justify-center mb-4 sm:mb-6">
+                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="w-32 h-6 bg-gray-200 dark:bg-gray-700 rounded mx-6 animate-pulse" />
+                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </div>
-                  <div className="grid grid-cols-7 gap-2">
-                    {/* Day headers skeleton */}
+
+                  {/* Calendar Grid Skeleton */}
+                  <div className="grid grid-cols-7 gap-0.5 sm:gap-2">
+                    {/* Day headers - matches real calendar */}
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                      <div key={idx} className="sm:hidden text-center text-[10px] font-semibold text-gray-400 py-1">
+                        {day}
+                      </div>
+                    ))}
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="text-center text-sm font-medium text-gray-400 py-2">
+                      <div key={day} className="hidden sm:block text-center text-sm font-medium text-gray-400 py-2">
                         {day}
                       </div>
                     ))}
 
-                    {/* Calendar day skeletons - showing 5 weeks worth */}
+                    {/* Calendar day skeletons - matching actual cell sizes */}
                     {Array.from({ length: 35 }, (_, index) => (
-                      <CalendarDaySkeleton key={index} />
+                      <div
+                        key={index}
+                        className="min-h-[44px] sm:min-h-[120px] p-1 sm:p-2 rounded-md sm:rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+                      >
+                        {/* Day number skeleton */}
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto sm:mx-0" />
+                        {/* Event dots on mobile */}
+                        <div className="sm:hidden flex gap-0.5 justify-center mt-1">
+                          {index % 3 === 0 && <div className="w-1.5 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse" />}
+                          {index % 4 === 0 && <div className="w-1.5 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse" />}
+                        </div>
+                        {/* Event placeholders on desktop */}
+                        <div className="hidden sm:block mt-2 space-y-1">
+                          {index % 3 === 0 && <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />}
+                          {index % 4 === 0 && <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -1405,12 +1503,17 @@ export default function CalendarPage() {
                     </button>
                   </div>
 
-                  {/* Calendar Grid - Scrollable on mobile for better readability */}
-                  <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-                    <div className="grid grid-cols-7 gap-1 sm:gap-2 min-w-[500px] sm:min-w-0">
-                    {/* Day headers */}
+                  {/* Calendar Grid - Fits on mobile without scrolling */}
+                  <div>
+                    <div className="grid grid-cols-7 gap-0.5 sm:gap-2">
+                    {/* Day headers - Single letters on mobile, full on desktop */}
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                      <div key={idx} className="sm:hidden text-center text-[10px] font-semibold text-gray-500 dark:text-gray-400 py-1">
+                        {day}
+                      </div>
+                    ))}
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                      <div key={day} className="text-center text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 py-1 sm:py-2">
+                      <div key={day} className="hidden sm:block text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
                         {day}
                       </div>
                     ))}
@@ -1428,73 +1531,112 @@ export default function CalendarPage() {
                       return (
                         <div
                           key={index}
-                          className={`min-h-[80px] sm:min-h-[120px] p-1 sm:p-2 rounded-lg border transition-all ${
+                          onClick={() => {
+                            // On mobile, tap day to view events
+                            if (totalItems > 0 && window.innerWidth < 640) {
+                              setCurrentMonth(day);
+                              setViewMode('day');
+                            }
+                          }}
+                          className={`min-h-[44px] sm:min-h-[120px] p-1 sm:p-2 rounded-md sm:rounded-lg border transition-all cursor-pointer sm:cursor-default ${
                             isCurrentMonth
-                              ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                              ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
                               : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
-                          } ${isToday ? 'ring-1 sm:ring-2 ring-purple-500' : ''}`}
+                          } ${isToday ? 'ring-2 ring-purple-500 bg-purple-50 dark:bg-purple-900/20' : ''}`}
                         >
-                          <div className={`text-xs sm:text-sm font-medium mb-1 sm:mb-2 ${
-                            isCurrentMonth
-                              ? isToday
-                                ? 'text-purple-600 dark:text-purple-400'
-                                : 'text-gray-900 dark:text-white'
-                              : 'text-gray-400 dark:text-gray-600'
-                          }`}>
-                            {format(day, 'd')}
+                          {/* Mobile: Compact day number with event dots */}
+                          <div className="sm:hidden flex flex-col items-center justify-center h-full">
+                            <span className={`text-sm font-semibold ${
+                              isCurrentMonth
+                                ? isToday
+                                  ? 'text-purple-600 dark:text-purple-400'
+                                  : 'text-gray-900 dark:text-white'
+                                : 'text-gray-400 dark:text-gray-600'
+                            }`}>
+                              {format(day, 'd')}
+                            </span>
+                            {/* Event indicator dots */}
+                            {totalItems > 0 && (
+                              <div className="flex gap-0.5 mt-0.5">
+                                {dayEvents.slice(0, 3).map((event, i) => (
+                                  <div
+                                    key={i}
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      event.status === 'completed' ? 'bg-green-500' :
+                                      event.status === 'in-progress' ? 'bg-amber-500' : 'bg-purple-500'
+                                    }`}
+                                  />
+                                ))}
+                                {totalItems > 3 && (
+                                  <span className="text-[8px] text-gray-500 ml-0.5">+{totalItems - 3}</span>
+                                )}
+                              </div>
+                            )}
                           </div>
 
-                          <div className="space-y-0.5 sm:space-y-1">
-                            {dayEvents.slice(0, 2).map((event) => {
-                              const categoryColor = getCategoryColor(event.category);
-                              const categoryConfig = {
-                                work: { icon: '💼', label: 'Work' },
-                                personal: { icon: '👤', label: 'Personal' },
-                                family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
-                                health: { icon: '💪', label: 'Health' },
-                                social: { icon: '🎉', label: 'Social' },
-                              };
-                              const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
+                          {/* Desktop: Full day view with event cards */}
+                          <div className="hidden sm:block">
+                            <div className={`text-sm font-medium mb-2 ${
+                              isCurrentMonth
+                                ? isToday
+                                  ? 'text-purple-600 dark:text-purple-400'
+                                  : 'text-gray-900 dark:text-white'
+                                : 'text-gray-400 dark:text-gray-600'
+                            }`}>
+                              {format(day, 'd')}
+                            </div>
 
-                              return (
-                                <div
-                                  key={event.id}
-                                  className={`w-full flex items-center gap-1 px-1 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border}`}
-                                >
-                                  {/* Status checkbox */}
-                                  <button
-                                    onClick={(e) => handleEventStatusClick(e, event.id, event.status)}
-                                    className={`flex-shrink-0 w-3 h-3 sm:w-4 sm:h-4 rounded border flex items-center justify-center transition-all ${
-                                      event.status === 'completed'
-                                        ? 'bg-green-500 border-green-500'
-                                        : event.status === 'in-progress'
-                                        ? 'bg-amber-500 border-amber-500'
-                                        : 'bg-transparent border-red-500'
-                                    }`}
-                                    aria-label={`Toggle status: ${event.status}`}
-                                  >
-                                    {event.status === 'completed' && <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-white" />}
-                                    {event.status === 'in-progress' && <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-white rounded-full" />}
-                                  </button>
+                            <div className="space-y-1">
+                              {dayEvents.slice(0, 2).map((event) => {
+                                const categoryColor = getCategoryColor(event.category);
+                                const categoryConfig = {
+                                  work: { icon: '💼', label: 'Work' },
+                                  personal: { icon: '👤', label: 'Personal' },
+                                  family: { icon: '👨‍👩‍👧‍👦', label: 'Family' },
+                                  health: { icon: '💪', label: 'Health' },
+                                  social: { icon: '🎉', label: 'Social' },
+                                };
+                                const category = categoryConfig[event.category as keyof typeof categoryConfig] || categoryConfig.personal;
 
-                                  {/* Event details - clickable to edit */}
-                                  <button
-                                    onClick={() => handleEditEvent(event)}
-                                    className="flex-1 text-left hover:opacity-80 transition-opacity min-w-0"
+                                return (
+                                  <div
+                                    key={event.id}
+                                    className={`w-full flex items-center gap-1 px-2 py-1 rounded text-xs ${categoryColor.bg} border-l-2 ${categoryColor.border}`}
                                   >
-                                    <p className={`font-medium ${categoryColor.text} truncate`}>
-                                      {event.title}
-                                    </p>
-                                    <div className="hidden sm:flex items-center gap-1 text-[10px]">
-                                      <span className="text-gray-500 dark:text-gray-400">
-                                        {format(parseISO(event.start_time), 'h:mm a')}
-                                      </span>
-                                      <span className={`px-1 py-0.5 rounded text-[9px] font-medium ${categoryColor.bg} ${categoryColor.text}`}>
-                                        {category.icon} {category.label}
-                                      </span>
-                                    </div>
-                                  </button>
-                                </div>
+                                    {/* Status checkbox */}
+                                    <button
+                                      onClick={(e) => handleEventStatusClick(e, event.id, event.status)}
+                                      className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                                        event.status === 'completed'
+                                          ? 'bg-green-500 border-green-500'
+                                          : event.status === 'in-progress'
+                                          ? 'bg-amber-500 border-amber-500'
+                                          : 'bg-transparent border-red-500'
+                                      }`}
+                                      aria-label={`Toggle status: ${event.status}`}
+                                    >
+                                      {event.status === 'completed' && <Check className="w-2.5 h-2.5 text-white" />}
+                                      {event.status === 'in-progress' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                                    </button>
+
+                                    {/* Event details - clickable to edit */}
+                                    <button
+                                      onClick={() => handleEditEvent(event)}
+                                      className="flex-1 text-left hover:opacity-80 transition-opacity min-w-0"
+                                    >
+                                      <p className={`font-medium ${categoryColor.text} truncate`}>
+                                        {event.title}
+                                      </p>
+                                      <div className="flex items-center gap-1 text-[10px]">
+                                        <span className="text-gray-500 dark:text-gray-400">
+                                          {format(parseISO(event.start_time), 'h:mm a')}
+                                        </span>
+                                        <span className={`px-1 py-0.5 rounded text-[9px] font-medium ${categoryColor.bg} ${categoryColor.text}`}>
+                                          {category.icon} {category.label}
+                                        </span>
+                                      </div>
+                                    </button>
+                                  </div>
                               );
                             })}
                             {/* Phase 9: Show unified items (tasks, meals, reminders) */}
@@ -1523,6 +1665,7 @@ export default function CalendarPage() {
                             )}
                           </div>
                         </div>
+                      </div>
                       );
                     })}
                     </div>
@@ -1574,7 +1717,7 @@ export default function CalendarPage() {
                   {/* Day Navigation */}
                   <div className="flex items-center justify-center mb-4 sm:mb-6">
                     <button
-                      onClick={handlePrevMonth}
+                      onClick={handlePrevDay}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
                       title="Previous day (←)"
                     >
@@ -1587,7 +1730,7 @@ export default function CalendarPage() {
                       {format(currentMonth, 'EEEE, MMMM d, yyyy')}
                     </h3>
                     <button
-                      onClick={handleNextMonth}
+                      onClick={handleNextDay}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors group relative"
                       title="Next day (→)"
                     >
@@ -1697,7 +1840,7 @@ export default function CalendarPage() {
                                 return (
                                   <div
                                     key={event.id}
-                                    className={`p-4 rounded-lg border-l-4 ${categoryColor.border} ${categoryColor.bg} hover:shadow-md transition-shadow`}
+                                    className={`p-4 rounded-lg border-l-4 ${categoryColor.border} bg-white dark:bg-gray-800 hover:shadow-md transition-shadow`}
                                   >
                                     <div className="flex items-start gap-4">
                                       <div className="flex-shrink-0 text-center min-w-[60px]">
@@ -1710,11 +1853,15 @@ export default function CalendarPage() {
                                       </div>
 
                                       <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                                           <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                                             {event.title}
                                           </h4>
-                                          <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColor.color}`}>
+                                          {/* Mobile: Simple text, Desktop: Pill badge */}
+                                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 sm:hidden">
+                                            {category.icon} {category.label}
+                                          </span>
+                                          <span className={`hidden sm:inline px-2 py-1 rounded text-xs font-medium ${categoryColor.color}`}>
                                             {category.icon} {category.label}
                                           </span>
                                         </div>
