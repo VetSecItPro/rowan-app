@@ -30,7 +30,8 @@ import {
   CalendarClock,
   ExternalLink
 } from 'lucide-react';
-import { useSubscription } from '@/lib/contexts/subscription-context';
+import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
+import type { FeatureLimits } from '@/lib/types';
 import { motion } from 'framer-motion';
 
 interface BillingInfo {
@@ -95,16 +96,39 @@ const TIER_DETAILS = {
 };
 
 export function SubscriptionSettings() {
-  const {
-    tier,
-    effectiveTier,
-    isLoading,
-    isInTrial,
-    trialDaysRemaining,
-    hasTrialExpired,
-    trial,
-    limits,
-  } = useSubscription();
+  const subscription = useSubscriptionSafe();
+
+  // Safe defaults when outside provider context
+  const tier = subscription?.tier ?? 'free';
+  const effectiveTier = subscription?.effectiveTier ?? 'free';
+  const isLoading = subscription?.isLoading ?? true;
+  const isInTrial = subscription?.isInTrial ?? false;
+  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
+  const hasTrialExpired = subscription?.hasTrialExpired ?? false;
+  const trial = subscription?.trial ?? null;
+  const limits: FeatureLimits = subscription?.limits ?? {
+    maxActiveTasks: Infinity,
+    dailyTaskCreation: Infinity,
+    canCreateCalendar: true,
+    maxShoppingLists: Infinity,
+    maxShoppingItems: Infinity,
+    dailyShoppingUpdates: Infinity,
+    messageHistoryDays: Infinity,
+    dailyMessages: Infinity,
+    dailyQuickActions: Infinity,
+    canUploadPhotos: true,
+    canUseMealPlanning: true,
+    canUseReminders: true,
+    canUseGoals: true,
+    canUseHousehold: true,
+    canUseAI: true,
+    canUseIntegrations: true,
+    canUseEventProposals: true,
+    realtimeSyncDelay: 0,
+    maxUsers: Infinity,
+    maxSpaces: Infinity,
+    storageGB: Infinity,
+  };
 
   const [isBillingLoading, setIsBillingLoading] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
@@ -243,7 +267,7 @@ export function SubscriptionSettings() {
               </span>
             </div>
             <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-              {trial.trialEndsAt
+              {trial?.trialEndsAt
                 ? `Your trial ends on ${new Date(trial.trialEndsAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`
                 : 'Your trial is active.'
               }
