@@ -7,7 +7,7 @@ export interface EventComment {
   user_id: string;
   content: string;
   mentions: string[];
-  parent_comment_id?: string;
+  parent_comment_id?: string | null;
   created_at: string;
   updated_at: string;
   // Relations
@@ -15,7 +15,7 @@ export interface EventComment {
     id: string;
     name: string;
     avatar_url?: string;
-  };
+  } | null;
   replies?: EventComment[];
 }
 
@@ -30,6 +30,30 @@ export interface CreateCommentInput {
 export interface UpdateCommentInput {
   content: string;
   mentions?: string[];
+}
+
+// Raw comment data from database (without relations)
+interface RawEventComment {
+  id: string;
+  event_id: string;
+  user_id: string;
+  content: string;
+  mentions: string[];
+  parent_comment_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// User info type for lookups
+interface UserInfo {
+  id: string;
+  name: string;
+  avatar_url?: string;
+}
+
+// Comment with user info attached
+interface CommentWithUser extends RawEventComment {
+  user: UserInfo | null;
 }
 
 export const eventCommentsService = {
@@ -116,28 +140,28 @@ export const eventCommentsService = {
         .in('id', userIds);
 
       if (users) {
-        usersMap = users.reduce((acc, user) => {
+        usersMap = users.reduce((acc: Record<string, UserInfo>, user: UserInfo) => {
           acc[user.id] = user;
           return acc;
-        }, {} as Record<string, { id: string; name: string; avatar_url?: string }>);
+        }, {} as Record<string, UserInfo>);
       }
     }
 
     // Add user info to comments
-    const topCommentsWithUsers = (topLevelComments || []).map(comment => ({
+    const topCommentsWithUsers: CommentWithUser[] = (topLevelComments || []).map((comment: RawEventComment) => ({
       ...comment,
       user: usersMap[comment.user_id] || null
     }));
 
-    const repliesWithUsers = (replies || []).map(reply => ({
+    const repliesWithUsers: CommentWithUser[] = (replies || []).map((reply: RawEventComment) => ({
       ...reply,
       user: usersMap[reply.user_id] || null
     }));
 
     // Nest replies under their parent comments
-    const commentsWithReplies = topCommentsWithUsers.map((comment: { id: string; [key: string]: unknown }) => ({
+    const commentsWithReplies = topCommentsWithUsers.map((comment: CommentWithUser) => ({
       ...comment,
-      replies: repliesWithUsers.filter((reply: { parent_comment_id: string }) => reply.parent_comment_id === comment.id)
+      replies: repliesWithUsers.filter((reply: CommentWithUser) => reply.parent_comment_id === comment.id)
     }));
 
     return commentsWithReplies;
