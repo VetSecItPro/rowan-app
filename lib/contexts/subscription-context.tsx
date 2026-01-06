@@ -307,3 +307,27 @@ export function useFeatureAccess(feature: keyof FeatureLimits) {
     requestUpgrade: () => showUpgradeModal(feature as string),
   };
 }
+
+/**
+ * Safe version of useFeatureAccess that returns defaults if outside provider
+ * Use this for components that may render before auth/subscription is ready
+ */
+export function useFeatureAccessSafe(feature: keyof FeatureLimits) {
+  const context = useSubscriptionSafe();
+
+  if (!context) {
+    return {
+      hasAccess: false,
+      tier: 'free' as const,
+      isInTrial: false,
+      requestUpgrade: () => {},
+    };
+  }
+
+  return {
+    hasAccess: context.canAccess(feature),
+    tier: context.effectiveTier,
+    isInTrial: context.isInTrial,
+    requestUpgrade: () => context.showUpgradeModal(feature as string),
+  };
+}

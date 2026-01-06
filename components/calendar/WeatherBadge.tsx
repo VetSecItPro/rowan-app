@@ -14,7 +14,7 @@ const weatherCache = new Map<string, {
 // In-flight request tracker to prevent duplicate concurrent fetches
 const inFlightRequests = new Map<string, Promise<WeatherForecast | null>>();
 
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 interface WeatherBadgeProps {
   eventTime: string;
@@ -29,8 +29,14 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    loadWeather();
+    // Stagger requests with random delay (0-2 seconds) to avoid rate limit bursts
+    const delay = Math.random() * 2000;
+    const timeoutId = setTimeout(() => {
+      loadWeather();
+    }, delay);
+
     return () => {
+      clearTimeout(timeoutId);
       // Cleanup on unmount
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();

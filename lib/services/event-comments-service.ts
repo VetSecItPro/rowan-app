@@ -39,29 +39,42 @@ export const eventCommentsService = {
   async createComment(input: CreateCommentInput): Promise<EventComment> {
     const supabase = createClient();
 
+    // Get current user ID for RLS policy compliance
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
     const { data, error } = await supabase
       .from('event_comments')
       .insert([{
         event_id: input.event_id,
         space_id: input.space_id,
+        user_id: user.id,
         content: input.content,
         mentions: input.mentions || [],
         parent_comment_id: input.parent_comment_id
       }])
-      .select(`
-        *,
-        user:users(id, name, avatar_url)
-      `)
+      .select('*')
       .single();
 
     if (error) throw error;
+
+    // Fetch user info separately (FK is to auth.users, not public.users)
+    let userInfo = null;
+    if (data.user_id) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id, name, avatar_url')
+        .eq('id', data.user_id)
+        .single();
+      userInfo = userData;
+    }
 
     // TODO: Send notifications to mentioned users
     if (input.mentions && input.mentions.length > 0) {
       await this.notifyMentionedUsers(input.event_id, input.mentions, input.content);
     }
 
-    return data;
+    return { ...data, user: userInfo };
   },
 
   /**
@@ -70,13 +83,10 @@ export const eventCommentsService = {
   async getComments(eventId: string): Promise<EventComment[]> {
     const supabase = createClient();
 
-    // Get top-level comments (no parent)
+    // Get top-level comments (no parent) - fetch without user join since FK is to auth.users
     const { data: topLevelComments, error: topError } = await supabase
       .from('event_comments')
-      .select(`
-        *,
-        user:users(id, name, avatar_url)
-      `)
+      .select('*')
       .eq('event_id', eventId)
       .is('parent_comment_id', null)
       .order('created_at', { ascending: true });
@@ -86,20 +96,48 @@ export const eventCommentsService = {
     // Get all replies
     const { data: replies, error: repliesError } = await supabase
       .from('event_comments')
-      .select(`
-        *,
-        user:users(id, name, avatar_url)
-      `)
+      .select('*')
       .eq('event_id', eventId)
       .not('parent_comment_id', 'is', null)
       .order('created_at', { ascending: true });
 
     if (repliesError) throw repliesError;
 
-    // Nest replies under their parent comments
-    const commentsWithReplies = topLevelComments.map((comment: { id: string; [key: string]: unknown }) => ({
+    // Get unique user IDs to fetch user info
+    const allComments = [...(topLevelComments || []), ...(replies || [])];
+    const userIds = [...new Set(allComments.map(c => c.user_id))];
+
+    // Fetch user info from public.users table
+    let usersMap: Record<string, { id: string; name: string; avatar_url?: string }> = {};
+    if (userIds.length > 0) {
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, name, avatar_url')
+        .in('id', userIds);
+
+      if (users) {
+        usersMap = users.reduce((acc, user) => {
+          acc[user.id] = user;
+          return acc;
+        }, {} as Record<string, { id: string; name: string; avatar_url?: string }>);
+      }
+    }
+
+    // Add user info to comments
+    const topCommentsWithUsers = (topLevelComments || []).map(comment => ({
       ...comment,
-      replies: replies.filter((reply: { parent_comment_id: string }) => reply.parent_comment_id === comment.id)
+      user: usersMap[comment.user_id] || null
+    }));
+
+    const repliesWithUsers = (replies || []).map(reply => ({
+      ...reply,
+      user: usersMap[reply.user_id] || null
+    }));
+
+    // Nest replies under their parent comments
+    const commentsWithReplies = topCommentsWithUsers.map((comment: { id: string; [key: string]: unknown }) => ({
+      ...comment,
+      replies: repliesWithUsers.filter((reply: { parent_comment_id: string }) => reply.parent_comment_id === comment.id)
     }));
 
     return commentsWithReplies;
@@ -113,15 +151,24 @@ export const eventCommentsService = {
 
     const { data, error } = await supabase
       .from('event_comments')
-      .select(`
-        *,
-        user:users(id, name, avatar_url)
-      `)
+      .select('*')
       .eq('id', commentId)
       .single();
 
     if (error) throw error;
-    return data;
+
+    // Fetch user info separately (FK is to auth.users, not public.users)
+    let user = null;
+    if (data.user_id) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id, name, avatar_url')
+        .eq('id', data.user_id)
+        .single();
+      user = userData;
+    }
+
+    return { ...data, user };
   },
 
   /**
@@ -137,21 +184,28 @@ export const eventCommentsService = {
         mentions: input.mentions || []
       })
       .eq('id', commentId)
-      .select(`
-        *,
-        user:users(id, name, avatar_url)
-      `)
+      .select('*')
       .single();
 
     if (error) throw error;
 
-    // TODO: Send notifications to newly mentioned users
-    if (input.mentions && input.mentions.length > 0) {
-      const comment = await this.getComment(commentId);
-      await this.notifyMentionedUsers(comment.event_id, input.mentions, input.content);
+    // Fetch user info separately (FK is to auth.users, not public.users)
+    let user = null;
+    if (data.user_id) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id, name, avatar_url')
+        .eq('id', data.user_id)
+        .single();
+      user = userData;
     }
 
-    return data;
+    // TODO: Send notifications to newly mentioned users
+    if (input.mentions && input.mentions.length > 0) {
+      await this.notifyMentionedUsers(data.event_id, input.mentions, input.content);
+    }
+
+    return { ...data, user };
   },
 
   /**
