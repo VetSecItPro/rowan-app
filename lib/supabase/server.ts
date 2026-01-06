@@ -3,6 +3,9 @@ import { cookies } from 'next/headers';
 import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { logger } from '@/lib/logger';
 
+/** User session cookie duration: 1 year (persistent login like Facebook/Instagram) */
+const SESSION_COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 31536000 seconds
+
 /**
  * Creates an async Supabase client for server-side use (API routes, Server Actions, Route Handlers).
  * In Next.js 15+, cookies() returns a Promise, so this function must be async.
@@ -51,9 +54,17 @@ export async function createClient() {
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: Partial<ResponseCookie> }>) {
         try {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Apply persistent login: 1 year cookie expiration for auth cookies
+            const persistentOptions: Partial<ResponseCookie> = {
+              ...options,
+              maxAge: options?.maxAge || SESSION_COOKIE_MAX_AGE,
+              path: options?.path || '/',
+              sameSite: options?.sameSite || 'lax',
+              secure: options?.secure ?? process.env.NODE_ENV === 'production',
+            };
+            cookieStore.set(name, value, persistentOptions);
+          });
         } catch {
           // The `setAll` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing

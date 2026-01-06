@@ -2032,6 +2032,54 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Quick Links - Mobile Only (footer links are hidden on mobile) */}
+      <div className="md:hidden px-4 pb-6">
+        <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+            <Link2 className="w-4 h-4" />
+            Quick Links
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              href="/legal"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Legal
+            </Link>
+            <Link
+              href="/settings/documentation"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Documentation
+            </Link>
+            <Link
+              href="/privacy"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/security"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Security
+            </Link>
+            <Link
+              href="/feedback"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              Feedback
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Space Management Modals */}
       <CreateSpaceModal
         isOpen={showCreateSpaceModal}
