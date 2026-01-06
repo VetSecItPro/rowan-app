@@ -284,11 +284,11 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
 
         {/* Mode Toggle */}
         <div className="px-6 pt-4">
-          <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-900 rounded-lg">
+          <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-900 rounded-full">
             <button
               type="button"
               onClick={() => handleModeSwitch('quick')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-sm font-medium transition-all ${
                 parseMode === 'quick'
                   ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -300,7 +300,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
             <button
               type="button"
               onClick={() => handleModeSwitch('ai')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-sm font-medium transition-all ${
                 parseMode === 'ai'
                   ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
@@ -489,19 +489,19 @@ Sarah"
           {/* Actions */}
           <div className="flex items-center gap-3 pt-2">
             <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium text-sm"
+            >
+              Cancel
+            </button>
+            <button
               type="submit"
               disabled={!input.trim() || (parseMode === 'ai' && (isAILoading || !parsedPreview))}
-              className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
               Create Event
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-sm"
-            >
-              Cancel
             </button>
           </div>
 

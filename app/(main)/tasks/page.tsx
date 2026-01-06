@@ -641,94 +641,87 @@ export default function TasksPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={loadData}>
-        <div className="min-h-full p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex flex-row items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-tasks flex items-center justify-center flex-shrink-0">
-                <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+        <div className="min-h-full p-3 sm:p-8">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
+          {/* Header - Compact on Mobile */}
+          <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            {/* Title Row */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-tasks flex items-center justify-center flex-shrink-0">
+                <CheckSquare className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
+                <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
                   Tasks & Chores
                 </h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-base text-gray-600 dark:text-gray-400 hidden sm:block">
                   Organize daily tasks and household chores together
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            {/* Action Row - Points + Buttons all on one line on mobile */}
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide">
               {/* Points Display - Compact */}
               {user && spaceId && (
                 <PointsDisplay
                   userId={user.id}
                   spaceId={spaceId}
                   variant="compact"
-                  showStreak={true}
+                  showStreak={false}
                 />
               )}
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleOpenModal('task')}
-                  className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  <CheckSquare className="w-4 h-4" />
-                  <span className="text-sm">New Task</span>
-                </button>
-                <button
-                  onClick={() => handleOpenModal('chore')}
-                  disabled={choreLoading}
-                  className="px-3 sm:px-4 py-2 sm:py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {choreLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Home className="w-4 h-4" />
-                  )}
-                  <span className="text-sm">{choreLoading ? 'Creating...' : 'New Chore'}</span>
-                </button>
-                <button
-                  onClick={() => setIsTemplatePickerOpen(true)}
-                  className="px-3 sm:px-4 py-2 sm:py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
-                  title="Create task from template"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span className="text-sm hidden sm:inline">Templates</span>
-                </button>
-              </div>
+              {/* Pill-shaped action buttons */}
+              <button
+                onClick={() => handleOpenModal('task')}
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
+              >
+                <CheckSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>New Task</span>
+              </button>
+              <button
+                onClick={() => handleOpenModal('chore')}
+                disabled={choreLoading}
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-colors flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 disabled:opacity-50"
+              >
+                {choreLoading ? (
+                  <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                )}
+                <span>{choreLoading ? '...' : 'New Chore'}</span>
+              </button>
+              <button
+                onClick={() => setIsTemplatePickerOpen(true)}
+                className="p-1.5 sm:px-4 sm:py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium flex-shrink-0"
+                title="Create task from template"
+              >
+                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Templates</span>
+              </button>
             </div>
           </div>
 
 
           {/* Stats Dashboard - Collapsible on mobile */}
-          <div className="space-y-3">
-            {/* Mobile toggle button - only visible on mobile */}
+          <div className="space-y-2 sm:space-y-3">
+            {/* Mobile toggle button - compact pill style */}
             <button
               onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
-              className="sm:hidden w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl active:scale-[0.98] transition-all"
+              className="sm:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full active:scale-[0.98] transition-all"
               aria-expanded={!mobileStatsCollapsed}
               aria-label={mobileStatsCollapsed ? 'Expand Stats Overview' : 'Collapse Stats Overview'}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-tasks rounded-lg flex items-center justify-center">
-                  <CheckSquare className="w-4 h-4 text-white" />
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-tasks rounded-full flex items-center justify-center">
+                  <CheckSquare className="w-3 h-3 text-white" />
                 </div>
-                <div className="text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">Stats Overview</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 block">
-                    {mobileStatsCollapsed ? 'Tap to view all stats' : 'Tap to collapse'}
-                  </span>
-                </div>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
+                </span>
               </div>
-              <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${mobileStatsCollapsed ? '' : 'rotate-180'}`} />
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${mobileStatsCollapsed ? '' : 'rotate-180'}`} />
             </button>
 
             {/* Stats cards - hidden on mobile when collapsed, always visible on desktop */}
@@ -817,16 +810,16 @@ export default function TasksPage() {
               </div>
             </div>
           </div>
-          {/* Search Bar - Full Width (spans same width as stats cards above) */}
+          {/* Search Bar - Compact on mobile */}
           <div className="w-full">
-            <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-              <Search className="apple-search-icon" />
+            <div className={`apple-search-container tasks-search group ${isSearchTyping ? 'apple-search-typing' : ''} !py-2 sm:!py-3`}>
+              <Search className="apple-search-icon !w-4 !h-4 sm:!w-5 sm:!h-5" />
               <input
                 type="search"
                 placeholder="Search tasks and chores..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="apple-search-input"
+                className="apple-search-input !text-sm sm:!text-base"
               />
               {searchQuery && (
                 <button
@@ -842,8 +835,8 @@ export default function TasksPage() {
               )}
             </div>
           </div>
-          {/* Tasks List */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Tasks List - Fill remaining screen height on mobile */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 flex-1 min-h-0">
             {/* Filters Sidebar - Only show when filters are enabled */}
             {showFilters && currentSpace && (
               <div className="lg:col-span-1">
@@ -851,44 +844,33 @@ export default function TasksPage() {
               </div>
             )}
 
-            {/* Main Content */}
-            <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 relative" style={{zIndex: 'auto'}}>
-                {/* Header with Month Badge and Status Filter */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                      All Tasks & Chores ({filteredItems.length})
+            {/* Main Content - Stretch to bottom */}
+            <div className={`${showFilters ? 'lg:col-span-3' : 'lg:col-span-4'} flex flex-col min-h-0`}>
+              <div className="bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-2 sm:p-4 relative flex-1 flex flex-col min-h-[50vh] sm:min-h-0" style={{zIndex: 'auto'}}>
+                {/* Compact Header with Status Filter */}
+                <div className="flex items-center justify-between gap-2 mb-2 sm:mb-4">
+                  <div className="flex items-center gap-1.5">
+                    <h2 className="text-xs sm:text-base font-semibold text-gray-900 dark:text-white">
+                      All Tasks & Chores
                     </h2>
-                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full">
-                      {format(new Date(), 'MMM yyyy')}
+                    <span className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-medium rounded">
+                      {filteredItems.length}
                     </span>
                   </div>
 
-                  {/* Status Filter - Mobile Dropdown + Desktop Buttons */}
-                  <div>
-                    {/* Custom Dropdown with Filter Icon */}
-                    <Tooltip content="Filter tasks by completion status" position="bottom">
-                      <div className="relative mb-3 max-w-xs">
-                        <div className="relative">
-                          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none z-10" />
-                          <Dropdown
-                            value={statusFilter}
-                            onChange={(value) => setStatusFilter(value || 'all')}
-                            options={[
-                              { value: 'all', label: 'All Tasks & Chores' },
-                              { value: 'pending', label: 'Pending' },
-                              { value: 'in_progress', label: 'In Progress' },
-                              { value: 'completed', label: 'Completed' }
-                            ]}
-                            placeholder="Filter by status..."
-                            className="pl-10"
-                          />
-                        </div>
-                      </div>
-                    </Tooltip>
-
-                  </div>
+                  {/* Compact Status Filter */}
+                  <Dropdown
+                    value={statusFilter}
+                    onChange={(value) => setStatusFilter(value || 'all')}
+                    options={[
+                      { value: 'all', label: 'All' },
+                      { value: 'pending', label: 'Pending' },
+                      { value: 'in_progress', label: 'Active' },
+                      { value: 'completed', label: 'Done' }
+                    ]}
+                    placeholder="Filter..."
+                    className="text-xs max-w-[90px] sm:max-w-[120px]"
+                  />
                 </div>
 
                 {loading || realtimeLoading || choreLoading ? (
@@ -898,30 +880,28 @@ export default function TasksPage() {
                     ))}
                   </div>
                 ) : filteredItems.length === 0 ? (
-                  <div className="text-center py-12">
-                    <CheckSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No tasks or chores found</p>
-                    <p className="text-gray-500 dark:text-gray-500 mb-6">
+                  <div className="text-center py-8 sm:py-12">
+                    <CheckSquare className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-lg mb-1 sm:mb-2">No tasks or chores found</p>
+                    <p className="text-gray-500 dark:text-gray-500 text-xs sm:text-base mb-4 sm:mb-6">
                       {searchQuery || statusFilter !== 'all'
                         ? 'Try adjusting your filters'
                         : 'Create your first task or chore to get started!'}
                     </p>
                     {!searchQuery && statusFilter === 'all' && (
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <button
-                          onClick={() => handleOpenModal('task')}
-                          className="btn-touch bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
-                        >
-                          <Plus className="w-5 h-5" />
-                          Create Task or Chore
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleOpenModal('task')}
+                        className="px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Create Task or Chore
+                      </button>
                     )}
                   </div>
                 ) : enableDragDrop && currentSpace ? (
                   /* Unified drag-and-drop for all items with scrollbar */
-                  <div className="space-y-4">
-                    <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                  <div className="space-y-2">
+                    <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
                       <LazyDraggableItemList
                         spaceId={currentSpace.id}
                         initialItems={paginatedItems as any}
@@ -959,8 +939,8 @@ export default function TasksPage() {
                   </div>
                 ) : (
                   /* Regular list when drag-drop disabled */
-                  <div className="space-y-4">
-                    <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                  <div className="space-y-2">
+                    <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
                       {paginatedItems.map((item) => (
                         <TaskCard
                           key={item.id}

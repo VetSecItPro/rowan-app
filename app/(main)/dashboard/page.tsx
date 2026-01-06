@@ -192,6 +192,47 @@ const scaleIn = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } }
 };
 
+// Mobile scroll animation variant - subtle fade + slide
+const mobileCardAnimation = {
+  hidden: {
+    opacity: 0,
+    y: 16,
+    scale: 0.98
+  },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.3,
+      delay: index * 0.05, // Stagger based on index
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] // Smooth easing
+    }
+  })
+};
+
+// Animated card wrapper for mobile scroll animations
+const AnimatedCard = memo(function AnimatedCard({
+  children,
+  index = 0
+}: {
+  children: React.ReactNode;
+  index?: number;
+}) {
+  return (
+    <motion.div
+      variants={mobileCardAnimation}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2, margin: "-50px" }}
+      custom={index}
+      className="h-full"
+    >
+      {children}
+    </motion.div>
+  );
+});
+
 // Progress Bar Component - Memoized
 const ProgressBar = memo(function ProgressBar({ value, max, color = 'blue', showLabel = true }: { value: number; max: number; color?: string; showLabel?: boolean }) {
   const percentage = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -1079,15 +1120,9 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                className="grid stats-grid-mobile gap-4 sm:gap-6"
-              >
+              <div className="grid stats-grid-mobile gap-4 sm:gap-6">
                 {/* Tasks & Chores Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={0}>
                   <Link
                   href="/tasks"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1150,10 +1185,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Calendar Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={1}>
                 <Link
                   href="/calendar"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1203,10 +1238,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Reminders Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={2}>
                 <Link
                   href="/reminders"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1264,10 +1299,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Messages Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={3}>
                 <Link
                   href="/messages"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1322,10 +1357,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Shopping Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={4}>
                 <Link
                   href="/shopping"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1376,10 +1411,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Meals Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={5}>
                 <Link
                   href="/meals"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1429,10 +1464,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Projects & Budget Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={6}>
                 <Link
                   href="/projects"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1493,10 +1528,10 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
+                </AnimatedCard>
 
                 {/* Goals Card */}
-                <motion.div variants={fadeInUp} className="h-full">
+                <AnimatedCard index={7}>
                 <Link
                   href="/goals"
                   className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
@@ -1567,8 +1602,8 @@ export default function DashboardPage() {
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </Link>
-                </motion.div>
-              </motion.div>
+                </AnimatedCard>
+              </div>
             )}
           </div>
 

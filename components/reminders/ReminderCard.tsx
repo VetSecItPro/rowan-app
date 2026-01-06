@@ -67,24 +67,24 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
   };
 
   return (
-    <div className={`bg-gray-50 dark:bg-gray-800 border-2 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group ${
+    <div className={`bg-gray-50 dark:bg-gray-800 border-2 rounded-lg p-2.5 sm:p-4 hover:shadow-lg transition-all duration-200 group ${
       selected ? 'border-blue-500 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' : 'border-transparent'
     }`}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-start gap-3 flex-1">
+      <div className="flex items-start justify-between mb-1.5 sm:mb-3">
+        <div className="flex items-start gap-2 flex-1">
           {/* Multi-select Checkbox (when selection mode enabled) */}
           {selectionMode && (
             <button
               onClick={() => onSelectionChange?.(reminder.id, !selected)}
               aria-label={`Select reminder: ${reminder.title}`}
-              className={`mt-0.5 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+              className={`mt-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
                 selected
                   ? 'bg-blue-500 border-blue-500'
                   : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-blue-500'
               }`}
             >
-              {selected && <Check className="w-4 h-4 text-white" />}
+              {selected && <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />}
             </button>
           )}
 
@@ -93,7 +93,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
             <button
               onClick={handleCheckboxClick}
               aria-label={`Current status: ${reminder.status}. Click to cycle status.`}
-              className={`mt-0.5 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+              className={`mt-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
                 reminder.status === 'completed'
                   ? 'bg-green-500 border-green-500'
                   : reminder.status === 'snoozed'
@@ -101,8 +101,8 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                   : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-pink-400 dark:hover:border-pink-500'
               }`}
             >
-              {reminder.status === 'completed' && <Check className="w-4 h-4 text-white" />}
-              {reminder.status === 'snoozed' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+              {reminder.status === 'completed' && <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />}
+              {reminder.status === 'snoozed' && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full" />}
             </button>
             {/* Improved tooltip positioning */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[99999] shadow-xl border border-gray-700 dark:border-gray-600">
@@ -114,15 +114,15 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
 
           {/* Title & Description */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
               {/* Left side: Emoji + Title + Badge grouped together */}
-              <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
                 {/* Emoji */}
-                <span className="text-lg flex-shrink-0">{reminder.emoji || '🔔'}</span>
+                <span className="text-base sm:text-lg flex-shrink-0">{reminder.emoji || '🔔'}</span>
 
                 {/* Title and Badge container */}
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <h3 className={`font-semibold truncate ${
+                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                  <h3 className={`text-sm sm:text-base font-semibold truncate ${
                     reminder.status === 'completed'
                       ? 'line-through opacity-60 text-gray-900 dark:text-white'
                       : categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor || 'text-gray-900 dark:text-white'
@@ -130,9 +130,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     {reminder.title}
                   </h3>
 
-                  {/* Category Badge - now positioned immediately after title */}
+                  {/* Category Badge - hidden on very small screens */}
                   {reminder.category && (
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.bgColor} ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor}`}>
+                    <span className={`hidden xs:inline-flex px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium flex-shrink-0 ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.bgColor} ${categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor}`}>
                       {categoryConfig[reminder.category as keyof typeof categoryConfig]?.icon} {categoryConfig[reminder.category as keyof typeof categoryConfig]?.label}
                     </span>
                   )}
@@ -168,7 +168,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
               )}
             </div>
             {reminder.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-1 sm:line-clamp-2">
                 {reminder.description}
               </p>
             )}
@@ -180,9 +180,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Reminder options menu"
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
-            <MoreVertical className="w-5 h-5" />
+            <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {showMenu && (
@@ -236,13 +236,13 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
       </div>
 
       {/* Meta Information */}
-      <div className="flex items-center gap-3 flex-wrap text-xs">
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-[10px] sm:text-xs">
         {/* Time */}
         {reminder.reminder_time && (
           <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
             <Clock className="w-3 h-3" />
             <span>{formatTimestamp(reminder.reminder_time, 'MMM d, h:mm a')}</span>
-            {isOverdue && <span className="font-semibold ml-1">Overdue</span>}
+            {isOverdue && <span className="font-semibold">Overdue</span>}
           </div>
         )}
 
@@ -251,7 +251,6 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <Flag className={`w-3 h-3 ${priorityColor.replace('bg-', 'text-')}`} />
           <span className="text-gray-600 dark:text-gray-400 capitalize">{reminder.priority}</span>
         </div>
-
       </div>
 
       {/* Snoozed Until */}
@@ -268,18 +267,18 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         </div>
       )}
 
-      {/* Collapsible Sections */}
-      <div className="mt-4 space-y-2">
+      {/* Collapsible Sections - Hidden on mobile for cleaner layout */}
+      <div className="hidden sm:block mt-4 space-y-2">
         {/* Attachments Toggle */}
         <button
           onClick={() => setShowAttachments(!showAttachments)}
-          className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+          className="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            <Paperclip className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+            <Paperclip className="w-3.5 h-3.5" />
             <span>Attachments</span>
           </div>
-          {showAttachments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          {showAttachments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
 
         {showAttachments && (
@@ -291,13 +290,13 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {/* Activity Timeline Toggle */}
         <button
           onClick={() => setShowActivity(!showActivity)}
-          className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+          className="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            <Activity className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+            <Activity className="w-3.5 h-3.5" />
             <span>Activity Timeline</span>
           </div>
-          {showActivity ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          {showActivity ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
 
         {showActivity && (
@@ -309,13 +308,13 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {/* Comments Section Toggle */}
         <button
           onClick={() => setShowComments(!showComments)}
-          className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+          className="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-            <MessageCircle className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+            <MessageCircle className="w-3.5 h-3.5" />
             <span>Comments</span>
           </div>
-          {showComments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          {showComments ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
 
         {showComments && (

@@ -78,7 +78,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
   };
 
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white dark:bg-gray-800 sm:bg-white/60 sm:dark:bg-gray-800/60 sm:backdrop-blur-md border border-gray-200 dark:border-gray-700 sm:border-gray-200/50 sm:dark:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -113,10 +113,18 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                 }`}>
                   {event.title}
                 </h3>
-                <span className={`px-2 py-0.5 sm:py-1 rounded text-xs font-medium ${getCategoryConfig().color} ${
+                {/* Mobile: Simple text badge, Desktop: Pill badge */}
+                <span className={`text-xs font-medium sm:px-2 sm:py-1 sm:rounded ${
                   event.status === 'completed' ? 'opacity-60' : ''
                 }`}>
-                  {getCategoryConfig().icon} {getCategoryConfig().label}
+                  {/* Mobile: Just icon and text */}
+                  <span className="sm:hidden text-gray-500 dark:text-gray-400">
+                    {getCategoryConfig().icon} {getCategoryConfig().label}
+                  </span>
+                  {/* Desktop: With background */}
+                  <span className={`hidden sm:inline px-2 py-1 rounded ${getCategoryConfig().color}`}>
+                    {getCategoryConfig().icon} {getCategoryConfig().label}
+                  </span>
                 </span>
               </div>
               <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex-wrap ${

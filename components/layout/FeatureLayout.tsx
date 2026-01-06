@@ -16,7 +16,7 @@ interface FeatureLayoutProps {
   }[];
   backgroundVariant?: 'subtle' | 'ambient' | 'vibrant';
   enableTimeAware?: boolean;
-  /** Hide footer on mobile for chat-style interfaces */
+  /** Hide footer on mobile - defaults to true for mobile-first UX */
   hideFooterOnMobile?: boolean;
 }
 
@@ -25,7 +25,7 @@ export function FeatureLayout({
   breadcrumbItems,
   backgroundVariant = 'ambient',
   enableTimeAware = false,
-  hideFooterOnMobile = false
+  hideFooterOnMobile = true
 }: FeatureLayoutProps) {
   const pathname = usePathname();
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Calendar, Clock, MapPin, MessageCircle, Paperclip, Users, Edit, Trash2 } from 'lucide-react';
+import { X, Calendar, Clock, MapPin, MessageCircle, Paperclip, Edit, Trash2, CheckCircle, AlertCircle, PlayCircle } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { EventCommentThread } from './EventCommentThread';
 import { AttachmentGallery } from './AttachmentGallery';
@@ -26,161 +26,155 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
 
   const getCategoryConfig = () => {
     const configs = {
-      work: {
-        icon: '💼',
-        label: 'Work',
-        color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-        gradient: 'from-blue-600 to-blue-700'
-      },
-      personal: {
-        icon: '👤',
-        label: 'Personal',
-        color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-        gradient: 'from-purple-600 to-indigo-600'
-      },
-      family: {
-        icon: '👨‍👩‍👧‍👦',
-        label: 'Family',
-        color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300',
-        gradient: 'from-pink-600 to-pink-700'
-      },
-      health: {
-        icon: '💪',
-        label: 'Health',
-        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-        gradient: 'from-green-600 to-green-700'
-      },
-      social: {
-        icon: '🎉',
-        label: 'Social',
-        color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
-        gradient: 'from-orange-600 to-orange-700'
-      },
+      work: { icon: '💼', label: 'Work', accent: 'text-blue-600 dark:text-blue-400' },
+      personal: { icon: '👤', label: 'Personal', accent: 'text-purple-600 dark:text-purple-400' },
+      family: { icon: '👨‍👩‍👧‍👦', label: 'Family', accent: 'text-pink-600 dark:text-pink-400' },
+      health: { icon: '💪', label: 'Health', accent: 'text-green-600 dark:text-green-400' },
+      social: { icon: '🎉', label: 'Social', accent: 'text-orange-600 dark:text-orange-400' },
     };
     return configs[event.category] || configs.personal;
   };
 
+  const getStatusConfig = () => {
+    const configs = {
+      'not-started': { icon: AlertCircle, label: 'Not Started', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
+      'in-progress': { icon: PlayCircle, label: 'In Progress', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+      'completed': { icon: CheckCircle, label: 'Completed', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
+    };
+    return configs[event.status] || configs['not-started'];
+  };
+
   const categoryConfig = getCategoryConfig();
+  const statusConfig = getStatusConfig();
+  const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-4xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
-        {/* Header - Fixed */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl flex-shrink-0">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{categoryConfig.icon}</span>
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
-                  {categoryConfig.label}
-                </span>
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold">{event.title}</h2>
-            </div>
-            <div className="flex items-center gap-1">
-              {onEdit && (
-                <button
-                  onClick={() => {
-                    onClose();
-                    onEdit(event);
-                  }}
-                  className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
-                  aria-label="Edit event"
-                  title="Edit event"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-              )}
-              {onDelete && (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-red-600 transition-colors"
-                  aria-label="Delete event"
-                  title="Delete event"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-purple-700 transition-colors"
-                aria-label="Close modal"
-              >
-                <X className="w-4 h-4" />
-              </button>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="relative bg-white dark:bg-gray-900 w-full max-h-[90vh] sm:max-w-lg sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col rounded-t-2xl sm:rounded-2xl border border-gray-200 dark:border-gray-700">
+        {/* Header */}
+        <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </button>
+
+          {/* Category & Status Row */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">{categoryConfig.icon}</span>
+            <span className={`text-sm font-medium ${categoryConfig.accent}`}>
+              {categoryConfig.label}
+            </span>
+            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <div className={`flex items-center gap-1 ${statusConfig.color}`}>
+              <StatusIcon className="w-3.5 h-3.5" />
+              <span className="text-xs font-medium">{statusConfig.label}</span>
             </div>
           </div>
 
-          {/* Event Meta Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-            <div className="flex items-center gap-2 text-white/90">
-              <Calendar className="w-4 h-4" />
-              <span className="text-sm">{format(new Date(event.start_time), 'EEEE, MMMM d, yyyy')}</span>
+          {/* Title */}
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white pr-8 mb-4">
+            {event.title}
+          </h2>
+
+          {/* Event Details Grid */}
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-3 text-sm">
+              <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-700 dark:text-gray-300">
+                {format(new Date(event.start_time), 'EEEE, MMMM d, yyyy')}
+              </span>
             </div>
-            <div className="flex items-center gap-2 text-white/90">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm">
+            <div className="flex items-center gap-3 text-sm">
+              <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <span className="text-gray-700 dark:text-gray-300">
                 {format(new Date(event.start_time), 'h:mm a')}
-                {event.end_time && ` - ${format(new Date(event.end_time), 'h:mm a')}`}
+                {event.end_time && ` – ${format(new Date(event.end_time), 'h:mm a')}`}
               </span>
             </div>
             {event.location && (
-              <div className="flex items-center gap-2 text-white/90 col-span-full">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">{event.location}</span>
+              <div className="flex items-center gap-3 text-sm">
+                <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <span className="text-gray-700 dark:text-gray-300">{event.location}</span>
               </div>
             )}
           </div>
 
+          {/* Description */}
           {event.description && (
-            <div className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
-              <p className="text-sm text-white/90">{event.description}</p>
+            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {event.description}
+              </p>
             </div>
           )}
 
-          {/* Weather Forecast */}
+          {/* Weather */}
           {event.location && (
             <div className="mt-4">
               <WeatherBadge eventTime={event.start_time} location={event.location} />
             </div>
           )}
-        </div>
 
-        {/* Tab Navigation - Fixed */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 flex-shrink-0">
-          <div className="flex gap-4">
-            <button
-              onClick={() => setActiveTab('comments')}
-              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
-                activeTab === 'comments'
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4" />
-                <span>Comments</span>
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab('attachments')}
-              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
-                activeTab === 'attachments'
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Paperclip className="w-4 h-4" />
-                <span>Attachments</span>
-              </div>
-            </button>
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-5">
+            {onEdit && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onEdit(event);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-full transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                Edit Event
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 text-sm font-medium rounded-full transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="sm:inline hidden">Delete</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Tab Content - Scrollable with fixed height */}
-        <div className="flex-1 overflow-y-auto p-6 min-h-0">
+        {/* Tab Navigation */}
+        <div className="bg-gray-50 dark:bg-gray-800/50 px-5 py-2 flex gap-2">
+          <button
+            onClick={() => setActiveTab('comments')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'comments'
+                ? 'bg-purple-600 text-white'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Comments
+          </button>
+          <button
+            onClick={() => setActiveTab('attachments')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              activeTab === 'attachments'
+                ? 'bg-purple-600 text-white'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Paperclip className="w-4 h-4" />
+            Files
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto p-5 min-h-[200px] max-h-[300px] bg-white dark:bg-gray-900">
           {activeTab === 'comments' ? (
             <EventCommentThread eventId={event.id} spaceId={event.space_id} />
           ) : (
@@ -193,21 +187,21 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
+          <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-sm w-full p-6">
             <div className="text-center">
               <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
-                <Trash2 className="w-6 h-6 text-red-600 dark:text-red-400" />
+                <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Delete Event
+                Delete Event?
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Are you sure you want to delete &quot;{event.title}&quot;? This event will be moved to trash and can be restored within 30 days.
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                &quot;{event.title}&quot; will be moved to trash and can be restored within 30 days.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
@@ -219,7 +213,7 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
                       onClose();
                     }
                   }}
-                  className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-white bg-red-600 rounded-full hover:bg-red-700 text-sm font-medium transition-colors"
                 >
                   Delete
                 </button>
