@@ -147,7 +147,7 @@ export function EnhancedWeekView({
   const firstEventWithLocation = weekDays.flatMap(day => getEventsForDay(day)).find(e => e.location);
 
   return (
-    <div className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
+    <div className="relative bg-white dark:bg-gray-900 sm:rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto -mx-4 sm:mx-0">
       {/* Weather Badge Header */}
       {firstEventWithLocation && (
         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
@@ -162,7 +162,7 @@ export function EnhancedWeekView({
       {/* Header with day names */}
       <div className="flex border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-30">
         {/* Time column spacer */}
-        <div className="w-16 sm:w-20 flex-shrink-0 border-r border-gray-200 dark:border-gray-700" />
+        <div className="w-12 sm:w-16 flex-shrink-0 border-r border-gray-200 dark:border-gray-700" />
 
         {/* Day headers */}
         {weekDays.map(day => {
@@ -170,7 +170,7 @@ export function EnhancedWeekView({
           return (
             <div
               key={day.toISOString()}
-              className={`flex-1 min-w-[100px] sm:min-w-0 p-2 sm:p-3 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
+              className={`flex-1 min-w-[44px] sm:min-w-0 p-1 sm:p-3 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
                 isTodayDate ? 'bg-purple-50 dark:bg-purple-900/20' : ''
               }`}
             >
@@ -195,17 +195,17 @@ export function EnhancedWeekView({
       </div>
 
       {/* Time grid + Events container */}
-      <div className="flex">
+      <div className="flex pt-2">
         {/* Time labels */}
-        <div className="w-16 sm:w-20 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
+        <div className="w-12 sm:w-16 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
           {HOURS.map(hour => (
             <div
               key={hour}
               className="relative border-b border-gray-200 dark:border-gray-700"
               style={{ height: `${HOUR_HEIGHT}px` }}
             >
-              <div className="absolute -top-2 left-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 px-1">
-                {format(new Date().setHours(hour, 0), 'h a')}
+              <div className="absolute -top-2 left-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 px-0.5">
+                {format(new Date().setHours(hour, 0), 'ha').toLowerCase()}
               </div>
             </div>
           ))}
@@ -219,7 +219,7 @@ export function EnhancedWeekView({
           return (
             <div
               key={day.toISOString()}
-              className={`flex-1 min-w-[100px] sm:min-w-0 relative border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
+              className={`flex-1 min-w-[44px] sm:min-w-0 relative border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
                 isTodayDate ? 'bg-purple-50/30 dark:bg-purple-900/10' : ''
               }`}
               style={{ height: `${HOURS.length * HOUR_HEIGHT}px` }}

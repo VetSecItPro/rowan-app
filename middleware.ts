@@ -27,6 +27,9 @@ const ADMIN_SESSION_DURATION = 24 * 60 * 60;
 /** Beta validation cache duration in seconds (1 hour) */
 const BETA_CACHE_DURATION = 60 * 60;
 
+/** User session cookie duration: 1 year (persistent login like Facebook/Instagram) */
+const SESSION_COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 31536000 seconds
+
 /**
  * Email verification enforcement cutoff date
  * Users who signed up BEFORE this date are grandfathered in (no email verification required)
@@ -75,10 +78,18 @@ export async function middleware(req: NextRequest) {
           return req.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
+          // Apply persistent login: 1 year cookie expiration for auth cookies
+          const persistentOptions = {
+            ...options,
+            maxAge: options.maxAge || SESSION_COOKIE_MAX_AGE,
+            path: options.path || '/',
+            sameSite: options.sameSite || 'lax',
+            secure: options.secure ?? process.env.NODE_ENV === 'production',
+          };
           req.cookies.set({
             name,
             value,
-            ...options,
+            ...persistentOptions,
           });
           response = NextResponse.next({
             request: {
@@ -88,7 +99,7 @@ export async function middleware(req: NextRequest) {
           response.cookies.set({
             name,
             value,
-            ...options,
+            ...persistentOptions,
           });
         },
         remove(name: string, options: CookieOptions) {

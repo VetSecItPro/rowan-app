@@ -6,6 +6,9 @@ let supabaseClient: ReturnType<typeof createBrowserClient> | null = null;
 // Track whether we're using placeholder values (build time)
 let isPlaceholder = false;
 
+// Session cookie duration: 1 year (persistent login like Facebook/Instagram)
+const SESSION_COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 31536000 seconds
+
 export const createClient = () => {
   // Return existing client if already created
   if (supabaseClient) {
@@ -42,21 +45,18 @@ export const createClient = () => {
         // Only access document in browser environment
         if (typeof window === 'undefined') return;
 
-        // Set cookie in document
+        // Set cookie in document with persistent login (1 year default)
         let cookie = `${name}=${value}`;
-        if (options?.maxAge) {
-          cookie += `; max-age=${options.maxAge}`;
-        }
-        if (options?.path) {
-          cookie += `; path=${options.path}`;
-        }
+        // Use provided maxAge or default to 1 year for persistent login
+        const maxAge = options?.maxAge || SESSION_COOKIE_MAX_AGE;
+        cookie += `; max-age=${maxAge}`;
+        cookie += `; path=${options?.path || '/'}`;
         if (options?.domain) {
           cookie += `; domain=${options.domain}`;
         }
-        if (options?.sameSite) {
-          cookie += `; samesite=${options.sameSite}`;
-        }
-        if (options?.secure) {
+        cookie += `; samesite=${options?.sameSite || 'lax'}`;
+        // Always use secure in production
+        if (options?.secure || (typeof window !== 'undefined' && window.location.protocol === 'https:')) {
           cookie += '; secure';
         }
         document.cookie = cookie;
