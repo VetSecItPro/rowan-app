@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { logger } from '@/lib/logger';
 import {
   DndContext,
@@ -61,6 +62,25 @@ interface SortableItemProps {
 
 function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onViewDetails }: SortableItemProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  const updateMenuPosition = useCallback(() => {
+    if (menuButtonRef.current) {
+      const rect = menuButtonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 4,
+        left: rect.right - 160, // 160px = w-40 menu width
+      });
+    }
+  }, []);
+
+  const handleMenuToggle = () => {
+    if (!showMenu) {
+      updateMenuPosition();
+    }
+    setShowMenu(!showMenu);
+  };
 
   const {
     attributes,
@@ -124,154 +144,137 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
     }
   };
 
+  const priorityColor = {
+    'low': 'bg-blue-500',
+    'medium': 'bg-yellow-500',
+    'high': 'bg-orange-500',
+    'urgent': 'bg-red-500'
+  }[item.priority] || 'bg-gray-500';
+
   const statusLabel = getStatusLabel();
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg p-4 hover:shadow-lg transition-all duration-200 group"
+      className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200"
     >
-      <div className="flex items-start justify-between mb-3 gap-3">
-        <div className="flex items-start gap-3 flex-1">
-          {/* Drag Handle - larger touch target on mobile */}
+      {/* Main row - compact single line */}
+      <div className="flex items-center gap-2">
+        {/* Drag Handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing touch-manipulation"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="w-4 h-4" />
+        </button>
+
+        {/* Checkbox */}
+        <button
+          onClick={handleStatusClick}
+          title={`Status: ${statusLabel.text}`}
+          className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition-colors ${getCheckboxStyle()}`}
+        >
+          {item.status === 'completed' && <CheckSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
+          {item.status === 'in-progress' && <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
+          {item.status === 'blocked' && <AlertCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
+          {item.status === 'on-hold' && <Pause className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
+        </button>
+
+        {/* Title */}
+        <h3 className={`flex-1 min-w-0 text-sm font-medium text-gray-900 dark:text-white truncate ${
+          item.status === 'completed' ? 'line-through opacity-60' : ''
+        }`}>
+          {item.title}
+        </h3>
+
+        {/* Type Badge */}
+        <span className={`flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+          item.type === 'chore'
+            ? 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30'
+            : 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30'
+        }`}>
+          {item.type === 'chore' ? 'Chore' : 'Task'}
+        </span>
+
+        {/* Priority dot */}
+        <div className={`flex-shrink-0 w-2 h-2 rounded-full ${priorityColor}`} title={`${item.priority} priority`} />
+
+        {/* Status badge */}
+        <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${
+          item.status === 'completed'
+            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+            : item.status === 'in-progress'
+            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+            : item.status === 'blocked'
+            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+            : item.status === 'on-hold'
+            ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+        }`}>
+          {item.status === 'in-progress' ? 'Active' : item.status === 'on-hold' ? 'Hold' : item.status === 'completed' ? 'Done' : item.status === 'blocked' ? 'Blocked' : 'Pending'}
+        </span>
+
+        {/* Menu button */}
+        <div className="flex-shrink-0">
           <button
-            {...attributes}
-            {...listeners}
-            className="mt-0.5 flex-shrink-0 w-8 h-8 sm:w-5 sm:h-5 rounded-lg sm:rounded flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-grab active:cursor-grabbing active:bg-gray-200 dark:active:bg-gray-600 touch-manipulation transition-colors"
-            aria-label="Drag to reorder"
+            ref={menuButtonRef}
+            onClick={handleMenuToggle}
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
           >
-            <GripVertical className="w-5 h-5 sm:w-4 sm:h-4" />
+            <MoreVertical className="w-4 h-4" />
           </button>
 
-          {/* Checkbox */}
-          <button
-            onClick={handleStatusClick}
-            title={`Status: ${getStatusLabel().text} (click to cycle)`}
-            className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded flex items-center justify-center transition-colors ${getCheckboxStyle()}`}
-          >
-            {item.status === 'completed' && (
-              <CheckSquare className="w-4 h-4 sm:w-3 sm:h-3 text-white" />
-            )}
-            {item.status === 'in-progress' && (
-              <Clock className="w-3 h-3 text-white" />
-            )}
-            {item.status === 'blocked' && (
-              <AlertCircle className="w-3 h-3 text-white" />
-            )}
-            {item.status === 'on-hold' && (
-              <Pause className="w-3 h-3 text-white" />
-            )}
-          </button>
-
-          {/* Title & Type */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className={`font-semibold text-gray-900 dark:text-white truncate ${
-                item.status === 'completed' ? 'line-through opacity-60' : ''
-              }`}>
-                {item.title}
-              </h3>
-              {/* Task/Chore Type Badge */}
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 ${
-                item.type === 'chore'
-                  ? 'border-amber-500 text-amber-600 dark:text-amber-400 dark:border-amber-400 bg-amber-50 dark:bg-amber-900/20'
-                  : 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-              }`}>
-                {item.type === 'chore' ? '🏠 Chore' : '📋 Task'}
-              </span>
-            </div>
-            {item.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                {item.description}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* More Menu */}
-        <div className="relative">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="w-8 h-8 flex items-center justify-center"
-          >
-            <MoreVertical className="w-5 h-5 md:w-4 md:h-4 text-gray-600 dark:text-gray-400" />
-          </button>
-
-          {showMenu && (
+          {showMenu && typeof document !== 'undefined' && createPortal(
             <>
+              <div className="fixed inset-0 z-[9999]" onClick={() => setShowMenu(false)} />
               <div
-                className="fixed inset-0 z-10"
-                onClick={() => setShowMenu(false)}
-              />
-              <div className="absolute right-0 mt-1 w-48 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-lg z-20">
+                className="fixed w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[10000] overflow-hidden"
+                style={{ top: menuPosition.top, left: menuPosition.left }}
+              >
                 {onViewDetails && item.type === 'task' && (
                   <button
-                    onClick={() => {
-                      onViewDetails(item);
-                      setShowMenu(false);
-                    }}
-                    className="w-full px-4 py-3 sm:py-2 text-left text-base sm:text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors"
+                    onClick={() => { onViewDetails(item); setShowMenu(false); }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     View Details
                   </button>
                 )}
                 <button
-                  onClick={() => {
-                    onEdit?.(item);
-                    setShowMenu(false);
-                  }}
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${!onViewDetails || item.type !== 'task' ? 'rounded-t-lg' : ''}`}
+                  onClick={() => { onEdit?.(item); setShowMenu(false); }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => {
-                    onDelete?.(item.id, item.type);
-                    setShowMenu(false);
-                  }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg transition-colors"
+                  onClick={() => { onDelete?.(item.id, item.type); setShowMenu(false); }}
+                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Delete
                 </button>
               </div>
-            </>
+            </>,
+            document.body
           )}
         </div>
       </div>
 
-      {/* Meta Information */}
-      <div className="flex items-center gap-3 flex-wrap text-xs">
-        {/* Priority */}
-        <div className="flex items-center gap-1">
-          <span className={`w-3 h-3 rounded-full ${{
-            'low': 'bg-blue-500',
-            'medium': 'bg-yellow-500',
-            'high': 'bg-orange-500',
-            'urgent': 'bg-red-500'
-          }[item.priority] || 'bg-gray-500'}`} />
-          <span className="text-gray-600 dark:text-gray-400 capitalize">{item.priority}</span>
+      {/* Description + Meta row */}
+      {(item.description || item.due_date) && (
+        <div className="mt-1 ml-12 sm:ml-14 flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+          {item.description && (
+            <span className="truncate flex-1">{item.description}</span>
+          )}
+          {item.due_date && (
+            <span className={`flex-shrink-0 ${isOverdue ? 'text-red-500 font-medium' : ''}`}>
+              {new Date(item.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {isOverdue && ' !'}
+            </span>
+          )}
         </div>
-
-        {/* Due Date */}
-        {item.due_date && (
-          <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
-            <span>{new Date(item.due_date).toLocaleDateString()}</span>
-            {isOverdue && <span className="font-semibold">Overdue</span>}
-          </div>
-        )}
-
-        {/* Status Badge */}
-        <span className={`px-2 py-0.5 text-white rounded-full capitalize ml-auto ${{
-          'pending': 'bg-gray-500',
-          'in-progress': 'bg-blue-500',
-          'blocked': 'bg-red-500',
-          'on-hold': 'bg-purple-500',
-          'completed': 'bg-green-500'
-        }[item.status] || 'bg-gray-500'}`}>
-          {item.status.replace('-', ' ')}
-        </span>
-      </div>
+      )}
     </div>
   );
 }
@@ -439,20 +442,18 @@ export function DraggableItemList({
       {/* Drag Overlay */}
       <DragOverlay>
         {activeItem ? (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-90">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-95">
             <GripVertical className="w-4 h-4 text-gray-400" />
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                {activeItem.title}
-              </h3>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
-                activeItem.type === 'chore'
-                  ? 'border-amber-500 text-amber-600 bg-amber-50'
-                  : 'border-blue-500 text-blue-600 bg-blue-50'
-              }`}>
-                {activeItem.type === 'chore' ? '🏠 Chore' : '📋 Task'}
-              </span>
-            </div>
+            <h3 className="flex-1 text-sm font-medium text-gray-900 dark:text-white truncate">
+              {activeItem.title}
+            </h3>
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+              activeItem.type === 'chore'
+                ? 'text-amber-600 bg-amber-100'
+                : 'text-blue-600 bg-blue-100'
+            }`}>
+              {activeItem.type === 'chore' ? 'Chore' : 'Task'}
+            </span>
           </div>
         ) : null}
       </DragOverlay>

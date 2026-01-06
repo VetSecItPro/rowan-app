@@ -234,10 +234,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
           <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>No comments yet. Start the conversation!</p>
-        </div>
+        <div className="py-4" />
       ) : (
         <div className="space-y-1">
           {comments.map(comment => renderComment(comment))}
@@ -265,13 +262,13 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Add a comment..."
-            className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+            className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
             rows={2}
           />
           <button
             type="submit"
             disabled={!newComment.trim()}
-            className="px-4 py-2 bg-gradient-calendar text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center gap-2 h-fit"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 h-fit font-medium"
           >
             <Send className="w-4 h-4" />
             Post

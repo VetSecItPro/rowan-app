@@ -603,7 +603,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
 
           {/* Recurring Frequency Panel */}
           {formData.is_recurring && (
-            <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+            <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
               <div>
                 <label htmlFor="field-9" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
                   Frequency
@@ -809,7 +809,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                     onClose();
                   }
                 }}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors font-medium"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors font-medium"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
@@ -818,15 +818,15 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!!dateError || uploading}
-              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg transition-colors font-medium ${
-                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-600 hover:to-purple-700'
+              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-purple-600 text-white rounded-full transition-colors font-medium ${
+                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
               }`}
             >
               {uploading ? 'Saving...' : editEvent ? 'Update Event' : 'Create Event'}

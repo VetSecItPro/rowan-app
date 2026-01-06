@@ -235,8 +235,9 @@ export function DateTimePicker({
         <input
           ref={inputRef}
           type="text"
-          value={manualInput}
+          defaultValue={manualInput}
           disabled={disabled}
+          readOnly
           className={`w-full px-4 py-3 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
           placeholder={placeholder}
         />
