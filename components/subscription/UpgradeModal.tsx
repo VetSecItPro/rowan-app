@@ -8,7 +8,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { X, Crown, Check, Clock, Sparkles, Zap, Lock } from 'lucide-react';
-import { useSubscription } from '@/lib/contexts/subscription-context';
+import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface UpgradeModalProps {
@@ -100,7 +100,11 @@ export function UpgradeModal({
   title: customTitle,
   description: customDescription,
 }: UpgradeModalProps) {
-  const { isInTrial, trialDaysRemaining, hasTrialExpired, effectiveTier } = useSubscription();
+  const subscription = useSubscriptionSafe();
+  const isInTrial = subscription?.isInTrial ?? false;
+  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
+  const hasTrialExpired = subscription?.hasTrialExpired ?? false;
+  const effectiveTier = subscription?.effectiveTier ?? 'free';
 
   const featureInfo = feature ? FEATURE_MESSAGES[feature] : null;
   const title = customTitle || featureInfo?.title || 'Upgrade to Pro';
@@ -234,13 +238,16 @@ export function FeatureLockOverlay({
   feature: string;
   children: React.ReactNode;
 }) {
-  const { canAccess, showUpgradeModal, isInTrial } = useSubscription();
+  const subscription = useSubscriptionSafe();
+  const canAccess = subscription?.canAccess ?? (() => true);
+  const showUpgradeModal = subscription?.showUpgradeModal ?? (() => {});
+  const isInTrial = subscription?.isInTrial ?? false;
   const featureKey = feature as keyof typeof FEATURE_MESSAGES;
 
-  // Check if feature is accessible
+  // Check if feature is accessible (default to true if no provider)
   const hasAccess = canAccess(featureKey as any);
 
-  if (hasAccess) {
+  if (hasAccess || !subscription) {
     return <>{children}</>;
   }
 

@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Clock, Gift, AlertTriangle, X, Crown, Zap } from 'lucide-react';
-import { useSubscription, useSubscriptionSafe } from '@/lib/contexts/subscription-context';
+import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TrialStatusBannerProps {
@@ -23,16 +23,17 @@ export function TrialStatusBanner({
   compact = false,
 }: TrialStatusBannerProps) {
   const [isDismissed, setIsDismissed] = useState(false);
-  const {
-    isLoading,
-    isInTrial,
-    trialDaysRemaining,
-    isTrialExpiringSoon,
-    hasTrialExpired,
-    tier,
-    effectiveTier,
-    isBetaTester,
-  } = useSubscription();
+  const subscription = useSubscriptionSafe();
+
+  // Safe defaults when outside provider context
+  const isLoading = subscription?.isLoading ?? true;
+  const isInTrial = subscription?.isInTrial ?? false;
+  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
+  const isTrialExpiringSoon = subscription?.isTrialExpiringSoon ?? false;
+  const hasTrialExpired = subscription?.hasTrialExpired ?? false;
+  const tier = subscription?.tier ?? 'free';
+  const effectiveTier = subscription?.effectiveTier ?? 'free';
+  const isBetaTester = subscription?.isBetaTester ?? false;
 
   // Check localStorage on mount for dismiss state (resets every 3 days)
   useEffect(() => {
@@ -55,6 +56,11 @@ export function TrialStatusBanner({
     setIsDismissed(true);
     onDismiss?.();
   };
+
+  // Return null if subscription context not available (during SSR or auth loading)
+  if (!subscription) {
+    return null;
+  }
 
   // BETA PERIOD: Hide trial banner entirely until Feb 15, 2026
   // All users during beta have full access - no upgrade pressure needed
