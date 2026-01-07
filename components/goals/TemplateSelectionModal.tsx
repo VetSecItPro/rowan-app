@@ -193,10 +193,10 @@ export function TemplateSelectionModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 bg-black/50 z-50">
-      <div className="w-full max-w-6xl max-h-screen sm:max-h-[90vh] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto sm:max-w-6xl sm:max-h-[90vh] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 sm:rounded-xl shadow-xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-indigo-500 to-indigo-600">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-indigo-500 to-indigo-600 sm:rounded-t-xl">
           <div>
             <h2 className="text-2xl font-bold text-white">Choose a Goal Template</h2>
             <p className="text-sm text-indigo-100 mt-1">

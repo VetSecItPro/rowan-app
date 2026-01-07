@@ -64,15 +64,15 @@ export function ForwardMessageModal({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 animate-fade-in"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[59] animate-fade-in"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+      <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
+        <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-md sm:max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-t-2xl">
+          <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-green-500 to-emerald-600 sm:rounded-t-2xl">
             <h2 className="text-xl font-semibold text-white">
               Forward Message
             </h2>

@@ -199,7 +199,7 @@ export function Modal({
   return (
     <div
       className={`
-        fixed inset-0 z-50
+        fixed inset-0 z-[60]
         ${fullScreenOnMobile ? '' : 'flex items-center justify-center p-4'}
         ${fullScreenOnMobile ? 'sm:flex sm:items-center sm:justify-center sm:p-4' : ''}
       `}
@@ -215,14 +215,14 @@ export function Modal({
       <div
         ref={modalRef}
         className={`
-          relative
+          ${fullScreenOnMobile ? 'absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto' : 'relative'}
           bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl
           border border-gray-200/50 dark:border-gray-700/50
-          ${fullScreenOnMobile ? 'w-full h-full' : 'w-full max-w-md'}
-          ${fullScreenOnMobile ? 'sm:w-auto sm:h-auto sm:rounded-xl' : 'rounded-xl'}
+          ${fullScreenOnMobile ? 'w-auto' : 'w-full max-w-md'}
+          ${fullScreenOnMobile ? 'sm:w-auto sm:rounded-xl' : 'rounded-xl'}
           ${fullScreenOnMobile ? `sm:${maxWidthClasses[maxWidth]}` : maxWidthClasses[maxWidth]}
           ${fullScreenOnMobile ? 'sm:max-h-[90vh]' : 'max-h-[90vh]'}
-          overflow-y-auto
+          overflow-hidden
           overscroll-contain
           shadow-2xl
           flex flex-col
@@ -238,7 +238,7 @@ export function Modal({
         onTouchEnd={handleTouchEnd}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           {/* Swipe Indicator - Mobile Only */}
           {fullScreenOnMobile && (
             <div
@@ -281,7 +281,7 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 pb-safe-4 sm:pb-6 relative" style={{ overflowX: 'visible', overflowY: 'visible' }}>
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 pb-safe-4 sm:pb-6 relative">
           {children}
         </div>
       </div>

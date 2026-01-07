@@ -390,11 +390,11 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Enhanced Wide Modal */}
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full max-w-6xl h-full max-h-[95vh] rounded-none sm:rounded-2xl shadow-2xl flex flex-col" style={{ overflowX: 'visible', overflowY: 'auto' }}>
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:max-w-6xl sm:max-h-[95vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden" style={{ overflowX: 'visible' }}>
 
         {/* Loading Overlay for Space Creation */}
         {spaceCreationLoading && (
@@ -422,7 +422,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
         )}
 
         {/* Compact Elegant Header */}
-        <div className="sticky top-0 z-10 bg-gradient-tasks text-white px-4 sm:px-6 py-3 sm:py-4 border-b border-blue-500/20">
+        <div className="flex-shrink-0 bg-gradient-tasks text-white px-4 sm:px-6 py-3 sm:py-4 border-b border-blue-500/20 sm:rounded-t-2xl">
           <div className="flex items-center justify-between gap-2">
             {/* Left: Icon + Title */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">

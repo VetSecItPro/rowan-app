@@ -39,9 +39,9 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute inset-0 sm:relative sm:inset-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-emerald-600">
           <h2 className="text-lg sm:text-xl font-bold text-white">Save as Template</h2>
           <button

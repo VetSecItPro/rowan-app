@@ -49,12 +49,12 @@ export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: E
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white dark:bg-gray-900 w-full max-h-[90vh] sm:max-w-lg sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col rounded-t-2xl sm:rounded-2xl border border-gray-200 dark:border-gray-700">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col border border-gray-200 dark:border-gray-700">
         {/* Header */}
-        <div className="px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex-shrink-0 px-5 pt-4 pb-3 sm:pt-5 sm:pb-4 border-b border-gray-100 dark:border-gray-800">
           {/* Close button */}
           <button
             onClick={onClose}

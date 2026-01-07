@@ -191,7 +191,6 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
             })
           ) : (
             <div className="py-4 text-center">
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">No meals planned</p>
               <button
                 onClick={() => onAddMeal(day)}
                 className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-sm font-medium rounded-lg transition-all"
@@ -229,23 +228,22 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
           </button>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Action Buttons - Desktop Only */}
+        <div className="hidden sm:flex flex-wrap items-center gap-2">
           {onGenerateList && !selectionMode && (
             <button
               onClick={onGenerateList}
-              className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium shadow-sm"
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium shadow-sm"
               title="Generate shopping list from meals"
             >
               <ShoppingBag className="w-4 h-4" />
-              <span className="hidden sm:inline">Generate Shopping List</span>
-              <span className="sm:hidden">Generate</span>
+              Generate Shopping List
             </button>
           )}
 
           <button
             onClick={toggleSelectionMode}
-            className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium ${
+            className={`px-4 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium ${
               selectionMode
                 ? 'bg-red-600 text-white hover:bg-red-700'
                 : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-sm'
@@ -253,8 +251,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
             title={selectionMode ? 'Cancel selection' : 'Select meals for bulk delete'}
           >
             {selectionMode ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-            <span className="hidden sm:inline">{selectionMode ? 'Cancel' : 'Select for Delete'}</span>
-            <span className="sm:hidden">{selectionMode ? 'Cancel' : 'Select'}</span>
+            {selectionMode ? 'Cancel' : 'Select for Delete'}
           </button>
         </div>
       </div>
