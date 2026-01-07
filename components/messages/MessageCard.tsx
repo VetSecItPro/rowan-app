@@ -123,28 +123,25 @@ export function MessageCard({
     ? message.content.substring(0, 200) + '...'
     : message.content;
 
-  // Render deleted message placeholder
+  // Render deleted message placeholder - WhatsApp style
   if (isDeleted) {
     return (
       <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-        <div className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
-          <div className="px-4 pb-1">
-            <p className={`text-xs font-medium ${colorClasses.textColor}`}>
-              {senderName}
-            </p>
-          </div>
-          <div className={`relative rounded-2xl px-4 py-3 backdrop-blur-lg backdrop-saturate-150 ${
-            isOwn
-              ? 'bg-gradient-to-br from-gray-200/40 via-gray-100/30 to-gray-200/20 dark:from-gray-700/30 dark:via-gray-600/20 dark:to-gray-700/10 border border-gray-300/30 dark:border-gray-600/25'
-              : 'bg-gradient-to-br from-gray-100/50 via-gray-50/40 to-gray-100/30 dark:from-gray-800/40 dark:via-gray-700/30 dark:to-gray-800/20 border border-gray-200/40 dark:border-gray-600/30'
+        <div className={`relative px-3 py-2 rounded-2xl ${
+          isOwn
+            ? 'bg-emerald-500/50 dark:bg-emerald-600/50 rounded-tr-sm'
+            : 'bg-gray-200 dark:bg-gray-600 rounded-tl-sm'
+        }`}>
+          <div className={`flex items-center gap-2 italic ${
+            isOwn ? 'text-emerald-100' : 'text-gray-500 dark:text-gray-400'
           }`}>
-            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 italic">
-              <Ban className="w-4 h-4" />
-              <span className="text-sm">This message was deleted</span>
-            </div>
-            <div className="flex items-center gap-2 mt-1.5 text-xs text-gray-400 dark:text-gray-500">
-              <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
-            </div>
+            <Ban className="w-4 h-4" />
+            <span className="text-sm">This message was deleted</span>
+          </div>
+          <div className={`flex items-center justify-end gap-1 mt-1 text-[11px] ${
+            isOwn ? 'text-emerald-200/70' : 'text-gray-400 dark:text-gray-500'
+          }`}>
+            <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
           </div>
         </div>
       </div>
@@ -154,39 +151,40 @@ export function MessageCard({
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
       <div className={`max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
-        {/* Sender Name */}
-        <div className="px-4 pb-1">
-          <p className={`text-xs font-medium ${colorClasses.textColor}`}>
-            {senderName}
-          </p>
-        </div>
-
-        {/* Message Bubble with Enhanced Glassmorphism */}
+        {/* Message Bubble - WhatsApp Style */}
         <div className="relative group/message z-10 w-fit">
+          {/* Bubble Tail */}
           <div
-            className={`relative rounded-2xl cursor-pointer backdrop-blur-lg backdrop-saturate-150 ${
-              // Dynamic padding based on content length
-              message.content && message.content.length < 20
-                ? 'px-4 py-2.5' // Small padding for short messages
-                : message.content && message.content.length < 80
-                ? 'px-4 py-3' // Medium padding
-                : 'px-5 py-3.5' // Full padding for longer messages
-            } ${
+            className={`absolute top-0 w-3 h-3 ${
               isOwn
-                ? 'bg-gradient-to-br from-blue-500/20 via-blue-400/15 to-indigo-500/10 dark:from-blue-500/25 dark:via-blue-400/20 dark:to-indigo-500/15 border border-blue-300/30 dark:border-blue-400/25 shadow-lg shadow-blue-500/10 dark:shadow-blue-500/5 hover:shadow-xl hover:shadow-blue-500/15 dark:hover:shadow-blue-500/10 hover:border-blue-300/50 dark:hover:border-blue-400/40 ring-1 ring-white/20 dark:ring-white/5'
-                : 'bg-gradient-to-br from-white/60 via-white/50 to-gray-100/40 dark:from-gray-700/50 dark:via-gray-600/40 dark:to-gray-700/30 border border-white/40 dark:border-gray-500/30 shadow-lg shadow-gray-500/10 dark:shadow-black/20 hover:shadow-xl hover:shadow-gray-500/15 dark:hover:shadow-black/30 hover:border-white/60 dark:hover:border-gray-500/40 ring-1 ring-white/30 dark:ring-white/5'
-            } transition-all duration-300 ease-out`}
+                ? '-right-1.5 bg-emerald-500 dark:bg-emerald-600'
+                : '-left-1.5 bg-white dark:bg-gray-700'
+            }`}
+            style={{
+              clipPath: isOwn
+                ? 'polygon(0 0, 100% 0, 0 100%)'
+                : 'polygon(100% 0, 0 0, 100% 100%)'
+            }}
+          />
+          <div
+            className={`relative px-3 py-2 min-w-[80px] ${
+              isOwn
+                ? 'bg-emerald-500 dark:bg-emerald-600 rounded-2xl rounded-tr-sm'
+                : 'bg-white dark:bg-gray-700 rounded-2xl rounded-tl-sm shadow-sm'
+            }`}
           >
-            {/* Message Content with Markdown Support and Expand/Collapse */}
+            {/* Message Content */}
             {message.content && (
-              <div className="relative z-10 break-words text-gray-900 dark:text-white text-sm prose prose-sm dark:prose-invert max-w-none">
-                <ReactMarkdown>
-                  {displayContent}
-                </ReactMarkdown>
+              <div className={`relative z-10 break-words text-[15px] leading-relaxed ${
+                isOwn ? 'text-white' : 'text-gray-900 dark:text-white'
+              }`}>
+                <MentionHighlight content={displayContent} />
                 {isLongMessage && (
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="mt-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    className={`mt-1 text-xs font-medium hover:underline ${
+                      isOwn ? 'text-emerald-100' : 'text-emerald-600 dark:text-emerald-400'
+                    }`}
                   >
                     {isExpanded ? 'Show less' : 'Read more'}
                   </button>
@@ -207,73 +205,47 @@ export function MessageCard({
               </div>
             )}
 
-            {/* Timestamp and Read Status */}
-            <div className="relative z-10 flex items-center gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-              <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
+            {/* Timestamp and Read Status - WhatsApp Style (bottom right, inline) */}
+            <div className={`relative z-10 flex items-center justify-end gap-1 mt-1 -mb-0.5 text-[11px] ${
+              isOwn ? 'text-emerald-100/80' : 'text-gray-500 dark:text-gray-400'
+            }`}>
               {message.updated_at && message.updated_at !== message.created_at && (
-                <span className="italic">(edited)</span>
+                <span className="italic mr-1">edited</span>
               )}
+              <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
               {isOwn && (
-                <div className="ml-1 relative group/receipt">
+                <div className="ml-0.5">
                   {message.read ? (
-                    <>
-                      <CheckCheck className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 transition-colors" />
-                      {message.read_at && (
-                        <div className="absolute bottom-full right-0 mb-1 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/receipt:opacity-100 transition-opacity pointer-events-none z-10">
-                          Read {formatTimestamp(message.read_at, 'MMM d, h:mm a')}
-                        </div>
-                      )}
-                    </>
+                    <CheckCheck className={`w-4 h-4 ${isOwn ? 'text-sky-200' : 'text-blue-500'}`} />
                   ) : (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-colors" />
-                      <div className="absolute bottom-full right-0 mb-1 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover/receipt:opacity-100 transition-opacity pointer-events-none z-10">
-                        Sent
-                      </div>
-                    </>
+                    <Check className={`w-4 h-4 ${isOwn ? 'text-emerald-200/70' : 'text-gray-400'}`} />
                   )}
                 </div>
               )}
             </div>
 
-            {/* Reply Button - Subtle conversational design */}
-            {showReplyButton && onReply && !message.parent_message_id && (
-              <div className="relative z-10 mt-1 opacity-0 group-hover/message:opacity-60 transition-opacity">
-                <button
-                  onClick={() => onReply(message)}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
-                >
-                  <MessageSquare className="w-3 h-3" />
-                  {('reply_count' in message && message.reply_count) ? (
-                    <span>{message.reply_count}</span>
-                  ) : null}
-                </button>
-              </div>
-            )}
-
-            {/* Reactions Display - Glassmorphism Pills */}
-            {reactions.length > 0 && (
-              <div className="relative z-10 flex flex-wrap gap-1.5 mt-2.5 pt-2 border-t border-white/10 dark:border-gray-600/20">
-                {reactions.map((reaction) => (
-                  <button
-                    key={reaction.emoji}
-                    onClick={() => handleAddReaction(reaction.emoji)}
-                    disabled={loadingReaction}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium backdrop-blur-sm transition-all duration-200 ${
-                      reaction.reacted_by_current_user
-                        ? 'bg-blue-500/20 dark:bg-blue-400/25 text-blue-700 dark:text-blue-300 border border-blue-300/40 dark:border-blue-400/30 shadow-sm shadow-blue-500/10'
-                        : 'bg-white/30 dark:bg-gray-600/30 text-gray-700 dark:text-gray-300 border border-white/30 dark:border-gray-500/30 hover:bg-white/50 dark:hover:bg-gray-600/50 hover:border-white/50 dark:hover:border-gray-500/50'
-                    }`}
-                    title={`${reaction.count} ${reaction.count === 1 ? 'reaction' : 'reactions'}`}
-                  >
-                    <span className="text-sm">{reaction.emoji}</span>
-                    <span>{reaction.count}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
           </div>
+
+          {/* Reactions Display - Floating below bubble */}
+          {reactions.length > 0 && (
+            <div className={`flex flex-wrap gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+              {reactions.map((reaction) => (
+                <button
+                  key={reaction.emoji}
+                  onClick={() => handleAddReaction(reaction.emoji)}
+                  disabled={loadingReaction}
+                  className={`flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                    reaction.reacted_by_current_user
+                      ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                  }`}
+                >
+                  <span>{reaction.emoji}</span>
+                  <span className="text-[10px]">{reaction.count}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Message Actions - Glassmorphism Floating Toolbar */}
           <div className={`absolute -top-12 z-[100] opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible hover:opacity-100 hover:visible transition-all duration-300 ease-out pointer-events-none ${

@@ -143,12 +143,12 @@ export function ConversationSidebar({
   }, [dropdownOpenForId]);
 
   return (
-    <div className={`flex flex-col h-full bg-gradient-to-b from-white/70 via-gray-50/60 to-white/50 dark:from-gray-900/80 dark:via-gray-800/70 dark:to-gray-900/60 backdrop-blur-xl backdrop-saturate-150 border-r border-white/30 dark:border-gray-700/40 shadow-xl shadow-gray-500/5 dark:shadow-black/20 conversation-sidebar ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/30 dark:border-gray-700/30 bg-gradient-to-r from-emerald-50/40 via-green-50/30 to-teal-50/20 dark:from-emerald-900/20 dark:via-green-900/10 dark:to-teal-900/10 backdrop-blur-sm">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-md">
-            <MessageCircle className="w-4 h-4 text-white" />
+    <div className={`flex flex-col h-full bg-white/40 dark:bg-gray-900/50 backdrop-blur-2xl backdrop-saturate-150 border-r border-white/20 dark:border-gray-700/30 shadow-xl conversation-sidebar ${className}`}>
+      {/* Header - Simplified */}
+      <div className="flex items-center justify-between p-3 border-b border-white/20 dark:border-gray-700/20 bg-transparent">
+        <h2 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center">
+            <MessageCircle className="w-3.5 h-3.5 text-white" />
           </div>
           Messages
         </h2>
