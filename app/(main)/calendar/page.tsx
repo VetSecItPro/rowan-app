@@ -874,11 +874,11 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-              {/* Segmented Toggle for Action Selection */}
-              <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 flex gap-0.5 flex-wrap sm:flex-nowrap">
+              {/* Segmented Toggle for Action Selection - 2x2 grid on mobile, single row on desktop */}
+              <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 grid grid-cols-2 sm:flex sm:flex-row gap-0.5">
                 <button
                   onClick={() => setActiveAction('quick-add')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] focus:outline-none ${
+                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 sm:w-[95px] focus:outline-none ${
                     activeAction === 'quick-add'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -889,7 +889,7 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('templates')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] focus:outline-none ${
+                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 sm:w-[95px] focus:outline-none ${
                     activeAction === 'templates'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -900,7 +900,7 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('propose')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[115px] focus:outline-none ${
+                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 sm:w-[115px] focus:outline-none ${
                     activeAction === 'propose'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -911,7 +911,7 @@ export default function CalendarPage() {
                 </button>
                 <button
                   onClick={() => setActiveAction('new-event')}
-                  className={`px-1.5 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 flex-1 sm:w-[95px] focus:outline-none ${
+                  className={`px-2 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1 sm:w-[95px] focus:outline-none ${
                     activeAction === 'new-event'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -930,7 +930,7 @@ export default function CalendarPage() {
                   else if (activeAction === 'propose') setIsProposalModalOpen(true);
                   else setIsModalOpen(true);
                 }}
-                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px] bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 focus:outline-none"
+                className="px-4 sm:px-4 py-2 sm:py-3 w-full sm:w-[165px] bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 focus:outline-none"
                 title={
                   activeAction === 'quick-add' ? 'Quick add with natural language (Q)' :
                   activeAction === 'templates' ? 'Create from template' :
