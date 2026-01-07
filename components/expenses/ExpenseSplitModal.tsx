@@ -248,7 +248,6 @@ export function ExpenseSplitModal({
               </button>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
