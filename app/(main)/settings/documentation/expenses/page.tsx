@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+
 import { Receipt, Camera, Scan, DollarSign, TrendingUp, PieChart, Calendar, Clock, AlertCircle, FileText, ArrowLeft } from 'lucide-react';
 
 interface GuideSection {
@@ -220,9 +220,7 @@ const guideSections: GuideSection[] = [
 
 export default function ExpensesDocumentationPage() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50/30 to-orange-50/30 dark:from-gray-950 dark:via-red-950/20 dark:to-orange-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50/30 to-orange-50/30 dark:from-gray-950 dark:via-red-950/20 dark:to-orange-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -1114,6 +1112,5 @@ export default function ExpensesDocumentationPage() {
           </div>
         </div>
       </div>
-    </>
   );
 }

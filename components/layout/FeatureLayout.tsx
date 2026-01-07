@@ -2,7 +2,6 @@
 
 import { ReactNode, useMemo, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Header } from './Header';
 import { Breadcrumb } from './Breadcrumb';
 import { Footer } from '@/components/navigation/Footer';
 import { SmartBackgroundCanvas } from '@/components/ui/SmartBackgroundCanvas';
@@ -98,7 +97,6 @@ export function FeatureLayout({
       className="min-h-screen"
       contentClassName="min-h-screen flex flex-col"
     >
-      <Header />
       <Breadcrumb items={breadcrumbItems} />
       <main className="flex-1">{children}</main>
       {/* Hide footer on mobile for chat-style interfaces like Messages */}

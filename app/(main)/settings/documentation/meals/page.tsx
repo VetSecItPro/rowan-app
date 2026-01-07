@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+
 import { ArrowLeft, UtensilsCrossed, BookOpen, Play, Eye, Plus, ChefHat, Globe, Sparkles, ShoppingBag, CheckSquare, Keyboard, Clock, Lightbulb, Search, Calendar, List as ListIcon, LayoutGrid } from 'lucide-react';
 
 interface GuideSection {
@@ -201,9 +201,7 @@ const guideSections: GuideSection[] = [
 
 export default function MealPlanningDocumentation() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="mb-8">
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -1608,6 +1606,5 @@ export default function MealPlanningDocumentation() {
         </div>
       </div>
     </div>
-    </>
   );
 }
