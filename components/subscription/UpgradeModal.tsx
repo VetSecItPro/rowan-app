@@ -116,34 +116,24 @@ export function UpgradeModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={onClose}
-          />
-
+        <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
           {/* Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-lg rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
+            className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto w-full sm:max-w-lg sm:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden flex flex-col"
           >
-            {/* Close button */}
-            <button
-              onClick={onClose}
-              className="absolute right-4 top-4 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 transition-colors z-10"
-              aria-label="Close"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
             {/* Header with gradient */}
-            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-8 text-center text-white">
+            <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-6 sm:py-8 text-center text-white relative">
+              {/* Close button */}
+              <button
+                onClick={onClose}
+                className="absolute right-4 top-4 rounded-full p-1.5 text-white/80 hover:bg-white/20 hover:text-white transition-colors z-10"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
                 {featureInfo?.icon || <Crown className="h-8 w-8" />}
               </div>
@@ -167,7 +157,7 @@ export function UpgradeModal({
             </div>
 
             {/* Content */}
-            <div className="px-6 py-6">
+            <div className="flex-1 overflow-y-auto px-6 py-6">
               {/* Trial message */}
               {isInTrial && (
                 <div className="mb-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-800">

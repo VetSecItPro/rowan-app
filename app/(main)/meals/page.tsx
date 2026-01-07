@@ -927,27 +927,6 @@ export default function MealsPage() {
                 </Tooltip>
               </div>
 
-              {/* Shopping Actions Toggle */}
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl border border-emerald-200 dark:border-emerald-700 w-full sm:w-auto">
-                <Link
-                  href="/shopping"
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-emerald-500 hover:text-white"
-                  title="View your shopping lists"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span className="text-sm">View Lists</span>
-                </Link>
-                <button
-                  onClick={() => setIsGenerateListOpen(true)}
-                  disabled={meals.length === 0}
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[120px] text-gray-700 dark:text-gray-300 hover:bg-emerald-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-700 dark:disabled:hover:text-gray-300"
-                  title={meals.length === 0 ? 'Plan some meals first' : 'Select multiple meals to combine all recipe ingredients into one shopping list'}
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="text-sm">Generate</span>
-                </button>
-              </div>
-
               {/* Meal Actions Toggle */}
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
                 <button
@@ -1056,8 +1035,8 @@ export default function MealsPage() {
             </Link>
           </CollapsibleStatsGrid>
 
-          {/* Search Bar */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          {/* Search Bar - No container box on mobile */}
+          <div className="sm:bg-gray-50 sm:dark:bg-gray-800 sm:border sm:border-gray-200 sm:dark:border-gray-700 sm:rounded-xl sm:p-4">
             <div className="apple-search-container meals-search">
               <Search className="apple-search-icon" />
               <input
@@ -1261,34 +1240,22 @@ export default function MealsPage() {
                 ) : (
                   /* Month Calendar View */
                   <div className="w-full space-y-4">
-                    {/* Month Navigation and Actions */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center justify-center sm:justify-start gap-2">
-                        <button
-                          onClick={handlePreviousMonth}
-                          className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        >
-                          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                          {format(currentMonth, 'MMMM yyyy')}
-                        </h3>
-                        <button
-                          onClick={handleNextMonth}
-                          className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        >
-                          <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        </button>
-                      </div>
-
+                    {/* Month Navigation */}
+                    <div className="flex items-center justify-center gap-2">
                       <button
-                        onClick={() => setIsGenerateListOpen(true)}
-                        className="px-3 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 rounded-lg transition-all flex items-center justify-center gap-2 text-sm font-medium shadow-sm"
-                        title="Generate shopping list from meals"
+                        onClick={handlePreviousMonth}
+                        className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <ShoppingBag className="w-4 h-4" />
-                        <span className="hidden sm:inline">Generate Shopping List</span>
-                        <span className="sm:hidden">Generate List</span>
+                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      </button>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                        {format(currentMonth, 'MMMM yyyy')}
+                      </h3>
+                      <button
+                        onClick={handleNextMonth}
+                        className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                       </button>
                     </div>
 
@@ -1342,7 +1309,7 @@ export default function MealsPage() {
                                       </button>
                                     </div>
 
-                                    {dayMeals.length > 0 ? (
+                                    {dayMeals.length > 0 && (
                                       <div className="space-y-1.5">
                                         {dayMeals.map((meal) => (
                                           <button
@@ -1359,8 +1326,6 @@ export default function MealsPage() {
                                           </button>
                                         ))}
                                       </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-2">No meals planned</p>
                                     )}
                                   </div>
                                 );

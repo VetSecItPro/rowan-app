@@ -320,16 +320,16 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-meals px-4 sm:px-6 py-4">
+        <div className="flex-shrink-0 bg-gradient-meals px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-white">
               {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all">
+            <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-white/20 rounded-full transition-all active:scale-95">
               <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
             </button>
           </div>

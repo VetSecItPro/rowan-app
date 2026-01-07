@@ -78,7 +78,7 @@ export function BadgeModal({
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Dialog as="div" className="relative z-[60]" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -88,11 +88,11 @@ export function BadgeModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+        <div className="fixed inset-0 sm:flex sm:items-center sm:justify-center sm:p-4">
+          <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto sm:flex sm:min-h-full sm:items-center sm:justify-center text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -102,9 +102,9 @@ export function BadgeModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full sm:max-w-md transform overflow-hidden sm:rounded-2xl bg-white dark:bg-gray-800 text-left align-middle shadow-xl transition-all h-full sm:h-auto flex flex-col">
                 {/* Header */}
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex-shrink-0 flex justify-between items-start p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center space-x-3">
                     <div className={cn(
                       'w-12 h-12 rounded-full flex items-center justify-center',
@@ -132,6 +132,8 @@ export function BadgeModal({
                   </button>
                 </div>
 
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 {/* Badge Status */}
                 {isEarned && (
                   <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
@@ -234,6 +236,7 @@ export function BadgeModal({
                   >
                     Close
                   </button>
+                </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

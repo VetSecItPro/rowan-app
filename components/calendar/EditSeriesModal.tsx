@@ -174,10 +174,10 @@ export function EditSeriesModal({
     : ['this', 'future', 'all'];
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <Calendar className="w-6 h-6 text-purple-600" />
             <div>
@@ -198,7 +198,7 @@ export function EditSeriesModal({
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {isDeleteAction && (
             <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
               <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />

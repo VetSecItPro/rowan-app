@@ -77,16 +77,10 @@ export function BudgetTemplateModal({
   const totalPercentage = previewCategories.reduce((sum, cat) => sum + cat.percentage, 0);
 
   return (
-    <>
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 animate-fade-in"
-        onClick={onClose}
-      />
-
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-6xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
+        {/* Header */}
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Choose a Budget Template
@@ -264,7 +258,7 @@ export function BudgetTemplateModal({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
@@ -283,6 +277,5 @@ export function BudgetTemplateModal({
           </div>
         </div>
       </div>
-    </>
   );
 }

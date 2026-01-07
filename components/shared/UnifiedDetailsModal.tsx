@@ -165,14 +165,12 @@ export function UnifiedDetailsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/60 backdrop-blur-sm">
       {/* Compact Elegant Modal - Fixed height for stability */}
-      <div className="relative bg-white dark:bg-gray-900 w-full max-w-lg h-[540px] max-h-[90vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:h-[540px] sm:max-h-[90vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header - Compact gradient */}
-        <div className={`px-4 py-3 ${itemType === 'task' ? 'bg-gradient-to-r from-blue-600 to-blue-500' : 'bg-gradient-to-r from-amber-600 to-amber-500'}`}>
+        <div className={`flex-shrink-0 px-4 py-3 ${itemType === 'task' ? 'bg-gradient-to-r from-blue-600 to-blue-500' : 'bg-gradient-to-r from-amber-600 to-amber-500'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -230,8 +228,8 @@ export function UnifiedDetailsModal({
           ))}
         </div>
 
-        {/* Content - Fixed height for stability */}
-        <div className="flex-1 overflow-y-auto min-h-[320px]">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto sm:min-h-[320px]">
 
           {/* Overview Tab */}
           {activeTab === 'overview' && (
@@ -420,7 +418,7 @@ export function UnifiedDetailsModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex-shrink-0 px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
           <div className="flex items-center justify-between gap-3">
             <button
               onClick={() => onEdit?.(item as any)}

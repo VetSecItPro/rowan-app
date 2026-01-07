@@ -134,15 +134,14 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
   const selectedFrequency = frequencyOptions.find(opt => opt.value === formData.frequency_type);
 
   return (
-    <div className="fixed inset-0 sm:flex sm:items-center sm:justify-center sm:p-4" style={{ zIndex: 9999 }}>
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Container with Glassmorphism */}
-      <div className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-2xl shadow-2xl flex flex-col overflow-hidden" style={{ zIndex: 10000, maxHeight: '90vh' }}>
-        <div className="flex-1 overflow-y-auto overscroll-contain relative">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] shadow-2xl flex flex-col overflow-hidden overscroll-contain">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-indigo-500 to-indigo-600 backdrop-blur-md border-b border-indigo-200/50 dark:border-indigo-700/50 px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 backdrop-blur-md border-b border-indigo-200/50 dark:border-indigo-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sm:rounded-t-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <Target className="w-5 h-5 text-white" />
@@ -272,7 +271,6 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
             </button>
           </div>
         </form>
-        </div>
       </div>
     </div>
   );
