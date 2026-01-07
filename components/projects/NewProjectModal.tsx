@@ -184,10 +184,10 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
   if (!isOpen) return null;
 
   return (
-    <div onClick={onClose} className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div onClick={onClose} className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      <div onClick={(e) => e.stopPropagation()} className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+      <div onClick={(e) => e.stopPropagation()} className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+        <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold">
               {editProject ? 'Edit Project' : 'Create New Project'}

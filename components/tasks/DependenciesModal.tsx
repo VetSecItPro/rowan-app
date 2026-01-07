@@ -128,10 +128,10 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
   const relatedDependencies = dependencies.filter(d => d.dependency_type === 'relates_to');
 
   return (
-    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-4 rounded-t-xl">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <Link2 className="w-5 h-5 text-white" />
             <h2 className="text-lg sm:text-xl font-bold text-white">Task Dependencies</h2>

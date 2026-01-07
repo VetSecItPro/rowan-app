@@ -232,21 +232,13 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
   };
 
   return (
-    <>
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="fixed inset-0 bg-black/50 z-50 animate-in fade-in duration-200"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md pointer-events-auto animate-in zoom-in-95 fade-in duration-200"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className={`px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl ${colors.bg}`}>
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className={`flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 sm:rounded-t-2xl ${colors.bg}`}>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg ${colors.bg} ${colors.border} border-2 flex items-center justify-center`}>
@@ -327,7 +319,7 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
             <button
               onClick={onClose}
               disabled={isNavigating}
@@ -361,6 +353,5 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
           </div>
         </div>
       </div>
-    </>
   );
 }

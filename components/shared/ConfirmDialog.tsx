@@ -59,20 +59,20 @@ export function ConfirmDialog({
   const Icon = style.icon;
 
   return (
-    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer transition-opacity hover:bg-black/60"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
-        className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 w-full h-full sm:h-auto sm:w-auto sm:max-w-md sm:max-h-[90vh] overflow-y-auto overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
         role="alertdialog"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >
         {/* Header */}
-        <div className={`flex items-center gap-3 px-6 py-5 border-b ${style.borderColor}`}>
+        <div className={`flex-shrink-0 flex items-center gap-3 px-6 py-4 sm:py-5 border-b ${style.borderColor}`}>
           <Icon className={`w-6 h-6 flex-shrink-0 ${style.iconColor}`} aria-hidden="true" />
           <h2
             id="dialog-title"
