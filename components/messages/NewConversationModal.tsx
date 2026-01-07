@@ -176,19 +176,19 @@ export function NewConversationModal({
               </div>
             )}
 
-            {/* Actions */}
+            {/* Actions - Pill Shaped Buttons */}
             <div className="flex items-center justify-end gap-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                className="px-6 py-2.5 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors font-medium"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!title.trim() || isCreating}
-                className="px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 text-white rounded-lg transition-all font-medium disabled:cursor-not-allowed shadow-lg shadow-green-500/25"
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-full transition-all font-medium disabled:cursor-not-allowed shadow-lg shadow-emerald-500/25"
               >
                 {isCreating ? 'Creating...' : 'Create Conversation'}
               </button>
