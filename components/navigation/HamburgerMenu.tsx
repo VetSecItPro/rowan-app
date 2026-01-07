@@ -1,13 +1,16 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X, Search, Command as CommandIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { NAVIGATION_ITEMS } from '@/lib/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
+import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
 // import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette'; // Temporarily disabled
 
 export function HamburgerMenu() {
@@ -18,10 +21,32 @@ export function HamburgerMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const prefetchedDataRef = useRef<Set<string>>(new Set());
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { currentSpace } = useSpaces();
   // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
+
+  // Prefetch data for a feature on hover
+  const prefetchData = useCallback((href: string) => {
+    if (!currentSpace?.id || prefetchedDataRef.current.has(href)) return;
+
+    const feature = ROUTE_TO_FEATURE_MAP[href];
+    if (feature) {
+      prefetchedDataRef.current.add(href);
+      prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
+    }
+  }, [queryClient, currentSpace?.id]);
+
+  // Prefetch all data when menu opens
+  useEffect(() => {
+    if (isOpen && currentSpace?.id) {
+      // Prefetch all feature data for instant navigation
+      prefetchCriticalData(queryClient, currentSpace.id).catch(console.error);
+    }
+  }, [isOpen, queryClient, currentSpace?.id]);
 
   // Mount check for portal and detect desktop
   useEffect(() => {
@@ -156,7 +181,10 @@ export function HamburgerMenu() {
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={true}
                       onClick={handleClick}
+                      onTouchStart={() => prefetchData(item.href)}
+                      onMouseEnter={() => prefetchData(item.href)}
                       className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-white/50 dark:hover:bg-white/10 transition-colors active:scale-[0.98]"
                     >
                       <div className={`w-7 h-7 rounded-md ${item.gradient} flex items-center justify-center flex-shrink-0`}>
@@ -188,7 +216,7 @@ export function HamburgerMenu() {
               </nav>
             </div>
 
-            {/* Desktop Content - unchanged */}
+            {/* Desktop Content - with data prefetching */}
             <div className="hidden sm:block flex-1 overflow-y-auto overscroll-contain py-2">
               <div className="px-4 py-3 sm:py-2">
                 <p className="text-sm font-semibold text-gray-900 dark:text-white">Features</p>
@@ -222,7 +250,9 @@ export function HamburgerMenu() {
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={true}
                       onClick={handleClick}
+                      onMouseEnter={() => prefetchData(item.href)}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-[0.98] group"
                     >
                       <div className={`w-10 h-10 rounded-lg ${item.gradient} flex items-center justify-center flex-shrink-0`}>
