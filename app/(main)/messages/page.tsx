@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
-import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock } from 'lucide-react';
+import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock, Users, Info } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -87,6 +87,7 @@ export default function MessagesPage() {
   const [conversationTitleInput, setConversationTitleInput] = useState('');
   const [showSchedulePicker, setShowSchedulePicker] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
+  const [showMembersPanel, setShowMembersPanel] = useState(false);
 
   const [stats, setStats] = useState({
     thisWeek: 0,
@@ -997,66 +998,106 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            {/* Chat Interface */}
-            <div className="flex-1 min-h-0 bg-gradient-to-br from-white/80 via-emerald-50/40 to-green-50/60 dark:from-gray-900/90 dark:via-gray-900/80 dark:to-gray-800/90 backdrop-blur-2xl border border-emerald-200/30 dark:border-gray-700/50 rounded-3xl overflow-hidden flex flex-col shadow-2xl shadow-emerald-500/10 dark:shadow-gray-900/50">
-            {/* Chat Header */}
-            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-400/10 via-green-400/10 to-teal-400/10 dark:from-gray-800 dark:to-gray-900 backdrop-blur-sm">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {/* Mobile Menu Button - Opens conversation sidebar */}
-                  <button
-                    onClick={() => setShowConversationSidebar(true)}
-                    className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-emerald-100/50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 flex-shrink-0 border border-emerald-200/50 dark:border-gray-600/50"
-                    aria-label="Open conversations"
-                  >
-                    <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">Chats</span>
-                  </button>
+            {/* Chat Interface - WhatsApp Style */}
+            <div className="flex-1 min-h-0 bg-[#efeae2] dark:bg-[#0b141a] md:rounded-3xl overflow-hidden flex flex-col md:border md:border-gray-200 dark:md:border-gray-700">
+            {/* Chat Header - WhatsApp Style */}
+            <div className="px-3 py-2 bg-[#f0f2f5] dark:bg-[#202c33] border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                {/* Back/Menu Button */}
+                <button
+                  onClick={() => setShowConversationSidebar(true)}
+                  className="md:hidden p-2 -ml-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  aria-label="Open conversations"
+                >
+                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
 
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white/50 dark:ring-gray-700 flex-shrink-0">
-                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      {editingConversationTitle ? (
-                        <input
-                          type="text"
-                          value={conversationTitleInput}
-                          onChange={(e) => setConversationTitleInput(e.target.value)}
-                          onKeyDown={handleTitleKeyDown}
-                          onBlur={handleSaveConversationTitle}
-                          autoFocus
-                          className="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight bg-transparent border-b-2 border-emerald-500 outline-none max-w-[150px] sm:max-w-[200px]"
-                        />
-                      ) : (
-                        <h2
-                          className="text-sm sm:text-base font-bold text-gray-900 dark:text-white tracking-tight cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors truncate"
-                          onClick={handleEditConversationTitle}
-                          title="Click to rename conversation"
-                        >
-                          {conversationTitle}
-                        </h2>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <p className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                          Active now
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                {/* Avatar */}
+                <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-5 h-5 text-white" />
                 </div>
 
-                {/* Date Badge */}
-                <span className="hidden sm:inline-flex px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 border border-emerald-300/50 dark:border-emerald-700/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-full shadow-sm flex-shrink-0">
-                  {format(new Date(), 'MMM yyyy')}
-                </span>
+                {/* Chat Info */}
+                <div className="flex-1 min-w-0">
+                  {editingConversationTitle ? (
+                    <input
+                      type="text"
+                      value={conversationTitleInput}
+                      onChange={(e) => setConversationTitleInput(e.target.value)}
+                      onKeyDown={handleTitleKeyDown}
+                      onBlur={handleSaveConversationTitle}
+                      autoFocus
+                      className="text-base font-semibold text-gray-900 dark:text-white bg-transparent border-b-2 border-emerald-500 outline-none w-full max-w-[200px]"
+                    />
+                  ) : (
+                    <h2
+                      className="text-base font-semibold text-gray-900 dark:text-white truncate cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                      onClick={handleEditConversationTitle}
+                    >
+                      {conversationTitle}
+                    </h2>
+                  )}
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">online</p>
+                </div>
+
+                {/* Header Actions */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setShowMembersPanel(!showMembersPanel)}
+                    className={`p-2 rounded-full transition-colors ${
+                      showMembersPanel
+                        ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
+                        : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400'
+                    }`}
+                    title="View members"
+                  >
+                    <Users className="w-5 h-5" />
+                  </button>
+                  <button className="hidden sm:flex p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">
+                    <Search className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  </button>
+                </div>
               </div>
+
+              {/* Members Panel - Slides down */}
+              {showMembersPanel && (
+                <div className="px-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Chat Members</h3>
+                    <button
+                      onClick={() => setShowMembersPanel(false)}
+                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                    >
+                      <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {/* Current user */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
+                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                        {user?.user_metadata?.name?.charAt(0)?.toUpperCase() || 'Y'}
+                      </div>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">You</span>
+                    </div>
+                    {/* Show other space members */}
+                    {currentSpace && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700/50 rounded-full">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                          <Users className="w-3 h-3" />
+                        </div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Space members</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Mobile Thread Navigation Bar - WhatsApp-style */}
-            {conversations.length >= 1 && (
-              <div className="md:hidden px-3 py-2 border-b border-emerald-200/20 dark:border-gray-700/50 bg-gradient-to-r from-emerald-50/30 to-green-50/30 dark:from-gray-800/50 dark:to-gray-900/50">
+            {/* Mobile Thread Navigation Bar */}
+            {conversations.length > 1 && (
+              <div className="md:hidden px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-[#f0f2f5] dark:bg-[#202c33]">
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
                   {/* New Thread Button - First */}
                   <button
@@ -1089,16 +1130,20 @@ export default function MessagesPage() {
               </div>
             )}
 
-            {/* Messages Area */}
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 bg-gradient-to-b from-emerald-50/30 via-white/60 to-green-50/40 dark:from-gray-900/70 dark:via-gray-900/80 dark:to-gray-800/70 backdrop-blur-sm relative">
-              {/* Subtle Chat Pattern Background with Glassmorphism */}
-              <div className="absolute inset-0 opacity-30 dark:opacity-15">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/40 via-transparent to-green-100/30 dark:from-gray-800/30 dark:to-gray-700/20"></div>
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(55,65,81,0.15),transparent_50%)]"></div>
-              </div>
+            {/* Messages Area - WhatsApp Style */}
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 py-2 space-y-1 relative"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300000008'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                backgroundColor: '#efeae2'
+              }}
+            >
+              {/* Dark mode background override */}
+              <div className="hidden dark:block absolute inset-0 bg-[#0b141a]" style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              }} />
 
               {/* Content */}
-              <div className="relative z-10 space-y-6">
+              <div className="relative z-10 space-y-1">
               {/* Pinned Messages Section */}
               {pinnedMessages.length > 0 && (
                 <PinnedMessages
@@ -1108,25 +1153,25 @@ export default function MessagesPage() {
               )}
 
               {loading ? (
-                <div className="space-y-6">
-                  {[...Array(6)].map((_, i) => (
+                <div className="space-y-2 py-4">
+                  {[...Array(5)].map((_, i) => (
                     <div key={i} className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-                      <div className={`max-w-[75%] ${i % 2 === 0 ? 'bg-white/80 dark:bg-gray-700/80 shadow-lg' : 'bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 shadow-emerald-200/30'} rounded-3xl p-5 backdrop-blur-sm animate-pulse border ${i % 2 === 0 ? 'border-gray-200/50 dark:border-gray-600/50' : 'border-emerald-200/30 dark:border-emerald-700/30'}`}>
-                        <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded-full w-32 mb-3" />
-                        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded-full w-20" />
+                      <div className={`max-w-[70%] ${i % 2 === 0 ? 'bg-white dark:bg-gray-700' : 'bg-emerald-500/60 dark:bg-emerald-600/60'} rounded-2xl px-3 py-2 animate-pulse`}>
+                        <div className={`h-4 rounded w-24 mb-2 ${i % 2 === 0 ? 'bg-gray-200 dark:bg-gray-600' : 'bg-emerald-400/50'}`} />
+                        <div className={`h-3 rounded w-16 ${i % 2 === 0 ? 'bg-gray-100 dark:bg-gray-600' : 'bg-emerald-400/30'}`} />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : filteredMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                  <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-full flex items-center justify-center mb-6 shadow-lg">
-                    <MessageCircle className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-16 h-16 bg-emerald-500/20 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
+                    <MessageCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300 text-lg font-medium mb-2">
+                  <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">
                     {emptyStateMessage.primary}
                   </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-xs">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
                     {emptyStateMessage.secondary}
                   </p>
                 </div>
@@ -1138,14 +1183,12 @@ export default function MessagesPage() {
 
                     return (
                       <div key={message.id}>
-                        {/* Date Separator */}
+                        {/* Date Separator - WhatsApp Style */}
                         {showDateSeparator && (
-                          <div className="flex items-center justify-center my-8">
-                            <div className="flex-grow border-t border-emerald-200/40 dark:border-gray-600/50"></div>
-                            <span className="px-5 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-full shadow-sm border border-emerald-200/30 dark:border-emerald-700/30 backdrop-blur-sm">
+                          <div className="flex items-center justify-center my-3">
+                            <span className="px-3 py-1 text-[11px] font-medium text-gray-600 dark:text-gray-300 bg-white/90 dark:bg-gray-700/90 rounded-lg shadow-sm">
                               {getDateLabel(new Date(message.created_at))}
                             </span>
-                            <div className="flex-grow border-t border-emerald-200/40 dark:border-gray-600/50"></div>
                           </div>
                         )}
 
@@ -1188,52 +1231,31 @@ export default function MessagesPage() {
               </div> {/* Close Content div */}
             </div>
 
-            {/* Message Input */}
-            <div className="flex-shrink-0 px-3 sm:px-6 py-3 sm:py-5 border-t border-emerald-200/30 dark:border-gray-700 bg-gradient-to-r from-emerald-50/50 via-white to-green-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-sm">
-              <div className="flex items-center gap-2 sm:gap-3">
-                {/* Message Input - Left */}
-                {currentSpace && (
-                  <MentionInput
-                    value={messageInput}
-                    onChange={handleMessageInputChange}
-                    onSubmit={handleSubmitMessage}
-                    spaceId={currentSpace.id}
-                    placeholder="Message..."
-                    disabled={isSending}
-                    className="flex-1 text-sm sm:text-base rounded-full"
-                  />
-                )}
-
-                {/* Right side buttons - Emoji, Image, File, Send */}
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  {/* Emoji Picker Button */}
-                  <div className="relative group">
+            {/* Message Input - WhatsApp Style */}
+            <div className="flex-shrink-0 px-2 py-2 bg-[#f0f2f5] dark:bg-[#202c33]">
+              <div className="flex items-center gap-2">
+                {/* Message Input with Emoji Inside */}
+                <div className="flex-1 flex items-center bg-white dark:bg-[#2a3942] rounded-3xl shadow-sm relative">
+                  {/* Emoji Button - Inside Input */}
+                  <div className="relative flex-shrink-0">
                     <button
                       type="button"
                       onClick={toggleEmojiPicker}
-                      className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                      className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full transition-colors ml-1"
                     >
-                      <Smile className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+                      <Smile className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     </button>
-                    {/* Tooltip */}
-                    <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      Add emoji
-                    </div>
-
-                    {/* Emoji Picker Popup - Glassmorphism */}
+                    {/* Emoji Picker */}
                     {showEmojiPicker && (
                       <>
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={closeEmojiPicker}
-                        />
-                        <div className="absolute bottom-full mb-2 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 p-3 sm:p-4 grid grid-cols-5 sm:grid-cols-6 gap-1 sm:gap-1.5 z-20 min-w-[220px] sm:min-w-[280px] ring-1 ring-black/5 dark:ring-white/5">
+                        <div className="fixed inset-0 z-10" onClick={closeEmojiPicker} />
+                        <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-3 grid grid-cols-6 gap-1 z-20 min-w-[240px] border border-gray-200 dark:border-gray-700">
                           {EMOJIS.map((emoji, idx) => (
                             <button
                               key={idx}
                               type="button"
                               onClick={() => handleEmojiClick(emoji)}
-                              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-white/60 dark:hover:bg-gray-600/60 rounded-xl text-xl sm:text-2xl transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer hover:shadow-md"
+                              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-xl transition-colors"
                             >
                               {emoji}
                             </button>
@@ -1243,227 +1265,70 @@ export default function MessagesPage() {
                     )}
                   </div>
 
-                  {/* Image Attachment Button */}
-                  <div className="relative group hidden sm:block">
-                    <button
-                      type="button"
-                      onClick={handleImageClick}
-                      className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                    >
-                      <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
-                    </button>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      Attach image
-                    </div>
-                  </div>
+                  {/* Text Input */}
+                  {currentSpace && (
+                    <MentionInput
+                      value={messageInput}
+                      onChange={handleMessageInputChange}
+                      onSubmit={handleSubmitMessage}
+                      spaceId={currentSpace.id}
+                      placeholder="Message"
+                      disabled={isSending}
+                      showToolbar={false}
+                      className="flex-1 text-[15px] bg-transparent border-0"
+                    />
+                  )}
 
-                  {/* File Attachment Button */}
-                  <div className="relative group hidden sm:block">
-                    <button
-                      type="button"
-                      onClick={handleFileClick}
-                      className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                    >
-                      <Paperclip className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
-                    </button>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      Attach file
-                    </div>
-                  </div>
-
-                  {/* Schedule Message Button */}
-                  <div className="relative group hidden sm:block">
-                    <button
-                      type="button"
-                      onClick={() => setShowSchedulePicker(!showSchedulePicker)}
-                      className={`p-1.5 sm:p-2 rounded-lg transition-all duration-200 cursor-pointer ${
-                        scheduledTime
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <CalendarClock className={`w-4 h-4 sm:w-5 sm:h-5 ${scheduledTime ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`} />
-                    </button>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      {scheduledTime ? `Scheduled: ${format(scheduledTime, 'MMM d, h:mm a')}` : 'Schedule message'}
-                    </div>
-
-                    {/* Schedule Picker Popup - Glassmorphism */}
-                    {showSchedulePicker && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setShowSchedulePicker(false)}
-                        />
-                        <div className="absolute bottom-full mb-2 right-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 p-4 z-20 min-w-[280px] ring-1 ring-black/5 dark:ring-white/5">
-                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                            <CalendarClock className="w-4 h-4 text-blue-500" />
-                            Schedule Message
-                          </h4>
-
-                          {/* Quick Schedule Options */}
-                          <div className="grid grid-cols-2 gap-2 mb-3">
-                            {[
-                              { label: 'In 1 hour', hours: 1 },
-                              { label: 'In 3 hours', hours: 3 },
-                              { label: 'Tomorrow 9am', preset: 'tomorrow9' },
-                              { label: 'Tomorrow 6pm', preset: 'tomorrow18' },
-                            ].map((option) => (
-                              <button
-                                key={option.label}
-                                type="button"
-                                onClick={() => {
-                                  const now = new Date();
-                                  let newTime: Date;
-                                  if (option.hours) {
-                                    newTime = new Date(now.getTime() + option.hours * 60 * 60 * 1000);
-                                  } else if (option.preset === 'tomorrow9') {
-                                    newTime = new Date(now);
-                                    newTime.setDate(newTime.getDate() + 1);
-                                    newTime.setHours(9, 0, 0, 0);
-                                  } else {
-                                    newTime = new Date(now);
-                                    newTime.setDate(newTime.getDate() + 1);
-                                    newTime.setHours(18, 0, 0, 0);
-                                  }
-                                  setScheduledTime(newTime);
-                                  setShowSchedulePicker(false);
-                                  toast.success(`Message scheduled for ${format(newTime, 'MMM d, h:mm a')}`);
-                                }}
-                                className="px-3 py-2 text-xs font-medium bg-white/60 dark:bg-gray-700/60 hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-gray-200/50 dark:border-gray-600/50 rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-600"
-                              >
-                                {option.label}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Custom Date/Time */}
-                          <div className="space-y-2">
-                            <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                              Custom date & time
-                            </label>
-                            <input
-                              type="datetime-local"
-                              min={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
-                              onChange={(e) => {
-                                if (e.target.value) {
-                                  const newTime = new Date(e.target.value);
-                                  setScheduledTime(newTime);
-                                  setShowSchedulePicker(false);
-                                  toast.success(`Message scheduled for ${format(newTime, 'MMM d, h:mm a')}`);
-                                }
-                              }}
-                              className="w-full px-3 py-2 text-sm bg-white/60 dark:bg-gray-700/60 border border-gray-200/50 dark:border-gray-600/50 rounded-lg focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
-                            />
-                          </div>
-
-                          {/* Clear Schedule */}
-                          {scheduledTime && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setScheduledTime(null);
-                                setShowSchedulePicker(false);
-                                toast.info('Schedule cleared');
-                              }}
-                              className="w-full mt-3 px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            >
-                              Clear schedule
-                            </button>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Voice Message Button */}
-                  <div className="relative group">
-                    <button
-                      type="button"
-                      onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                      className={`p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer ${
-                        showVoiceRecorder
-                          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                      </svg>
-                    </button>
-                    {/* Tooltip */}
-                    <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                      {showVoiceRecorder ? 'Close recorder' : 'Voice message'}
-                    </div>
-                  </div>
-
-                  {/* Send Button with Right-Pointing Arrow */}
-                  <div className="relative group">
-                    <button
-                      type="button"
-                      onClick={handleSubmitMessage}
-                      disabled={isSending || !messageInput.trim()}
-                      style={{ cursor: messageInput.trim() && !isSending ? 'pointer' : 'not-allowed' }}
-                      className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg transform ${
-                        isSending
-                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 scale-95 animate-pulse'
-                          : messageInput.trim()
-                          ? 'bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 hover:scale-110 hover:shadow-xl active:scale-95 hover:-translate-y-1'
-                          : 'bg-gray-300 dark:bg-gray-600 opacity-50'
-                      } ring-2 ring-white/50 dark:ring-gray-700`}
-                    >
-                      {isSending ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      )}
-                    </button>
-                    {/* Tooltip */}
-                    {messageInput.trim() && !isSending && (
-                      <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs font-medium rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg">
-                        Send message
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-100 rotate-45"></div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Attachment Button - Inside Input on right */}
+                  <button
+                    type="button"
+                    onClick={handleFileClick}
+                    className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full transition-colors mr-1 flex-shrink-0"
+                  >
+                    <Paperclip className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  </button>
                 </div>
+
+                {/* Voice/Send Button - Pill Shaped */}
+                {messageInput.trim() ? (
+                  <button
+                    type="button"
+                    onClick={handleSubmitMessage}
+                    disabled={isSending}
+                    className="h-11 px-5 bg-emerald-500 hover:bg-emerald-600 rounded-full flex items-center justify-center transition-colors shadow-md flex-shrink-0"
+                  >
+                    {isSending ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                      </svg>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
+                    className={`h-11 w-11 rounded-full flex items-center justify-center transition-colors shadow-md flex-shrink-0 ${
+                      showVoiceRecorder
+                        ? 'bg-red-500 hover:bg-red-600'
+                        : 'bg-emerald-500 hover:bg-emerald-600'
+                    }`}
+                  >
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* Voice Recorder */}
               {showVoiceRecorder && (
-                <div className="mt-3 p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-xl border border-white/40 dark:border-gray-600/40 shadow-lg">
+                <div className="mt-2 p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
                   <VoiceRecorder
                     onSendVoice={handleSendVoice}
                     onCancel={() => setShowVoiceRecorder(false)}
                   />
-                </div>
-              )}
-
-              {/* Scheduled Message Indicator */}
-              {scheduledTime && (
-                <div className="mt-3 flex items-center justify-between px-4 py-2.5 bg-blue-50/80 dark:bg-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-200/50 dark:border-blue-700/30">
-                  <div className="flex items-center gap-2">
-                    <CalendarClock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                      Message will be sent: {format(scheduledTime, 'MMM d, h:mm a')}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setScheduledTime(null);
-                      toast.info('Schedule cleared');
-                    }}
-                    className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800/30 rounded-lg transition-colors"
-                    aria-label="Clear schedule"
-                  >
-                    <X className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  </button>
                 </div>
               )}
 
@@ -1497,8 +1362,8 @@ export default function MessagesPage() {
                 onClick={() => setShowConversationSidebar(false)}
               />
 
-              {/* Drawer */}
-              <div className="fixed inset-y-0 left-0 w-80 z-50 md:hidden">
+              {/* Drawer - Narrower and more transparent */}
+              <div className="fixed inset-y-0 left-0 w-72 z-50 md:hidden">
                 <ConversationSidebar
                   conversations={conversations}
                   activeConversationId={conversationId || undefined}
