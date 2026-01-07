@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+
 import {
   ArrowLeft,
   Calendar,
@@ -494,9 +494,7 @@ const guideSections: GuideSection[] = [
 
 export default function CalendarDocumentationPage() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -1303,8 +1301,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="event-details" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Eye className="w-8 h-8 text-purple-500" />
@@ -1335,8 +1331,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="shopping-integration" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <ShoppingBag className="w-8 h-8 text-emerald-500" />
@@ -1367,8 +1361,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="search-filter" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Search className="w-8 h-8 text-gray-500" />
@@ -1399,8 +1391,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="status-management" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <CheckCircle className="w-8 h-8 text-green-500" />
@@ -1431,8 +1421,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="validation" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Target className="w-8 h-8 text-blue-500" />
@@ -1463,8 +1451,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="real-time" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Zap className="w-8 h-8 text-yellow-500" />
@@ -1495,8 +1481,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="proposal-view" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Users className="w-8 h-8 text-pink-500" />
@@ -1527,8 +1511,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="create-proposal" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Plus className="w-8 h-8 text-purple-500" />
@@ -1559,8 +1541,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="voting" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Star className="w-8 h-8 text-amber-500" />
@@ -1591,8 +1571,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="approve-proposals" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <CheckCircle className="w-8 h-8 text-green-500" />
@@ -1623,8 +1601,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="counter-proposals" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <MessageSquare className="w-8 h-8 text-blue-500" />
@@ -1655,8 +1631,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="smart-scheduling" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Sparkles className="w-8 h-8 text-indigo-500" />
@@ -1687,8 +1661,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="mobile" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Smartphone className="w-8 h-8 text-purple-500" />
@@ -1719,8 +1691,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="dark-mode" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Moon className="w-8 h-8 text-indigo-500" />
@@ -1751,8 +1721,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="keyboard-nav" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Command className="w-8 h-8 text-blue-500" />
@@ -1783,8 +1751,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="touch-gestures" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Hand className="w-8 h-8 text-pink-500" />
@@ -1815,8 +1781,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="accessibility" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Eye className="w-8 h-8 text-green-500" />
@@ -1847,8 +1811,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="category-tips" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Lightbulb className="w-8 h-8 text-amber-500" />
@@ -1879,8 +1841,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="color-strategy" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Palette className="w-8 h-8 text-purple-500" />
@@ -1911,8 +1871,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="collab-workflow" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Users className="w-8 h-8 text-blue-500" />
@@ -1943,8 +1901,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="recurring-mastery" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Repeat className="w-8 h-8 text-green-500" />
@@ -1975,8 +1931,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="integration-tips" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Zap className="w-8 h-8 text-indigo-500" />
@@ -2007,8 +1961,6 @@ export default function CalendarDocumentationPage() {
     ↑ Back to top
   </a>
 </section>
-
-
 <section id="family-setup" className="scroll-mt-24">
   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
     <Heart className="w-8 h-8 text-pink-500" />
@@ -3733,6 +3685,5 @@ export default function CalendarDocumentationPage() {
         </div>
       </div>
       </div>
-    </>
   );
 }

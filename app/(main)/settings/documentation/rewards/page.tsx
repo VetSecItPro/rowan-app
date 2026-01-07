@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+
 import {
   ArrowLeft,
   Gift,
@@ -236,9 +236,7 @@ const guideSections: GuideSection[] = [
 
 export default function RewardsDocumentationPage() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/30 to-orange-50/30 dark:from-gray-950 dark:via-amber-950/20 dark:to-orange-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/30 to-orange-50/30 dark:from-gray-950 dark:via-amber-950/20 dark:to-orange-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -1257,6 +1255,5 @@ export default function RewardsDocumentationPage() {
 
         </div>
       </div>
-    </>
   );
 }

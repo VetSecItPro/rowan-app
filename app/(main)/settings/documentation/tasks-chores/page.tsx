@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+
 import {
   ArrowLeft,
   CheckSquare,
@@ -425,9 +425,7 @@ const guideSections: GuideSection[] = [
 
 export default function TasksChoresDocumentationPage() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
         <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -2024,6 +2022,5 @@ export default function TasksChoresDocumentationPage() {
         </div>
       </div>
     </div>
-    </>
   );
 }

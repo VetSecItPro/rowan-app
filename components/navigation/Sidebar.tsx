@@ -3,10 +3,13 @@
 import { useState, useEffect, useMemo, memo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
 import { useAdmin } from '@/hooks/useAdmin';
 import { TrialBadge } from '@/components/subscription';
+import { useSpaces } from '@/lib/contexts/spaces-context';
+import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
 
 const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
 const HOVER_DELAY = 200; // ms delay before hover expand
@@ -106,40 +109,64 @@ export function Sidebar() {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isAdmin } = useAdmin();
+  const { currentSpace } = useSpaces();
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const prefetchedRoutesRef = useRef<Set<string>>(new Set());
+  const prefetchedDataRef = useRef<Set<string>>(new Set());
+  const hasInitialPrefetch = useRef(false);
 
   // Effective expanded state (either pinned or hover-expanded)
   const effectivelyExpanded = isExpanded || isHoverExpanded;
 
-  // Prefetch a route (with deduplication)
+  // Prefetch a route AND its data (with deduplication)
   const prefetchRoute = useCallback((href: string) => {
+    // Prefetch route
     if (!prefetchedRoutesRef.current.has(href)) {
       prefetchedRoutesRef.current.add(href);
       router.prefetch(href);
     }
-  }, [router]);
 
-  // Prefetch all navigation routes on mount for instant loading
+    // Prefetch data for the feature
+    if (currentSpace?.id && !prefetchedDataRef.current.has(href)) {
+      const feature = ROUTE_TO_FEATURE_MAP[href];
+      if (feature) {
+        prefetchedDataRef.current.add(href);
+        prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
+      }
+    }
+  }, [router, queryClient, currentSpace?.id]);
+
+  // Prefetch ALL data on mount for instant page loads
   useEffect(() => {
-    if (mounted) {
-      // Prefetch all feature routes after a short delay to not block initial render
+    if (mounted && currentSpace?.id && !hasInitialPrefetch.current) {
+      hasInitialPrefetch.current = true;
+
+      // Prefetch all routes and data after a short delay
       const timer = setTimeout(() => {
+        // Prefetch route links
         NAVIGATION_ITEMS.forEach(item => {
-          prefetchRoute(item.href);
+          if (!prefetchedRoutesRef.current.has(item.href)) {
+            prefetchedRoutesRef.current.add(item.href);
+            router.prefetch(item.href);
+          }
         });
-        // Also prefetch admin route if admin
+
+        // Prefetch admin route if admin
         if (isAdmin) {
-          prefetchRoute('/admin/dashboard');
+          router.prefetch('/admin/dashboard');
         }
-      }, 1000); // Wait 1 second after mount to prefetch
+
+        // Prefetch ALL feature data for instant navigation
+        prefetchCriticalData(queryClient, currentSpace.id).catch(console.error);
+      }, 500); // Faster initial prefetch
 
       return () => clearTimeout(timer);
     }
-  }, [mounted, isAdmin, prefetchRoute]);
+  }, [mounted, isAdmin, router, queryClient, currentSpace?.id]);
 
   // Load saved state from localStorage - default collapsed on all screen sizes
   useEffect(() => {
