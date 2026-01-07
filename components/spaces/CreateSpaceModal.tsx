@@ -62,16 +62,16 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
 
   return (
     <div
-      className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4"
+      className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-2xl sm:max-w-md sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
+        <div className="flex-shrink-0 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/20 rounded-lg">

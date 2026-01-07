@@ -82,23 +82,16 @@ export function StorageWarningModal({
   const colors = getColorClasses();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onClose}
-        aria-label="Close notification"
-      />
-
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
       {/* Modal Container */}
       <div
         className={`
-          relative
+          absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto
           bg-white dark:bg-gray-800
-          rounded-2xl
+          sm:rounded-2xl
           shadow-2xl
-          max-w-md
-          w-full
+          sm:max-w-md
+          w-full sm:w-auto
           border-2
           ${colors.border}
           overflow-hidden
@@ -107,14 +100,15 @@ export function StorageWarningModal({
           animate-in
           fade-in-0
           zoom-in-95
+          flex flex-col
         `}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Accent Bar */}
-        <div className={`h-2 ${colors.button}`} />
+        <div className={`flex-shrink-0 h-2 ${colors.button}`} />
 
         {/* Content */}
-        <div className="p-6">
+        <div className="flex-1 overflow-y-auto p-6">
           {/* Icon & Header */}
           <div className="flex items-start gap-4 mb-4">
             <div className={`flex-shrink-0 p-3 rounded-full ${colors.bg}`}>

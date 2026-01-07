@@ -180,13 +180,13 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
       <div
         ref={modalContentRef}
-        className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl my-auto"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto sm:max-w-2xl sm:max-h-[85vh] overflow-hidden bg-white dark:bg-gray-900 sm:rounded-xl shadow-2xl flex flex-col"
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-blue-600">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-blue-600 sm:rounded-t-xl">
           <div>
             <h2 className="text-2xl font-bold text-white">Send Feedback</h2>
             <p className="text-sm text-blue-100 mt-1">Help us improve Rowan by sharing your thoughts</p>
@@ -201,7 +201,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Error Message */}
           {error && (
             <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
