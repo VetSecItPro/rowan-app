@@ -82,23 +82,21 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
       </div>
 
       {isExpanded && (
-        <div className="flex flex-wrap gap-2 sm:gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {frequentItems.map((item, index) => (
-            <Tooltip key={`${item.name}-${index}`} content={`Added ${item.count}x recently`} delay={0}>
-              <button
-                onClick={() => onAddItem(item.name, item.category)}
-                className="group relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gray-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-700 rounded-full hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:shadow-sm"
-              >
-                <span className="text-base sm:text-lg flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap max-w-[120px] sm:max-w-none truncate">
-                  {item.name}
-                </span>
-                {/* Purchased count badge */}
-                <div className="w-4 h-4 bg-emerald-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center flex-shrink-0">
-                  {item.count}
-                </div>
-              </button>
-            </Tooltip>
+            <button
+              key={`${item.name}-${index}`}
+              onClick={() => onAddItem(item.name, item.category)}
+              className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all text-left"
+            >
+              <span className="text-sm flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate flex-1">
+                {item.name}
+              </span>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex-shrink-0">
+                +{item.count}
+              </span>
+            </button>
           ))}
         </div>
       )}

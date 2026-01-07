@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Check, GripVertical, UserPlus } from 'lucide-react';
+import { X, Plus, Trash2, Check, FileText } from 'lucide-react';
 import { CreateListInput, ShoppingList, shoppingService } from '@/lib/services/shopping-service';
-import { UserAvatar } from '@/components/ui/UserAvatar';
 import { createClient } from '@/lib/supabase/client';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { Dropdown } from '@/components/ui/Dropdown';
@@ -14,9 +13,10 @@ interface NewShoppingListModalProps {
   onSave: (list: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => void;
   editList?: ShoppingList | null;
   spaceId: string;
+  onUseTemplate?: () => void;
 }
 
-export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceId }: NewShoppingListModalProps) {
+export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceId, onUseTemplate }: NewShoppingListModalProps) {
   const [formData, setFormData] = useState<CreateListInput & { store_name?: string; budget?: number }>({
     space_id: spaceId,
     title: '',
@@ -28,7 +28,6 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
   const [items, setItems] = useState<{ id?: string; name: string; quantity: number; checked: boolean; assigned_to?: string }[]>([]);
   const [newItemName, setNewItemName] = useState('');
-  const [isReorderMode, setIsReorderMode] = useState(false);
   const [spaceMembers, setSpaceMembers] = useState<any[]>([]);
   const [defaultAssignee, setDefaultAssignee] = useState<string>('');
 
@@ -105,7 +104,6 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     // Reset form
     setItems([]);
     setNewItemName('');
-    setIsReorderMode(false);
   };
 
   const handleAddItem = () => {
@@ -130,30 +128,9 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     ));
   };
 
-  const handleReorderItems = (reorderedItems: typeof items) => {
-    setItems(reorderedItems);
-  };
-
-  const handleAssignItem = (index: number, userId: string | undefined) => {
-    setItems(items.map((item, i) =>
-      i === index ? { ...item, assigned_to: userId } : item
-    ));
-  };
-
   // Helper functions for dropdown options
   const getAssignAllOptions = () => {
     const options = [{ value: '', label: 'No one' }];
-    spaceMembers.forEach((member) => {
-      options.push({
-        value: member.user_id,
-        label: member.display_name || member.email
-      });
-    });
-    return options;
-  };
-
-  const getItemAssignmentOptions = () => {
-    const options = [{ value: '', label: 'Unassigned' }];
     spaceMembers.forEach((member) => {
       options.push({
         value: member.user_id,
@@ -168,8 +145,8 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
   return (
     <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-5 border-b border-emerald-600">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-[100dvh] sm:w-auto sm:h-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-5 border-b border-emerald-600">
           <h2 className="text-xl sm:text-2xl font-bold text-white">
             {editList ? 'Edit Shopping List' : 'New Shopping List'}
           </h2>
@@ -178,6 +155,32 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           </button>
         </div>
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
+          {/* Use Template Option - only show when creating new list */}
+          {!editList && onUseTemplate && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onUseTemplate();
+              }}
+              className="w-full p-3 sm:p-4 border-2 border-dashed border-emerald-300 dark:border-emerald-600 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    Use a Template
+                  </h4>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    Start with a pre-made list
+                  </p>
+                </div>
+              </div>
+            </button>
+          )}
+
           {/* Title */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Title *</label>
@@ -226,45 +229,33 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           {/* Description */}
           <div>
             <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Description</label>
-            <textarea
+            <input
+              type="text"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Type a Description"
-              rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white resize-none placeholder-gray-400 dark:placeholder-gray-500"
+              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
 
           {/* Items */}
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between gap-2 mb-3">
               <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Items</label>
-              <div className="flex items-center gap-2">
-                {spaceMembers.length > 0 && items.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Assign all to:</span>
-                    <div className="w-40">
-                      <Dropdown
-                        value={defaultAssignee}
-                        onChange={(value) => handleAssignAllItems(value || undefined)}
-                        options={getAssignAllOptions()}
-                        placeholder="No one"
-                        className="text-xs bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 font-medium focus:ring-emerald-500"
-                      />
-                    </div>
+              {spaceMembers.length > 0 && items.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">Assign all:</span>
+                  <div className="w-32 sm:w-36">
+                    <Dropdown
+                      value={defaultAssignee}
+                      onChange={(value) => handleAssignAllItems(value || undefined)}
+                      options={getAssignAllOptions()}
+                      placeholder="No one"
+                      className="text-xs bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 font-medium focus:ring-emerald-500"
+                    />
                   </div>
-                )}
-                {items.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setIsReorderMode(!isReorderMode)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-colors"
-                  >
-                    <GripVertical className="w-3.5 h-3.5" />
-                    {isReorderMode ? 'Done Reordering' : 'Reorder Items'}
-                  </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* Add Item Input */}
@@ -280,102 +271,41 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                className="px-3 py-2 sm:px-5 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors flex items-center gap-1.5 sm:gap-2 font-medium shadow-sm text-sm sm:text-base"
               >
                 <Plus className="w-4 h-4" />
-                Add
+                <span className="hidden sm:inline">Add</span>
               </button>
             </div>
 
             {/* Items List */}
             {items.length > 0 && (
               <div className="space-y-2 max-h-64 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                {isReorderMode ? (
-                  /* Reorder Mode with Drag Handles */
-                  items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                        onMouseDown={(e) => {
-                          const startY = e.clientY;
-                          const startIndex = index;
-                          const onMouseMove = (e: MouseEvent) => {
-                            const deltaY = e.clientY - startY;
-                            const newIndex = Math.round(startIndex + deltaY / 40);
-                            if (newIndex >= 0 && newIndex < items.length && newIndex !== startIndex) {
-                              const newItems = [...items];
-                              const [removed] = newItems.splice(startIndex, 1);
-                              newItems.splice(newIndex, 0, removed);
-                              handleReorderItems(newItems);
-                            }
-                          };
-                          const onMouseUp = () => {
-                            document.removeEventListener('mousemove', onMouseMove);
-                            document.removeEventListener('mouseup', onMouseUp);
-                          };
-                          document.addEventListener('mousemove', onMouseMove);
-                          document.addEventListener('mouseup', onMouseUp);
-                        }}
-                      >
-                        <GripVertical className="w-4 h-4 text-gray-400" />
-                      </button>
-                      <span className="flex-1 text-sm text-gray-700 dark:text-gray-300">
-                        {item.name}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  /* Normal Mode with Assignment */
-                  items.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                      <button
-                        type="button"
-                        onClick={() => handleToggleItem(index)}
-                        className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                          item.checked
-                            ? 'bg-green-500 border-green-500'
-                            : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
-                        }`}
-                      >
-                        {item.checked && <Check className="w-3 h-3 text-white" />}
-                      </button>
-                      <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
-                        {item.name}
-                      </span>
-
-                      {/* Assignment Dropdown */}
-                      {spaceMembers.length > 0 && (
-                        <div className="flex items-center gap-2 relative z-50">
-                          {item.assigned_to && (
-                            <UserAvatar
-                              name={spaceMembers.find(m => m.user_id === item.assigned_to)?.display_name || 'User'}
-                              size="sm"
-                              colorTheme="emerald"
-                            />
-                          )}
-                          <div className="w-32">
-                            <Dropdown
-                              value={item.assigned_to || ''}
-                              onChange={(value) => handleAssignItem(index, value || undefined)}
-                              options={getItemAssignmentOptions()}
-                              placeholder="Unassigned"
-                              className="text-xs bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 focus:ring-emerald-500"
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(index)}
-                        className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))
-                )}
+                {items.map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleItem(index)}
+                      className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                        item.checked
+                          ? 'bg-green-500 border-green-500'
+                          : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
+                      }`}
+                    >
+                      {item.checked && <Check className="w-3 h-3 text-white" />}
+                    </button>
+                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                      {item.name}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(index)}
+                      className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -386,6 +316,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
               type="button"
               onClick={onClose}
               feature="shopping"
+              className="rounded-full px-6"
             >
               Cancel
             </SecondaryButton>
@@ -393,8 +324,9 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
               type="submit"
               feature="shopping"
               icon={editList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              className="rounded-full px-6"
             >
-              {editList ? 'Save Changes' : 'Create List'}
+              {editList ? 'Save Changes' : 'Create Shopping List'}
             </CTAButton>
           </div>
         </form>
