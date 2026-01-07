@@ -170,31 +170,29 @@ export function MentionInput({
   }, []);
 
   return (
-    <div className="relative w-full">
-      <div className={`border border-gray-200/50 dark:border-gray-700/50 rounded-xl overflow-hidden transition-all duration-300 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md shadow-lg ${
-        isToolbarVisible ? '' : ''
-      }`}>
+    <div className={`relative w-full ${className}`}>
+      <div className="overflow-hidden transition-all duration-200">
         {/* Rich Text Toolbar - Only show when toggled */}
-        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-          showToolbar && isToolbarVisible ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
-        }`}>
-          {showToolbar && <RichTextToolbar textareaRef={inputRef} />}
-        </div>
+        {showToolbar && (
+          <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+            isToolbarVisible ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
+            <RichTextToolbar textareaRef={inputRef} />
+          </div>
+        )}
 
         <textarea
           ref={inputRef}
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => setIsToolbarVisible(true)}
+          onFocus={() => showToolbar && setIsToolbarVisible(true)}
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className={`w-full px-4 py-3 pr-12 ${isToolbarVisible ? 'rounded-b-xl border-0' : 'rounded-xl border-0'}
-            bg-transparent text-gray-900 dark:text-white
+          className="w-full px-2 py-3 bg-transparent text-gray-900 dark:text-white
             placeholder-gray-500 dark:placeholder-gray-400
-            focus:outline-none focus:ring-2 focus:ring-green-500/50 dark:focus:ring-green-600/50
-            resize-none min-h-[48px] max-h-[150px] ${className}`}
+            focus:outline-none resize-none min-h-[44px] max-h-[120px]"
           style={{
             height: 'auto',
             overflowY: value.split('\n').length > 3 ? 'scroll' : 'hidden',

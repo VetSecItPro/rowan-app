@@ -34,13 +34,11 @@ const nextConfig = {
     // webpackBuildWorker: true,
   },
 
-  // Disable webpack cache in development to prevent race condition errors
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.cache = false;
-    }
-    return config;
-  },
+  // Re-enable webpack cache (disabling it causes server folder to not be created)
+  // webpack: (config) => {
+  //   config.cache = false;
+  //   return config;
+  // },
 
   // Performance optimizations
   // Remove console.log/warn in production but keep console.error for Sentry
