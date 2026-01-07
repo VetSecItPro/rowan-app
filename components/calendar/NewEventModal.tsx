@@ -347,9 +347,9 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center sm:p-4 pt-0 sm:pt-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-3xl sm:h-[90vh] sm:rounded-2xl overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
+      <div className="relative bg-gray-50 dark:bg-gray-800 w-full h-full sm:w-[600px] sm:max-w-[90vw] sm:h-auto sm:max-h-[85vh] sm:rounded-2xl overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -370,7 +370,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* Title */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
@@ -772,34 +772,36 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
               Category
             </label>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
+            {/* Mobile: equal-width pills in one row | Desktop: grid */}
+            <div className="flex gap-1 sm:grid sm:grid-cols-5 sm:gap-3">
               {[
                 { value: 'work', label: 'Work', icon: '💼', color: 'bg-blue-500' },
-                { value: 'personal', label: 'Personal', icon: '👤', color: 'bg-purple-500' },
-                { value: 'family', label: 'Family', icon: '👨‍👩‍👧‍👦', color: 'bg-pink-500' },
+                { value: 'personal', label: 'Pers.', icon: '👤', color: 'bg-purple-500' },
+                { value: 'family', label: 'Fam.', icon: '👨‍👩‍👧‍👦', color: 'bg-pink-500' },
                 { value: 'health', label: 'Health', icon: '💪', color: 'bg-green-500' },
                 { value: 'social', label: 'Social', icon: '🎉', color: 'bg-orange-500' },
-              ].map((category) => (
+              ].map((category, index) => (
                 <button
                   key={category.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: category.value as any })}
-                  className={`flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-lg border-2 transition-colors ${
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl border-2 transition-colors sm:gap-2 sm:p-3 sm:rounded-lg ${
                     formData.category === category.value
                       ? `${category.color} border-transparent text-white`
                       : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                   }`}
                 >
-                  <span className="text-xl sm:text-2xl">{category.icon}</span>
-                  <span className="text-xs font-medium text-center leading-tight">{category.label}</span>
+                  <span className="text-base sm:text-2xl">{category.icon}</span>
+                  <span className="text-[9px] sm:text-xs font-medium leading-tight sm:block hidden">{['Work', 'Personal', 'Family', 'Health', 'Social'][index]}</span>
+                  <span className="text-[9px] font-medium leading-tight sm:hidden">{category.label}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
-            {/* Delete button - only shown when editing */}
+          <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+            {/* Delete button - only shown when editing, full width on mobile */}
             {editEvent && onDelete && (
               <button
                 type="button"
@@ -815,22 +817,25 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 Delete
               </button>
             )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!dateError || uploading}
-              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-purple-600 text-white rounded-full transition-colors font-medium ${
-                dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
-              }`}
-            >
-              {uploading ? 'Saving...' : editEvent ? 'Update Event' : 'Create Event'}
-            </button>
+            {/* Cancel and Create/Update buttons - always on one line */}
+            <div className="flex gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-3 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!!dateError || uploading}
+                className={`flex-1 px-3 sm:px-6 py-2.5 sm:py-3 bg-purple-600 text-white rounded-full transition-colors font-medium text-sm sm:text-base ${
+                  dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
+                }`}
+              >
+                {uploading ? 'Saving...' : editEvent ? 'Update' : 'Create Event'}
+              </button>
+            </div>
           </div>
 
           {/* Hidden File Inputs */}

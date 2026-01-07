@@ -20,10 +20,9 @@ interface ShoppingListCardProps {
   onScheduleTrip?: (list: ShoppingList) => void;
   onCreateTask?: (list: ShoppingList) => void;
   onUpdateQuantity?: (itemId: string, newQuantity: number) => void;
-  onShare?: (list: ShoppingList) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity, onShare }: ShoppingListCardProps) {
+export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
@@ -141,7 +140,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
 
           {/* Items Preview - Grouped by Category */}
           {list.items && list.items.length > 0 && (
-            <div className="space-y-3 mt-2">
+            <div className="space-y-3 mt-2 -mr-7 sm:mr-0">
               {Object.entries(itemsByCategory).slice(0, isExpanded ? undefined : 2).map(([category, items]) => (
                 <div key={category} className="space-y-1.5">
                   <div className="flex items-center gap-1.5 mb-1.5">
@@ -151,7 +150,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                     </span>
                   </div>
                   {items?.slice(0, isExpanded ? undefined : 3).map((item) => (
-                    <div key={item.id} className="flex items-center justify-between gap-2 ml-0 sm:ml-2 -mr-1 sm:mr-0 group/item">
+                    <div key={item.id} className="flex items-center justify-between gap-2 ml-0 sm:ml-2 group/item">
                       {/* Left side: checkbox + item name */}
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         <Tooltip content={item.checked ? 'Mark as not purchased' : 'Mark as purchased'} delay={0}>
@@ -174,14 +173,14 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
 
                       {/* Right side: Quantity Controls - pushed to right edge */}
                       {onUpdateQuantity && (
-                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <div className="flex items-center gap-px flex-shrink-0">
                           <button
                             onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
                             disabled={Number(item.quantity) <= 1}
-                            className="w-6 h-6 sm:w-5 sm:h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                            className="w-[18px] h-[18px] sm:w-5 sm:h-5 flex-shrink-0 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
                             aria-label="Decrease quantity"
                           >
-                            <span className="text-sm sm:text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
+                            <span className="text-[9px] sm:text-xs font-bold text-gray-600 dark:text-gray-300">−</span>
                           </button>
                           <input
                             type="text"
@@ -190,16 +189,16 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                             onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                             onBlur={() => handleQuantityBlur(item.id, item.quantity)}
                             onKeyPress={(e) => handleQuantityKeyPress(e, item.id)}
-                            className="w-8 h-6 sm:h-5 text-sm sm:text-xs font-semibold text-gray-700 dark:text-gray-300 text-center bg-gray-50 dark:bg-gray-800 border border-gray-200/50 dark:border-gray-600/50 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-[22px] h-[18px] sm:w-7 sm:h-5 text-[8px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 text-center bg-gray-50 dark:bg-gray-800 border border-gray-200/50 dark:border-gray-600/50 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             aria-label="Edit quantity"
                           />
                           <button
                             onClick={() => onUpdateQuantity(item.id, Math.min(200, Number(item.quantity) + 1))}
                             disabled={Number(item.quantity) >= 200}
-                            className="w-6 h-6 sm:w-5 sm:h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                            className="w-[18px] h-[18px] sm:w-5 sm:h-5 flex-shrink-0 rounded bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
                             aria-label="Increase quantity"
                           >
-                            <span className="text-sm sm:text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
+                            <span className="text-[9px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400">+</span>
                           </button>
                         </div>
                       )}
@@ -276,17 +275,6 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                     className="w-full px-4 py-2 text-left text-emerald-600 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   >
                     Save as Template
-                  </button>
-                )}
-                {onShare && (
-                  <button
-                    onClick={() => {
-                      onShare(list);
-                      setShowMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
-                  >
-                    🔗 Share List
                   </button>
                 )}
                 <button

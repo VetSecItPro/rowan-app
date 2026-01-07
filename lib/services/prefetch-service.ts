@@ -55,8 +55,8 @@ const prefetchFunctions = {
     endDate.setMonth(endDate.getMonth() + 1);
 
     const { data } = await supabase
-      .from('calendar_events')
-      .select('id, title, start_time, end_time, all_day, color')
+      .from('events')
+      .select('id, title, start_time, end_time, all_day, custom_color')
       .eq('space_id', spaceId)
       .gte('start_time', startDate.toISOString())
       .lt('start_time', endDate.toISOString())
@@ -68,10 +68,10 @@ const prefetchFunctions = {
     const supabase = createClient();
     const { data } = await supabase
       .from('reminders')
-      .select('id, title, due_date, completed, priority, recurring_pattern')
+      .select('id, title, remind_at, completed, priority, recurrence_pattern')
       .eq('space_id', spaceId)
       .eq('completed', false)
-      .order('due_date')
+      .order('remind_at')
       .limit(50);
     return data || [];
   },
@@ -80,13 +80,7 @@ const prefetchFunctions = {
     const supabase = createClient();
     const { data } = await supabase
       .from('conversations')
-      .select(`
-        id,
-        name,
-        is_group,
-        last_message_at,
-        conversation_participants!inner(user_id)
-      `)
+      .select('id, title, conversation_type, last_message_at, participants')
       .eq('space_id', spaceId)
       .order('last_message_at', { ascending: false })
       .limit(20);
@@ -116,11 +110,11 @@ const prefetchFunctions = {
 
     const { data } = await supabase
       .from('meal_plans')
-      .select('id, date, meal_type, recipe_id, notes')
+      .select('id, meal_date, meal_type, recipe_id, notes')
       .eq('space_id', spaceId)
-      .gte('date', startOfWeek.toISOString().split('T')[0])
-      .lte('date', endOfWeek.toISOString().split('T')[0])
-      .order('date');
+      .gte('meal_date', startOfWeek.toISOString().split('T')[0])
+      .lte('meal_date', endOfWeek.toISOString().split('T')[0])
+      .order('meal_date');
     return data || [];
   },
 
@@ -128,7 +122,7 @@ const prefetchFunctions = {
     const supabase = createClient();
     const { data } = await supabase
       .from('goals')
-      .select('id, title, status, target_date, current_value, target_value')
+      .select('id, title, status, target_date, current_amount, target_amount')
       .eq('space_id', spaceId)
       .in('status', ['active', 'in_progress'])
       .order('target_date')
@@ -140,7 +134,7 @@ const prefetchFunctions = {
     const supabase = createClient();
     const { data } = await supabase
       .from('projects')
-      .select('id, name, status, budget, actual_spend')
+      .select('id, name, status, budget_amount, actual_cost')
       .eq('space_id', spaceId)
       .in('status', ['active', 'in_progress'])
       .order('created_at', { ascending: false })
@@ -151,11 +145,11 @@ const prefetchFunctions = {
   async rewards(spaceId: string) {
     const supabase = createClient();
     const { data } = await supabase
-      .from('reward_items')
-      .select('id, name, points_cost, available')
+      .from('rewards_catalog')
+      .select('id, name, cost_points, is_active')
       .eq('space_id', spaceId)
-      .eq('available', true)
-      .order('points_cost')
+      .eq('is_active', true)
+      .order('cost_points')
       .limit(20);
     return data || [];
   },
