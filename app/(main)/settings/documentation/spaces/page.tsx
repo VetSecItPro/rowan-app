@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+
 import {
   ArrowLeft,
   Users,
@@ -230,9 +230,7 @@ const guideSections: GuideSection[] = [
 
 export default function SpacesDocumentationPage() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-teal-50/30 to-cyan-50/30 dark:from-gray-950 dark:via-teal-950/20 dark:to-cyan-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-teal-50/30 to-cyan-50/30 dark:from-gray-950 dark:via-teal-950/20 dark:to-cyan-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -1628,6 +1626,5 @@ export default function SpacesDocumentationPage() {
 
         </div>
       </div>
-    </>
   );
 }

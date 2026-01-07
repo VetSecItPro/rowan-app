@@ -68,6 +68,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { formatDate, formatTimestamp, getCurrentDateString } from '@/lib/utils/date-utils';
+import { usePrefetchAllData } from '@/lib/hooks/usePrefetchData';
 
 // Enhanced stats interface with detailed metrics
 interface EnhancedDashboardStats {
@@ -286,6 +287,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+
+  // Prefetch all feature data immediately for instant navigation to other pages
+  usePrefetchAllData({ delay: 300 });
 
   // Handle ?invite=true query parameter from header dropdown
   useEffect(() => {

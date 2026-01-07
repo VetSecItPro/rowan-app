@@ -160,10 +160,8 @@ export function Header() {
 
           {/* Menu, Theme Toggle & Auth Buttons */}
           <div className="flex items-center gap-1 sm:gap-4">
-            {/* Desktop only: Feedback button */}
-            <div className="hidden sm:block">
-              <FeedbackButton />
-            </div>
+            {/* Feedback button - visible on all screen sizes */}
+            <FeedbackButton />
 
             {/* Hamburger Menu - always visible */}
             <HamburgerMenu />
@@ -253,7 +251,7 @@ export function Header() {
                 <button
                   ref={buttonRef}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[10px] font-medium transition-all hover:opacity-90 active:scale-95 ${
                     COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'
                   }`}
                 >
@@ -261,19 +259,18 @@ export function Header() {
                     <Image
                       src={user.avatar_url}
                       alt={user.name || 'User'}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 rounded-full object-cover border border-white/20"
-                      sizes="24px"
+                      width={18}
+                      height={18}
+                      className="w-[18px] h-[18px] rounded-full object-cover border border-white/20"
+                      sizes="18px"
                       priority
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold">
+                    <div className="w-[18px] h-[18px] rounded-full bg-white/20 flex items-center justify-center text-[9px] font-semibold">
                       {(user.name || 'U').charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="hidden sm:inline text-sm truncate max-w-[100px]">{user.name}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown Menu - Rendered via portal for proper positioning on mobile */}

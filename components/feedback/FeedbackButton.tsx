@@ -4,14 +4,45 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, List } from 'lucide-react';
 import { FeedbackModal } from './FeedbackModal';
+import { useAuth } from '@/lib/contexts/auth-context';
+
+// Beta period end date - Feb 15, 2026
+const BETA_END_DATE = new Date('2026-02-15T23:59:59Z');
+
+// Helper to check beta tester status (same logic as Header)
+const isBetaTester = (user: {
+  is_beta_tester?: boolean;
+  beta_status?: string;
+  beta_invite_code_id?: string;
+  beta_ends_at?: string;
+  created_at?: string;
+} | null) => {
+  if (!user) return false;
+
+  // BETA PERIOD: All users created before Feb 15, 2026 are beta testers
+  if (user.created_at) {
+    const createdAt = new Date(user.created_at);
+    if (createdAt < BETA_END_DATE) return true;
+  }
+
+  // Legacy checks (for backward compatibility)
+  if (user.is_beta_tester && user.beta_status === 'approved') return true;
+  if (user.beta_invite_code_id && user.beta_ends_at) {
+    const endsAt = new Date(user.beta_ends_at);
+    return endsAt > new Date();
+  }
+  return false;
+};
 
 export function FeedbackButton() {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Only show in beta mode
+  // Show for beta mode OR for beta testers
   const isBetaMode = process.env.NEXT_PUBLIC_BETA_MODE === 'true';
+  const shouldShow = isBetaMode || isBetaTester(user);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -25,7 +56,7 @@ export function FeedbackButton() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  if (!isBetaMode) {
+  if (!shouldShow) {
     return null;
   }
 
@@ -34,7 +65,7 @@ export function FeedbackButton() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="btn-touch px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-full transition-all shadow-sm hover:shadow-md active:scale-95"
+          className="px-2.5 py-1 bg-blue-500 hover:bg-blue-600 text-white text-[10px] font-medium rounded-full transition-all active:scale-95"
           aria-label="Beta Feedback"
           title="Beta Feedback"
         >
