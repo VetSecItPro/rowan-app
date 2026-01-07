@@ -107,11 +107,6 @@ export const LazyScheduleTripModal = dynamic(
   { loading: ModalLoading, ssr: false }
 );
 
-export const LazyShareListModal = dynamic(
-  () => import('@/components/shopping/ShareListModal').then(mod => ({ default: mod.ShareListModal })),
-  { loading: ModalLoading, ssr: false }
-);
-
 export const LazyFrequentItemsPanel = dynamic(
   () => import('@/components/shopping/FrequentItemsPanel').then(mod => ({ default: mod.FrequentItemsPanel })),
   { ssr: false }

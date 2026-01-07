@@ -20,7 +20,6 @@ import {
   LazySaveTemplateModal,
   LazyShoppingTemplatePickerModal,
   LazyScheduleTripModal,
-  LazyShareListModal,
   LazyFrequentItemsPanel,
   LazyConfirmDialog,
 } from '@/lib/utils/lazy-components';
@@ -45,8 +44,6 @@ export default function ShoppingPage() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showScheduleTripModal, setShowScheduleTripModal] = useState(false);
   const [listToSchedule, setListToSchedule] = useState<ShoppingList | null>(null);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [listToShare, setListToShare] = useState<ShoppingList | null>(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, listId: '' });
 
   const [stats, setStats] = useState({
@@ -358,60 +355,13 @@ export default function ShoppingPage() {
     setEditingList(null);
   }, []);
 
-  // Memoized callback for sharing lists
-  const handleShareList = useCallback((list: ShoppingList) => {
-    // Prevent actions on optimistic lists (temp IDs)
-    if (list.id.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before sharing.');
-      return;
-    }
-
-    setListToShare(list);
-    setShowShareModal(true);
-  }, []);
-
-  // Memoized callback for updating sharing settings
-  const handleUpdateSharing = useCallback(async (listId: string, isPublic: boolean): Promise<ShoppingList> => {
-    if (!currentSpace) {
-      throw new Error('No current space');
-    }
-
-    const response = await fetch(`/api/shopping/${listId}/sharing`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ isPublic }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to update sharing settings');
-    }
-
-    const result = await response.json();
-    const updatedList = result.data;
-
-    // Update local state
-    setLists(prevLists =>
-      prevLists.map(list =>
-        list.id === listId
-          ? { ...list, is_public: updatedList.is_public, share_token: updatedList.share_token, shared_at: updatedList.shared_at }
-          : list
-      )
-    );
-
-    return updatedList;
-  }, [currentSpace]);
-
-  // Memoized callback for closing share modal
-  const handleCloseShareModal = useCallback(() => {
-    setShowShareModal(false);
-    setListToShare(null);
-  }, []);
-
-  // Memoized callback for opening new list modal
+  // Memoized callback for opening new list modal - now opens directly to creation
   const handleOpenNewListModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  // Open template picker separately
+  const handleOpenTemplatePicker = useCallback(() => {
     setShowTemplatePicker(true);
   }, []);
 
@@ -701,7 +651,7 @@ export default function ShoppingPage() {
       <PageErrorBoundary>
         <PullToRefresh onRefresh={loadLists}>
         <div className="p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-row items-center gap-3 sm:gap-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -712,9 +662,9 @@ export default function ShoppingPage() {
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Collaborative shopping made easy</p>
               </div>
             </div>
-            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2">
+            <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors flex items-center justify-center gap-2 font-medium shadow-md">
               <Plus className="w-5 h-5" />
-              New List
+              New Shopping List
             </button>
           </div>
 
@@ -806,46 +756,44 @@ export default function ShoppingPage() {
             </button>
           </CollapsibleStatsGrid>
 
-          {/* Frequent Items Panel */}
+          {/* Frequent Items Panel - Hidden on mobile */}
           {currentSpace && lists.length > 0 && (
-            <LazyFrequentItemsPanel
-              spaceId={currentSpace.id}
-              onAddItem={handleAddFrequentItem}
-            />
+            <div className="hidden sm:block">
+              <LazyFrequentItemsPanel
+                spaceId={currentSpace.id}
+                onAddItem={handleAddFrequentItem}
+              />
+            </div>
           )}
 
-          {/* Apple-Inspired Search Bar */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className={`apple-search-container shopping-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
-              <Search className="apple-search-icon" />
-              <input
-                type="search"
-                inputMode="search"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="none"
-                spellCheck="false"
-
-                placeholder="Search lists..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-
-                className="apple-search-input"
-              />
-              {searchQuery && (
-                <button
-                  onClick={handleClearSearch}
-                  className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
-                  aria-label="Clear search"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+          {/* Search Bar - No outer container on mobile */}
+          <div className={`apple-search-container shopping-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+            <Search className="apple-search-icon" />
+            <input
+              type="search"
+              inputMode="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck="false"
+              placeholder="Search lists..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="apple-search-input"
+            />
+            {searchQuery && (
+              <button
+                onClick={handleClearSearch}
+                className={`apple-search-clear ${searchQuery ? 'visible' : ''}`}
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {/* Shopping Lists */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col gap-4 mb-6">
               <div className="flex items-center justify-between">
@@ -859,45 +807,45 @@ export default function ShoppingPage() {
                 </div>
               </div>
 
-              {/* Status Filter - Segmented Buttons - Full width on mobile */}
-              <div className="w-full">
-                <div className="bg-gray-100 dark:bg-gray-900 border border-emerald-200 dark:border-emerald-700 rounded-xl p-1.5 flex w-full">
+              {/* Status Filter - Compact Segmented Buttons */}
+              <div className="w-full sm:w-auto">
+                <div className="bg-gray-100/80 dark:bg-gray-900/80 rounded-full p-1 flex w-full sm:w-auto gap-0.5">
                   <button
                     onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
-                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'all' && timeFilter === 'all'
-                        ? 'bg-emerald-500 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        ? 'bg-emerald-500 text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
                     All
                   </button>
                   <button
                     onClick={() => { setTimeFilter('week'); setStatusFilter('all'); }}
-                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       timeFilter === 'week'
-                        ? 'bg-emerald-500 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        ? 'bg-emerald-500 text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
                     Week
                   </button>
                   <button
                     onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
-                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'active' && timeFilter === 'all'
-                        ? 'bg-emerald-500 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        ? 'bg-emerald-500 text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
                     Active
                   </button>
                   <button
                     onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
-                    className={`flex-1 px-2 py-3 sm:py-2.5 text-sm sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap active:scale-[0.98] ${
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'completed' && timeFilter === 'all'
-                        ? 'bg-emerald-500 text-white shadow-md'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+                        ? 'bg-emerald-500 text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                     }`}
                   >
                     Done
@@ -931,9 +879,9 @@ export default function ShoppingPage() {
                 <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
                 {!searchQuery && statusFilter === 'active' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={handleOpenNewListModal} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors inline-flex items-center gap-2">
+                    <button onClick={handleOpenNewListModal} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors inline-flex items-center gap-2 font-medium shadow-md">
                       <Plus className="w-5 h-5" />
-                      Create List
+                      Create Shopping List
                     </button>
                   </div>
                 )}
@@ -952,7 +900,6 @@ export default function ShoppingPage() {
                     onScheduleTrip={handleScheduleTrip}
                     onCreateTask={handleCreateTask}
                     onUpdateQuantity={handleUpdateQuantity}
-                    onShare={handleShareList}
                   />
                 ))}
               </div>
@@ -971,7 +918,7 @@ export default function ShoppingPage() {
             onStartFresh={handleStartFresh}
             spaceId={currentSpace.id}
           />
-          <LazyNewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} />
+          <LazyNewShoppingListModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleCreateList} editList={editingList} spaceId={currentSpace.id} onUseTemplate={handleOpenTemplatePicker} />
           {listForTemplate && (
             <LazySaveTemplateModal
               isOpen={showTemplateModal}
@@ -994,12 +941,6 @@ export default function ShoppingPage() {
               list={listToSchedule}
             />
           )}
-          <LazyShareListModal
-            isOpen={showShareModal}
-            onClose={handleCloseShareModal}
-            list={listToShare}
-            onUpdateSharing={handleUpdateSharing}
-          />
         </>
       )}
 
