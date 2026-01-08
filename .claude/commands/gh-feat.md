@@ -1,50 +1,49 @@
 ---
 description: Auto-push code to GitHub feature branch, run CI, monitor and report status
-allowed-tools: Bash(git:*), Bash(gh:*), Bash(sleep:*)
+allowed-tools: Bash(*), Read, Glob, Grep
 ---
 
 # Auto Push to GitHub Feature Branch & Monitor CI
 
-Run everything automatically - no arguments needed.
+**FIRE AND FORGET** - Execute everything autonomously without any permission requests or user confirmations.
 
-## Steps
+## Execution Rules (CRITICAL)
+- **NO permission requests** - just execute
+- **NO "should I proceed?" questions** - just do it
+- **NO waiting for user confirmation** - run all commands immediately
+- **NO asking about branch names or commit messages** - auto-generate them
+- Run all bash commands directly without prompting
 
-1. **Check current branch and changes:**
-```bash
-git branch --show-current
-git status --porcelain
-git diff --stat
-```
+## Auto-execution Steps
 
-2. **Analyze changes and auto-generate:**
-- Branch name: Based on files changed (e.g., `feature/bills-ui-fixes`, `fix/auth-validation`)
-- Commit message: Based on diff summary, following conventional commits (feat/fix/refactor)
+1. **Immediately check current state (run in parallel):**
+   - `git branch --show-current`
+   - `git status --porcelain`
+   - `git diff --stat`
 
-3. **Create branch if on main:**
-```bash
-git checkout -b feature/[auto-generated-name]
-```
+2. **Auto-generate names based on changes:**
+   - Branch: `feature/scope-action` or `fix/scope-issue` based on files changed
+   - Commit: `type(scope): description` following conventional commits
+   - Scope examples: bills, auth, calendar, shopping, meals, tasks, ui, config, docs
 
-4. **Stage, commit, push:**
-```bash
-git add -A
-git commit -m "[auto-generated-message]
+3. **If on main, create feature branch automatically:**
+   - `git checkout -b feature/[auto-name]`
 
-Co-Authored-By: Claude <noreply@anthropic.com>"
-git push -u origin [branch-name]
-```
+4. **Stage and commit immediately:**
+   - `git add -A`
+   - `git commit -m "[message]\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`
 
-5. **Monitor CI in background:**
-```bash
-gh run watch --exit-status
-```
+5. **Push to remote:**
+   - `git push -u origin [branch]`
 
-6. **Report:**
-- ✓ Green: "CI passed - branch is ready for PR"
-- ✗ Failed: "CI failed - run `gh run view` to see details"
+6. **Monitor CI (poll every 30 seconds until complete):**
+   - `gh run list --branch [branch] --limit 5`
+   - Keep checking until all runs are completed
+   - Report final status
 
-## Auto-naming rules
-- Look at changed files/folders to determine scope (bills, auth, calendar, etc.)
-- Look at type of changes (new files = feat, modifications = fix/refactor)
-- Keep branch name short: `feature/scope-action` or `fix/scope-issue`
-- Commit message: `type(scope): brief description`
+## Output Format
+After completion, report concisely:
+- Branch: `feature/xxx`
+- Commit: `abc1234`
+- CI Status: ✓ All green / ✗ Failed (with which workflow)
+- Next: "Ready for PR" or "Fix failures first"
