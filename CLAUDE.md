@@ -332,9 +332,40 @@ import { Dropdown } from '@/components/ui/Dropdown';
 
 ## MCP Configuration
 
-### Supabase MCP
-**Project**: `SUPABASE_PROJECT_REF`
+### Supabase MCP - ROWAN APP DATABASE
+> **CRITICAL**: The Rowan app uses Supabase project `SUPABASE_PROJECT_REF`. NEVER use any other project ref.
+
+**FIRST ACTION when starting a session**: Run `mcp__supabase__get_project_url` to verify you're connected to the correct project. Expected result: `https://SUPABASE_PROJECT_REF.supabase.co`
+
+## PENDING TASKS (January 2025)
+After MCP re-authentication, complete these:
+1. ✅ MCP reconfigured - needs restart to re-authenticate
+2. ⏳ Verify MCP connects to `SUPABASE_PROJECT_REF` (run `get_project_url`)
+3. ⏳ Create `budget_templates` table with seed data
+4. ⏳ Create `budget_template_categories` table with seed data
+5. ⏳ Test BudgetTemplateModal functionality
+
+**Context**: BudgetTemplateModal wasn't working because MCP was connected to wrong Supabase project. Tables `budget_templates` and `budget_template_categories` need to be created.
+
+**Project Reference**: `SUPABASE_PROJECT_REF`
+**Project URL**: `https://SUPABASE_PROJECT_REF.supabase.co`
+**Dashboard**: `https://supabase.com/dashboard/project/SUPABASE_PROJECT_REF`
 **Authentication**: OAuth (browser-based login)
+
+**Expected Rowan Tables** (verify these exist when connected):
+- `spaces`, `space_members`, `users`
+- `tasks`, `events`, `reminders`, `messages`
+- `shopping_lists`, `shopping_items`
+- `recipes`, `meal_plans`, `meals`
+- `budgets`, `budget_categories`, `expenses`, `bills`
+- `chores`, `goals`, `daily_checkins`
+
+**If MCP returns wrong tables** (like `content`, `summaries`, `chat_threads`):
+1. The OAuth session is authenticated to a different project
+2. Run: `claude mcp remove supabase -s project`
+3. Run: `claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF" --transport http --scope project`
+4. Restart Claude Code to re-authenticate
+5. When browser opens, select the correct Supabase account/project
 
 **Correct `.mcp.json` configuration:**
 ```json

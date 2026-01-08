@@ -320,61 +320,63 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-[70] sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden sm:overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-meals px-4 sm:px-6 py-4">
+        <div className="bg-gradient-meals px-4 sm:px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-white">
               {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
             </h2>
-            <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-white/20 rounded-full transition-all active:scale-95">
-              <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
+            <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-auto sm:h-auto flex items-center justify-center hover:bg-white/20 sm:hover:bg-transparent rounded-full sm:rounded-none transition-all active:scale-95 sm:active:scale-100 sm:opacity-80 sm:hover:opacity-100">
+              <X className="w-5 h-5 sm:w-5 sm:h-5 text-white" />
             </button>
           </div>
         </div>
 
-        {/* Content - scrollable with fixed height */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Toggle Buttons - In Content Area */}
           {!editRecipe && (
-            <div className="p-6 pb-0">
-              <div className="inline-flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+            <div className="px-4 sm:px-6 pt-4 pb-0 flex-shrink-0">
+              <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto sm:inline-flex">
                 <button
                   onClick={() => setActiveTab('manual')}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
+                  className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${
                     activeTab === 'manual'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <FileText className="w-4 h-4" />
-                  <span>Manual Entry</span>
+                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Manual Entry</span>
+                  <span className="sm:hidden">Manual</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('ai')}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
+                  className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${
                     activeTab === 'ai'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <Sparkles className="w-4 h-4" />
-                  <span>AI Import</span>
+                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">AI Import</span>
+                  <span className="sm:hidden">AI</span>
                 </button>
                 <button
                   onClick={() => {
                     setActiveTab('discover');
                     if (externalRecipes.length === 0) handleLoadRandom();
                   }}
-                  className={`btn-touch px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium text-sm min-w-[130px] ${
+                  className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${
                     activeTab === 'discover'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
                   }`}
                 >
-                  <Globe className="w-4 h-4" />
+                  <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>Discover</span>
                 </button>
               </div>
@@ -473,7 +475,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               <button
                 onClick={handleParseRecipe}
                 disabled={parsing || (!recipeText && !recipeImage)}
-                className="btn-touch w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="btn-touch w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {parsing ? (
                   <>
@@ -492,101 +494,95 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
           {/* Discover Recipes Tab */}
           {activeTab === 'discover' && !editRecipe && (
-            <div className="p-6 pt-4 space-y-6 h-full">
-              {/* Search Bar */}
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                      placeholder="Search recipes (e.g., 'pasta', 'chicken curry', 'chocolate cake')..."
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSearch}
-                    disabled={loading || !searchQuery.trim()}
-                    className="btn-touch px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
-                  >
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                    Search
-                  </button>
-                </div>
+            <div className="p-4 sm:p-6 pt-3 sm:pt-4 space-y-3 h-full flex flex-col">
+              {/* Search Bar with integrated button */}
+              <div className="relative flex-shrink-0">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Search recipes..."
+                  className="w-full pl-9 pr-20 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                />
+                <button
+                  onClick={handleSearch}
+                  disabled={loading || !searchQuery.trim()}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1 text-xs bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                >
+                  {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Search'}
+                </button>
+              </div>
 
-                {/* Quick Actions */}
-                <div className="flex items-center gap-2 flex-wrap">
+              {/* Quick Actions - Compact pills */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={handleLoadRandom}
+                  disabled={loading}
+                  className="btn-touch px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50 text-xs font-medium"
+                >
+                  🎲 Random
+                </button>
+
+                {/* Cuisine Dropdown */}
+                <div className="relative">
                   <button
-                    onClick={handleLoadRandom}
+                    onClick={() => setShowCuisineDropdown(!showCuisineDropdown)}
                     disabled={loading}
-                    className="btn-touch px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50 text-sm font-medium"
+                    className="btn-touch px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors disabled:opacity-50 text-xs font-medium flex items-center gap-1"
                   >
-                    🎲 Random Recipes
+                    🍽️ Cuisine
+                    <span className="text-[10px]">▼</span>
                   </button>
-                  <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
 
-                  {/* Cuisine Dropdown */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setShowCuisineDropdown(!showCuisineDropdown)}
-                      disabled={loading}
-                      className="btn-touch px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium flex items-center gap-2"
-                    >
-                      🍽️ Browse by Cuisine
-                      <span className="text-xs">▼</span>
-                    </button>
+                  {showCuisineDropdown && (
+                    <>
+                      {/* Backdrop */}
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowCuisineDropdown(false)}
+                      />
 
-                    {showCuisineDropdown && (
-                      <>
-                        {/* Backdrop */}
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setShowCuisineDropdown(false)}
-                        />
-
-                        {/* Dropdown Menu */}
-                        <div className="absolute top-full left-0 mt-2 w-64 max-h-96 overflow-y-auto bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl z-20">
-                          <div className="p-2 space-y-1">
-                            {SUPPORTED_CUISINES.map((cuisine) => (
-                              <button
-                                key={cuisine.value}
-                                onClick={() => {
-                                  handleBrowseCuisine(cuisine.value);
-                                  setShowCuisineDropdown(false);
-                                }}
-                                disabled={loading}
-                                className="btn-touch w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300 disabled:opacity-50"
-                              >
-                                <span className="text-lg">{cuisine.flag}</span>
-                                <span>{cuisine.label}</span>
-                              </button>
-                            ))}
-                          </div>
+                      {/* Dropdown Menu */}
+                      <div className="absolute top-full left-0 mt-1 w-48 max-h-72 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20">
+                        <div className="p-1.5 space-y-0.5">
+                          {SUPPORTED_CUISINES.map((cuisine) => (
+                            <button
+                              key={cuisine.value}
+                              onClick={() => {
+                                handleBrowseCuisine(cuisine.value);
+                                setShowCuisineDropdown(false);
+                              }}
+                              disabled={loading}
+                              className="btn-touch w-full px-2.5 py-1.5 text-left text-xs rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300 disabled:opacity-50"
+                            >
+                              <span>{cuisine.flag}</span>
+                              <span>{cuisine.label}</span>
+                            </button>
+                          ))}
                         </div>
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Loading State */}
               {loading && (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Loader2 className="w-12 h-12 text-orange-500 animate-spin mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">Searching recipes...</p>
+                <div className="flex flex-col items-center justify-center py-8 flex-1">
+                  <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-2" />
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Searching...</p>
                 </div>
               )}
 
               {/* Results */}
               {!loading && externalRecipes.length > 0 && (
-                <div className="space-y-3">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Found {externalRecipes.length} recipe{externalRecipes.length > 1 ? 's' : ''}
+                <div className="space-y-2 flex-1 flex flex-col min-h-0">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                    {externalRecipes.length} recipe{externalRecipes.length > 1 ? 's' : ''} found
                   </p>
-                  <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-2 flex-1 overflow-y-auto min-h-0 max-h-none sm:max-h-[350px]">
                     {externalRecipes.map((recipe) => (
                       <button
                         key={recipe.id}
@@ -594,10 +590,10 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                           setSelectedRecipe(recipe);
                           setShowPreview(true);
                         }}
-                        className="btn-touch text-left p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md hover:border-orange-500 dark:hover:border-orange-400 transition-all group"
+                        className="btn-touch text-left p-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md hover:border-orange-500 dark:hover:border-orange-400 transition-all group"
                       >
                         {recipe.image_url && (
-                          <div className="w-full h-24 mb-2 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
+                          <div className="w-full h-20 mb-1.5 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
                             <img
                               src={recipe.image_url}
                               alt={recipe.name}
@@ -606,15 +602,15 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                             />
                           </div>
                         )}
-                        <h4 className="font-medium text-sm text-gray-900 dark:text-white line-clamp-2 mb-1">
+                        <h4 className="font-medium text-xs text-gray-900 dark:text-white line-clamp-2 mb-1">
                           {recipe.name}
                         </h4>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                          <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded">
+                        <div className="flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400">
+                          <span className="px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded">
                             {recipe.source}
                           </span>
                           {recipe.cuisine && (
-                            <span>{recipe.cuisine}</span>
+                            <span className="truncate">{recipe.cuisine}</span>
                           )}
                         </div>
                       </button>
@@ -625,19 +621,19 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
               {/* Empty State */}
               {!loading && externalRecipes.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Globe className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <div className="flex flex-col items-center justify-center py-8 text-center flex-1">
+                  <Globe className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
                     Discover Recipes
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 max-w-sm">
-                    Search for recipes or browse by cuisine to find inspiration from multiple recipe APIs.
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 max-w-xs">
+                    Search or browse by cuisine to find inspiration
                   </p>
                   <button
                     onClick={handleLoadRandom}
-                    className="btn-touch px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all flex items-center gap-2 font-medium"
+                    className="btn-touch px-4 py-2 text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full transition-all flex items-center gap-2 font-medium"
                   >
-                    🎲 Load Random Recipes
+                    🎲 Load Random
                   </button>
                 </div>
               )}
@@ -829,7 +825,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <button
                     type="button"
                     onClick={addTag}
-                    className="btn-touch px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                    className="btn-touch px-4 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
                   >
                     Add
                   </button>
@@ -859,11 +855,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-gradient-meals hover:opacity-90 text-white rounded-lg transition-all font-medium shadow-md hover:shadow-lg">
+                <button type="submit" className="px-6 py-2 bg-gradient-meals hover:opacity-90 text-white rounded-full transition-all font-medium shadow-md hover:shadow-lg">
                   {editRecipe ? 'Save' : 'Create'}
                 </button>
               </div>

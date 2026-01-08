@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, DollarSign, Users, TrendingUp, Info, Check } from 'lucide-react';
+import { X, DollarSign, Users, TrendingUp, Info, Check, ChevronDown } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import type {
   BudgetTemplate,
@@ -28,12 +28,14 @@ export function BudgetTemplateModal({
   const [monthlyIncome, setMonthlyIncome] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [householdFilter, setHouseholdFilter] = useState<HouseholdType | 'all'>('all');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
       setSelectedTemplate(null);
       setMonthlyIncome('');
       setHouseholdFilter('all');
+      setIsDropdownOpen(false);
     }
   }, [isOpen]);
 
@@ -123,23 +125,69 @@ export function BudgetTemplateModal({
                   </p>
                 </div>
 
-                <div className="relative z-50">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Filter by Household Type
                   </label>
-                  <select
-                    value={householdFilter}
-                    onChange={(e) => setHouseholdFilter(e.target.value as HouseholdType | 'all')}
-                    className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50"
-                    style={{ position: 'relative', zIndex: 9999 }}
-                  >
-                    <option value="all">All Templates</option>
-                    {Object.entries(householdLabels).map(([key, label]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="w-full px-4 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white text-left"
+                    >
+                      {householdFilter === 'all' ? 'All Templates' : householdLabels[householdFilter]}
+                    </button>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+
+                    {/* Custom Dropdown Menu */}
+                    {isDropdownOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setIsDropdownOpen(false)}
+                        />
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                          <div className="py-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setHouseholdFilter('all');
+                                setIsDropdownOpen(false);
+                              }}
+                              className={`w-full px-4 py-3 text-left text-base flex items-center gap-3 transition-colors ${
+                                householdFilter === 'all'
+                                  ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
+                                  : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              {householdFilter === 'all' && <Check className="w-4 h-4" />}
+                              <span className={householdFilter !== 'all' ? 'ml-7' : ''}>All Templates</span>
+                            </button>
+                            {Object.entries(householdLabels).map(([key, label]) => (
+                              <button
+                                key={key}
+                                type="button"
+                                onClick={() => {
+                                  setHouseholdFilter(key as HouseholdType);
+                                  setIsDropdownOpen(false);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-base flex items-center gap-3 transition-colors ${
+                                  householdFilter === key
+                                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
+                                    : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                                }`}
+                              >
+                                {householdFilter === key && <Check className="w-4 h-4" />}
+                                <span className={householdFilter !== key ? 'ml-7' : ''}>{label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
@@ -262,7 +310,7 @@ export function BudgetTemplateModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+              className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full transition-colors font-medium"
             >
               Cancel
             </button>
@@ -270,7 +318,7 @@ export function BudgetTemplateModal({
               type="button"
               onClick={handleApply}
               disabled={!selectedTemplate || !monthlyIncome || isApplying}
-              className="px-6 py-2.5 shimmer-projects text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 shimmer-projects text-white rounded-full transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isApplying ? 'Applying Template...' : 'Apply Template'}
             </button>
