@@ -65,7 +65,7 @@ export function FeedbackButton() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="px-2.5 py-1 bg-blue-500 hover:bg-blue-600 text-white text-[10px] font-medium rounded-full transition-all active:scale-95"
+          className="px-2.5 py-1 sm:px-4 sm:py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-[10px] sm:text-xs font-medium rounded-full transition-all active:scale-95"
           aria-label="Beta Feedback"
           title="Beta Feedback"
         >
