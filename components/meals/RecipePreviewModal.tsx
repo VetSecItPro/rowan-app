@@ -209,7 +209,7 @@ export function RecipePreviewModal({
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={onClose}
-              className="px-3 sm:px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium"
+              className="px-3 sm:px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium"
             >
               Close
             </button>
@@ -218,7 +218,7 @@ export function RecipePreviewModal({
                 onAddToLibrary(recipe);
                 onClose();
               }}
-              className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+              className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Add to Library</span>
@@ -229,7 +229,7 @@ export function RecipePreviewModal({
                 onPlanMeal(recipe);
                 onClose();
               }}
-              className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
+              className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
             >
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Plan Meal</span>
