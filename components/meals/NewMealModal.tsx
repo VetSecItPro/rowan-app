@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { X, Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart, Search, Save } from 'lucide-react';
 import { CreateMealInput, Meal, Recipe } from '@/lib/services/meals-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { ShoppingListPreviewModal } from './ShoppingListPreviewModal';
 
 interface NewMealModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
   const [isMealTypeOpen, setIsMealTypeOpen] = useState(false);
   const [isRecipeSelectorOpen, setIsRecipeSelectorOpen] = useState(false);
   const [createShoppingList, setCreateShoppingList] = useState(false);
+  const [showShoppingPreview, setShowShoppingPreview] = useState(false);
   const [recipeSearch, setRecipeSearch] = useState('');
   const [cuisineFilter, setCuisineFilter] = useState<string | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
@@ -95,7 +97,22 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData, createShoppingList && !!formData.recipe_id);
+
+    // If shopping list is checked and we have a recipe with ingredients, show preview modal
+    if (createShoppingList && selectedRecipe && selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0) {
+      // Save the meal first (without shopping list flag since we handle it separately)
+      onSave(formData, false);
+      // Show the shopping list preview modal
+      setShowShoppingPreview(true);
+    } else {
+      // Normal flow - just save and close
+      onSave(formData, false);
+      onClose();
+    }
+  };
+
+  const handleShoppingPreviewClose = () => {
+    setShowShoppingPreview(false);
     onClose();
   };
 
@@ -372,6 +389,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               type="button"
               onClick={onClose}
               feature="meals"
+              className="rounded-full"
             >
               Cancel
             </SecondaryButton>
@@ -379,12 +397,25 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               type="submit"
               feature="meals"
               icon={isEditing ? <Save className="w-4 h-4" /> : <ChefHat className="w-4 h-4" />}
+              className="rounded-full"
             >
               {isEditing ? 'Save' : 'Create'}
             </CTAButton>
           </div>
         </form>
       </div>
+
+      {/* Shopping List Preview Modal */}
+      {selectedRecipe && (
+        <ShoppingListPreviewModal
+          isOpen={showShoppingPreview}
+          onClose={handleShoppingPreviewClose}
+          ingredients={selectedRecipe.ingredients || []}
+          recipeName={selectedRecipe.name}
+          spaceId={spaceId}
+          onSuccess={handleShoppingPreviewClose}
+        />
+      )}
     </div>
   );
 }

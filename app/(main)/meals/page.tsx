@@ -886,10 +886,9 @@ export default function MealsPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Toggle */}
               <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
-                <Tooltip content="View meals in weekly calendar format" position="bottom">
-                  <button
+                <button
                     onClick={handleSetCalendarView}
-                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
                       viewMode === 'calendar'
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
@@ -898,11 +897,9 @@ export default function MealsPage() {
                     <LayoutGrid className="w-4 h-4" />
                     <span className="text-sm">Calendar</span>
                   </button>
-                </Tooltip>
-                <Tooltip content="View all planned meals as a list" position="bottom">
-                  <button
+                <button
                     onClick={handleSetListView}
-                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
                       viewMode === 'list'
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
@@ -911,11 +908,9 @@ export default function MealsPage() {
                     <List className="w-4 h-4" />
                     <span className="text-sm">List</span>
                   </button>
-                </Tooltip>
-                <Tooltip content="Browse your saved recipe collection" position="bottom">
-                  <button
+                <button
                     onClick={handleSetRecipesView}
-                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] ${
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
                       viewMode === 'recipes'
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
@@ -924,7 +919,6 @@ export default function MealsPage() {
                     <BookOpen className="w-4 h-4" />
                     <span className="text-sm">Recipes</span>
                   </button>
-                </Tooltip>
               </div>
 
               {/* Meal Actions Toggle */}
@@ -1065,12 +1059,12 @@ export default function MealsPage() {
           {/* Meals/Recipes Section */}
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
             {viewMode !== 'calendar' && (
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                     {viewMode === 'recipes' ? `Saved Recipes (${filteredRecipes.length})` : `Planned Meals (${filteredMeals.length})`}
                   </h2>
-                  <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-sm font-medium rounded-full">
+                  <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap">
                     {format(new Date(), 'MMM yyyy')}
                   </span>
                 </div>
@@ -1079,14 +1073,14 @@ export default function MealsPage() {
                 {viewMode === 'list' && (
                   <button
                     onClick={() => setShowPastMeals(!showPastMeals)}
-                    className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium ${
+                    className={`hidden sm:flex px-4 py-2 rounded-full transition-colors items-center gap-2 text-sm font-medium whitespace-nowrap ${
                       showPastMeals
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700'
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }`}
                     title={showPastMeals ? 'Hide past meals' : 'Show past meals'}
                   >
-                    <CheckSquare className="w-4 h-4" />
+                    <CheckSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     {showPastMeals ? 'Hide Past' : 'Show Past'}
                   </button>
                 )}
@@ -1393,6 +1387,7 @@ export default function MealsPage() {
                           onClick={handleOpenMealModal}
                           feature="meals"
                           icon={<Plus className="w-5 h-5" />}
+                          className="rounded-full"
                         >
                           Plan Your First Meal
                         </CTAButton>

@@ -539,7 +539,7 @@ export default function ProjectsPage() {
                   }}
                   feature="projects"
                   icon={<Plus className="w-5 h-5 flex-shrink-0" />}
-                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3"
+                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3 !rounded-full"
                 >
                   <span className="hidden sm:inline whitespace-nowrap">
                     {activeTab === 'projects' ? 'New Project' : activeTab === 'budgets' ? 'Set Budget' : activeTab === 'bills' ? 'New Bill' : 'New Expense'}
@@ -552,7 +552,7 @@ export default function ProjectsPage() {
                   onClick={() => setIsReceiptModalOpen(true)}
                   feature="projects"
                   icon={<Plus className="w-5 h-5 flex-shrink-0" />}
-                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3"
+                  className="min-w-[120px] sm:min-w-[180px] px-4 py-2 sm:px-6 sm:py-3 !rounded-full"
                 >
                   <span className="hidden sm:inline whitespace-nowrap">Upload Receipt</span>
                   <span className="sm:hidden whitespace-nowrap">Upload</span>
@@ -732,6 +732,7 @@ export default function ProjectsPage() {
                     onClick={() => setIsProjectModalOpen(true)}
                     feature="projects"
                     icon={<Plus className="w-5 h-5" />}
+                    className="!rounded-full"
                   >
                     Create Project
                   </CTAButton>
@@ -753,12 +754,13 @@ export default function ProjectsPage() {
                     <CTAButton
                       onClick={() => setIsTemplateModalOpen(true)}
                       feature="projects"
-                      icon={<FileText className="w-5 h-5" />}
+                      icon={<FileText className="w-4 h-4" />}
+                      className="!rounded-full px-5 py-2.5 text-sm"
                     >
                       Use Template
                     </CTAButton>
-                    <button onClick={() => setIsBudgetModalOpen(true)} className="btn-touch bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all shadow-lg inline-flex items-center gap-2">
-                      <Plus className="w-5 h-5" />
+                    <button onClick={() => setIsBudgetModalOpen(true)} className="btn-touch bg-gray-600 hover:bg-gray-700 text-white rounded-full transition-all shadow-lg inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium">
+                      <Plus className="w-4 h-4" />
                       Set Custom
                     </button>
                   </div>
