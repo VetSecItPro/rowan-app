@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, AlertCircle, DollarSign } from 'lucide-react';
+import { X, AlertCircle, DollarSign, ChevronDown } from 'lucide-react';
 import type { Bill, CreateBillInput, BillFrequency } from '@/lib/services/bills-service';
 import { logger } from '@/lib/logger';
 import {
@@ -33,7 +33,6 @@ export function NewBillModal({
   const [payee, setPayee] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [frequency, setFrequency] = useState<BillFrequency>('monthly');
-  const [autoPay, setAutoPay] = useState(false);
   const [reminderEnabled, setReminderEnabled] = useState(true);
   const [reminderDays, setReminderDays] = useState(3);
   const [notes, setNotes] = useState('');
@@ -53,7 +52,6 @@ export function NewBillModal({
       setPayee(editBill.payee || '');
       setDueDate(editBill.due_date);
       setFrequency(editBill.frequency);
-      setAutoPay(editBill.auto_pay);
       setReminderEnabled(editBill.reminder_enabled);
       setReminderDays(editBill.reminder_days_before);
       setNotes(editBill.notes || '');
@@ -65,7 +63,6 @@ export function NewBillModal({
       setPayee('');
       setDueDate('');
       setFrequency('monthly');
-      setAutoPay(false);
       setReminderEnabled(true);
       setReminderDays(3);
       setNotes('');
@@ -90,7 +87,7 @@ export function NewBillModal({
       payee: payee.trim() || undefined,
       due_date: dueDate,
       frequency,
-      auto_pay: autoPay,
+      auto_pay: false,
       reminder_enabled: reminderEnabled,
       reminder_days_before: reminderDays,
       notes: notes.trim() || undefined,
@@ -240,47 +237,51 @@ export function NewBillModal({
                 )}
               </div>
 
-              <div className="relative z-50">
+              <div className="relative">
                 <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Frequency
                 </label>
-                <select
-                  id="frequency"
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.target.value as BillFrequency)}
-                  className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50"
-                  style={{ position: 'relative', zIndex: 9999 }}
-                >
-                  {frequencies.map((freq) => (
-                    <option key={freq.value} value={freq.value}>
-                      {freq.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="frequency"
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.target.value as BillFrequency)}
+                    className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
+                  >
+                    {frequencies.map((freq) => (
+                      <option key={freq.value} value={freq.value}>
+                        {freq.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
               </div>
 
-              <div className="relative z-50">
+              <div className="relative">
                 <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Category
                 </label>
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50 ${
-                    errors.category
-                      ? 'border-red-500 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  }`}
-                  style={{ position: 'relative', zIndex: 9999 }}
-                >
-                  <option value="">Select category...</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    id="category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className={`w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none ${
+                      errors.category
+                        ? 'border-red-500 dark:border-red-500'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
+                  >
+                    <option value="">Select category...</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
                 {errors.category && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>
                 )}
@@ -334,18 +335,6 @@ export function NewBillModal({
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={autoPay}
-                    onChange={(e) => setAutoPay(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Auto Pay Enabled
-                  </span>
-                </label>
-
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
                     checked={reminderEnabled}
                     onChange={(e) => setReminderEnabled(e.target.checked)}
                     className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
@@ -384,6 +373,7 @@ export function NewBillModal({
                 type="button"
                 onClick={onClose}
                 feature="projects"
+                className="!rounded-full"
               >
                 Cancel
               </SecondaryButton>
@@ -392,6 +382,7 @@ export function NewBillModal({
                 disabled={isSaving}
                 feature="projects"
                 icon={<DollarSign className="w-4 h-4" />}
+                className="!rounded-full"
               >
                 {isSaving ? 'Saving...' : editBill ? 'Update Bill' : 'Create Bill'}
               </CTAButton>

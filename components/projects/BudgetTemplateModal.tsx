@@ -82,21 +82,21 @@ export function BudgetTemplateModal({
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
       <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-6xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-amber-500 to-orange-500">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-white">
                 Choose a Budget Template
               </h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              <p className="text-amber-100 text-sm mt-1">
                 Get started with a pre-built budget template tailored to your household
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
 

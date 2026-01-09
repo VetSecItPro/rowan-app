@@ -9,7 +9,6 @@ import {
   AlertCircle,
   Clock,
   Repeat,
-  CreditCard,
   Edit,
   Trash2,
 } from 'lucide-react';
@@ -122,24 +121,12 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
-                {!isPaid && (
-                  <button
-                    onClick={() => {
-                      onMarkPaid(bill.id);
-                      setShowMenu(false);
-                    }}
-                    className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg flex items-center gap-2 transition-colors"
-                  >
-                    <Check className="w-4 h-4" />
-                    Mark as Paid
-                  </button>
-                )}
                 <button
                   onClick={() => {
                     onEdit(bill);
                     setShowMenu(false);
                   }}
-                  className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                  className="btn-touch w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg flex items-center gap-2 transition-colors"
                 >
                   <Edit className="w-4 h-4" />
                   Edit
@@ -196,13 +183,6 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
           </div>
         )}
 
-        {/* Auto Pay */}
-        {bill.auto_pay && (
-          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-            <CreditCard className={`w-4 h-4 ${config.iconColor}`} />
-            <span className="font-medium">Auto Pay</span>
-          </div>
-        )}
       </div>
 
       {/* Status Badge & Pay Button */}
@@ -212,14 +192,14 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
           {config.label}
         </div>
 
-        {/* Pay Now Button or Last Paid */}
+        {/* Mark as Paid Button or Last Paid */}
         {!isPaid ? (
           <button
             onClick={() => onMarkPaid(bill.id)}
-            className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-green-500/25 flex items-center gap-1.5"
+            className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-sm font-medium rounded-full transition-all shadow-lg shadow-green-500/25 flex items-center gap-1.5"
           >
             <Check className="w-4 h-4" />
-            Pay Now
+            Mark As Paid
           </button>
         ) : bill.last_paid_date ? (
           <span className="text-xs text-gray-500 dark:text-gray-400">
