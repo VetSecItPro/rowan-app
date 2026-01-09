@@ -29,6 +29,7 @@ const nextConfig = {
     return 'build-' + Date.now();
   },
   experimental: {
+    // Re-enabled: hang was caused by duplicate node_modules folders, not this feature
     optimizePackageImports: ['lucide-react', 'framer-motion'],
     // Disabled due to race condition causing 500 errors in dev
     // webpackBuildWorker: true,
