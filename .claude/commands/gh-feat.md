@@ -1,6 +1,6 @@
 ---
 description: Auto-push code to GitHub feature branch, run CI, monitor and report status
-allowed-tools: Bash(*), Read, Write, Edit, Glob, Grep, Task
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Task
 ---
 
 # Auto Push to GitHub Feature Branch & Monitor CI
@@ -24,17 +24,32 @@ git status --porcelain
 git diff --stat
 ```
 
-### 2. Auto-generate names based on changes:
+### 2. Pre-commit validation (REQUIRED):
+Run build and type check BEFORE committing:
+```bash
+npm run build && npx tsc --noEmit
+```
+
+**If validation fails:**
+- Parse the error output
+- Identify which files have errors
+- Show concise error summary
+- **DO NOT commit or push** - stop and report what needs fixing
+
+**If validation passes:**
+- Continue to step 3
+
+### 3. Auto-generate names based on changes:
 - Branch: `feature/scope-action` or `fix/scope-issue` based on files changed
 - Commit: `type(scope): description` following conventional commits
 - Scope examples: bills, auth, calendar, shopping, meals, tasks, ui, config, docs, commands
 
-### 3. If on main, create feature branch automatically:
+### 4. If on main, create feature branch automatically:
 ```bash
 git checkout -b feature/[auto-name]
 ```
 
-### 4. Stage and commit immediately:
+### 5. Stage and commit immediately:
 ```bash
 git add -A
 git commit -m "[message]
@@ -42,18 +57,35 @@ git commit -m "[message]
 Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
-### 5. Push to remote:
+### 6. Push to remote:
 ```bash
 git push -u origin [branch]
 ```
 
-### 6. Monitor CI (poll every 30 seconds until complete):
+### 7. Monitor CI (poll every 30 seconds until complete):
 ```bash
 gh run list --branch [branch] --limit 5 --json status,conclusion,name
 ```
 Keep checking until all runs show `completed` status.
 
 ## Self-Healing Behaviors
+
+### If build fails with missing dependencies:
+```bash
+npm install
+```
+Then retry build.
+
+### If build fails with cache issues:
+```bash
+rm -rf .next node_modules/.cache
+```
+Then retry build.
+
+### If TypeScript errors exist:
+- Report the specific errors with file paths and line numbers
+- Do NOT attempt to auto-fix code errors
+- Stop and let user fix manually
 
 ### If push fails (no upstream):
 ```bash
@@ -86,9 +118,21 @@ Report authentication issue and provide fix command.
 - Check up to 3 times before reporting
 
 ## Output Format
-After completion, report concisely:
+
+**If pre-commit checks fail:**
+```
+Pre-commit Check: ✗ Failed
+├─ Build: ✗ [error type]
+├─ Errors:
+│   └─ [file:line] [error message]
+│   └─ [file:line] [error message]
+└─ Action: Fix errors and run /gh-feat again
+```
+
+**If successful:**
 ```
 Branch: feature/xxx
+├─ Check: ✓ Build passed, types valid
 ├─ Commit: abc1234 - [message]
 ├─ Push: ✓ Uploaded to origin
 ├─ CI Status: ✓ All green / ⏳ Running / ✗ Failed

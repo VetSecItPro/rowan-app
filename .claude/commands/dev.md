@@ -1,6 +1,6 @@
 ---
 description: Start a clean development server (fast, handles all common issues)
-allowed-tools: Bash(*), Read, Write, Edit, Glob, Grep, Task
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Task
 ---
 
 # Start Clean Dev Server

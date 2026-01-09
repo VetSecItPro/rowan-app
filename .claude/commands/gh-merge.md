@@ -1,6 +1,6 @@
 ---
 description: Merge PR to main after CI passes, cleanup branches, resolve conflicts automatically
-allowed-tools: Bash(*), Read, Write, Edit, Glob, Grep, Task
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Task
 ---
 
 # Auto Merge PR & Cleanup
