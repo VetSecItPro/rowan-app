@@ -1,6 +1,6 @@
 ---
 description: Comprehensive security audit - scan, auto-fix safe issues, report findings
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Task, mcp__supabase__execute_sql, mcp__supabase__list_tables, mcp__supabase__get_advisors
+allowed-tools: Bash(git *), Bash(gh *), Bash(npm *), Bash(npx *), Bash(sleep *), Bash(jq *), Bash(cat *), Bash(rm *), Bash(mkdir *), Bash(ls *), Bash(head *), Bash(tail *), Bash(grep *), Bash(find *), Bash(xargs *), Bash(kill *), Bash(pkill *), Bash(lsof *), Bash(echo *), Bash(source *), Bash(export *), Read, Write, Edit, Glob, Grep, Task, mcp__supabase__execute_sql, mcp__supabase__list_tables, mcp__supabase__get_advisors
 ---
 
 # Comprehensive Security Audit

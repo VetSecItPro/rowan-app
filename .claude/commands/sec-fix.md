@@ -1,6 +1,6 @@
 ---
 description: Fix security issues from audit report by FIX number
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Task, mcp__supabase__execute_sql, mcp__supabase__apply_migration
+allowed-tools: Bash(git *), Bash(gh *), Bash(npm *), Bash(npx *), Bash(sleep *), Bash(jq *), Bash(cat *), Bash(rm *), Bash(mkdir *), Bash(ls *), Bash(head *), Bash(tail *), Bash(grep *), Bash(find *), Bash(xargs *), Bash(kill *), Bash(pkill *), Bash(lsof *), Bash(echo *), Bash(source *), Bash(export *), Read, Write, Edit, Glob, Grep, Task, mcp__supabase__execute_sql, mcp__supabase__apply_migration
 ---
 
 # Security Fix - Manual Review Issues
