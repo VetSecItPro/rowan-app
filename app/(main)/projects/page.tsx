@@ -495,7 +495,7 @@ export default function ProjectsPage() {
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
       <div className="p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
@@ -616,7 +616,7 @@ export default function ProjectsPage() {
 
           {/* Search box - hidden for bills/receipts tabs which have their own search */}
           {activeTab !== 'bills' && activeTab !== 'receipts' ? (
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div>
               <div className="apple-search-container projects-search">
                 <Search className="apple-search-icon" />
                 <input
@@ -652,10 +652,7 @@ export default function ProjectsPage() {
                 )}
               </div>
             </div>
-          ) : (
-            /* Spacer to maintain layout when search is hidden */
-            <div className="h-[58px]" />
-          )}
+          ) : null}
 
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 overflow-visible min-h-content-panel">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -938,6 +935,7 @@ export default function ProjectsPage() {
                     onClick={() => setIsExpenseModalOpen(true)}
                     feature="projects"
                     icon={<Plus className="w-5 h-5" />}
+                    className="!rounded-full"
                   >
                     Add Expense
                   </CTAButton>

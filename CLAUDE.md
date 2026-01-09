@@ -65,127 +65,37 @@
 - **date-fns 4** - Date utilities
 - **Sonner** - Toast notifications
 
-## Development Server Setup (IMPORTANT)
+## Development Server Setup
 
-> **MANDATORY:** Always reference this section before starting a dev server.
+> **Use `/dev` slash command** or the one-liner below. See [DEV-SERVER.md](DEV-SERVER.md) if issues persist.
 
-### Stable Configuration (December 2024)
-**Next.js Version:** 15.4.10 (security patched, 0 vulnerabilities)
-**Node.js Version:** 20.x LTS (use `nvm use 20`)
-**Bundler:** Webpack (NOT Turbopack)
-
-> **CRITICAL:** Node 22 + Next.js 15.4.10 has filesystem race conditions. Use Node 20.
-> Next.js 15.5.x has race conditions with ANY Node version. Always use 15.4.10.
-
-### Quick Start (Recommended) - USE THIS EVERY TIME
+### One Command (Use This)
 ```bash
-# Standard dev server start - THIS IS THE RELIABLE WAY
-pkill -f "next" 2>/dev/null || true && rm -rf .next && npm run dev
+pkill -f "next" 2>/dev/null; rm -rf ".next 2" "node_modules 2" ".next 3" "node_modules 3" .next 2>/dev/null; PATH="$HOME/.nvm/versions/node/v20.19.6/bin:$PATH" npm run dev
 ```
-**Why this works:** Kills any orphaned Next.js processes and clears the cache before starting.
-Server runs at http://localhost:3000.
 
-### If Quick Start Fails (Cache Corruption)
+**What it does (~5 sec):** Kills processes → removes duplicate folders → clears cache → starts server with correct PATH.
+
+**Expected:** "Ready in ~5s" → first page compile 15-30s → http://localhost:3000
+
+### If Still Fails (Nuclear Option)
 ```bash
-# Full cache clear with node_modules cache
-pkill -f "next" 2>/dev/null || true
-rm -rf .next node_modules/.cache
-npm run dev
+pkill -f "next" 2>/dev/null; rm -rf .next node_modules package-lock.json && npm install && npm run dev
 ```
 
-### Nuclear Option (For Persistent Issues)
-```bash
-# Full reinstall - USE THIS when middleware-manifest.json errors persist
-pkill -f "next" 2>/dev/null || true
-rm -rf .next node_modules package-lock.json
-npm install
-npm run dev
-```
-**When to use:** After Node version changes, after switching between Turbopack/Webpack, or when quick start fails repeatedly with ENOENT errors.
+### Environment
+- **Next.js:** 15.4.10 (NOT 15.5.x - has race conditions)
+- **Node.js:** 20.x LTS (NOT 22 - has race conditions)
+- **Node Path:** `~/.nvm/versions/node/v20.19.6/bin/`
+- **Bundler:** Webpack (NOT Turbopack)
 
-### Production Mode Testing
-```bash
-# Build and run production server (no HMR, more stable)
-rm -rf .next && npm run build && npm run start
-```
+### HMR (Hot Module Replacement)
+**Don't restart server for file edits** - HMR handles it automatically. Only restart when:
+- Server crashes
+- After `npm install`
+- After changing `next.config.mjs` or env vars
 
-### Why This Configuration Works
-
-**1. Node.js 20.x LTS (NOT Node 22)**
-- Node 22 has filesystem race conditions with Next.js webpack caching
-- Node 20 is more stable with Next.js 15.4.x
-- Switch with: `nvm use 20` (install first: `nvm install 20`)
-
-**2. Next.js 15.4.10 (NOT 15.5.x or 15.1.x)**
-- 15.5.x has filesystem race conditions (`.tmp` file errors, missing manifests)
-- 15.1.x has critical security vulnerabilities
-- 15.4.10 is the sweet spot: security patched AND stable
-- Run `npm audit` to verify 0 vulnerabilities
-
-**3. Webpack Mode (NOT Turbopack)**
-- Next.js 15.4.x uses Webpack by default
-- Turbopack has race condition bugs in all 15.x versions
-- Webpack is slower but more stable
-- `next.config.mjs` has `config.cache = false` for dev to prevent race conditions
-
-**4. Always Kill Before Start**
-- Orphaned Next.js processes can hold file locks
-- Always run `pkill -f "next"` before starting
-- This prevents "address already in use" and cache conflicts
-
-**5. Always Clear .next Cache**
-- Corrupted cache causes 500 errors and missing manifest files
-- `rm -rf .next` ensures clean compilation
-- Takes ~15-20 seconds for initial compile but prevents hours of debugging
-
-### Package.json Scripts (Correct Configuration)
-```json
-{
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start"
-}
-```
-Note: No `--turbopack` flag - use Webpack for stability.
-
-### Troubleshooting Guide
-
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `ENOENT: .next/server/app-paths-manifest.json` | Cache corruption | `rm -rf .next && npm run dev` |
-| `middleware-manifest.json not found` | Race condition | Nuclear option: full reinstall |
-| `address already in use` | Orphaned process | `pkill -f "next"` first |
-| `500 Internal Server Error` | Multiple causes | Full clean start |
-| `.tmp` file errors | Node version issue | Use Node 20: `nvm use 20` |
-| `next-font-manifest.json not found` | Corrupted node_modules | Nuclear option |
-| Persistent 500s after clean start | node_modules corruption | Nuclear option |
-
-### Hot Module Replacement (HMR) - IMPORTANT
-**DO NOT restart the dev server for file edits.** HMR handles changes automatically.
-
-**When editing files:**
-1. Make code changes
-2. Save the file
-3. Browser auto-refreshes via HMR (or do a normal refresh)
-4. Changes appear immediately
-
-**Only restart the server when:**
-- Server actually crashes (process exits)
-- Persistent compilation errors that don't resolve after fixing code
-- After running `npm install` for new packages
-- Changing `next.config.mjs` or environment variables
-
-**500 errors on `/fallback/` webpack chunks:**
-- This is a **browser cache issue**, not a server problem
-- Caused by stale browser tabs after a server restart
-- Fix: Hard refresh (Cmd+Shift+R) or open a fresh tab
-- Do NOT restart the server - it's already working
-
-### Maintenance
-- **Version check:** Ensure `package.json` has `"next": "15.4.10"`
-- **Security audit:** Run `npm audit` - should show 0 vulnerabilities
-- **Before major changes:** Always do a clean start
-- **After npm install:** Run `rm -rf .next` before starting dev
+**Browser 500 errors after restart?** Hard refresh (Cmd+Shift+R) - it's browser cache, not server.
 
 ## Security Rules
 
@@ -433,6 +343,8 @@ git push origin main   # Triggers automated deployment
 
 ### CRITICAL: Branching Strategy
 **NEVER commit directly to main branch. Always use feature branches.**
+
+> **Quick:** Use `/gh-feat` to auto-push code, create branch, run CI, and monitor until green (auto-generates branch name and commit message).
 
 **Required workflow:**
 1. **Start new work:** `git checkout -b feature/description`

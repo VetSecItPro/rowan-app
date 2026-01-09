@@ -11,11 +11,9 @@ import {
   type BillStatus,
 } from '@/lib/services/bills-service';
 import {
-  Filter,
   SortAsc,
   SortDesc,
   Calendar,
-  DollarSign,
   Loader2,
   AlertCircle,
   Plus,
@@ -192,34 +190,30 @@ export function BillsList({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header with Controls */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
         {/* Search */}
-        <div className="mb-4">
+        <div className="mb-3">
           <input
             type="text"
-            placeholder="Search bills by name, payee, or category..."
+            placeholder="Search bills..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border-2 border-amber-300 dark:border-amber-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className="w-full px-5 py-2.5 border-2 border-amber-300 dark:border-amber-600 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm"
           />
         </div>
 
-        {/* Filter and Sort Controls - Same Line */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-          {/* Status Filter */}
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <Filter className="w-4 h-4 inline mr-1" />
-              Filter by Status
-            </label>
-            <div className="flex flex-wrap gap-2">
+        {/* Filter and Sort Controls - Compact Layout */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          {/* Status Filter - Scrollable on mobile */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
               {statusOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => setStatusFilter(option.value)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                     statusFilter === option.value
                       ? 'bg-amber-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -231,63 +225,57 @@ export function BillsList({
             </div>
           </div>
 
-          {/* Sort Options - Right Justified */}
-          <div className="flex-shrink-0">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Sort By
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => toggleSort('due_date')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                  sortBy === 'due_date'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                <Calendar className="w-4 h-4" />
-                Due Date
-                {sortBy === 'due_date' &&
-                  (sortDirection === 'asc' ? (
-                    <SortAsc className="w-4 h-4" />
-                  ) : (
-                    <SortDesc className="w-4 h-4" />
-                  ))}
-              </button>
-              <button
-                onClick={() => toggleSort('amount')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                  sortBy === 'amount'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                <DollarSign className="w-4 h-4" />
-                Amount
-                {sortBy === 'amount' &&
-                  (sortDirection === 'asc' ? (
-                    <SortAsc className="w-4 h-4" />
-                  ) : (
-                    <SortDesc className="w-4 h-4" />
-                  ))}
-              </button>
-              <button
-                onClick={() => toggleSort('name')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                  sortBy === 'name'
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                Name
-                {sortBy === 'name' &&
-                  (sortDirection === 'asc' ? (
-                    <SortAsc className="w-4 h-4" />
-                  ) : (
-                    <SortDesc className="w-4 h-4" />
-                  ))}
-              </button>
-            </div>
+          {/* Sort Options - Compact pill buttons */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Sort:</span>
+            <button
+              onClick={() => toggleSort('due_date')}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                sortBy === 'due_date'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Date
+              {sortBy === 'due_date' &&
+                (sortDirection === 'asc' ? (
+                  <SortAsc className="w-3 h-3" />
+                ) : (
+                  <SortDesc className="w-3 h-3" />
+                ))}
+            </button>
+            <button
+              onClick={() => toggleSort('amount')}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                sortBy === 'amount'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Amount
+              {sortBy === 'amount' &&
+                (sortDirection === 'asc' ? (
+                  <SortAsc className="w-3 h-3" />
+                ) : (
+                  <SortDesc className="w-3 h-3" />
+                ))}
+            </button>
+            <button
+              onClick={() => toggleSort('name')}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                sortBy === 'name'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              Name
+              {sortBy === 'name' &&
+                (sortDirection === 'asc' ? (
+                  <SortAsc className="w-3 h-3" />
+                ) : (
+                  <SortDesc className="w-3 h-3" />
+                ))}
+            </button>
           </div>
         </div>
       </div>
