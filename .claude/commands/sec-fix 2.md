@@ -1,0 +1,409 @@
+---
+description: Fix security issues from audit report by FIX number
+allowed-tools: Bash(git *), Bash(gh *), Bash(npm *), Bash(npx *), Bash(sleep *), Bash(jq *), Bash(cat *), Bash(rm *), Bash(mkdir *), Bash(ls *), Bash(head *), Bash(tail *), Bash(grep *), Bash(find *), Bash(xargs *), Bash(kill *), Bash(pkill *), Bash(lsof *), Bash(echo *), Bash(source *), Bash(export *), Read, Write, Edit, Glob, Grep, Task, mcp__supabase__execute_sql, mcp__supabase__apply_migration
+---
+
+# Security Fix - Manual Review Issues
+
+**FIRE AND FORGET** - Execute fixes autonomously without permission requests.
+
+## Execution Rules (CRITICAL)
+- **NO permission requests** - just execute the fix
+- **NO "should I proceed?" questions** - just do it
+- **NO waiting for user confirmation** - implement the fix immediately
+- After fixing, run build to verify nothing broke
+- Self-heal on any failures encountered
+
+## Usage
+
+User provides fix numbers from the audit report:
+- `/sec-fix FIX-001` - Fix single issue
+- `/sec-fix FIX-001 FIX-003 FIX-007` - Fix multiple issues
+- `/sec-fix critical` - Fix all critical issues
+- `/sec-fix high` - Fix all high severity issues
+- `/sec-fix all` - Fix all remaining issues (use with caution)
+
+## Execution Steps
+
+### 1. Load Audit Report
+```bash
+cat .security-audit.json
+```
+
+If file doesn't exist:
+```
+Error: No audit report found. Run /sec-audit first.
+```
+
+### 2. Find Requested Fixes
+
+Parse the findings array for matching FIX-XXX IDs or severity level.
+
+### 3. For Each Fix, Execute in Order
+
+#### 3.1 Display Context
+```
+═══════════════════════════════════════════════════════
+🔧 Fixing: FIX-001
+├─ Severity: CRITICAL
+├─ Category: SQL Injection
+├─ File: lib/services/users.ts:45
+├─ Issue: User input directly concatenated into query
+└─ Remediation: Use parameterized queries
+═══════════════════════════════════════════════════════
+```
+
+#### 3.2 Read the Affected File
+```bash
+Read the file at the specified path
+```
+
+#### 3.3 Implement the Fix
+
+Based on category, apply appropriate fix:
+
+**SQL Injection:**
+- Replace string concatenation with parameterized queries
+- Use Supabase client methods instead of raw SQL
+
+**XSS (dangerouslySetInnerHTML):**
+- Add DOMPurify sanitization
+- Import DOMPurify if not present
+
+**Missing Authentication:**
+- Add auth check at start of API route
+- Use getUser() or getSession()
+
+**Missing Rate Limiting:**
+- Add Upstash rate limiter
+- Import and configure rate limit
+
+**Missing Input Validation:**
+- Add Zod schema validation
+- Parse request body with schema
+
+**Missing RLS:**
+- Create appropriate RLS policy
+- Use mcp__supabase__apply_migration
+
+**Hardcoded Secrets:**
+- Move to environment variable
+- Update .env.example
+
+**Insecure Randomness:**
+- Replace Math.random() with crypto.randomUUID() or crypto.getRandomValues()
+
+**Missing Security Headers:**
+- Add to next.config.mjs headers array
+
+**Sensitive Data in Logs:**
+- Remove or redact sensitive fields from console.log
+
+**eval/Function usage:**
+- Refactor to avoid dynamic code execution
+- Use safer alternatives
+
+**Missing Space Isolation:**
+- Add space_id filter to queries
+- Verify RLS policy includes space check
+
+#### 3.4 Verify Fix
+```bash
+npm run build
+```
+
+If build fails:
+- Analyze error
+- Attempt to fix build error
+- If can't fix, revert and report
+
+#### 3.5 Update Report
+
+Mark fix as resolved in `.security-audit.json`:
+```json
+{
+  "id": "FIX-001",
+  "status": "resolved",
+  "resolvedAt": "ISO timestamp",
+  "resolution": "description of what was done"
+}
+```
+
+### 4. Generate Fix Report
+
+**Directory:** `.security-reports/`
+
+Save to `.security-reports/fix-YYYY-MM-DD-HHMMSS.md`:
+
+```markdown
+# Security Fix Report
+
+**Date:** YYYY-MM-DD HH:MM:SS
+**Project:** [project name from package.json]
+**Fixed by:** Claude Security Fix
+
+---
+
+## Summary
+
+| Status | Count |
+|--------|-------|
+| ✅ Fixed | X |
+| ⚠️ Skipped | X |
+| 🔨 Build | Passing/Failed |
+
+---
+
+## Fixed Issues
+
+### FIX-001: [Title]
+- **File:** `path/to/file.ts:45`
+- **Category:** [SQL Injection/XSS/etc]
+- **Severity:** Critical
+- **Resolution:** [What was done to fix it]
+- **Before:**
+  ```typescript
+  // Original vulnerable code
+  ```
+- **After:**
+  ```typescript
+  // Fixed code
+  ```
+
+### FIX-003: [Title]
+...
+
+---
+
+## Skipped Issues
+
+These issues could not be automatically fixed and require manual review:
+
+### FIX-005: [Title]
+- **File:** `path/to/file.ts:120`
+- **Reason:** [Why it couldn't be auto-fixed]
+- **Recommendation:** [What the developer should do]
+
+---
+
+## Remaining Issues
+
+After this fix session, the following issues remain:
+
+| ID | Severity | Title | File |
+|----|----------|-------|------|
+| FIX-010 | High | Missing rate limiting | api/users/route.ts |
+| FIX-020 | Medium | Console.log in production | lib/utils.ts |
+
+---
+
+## Verification
+
+- **Build:** ✓ Passing / ✗ Failed
+- **Type Check:** ✓ Passing / ✗ Failed
+- **Files Changed:** [n]
+
+---
+
+## Next Steps
+
+1. Review changes: `git diff`
+2. Run tests: `npm test`
+3. Push fixes: `/gh-feat`
+4. Fix remaining issues: `/sec-fix [ID]`
+
+---
+
+*Generated by Claude Security Fix*
+```
+
+Also update `.security-audit.json` to mark fixed issues as resolved.
+
+### 5. Console Output
+
+After all fixes:
+```
+═══════════════════════════════════════════════════════
+✅ SECURITY FIXES COMPLETE
+═══════════════════════════════════════════════════════
+
+📊 RESULTS
+├─ ✅ Fixed: [n] issues
+├─ ⚠️  Skipped: [n] issues (couldn't auto-fix)
+└─ 🔨 Build: ✓ Passing
+
+✅ FIXED
+├─ FIX-001: SQL Injection in users.ts - parameterized query
+├─ FIX-003: Missing auth in /api/data - added getUser check
+└─ FIX-007: XSS in CommentCard - added DOMPurify
+
+⚠️  SKIPPED (Manual intervention needed)
+├─ FIX-005: Business logic race condition - needs architectural review
+└─ ...
+
+═══════════════════════════════════════════════════════
+📁 Reports saved:
+   └─ .security-reports/fix-YYYY-MM-DD-HHMMSS.md
+   └─ .security-audit.json (updated)
+
+🔄 NEXT STEPS
+├─ Review changes: git diff
+├─ Run tests: npm test
+├─ If satisfied: /gh-feat to push changes
+└─ Remaining issues: [n] - run /sec-fix [ID] to continue
+═══════════════════════════════════════════════════════
+```
+
+## Fix Templates by Category
+
+### SQL Injection
+```typescript
+// Before (vulnerable)
+const result = await supabase.from('users').select('*').eq('id', userId)
+
+// After (safe - already parameterized by Supabase client)
+// If raw SQL:
+// Before
+const { data } = await supabase.rpc('custom_query', { user_input: untrusted })
+// After
+const sanitized = validator.escape(untrusted)
+const { data } = await supabase.rpc('custom_query', { user_input: sanitized })
+```
+
+### XSS Prevention
+```typescript
+// Before
+<div dangerouslySetInnerHTML={{ __html: userContent }} />
+
+// After
+import DOMPurify from 'dompurify'
+<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(userContent) }} />
+```
+
+### API Authentication
+```typescript
+// Before
+export async function POST(request: Request) {
+  const body = await request.json()
+  // ... process
+}
+
+// After
+import { createClient } from '@/lib/supabase/server'
+
+export async function POST(request: Request) {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+
+  if (error || !user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const body = await request.json()
+  // ... process
+}
+```
+
+### Rate Limiting
+```typescript
+// Add to API route
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, '10 s'),
+})
+
+export async function POST(request: Request) {
+  const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1'
+  const { success } = await ratelimit.limit(ip)
+
+  if (!success) {
+    return Response.json({ error: 'Too many requests' }, { status: 429 })
+  }
+  // ... rest of handler
+}
+```
+
+### Input Validation
+```typescript
+// Before
+export async function POST(request: Request) {
+  const body = await request.json()
+  const { name, email } = body
+  // ... use directly
+}
+
+// After
+import { z } from 'zod'
+
+const CreateUserSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+})
+
+export async function POST(request: Request) {
+  const body = await request.json()
+  const result = CreateUserSchema.safeParse(body)
+
+  if (!result.success) {
+    return Response.json({ error: 'Invalid input', details: result.error.flatten() }, { status: 400 })
+  }
+
+  const { name, email } = result.data
+  // ... use validated data
+}
+```
+
+### RLS Policy
+```sql
+-- Enable RLS
+ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
+
+-- Add policy for authenticated users
+CREATE POLICY "Users can access own space data" ON table_name
+  FOR ALL
+  USING (space_id IN (
+    SELECT space_id FROM space_members WHERE user_id = auth.uid()
+  ));
+```
+
+### Secure Randomness
+```typescript
+// Before
+const token = Math.random().toString(36).substring(7)
+
+// After
+const token = crypto.randomUUID()
+// or for bytes:
+const bytes = crypto.getRandomValues(new Uint8Array(32))
+const token = Buffer.from(bytes).toString('hex')
+```
+
+## Self-Healing Behaviors
+
+### If file not found:
+- Check if path changed
+- Search for similar file name
+- Report if can't locate
+
+### If fix causes build error:
+```bash
+git checkout -- [file]  # Revert
+```
+Report as "needs manual review"
+
+### If fix causes type errors:
+- Attempt to fix type errors
+- If complex, revert and report
+
+### If Supabase MCP unavailable:
+- Skip RLS fixes
+- Report as "needs manual RLS configuration"
+
+### After all fixes:
+```bash
+npm run build && npx tsc --noEmit
+```
+Verify everything still compiles.
