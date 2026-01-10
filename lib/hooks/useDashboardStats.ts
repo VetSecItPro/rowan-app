@@ -11,8 +11,7 @@ import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
-import { User } from '@/lib/types';
-import { Space } from '@/lib/contexts/spaces-context';
+import { User, Space } from '@/lib/types';
 import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
 import { getCurrentDateString } from '@/lib/utils/date-utils';
 
