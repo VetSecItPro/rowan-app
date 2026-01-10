@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Upload, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
@@ -48,6 +49,13 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  // Mount state for portal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Auto-populate page URL and scroll to top
   useEffect(() => {
@@ -177,10 +185,10 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm overflow-hidden">
+  const modalContent = (
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm overflow-hidden">
       <div
         ref={modalContentRef}
         className="w-full max-h-[100dvh] sm:h-auto sm:max-h-[80vh] sm:max-w-2xl bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden my-auto"
@@ -366,4 +374,6 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
