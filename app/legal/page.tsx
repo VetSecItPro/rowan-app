@@ -77,11 +77,10 @@ export default function LegalPage() {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md'
-                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id
+                  ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                  }`}
               >
                 {tab.icon}
                 {tab.label}
@@ -104,7 +103,7 @@ export default function LegalPage() {
 function TermsContent() {
   return (
     <>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: December 2024</p>
+      <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: January 2026</p>
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Agreement to Terms</h2>
@@ -210,7 +209,7 @@ function TermsContent() {
 function PrivacyContent() {
   return (
     <>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: December 2024</p>
+      <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: January 2026</p>
 
       <section className="mb-8 p-6 bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Data Controller</h2>

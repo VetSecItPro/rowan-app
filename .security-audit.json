@@ -1,0 +1,152 @@
+{
+  "auditDate": "2026-01-08T23:46:08.000Z",
+  "summary": {
+    "critical": 0,
+    "high": 2,
+    "medium": 4,
+    "low": 2,
+    "info": 3,
+    "autoFixed": 0
+  },
+  "autoFixed": [],
+  "findings": [
+    {
+      "id": "FIX-001",
+      "category": "input-validation",
+      "severity": "high",
+      "title": "API Routes Missing Input Validation",
+      "files": [
+        "app/api/beta/transition/route.ts",
+        "app/api/beta/validate/route.ts",
+        "app/api/settings/privacy-data/route.ts",
+        "app/api/bulk/archive-old-data/route.ts",
+        "app/api/bulk/export-by-date/route.ts",
+        "app/api/messages/[id]/route.ts",
+        "app/api/shopping/[id]/sharing/route.ts",
+        "app/api/shopping/[id]/route.ts",
+        "app/api/test-sentry/route.ts",
+        "app/api/test/email-templates/route.ts",
+        "app/api/year-in-review/route.ts",
+        "app/api/auth/resend-verification/route.ts",
+        "app/api/auth/mfa/enroll/route.ts",
+        "app/api/auth/signout/route.ts",
+        "app/api/auth/cleanup-orphaned-user/route.ts",
+        "app/api/launch/notify/route.ts",
+        "app/api/expenses/[id]/route.ts",
+        "app/api/projects/[id]/route.ts",
+        "app/api/spaces/[spaceId]/delete/route.ts",
+        "app/api/spaces/[spaceId]/export/route.ts",
+        "app/api/spaces/route.ts",
+        "app/api/spaces/invitations/route.ts",
+        "app/api/admin/beta/feedback/route.ts",
+        "app/api/admin/beta/requests/route.ts",
+        "app/api/admin/beta/users/route.ts",
+        "app/api/admin/beta/stats/route.ts",
+        "app/api/admin/feature-usage/route.ts",
+        "app/api/admin/auth/login/route.ts",
+        "app/api/admin/activity/route.ts",
+        "app/api/admin/health/route.ts"
+      ],
+      "description": "These API routes do not use Zod schema validation for request bodies/parameters",
+      "remediation": "Add Zod schema validation to all API routes"
+    },
+    {
+      "id": "FIX-002",
+      "category": "authentication",
+      "severity": "high",
+      "title": "API Routes Without Explicit Authentication Checks",
+      "files": [
+        "app/api/beta/request/route.ts",
+        "app/api/settings/privacy-data/route.ts",
+        "app/api/test-sentry/route.ts",
+        "app/api/test-cookies/route.ts",
+        "app/api/geolocation/route.ts",
+        "app/api/weather/forecast/route.ts",
+        "app/api/weather/user-location/route.ts",
+        "app/api/weather/geocode/route.ts",
+        "app/api/webhooks/stripe/route.ts",
+        "app/api/cookies/route.ts",
+        "app/api/stripe/webhook/route.ts"
+      ],
+      "description": "These API routes don't have explicit authentication imports. Some may be intentionally public (webhooks), but others should be reviewed.",
+      "remediation": "Review each route and add authentication where required"
+    },
+    {
+      "id": "FIX-003",
+      "category": "cryptography",
+      "severity": "medium",
+      "title": "Math.random() Used for ID Generation",
+      "files": [
+        "app/api/recipes/external/apininjas/search/route.ts:81",
+        "app/(main)/messages/page.tsx:420",
+        "app/(main)/reminders/page.tsx:181",
+        "components/shared/UnifiedDetailsModal.tsx:87",
+        "lib/hooks/useOfflineQueue.ts:159"
+      ],
+      "description": "Math.random() is not cryptographically secure and should not be used for generating IDs",
+      "remediation": "Use crypto.randomUUID() for unique identifiers"
+    },
+    {
+      "id": "FIX-004",
+      "category": "security-headers",
+      "severity": "medium",
+      "title": "CSP Uses unsafe-inline and unsafe-eval",
+      "files": [
+        "next.config.mjs:120-143"
+      ],
+      "description": "The Content Security Policy includes unsafe-inline and unsafe-eval directives. Documented as necessary for Next.js.",
+      "remediation": "Implement nonce-based CSP when Next.js support stabilizes"
+    },
+    {
+      "id": "FIX-005",
+      "category": "information-disclosure",
+      "severity": "medium",
+      "title": "Console.log Statements in Production Code",
+      "count": 14,
+      "description": "Console.log statements found. Removed in production builds via next.config.mjs.",
+      "remediation": "Already handled by compiler.removeConsole setting"
+    },
+    {
+      "id": "FIX-006",
+      "category": "security-headers",
+      "severity": "medium",
+      "title": "Security Headers Not Applied in Development",
+      "files": [
+        "next.config.mjs:104-106"
+      ],
+      "description": "Security headers are disabled in development mode",
+      "remediation": "Consider enabling permissive security headers in development"
+    },
+    {
+      "id": "FIX-007",
+      "category": "client-storage",
+      "severity": "low",
+      "title": "LocalStorage Used for Non-Sensitive Data",
+      "description": "LocalStorage is used for UI preferences and caching. No sensitive data stored.",
+      "status": "acceptable"
+    },
+    {
+      "id": "FIX-008",
+      "category": "client-storage",
+      "severity": "low",
+      "title": "CSRF Token in SessionStorage",
+      "files": [
+        "lib/hooks/useCsrfToken.ts:48"
+      ],
+      "description": "CSRF token stored in sessionStorage - valid approach",
+      "status": "acceptable"
+    }
+  ],
+  "positiveFindings": [
+    "All 178 tables have RLS enabled",
+    "Security headers configured in production",
+    "Rate limiting implemented across API routes",
+    "No hardcoded secrets detected",
+    "No SQL injection vulnerabilities",
+    "No XSS vulnerabilities",
+    "No command injection",
+    "No eval() usage",
+    "Image optimization secure (SVG disabled)",
+    "Environment files in .gitignore"
+  ]
+}
