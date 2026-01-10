@@ -25,6 +25,8 @@ import { tasksService } from '@/lib/services/tasks-service';
 import { remindersService, type Reminder } from '@/lib/services/reminders-service';
 import { mealsService, type Meal } from '@/lib/services/meals-service';
 import type { Task } from '@/lib/types';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 
 interface TodayAtAGlanceProps {
   spaceId: string;
@@ -112,38 +114,50 @@ const Section = memo(function Section({
     pink: 'text-pink-600 dark:text-pink-400'
   };
 
+  const spotlightColors: Record<string, string> = {
+    purple: 'rgba(147, 51, 234, 0.2)',
+    blue: 'rgba(59, 130, 246, 0.2)',
+    orange: 'rgba(249, 115, 22, 0.2)',
+    pink: 'rgba(236, 72, 153, 0.2)'
+  };
+
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className={colorClasses[color]}>{icon}</span>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-            {title}
-          </h4>
-          {count > 0 && (
-            <span className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-semibold">
-              {count}
-            </span>
+    <SpotlightCard
+      className="flex flex-col h-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-0"
+      spotlightColor={spotlightColors[color]}
+    >
+      <div className="p-4 flex flex-col h-full">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className={colorClasses[color]}>{icon}</span>
+            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              {title}
+            </h4>
+            {count > 0 && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300`}>
+                {count}
+              </span>
+            )}
+          </div>
+          <Link
+            href={href}
+            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-0.5"
+          >
+            View all
+            <ChevronRight className="w-3 h-3" />
+          </Link>
+        </div>
+        <div className="flex-1 space-y-1.5">
+          {isEmpty ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 italic py-2">
+              Nothing scheduled
+            </p>
+          ) : (
+            children
           )}
         </div>
-        <Link
-          href={href}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-0.5"
-        >
-          View all
-          <ChevronRight className="w-3 h-3" />
-        </Link>
       </div>
-      <div className="flex-1 space-y-1.5">
-        {isEmpty ? (
-          <p className="text-sm text-gray-400 dark:text-gray-500 italic py-2">
-            Nothing scheduled
-          </p>
-        ) : (
-          children
-        )}
-      </div>
-    </div>
+    </SpotlightCard>
   );
 });
 
@@ -174,15 +188,13 @@ const EventItem = memo(function EventItem({ event }: { event: CalendarEvent }) {
 // Task item component
 const TaskItem = memo(function TaskItem({ task, isOverdue }: { task: Task; isOverdue?: boolean }) {
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-      isOverdue ? 'border-l-2 border-red-500' : ''
-    }`}>
-      <PriorityBadge priority={task.priority} />
-      <p className={`text-sm flex-1 truncate ${
-        isOverdue
-          ? 'text-red-700 dark:text-red-400'
-          : 'text-gray-800 dark:text-gray-200'
+    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
       }`}>
+      <PriorityBadge priority={task.priority} />
+      <p className={`text-sm flex-1 truncate ${isOverdue
+        ? 'text-red-700 dark:text-red-400'
+        : 'text-gray-800 dark:text-gray-200'
+        }`}>
         {task.title}
       </p>
       {task.due_date && (
@@ -217,15 +229,13 @@ const ReminderItem = memo(function ReminderItem({ reminder, isOverdue }: { remin
   const remindAt = reminder.remind_at || reminder.reminder_time;
 
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-      isOverdue ? 'border-l-2 border-red-500' : ''
-    }`}>
-      {reminder.emoji && <span className="text-sm">{reminder.emoji}</span>}
-      <p className={`text-sm flex-1 truncate ${
-        isOverdue
-          ? 'text-red-700 dark:text-red-400'
-          : 'text-gray-800 dark:text-gray-200'
+    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
       }`}>
+      {reminder.emoji && <span className="text-sm">{reminder.emoji}</span>}
+      <p className={`text-sm flex-1 truncate ${isOverdue
+        ? 'text-red-700 dark:text-red-400'
+        : 'text-gray-800 dark:text-gray-200'
+        }`}>
         {reminder.title}
       </p>
       {remindAt && (
@@ -378,10 +388,42 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
-          <span className="ml-2 text-gray-500 dark:text-gray-400">Loading today&apos;s overview...</span>
+      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}>
+        {/* Header Skeleton */}
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            </div>
+            <div className="hidden sm:flex items-center gap-4">
+              <Skeleton className="h-8 w-24 rounded-full" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+        </div>
+
+        {/* Grid Skeleton */}
+        <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-48 rounded-3xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-4 space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  <Skeleton className="w-5 h-5 rounded" />
+                  <Skeleton className="w-20 h-5 rounded" />
+                </div>
+                <Skeleton className="w-16 h-4 rounded" />
+              </div>
+              <div className="space-y-3">
+                <Skeleton className="w-full h-8 rounded" />
+                <Skeleton className="w-full h-8 rounded" />
+                <Skeleton className="w-full h-8 rounded" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );
