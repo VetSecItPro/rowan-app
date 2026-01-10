@@ -175,7 +175,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
             className="block group"
             style={{ animationDelay: `${index * 50}ms` }}
           >
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-200 hover:shadow-md">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-gray-800/80 border border-white/20 dark:border-gray-700/30 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 transition-all duration-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] group-hover:translate-x-1">
               {/* Icon */}
               <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform`}>
                 <Icon className="w-4 h-4 text-white" />
