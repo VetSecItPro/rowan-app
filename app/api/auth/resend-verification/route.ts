@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Build verification URL
-    const verificationUrl = buildAppUrl('/auth/verify-email', { token: verificationToken });
+    // Note: /verify-email is the correct path because (auth) is a Next.js route group
+    const verificationUrl = buildAppUrl('/verify-email', { token: verificationToken });
 
     // Get user's name from metadata or database
     const userName = user.user_metadata?.name || user.user_metadata?.full_name || 'there';

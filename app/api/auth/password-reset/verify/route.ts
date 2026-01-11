@@ -84,28 +84,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mark the token as used
-    const { error: markUsedError } = await supabaseAdmin
-      .from('password_reset_tokens')
-      .update({ used_at: new Date().toISOString() })
-      .eq('token', token);
-
-    if (markUsedError) {
-      logger.error('Failed to mark token as used:', markUsedError, { component: 'api-route', action: 'api_request' });
-      // Don't fail the request, password was already updated
-    }
-
-    // Clean up any other reset tokens for this user
-    const { error: cleanupError } = await supabaseAdmin
-      .from('password_reset_tokens')
-      .delete()
-      .eq('user_id', tokenData.user_id)
-      .neq('token', token);
-
-    if (cleanupError) {
-      logger.error('Failed to cleanup other tokens:', cleanupError, { component: 'api-route', action: 'api_request' });
-      // Don't fail the request
-    }
+    // OPTIMIZATION: Fire-and-forget cleanup operations (password already updated successfully)
+    // Mark token as used and cleanup other tokens in parallel - don't block response
+    Promise.all([
+      supabaseAdmin
+        .from('password_reset_tokens')
+        .update({ used_at: new Date().toISOString() })
+        .eq('token', token),
+      supabaseAdmin
+        .from('password_reset_tokens')
+        .delete()
+        .eq('user_id', tokenData.user_id)
+        .neq('token', token)
+    ]).catch(err => {
+      logger.error('Token cleanup error:', err, { component: 'api-route', action: 'api_request' });
+    });
 
     return NextResponse.json({
       success: true,

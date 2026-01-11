@@ -116,12 +116,19 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Prepare update data
+    // Check if email is being changed
+    const isEmailChange = sanitizedEmail !== user.email?.toLowerCase();
+
+    // Prepare update data (don't include email if it's being changed - that goes through verification)
     const updateData: any = {
       name: sanitizedName,
-      email: sanitizedEmail,
       updated_at: new Date().toISOString(),
     };
+
+    // Only include email if it's NOT being changed (to avoid bypassing verification)
+    if (!isEmailChange) {
+      updateData.email = sanitizedEmail;
+    }
 
     // Include avatar_url if provided (with URL validation)
     if (avatar_url !== undefined && avatar_url !== null && avatar_url !== '') {
@@ -175,25 +182,83 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update auth user metadata if email changed
-    if (sanitizedEmail !== user.email) {
-      const { error: authUpdateError } = await supabase.auth.updateUser({
-        email: sanitizedEmail,
-      });
+    // Handle email change through verification flow
+    let emailChangeInitiated = false;
+    if (isEmailChange) {
+      try {
+        // Import the email change functionality
+        const { sendEmailChangeEmail } = await import('@/lib/services/email-service');
+        const { supabaseAdmin } = await import('@/lib/supabase/admin');
+        const { buildAppUrl } = await import('@/lib/utils/app-url');
+        const crypto = await import('crypto');
 
-      if (authUpdateError) {
-        logger.error('[API] Auth email update error', authUpdateError, {
+        // Check if new email is already in use
+        const { data: existingUser } = await supabaseAdmin
+          .from('users')
+          .select('id')
+          .eq('email', sanitizedEmail)
+          .single();
+
+        if (existingUser) {
+          return NextResponse.json(
+            { error: 'This email address is already in use by another account.' },
+            { status: 409 }
+          );
+        }
+
+        // Get user's name for the email
+        const userName = updatedUser?.name || user.user_metadata?.name || 'there';
+
+        // Generate a secure token
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+        // Invalidate any existing email change tokens for this user
+        await supabaseAdmin
+          .from('email_change_tokens')
+          .delete()
+          .eq('user_id', user.id);
+
+        // Store the email change token
+        const { error: tokenError } = await supabaseAdmin
+          .from('email_change_tokens')
+          .insert({
+            user_id: user.id,
+            current_email: user.email,
+            new_email: sanitizedEmail,
+            token: token,
+            expires_at: expiresAt.toISOString(),
+            created_at: new Date().toISOString()
+          });
+
+        if (!tokenError) {
+          // Send verification email to the NEW email address
+          // Note: /verify-email-change is the correct path because (auth) is a Next.js route group
+          const verificationUrl = buildAppUrl('/verify-email-change', { token });
+          const emailResult = await sendEmailChangeEmail({
+            currentEmail: user.email!,
+            newEmail: sanitizedEmail,
+            verificationUrl,
+            userName,
+          });
+
+          if (emailResult.success) {
+            emailChangeInitiated = true;
+            logger.info('[API] Email change verification sent', {
+              component: 'ProfileUpdateAPI',
+              action: 'EMAIL_CHANGE_INITIATED',
+              userId: user.id,
+              newEmail: sanitizedEmail.substring(0, 3) + '***',
+            });
+          }
+        }
+      } catch (emailChangeError) {
+        logger.error('[API] Failed to initiate email change', emailChangeError, {
           component: 'ProfileUpdateAPI',
-          action: 'UPDATE_AUTH_EMAIL',
+          action: 'EMAIL_CHANGE_ERROR',
           userId: user.id,
         });
-
-        // Note: We don't fail the request if auth update fails
-        // because the database update succeeded
-        logger.warn('[API] Profile updated in database but auth email update failed', {
-          userId: user.id,
-          newEmail: sanitizedEmail,
-        });
+        // Continue with other updates, but note the email change failed
       }
     }
 
@@ -202,13 +267,16 @@ export async function PUT(request: NextRequest) {
       action: 'UPDATE_SUCCESS',
       userId: user.id,
       nameChanged: sanitizedName !== user.user_metadata?.name,
-      emailChanged: sanitizedEmail !== user.email,
+      emailChangeInitiated,
     });
 
     return NextResponse.json({
       success: true,
       user: updatedUser,
-      message: 'Profile updated successfully',
+      message: emailChangeInitiated
+        ? 'Profile updated. A verification email has been sent to your new email address.'
+        : 'Profile updated successfully',
+      emailChangeInitiated,
     });
 
   } catch (error) {

@@ -23,7 +23,7 @@ interface MagicLinkEmailProps {
 
 export const MagicLinkEmail = ({
   userEmail = 'user@example.com',
-  magicLinkUrl = 'https://rowanapp.com/auth/magic?token=sample-token',
+  magicLinkUrl = 'https://rowanapp.com/magic?token=sample-token',
   userName = 'there',
   ipAddress = '192.168.1.1',
   userAgent = 'Chrome on macOS',
