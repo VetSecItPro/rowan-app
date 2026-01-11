@@ -15,7 +15,7 @@ const PasswordResetRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
+    // Rate limiting: 5 attempts per hour per IP
     const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
     const { success: rateLimitPassed } = await checkAuthRateLimit(`password-reset:${ip}`);
 
@@ -26,84 +26,98 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body
     const body = await request.json();
-    const validatedData = PasswordResetRequestSchema.parse(body);
-    const { email } = validatedData;
+    const { email } = PasswordResetRequestSchema.parse(body);
 
-    // Check if user exists using admin client (bypasses RLS for unauthenticated requests)
+    // Check if user exists
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
       .select('id, name, email')
       .eq('email', email.toLowerCase())
       .single();
 
-    // Always return success to prevent user enumeration attacks
-    // But only send email if user actually exists
+    // Only process if user exists (but always return success for security)
     if (userData && !userError) {
-      try {
-        // Generate a secure reset token
-        const resetToken = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+      // Generate token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-        // Invalidate any existing tokens for this user
-        await supabaseAdmin
+      // CRITICAL: Insert new token first (this is the critical path)
+      // Don't run delete in parallel - it can delete the newly inserted token!
+      const { error: tokenError } = await supabaseAdmin
+        .from('password_reset_tokens')
+        .insert({
+          user_id: userData.id,
+          token: resetToken,
+          expires_at: expiresAt.toISOString(),
+          created_at: new Date().toISOString()
+        });
+
+      // Fire-and-forget: cleanup old tokens AFTER insert succeeds
+      // This prevents race condition where delete removes the new token
+      if (!tokenError) {
+        supabaseAdmin
           .from('password_reset_tokens')
           .delete()
-          .eq('user_id', userData.id);
-
-        // Store the reset token in the database using admin client (bypasses RLS)
-        const { error: tokenError } = await supabaseAdmin
-          .from('password_reset_tokens')
-          .insert({
-            user_id: userData.id,
-            token: resetToken,
-            expires_at: expiresAt.toISOString(),
-            created_at: new Date().toISOString()
+          .eq('user_id', userData.id)
+          .neq('token', resetToken)
+          .then(() => {})
+          .catch(err => {
+            logger.error('Failed to cleanup old tokens:', err, {
+              component: 'api-route',
+              action: 'api_request'
+            });
           });
+      }
 
-        if (tokenError) {
-          logger.error('Failed to store reset token:', tokenError, { component: 'api-route', action: 'api_request' });
-          // Still return success to prevent information leakage
-        } else {
-          // Send password reset email using our custom template via Resend
-          const resetUrl = buildAppUrl('/reset-password', { token: resetToken });
+      const tokenResult = { error: tokenError };
 
-          // Get user agent and IP for security info
-          const userAgent = request.headers.get('user-agent') || 'Unknown browser';
+      // Only send email if token was stored successfully
+      if (!tokenResult.error) {
+        const resetUrl = buildAppUrl('/reset-password', { token: resetToken });
+        const userAgent = request.headers.get('user-agent') || 'Unknown browser';
 
-          const emailData: PasswordResetData = {
-            userEmail: email,
-            resetUrl: resetUrl,
-            userName: userData.name || 'there',
-            ipAddress: ip,
-            userAgent: userAgent
-          };
+        const emailData: PasswordResetData = {
+          userEmail: email,
+          resetUrl: resetUrl,
+          userName: userData.name || 'there',
+          ipAddress: ip,
+          userAgent: userAgent
+        };
 
-          // Send email and wait for result to ensure it's sent
-          const emailResult = await sendPasswordResetEmail(emailData);
-          if (!emailResult.success) {
-            logger.error('Failed to send password reset email:', undefined, {
+        // OPTIMIZATION: Fire-and-forget email - don't await
+        sendPasswordResetEmail(emailData)
+          .then(result => {
+            if (result.success) {
+              logger.info('Password reset email sent', {
+                component: 'api-route',
+                action: 'password_reset',
+                email: email.substring(0, 3) + '***'
+              });
+            } else {
+              logger.error('Failed to send password reset email', {
+                component: 'api-route',
+                action: 'api_request',
+                details: result.error
+              });
+            }
+          })
+          .catch(err => {
+            logger.error('Password reset email error:', err, {
               component: 'api-route',
-              action: 'api_request',
-              details: emailResult.error,
-              email: email.substring(0, 3) + '***'
+              action: 'api_request'
             });
-          } else {
-            logger.info('Password reset email sent successfully', {
-              component: 'api-route',
-              action: 'password_reset',
-              email: email.substring(0, 3) + '***'
-            });
-          }
-        }
-      } catch (emailError) {
-        logger.error('Password reset email error:', emailError, { component: 'api-route', action: 'api_request' });
-        // Still return success to user
+          });
+      } else {
+        logger.error('Failed to store reset token:', tokenResult.error, {
+          component: 'api-route',
+          action: 'api_request'
+        });
       }
     }
 
-    // Always return success message to prevent user enumeration
+    // Return success immediately (email sends in background)
     return NextResponse.json({
       success: true,
       message: 'If an account with that email exists, we\'ve sent you a password reset link.'
@@ -135,7 +149,7 @@ export async function GET() {
     requestBody: {
       email: 'string (required) - User email address'
     },
-    rateLimit: '3 requests per hour per IP address',
+    rateLimit: '5 requests per hour per IP address',
     security: [
       'Rate limiting prevents brute force attacks',
       'User enumeration protection (always returns success)',

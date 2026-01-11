@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Send verification email to the NEW email address
-    const verificationUrl = buildAppUrl('/auth/verify-email-change', { token });
+    // Note: /verify-email-change is the correct path because (auth) is a Next.js route group
+    const verificationUrl = buildAppUrl('/verify-email-change', { token });
 
     const emailData: EmailChangeData = {
       currentEmail: user.email!,

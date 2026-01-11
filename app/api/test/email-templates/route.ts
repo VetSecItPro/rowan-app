@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { Resend } from 'resend';
+import { render } from '@react-email/components';
+import BetaInviteEmail from '@/lib/emails/templates/BetaInviteEmail';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -21,6 +24,8 @@ import {
   type MagicLinkData,
   type EmailVerificationData
 } from '@/lib/services/email-service';
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export const dynamic = 'force-dynamic';
 
@@ -182,7 +187,7 @@ export async function POST(request: NextRequest) {
       case 'magic-link':
         const magicLinkData: MagicLinkData = {
           userEmail: email,
-          magicLinkUrl: 'https://rowanapp.com/auth/magic?token=test-magic-token-67890',
+          magicLinkUrl: 'https://rowanapp.com/magic?token=test-magic-token-67890',
           userName: 'Test User',
           ipAddress: '192.168.1.1',
           userAgent: 'Safari on iPhone'
@@ -193,7 +198,7 @@ export async function POST(request: NextRequest) {
       case 'email-verification':
         const emailVerificationData: EmailVerificationData = {
           userEmail: email,
-          verificationUrl: 'https://rowanapp.com/auth/verify?token=test-verify-token-abcdef',
+          verificationUrl: 'https://rowanapp.com/verify-email?token=test-verify-token-abcdef',
           userName: 'Test User'
         };
         result = await sendEmailVerificationEmail(emailVerificationData);
@@ -203,10 +208,34 @@ export async function POST(request: NextRequest) {
         result = await verifyEmailService();
         break;
 
+      case 'beta-invite':
+        if (!resend) {
+          return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
+        }
+        const betaCode = body.betaCode || 'TEST-CODE-1234';
+        const signupUrl = `https://rowanapp.com/signup?beta_code=${betaCode}`;
+        const betaEmailHtml = await render(
+          BetaInviteEmail({
+            recipientEmail: email,
+            inviteCode: betaCode,
+            signupUrl,
+            expiresAt: 'February 15, 2026',
+          })
+        );
+        const { data: betaData, error: betaError } = await resend.emails.send({
+          from: 'Rowan <notifications@rowanapp.com>',
+          replyTo: 'support@rowanapp.com',
+          to: email,
+          subject: "You're invited to Rowan Beta! 🌳",
+          html: betaEmailHtml,
+        });
+        result = betaError ? { success: false, error: betaError.message } : { success: true, messageId: betaData?.id };
+        break;
+
       default:
         return NextResponse.json({
           error: 'Invalid email type',
-          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'password-reset', 'magic-link', 'email-verification', 'verify']
+          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'password-reset', 'magic-link', 'email-verification', 'beta-invite', 'verify']
         }, { status: 400 });
     }
 

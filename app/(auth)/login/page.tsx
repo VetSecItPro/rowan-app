@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
-import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, ArrowLeft, CheckCircle } from 'lucide-react';
 import { RestoreAccountModal } from '@/components/settings/RestoreAccountModal';
 import { useValidatedSearchParams, LoginParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { logger } from '@/lib/logger';
@@ -22,6 +23,9 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [useMagicLink, setUseMagicLink] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [isProcessingCallback, setIsProcessingCallback] = useState(false);
   const [deletionInfo, setDeletionInfo] = useState<{
     deletionRequestedAt: string;
     permanentDeletionAt: string;
@@ -30,18 +34,123 @@ export default function LoginPage() {
   const router = useRouter();
   const { params } = useValidatedSearchParams(LoginParamsSchema);
 
+  // Handle Supabase auth callback (magic link, OAuth, etc.)
+  // This detects #access_token in URL hash and processes it
+  useEffect(() => {
+    const handleAuthCallback = async () => {
+      // Check if URL has hash with access_token (Supabase callback)
+      const hash = window.location.hash;
+      if (!hash || !hash.includes('access_token')) return;
+
+      setIsProcessingCallback(true);
+
+      try {
+        // Parse tokens from hash fragment
+        const hashParams = new URLSearchParams(hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+
+        if (!accessToken || !refreshToken) {
+          console.error('Missing tokens in hash');
+          setError('Invalid authentication response. Please try again.');
+          setIsProcessingCallback(false);
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          return;
+        }
+
+        const supabase = createClient();
+
+        // Explicitly set the session with tokens from hash
+        const { data: { session }, error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        // Clear hash immediately to prevent reprocessing
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+
+        if (sessionError) {
+          console.error('Auth callback error:', sessionError);
+          setError('Failed to complete sign in. Please try again.');
+          setIsProcessingCallback(false);
+          return;
+        }
+
+        if (session) {
+          // Success! Get redirect target from query params
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectTo = urlParams.get('redirectTo') || '/dashboard';
+          const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
+
+          // Redirect to dashboard
+          window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
+          return;
+        }
+
+        setIsProcessingCallback(false);
+      } catch (err) {
+        console.error('Auth callback processing error:', err);
+        setError('Something went wrong. Please try again.');
+        setIsProcessingCallback(false);
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    };
+
+    handleAuthCallback();
+  }, []);
+
   // Smooth fade-in animation on mount
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
 
-  // Check if user was just registered
+  // Check if user was just registered or verified
   useEffect(() => {
     if (params?.registered === 'true') {
       setSuccessMessage('Account created successfully! Please log in with your credentials.');
     }
+    if (params?.verified === 'true') {
+      setSuccessMessage('Email verified successfully! Please log in to continue.');
+    }
+    if (params?.email_changed === 'true') {
+      setSuccessMessage('Email updated successfully! Please log in with your new email.');
+    }
   }, [params]);
+
+  // Handle magic link request
+  const handleMagicLinkRequest = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    if (!email) {
+      setError('Please enter your email address');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to send magic link. Please try again.');
+      } else {
+        setMagicLinkSent(true);
+      }
+    } catch (err) {
+      logger.error('Magic link request error:', err, { component: 'page', action: 'execution' });
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -100,6 +209,19 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state when processing auth callback (magic link, OAuth)
+  if (isProcessingCallback) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950 dark:via-teal-950 dark:to-cyan-950">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Signing you in...</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">Please wait a moment</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row transition-all duration-500">
@@ -183,102 +305,215 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Login form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Success message */}
-            {successMessage && (
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm leading-relaxed animate-in slide-in-from-top-2 duration-300">
-                {successMessage}
-              </div>
-            )}
-
-            {/* Error message */}
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm leading-relaxed animate-in slide-in-from-top-2 duration-300">
-                {error}
-              </div>
-            )}
-
-            {/* Email field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="email"
-                  type="email"
-                  inputMode="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-base md:text-sm mobile-text-input"
-                  placeholder="john@fake.com"
-                  required
-                  autoComplete="email"
-                  autoCapitalize="none"
-                />
-              </div>
+          {/* Success message */}
+          {successMessage && (
+            <div className="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm leading-relaxed animate-in slide-in-from-top-2 duration-300">
+              {successMessage}
             </div>
+          )}
 
-            {/* Password field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-base md:text-sm mobile-text-input"
-                  placeholder="••••••••"
-                  required
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 p-2 mobile-clickable"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
+          {/* Error message */}
+          {error && (
+            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm leading-relaxed animate-in slide-in-from-top-2 duration-300">
+              {error}
             </div>
+          )}
 
-            {/* Forgot password link */}
-            <div className="flex justify-end">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+          {/* Magic Link Sent Success */}
+          {magicLinkSent ? (
+            <div className="space-y-6">
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Check your email!
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  We sent a magic link to <strong className="text-gray-900 dark:text-white">{email}</strong>
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-500">
+                  Click the link in your email to sign in instantly. The link expires in 15 minutes.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setMagicLinkSent(false);
+                  setUseMagicLink(false);
+                  setEmail('');
+                }}
+                className="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
               >
-                Forgot password?
-              </Link>
+                <ArrowLeft className="w-4 h-4" />
+                Back to login options
+              </button>
             </div>
+          ) : useMagicLink ? (
+            /* Magic Link Form */
+            <form onSubmit={handleMagicLinkRequest} className="space-y-6">
+              {/* Email field */}
+              <div>
+                <label htmlFor="magic-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="magic-email"
+                    type="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-base md:text-sm mobile-text-input"
+                    placeholder="john@example.com"
+                    required
+                    autoComplete="email"
+                    autoCapitalize="none"
+                    autoFocus
+                  />
+                </div>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  We'll send you a link to sign in without a password.
+                </p>
+              </div>
 
-            {/* Sign in button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  Sign In
-                </>
-              )}
-            </button>
-          </form>
+              {/* Send magic link button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Send Magic Link
+                  </>
+                )}
+              </button>
+
+              {/* Back to password */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUseMagicLink(false);
+                  setError('');
+                }}
+                className="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-2 transition-colors duration-200 flex items-center justify-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Sign in with password instead
+              </button>
+            </form>
+          ) : (
+            /* Password Login Form */
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-base md:text-sm mobile-text-input"
+                    placeholder="john@example.com"
+                    required
+                    autoComplete="email"
+                    autoCapitalize="none"
+                  />
+                </div>
+              </div>
+
+              {/* Password field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-base md:text-sm mobile-text-input"
+                    placeholder="••••••••"
+                    required
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 p-2 mobile-clickable"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Forgot password link */}
+              <div className="flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              {/* Sign in button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <LogIn className="w-5 h-5" />
+                    Sign In
+                  </>
+                )}
+              </button>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">or</span>
+                </div>
+              </div>
+
+              {/* Magic link button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUseMagicLink(true);
+                  setError('');
+                }}
+                className="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600"
+              >
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                Sign in with Magic Link
+              </button>
+            </form>
+          )}
 
           {/* Sign up link */}
           <div className="mt-6 text-center">

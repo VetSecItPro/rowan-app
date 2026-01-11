@@ -23,7 +23,7 @@ interface EmailChangeEmailProps {
 export const EmailChangeEmail = ({
   currentEmail = 'current@example.com',
   newEmail = 'new@example.com',
-  verificationUrl = 'https://rowanapp.com/auth/verify-email-change?token=sample-token',
+  verificationUrl = 'https://rowanapp.com/verify-email-change?token=sample-token',
   userName = 'there',
 }: EmailChangeEmailProps) => {
   return (
