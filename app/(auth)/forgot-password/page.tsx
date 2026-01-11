@@ -4,7 +4,6 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, FormEvent } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { Mail, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 
@@ -26,19 +25,24 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    const supabase = createClient();
-
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
+      // Use our custom API route which uses Resend for emails
+      const response = await fetch('/api/auth/password-reset', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
 
-      if (error) {
-        setError('Failed to send reset email. Please try again.');
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to send reset email. Please try again.');
       } else {
         setEmailSent(true);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

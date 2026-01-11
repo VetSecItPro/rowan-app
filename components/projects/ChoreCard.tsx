@@ -36,13 +36,12 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
                 </div>
                 <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all ${
-                      chore.completion_percentage < 30
+                    className={`h-full transition-all ${chore.completion_percentage < 30
                         ? 'bg-gradient-to-r from-red-400 to-red-500'
                         : chore.completion_percentage < 70
-                        ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                        : 'bg-gradient-to-r from-green-400 to-green-500'
-                    }`}
+                          ? 'bg-gradient-to-r from-amber-400 to-orange-500'
+                          : 'bg-gradient-to-r from-green-400 to-green-500'
+                      }`}
                     style={{ width: `${chore.completion_percentage}%` }}
                   />
                 </div>
@@ -64,12 +63,12 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
-                <button onClick={() => { onEdit(chore); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors">Edit</button>
+              <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg z-20 overflow-hidden">
+                <button onClick={() => { onEdit(chore); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Edit</button>
                 {onUpdateProgress && (
                   <button onClick={() => { onUpdateProgress(chore); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Update Progress</button>
                 )}
-                <button onClick={() => { onDelete(chore.id); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors">Delete</button>
+                <button onClick={() => { onDelete(chore.id); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Delete</button>
               </div>
             </>
           )}

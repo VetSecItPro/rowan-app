@@ -163,7 +163,7 @@ export function ThreadView({
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             aria-label="Close thread"
           >
             <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -178,7 +178,7 @@ export function ThreadView({
               message={parentMessage}
               onEdit={() => toast.info('Edit parent message not supported in thread view')}
               onDelete={() => toast.info('Delete parent message not supported in thread view')}
-              onMarkRead={() => {}}
+              onMarkRead={() => { }}
               isOwn={parentMessage.sender_id === currentUserId}
               currentUserId={currentUserId}
               partnerName={partnerName}
@@ -211,7 +211,7 @@ export function ThreadView({
                   message={reply}
                   onEdit={handleEditReply}
                   onDelete={handleDeleteReply}
-                  onMarkRead={() => {}}
+                  onMarkRead={() => { }}
                   isOwn={reply.sender_id === currentUserId}
                   currentUserId={currentUserId}
                   partnerName={partnerName}
@@ -249,7 +249,7 @@ export function ThreadView({
             <button
               type="submit"
               disabled={!replyInput.trim() || sending}
-              className="w-12 h-12 flex items-center justify-center rounded-lg bg-green-500 hover:bg-green-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors active:scale-95"
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors active:scale-95"
               aria-label="Send reply"
             >
               {sending ? (
