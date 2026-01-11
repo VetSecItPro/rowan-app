@@ -262,7 +262,7 @@ export function ProjectDashboard({
           </h3>
           <button
             onClick={() => setShowEditProject(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors text-sm font-medium"
           >
             <Edit3 className="w-4 h-4" />
             Edit Project
@@ -368,7 +368,7 @@ export function ProjectDashboard({
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
           <Plus className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           <div className="text-left">
             <p className="font-medium text-gray-900 dark:text-white">Add Line Item</p>
@@ -376,7 +376,7 @@ export function ProjectDashboard({
           </div>
         </button>
 
-        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
           <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           <div className="text-left">
             <p className="font-medium text-gray-900 dark:text-white">Manage Vendors</p>
@@ -384,7 +384,7 @@ export function ProjectDashboard({
           </div>
         </button>
 
-        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
           <BarChart3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           <div className="text-left">
             <p className="font-medium text-gray-900 dark:text-white">View Reports</p>

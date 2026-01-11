@@ -216,14 +216,14 @@ export default function PrivacyDataPage() {
                 Data Management Actions
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                <button className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
                   <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <div className="text-left">
                     <div className="font-medium text-blue-900 dark:text-blue-100">Download My Data</div>
                     <div className="text-sm text-blue-600 dark:text-blue-400">Export all your data</div>
                   </div>
                 </button>
-                <button className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                <button className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
                   <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
                   <div className="text-left">
                     <div className="font-medium text-red-900 dark:text-red-100">Delete My Account</div>
@@ -238,7 +238,7 @@ export default function PrivacyDataPage() {
               <button
                 onClick={handleSaveSettings}
                 disabled={loading}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors"
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-full transition-colors"
               >
                 {loading ? 'Saving...' : 'Save Settings'}
               </button>

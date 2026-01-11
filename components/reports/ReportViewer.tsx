@@ -182,7 +182,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           <button
             onClick={handleShare}
             disabled={loading}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
             <ShareIcon className="h-4 w-4 mr-1" />
             Share
@@ -192,7 +192,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
             <button
               onClick={handleDownload}
               disabled={loading}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
               <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
               {loading ? 'Downloading...' : 'Download PDF'}
@@ -302,7 +302,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
       {/* Share Modal */}
       {showShareModal && shareUrl && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" onClick={() => setShowShareModal(false)}>
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800" onClick={e => e.stopPropagation()}>
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-full bg-white dark:bg-gray-800" onClick={e => e.stopPropagation()}>
             <div className="mt-3">
               <div className="flex items-center">
                 <LinkIcon className="h-6 w-6 text-blue-600 mr-2" />
@@ -335,7 +335,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
               <div className="flex justify-end mt-6">
                 <button
                   onClick={() => setShowShareModal(false)}
-                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-full hover:bg-gray-400 dark:hover:bg-gray-500"
                 >
                   Close
                 </button>
