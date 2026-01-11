@@ -14,6 +14,7 @@ import DailyDigestEmail from '@/lib/emails/templates/DailyDigestEmail';
 import { PasswordResetEmail } from '@/lib/emails/templates/password-reset-email';
 import { MagicLinkEmail } from '@/lib/emails/templates/magic-link-email';
 import { EmailVerificationEmail } from '@/lib/emails/templates/email-verification-email';
+import { EmailChangeEmail } from '@/lib/emails/templates/email-change-email';
 
 // Initialize Resend with API key
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -186,6 +187,13 @@ export interface MagicLinkData {
 
 export interface EmailVerificationData {
   userEmail: string;
+  verificationUrl: string;
+  userName: string;
+}
+
+export interface EmailChangeData {
+  currentEmail: string;
+  newEmail: string;
   verificationUrl: string;
   userName: string;
 }
@@ -690,6 +698,47 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
 }
 
 /**
+ * Send an email change verification email
+ */
+export async function sendEmailChangeEmail(data: EmailChangeData): Promise<EmailResult> {
+  try {
+    if (!resend) {
+      logger.error('Resend not initialized - missing RESEND_API_KEY', undefined, { component: 'lib-email-service', action: 'service_call' });
+      return { success: false, error: 'Email service not configured' };
+    }
+
+    const emailHtml = await render(EmailChangeEmail({
+      currentEmail: data.currentEmail,
+      newEmail: data.newEmail,
+      verificationUrl: data.verificationUrl,
+      userName: data.userName,
+    }));
+
+    const { data: result, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [data.newEmail],
+      subject: 'Confirm your new email address - Rowan',
+      html: emailHtml,
+      replyTo: REPLY_TO_EMAIL,
+      tags: [
+        { name: 'category', value: 'email-change' },
+        { name: 'auth_type', value: 'email-change' }
+      ]
+    });
+
+    if (error) {
+      logger.error('Failed to send email change email:', error, { component: 'lib-email-service', action: 'service_call' });
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, messageId: result?.id };
+  } catch (error) {
+    logger.error('Error sending email change email:', error, { component: 'lib-email-service', action: 'service_call' });
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+/**
  * Send a daily digest email
  */
 export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
@@ -817,6 +866,8 @@ async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
       return sendMagicLinkEmail(data);
     case 'email-verification':
       return sendEmailVerificationEmail(data);
+    case 'email-change':
+      return sendEmailChangeEmail(data);
     default:
       return { success: false, error: 'Unknown email type' };
   }
@@ -828,7 +879,7 @@ async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
  * This reduces 100 emails from ~10s to ~1s
  */
 export async function sendBatchEmails(emails: Array<{
-  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation' | 'password-reset' | 'magic-link' | 'email-verification';
+  type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation' | 'password-reset' | 'magic-link' | 'email-verification' | 'email-change';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 }>): Promise<{ success: number; failed: number; results: EmailResult[] }> {
@@ -1055,6 +1106,7 @@ export const emailService = {
   sendPasswordResetEmail,
   sendMagicLinkEmail,
   sendEmailVerificationEmail,
+  sendEmailChangeEmail,
   sendBatchEmails,
   verifyEmailService,
   // Subscription emails

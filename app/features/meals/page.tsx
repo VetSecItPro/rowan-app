@@ -1,171 +1,251 @@
 'use client';
 
-import { useRef } from 'react';
-import { UtensilsCrossed, Calendar, ShoppingCart, BookOpen, Check } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, Variants } from 'framer-motion';
+import { Utensils, Check, ShoppingCart, Calendar, Heart, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
+import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
+import { MagneticButton } from '@/components/ui/magnetic-button';
 
-function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-100px" });
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  },
+};
 
 export default function MealsFeaturePage() {
+  const router = useRouter();
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
+
+  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
+    if (inviteCode) {
+      const params = new URLSearchParams();
+      params.set('beta_code', inviteCode);
+      if (email) params.set('email', email);
+      if (firstName) params.set('first_name', firstName);
+      if (lastName) params.set('last_name', lastName);
+      router.push(`/signup?${params.toString()}`);
+    } else {
+      router.push('/signup');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-orange-50/30 to-white dark:from-black dark:via-orange-950/20 dark:to-black">
-      <Header />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+      <Header
+        onBetaClick={() => setIsBetaModalOpen(true)}
+        onLaunchClick={() => setIsLaunchModalOpen(true)}
+        isPublicFeaturePage={true}
+      />
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <AnimatedSection>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-meals rounded-3xl mb-6 shadow-xl shadow-orange-500/30 animate-bounce-subtle">
-              <UtensilsCrossed className="w-10 h-10 text-white" />
-            </div>
+      <main>
+        {/* Hero Section */}
+        <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(249,115,22,0.1),transparent)] dark:bg-[radial-gradient(45%_45%_at_50%_0%,rgba(234,88,12,0.05),transparent)]" />
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Meal Planning
-            </h1>
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              className="text-center"
+            >
+              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm font-medium mb-8">
+                <Sparkles className="w-4 h-4" />
+                <span>Kitchen Bliss</span>
+              </motion.div>
 
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Plan meals for your space with a visual calendar. Create recipes, schedule meals for specific days, and organize your family's meal planning.
-            </p>
-          </div>
-        </AnimatedSection>
+              <motion.h1
+                variants={itemVariants}
+                className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6"
+              >
+                Meal <span className="bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 bg-clip-text text-transparent">Planning</span>
+              </motion.h1>
 
-        {/* Key Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          {[
-            {
-              icon: Calendar,
-              color: 'bg-orange-500',
-              title: 'Weekly Planning',
-              description: 'Plan meals for the entire week. Drag and drop recipes to different days effortlessly.'
-            },
-            {
-              icon: BookOpen,
-              color: 'bg-red-500',
-              title: 'Recipe Library',
-              description: 'Save your favorite recipes with ingredients, steps, and photos. Build your family cookbook.'
-            },
-            {
-              icon: ShoppingCart,
-              color: 'bg-emerald-500',
-              title: 'Auto Shopping Lists',
-              description: 'Generate shopping lists automatically from your meal plan. Never forget ingredients.'
-            }
-          ].map((feature, index) => (
-            <AnimatedSection key={feature.title} delay={index * 0.1}>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mb-6`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-      </section>
+              <motion.p
+                variants={itemVariants}
+                className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10"
+              >
+                Take the stress out of dinner. Plan your weekly meals, organize recipes,
+                and generate shopping lists automatically with your family.
+              </motion.p>
 
-      {/* What You Can Do Section */}
-      <section className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Everything You Need
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Complete meal planning tools for busy families
-              </p>
-            </div>
-          </AnimatedSection>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {[
-              'Plan meals on a visual calendar view',
-              'Create and save unlimited recipes with ingredients',
-              'Add detailed instructions and notes to recipes',
-              'Assign meal types (breakfast, lunch, dinner, snack)',
-              'View planned meals in calendar, list, or recipe format',
-              'Search through meals and recipes',
-              'Track statistics for meals this week and saved recipes'
-            ].map((feature, index) => (
-              <AnimatedSection key={index} delay={index * 0.05}>
-                <div className="flex items-start gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50">
-                  <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mt-1">
-                    <Check className="w-4 h-4 text-white" />
+              <motion.div
+                variants={itemVariants}
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+              >
+                <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                  <div className="px-8 py-4 bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2">
+                    Access Beta Test
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <p className="text-lg text-gray-900 dark:text-white font-medium">{feature}</p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
+                </MagneticButton>
 
-      {/* Use Cases Section */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Perfect For
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Common ways to organize family meals
-              </p>
+                <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                  <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                    Get Notified on Launch
+                  </div>
+                </MagneticButton>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Feature Grid */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Calendar,
+                  title: "Weekly Planning",
+                  description: "Design your family's meal schedule with a simple drag-and-drop interface. Plan for the whole week in minutes.",
+                  color: "orange"
+                },
+                {
+                  icon: Heart,
+                  title: "Recipe Box",
+                  description: "Store all your family favorites in one place. Add notes, ratings, and tag by dietary preferences.",
+                  color: "red"
+                },
+                {
+                  icon: ShoppingCart,
+                  title: "Auto Shopping",
+                  description: "Instantly turn your meal plan into a sorted shopping list. No more forgotten ingredients or double-buying.",
+                  color: "pink"
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                >
+                  <SpotlightCard className="p-8 h-full">
+                    <div className={`w-12 h-12 rounded-2xl bg-${item.color}-500/10 flex items-center justify-center mb-6`}>
+                      <item.icon className={`w-6 h-6 text-${item.color}-500`} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </SpotlightCard>
+                </motion.div>
+              ))}
             </div>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <AnimatedSection delay={0.2}>
-              <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-8 border border-orange-200/50 dark:border-orange-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Daily Meals</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Plan weekly breakfast, lunch, and dinner', 'Create recipe collections for easy planning', 'Schedule leftovers and meal prep days', 'Track dietary preferences and restrictions'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <UtensilsCrossed className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.4}>
-              <div className="bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 rounded-2xl p-8 border border-red-200/50 dark:border-red-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Special Occasions</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Holiday meal planning and preparation', 'Birthday parties and celebrations', 'Family gatherings and potluck coordination', 'Vacation and travel meal planning'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <Calendar className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Details Section */}
+        <section className="py-20 bg-gray-100/50 dark:bg-gray-800/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                  Mealtime, Reimagined
+                </h2>
+                <div className="space-y-6">
+                  {[
+                    "Collaborative meal planning for the whole household",
+                    "Import recipes from your favorite websites",
+                    "Smart leftovers management and dinner logging",
+                    "Integrated with family calendar for visibility",
+                    "Personalized dinner ideas and suggestions"
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                      </div>
+                      <span className="text-lg text-gray-700 dark:text-gray-300 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-orange-400 via-red-400 to-pink-500 shadow-2xl"
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                  <Utensils className="w-32 h-32 animate-pulse" />
+                </div>
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-white font-bold text-xl drop-shadow-md">Meals Preview</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="py-24 text-center">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">
+              Ready to simplify your dinner?
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                <div className="px-8 py-4 bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2">
+                  Access Beta Test
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </MagneticButton>
+
+              <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  Get Notified on Launch
+                </div>
+              </MagneticButton>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
+
+      <BetaAccessModal
+        isOpen={isBetaModalOpen}
+        onClose={() => setIsBetaModalOpen(false)}
+        onSuccess={handleBetaSuccess}
+        onSwitchToLaunch={() => {
+          setIsBetaModalOpen(false);
+          setIsLaunchModalOpen(true);
+        }}
+      />
+      <LaunchNotificationModal
+        isOpen={isLaunchModalOpen}
+        onClose={() => setIsLaunchModalOpen(false)}
+      />
     </div>
   );
 }

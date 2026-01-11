@@ -76,7 +76,7 @@ const features = [
         description: "Start each day with intention — reflect on your mood, set priorities, and stay connected with your family's rhythm",
         icon: Sun,
         gradient: "from-yellow-400 via-orange-400 to-rose-400",
-        href: "/dashboard",
+        href: "/features/daily-check-in",
         size: "large"
     },
 ];

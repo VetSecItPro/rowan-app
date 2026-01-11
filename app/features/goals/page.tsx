@@ -1,171 +1,251 @@
 'use client';
 
-import { useRef } from 'react';
-import { Target, TrendingUp, Award, Users, Check } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, Variants } from 'framer-motion';
+import { Trophy, Check, Target, Flame, Star, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
+import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
+import { MagneticButton } from '@/components/ui/magnetic-button';
 
-function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-100px" });
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  },
+};
 
 export default function GoalsFeaturePage() {
+  const router = useRouter();
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
+
+  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
+    if (inviteCode) {
+      const params = new URLSearchParams();
+      params.set('beta_code', inviteCode);
+      if (email) params.set('email', email);
+      if (firstName) params.set('first_name', firstName);
+      if (lastName) params.set('last_name', lastName);
+      router.push(`/signup?${params.toString()}`);
+    } else {
+      router.push('/signup');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-indigo-50/30 to-white dark:from-black dark:via-indigo-950/20 dark:to-black">
-      <Header />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+      <Header
+        onBetaClick={() => setIsBetaModalOpen(true)}
+        onLaunchClick={() => setIsLaunchModalOpen(true)}
+        isPublicFeaturePage={true}
+      />
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <AnimatedSection>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-goals rounded-3xl mb-6 shadow-xl shadow-indigo-500/30 animate-bounce-subtle">
-              <Target className="w-10 h-10 text-white" />
-            </div>
+      <main>
+        {/* Hero Section */}
+        <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(139,92,246,0.1),transparent)] dark:bg-[radial-gradient(45%_45%_at_50%_0%,rgba(124,58,237,0.05),transparent)]" />
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Goal Tracking
-            </h1>
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              className="text-center"
+            >
+              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-sm font-medium mb-8">
+                <Sparkles className="w-4 h-4" />
+                <span>Reach Higher</span>
+              </motion.div>
 
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Set and track goals for your space. Create milestones, monitor progress, and organize your family's objectives.
-            </p>
-          </div>
-        </AnimatedSection>
+              <motion.h1
+                variants={itemVariants}
+                className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6"
+              >
+                Shared <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent">Goals</span>
+              </motion.h1>
 
-        {/* Key Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          {[
-            {
-              icon: Target,
-              color: 'bg-indigo-500',
-              title: 'Goal Setting',
-              description: 'Create individual and family goals with clear targets, deadlines, and measurable outcomes.'
-            },
-            {
-              icon: TrendingUp,
-              color: 'bg-blue-500',
-              title: 'Progress Tracking',
-              description: 'Visual progress bars and charts show how far you\'ve come and what\'s left to achieve.'
-            },
-            {
-              icon: Award,
-              color: 'bg-violet-500',
-              title: 'Celebrate Wins',
-              description: 'Mark milestones, celebrate achievements, and keep everyone motivated on the journey.'
-            }
-          ].map((feature, index) => (
-            <AnimatedSection key={feature.title} delay={index * 0.1}>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mb-6`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-      </section>
+              <motion.p
+                variants={itemVariants}
+                className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10"
+              >
+                Achieve more together. Set ambitious family goals, track your collective
+                progress, and celebrate every milestone along the way.
+              </motion.p>
 
-      {/* What You Can Do Section */}
-      <section className="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Everything You Need
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Powerful goal tracking for personal and family success
-              </p>
-            </div>
-          </AnimatedSection>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {[
-              'Create goals with custom titles and detailed descriptions',
-              'Organize goals by category (fitness, financial, education, etc.)',
-              'Track progress with visual progress bars',
-              'Set goal status (active, paused, completed)',
-              'Break down goals into trackable milestones',
-              'Track different milestone types (money, count, percentage, custom)',
-              'View statistics for active, in progress, and completed goals'
-            ].map((feature, index) => (
-              <AnimatedSection key={index} delay={index * 0.05}>
-                <div className="flex items-start gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50">
-                  <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-indigo-500 to-violet-500 rounded-full flex items-center justify-center mt-1">
-                    <Check className="w-4 h-4 text-white" />
+              <motion.div
+                variants={itemVariants}
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+              >
+                <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                  <div className="px-8 py-4 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-purple-500/20 flex items-center justify-center gap-2">
+                    Access Beta Test
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <p className="text-lg text-gray-900 dark:text-white font-medium">{feature}</p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
+                </MagneticButton>
 
-      {/* Use Cases Section */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Perfect For
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Common types of goals people track
-              </p>
+                <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                  <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                    Get Notified on Launch
+                  </div>
+                </MagneticButton>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Feature Grid */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Target,
+                  title: "Goal Setting",
+                  description: "Define clear, actionable family goals. Break down big ambitions into manageable steps and milestones.",
+                  color: "violet"
+                },
+                {
+                  icon: Flame,
+                  title: "Streak Tracking",
+                  description: "Build momentum with daily streaks. Stay motivated as you watch your family's consistency grow.",
+                  color: "purple"
+                },
+                {
+                  icon: Star,
+                  title: "Achievements",
+                  description: "Unlock badges and rewards as you reach your targets. Turn family progress into a rewarding experience.",
+                  color: "indigo"
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                >
+                  <SpotlightCard className="p-8 h-full">
+                    <div className={`w-12 h-12 rounded-2xl bg-${item.color}-500/10 flex items-center justify-center mb-6`}>
+                      <item.icon className={`w-6 h-6 text-${item.color}-500`} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </SpotlightCard>
+                </motion.div>
+              ))}
             </div>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <AnimatedSection delay={0.2}>
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-2xl p-8 border border-indigo-200/50 dark:border-indigo-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Personal Goals</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Fitness and health objectives', 'Learning new skills or hobbies', 'Career and professional development', 'Reading, writing, or creative projects'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <Target className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.4}>
-              <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-2xl p-8 border border-violet-200/50 dark:border-violet-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Family Goals</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Save for a dream vacation together', 'Plan and achieve home renovation projects', 'Build emergency fund or college savings', 'Establish family traditions and habits'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <Users className="w-5 h-5 text-violet-600 dark:text-violet-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Details Section */}
+        <section className="py-20 bg-gray-100/50 dark:bg-gray-800/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                  Success is a Team Effort
+                </h2>
+                <div className="space-y-6">
+                  {[
+                    "Visual progress bars for every shared goal",
+                    "Collaborative contribution tracking",
+                    "Automated check-ins and progress updates",
+                    "Milestone celebration notifications",
+                    "Historical archive of achieved family goals"
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-violet-500/20 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                      </div>
+                      <span className="text-lg text-gray-700 dark:text-gray-300 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-violet-500 to-purple-600 shadow-2xl"
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                  <Trophy className="w-32 h-32 animate-bounce-slow" />
+                </div>
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-white font-bold text-xl drop-shadow-md">Goals Preview</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="py-24 text-center">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">
+              Ready to achieve your family dreams?
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                <div className="px-8 py-4 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-purple-500/20 flex items-center justify-center gap-2">
+                  Access Beta Test
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </MagneticButton>
+
+              <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  Get Notified on Launch
+                </div>
+              </MagneticButton>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
+
+      <BetaAccessModal
+        isOpen={isBetaModalOpen}
+        onClose={() => setIsBetaModalOpen(false)}
+        onSuccess={handleBetaSuccess}
+        onSwitchToLaunch={() => {
+          setIsBetaModalOpen(false);
+          setIsLaunchModalOpen(true);
+        }}
+      />
+      <LaunchNotificationModal
+        isOpen={isLaunchModalOpen}
+        onClose={() => setIsLaunchModalOpen(false)}
+      />
     </div>
   );
 }
