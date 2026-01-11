@@ -229,7 +229,74 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================================================
-    // STEP 5: Success response
+    // STEP 5: Send custom verification email via Resend
+    // ========================================================================
+    let verificationSent = false;
+
+    // Only send verification email if email is not already confirmed
+    if (!data.user.email_confirmed_at) {
+      try {
+        const crypto = await import('crypto');
+        const { sendEmailVerificationEmail } = await import('@/lib/services/email-service');
+        const { buildAppUrl } = await import('@/lib/utils/app-url');
+
+        // Generate verification token
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+        // Store the verification token
+        const { error: tokenError } = await supabaseAdmin
+          .from('email_verification_tokens')
+          .insert({
+            user_id: data.user.id,
+            email: validated.email,
+            token: verificationToken,
+            expires_at: expiresAt.toISOString(),
+            created_at: new Date().toISOString()
+          });
+
+        if (!tokenError) {
+          // Send verification email via Resend
+          // Note: /verify-email is the correct path because (auth) is a Next.js route group
+          const verificationUrl = buildAppUrl('/verify-email', { token: verificationToken });
+          const emailResult = await sendEmailVerificationEmail({
+            userEmail: validated.email,
+            verificationUrl,
+            userName: sanitizedProfile.name,
+          });
+
+          if (emailResult.success) {
+            verificationSent = true;
+            logger.info('Signup verification email sent', {
+              component: 'api-signup',
+              action: 'verification_email_sent',
+              userId: data.user.id,
+              email: validated.email.substring(0, 3) + '***'
+            });
+          } else {
+            logger.error('Failed to send signup verification email', undefined, {
+              component: 'api-signup',
+              action: 'verification_email_failed',
+              error: emailResult.error
+            });
+          }
+        } else {
+          logger.error('Failed to store verification token', tokenError, {
+            component: 'api-signup',
+            action: 'token_storage_failed'
+          });
+        }
+      } catch (emailError) {
+        logger.error('Error in verification email flow', emailError instanceof Error ? emailError : new Error(String(emailError)), {
+          component: 'api-signup',
+          action: 'verification_flow_error'
+        });
+        // Continue with signup success even if email fails
+      }
+    }
+
+    // ========================================================================
+    // STEP 6: Success response
     // ========================================================================
     return NextResponse.json(
       {
@@ -241,7 +308,9 @@ export async function POST(request: NextRequest) {
         },
         message: data.user.email_confirmed_at
           ? 'Account created successfully'
-          : 'Account created. Please check your email to verify your account.'
+          : verificationSent
+            ? 'Account created. Please check your email to verify your account.'
+            : 'Account created. Email verification may be delayed.'
       },
       { headers: rateLimitHeaders(limit, remaining, reset) }
     );

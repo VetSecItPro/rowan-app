@@ -21,7 +21,7 @@ interface EmailVerificationEmailProps {
 
 export const EmailVerificationEmail = ({
   userEmail = 'user@example.com',
-  verificationUrl = 'https://rowanapp.com/auth/verify?token=sample-token',
+  verificationUrl = 'https://rowanapp.com/verify-email?token=sample-token',
   userName = 'there',
 }: EmailVerificationEmailProps) => {
   return (

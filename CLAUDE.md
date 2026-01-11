@@ -28,6 +28,18 @@
 4. **Test thoroughly** - Verify the fix doesn't break anything else
 5. **Document learnings** - Prevent the same issue from recurring
 
+### Strategic Bug Fixing (Pattern Recognition)
+When you discover a bug or issue in one location:
+1. **Recognize patterns** - Ask: "Is this a one-off mistake or a systemic pattern?"
+2. **Search comprehensively** - Immediately grep/search for all instances of the same pattern across the entire codebase
+3. **Fix everywhere** - Correct every occurrence, not just the one that was reported
+4. **Think about related issues** - Consider if similar logic elsewhere might have the same class of problem
+5. **Be proactive** - Don't wait for the user to point out other instances; anticipate and fix them all in one sweep
+
+**Example:** If a URL path is wrong in one email template, immediately check ALL email templates, ALL API routes that generate URLs, and ALL places that construct similar paths. Fix them all together, strategically, without breaking dependent code.
+
+**The goal:** When a bug is found, the fix should be comprehensive and complete. The user should never have to say "did you check the other places too?"
+
 ### Quality Over Speed
 - A well-implemented feature that takes longer is better than a rushed feature that creates tech debt
 - Every line of code should serve a clear purpose
