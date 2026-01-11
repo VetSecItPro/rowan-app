@@ -1,171 +1,251 @@
 'use client';
 
-import { useRef } from 'react';
-import { Bell, Clock, Repeat, MapPin, Users, Check } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, Variants } from 'framer-motion';
+import { Bell, Check, Clock, Repeat, MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
+import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
+import { MagneticButton } from '@/components/ui/magnetic-button';
 
-function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-100px" });
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  },
+};
 
 export default function RemindersFeaturePage() {
+  const router = useRouter();
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
+
+  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
+    if (inviteCode) {
+      const params = new URLSearchParams();
+      params.set('beta_code', inviteCode);
+      if (email) params.set('email', email);
+      if (firstName) params.set('first_name', firstName);
+      if (lastName) params.set('last_name', lastName);
+      router.push(`/signup?${params.toString()}`);
+    } else {
+      router.push('/signup');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-pink-50/30 to-white dark:from-black dark:via-pink-950/20 dark:to-black">
-      <Header />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+      <Header
+        onBetaClick={() => setIsBetaModalOpen(true)}
+        onLaunchClick={() => setIsLaunchModalOpen(true)}
+        isPublicFeaturePage={true}
+      />
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <AnimatedSection>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-reminders rounded-3xl mb-6 shadow-xl shadow-pink-500/30 animate-bounce-subtle">
-              <Bell className="w-10 h-10 text-white" />
-            </div>
+      <main>
+        {/* Hero Section */}
+        <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(244,114,182,0.1),transparent)] dark:bg-[radial-gradient(45%_45%_at_50%_0%,rgba(219,39,119,0.05),transparent)]" />
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Reminders
-            </h1>
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              className="text-center"
+            >
+              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 text-sm font-medium mb-8">
+                <Sparkles className="w-4 h-4" />
+                <span>Never Forget Again</span>
+              </motion.div>
 
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Create and manage reminders for your space. Set time-based or recurring reminders that notify you when things need attention.
-            </p>
-          </div>
-        </AnimatedSection>
+              <motion.h1
+                variants={itemVariants}
+                className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6"
+              >
+                Smart <span className="bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">Reminders</span>
+              </motion.h1>
 
-        {/* Key Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          {[
-            {
-              icon: Clock,
-              color: 'bg-pink-500',
-              title: 'Time-Based',
-              description: 'Set reminders for specific times or relative to events. Get notified exactly when you need to be.'
-            },
-            {
-              icon: MapPin,
-              color: 'bg-rose-500',
-              title: 'Location-Based',
-              description: 'Get reminded when you arrive at or leave specific locations like the grocery store or home.'
-            },
-            {
-              icon: Repeat,
-              color: 'bg-fuchsia-500',
-              title: 'Recurring',
-              description: 'Set up reminders that repeat daily, weekly, monthly, or on custom schedules automatically.'
-            }
-          ].map((feature, index) => (
-            <AnimatedSection key={feature.title} delay={index * 0.1}>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mb-6`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-      </section>
+              <motion.p
+                variants={itemVariants}
+                className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10"
+              >
+                Intelligent alerts that keep your life in sync. From one-time tasks to
+                recurring bills, Rowan ensures nothing falls through the cracks.
+              </motion.p>
 
-      {/* What You Can Do Section */}
-      <section className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/30 dark:to-rose-950/30 py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Everything You Need
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Intelligent reminder features that work for you
-              </p>
-            </div>
-          </AnimatedSection>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {[
-              'Create reminders with custom titles and descriptions',
-              'Set specific reminder times and dates',
-              'Add emoji icons to make reminders more visual',
-              'Organize by category (work, personal, health, bills, events)',
-              'Set priority levels (urgent, high, medium, low)',
-              'Set up recurring reminders (daily, weekly, monthly, custom)',
-              'Snooze reminders for later'
-            ].map((feature, index) => (
-              <AnimatedSection key={index} delay={index * 0.05}>
-                <div className="flex items-start gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50">
-                  <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center mt-1">
-                    <Check className="w-4 h-4 text-white" />
+              <motion.div
+                variants={itemVariants}
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+              >
+                <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                  <div className="px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-pink-500/20 flex items-center justify-center gap-2">
+                    Access Beta Test
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <p className="text-lg text-gray-900 dark:text-white font-medium">{feature}</p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
+                </MagneticButton>
 
-      {/* Use Cases Section */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Perfect For
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Common types of reminders people create
-              </p>
+                <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                  <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                    Get Notified on Launch
+                  </div>
+                </MagneticButton>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Feature Grid */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Clock,
+                  title: "Time-Sensitive",
+                  description: "Set reminders for precise moments or relative to other events. Get notified exactly when it matters.",
+                  color: "pink"
+                },
+                {
+                  icon: Repeat,
+                  title: "Smart Recurring",
+                  description: "Automatically repeat reminders daily, weekly, or on custom cycles. Perfect for habits and chores.",
+                  color: "rose"
+                },
+                {
+                  icon: MapPin,
+                  title: "Location Aware",
+                  description: "Receive alerts when arriving at or leaving specific places like home, school, or the store. (Coming Soon)",
+                  color: "fuchsia"
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                >
+                  <SpotlightCard className="p-8 h-full">
+                    <div className={`w-12 h-12 rounded-2xl bg-${item.color}-500/10 flex items-center justify-center mb-6`}>
+                      <item.icon className={`w-6 h-6 text-${item.color}-500`} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </SpotlightCard>
+                </motion.div>
+              ))}
             </div>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <AnimatedSection delay={0.2}>
-              <div className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-2xl p-8 border border-pink-200/50 dark:border-pink-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Personal & Health</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Daily medication and vitamin reminders', 'Medical and dental appointments', 'Exercise and workout schedules', 'Birthdays and anniversaries'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <Bell className="w-5 h-5 text-pink-600 dark:text-pink-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.4}>
-              <div className="bg-gradient-to-br from-fuchsia-50 to-purple-50 dark:from-fuchsia-900/20 dark:to-purple-900/20 rounded-2xl p-8 border border-fuchsia-200/50 dark:border-fuchsia-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Household & Bills</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Monthly bill payments and due dates', 'Home maintenance tasks', 'Seasonal cleaning and organization', 'Car maintenance and renewals'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <Clock className="w-5 h-5 text-fuchsia-600 dark:text-fuchsia-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Details Section */}
+        <section className="py-20 bg-gray-100/50 dark:bg-gray-800/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                  Elegance in Every Alert
+                </h2>
+                <div className="space-y-6">
+                  {[
+                    "Unified inbox for all personal and family reminders",
+                    "Visual categorization with emoji and color themes",
+                    "Intelligent snooze with custom time presets",
+                    "Shared family lists for collaborative management",
+                    "Interactive notifications for quick completion"
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-pink-500/20 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+                      </div>
+                      <span className="text-lg text-gray-700 dark:text-gray-300 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-pink-400 to-rose-500 shadow-2xl"
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                  <Bell className="w-32 h-32 animate-pulse" />
+                </div>
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-white font-bold text-xl drop-shadow-md">Reminders Preview</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="py-24 text-center">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">
+              Stay ahead of your schedule today.
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                <div className="px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-pink-500/20 flex items-center justify-center gap-2">
+                  Access Beta Test
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </MagneticButton>
+
+              <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  Get Notified on Launch
+                </div>
+              </MagneticButton>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
+
+      <BetaAccessModal
+        isOpen={isBetaModalOpen}
+        onClose={() => setIsBetaModalOpen(false)}
+        onSuccess={handleBetaSuccess}
+        onSwitchToLaunch={() => {
+          setIsBetaModalOpen(false);
+          setIsLaunchModalOpen(true);
+        }}
+      />
+      <LaunchNotificationModal
+        isOpen={isLaunchModalOpen}
+        onClose={() => setIsLaunchModalOpen(false)}
+      />
     </div>
   );
 }

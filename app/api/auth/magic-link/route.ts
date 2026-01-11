@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { sendMagicLinkEmail, type MagicLinkData } from '@/lib/services/email-service';
 import { z } from 'zod';
 import crypto from 'crypto';
@@ -31,12 +31,9 @@ export async function POST(request: NextRequest) {
     const validatedData = MagicLinkRequestSchema.parse(body);
     const { email } = validatedData;
 
-    // Create Supabase client
-    const supabase = await createClient();
-
-    // Check if user exists
-    const { data: userData, error: userError } = await supabase
-      .from('profiles')
+    // Check if user exists using admin client (bypasses RLS for unauthenticated requests)
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
       .select('id, name, email')
       .eq('email', email.toLowerCase())
       .single();
@@ -49,8 +46,14 @@ export async function POST(request: NextRequest) {
         const magicToken = crypto.randomBytes(32).toString('hex');
         const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
 
-        // Store the magic link token in the database
-        const { error: tokenError } = await supabase
+        // Invalidate any existing tokens for this user
+        await supabaseAdmin
+          .from('magic_link_tokens')
+          .delete()
+          .eq('user_id', userData.id);
+
+        // Store the magic link token in the database using admin client
+        const { error: tokenError } = await supabaseAdmin
           .from('magic_link_tokens')
           .insert({
             user_id: userData.id,
@@ -63,12 +66,12 @@ export async function POST(request: NextRequest) {
           logger.error('Failed to store magic link token:', tokenError, { component: 'api-route', action: 'api_request' });
           // Still return success to prevent information leakage
         } else {
-          // Send magic link email using our custom template
+          // Send magic link email using our custom template via Resend
           const magicLinkUrl = buildAppUrl('/auth/magic', { token: magicToken });
-          
+
           // Get user agent and IP for security info
           const userAgent = request.headers.get('user-agent') || 'Unknown browser';
-          
+
           const emailData: MagicLinkData = {
             userEmail: email,
             magicLinkUrl: magicLinkUrl,
@@ -77,14 +80,21 @@ export async function POST(request: NextRequest) {
             userAgent: userAgent
           };
 
-          // Send email in background (non-blocking for fast response)
-          sendMagicLinkEmail(emailData).then((emailResult) => {
-            if (!emailResult.success) {
-              logger.error('Failed to send magic link email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
-            }
-          }).catch((err) => {
-            logger.error('Magic link email error:', err, { component: 'api-route', action: 'api_request' });
-          });
+          // Send email and wait for result
+          const emailResult = await sendMagicLinkEmail(emailData);
+          if (!emailResult.success) {
+            logger.error('Failed to send magic link email:', undefined, {
+              component: 'api-route',
+              action: 'api_request',
+              details: emailResult.error
+            });
+          } else {
+            logger.info('Magic link email sent successfully', {
+              component: 'api-route',
+              action: 'magic_link',
+              email: email.substring(0, 3) + '***'
+            });
+          }
         }
       } catch (emailError) {
         logger.error('Magic link email error:', emailError, { component: 'api-route', action: 'api_request' });

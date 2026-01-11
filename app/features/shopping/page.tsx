@@ -1,171 +1,251 @@
 'use client';
 
-import { useRef } from 'react';
-import { ShoppingCart, CheckCircle, Smartphone, Users, RefreshCw, Check } from 'lucide-react';
-import { motion, useInView } from 'framer-motion';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, Variants } from 'framer-motion';
+import { ShoppingCart, Check, List, Tag, Share2, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
+import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
+import { MagneticButton } from '@/components/ui/magnetic-button';
 
-function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-100px" });
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.4, 0.25, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  },
+};
 
 export default function ShoppingFeaturePage() {
+  const router = useRouter();
+  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
+  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
+
+  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
+    if (inviteCode) {
+      const params = new URLSearchParams();
+      params.set('beta_code', inviteCode);
+      if (email) params.set('email', email);
+      if (firstName) params.set('first_name', firstName);
+      if (lastName) params.set('last_name', lastName);
+      router.push(`/signup?${params.toString()}`);
+    } else {
+      router.push('/signup');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-emerald-50/30 to-white dark:from-black dark:via-emerald-950/20 dark:to-black">
-      <Header />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+      <Header
+        onBetaClick={() => setIsBetaModalOpen(true)}
+        onLaunchClick={() => setIsLaunchModalOpen(true)}
+        isPublicFeaturePage={true}
+      />
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <AnimatedSection>
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-shopping rounded-3xl mb-6 shadow-xl shadow-emerald-500/30 animate-bounce-subtle">
-              <ShoppingCart className="w-10 h-10 text-white" />
-            </div>
+      <main>
+        {/* Hero Section */}
+        <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.1),transparent)] dark:bg-[radial-gradient(45%_45%_at_50%_0%,rgba(5,150,105,0.05),transparent)]" />
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Shopping Lists
-            </h1>
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              className="text-center"
+            >
+              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-8">
+                <Sparkles className="w-4 h-4" />
+                <span>Always Prepared</span>
+              </motion.div>
 
-            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Create and share shopping lists with your space members. Add items, check them off in real-time, and coordinate your shopping with shared lists.
-            </p>
-          </div>
-        </AnimatedSection>
+              <motion.h1
+                variants={itemVariants}
+                className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6"
+              >
+                Shared <span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 bg-clip-text text-transparent">Shopping</span>
+              </motion.h1>
 
-        {/* Key Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          {[
-            {
-              icon: RefreshCw,
-              color: 'bg-emerald-500',
-              title: 'Real-Time Sync',
-              description: 'Changes appear instantly for everyone. See what\'s been checked off as you shop.'
-            },
-            {
-              icon: Users,
-              color: 'bg-green-500',
-              title: 'Collaborative',
-              description: 'Everyone can add items, check them off, or add notes. Shop together or separately.'
-            },
-            {
-              icon: Smartphone,
-              color: 'bg-teal-500',
-              title: 'Mobile Friendly',
-              description: 'Access your lists from any device. Perfect for shopping on the go at any store.'
-            }
-          ].map((feature, index) => (
-            <AnimatedSection key={feature.title} delay={index * 0.1}>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
-                <div className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mb-6`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-      </section>
+              <motion.p
+                variants={itemVariants}
+                className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10"
+              >
+                Never forget an item again. Create collaborative shopping lists that update
+                in real-time, helping your family stay organized and efficient.
+              </motion.p>
 
-      {/* What You Can Do Section */}
-      <section className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/30 dark:to-green-950/30 py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Everything You Need
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Smart shopping list features that save time and money
-              </p>
-            </div>
-          </AnimatedSection>
-
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {[
-              'Create unlimited shopping lists with custom titles',
-              'Add items with quantities to each list',
-              'Check off items in real-time as you shop',
-              'Auto-complete lists when all items are checked',
-              'Filter lists by status (active, completed, all)',
-              'Search across all your shopping lists',
-              'View stats for total lists, active lists, and items this week'
-            ].map((feature, index) => (
-              <AnimatedSection key={index} delay={index * 0.05}>
-                <div className="flex items-start gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50">
-                  <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center mt-1">
-                    <Check className="w-4 h-4 text-white" />
+              <motion.div
+                variants={itemVariants}
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+              >
+                <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                  <div className="px-8 py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2">
+                    Access Beta Test
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <p className="text-lg text-gray-900 dark:text-white font-medium">{feature}</p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
+                </MagneticButton>
 
-      {/* Use Cases Section */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                Perfect For
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Common ways to organize household shopping
-              </p>
+                <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                  <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                    Get Notified on Launch
+                  </div>
+                </MagneticButton>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Feature Grid */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: List,
+                  title: "Smart Lists",
+                  description: "Create multiple lists for different stores or occasions. Organize items by category for faster shopping.",
+                  color: "emerald"
+                },
+                {
+                  icon: Share2,
+                  title: "Real-time Sync",
+                  description: "Updates instantly on all family devices. See items being checked off as someone else shops.",
+                  color: "teal"
+                },
+                {
+                  icon: Tag,
+                  title: "Quick Entry",
+                  description: "Add items fast with intelligent suggestions. Store quantities, notes, and photos for clarity.",
+                  color: "green"
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                >
+                  <SpotlightCard className="p-8 h-full">
+                    <div className={`w-12 h-12 rounded-2xl bg-${item.color}-500/10 flex items-center justify-center mb-6`}>
+                      <item.icon className={`w-6 h-6 text-${item.color}-500`} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </SpotlightCard>
+                </motion.div>
+              ))}
             </div>
-          </AnimatedSection>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <AnimatedSection delay={0.2}>
-              <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-2xl p-8 border border-emerald-200/50 dark:border-emerald-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Grocery & Food</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Weekly grocery shopping lists', 'Special occasion meal planning', 'Bulk buying for large families', 'Party and entertaining supplies'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <ShoppingCart className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.4}>
-              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 rounded-2xl p-8 border border-teal-200/50 dark:border-teal-700/50">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Household & Other</h3>
-                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
-                  {['Household supplies and cleaning products', 'Home improvement project materials', 'Back-to-school and office supplies', 'Gift and holiday shopping'].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-teal-600 dark:text-teal-400 mt-0.5 flex-shrink-0" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimatedSection>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Details Section */}
+        <section className="py-20 bg-gray-100/50 dark:bg-gray-800/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                  Shopping, Made Simple
+                </h2>
+                <div className="space-y-6">
+                  {[
+                    "Collaborative lists for the whole family",
+                    "Smart categorization for easy store navigation",
+                    "Historical list of frequently bought items",
+                    "Photo attachments for specific products",
+                    "Integrated with meal planning for auto-lists"
+                  ].map((feature, i) => (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <span className="text-lg text-gray-700 dark:text-gray-300 font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 shadow-2xl"
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                  <ShoppingCart className="w-32 h-32 animate-pulse" />
+                </div>
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-white font-bold text-xl drop-shadow-md">Shopping Preview</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="py-24 text-center">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">
+              Ready to simplify your shopping?
+            </h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                <div className="px-8 py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2">
+                  Access Beta Test
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </MagneticButton>
+
+              <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  Get Notified on Launch
+                </div>
+              </MagneticButton>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
+
+      <BetaAccessModal
+        isOpen={isBetaModalOpen}
+        onClose={() => setIsBetaModalOpen(false)}
+        onSuccess={handleBetaSuccess}
+        onSwitchToLaunch={() => {
+          setIsBetaModalOpen(false);
+          setIsLaunchModalOpen(true);
+        }}
+      />
+      <LaunchNotificationModal
+        isOpen={isLaunchModalOpen}
+        onClose={() => setIsLaunchModalOpen(false)}
+      />
     </div>
   );
 }

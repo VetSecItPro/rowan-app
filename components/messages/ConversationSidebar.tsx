@@ -155,7 +155,7 @@ export function ConversationSidebar({
         <div className="flex items-center gap-1.5">
           <button
             onClick={onNewConversation}
-            className="p-2 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 rounded-xl transition-all duration-200 group"
+            className="p-2 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 rounded-full transition-all duration-200 group"
             title="New conversation"
             aria-label="Start new conversation"
           >
@@ -164,7 +164,7 @@ export function ConversationSidebar({
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200 md:hidden"
+              className="p-2 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 rounded-full transition-all duration-200 md:hidden"
               aria-label="Close sidebar"
             >
               <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -182,7 +182,7 @@ export function ConversationSidebar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full pl-10 pr-4 py-2.5 text-sm bg-white/50 dark:bg-gray-800/50 backdrop-blur-lg border border-white/40 dark:border-gray-600/40 rounded-xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-400/50 dark:focus:border-emerald-500/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full pl-10 pr-4 py-2.5 text-sm bg-white/50 dark:bg-gray-800/50 backdrop-blur-lg border border-white/40 dark:border-gray-600/40 rounded-full focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-400/50 dark:focus:border-emerald-500/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
           />
         </div>
       </div>
@@ -253,7 +253,7 @@ export function ConversationSidebar({
       {dropdownOpenForId && mounted && createPortal(
         <div
           ref={dropdownRef}
-          className="fixed w-44 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-xl shadow-2xl shadow-black/20 dark:shadow-black/40 py-1.5 z-[10000] ring-1 ring-black/5 dark:ring-white/5"
+          className="fixed w-44 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-white/50 dark:border-gray-600/50 rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 py-1.5 z-[10000] ring-1 ring-black/5 dark:ring-white/5"
           style={{
             top: dropdownPosition.top,
             right: dropdownPosition.right
@@ -347,11 +347,10 @@ function ConversationItem({
           onClick?.();
         }
       }}
-      className={`group w-full px-4 py-3 flex items-start gap-3 transition-all duration-200 cursor-pointer ${
-        isActive
+      className={`group w-full px-4 py-3 flex items-start gap-3 transition-all duration-200 cursor-pointer ${isActive
           ? 'bg-gradient-to-r from-emerald-100/60 via-green-50/50 to-teal-50/40 dark:from-emerald-900/30 dark:via-green-900/20 dark:to-teal-900/20 border-l-4 border-l-emerald-500 shadow-sm'
           : 'hover:bg-white/40 dark:hover:bg-gray-800/40 border-l-4 border-l-transparent hover:border-l-emerald-300 dark:hover:border-l-emerald-700'
-      } border-b border-white/20 dark:border-gray-700/20`}
+        } border-b border-white/20 dark:border-gray-700/20`}
     >
       {/* Avatar/Icon */}
       <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 via-green-500 to-teal-500 flex items-center justify-center text-2xl shadow-lg ring-2 ring-white/30 dark:ring-gray-700/50">

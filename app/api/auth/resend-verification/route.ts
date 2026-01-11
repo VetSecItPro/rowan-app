@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { authRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { sendEmailVerificationEmail } from '@/lib/services/email-service';
+import { buildAppUrl } from '@/lib/utils/app-url';
+import crypto from 'crypto';
 
 /**
  * POST /api/auth/resend-verification
  *
  * Resends the email verification link to the logged-in user.
+ * Uses custom Resend-based email service instead of Supabase's built-in email.
  * Rate limited to prevent abuse.
  */
 export async function POST(request: NextRequest) {
@@ -60,27 +65,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Resend the verification email using Supabase's built-in method
-    const { error: resendError } = await supabase.auth.resend({
-      type: 'signup',
-      email: user.email!,
-    });
+    // Generate a secure verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    if (resendError) {
-      logger.error('Failed to resend verification email', resendError, {
-        component: 'api-resend-verification',
-        action: 'resend',
-        userId: user.id,
+    // Invalidate any existing tokens for this user
+    await supabaseAdmin
+      .from('email_verification_tokens')
+      .delete()
+      .eq('user_id', user.id);
+
+    // Store the new verification token
+    const { error: tokenError } = await supabaseAdmin
+      .from('email_verification_tokens')
+      .insert({
+        user_id: user.id,
+        email: user.email!,
+        token: verificationToken,
+        expires_at: expiresAt.toISOString(),
       });
 
-      // Handle specific error cases
-      if (resendError.message.includes('rate')) {
-        return NextResponse.json(
-          { error: 'Too many requests. Please wait a few minutes before trying again.' },
-          { status: 429 }
-        );
-      }
+    if (tokenError) {
+      logger.error('Failed to store verification token', tokenError, {
+        component: 'api-resend-verification',
+        action: 'store_token',
+        userId: user.id,
+      });
+      return NextResponse.json(
+        { error: 'Failed to generate verification link. Please try again.' },
+        { status: 500 }
+      );
+    }
 
+    // Build verification URL
+    const verificationUrl = buildAppUrl('/auth/verify-email', { token: verificationToken });
+
+    // Get user's name from metadata or database
+    const userName = user.user_metadata?.name || user.user_metadata?.full_name || 'there';
+
+    // Send verification email using Resend
+    const emailResult = await sendEmailVerificationEmail({
+      userEmail: user.email!,
+      verificationUrl,
+      userName,
+    });
+
+    if (!emailResult.success) {
+      logger.error('Failed to send verification email', undefined, {
+        component: 'api-resend-verification',
+        action: 'send_email',
+        userId: user.id,
+        error: emailResult.error,
+      });
       return NextResponse.json(
         { error: 'Failed to send verification email. Please try again later.' },
         { status: 500 }
