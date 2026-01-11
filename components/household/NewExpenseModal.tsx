@@ -61,8 +61,8 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white" />
           </div>
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Cancel</button>
-            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-lg">{editExpense ? 'Save' : 'Create'}</button>
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-full">Cancel</button>
+            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-full">{editExpense ? 'Save' : 'Create'}</button>
           </div>
         </form>
       </div>

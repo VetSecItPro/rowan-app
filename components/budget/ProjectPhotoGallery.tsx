@@ -180,7 +180,7 @@ export function ProjectPhotoGallery({
 
         <button
           onClick={() => setShowUpload(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors font-medium"
         >
           <Upload className="w-4 h-4" />
           Upload Photos
@@ -196,7 +196,7 @@ export function ProjectPhotoGallery({
           </p>
           <button
             onClick={() => setShowUpload(true)}
-            className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+            className="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors"
           >
             Upload First Photo
           </button>
@@ -377,7 +377,7 @@ export function ProjectPhotoGallery({
                     onClick={() => {
                       // TODO: Implement download
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     Download
@@ -417,11 +417,11 @@ export function ProjectPhotoGallery({
               <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => setShowUpload(false)}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 >
                   Cancel
                 </button>
-                <button className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">
+                <button className="px-4 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors">
                   Upload
                 </button>
               </div>

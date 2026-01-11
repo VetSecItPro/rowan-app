@@ -170,7 +170,7 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
     // Build className based on props
     const buttonClasses = cn(
       // Base styles
-      'relative inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300',
+      'relative inline-flex items-center justify-center font-medium rounded-full transition-all duration-300',
       'focus:outline-none focus:ring-2 focus:ring-offset-2',
       'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
 

@@ -1316,10 +1316,10 @@ export default function TasksChoresDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">Emoji Reactions</h3>
               <div className="flex gap-3 my-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">👍</button>
-                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">❤️</button>
-                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">😄</button>
-                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">🎉</button>
+                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">👍</button>
+                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">❤️</button>
+                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">😄</button>
+                <button className="px-3 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">🎉</button>
               </div>
 
               <div className="bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800 rounded-lg p-4 mt-6">
