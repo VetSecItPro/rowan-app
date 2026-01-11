@@ -104,18 +104,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Fire-and-forget: cleanup other tokens for this user (don't block response)
-    supabaseAdmin
-      .from('magic_link_tokens')
-      .delete()
-      .eq('user_id', tokenData.user_id)
-      .neq('token', token)
-      .then(() => {})
-      .catch(err => {
+    void (async () => {
+      try {
+        await supabaseAdmin
+          .from('magic_link_tokens')
+          .delete()
+          .eq('user_id', tokenData.user_id)
+          .neq('token', token);
+      } catch (err) {
         logger.error('Failed to cleanup tokens:', err, {
           component: 'api-route',
           action: 'api_request'
         });
-      });
+      }
+    })();
 
     logger.info('Magic link verified successfully', {
       component: 'api-route',

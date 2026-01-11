@@ -57,18 +57,20 @@ export async function POST(request: NextRequest) {
       // Fire-and-forget: cleanup old tokens AFTER insert succeeds
       // This prevents race condition where delete removes the new token
       if (!tokenError) {
-        supabaseAdmin
-          .from('password_reset_tokens')
-          .delete()
-          .eq('user_id', userData.id)
-          .neq('token', resetToken)
-          .then(() => {})
-          .catch(err => {
+        void (async () => {
+          try {
+            await supabaseAdmin
+              .from('password_reset_tokens')
+              .delete()
+              .eq('user_id', userData.id)
+              .neq('token', resetToken);
+          } catch (err) {
             logger.error('Failed to cleanup old tokens:', err, {
               component: 'api-route',
               action: 'api_request'
             });
-          });
+          }
+        })();
       }
 
       const tokenResult = { error: tokenError };
