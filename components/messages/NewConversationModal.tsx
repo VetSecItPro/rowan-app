@@ -122,11 +122,10 @@ export function NewConversationModal({
                       key={type.value}
                       type="button"
                       onClick={() => setConversationType(type.value)}
-                      className={`p-4 rounded-xl border-2 transition-all text-left ${
-                        isSelected
+                      className={`p-4 rounded-3xl border-2 transition-all text-left ${isSelected
                           ? `${type.bgColor} border-${type.value === 'direct' ? 'blue' : type.value === 'group' ? 'purple' : 'green'}-500`
                           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                      }`}
+                        }`}
                     >
                       <Icon className={`w-6 h-6 mb-2 ${isSelected ? type.color : 'text-gray-400'}`} />
                       <div className="font-medium text-gray-900 dark:text-white text-sm mb-1">

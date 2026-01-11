@@ -22,6 +22,8 @@ export default function SignUpPage() {
   const [mounted, setMounted] = useState(false);
   const [accountCreated, setAccountCreated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
   const [emailOptIn, setEmailOptIn] = useState(false);
   const { signUp, signOut } = useAuth();
@@ -198,6 +200,12 @@ export default function SignUpPage() {
     }
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       setError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)');
+      return;
+    }
+
+    // Check password confirmation
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -479,6 +487,53 @@ export default function SignUpPage() {
                   10+ characters with uppercase, lowercase, number, and special character
                 </p>
               )}
+            </div>
+
+            {/* Confirm Password Field */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Confirm Password <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={10}
+                  className="w-full pl-11 pr-24 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                  placeholder="••••••••••••"
+                  disabled={isLoading}
+                  autoComplete="new-password"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {confirmPassword && password && confirmPassword === password && (
+                    <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      Match
+                    </span>
+                  )}
+                  {confirmPassword && password && confirmPassword !== password && (
+                    <span className="text-xs font-medium text-red-500 dark:text-red-400">
+                      No match
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Space Name */}
