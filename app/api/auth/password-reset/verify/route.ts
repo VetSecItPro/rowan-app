@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -9,12 +9,12 @@ export const dynamic = 'force-dynamic';
 const PasswordResetVerifySchema = z.object({
   token: z.string().min(1, 'Reset token is required'),
   password: z.string()
-    .min(12, 'Password must be at least 12 characters')
+    .min(10, 'Password must be at least 10 characters')
     .max(128, 'Password too long')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/\d/, 'Password must contain at least one number')
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
+    .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)')
 });
 
 export async function POST(request: NextRequest) {
@@ -35,11 +35,10 @@ export async function POST(request: NextRequest) {
     const validatedData = PasswordResetVerifySchema.parse(body);
     const { token, password } = validatedData;
 
-    // Create Supabase client
-    const supabase = await createClient();
+    // Use admin client to bypass RLS for token verification
 
     // Verify the reset token
-    const { data: tokenData, error: tokenError } = await supabase
+    const { data: tokenData, error: tokenError } = await supabaseAdmin
       .from('password_reset_tokens')
       .select('user_id, expires_at, used_at')
       .eq('token', token)
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the user's password using Supabase admin client
-    const { error: passwordError } = await supabase.auth.admin.updateUserById(
+    const { error: passwordError } = await supabaseAdmin.auth.admin.updateUserById(
       tokenData.user_id,
       { password: password }
     );
@@ -86,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark the token as used
-    const { error: markUsedError } = await supabase
+    const { error: markUsedError } = await supabaseAdmin
       .from('password_reset_tokens')
       .update({ used_at: new Date().toISOString() })
       .eq('token', token);
@@ -97,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Clean up any other reset tokens for this user
-    const { error: cleanupError } = await supabase
+    const { error: cleanupError } = await supabaseAdmin
       .from('password_reset_tokens')
       .delete()
       .eq('user_id', tokenData.user_id)
@@ -144,10 +143,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
     // Check token validity
-    const { data: tokenData, error: tokenError } = await supabase
+    const { data: tokenData, error: tokenError } = await supabaseAdmin
       .from('password_reset_tokens')
       .select('expires_at, used_at')
       .eq('token', token)

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { ShoppingCart, Check, List, Tag, Share2, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -11,7 +11,7 @@ import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
 import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -21,7 +21,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,

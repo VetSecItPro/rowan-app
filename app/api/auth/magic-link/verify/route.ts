@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
@@ -29,11 +29,10 @@ export async function POST(request: NextRequest) {
     const validatedData = MagicLinkVerifySchema.parse(body);
     const { token } = validatedData;
 
-    // Create Supabase client
-    const supabase = await createClient();
+    // Use admin client to bypass RLS for token verification
 
     // Verify the magic link token
-    const { data: tokenData, error: tokenError } = await supabase
+    const { data: tokenData, error: tokenError } = await supabaseAdmin
       .from('magic_link_tokens')
       .select('user_id, expires_at, used_at')
       .eq('token', token)
@@ -66,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark the token as used immediately to prevent race conditions
-    const { error: markUsedError } = await supabase
+    const { error: markUsedError } = await supabaseAdmin
       .from('magic_link_tokens')
       .update({ used_at: new Date().toISOString() })
       .eq('token', token);
@@ -80,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate a new session for the user using Supabase admin
-    const { data: authData, error: authError } = await supabase.auth.admin.generateLink({
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email: '', // We don't have email here, but we have user_id
       options: {
@@ -92,8 +91,8 @@ export async function POST(request: NextRequest) {
       logger.error('Failed to generate session:', authError, { component: 'api-route', action: 'api_request' });
       
       // Alternative approach: Create a temporary access token
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
+      const { data: userData, error: userError } = await supabaseAdmin
+        .from('users')
         .select('email')
         .eq('id', tokenData.user_id)
         .single();
@@ -116,7 +115,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Clean up other magic link tokens for this user
-    const { error: cleanupError } = await supabase
+    const { error: cleanupError } = await supabaseAdmin
       .from('magic_link_tokens')
       .delete()
       .eq('user_id', tokenData.user_id)
@@ -163,10 +162,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
     // Check token validity without using it
-    const { data: tokenData, error: tokenError } = await supabase
+    const { data: tokenData, error: tokenError } = await supabaseAdmin
       .from('magic_link_tokens')
       .select('expires_at, used_at')
       .eq('token', token)

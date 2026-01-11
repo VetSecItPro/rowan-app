@@ -1,11 +1,112 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useValidatedSearchParams, AuthCallbackParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
+
+// Password strength calculator
+function calculatePasswordStrength(password: string): {
+  score: number;
+  label: string;
+  color: string;
+  bgColor: string;
+  requirements: { label: string; met: boolean }[];
+} {
+  const requirements = [
+    { label: 'At least 10 characters', met: password.length >= 10 },
+    { label: 'At least 12 characters (recommended)', met: password.length >= 12 },
+    { label: 'Uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
+    { label: 'Lowercase letter (a-z)', met: /[a-z]/.test(password) },
+    { label: 'Number (0-9)', met: /\d/.test(password) },
+    { label: 'Special character (!@#$%^&*)', met: /[!@#$%^&*(),.?":{}|<>]/.test(password) },
+  ];
+
+  // Calculate score based on requirements met
+  let score = 0;
+  if (password.length >= 10) score += 1;
+  if (password.length >= 12) score += 1;
+  if (/[A-Z]/.test(password)) score += 1;
+  if (/[a-z]/.test(password)) score += 1;
+  if (/\d/.test(password)) score += 1;
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 1;
+
+  // Bonus for length
+  if (password.length >= 16) score += 1;
+
+  // Determine label and color based on score
+  let label: string;
+  let color: string;
+  let bgColor: string;
+
+  if (score <= 2) {
+    label = 'Weak';
+    color = 'text-red-600 dark:text-red-400';
+    bgColor = 'bg-red-500';
+  } else if (score <= 4) {
+    label = 'Fair';
+    color = 'text-orange-600 dark:text-orange-400';
+    bgColor = 'bg-orange-500';
+  } else if (score <= 5) {
+    label = 'Good';
+    color = 'text-yellow-600 dark:text-yellow-400';
+    bgColor = 'bg-yellow-500';
+  } else {
+    label = 'Strong';
+    color = 'text-green-600 dark:text-green-400';
+    bgColor = 'bg-green-500';
+  }
+
+  return { score: Math.min(score, 7), label, color, bgColor, requirements };
+}
+
+// Password Strength Meter Component
+function PasswordStrengthMeter({ password }: { password: string }) {
+  const strength = useMemo(() => calculatePasswordStrength(password), [password]);
+
+  if (!password) return null;
+
+  return (
+    <div className="mt-3 space-y-3">
+      {/* Strength Bar */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Password Strength</span>
+          <span className={`text-xs font-semibold ${strength.color}`}>{strength.label}</span>
+        </div>
+        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className={`h-full ${strength.bgColor} transition-all duration-300 ease-out`}
+            style={{ width: `${(strength.score / 7) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Requirements Checklist */}
+      <div className="grid grid-cols-1 gap-1.5">
+        {strength.requirements.map((req, index) => (
+          <div
+            key={index}
+            className={`flex items-center gap-2 text-xs transition-colors ${
+              req.met
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-gray-400 dark:text-gray-500'
+            }`}
+          >
+            {req.met ? (
+              <Check className="w-3.5 h-3.5 flex-shrink-0" />
+            ) : (
+              <X className="w-3.5 h-3.5 flex-shrink-0" />
+            )}
+            <span>{req.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -87,8 +188,8 @@ function ResetPasswordForm() {
   const validatePassword = (pwd: string): string[] => {
     const errors: string[] = [];
 
-    if (pwd.length < 8) {
-      errors.push('Password must be at least 8 characters long');
+    if (pwd.length < 10) {
+      errors.push('Password must be at least 10 characters long');
     }
     if (!/[A-Z]/.test(pwd)) {
       errors.push('Password must contain at least one uppercase letter');
@@ -98,6 +199,9 @@ function ResetPasswordForm() {
     }
     if (!/\d/.test(pwd)) {
       errors.push('Password must contain at least one number');
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {
+      errors.push('Password must contain at least one special character');
     }
 
     return errors;
@@ -161,7 +265,7 @@ function ResetPasswordForm() {
 
       // Redirect to sign-in page after 2 seconds
       setTimeout(() => {
-        router.push('/auth/signin');
+        router.push('/login');
       }, 2000);
 
     } catch (err) {
@@ -214,7 +318,7 @@ function ResetPasswordForm() {
             {error || 'This password reset link is invalid or has expired. Please request a new one.'}
           </p>
           <Link
-            href="/auth/signin"
+            href="/login"
             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -267,7 +371,7 @@ function ResetPasswordForm() {
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white pr-12 text-base md:text-sm mobile-text-input"
                 placeholder="Enter your new password"
                 required
-                minLength={8}
+                minLength={10}
               />
               <button
                 type="button"
@@ -277,6 +381,9 @@ function ResetPasswordForm() {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+
+            {/* Password Strength Meter */}
+            <PasswordStrengthMeter password={password} />
           </div>
 
           {/* Confirm Password */}
@@ -290,32 +397,32 @@ function ResetPasswordForm() {
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white pr-12 text-base md:text-sm mobile-text-input"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white pr-24 text-base md:text-sm mobile-text-input"
                 placeholder="Confirm your new password"
                 required
-                minLength={8}
+                minLength={10}
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2 mobile-clickable"
-              >
-                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                {confirmPassword && password && confirmPassword === password && (
+                  <span className="text-xs font-medium text-green-600 dark:text-green-400 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    Match
+                  </span>
+                )}
+                {confirmPassword && password && confirmPassword !== password && (
+                  <span className="text-xs font-medium text-red-500 dark:text-red-400">
+                    No match
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2 mobile-clickable"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Password Requirements */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-            <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
-              Password Requirements:
-            </p>
-            <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-              <li>• At least 8 characters long</li>
-              <li>• One uppercase letter (A-Z)</li>
-              <li>• One lowercase letter (a-z)</li>
-              <li>• One number (0-9)</li>
-            </ul>
           </div>
 
           {/* Submit Button */}
@@ -341,7 +448,7 @@ function ResetPasswordForm() {
         {/* Back to Sign In */}
         <div className="mt-6 text-center">
           <Link
-            href="/auth/signin"
+            href="/login"
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
             Back to Sign In

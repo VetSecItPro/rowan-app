@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAuthRateLimit } from '@/lib/ratelimit';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { sendPasswordResetEmail, type PasswordResetData } from '@/lib/services/email-service';
 import { z } from 'zod';
 import crypto from 'crypto';
@@ -31,12 +31,9 @@ export async function POST(request: NextRequest) {
     const validatedData = PasswordResetRequestSchema.parse(body);
     const { email } = validatedData;
 
-    // Create Supabase client
-    const supabase = await createClient();
-
-    // Check if user exists (but don't reveal this information for security)
-    const { data: userData, error: userError } = await supabase
-      .from('profiles')
+    // Check if user exists using admin client (bypasses RLS for unauthenticated requests)
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from('users')
       .select('id, name, email')
       .eq('email', email.toLowerCase())
       .single();
@@ -49,8 +46,14 @@ export async function POST(request: NextRequest) {
         const resetToken = crypto.randomBytes(32).toString('hex');
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
 
-        // Store the reset token in the database
-        const { error: tokenError } = await supabase
+        // Invalidate any existing tokens for this user
+        await supabaseAdmin
+          .from('password_reset_tokens')
+          .delete()
+          .eq('user_id', userData.id);
+
+        // Store the reset token in the database using admin client (bypasses RLS)
+        const { error: tokenError } = await supabaseAdmin
           .from('password_reset_tokens')
           .insert({
             user_id: userData.id,
@@ -63,12 +66,12 @@ export async function POST(request: NextRequest) {
           logger.error('Failed to store reset token:', tokenError, { component: 'api-route', action: 'api_request' });
           // Still return success to prevent information leakage
         } else {
-          // Send password reset email using our custom template
+          // Send password reset email using our custom template via Resend
           const resetUrl = buildAppUrl('/reset-password', { token: resetToken });
-          
+
           // Get user agent and IP for security info
           const userAgent = request.headers.get('user-agent') || 'Unknown browser';
-          
+
           const emailData: PasswordResetData = {
             userEmail: email,
             resetUrl: resetUrl,
@@ -77,14 +80,22 @@ export async function POST(request: NextRequest) {
             userAgent: userAgent
           };
 
-          // Send email in background (non-blocking for fast response)
-          sendPasswordResetEmail(emailData).then((emailResult) => {
-            if (!emailResult.success) {
-              logger.error('Failed to send password reset email:', undefined, { component: 'api-route', action: 'api_request', details: emailResult.error });
-            }
-          }).catch((err) => {
-            logger.error('Password reset email error:', err, { component: 'api-route', action: 'api_request' });
-          });
+          // Send email and wait for result to ensure it's sent
+          const emailResult = await sendPasswordResetEmail(emailData);
+          if (!emailResult.success) {
+            logger.error('Failed to send password reset email:', undefined, {
+              component: 'api-route',
+              action: 'api_request',
+              details: emailResult.error,
+              email: email.substring(0, 3) + '***'
+            });
+          } else {
+            logger.info('Password reset email sent successfully', {
+              component: 'api-route',
+              action: 'password_reset',
+              email: email.substring(0, 3) + '***'
+            });
+          }
         }
       } catch (emailError) {
         logger.error('Password reset email error:', emailError, { component: 'api-route', action: 'api_request' });
