@@ -784,7 +784,7 @@ export default function ProjectsPage() {
                       >
                         Use Template
                       </CTAButton>
-                      <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
+                      <button onClick={() => setIsBudgetModalOpen(true)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all">
                         Update Budget
                       </button>
                     </div>

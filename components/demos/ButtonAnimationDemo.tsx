@@ -277,7 +277,7 @@ export function LegacyButtonExample() {
       ref={ref as React.Ref<HTMLButtonElement>}
       {...otherProps}
       onClick={enhancedClickHandler(() => console.log('Legacy button clicked!'))}
-      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-medium"
+      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full font-medium"
     >
       Enhanced Legacy Button
     </button>

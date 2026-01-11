@@ -67,8 +67,8 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
             </div>
           </div>
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Cancel</button>
-            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-lg">{editChore ? 'Save' : 'Create'}</button>
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-full">Cancel</button>
+            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-full">{editChore ? 'Save' : 'Create'}</button>
           </div>
         </form>
       </div>

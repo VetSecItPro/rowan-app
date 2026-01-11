@@ -281,22 +281,22 @@ export const OverviewPanel = memo(function OverviewPanel() {
       <div>
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Quick Navigation</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
             <TrendingUp className="w-5 h-5 text-green-500 mb-2" />
             <p className="text-sm font-medium text-gray-900 dark:text-white">Growth</p>
             <p className="text-xs text-gray-500">View acquisition funnel</p>
           </button>
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
             <Activity className="w-5 h-5 text-cyan-500 mb-2" />
             <p className="text-sm font-medium text-gray-900 dark:text-white">Engagement</p>
             <p className="text-xs text-gray-500">See user activity</p>
           </button>
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
             <UserCheck className="w-5 h-5 text-purple-500 mb-2" />
             <p className="text-sm font-medium text-gray-900 dark:text-white">Retention</p>
             <p className="text-xs text-gray-500">Check cohort data</p>
           </button>
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
             <DollarSign className="w-5 h-5 text-orange-500 mb-2" />
             <p className="text-sm font-medium text-gray-900 dark:text-white">Revenue</p>
             <p className="text-xs text-gray-500">View MRR trends</p>
