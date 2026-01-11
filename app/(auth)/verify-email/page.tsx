@@ -1,33 +1,85 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Mail, RefreshCw, LogOut, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, RefreshCw, LogOut, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 /**
- * Email Verification Required Page
+ * Email Verification Page
  *
- * Shown to new users (on or after Jan 4, 2026) who haven't verified their email yet.
- * Existing beta users (before Jan 4, 2026) are grandfathered in and won't see this page.
+ * Handles two cases:
+ * 1. User clicks verification link from email (has token)
+ * 2. User is logged in and waiting for verification (no token, polling)
  */
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendError, setResendError] = useState('');
   const [mounted, setMounted] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [verificationError, setVerificationError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
+  const token = searchParams.get('token');
 
   // Smooth fade-in animation on mount
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle token verification if token is present
+  useEffect(() => {
+    if (token && !isVerifying && !verificationSuccess && !verificationError) {
+      verifyToken(token);
+    }
+  }, [token]);
+
+  const verifyToken = async (verificationToken: string) => {
+    setIsVerifying(true);
+    setVerificationError('');
+
+    try {
+      // First check if token is valid
+      const checkResponse = await fetch(`/api/auth/verify-email?token=${verificationToken}`);
+      const checkData = await checkResponse.json();
+
+      if (!checkData.valid) {
+        setVerificationError(checkData.error || 'Invalid verification link');
+        setIsVerifying(false);
+        return;
+      }
+
+      // Now verify the token
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: verificationToken }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setVerificationSuccess(true);
+        // Redirect to login after 3 seconds
+        setTimeout(() => {
+          router.push('/login?verified=true');
+        }, 3000);
+      } else {
+        setVerificationError(data.error || 'Verification failed');
+      }
+    } catch {
+      setVerificationError('Network error. Please try again.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   // Check if user has verified their email (poll every 5 seconds)
   useEffect(() => {
@@ -89,6 +141,96 @@ export default function VerifyEmailPage() {
     router.push('/login');
   };
 
+  // If verifying a token, show verification UI
+  if (token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 p-4">
+        <div
+          className={`w-full max-w-md transition-all duration-700 ease-out ${
+            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+        >
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-block">
+              <Image
+                src="/rowan-logo.png"
+                alt="Rowan"
+                width={80}
+                height={80}
+                className="mx-auto drop-shadow-lg"
+                priority
+              />
+            </Link>
+          </div>
+
+          {/* Card */}
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-700/50">
+            {isVerifying && (
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center animate-pulse">
+                  <Mail className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Verifying Your Email
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Please wait...
+                </p>
+              </div>
+            )}
+
+            {verificationSuccess && (
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Email Verified!
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  Your email has been successfully verified. Redirecting you to login...
+                </p>
+                <Link
+                  href="/login?verified=true"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all"
+                >
+                  Continue to Login <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
+            {verificationError && (
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                  <AlertCircle className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  Verification Failed
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  {verificationError}
+                </p>
+                <div className="space-y-3">
+                  <Link
+                    href="/login"
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all text-center"
+                  >
+                    Go to Login
+                  </Link>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    You can request a new verification email after logging in.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Standard "waiting for verification" UI (no token)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 p-4">
       <div
@@ -213,5 +355,20 @@ export default function VerifyEmailPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950">
+        <div className="animate-pulse">
+          <div className="w-16 h-16 rounded-full bg-emerald-200 dark:bg-emerald-800 mx-auto mb-4" />
+          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

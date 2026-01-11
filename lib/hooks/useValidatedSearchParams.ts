@@ -105,7 +105,10 @@ export const AuthCallbackParamsSchema = z.object({
  */
 export const LoginParamsSchema = z.object({
   redirect: z.string().max(500).optional(),
+  redirectTo: z.string().max(500).optional(),
   registered: z.enum(['true', 'false']).optional(),
+  verified: z.enum(['true', 'false']).optional(),
+  email_changed: z.enum(['true', 'false']).optional(),
   error: z.string().max(200).optional(),
 });
 
