@@ -9,6 +9,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { UserPlus, Mail, Lock, User, Home, Eye, EyeOff, ChevronDown, Check, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { opacity: 1, x: 0 }
+};
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -271,9 +289,8 @@ export default function SignUpPage() {
     <div className="min-h-screen flex flex-col lg:flex-row transition-all duration-500">
       {/* Mobile Header - Green section with logo */}
       <div
-        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${
-          mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-        }`}
+        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+          }`}
       >
         <Link href="/" className="flex flex-col items-center group">
           <Image
@@ -291,9 +308,8 @@ export default function SignUpPage() {
 
       {/* Desktop Left side - Branding */}
       <div
-        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${
-          mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-        }`}
+        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+          }`}
       >
 
         {/* Logo and branding */}
@@ -333,44 +349,54 @@ export default function SignUpPage() {
 
       {/* Right side - Sign up form */}
       <div
-        className={`flex-1 lg:w-1/2 bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 sm:p-8 overflow-y-auto transform transition-all duration-700 ${
-          mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
-        }`}
+        className="flex-1 lg:w-1/2 bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4 sm:p-8 overflow-y-auto"
       >
-        <div className="w-full max-w-md py-8">
+        <motion.div
+          className="w-full max-w-md py-10 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800/50 my-8"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
           {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {accountCreated ? 'Account created successfully!' : 'Create Your Account'}
+          <motion.div className="mb-8" variants={itemVariants}>
+            <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
+              {accountCreated ? 'Welcome to Rowan!' : 'Create Account'}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              {accountCreated ? 'Redirecting you to login...' : 'Join Rowan to start collaborating'}
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              {accountCreated ? 'Redirecting you to login...' : 'Start your collaborative journey'}
             </p>
-          </div>
+          </motion.div>
 
           {/* Sign up form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error message */}
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-base md:text-sm animate-in slide-in-from-top-2 duration-300">
-                {error}
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/50 text-red-600 dark:text-red-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Name Field */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                 Full Name <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors duration-200" />
                 <input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="Alex Johnson"
                   disabled={isLoading}
                   autoFocus
@@ -378,15 +404,15 @@ export default function SignUpPage() {
                   autoCapitalize="words"
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                 Email Address <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors duration-200" />
                 <input
                   id="email"
                   type="email"
@@ -394,22 +420,22 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="alex@example.com"
                   disabled={isLoading}
                   autoComplete="email"
                   autoCapitalize="none"
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                 Password <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors duration-200" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -417,7 +443,7 @@ export default function SignUpPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={10}
-                  className="w-full pl-11 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-14 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="••••••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
@@ -425,7 +451,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -443,17 +469,16 @@ export default function SignUpPage() {
                     {[1, 2, 3, 4, 5].map((level) => (
                       <div
                         key={level}
-                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                          passwordStrength >= level
-                            ? passwordStrength <= 2
-                              ? 'bg-red-500'
-                              : passwordStrength <= 3
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${passwordStrength >= level
+                          ? passwordStrength <= 2
+                            ? 'bg-red-500'
+                            : passwordStrength <= 3
                               ? 'bg-yellow-500'
                               : passwordStrength <= 4
-                              ? 'bg-blue-500'
-                              : 'bg-emerald-500'
-                            : 'bg-gray-200 dark:bg-gray-700'
-                        }`}
+                                ? 'bg-blue-500'
+                                : 'bg-emerald-500'
+                          : 'bg-gray-200 dark:bg-gray-700'
+                          }`}
                       />
                     ))}
                   </div>
@@ -483,19 +508,19 @@ export default function SignUpPage() {
                 </div>
               )}
               {password.length === 0 && (
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 ml-1">
                   10+ characters with uppercase, lowercase, number, and special character
                 </p>
               )}
-            </div>
+            </motion.div>
 
             {/* Confirm Password Field */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                 Confirm Password <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors duration-200" />
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
@@ -503,27 +528,27 @@ export default function SignUpPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={10}
-                  className="w-full pl-11 pr-24 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-24 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="••••••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   {confirmPassword && password && confirmPassword === password && (
-                    <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" />
                       Match
                     </span>
                   )}
                   {confirmPassword && password && confirmPassword !== password && (
-                    <span className="text-xs font-medium text-red-500 dark:text-red-400">
+                    <span className="text-xs font-semibold text-red-500 dark:text-red-400">
                       No match
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
                     {showConfirmPassword ? (
@@ -534,15 +559,15 @@ export default function SignUpPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Space Name */}
-            <div>
-              <label htmlFor="spaceName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="spaceName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                 Space Name <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <Home className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors duration-200" />
                 <input
                   id="spaceName"
                   type="text"
@@ -552,16 +577,16 @@ export default function SignUpPage() {
                     setSpaceTouched(true);
                   }}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="Samira's Space"
                   disabled={isLoading}
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Color Theme Selector */}
-            <div>
-              <label htmlFor="colorTheme" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <motion.div variants={itemVariants}>
+              <label htmlFor="colorTheme" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
                 Choose your color theme
               </label>
               <div className="relative">
@@ -569,24 +594,27 @@ export default function SignUpPage() {
                   type="button"
                   onClick={() => setShowColorDropdown(!showColorDropdown)}
                   disabled={isLoading}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-200 flex items-center justify-between"
+                  className="w-full px-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all duration-300 flex items-center justify-between shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg shadow-lg ${getColorClasses(colorTheme)}`} />
-                    <span className="font-medium">
+                    <span className="font-semibold">
                       {colorThemes.find((t) => t.value === colorTheme)?.label || 'Select a color'}
                     </span>
                   </div>
                   <ChevronDown
-                    className={`w-5 h-5 text-gray-400 transition-transform ${
-                      showColorDropdown ? 'rotate-180' : ''
-                    }`}
+                    className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${showColorDropdown ? 'rotate-180' : ''
+                      }`}
                   />
                 </button>
 
                 {/* Dropdown Menu */}
                 {showColorDropdown && (
-                  <div className="absolute z-10 w-full mt-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-64 overflow-y-auto">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl"
+                  >
                     {colorThemes.map((theme) => (
                       <button
                         key={theme.value}
@@ -598,8 +626,8 @@ export default function SignUpPage() {
                         disabled={isLoading}
                         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                       >
-                        <div className={`w-8 h-8 rounded-lg shadow-lg flex-shrink-0 ${getColorClasses(theme.value)}`} />
-                        <span className="flex-1 font-medium text-gray-900 dark:text-white">
+                        <div className={`w-8 h-8 rounded-lg shadow-md flex-shrink-0 ${getColorClasses(theme.value)}`} />
+                        <span className="flex-1 font-semibold text-gray-900 dark:text-white text-sm">
                           {theme.label}
                         </span>
                         {colorTheme === theme.value && (
@@ -607,62 +635,66 @@ export default function SignUpPage() {
                         )}
                       </button>
                     ))}
-                  </div>
+                  </motion.div>
                 )}
               </div>
-            </div>
+            </motion.div>
 
             {/* Email Opt-in */}
-            <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+            <motion.div
+              variants={itemVariants}
+              className="flex items-start gap-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/50 rounded-2xl"
+            >
               <input
                 type="checkbox"
                 id="emailOptIn"
                 checked={emailOptIn}
                 onChange={(e) => setEmailOptIn(e.target.checked)}
                 disabled={isLoading}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mt-1"
+                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded-lg focus:ring-blue-500/50 transition-all duration-200 mt-1 cursor-pointer"
               />
-              <label htmlFor="emailOptIn" className="text-sm text-blue-900 dark:text-blue-100">
-                <span className="font-medium">Stay updated with Rowan</span>
-                <p className="text-blue-700 dark:text-blue-300 mt-1">
+              <label htmlFor="emailOptIn" className="text-sm text-blue-900 dark:text-blue-100 cursor-pointer">
+                <span className="font-bold">Stay updated with Rowan</span>
+                <p className="text-blue-700 dark:text-blue-300 mt-1.5 leading-relaxed">
                   Receive occasional updates about new features and tips. You can unsubscribe anytime.
-                  <span className="block text-xs mt-1 text-blue-600 dark:text-blue-400">
-                    From Rowan only • Never shared with third parties
-                  </span>
                 </p>
+                <span className="block text-[11px] mt-2 text-blue-500 dark:text-blue-400 font-medium uppercase tracking-wider">
+                  From Rowan only • Never shared with third parties
+                </span>
               </label>
-            </div>
+            </motion.div>
 
             {/* Submit Button */}
-            <button
+            <motion.button
+              variants={itemVariants}
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <UserPlus className="w-5 h-5" />
-                  Create Account
+                  Create Your Account
                 </>
               )}
-            </button>
+            </motion.button>
           </form>
 
           {/* Sign in link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
+          <motion.div className="mt-8 text-center" variants={itemVariants}>
+            <p className="text-gray-600 dark:text-gray-400 text-md font-medium">
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold transition-colors duration-200"
+                className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold transition-all duration-200 hover:underline"
               >
-                Sign in
+                Sign In
               </Link>
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
