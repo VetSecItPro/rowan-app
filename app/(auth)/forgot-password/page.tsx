@@ -6,6 +6,24 @@ export const dynamic = 'force-dynamic';
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { Mail, Check, AlertCircle, ArrowLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 }
+};
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -51,90 +69,109 @@ export default function ForgotPasswordPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4">
+        <motion.div
+          className="w-full max-w-md bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/20 dark:border-gray-800/50"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <motion.div className="flex items-center justify-center mb-8" variants={itemVariants}>
+            <div className="w-20 h-20 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center shadow-inner">
+              <Check className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
             </div>
-          </div>
-          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
+          </motion.div>
+          <motion.h2 className="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3" variants={itemVariants}>
             Check Your Email
-          </h2>
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
-            We've sent a password reset link to <span className="font-semibold">{email}</span>
-          </p>
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">
+          </motion.h2>
+          <motion.p className="text-center text-gray-600 dark:text-gray-400 mb-8 text-lg" variants={itemVariants}>
+            We've sent a password reset link to <span className="font-bold text-emerald-600 dark:text-emerald-400">{email}</span>
+          </motion.p>
+          <motion.p className="text-center text-sm text-gray-500 dark:text-gray-500 mb-8 leading-relaxed" variants={itemVariants}>
             Didn't receive the email? Check your spam folder or try again with a different email address.
-          </p>
-          <div className="flex justify-center">
+          </motion.p>
+          <motion.div className="flex justify-center" variants={itemVariants}>
             <Link
               href="/login"
-              className="btn-touch text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-sm font-medium rounded-md py-2 px-3 active:scale-95 transition-colors"
+              className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-md font-bold flex items-center gap-2 group transition-all"
             >
-              ← Back to Login
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Back to Login
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4 font-inter">
+      <motion.div
+        className="w-full max-w-md bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/20 dark:border-gray-800/50"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
         {/* Header */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
-            <Mail className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+        <motion.div className="flex items-center justify-center mb-8" variants={itemVariants}>
+          <div className="w-20 h-20 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center shadow-inner">
+            <Mail className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
           </div>
-        </div>
+        </motion.div>
 
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-2">
-          Forgot Your Password?
-        </h2>
-        <p className="text-center text-gray-600 dark:text-gray-400 mb-8">
+        <motion.h2 className="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3 tracking-tight" variants={itemVariants}>
+          Forgot Password?
+        </motion.h2>
+        <motion.p className="text-center text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed" variants={itemVariants}>
           Enter your email address and we'll send you a link to reset your password.
-        </p>
+        </motion.p>
 
         {/* Error Message */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
-                <p className="text-sm text-red-700 dark:text-red-300 mt-1 leading-relaxed">{error}</p>
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-8 p-5 bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/50 rounded-2xl overflow-hidden"
+            >
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-red-800 dark:text-red-200">Error</p>
+                  <p className="text-sm text-red-700 dark:text-red-300 mt-1 leading-relaxed font-medium">{error}</p>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <motion.div variants={itemVariants}>
+            <label htmlFor="email" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 ml-1">
               Email Address
             </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="relative group">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-emerald-500 transition-colors duration-200" />
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:outline-none text-gray-900 dark:text-white placeholder-gray-400 transition-colors text-base md:text-sm mobile-text-input"
-                placeholder="Enter your email address"
+                className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:outline-none text-gray-900 dark:text-white placeholder-gray-400 transition-all duration-300 text-base md:text-sm shadow-sm"
+                placeholder="john@example.com"
                 required
                 autoComplete="email"
               />
             </div>
-          </div>
+          </motion.div>
 
-          <button
+          <motion.button
+            variants={itemVariants}
             type="submit"
             disabled={isLoading}
-            className="btn-touch w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 active:scale-[0.98]"
+            className="w-full px-4 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:-translate-y-0.5 mt-2"
           >
             {isLoading ? (
               <>
@@ -147,20 +184,20 @@ export default function ForgotPasswordPage() {
                 Send Reset Email
               </>
             )}
-          </button>
+          </motion.button>
         </form>
 
         {/* Back to Login */}
-        <div className="mt-6 text-center">
+        <motion.div className="mt-10 text-center" variants={itemVariants}>
           <Link
             href="/login"
-            className="btn-touch inline-flex items-center gap-2 py-2 px-3 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium rounded-md transition-colors active:scale-95"
+            className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold flex items-center justify-center gap-2 group transition-all"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Login
           </Link>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
