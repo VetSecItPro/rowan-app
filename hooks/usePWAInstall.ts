@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -12,44 +13,50 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 interface PWAInstallState {
+  /** Whether the app can be installed (install prompt available or iOS share sheet) */
   isInstallable: boolean;
+  /** Whether the app is already installed (running in standalone mode) */
   isInstalled: boolean;
-  isIOS: boolean;
-  isAndroid: boolean;
-  isMobile: boolean;
-  isStandalone: boolean;
 }
 
+/**
+ * Hook for managing PWA installation.
+ *
+ * Platform detection (isIOS, isAndroid, isMobile, isStandalone) is delegated
+ * to the DeviceContext for consistency across the app.
+ *
+ * This hook manages PWA-specific functionality:
+ * - Detecting if install prompt is available
+ * - Triggering the install prompt
+ * - Tracking installation state
+ *
+ * @example
+ * ```tsx
+ * const { isInstalled, isIOS, canPrompt, promptInstall } = usePWAInstall();
+ *
+ * if (isInstalled) return null;
+ *
+ * return canPrompt ? (
+ *   <button onClick={promptInstall}>Install App</button>
+ * ) : isIOS ? (
+ *   <p>Use Safari's Share menu to install</p>
+ * ) : null;
+ * ```
+ */
 export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [state, setState] = useState<PWAInstallState>({
     isInstallable: false,
     isInstalled: false,
-    isIOS: false,
-    isAndroid: false,
-    isMobile: false,
-    isStandalone: false,
   });
 
+  // Get platform detection from DeviceContext
+  const { isIOS, isAndroid, isMobile, isStandalone } = useDevice();
+
   useEffect(() => {
-    // Detect platform
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
-    const isAndroid = /android/.test(userAgent);
-    const isMobile = isIOS || isAndroid || /mobile/.test(userAgent);
-
-    // Check if already installed (running in standalone mode)
-    const isStandalone =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as Navigator & { standalone?: boolean }).standalone === true ||
-      document.referrer.includes('android-app://');
-
+    // Update installed state based on standalone mode from device context
     setState(prev => ({
       ...prev,
-      isIOS,
-      isAndroid,
-      isMobile,
-      isStandalone,
       isInstalled: isStandalone,
       // iOS doesn't support beforeinstallprompt but can still install
       isInstallable: isIOS && !isStandalone,
@@ -82,7 +89,7 @@ export function usePWAInstall() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, []);
+  }, [isIOS, isStandalone]);
 
   const promptInstall = useCallback(async () => {
     if (!deferredPrompt) {
@@ -111,6 +118,12 @@ export function usePWAInstall() {
 
   return {
     ...state,
+    // Platform detection from DeviceContext (for backwards compatibility)
+    isIOS,
+    isAndroid,
+    isMobile,
+    isStandalone,
+    // PWA-specific functionality
     promptInstall,
     canPrompt: !!deferredPrompt,
   };
