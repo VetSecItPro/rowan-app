@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, ChevronDown, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { z } from 'zod';
@@ -120,6 +121,7 @@ function safeGetLocalStorageString(
 export default function CalendarPage() {
   const { currentSpace, user } = useAuthWithSpaces();
   const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccessSafe('canUseEventProposals');
+  const { isMobile } = useDevice();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1533,7 +1535,7 @@ export default function CalendarPage() {
                           key={index}
                           onClick={() => {
                             // On mobile, tap day to view events
-                            if (totalItems > 0 && window.innerWidth < 640) {
+                            if (totalItems > 0 && isMobile) {
                               setCurrentMonth(day);
                               setViewMode('day');
                             }

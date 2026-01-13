@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { DeviceProvider } from "@/lib/contexts/DeviceContext";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 import { SpacesProvider } from "@/lib/contexts/spaces-context";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
@@ -117,33 +118,35 @@ export default function RootLayout({
           storageKey="rowan-theme"
           disableTransitionOnChange
         >
-          <AuthProvider>
-            <SpacesProvider>
-              <ClientErrorBoundary>
-                <NetworkStatus />
-                {/* <CommandPaletteProvider> // Temporarily disabled UI */}
-                  {children}
-                {/* </CommandPaletteProvider> */}
-              </ClientErrorBoundary>
-            </SpacesProvider>
-            <CookieConsent />
-            <Toaster
-              position="top-center"
-              duration={4000}
-              closeButton
-              richColors
-              theme="system"
-              toastOptions={{
-                className: 'w-full max-w-md mx-4 sm:mx-0',
-                style: {
-                  fontSize: '14px',
-                  padding: '12px 16px',
-                },
-              }}
-              visibleToasts={3}
-              offset="16px"
-            />
-          </AuthProvider>
+          <DeviceProvider>
+            <AuthProvider>
+              <SpacesProvider>
+                <ClientErrorBoundary>
+                  <NetworkStatus />
+                  {/* <CommandPaletteProvider> // Temporarily disabled UI */}
+                    {children}
+                  {/* </CommandPaletteProvider> */}
+                </ClientErrorBoundary>
+              </SpacesProvider>
+              <CookieConsent />
+              <Toaster
+                position="top-center"
+                duration={4000}
+                closeButton
+                richColors
+                theme="system"
+                toastOptions={{
+                  className: 'w-full max-w-md mx-4 sm:mx-0',
+                  style: {
+                    fontSize: '14px',
+                    padding: '12px 16px',
+                  },
+                }}
+                visibleToasts={3}
+                offset="16px"
+              />
+            </AuthProvider>
+          </DeviceProvider>
         </ThemeProvider>
       </body>
     </html>
