@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Filter, Check, RotateCcw, X } from 'lucide-react';
 import { BottomSheet, useBottomSheet } from './BottomSheet';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 
 export interface FilterOption {
   value: string;
@@ -37,8 +38,6 @@ interface FilterDrawerProps {
   showBadge?: boolean;
   /** Custom trigger button render */
   renderTrigger?: (props: { onClick: () => void; activeCount: number }) => React.ReactNode;
-  /** Breakpoint to switch from desktop to mobile (default: 768) */
-  mobileBreakpoint?: number;
 }
 
 /**
@@ -60,21 +59,9 @@ export function FilterDrawer({
   title = 'Filters',
   showBadge = true,
   renderTrigger,
-  mobileBreakpoint = 768,
 }: FilterDrawerProps) {
-  const [isMobile, setIsMobile] = useState(false);
+  const { isMobile } = useDevice();
   const { isOpen, open, close } = useBottomSheet();
-
-  // Detect mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < mobileBreakpoint);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, [mobileBreakpoint]);
 
   // Count active filters
   const activeCount = Object.entries(values).reduce((count, [, value]) => {
