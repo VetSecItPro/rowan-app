@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, X, Search, Command as CommandIcon } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,14 +10,13 @@ import { NAVIGATION_ITEMS } from '@/lib/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
-// import { useCommandPaletteTrigger } from '@/hooks/useCommandPalette'; // Temporarily disabled
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
-  const [isDesktop, setIsDesktop] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const portalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -27,7 +26,7 @@ export function HamburgerMenu() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { currentSpace } = useSpaces();
-  // const { trigger } = useCommandPaletteTrigger(); // Temporarily disabled
+  const { isDesktop } = useDevice();
 
   // Prefetch data for a feature on hover
   const prefetchData = useCallback((href: string) => {
@@ -48,16 +47,10 @@ export function HamburgerMenu() {
     }
   }, [isOpen, queryClient, currentSpace?.id]);
 
-  // Mount check for portal and detect desktop
+  // Mount check for portal
   useEffect(() => {
     setMounted(true);
-    const checkDesktop = () => setIsDesktop(window.innerWidth >= 640);
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
-    return () => {
-      setMounted(false);
-      window.removeEventListener('resize', checkDesktop);
-    };
+    return () => setMounted(false);
   }, []);
 
   // Calculate menu position relative to button for desktop

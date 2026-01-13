@@ -1,31 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 
 interface WindowSize {
   width: number;
   height: number;
 }
 
+/**
+ * @deprecated Use `useDevice()` from '@/lib/contexts/DeviceContext' instead.
+ *
+ * This hook is maintained for backwards compatibility but delegates to useDevice internally.
+ * The useDevice hook provides windowWidth and windowHeight along with many other device
+ * detection features.
+ *
+ * @example
+ * ```tsx
+ * // Preferred - use useDevice directly:
+ * const { windowWidth, windowHeight } = useDevice();
+ *
+ * // Legacy usage (still works):
+ * const { width, height } = useWindowSize();
+ * ```
+ */
 export function useWindowSize(): WindowSize {
-  const [windowSize, setWindowSize] = useState<WindowSize>({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0,
-  });
+  const { windowWidth, windowHeight } = useDevice();
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    function handleResize() {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }
-
-    window.addEventListener('resize', handleResize);
-    handleResize();
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return windowSize;
+  return {
+    width: windowWidth,
+    height: windowHeight,
+  };
 }

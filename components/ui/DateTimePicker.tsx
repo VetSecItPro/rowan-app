@@ -4,13 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, Clock, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
-
-// Check if we're on a mobile device (touch-first)
-const isMobileDevice = () => {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(max-width: 640px)').matches ||
-         window.matchMedia('(pointer: coarse)').matches;
-};
+import { useDevice } from '@/lib/contexts/DeviceContext';
 
 interface DateTimePickerProps {
   value: string;
@@ -34,20 +28,19 @@ export function DateTimePicker({
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [manualInput, setManualInput] = useState<string>('');
-  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
-  // Ensure component is mounted on client side and detect mobile
+  // Use device detection from context
+  // Show mobile UI on small screens OR touch devices (bottom sheets work better with touch)
+  const { isMobile: isSmallScreen, hasCoarsePointer } = useDevice();
+  const isMobile = isSmallScreen || hasCoarsePointer;
+
+  // Ensure component is mounted on client side
   useEffect(() => {
     setMounted(true);
-    setIsMobile(isMobileDevice());
-
-    // Listen for resize to update mobile state
-    const handleResize = () => setIsMobile(isMobileDevice());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => setMounted(false);
   }, []);
 
   // Lock scroll when picker is open on mobile (bottom sheet mode)
