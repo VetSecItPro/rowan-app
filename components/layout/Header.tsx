@@ -199,7 +199,7 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage }: Head
                 <ThemeToggle />
               </div>
 
-              {/* Features & Pricing Links - Only show for non-logged-in users on desktop */}
+              {/* Features, Pricing & Articles Links - Only show for non-logged-in users on desktop */}
               {!user && (
                 <>
                   <a href="#features" className="hidden md:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
@@ -208,6 +208,9 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage }: Head
                   <a href="#pricing" className="hidden md:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
                     Pricing
                   </a>
+                  <Link href="/articles" className="hidden md:inline-block py-2 px-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors active:scale-95">
+                    Articles
+                  </Link>
                 </>
               )}
 
