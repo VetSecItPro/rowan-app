@@ -100,9 +100,19 @@ const nextConfig = {
 
   // Security headers and CSP
   async headers() {
-    // COMPLETELY DISABLE CSP AND MOST HEADERS IN DEVELOPMENT
+    // In development: Enable basic security headers but skip CSP (breaks hot reload)
     if (process.env.NODE_ENV === 'development') {
-      return [];
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            // Basic security headers that don't break dev workflow
+            { key: 'X-Content-Type-Options', value: 'nosniff' },
+            { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+            { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          ],
+        },
+      ];
     }
 
     // Production CSP policy

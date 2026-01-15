@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Zod schema for cookie preferences
+const CookiePreferencesSchema = z.object({
+  preferences: z.object({
+    essential: z.boolean().optional(),
+    analytics: z.boolean().optional(),
+    marketing: z.boolean().optional(),
+    preferences: z.boolean().optional(),
+  }).strict(),
+}).strict();
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +51,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const { preferences } = await request.json();
+    const body = await request.json();
+    const validationResult = CookiePreferencesSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validationResult.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { preferences } = validationResult.data;
 
     // Here you would normally save cookie preferences
     // For now, just return success

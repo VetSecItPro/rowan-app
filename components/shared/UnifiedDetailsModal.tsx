@@ -84,7 +84,7 @@ export function UnifiedDetailsModal({
   const handleFileUpload = (files: FileList) => {
     Array.from(files).forEach(file => {
       setAttachments(prev => [...prev, {
-        id: Date.now() + Math.random(),
+        id: crypto.randomUUID(),
         name: file.name,
         size: file.size,
         type: file.type,

@@ -145,7 +145,7 @@ export const reminderAttachmentsService = {
 
     // Generate unique file path
     const fileExt = file.name.split('.').pop();
-    const fileName = `${reminderId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const fileName = `${reminderId}/${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
 
     // Upload to storage
     const { error: uploadError } = await supabase.storage

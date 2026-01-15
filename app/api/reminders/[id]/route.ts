@@ -7,6 +7,25 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Zod schema for reminder updates
+const UpdateReminderSchema = z.object({
+  title: z.string().min(1).max(500).optional(),
+  description: z.string().max(2000).optional(),
+  remind_at: z.string().datetime().optional(),
+  is_recurring: z.boolean().optional(),
+  recurrence_pattern: z.string().max(100).optional(),
+  assigned_to: z.string().uuid().optional(),
+  completed: z.boolean().optional(),
+  completed_at: z.string().datetime().optional(),
+  category: z.enum(['bills', 'health', 'work', 'personal', 'household']).optional(),
+  emoji: z.string().max(10).optional(),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  status: z.enum(['active', 'completed', 'snoozed']).optional(),
+  snooze_until: z.string().datetime().optional(),
+  reminder_time: z.string().max(10).optional(),
+}).strict(); // Reject unknown keys
 
 /**
  * GET /api/reminders/[id]
@@ -155,8 +174,18 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
-    // Parse request body
-    const updates = await req.json();
+    // Parse and validate request body
+    const body = await req.json();
+    const validationResult = UpdateReminderSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validationResult.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const updates = validationResult.data;
 
     // Update reminder using service
     const updatedReminder = await remindersService.updateReminder(params.id, updates);

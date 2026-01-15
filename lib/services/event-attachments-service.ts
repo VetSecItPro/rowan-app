@@ -63,7 +63,7 @@ export const eventAttachmentsService = {
 
     // Generate unique file path
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(7);
+    const randomString = crypto.randomUUID();
     const fileExtension = input.file.name.split('.').pop();
     const sanitizedFileName = input.file.name
       .replace(/[^a-zA-Z0-9.-]/g, '_')
