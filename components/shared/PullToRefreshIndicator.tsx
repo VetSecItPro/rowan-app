@@ -23,7 +23,7 @@ export function PullToRefreshIndicator({
         transition: isRefreshing ? 'transform 0.3s ease-out' : 'none',
       }}
     >
-      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800/90 backdrop-blur-lg rounded-full px-4 py-2 shadow-lg border border-gray-700">
         <div className="flex items-center gap-2">
           <Loader2 
             className={`w-4 h-4 text-indigo-500 ${isRefreshing ? 'animate-spin' : ''}`}
@@ -31,7 +31,7 @@ export function PullToRefreshIndicator({
               transform: !isRefreshing ? `rotate(${pullProgress * 360}deg)` : undefined,
             }}
           />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-300">
             {isRefreshing ? 'Refreshing...' : pullProgress >= 1 ? 'Release to refresh' : 'Pull to refresh'}
           </span>
         </div>

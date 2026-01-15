@@ -32,26 +32,26 @@ export function ConfirmDialog({
     danger: {
       icon: XCircle,
       iconColor: 'text-red-500',
-      confirmBg: 'bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700',
-      borderColor: 'border-red-200 dark:border-red-800',
+      confirmBg: 'bg-red-600 bg-red-600 hover:bg-red-700',
+      borderColor: 'border-red-800',
     },
     warning: {
       icon: AlertTriangle,
       iconColor: 'text-amber-500',
-      confirmBg: 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700',
-      borderColor: 'border-amber-200 dark:border-amber-800',
+      confirmBg: 'bg-amber-600 bg-amber-600 hover:bg-amber-700',
+      borderColor: 'border-amber-800',
     },
     info: {
       icon: Info,
       iconColor: 'text-blue-500',
-      confirmBg: 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700',
-      borderColor: 'border-blue-200 dark:border-blue-800',
+      confirmBg: 'bg-blue-600 bg-blue-600 hover:bg-blue-700',
+      borderColor: 'border-blue-800',
     },
     success: {
       icon: CheckCircle,
       iconColor: 'text-green-500',
-      confirmBg: 'bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700',
-      borderColor: 'border-green-200 dark:border-green-800',
+      confirmBg: 'bg-green-600 bg-green-600 hover:bg-green-700',
+      borderColor: 'border-green-800',
     },
   };
 
@@ -66,7 +66,7 @@ export function ConfirmDialog({
         aria-hidden="true"
       />
       <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
         role="alertdialog"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
@@ -76,7 +76,7 @@ export function ConfirmDialog({
           <Icon className={`w-6 h-6 flex-shrink-0 ${style.iconColor}`} aria-hidden="true" />
           <h2
             id="dialog-title"
-            className="text-lg sm:text-base font-semibold text-gray-900 dark:text-white"
+            className="text-lg sm:text-base font-semibold text-white"
           >
             {title}
           </h2>
@@ -86,14 +86,14 @@ export function ConfirmDialog({
         <div className="flex-1 px-6 py-6 sm:py-5 overflow-y-auto">
           <p
             id="dialog-description"
-            className="text-base sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+            className="text-base sm:text-sm text-gray-300 leading-relaxed"
           >
             {message}
           </p>
         </div>
 
         {/* Actions */}
-        <div className="px-6 py-5 sm:py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+        <div className="px-6 py-5 sm:py-4 border-t border-gray-700 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
           <SecondaryButton
             onClick={onClose}
             disabled={confirmLoading}

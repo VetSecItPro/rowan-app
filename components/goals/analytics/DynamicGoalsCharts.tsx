@@ -10,10 +10,10 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 // Chart Loading Component
 const ChartLoader = () => (
-  <div className="w-full h-64 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+  <div className="w-full h-64 flex items-center justify-center bg-gray-800 rounded-lg border border-gray-700">
     <div className="text-center w-full p-6">
       <Skeleton className="w-full h-48 mb-2" />
-      <p className="text-sm text-gray-500 dark:text-gray-400">Loading chart...</p>
+      <p className="text-sm text-gray-400">Loading chart...</p>
     </div>
   </div>
 );

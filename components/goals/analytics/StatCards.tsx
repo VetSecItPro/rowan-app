@@ -28,36 +28,36 @@ export default function StatCards({
       label: 'Total Goals',
       value: totalGoals.toString(),
       icon: Target,
-      color: 'text-indigo-600 dark:text-indigo-400',
-      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+      color: 'text-indigo-400',
+      bgColor: 'bg-indigo-900/20',
     },
     {
       label: 'Completion Rate',
       value: `${Math.round(completionRate)}%`,
       icon: Trophy,
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      color: 'text-green-400',
+      bgColor: 'bg-green-900/20',
     },
     {
       label: 'Current Streak',
       value: `${currentStreak} days`,
       icon: Flame,
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+      color: 'text-orange-400',
+      bgColor: 'bg-orange-900/20',
     },
     {
       label: 'Avg Time to Complete',
       value: `${avgTimeToComplete} days`,
       icon: TrendingUp,
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-900/20',
     },
     {
       label: 'Total Milestones',
       value: totalMilestones.toString(),
       icon: CheckCircle,
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-900/20',
     },
     {
       label: 'Most Productive',
@@ -68,8 +68,8 @@ export default function StatCards({
         ? `${mostProductiveMonth.completions} completions`
         : undefined,
       icon: Calendar,
-      color: 'text-pink-600 dark:text-pink-400',
-      bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+      color: 'text-pink-400',
+      bgColor: 'bg-pink-900/20',
     },
   ];
 
@@ -80,18 +80,18 @@ export default function StatCards({
         return (
           <div
             key={stat.label}
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+            className="bg-gray-800 rounded-lg border border-gray-700 p-6 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-gray-400">
                   {stat.label}
                 </p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="mt-2 text-3xl font-bold text-white">
                   {stat.value}
                 </p>
                 {stat.subValue && (
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-sm text-gray-400">
                     {stat.subValue}
                   </p>
                 )}

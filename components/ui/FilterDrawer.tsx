@@ -112,7 +112,7 @@ export function FilterDrawer({
     <div className="space-y-6">
       {groups.map((group) => (
         <div key={group.id}>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+          <h3 className="text-sm font-semibold text-white mb-3">
             {group.label}
           </h3>
 
@@ -132,7 +132,7 @@ export function FilterDrawer({
                       ${
                         isSelected
                           ? 'bg-indigo-600 text-white shadow-md'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                          : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                       }
                     `}
                   >
@@ -142,7 +142,7 @@ export function FilterDrawer({
                       <span
                         className={`
                           ml-1 text-xs
-                          ${isSelected ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400'}
+                          ${isSelected ? 'text-indigo-200' : 'text-gray-400'}
                         `}
                       >
                         ({option.count})
@@ -172,8 +172,8 @@ export function FilterDrawer({
                       min-h-[48px] touch-manipulation
                       ${
                         isSelected
-                          ? 'bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500'
-                          : 'bg-gray-50 dark:bg-gray-800 border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'bg-indigo-900/30 border-2 border-indigo-500'
+                          : 'bg-gray-800 border-2 border-transparent hover:border-gray-600'
                       }
                     `}
                   >
@@ -182,20 +182,20 @@ export function FilterDrawer({
                       <span
                         className={
                           isSelected
-                            ? 'text-indigo-700 dark:text-indigo-300'
-                            : 'text-gray-700 dark:text-gray-300'
+                            ? 'text-indigo-300'
+                            : 'text-gray-300'
                         }
                       >
                         {option.label}
                       </span>
                       {option.count !== undefined && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-400">
                           ({option.count})
                         </span>
                       )}
                     </div>
                     {isSelected && (
-                      <Check className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <Check className="w-5 h-5 text-indigo-400" />
                     )}
                   </button>
                 );
@@ -211,8 +211,8 @@ export function FilterDrawer({
           onClick={handleClearAll}
           className="
             flex items-center gap-2 px-4 py-2.5
-            text-sm font-medium text-gray-600 dark:text-gray-400
-            hover:text-gray-900 dark:hover:text-white
+            text-sm font-medium text-gray-400
+            hover:text-white
             transition-colors
             min-h-[44px] touch-manipulation
           "
@@ -230,10 +230,10 @@ export function FilterDrawer({
       onClick={open}
       className="
         inline-flex items-center gap-2 px-4 py-2.5
-        bg-gray-100 dark:bg-gray-800
-        text-gray-700 dark:text-gray-300
+        bg-gray-800
+        text-gray-300
         rounded-xl font-medium text-sm
-        hover:bg-gray-200 dark:hover:bg-gray-700
+        hover:bg-gray-700
         transition-colors
         min-h-[44px] touch-manipulation
         relative
@@ -277,7 +277,7 @@ export function FilterDrawer({
           {renderFilters()}
 
           {/* Apply button for mobile */}
-          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="mt-6 pt-4 border-t border-gray-800">
             <button
               onClick={() => {
                 close();
@@ -322,7 +322,7 @@ export function FilterDrawer({
                       ${
                         isSelected
                           ? 'bg-indigo-600 text-white'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }
                     `}
                   >
@@ -343,8 +343,8 @@ export function FilterDrawer({
             onClick={handleClearAll}
             className="
               inline-flex items-center gap-1 px-2 py-1.5
-              text-sm text-gray-500 dark:text-gray-400
-              hover:text-gray-700 dark:hover:text-gray-200
+              text-sm text-gray-400
+              hover:text-gray-200
               transition-colors
             "
           >

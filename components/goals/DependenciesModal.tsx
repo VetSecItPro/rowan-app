@@ -50,21 +50,21 @@ const DEPENDENCY_TYPES: Array<{
     label: 'Prerequisite',
     description: 'Must complete this goal before starting the current goal',
     icon: Shield,
-    color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30'
+    color: 'text-blue-600 bg-blue-900/30'
   },
   {
     type: 'trigger',
     label: 'Trigger',
     description: 'Automatically starts the current goal when completed',
     icon: Zap,
-    color: 'text-green-600 bg-green-100 dark:bg-green-900/30'
+    color: 'text-green-600 bg-green-900/30'
   },
   {
     type: 'blocking',
     label: 'Blocking',
     description: 'Prevents starting the current goal while active',
     icon: Ban,
-    color: 'text-red-600 bg-red-100 dark:bg-red-900/30'
+    color: 'text-red-600 bg-red-900/30'
   }
 ];
 
@@ -205,9 +205,9 @@ export function DependenciesModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-xl sm:max-w-4xl w-full sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-4xl w-full sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+        <div className="flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-700 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -231,10 +231,10 @@ export function DependenciesModal({
         <div className="flex-1 overflow-y-auto p-6">
           {/* Error Message */}
           {error && (
-            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <div className="mb-6 bg-red-900/20 border border-red-800 rounded-lg p-4">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                <p className="text-red-800 dark:text-red-200">{error}</p>
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+                <p className="text-red-200">{error}</p>
               </div>
             </div>
           )}
@@ -254,15 +254,15 @@ export function DependenciesModal({
 
           {/* Add Dependency Form */}
           {showAddForm && (
-            <div className="mb-6 bg-gray-50 dark:bg-gray-700 rounded-xl p-6">
+            <div className="mb-6 bg-gray-700 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Add New Dependency</h3>
+                <h3 className="text-lg font-semibold text-white">Add New Dependency</h3>
                 <button
                   onClick={() => {
                     setShowAddForm(false);
                     resetForm();
                   }}
-                  className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
                 >
                   <X className="w-4 h-4 text-gray-500" />
                 </button>
@@ -271,13 +271,13 @@ export function DependenciesModal({
               <div className="space-y-4">
                 {/* Select Goal */}
                 <div className="relative z-50">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Select Goal
                   </label>
                   <select
                     value={selectedGoalId}
                     onChange={(e) => setSelectedGoalId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 relative z-50"
+                    className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 relative z-50"
                     style={{ position: 'relative', zIndex: 9999 }}
                   >
                     <option value="">Choose a goal...</option>
@@ -291,7 +291,7 @@ export function DependenciesModal({
 
                 {/* Dependency Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Dependency Type
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -303,19 +303,19 @@ export function DependenciesModal({
                           onClick={() => setDependencyType(type.type)}
                           className={`p-4 border-2 rounded-lg text-left transition-colors ${
                             dependencyType === type.type
-                              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                              ? 'border-indigo-500 bg-indigo-900/20'
+                              : 'border-gray-600 hover:border-gray-500'
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <div className={`p-2 rounded-lg ${type.color}`}>
                               <Icon className="w-4 h-4" />
                             </div>
-                            <span className="font-medium text-gray-900 dark:text-white">
+                            <span className="font-medium text-white">
                               {type.label}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-400">
                             {type.description}
                           </p>
                         </button>
@@ -328,7 +328,7 @@ export function DependenciesModal({
                 {dependencyType === 'prerequisite' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Completion Threshold (%)
                       </label>
                       <input
@@ -337,12 +337,12 @@ export function DependenciesModal({
                         max="100"
                         value={completionThreshold}
                         onChange={(e) => setCompletionThreshold(parseInt(e.target.value))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Unlock Delay (days)
                       </label>
                       <input
@@ -350,7 +350,7 @@ export function DependenciesModal({
                         min="0"
                         value={unlockDelay}
                         onChange={(e) => setUnlockDelay(parseInt(e.target.value))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
@@ -365,7 +365,7 @@ export function DependenciesModal({
                       onChange={(e) => setAutoUnlock(e.target.checked)}
                       className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-sm text-gray-300">
                       Automatically unlock when dependency is satisfied
                     </span>
                   </label>
@@ -378,7 +378,7 @@ export function DependenciesModal({
                       setShowAddForm(false);
                       resetForm();
                     }}
-                    className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors"
+                    className="px-4 py-2 text-gray-300 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
@@ -399,22 +399,22 @@ export function DependenciesModal({
 
           {/* Dependencies List */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-lg font-semibold text-white mb-4">
               Current Dependencies ({dependencies.length})
             </h3>
 
             {loading ? (
               <div className="text-center py-8">
                 <div className="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-3" />
-                <p className="text-gray-600 dark:text-gray-400">Loading dependencies...</p>
+                <p className="text-gray-400">Loading dependencies...</p>
               </div>
             ) : dependencies.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 dark:bg-gray-700 rounded-xl">
+              <div className="text-center py-8 bg-gray-700 rounded-xl">
                 <Link className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <h4 className="text-lg font-medium text-white mb-2">
                   No Dependencies Yet
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-gray-400 mb-4">
                   Add dependencies to create relationships between your goals
                 </p>
               </div>
@@ -427,7 +427,7 @@ export function DependenciesModal({
                   return (
                     <div
                       key={dependency.id}
-                      className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-4"
+                      className="bg-gray-700 border border-gray-600 rounded-xl p-4"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -436,15 +436,15 @@ export function DependenciesModal({
                               <Icon className="w-4 h-4" />
                             </div>
                             <div>
-                              <span className="font-medium text-gray-900 dark:text-white">
+                              <span className="font-medium text-white">
                                 {typeConfig.label}
                               </span>
                               <div className="flex items-center gap-2 mt-1">
                                 {getStatusIcon(dependency.status)}
                                 <span className={`text-sm capitalize ${
-                                  dependency.status === 'satisfied' ? 'text-green-600 dark:text-green-400' :
-                                  dependency.status === 'bypassed' ? 'text-orange-600 dark:text-orange-400' :
-                                  'text-gray-500 dark:text-gray-400'
+                                  dependency.status === 'satisfied' ? 'text-green-400' :
+                                  dependency.status === 'bypassed' ? 'text-orange-400' :
+                                  'text-gray-400'
                                 }`}>
                                   {dependency.status}
                                 </span>
@@ -452,12 +452,12 @@ export function DependenciesModal({
                             </div>
                           </div>
 
-                          <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                          <p className="text-gray-400 text-sm mb-2">
                             {typeConfig.description}
                           </p>
 
                           {dependency.dependency_type === 'prerequisite' && (
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <div className="text-sm text-gray-400">
                               Threshold: {dependency.completion_threshold}%
                               {dependency.unlock_delay_days > 0 && (
                                 <span className="ml-2">
@@ -468,7 +468,7 @@ export function DependenciesModal({
                           )}
 
                           {dependency.bypassed_at && (
-                            <div className="mt-2 text-sm text-orange-600 dark:text-orange-400">
+                            <div className="mt-2 text-sm text-orange-400">
                               Bypassed: {dependency.bypass_reason}
                             </div>
                           )}
@@ -479,7 +479,7 @@ export function DependenciesModal({
                           {dependency.status === 'pending' && (
                             <button
                               onClick={() => handleBypassDependency(dependency.id)}
-                              className="p-2 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-colors"
+                              className="p-2 text-orange-400 hover:bg-orange-900/30 rounded-lg transition-colors"
                               title="Bypass dependency"
                             >
                               <Shield className="w-4 h-4" />
@@ -487,7 +487,7 @@ export function DependenciesModal({
                           )}
                           <button
                             onClick={() => handleDeleteDependency(dependency.id)}
-                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                            className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                             title="Remove dependency"
                           >
                             <Trash2 className="w-4 h-4" />

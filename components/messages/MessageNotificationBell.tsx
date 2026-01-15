@@ -83,19 +83,19 @@ export function MessageNotificationBell({
   return (
     <button
       onClick={onBellClick}
-      className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
+      className="relative p-2 rounded-full hover:bg-gray-700 transition-colors group"
       title={`${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}`}
       aria-label={`${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}`}
     >
-      <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors" />
+      <Bell className="w-5 h-5 text-gray-400 group-hover:text-gray-200 transition-colors" />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-gray-800">
+        <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg border-2 border-gray-800">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
 
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-100 text-gray-900 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
         {unreadCount === 0 ? 'No new messages' : `${unreadCount} unread message${unreadCount !== 1 ? 's' : ''}`}
       </div>
     </button>

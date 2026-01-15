@@ -66,25 +66,25 @@ export function AttachmentUploader({
         type="button"
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
-        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Upload file"
       >
         {uploading ? (
-          <Loader2 className="w-5 h-5 text-gray-600 dark:text-gray-400 animate-spin" />
+          <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
         ) : (
-          <Upload className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <Upload className="w-5 h-5 text-gray-400" />
         )}
       </button>
 
       {uploading && (
-        <div className="absolute top-full mt-2 left-0 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 min-w-[200px] z-10">
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div className="absolute top-full mt-2 left-0 right-0 bg-gray-800 border border-gray-700 rounded-lg p-2 min-w-[200px] z-10">
+          <div className="w-full bg-gray-700 rounded-full h-2">
             <div
               className="bg-blue-500 h-2 rounded-full transition-all"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 text-center">
+          <p className="text-xs text-gray-400 mt-1 text-center">
             Uploading... {uploadProgress}%
           </p>
         </div>

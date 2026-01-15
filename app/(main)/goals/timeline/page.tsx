@@ -54,38 +54,38 @@ const EVENT_CONFIGS = {
   goal_created: {
     icon: Target,
     color: 'bg-blue-500',
-    borderColor: 'border-blue-200 dark:border-blue-800',
-    bgColor: 'bg-blue-50 dark:bg-blue-900/20'
+    borderColor: 'border-blue-800',
+    bgColor: 'bg-blue-900/20'
   },
   goal_completed: {
     icon: CheckCircle2,
     color: 'bg-green-500',
-    borderColor: 'border-green-200 dark:border-green-800',
-    bgColor: 'bg-green-50 dark:bg-green-900/20'
+    borderColor: 'border-green-800',
+    bgColor: 'bg-green-900/20'
   },
   milestone_completed: {
     icon: MilestoneIcon,
     color: 'bg-purple-500',
-    borderColor: 'border-purple-200 dark:border-purple-800',
-    bgColor: 'bg-purple-50 dark:bg-purple-900/20'
+    borderColor: 'border-purple-800',
+    bgColor: 'bg-purple-900/20'
   },
   check_in: {
     icon: MessageSquare,
     color: 'bg-indigo-500',
-    borderColor: 'border-indigo-200 dark:border-indigo-800',
-    bgColor: 'bg-indigo-50 dark:bg-indigo-900/20'
+    borderColor: 'border-indigo-800',
+    bgColor: 'bg-indigo-900/20'
   },
   goal_paused: {
     icon: Pause,
     color: 'bg-orange-500',
-    borderColor: 'border-orange-200 dark:border-orange-800',
-    bgColor: 'bg-orange-50 dark:bg-orange-900/20'
+    borderColor: 'border-orange-800',
+    bgColor: 'bg-orange-900/20'
   },
   goal_resumed: {
     icon: Play,
     color: 'bg-emerald-500',
-    borderColor: 'border-emerald-200 dark:border-emerald-800',
-    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20'
+    borderColor: 'border-emerald-800',
+    bgColor: 'bg-emerald-900/20'
   }
 };
 
@@ -285,23 +285,23 @@ export default function GoalsTimelinePage() {
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Goals Timeline
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Your journey of growth and achievement over time
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-xl p-4">
+            <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <p className="text-red-800 dark:text-red-200">{error}</p>
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                <p className="text-red-200">{error}</p>
               </div>
             </div>
           )}
 
           {/* Filters */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="relative flex-1">
@@ -311,7 +311,7 @@ export default function GoalsTimelinePage() {
                   placeholder="Search timeline..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -319,7 +319,7 @@ export default function GoalsTimelinePage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm"
               >
                 <option value="all">All Categories</option>
                 {categories.map((category) => (
@@ -333,7 +333,7 @@ export default function GoalsTimelinePage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm"
               >
                 <option value="all">All Events</option>
                 <option value="goal_created">Goals Created</option>
@@ -348,15 +348,15 @@ export default function GoalsTimelinePage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">Loading your timeline...</p>
+              <p className="text-gray-400">Loading your timeline...</p>
             </div>
           ) : filteredGroups.length === 0 ? (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="text-center py-12 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
               <Sparkles className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 {goals.length === 0 ? 'Your Journey Awaits' : 'No Events Found'}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4">
                 {goals.length === 0
                   ? 'Start creating goals to see your progress timeline here'
                   : 'Try adjusting your search or filter criteria'
@@ -382,7 +382,7 @@ export default function GoalsTimelinePage() {
                       <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                         {group.label}
                       </div>
-                      <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 to-purple-200 dark:from-indigo-800 dark:to-purple-800" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 from-indigo-800 to-purple-800" />
                     </div>
                   </div>
 
@@ -416,7 +416,7 @@ function TimelineEvent({ event, isLast }: TimelineEventProps) {
     <div className="relative flex items-start gap-4">
       {/* Timeline Line */}
       {!isLast && (
-        <div className="absolute left-6 top-12 w-0.5 h-full bg-gradient-to-b from-gray-300 to-transparent dark:from-gray-600" />
+        <div className="absolute left-6 top-12 w-0.5 h-full bg-gradient-to-b from-gray-300 from-gray-600" />
       )}
 
       {/* Event Icon */}
@@ -428,23 +428,23 @@ function TimelineEvent({ event, isLast }: TimelineEventProps) {
       <div className={`flex-1 p-6 rounded-xl border-2 ${config.borderColor} ${config.bgColor} shadow-sm`}>
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               {event.title}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               {format(parseISO(event.date), 'h:mm a')}
             </p>
           </div>
 
           {/* Goal Category Badge */}
           {event.goal.category && (
-            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">
+            <span className="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">
               {event.goal.category}
             </span>
           )}
         </div>
 
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <p className="text-gray-300 mb-4">
           {event.description}
         </p>
 
@@ -452,8 +452,8 @@ function TimelineEvent({ event, isLast }: TimelineEventProps) {
         {event.checkIn && (
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-gray-600 dark:text-gray-400">
+              <TrendingUp className="w-4 h-4 text-indigo-400" />
+              <span className="text-gray-400">
                 Progress: {event.checkIn.progress_percentage}%
               </span>
             </div>
@@ -463,7 +463,7 @@ function TimelineEvent({ event, isLast }: TimelineEventProps) {
                 event.checkIn.mood === 'great' ? 'bg-green-500' :
                 event.checkIn.mood === 'okay' ? 'bg-yellow-500' : 'bg-red-500'
               }`} />
-              <span className="text-gray-600 dark:text-gray-400 capitalize">
+              <span className="text-gray-400 capitalize">
                 {event.checkIn.mood}
               </span>
             </div>
@@ -472,8 +472,8 @@ function TimelineEvent({ event, isLast }: TimelineEventProps) {
 
         {event.milestone && (
           <div className="flex items-center gap-2 text-sm">
-            <Medal className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <span className="text-gray-600 dark:text-gray-400">
+            <Medal className="w-4 h-4 text-purple-400" />
+            <span className="text-gray-400">
               Milestone Type: {event.milestone.type}
               {event.milestone.target_value && (
                 <span className="ml-1">

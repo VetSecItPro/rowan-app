@@ -122,7 +122,7 @@ export function UpgradeModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto w-full sm:max-w-lg sm:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden flex flex-col"
+            className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto w-full sm:max-w-lg sm:rounded-2xl bg-gray-900 shadow-2xl overflow-hidden flex flex-col"
           >
             {/* Header with gradient */}
             <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-6 sm:py-8 text-center text-white relative">
@@ -160,8 +160,8 @@ export function UpgradeModal({
             <div className="flex-1 overflow-y-auto px-6 py-6">
               {/* Trial message */}
               {isInTrial && (
-                <div className="mb-6 rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-800">
-                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                <div className="mb-6 rounded-lg bg-amber-900/20 p-4 border border-amber-800">
+                  <p className="text-sm text-amber-200">
                     <strong>You're on a free trial!</strong> You currently have access to this feature.
                     Upgrade before your trial ends to keep using it.
                   </p>
@@ -170,13 +170,13 @@ export function UpgradeModal({
 
               {/* Features list */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 dark:text-white">
+                <h3 className="font-semibold text-white">
                   {requiresFamily ? 'Family Plan includes:' : 'Pro Plan includes:'}
                 </h3>
 
                 <ul className="space-y-2">
                   {(requiresFamily ? [...PRO_FEATURES, ...FAMILY_EXTRAS] : PRO_FEATURES).map((feat, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
                       <Check className="h-4 w-4 flex-shrink-0 text-emerald-500" />
                       <span>{feat}</span>
                     </li>
@@ -186,7 +186,7 @@ export function UpgradeModal({
 
               {/* Pricing hint */}
               <div className="mt-6 text-center">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   {requiresFamily
                     ? 'Starting at $17.99/month'
                     : 'Starting at $11.99/month'}
@@ -195,10 +195,10 @@ export function UpgradeModal({
             </div>
 
             {/* Actions */}
-            <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex gap-3">
+            <div className="border-t border-gray-700 px-6 py-4 flex gap-3">
               <button
                 onClick={onClose}
-                className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="flex-1 rounded-lg border border-gray-600 px-4 py-2.5 text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors"
               >
                 Maybe Later
               </button>

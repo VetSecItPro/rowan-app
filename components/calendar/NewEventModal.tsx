@@ -349,7 +349,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
   return (
     <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center sm:p-4 pt-0 sm:pt-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-[600px] sm:max-w-[90vw] sm:max-h-[85vh] sm:rounded-2xl overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-[600px] sm:max-w-[90vw] sm:max-h-[85vh] sm:rounded-2xl overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -373,7 +373,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* Title */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Event Title *
             </label>
             <div className="relative">
@@ -383,7 +383,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Team meeting"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -392,21 +392,21 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="p-1.5 rounded-md hover:bg-gray-700 transition-colors"
                 >
-                  <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <Smile className="w-5 h-5 text-gray-400" />
                 </button>
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 z-50 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+                  <div className="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-3 z-50 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
                     <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {EMOJIS.map((emoji, idx) => (
                         <button
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="w-10 h-10 text-xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                          className="w-10 h-10 text-xl flex items-center justify-center hover:bg-gray-700 rounded-md transition-colors"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -421,7 +421,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
 
           {/* Description */}
           <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -429,27 +429,27 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add event details..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
             />
             <div className="flex items-center gap-2 mt-2">
               {/* Image Attachment Button */}
               <button
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
-                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
                 title="Attach images"
               >
-                <ImageIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <ImageIcon className="w-5 h-5 text-gray-400" />
               </button>
 
               {/* File Attachment Button */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
                 title="Attach files"
               >
-                <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <Paperclip className="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>
@@ -457,13 +457,13 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
           {/* Attached Images */}
           {attachedImages.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Attached Images ({attachedImages.length})
               </label>
               <div className="flex flex-wrap gap-2">
                 {attachedImages.map((img, idx) => (
                   <div key={idx} className="relative group">
-                    <div className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm flex items-center gap-2">
+                    <div className="px-3 py-1.5 bg-blue-900/30 text-blue-300 rounded-lg text-sm flex items-center gap-2">
                       <ImageIcon className="w-4 h-4" />
                       {img.name}
                       <button
@@ -483,13 +483,13 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
           {/* Attached Files */}
           {attachedFiles.length > 0 && (
             <div>
-              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Attached Files ({attachedFiles.length})
               </label>
               <div className="flex flex-wrap gap-2">
                 {attachedFiles.map((file, idx) => (
                   <div key={idx} className="relative group">
-                    <div className="px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg text-sm flex items-center gap-2">
+                    <div className="px-3 py-1.5 bg-purple-900/30 text-purple-300 rounded-lg text-sm flex items-center gap-2">
                       <Paperclip className="w-4 h-4" />
                       {file.name}
                       <button
@@ -532,7 +532,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                   }
                 }}
                 placeholder="Select start date and time..."
-                className={dateError ? 'border-red-500 dark:border-red-500' : ''}
+                className={dateError ? 'border-red-500' : ''}
               />
             </div>
 
@@ -563,10 +563,10 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                   }
                 }}
                 placeholder="Select end date and time..."
-                className={dateError ? 'border-red-500 dark:border-red-500' : ''}
+                className={dateError ? 'border-red-500' : ''}
               />
               {dateError && (
-                <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                <p className="mt-2 text-base md:text-sm text-red-400 flex items-center gap-1">
                   <span className="font-medium">⚠</span>
                   {dateError}
                 </p>
@@ -576,7 +576,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
 
           {/* Location */}
           <div>
-            <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-7" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Location
             </label>
             <input
@@ -584,7 +584,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               placeholder="Add location..."
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
             />
           </div>
 
@@ -595,17 +595,17 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 type="checkbox"
                 checked={formData.is_recurring}
                 onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recurring event</span>
+              <span className="text-sm font-medium text-gray-300">Recurring event</span>
             </label>
           </div>
 
           {/* Recurring Frequency Panel */}
           {formData.is_recurring && (
-            <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+            <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-800 rounded-xl border border-gray-700">
               <div>
-                <label htmlFor="field-9" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="field-9" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Frequency
                 </label>
                 <Dropdown
@@ -619,7 +619,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               {/* Day Selection for Weekly */}
               {recurringFrequency === 'weekly' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2 sm:mb-3">
                     Select Days of Week
                   </label>
                   <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
@@ -637,7 +637,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                         className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                           selectedDaysOfWeek.includes(index)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
                         }`}
                       >
                         {day}
@@ -650,7 +650,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               {/* Day Selection for Monthly */}
               {recurringFrequency === 'monthly' && (
                 <div>
-                  <label htmlFor="field-11" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3 cursor-pointer">
+                  <label htmlFor="field-11" className="block text-sm font-medium text-gray-300 mb-2 sm:mb-3 cursor-pointer">
                     Select Days of Month
                   </label>
                   <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
@@ -668,7 +668,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                         className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                           selectedDaysOfMonth.includes(day)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
                         }`}
                       >
                         {day}
@@ -687,9 +687,9 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 type="checkbox"
                 checked={linkToShopping}
                 onChange={(e) => setLinkToShopping(e.target.checked)}
-                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-300 flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" />
                 Link to Shopping List
               </span>
@@ -698,9 +698,9 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
 
           {/* Shopping List Selection */}
           {linkToShopping && (
-            <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-700">
+            <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-emerald-900/20 rounded-xl border border-emerald-700">
               <div>
-                <label htmlFor="field-13" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="field-13" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Select Shopping List
                 </label>
                 {shoppingLists.length > 0 ? (
@@ -711,15 +711,15 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                     placeholder="Choose a list..."
                   />
                 ) : (
-                  <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                    <p className="text-sm text-gray-400">
                       No active shopping lists found. Create a shopping list first to link it to this event.
                     </p>
                   </div>
                 )}
               </div>
-              <div className="bg-emerald-100 dark:bg-emerald-900/30 rounded-lg p-3 border border-emerald-300 dark:border-emerald-700">
-                <p className="text-xs text-emerald-900 dark:text-emerald-100">
+              <div className="bg-emerald-900/30 rounded-lg p-3 border border-emerald-700">
+                <p className="text-xs text-emerald-100">
                   <strong>Tip:</strong> Linking a shopping list helps you coordinate your shopping trip with this event. The list will appear in your event details.
                 </p>
               </div>
@@ -733,23 +733,23 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 type="checkbox"
                 checked={showCountdown}
                 onChange={(e) => setShowCountdown(e.target.checked)}
-                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-300 flex items-center gap-2">
                 <Timer className="w-4 h-4" />
                 Show as Countdown
               </span>
             </label>
-            <p className="ml-6 mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="ml-6 mt-1 text-xs text-gray-400">
               Display a countdown to this event on your dashboard
             </p>
           </div>
 
           {/* Countdown Label Input */}
           {showCountdown && (
-            <div className="space-y-3 p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+            <div className="space-y-3 p-3 sm:p-4 bg-purple-900/20 rounded-xl border border-purple-700">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Countdown Label (Optional)
                 </label>
                 <input
@@ -758,9 +758,9 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                   onChange={(e) => setCountdownLabel(e.target.value)}
                   placeholder="e.g., Birthday!, Vacation, Wedding Day"
                   maxLength={50}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder:text-gray-400 placeholder:text-gray-500"
                 />
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-xs text-gray-400">
                   A custom label to display instead of the event title. Leave empty to use the event title.
                 </p>
               </div>
@@ -769,7 +769,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-2 sm:mb-3">
               Category
             </label>
             {/* Mobile: equal-width pills in one row | Desktop: grid */}
@@ -788,7 +788,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                   className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl border-2 transition-colors sm:gap-2 sm:p-3 sm:rounded-lg ${
                     formData.category === category.value
                       ? `${category.color} border-transparent text-white`
-                      : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                      : 'border-gray-600 text-gray-300 hover:border-gray-500'
                   }`}
                 >
                   <span className="text-base sm:text-2xl">{category.icon}</span>
@@ -800,7 +800,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-700">
             {/* Delete button - only shown when editing, full width on mobile */}
             {editEvent && onDelete && (
               <button
@@ -811,7 +811,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                     onClose();
                   }
                 }}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors font-medium"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-900/30 text-red-300 rounded-full hover:bg-red-900/50 transition-colors font-medium"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
@@ -822,7 +822,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-3 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
+                className="flex-1 px-3 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
               >
                 Cancel
               </button>

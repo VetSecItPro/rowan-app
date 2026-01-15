@@ -162,7 +162,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-red-600 p-6 text-white">
         <div className="flex items-center justify-between mb-4">
@@ -211,7 +211,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
       {/* Calendar Grid */}
       <div className="p-6">
         {loading ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 text-gray-400">
             Loading calendar...
           </div>
         ) : (
@@ -221,7 +221,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
               {weekDays.map((day) => (
                 <div
                   key={day}
-                  className="text-center text-xs font-semibold text-gray-600 dark:text-gray-400 py-2"
+                  className="text-center text-xs font-semibold text-gray-400 py-2"
                 >
                   {day}
                 </div>
@@ -246,14 +246,14 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
                     onClick={() => setSelectedDate(day)}
                     className={`relative aspect-square border-2 rounded-lg p-2 cursor-pointer transition-all hover:shadow-md ${
                       isToday
-                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                        ? 'border-orange-500 bg-orange-900/20'
                         : dayOccs.length > 0
-                        ? 'border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-900/10'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ? 'border-orange-800 bg-orange-900/10'
+                        : 'border-gray-700 hover:border-gray-600'
                     } ${!isCurrentMonth ? 'opacity-40' : ''}`}
                   >
                     {/* Day Number */}
-                    <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                    <div className="text-sm font-semibold text-white mb-1">
                       {format(day, 'd')}
                     </div>
 
@@ -261,12 +261,12 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
                     {dayOccs.length > 0 && (
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3 text-orange-600 dark:text-orange-400" />
-                          <span className="text-xs font-medium text-orange-700 dark:text-orange-300">
+                          <AlertCircle className="w-3 h-3 text-orange-400" />
+                          <span className="text-xs font-medium text-orange-300">
                             {dayOccs.length} bill{dayOccs.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        <div className="text-xs font-bold text-orange-600 dark:text-orange-400">
+                        <div className="text-xs font-bold text-orange-400">
                           ${dayTotal.toLocaleString()}
                         </div>
                       </div>
@@ -281,14 +281,14 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
 
       {/* Selected Date Details */}
       {selectedDate && (
-        <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-900/50">
+        <div className="border-t border-gray-700 p-6 bg-gray-900/50">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-bold text-gray-900 dark:text-white">
+            <h4 className="text-lg font-bold text-white">
               Bills on {format(selectedDate, 'MMMM d, yyyy')}
             </h4>
             <button
               onClick={() => setSelectedDate(null)}
-              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              className="text-gray-500 hover:text-gray-300"
             >
               Close
             </button>
@@ -298,22 +298,22 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
             {getDayOccurrences(selectedDate).map((occ, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700"
               >
                 <div className="flex-1">
-                  <h5 className="font-semibold text-gray-900 dark:text-white">
+                  <h5 className="font-semibold text-white">
                     {occ.expense.description}
                   </h5>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     {occ.expense.category} • {occ.expense.recurring_frequency}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                  <p className="text-lg font-bold text-orange-400">
                     ${occ.amount.toLocaleString()}
                   </p>
                   {occ.expense.payment_method && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-400">
                       {occ.expense.payment_method}
                     </p>
                   )}
@@ -322,7 +322,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
             ))}
 
             {getDayOccurrences(selectedDate).length === 0 && (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+              <p className="text-center text-gray-400 py-4">
                 No bills due on this date
               </p>
             )}

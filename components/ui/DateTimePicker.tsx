@@ -221,7 +221,7 @@ export function DateTimePicker({
     return (
       <div className="relative">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             {label}
           </label>
         )}
@@ -231,7 +231,7 @@ export function DateTimePicker({
           defaultValue={manualInput}
           disabled={disabled}
           readOnly
-          className={`w-full px-4 py-3 pr-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+          className={`w-full px-4 py-3 pr-10 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
           placeholder={placeholder}
         />
       </div>
@@ -241,7 +241,7 @@ export function DateTimePicker({
   return (
     <div className="relative">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-300 mb-2">
           {label}
         </label>
       )}
@@ -254,7 +254,7 @@ export function DateTimePicker({
           onChange={handleManualInputChange}
           onFocus={handleInputFocus}
           disabled={disabled}
-          className={`w-full px-4 py-3 pr-20 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+          className={`w-full px-4 py-3 pr-20 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
           placeholder={placeholder}
         />
 
@@ -263,7 +263,7 @@ export function DateTimePicker({
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+              className="p-1 hover:bg-gray-700 rounded transition-colors"
               title="Clear date"
             >
               <X className="w-4 h-4 text-gray-500" />
@@ -272,7 +272,7 @@ export function DateTimePicker({
           <button
             type="button"
             onClick={() => !disabled && setIsOpen(!isOpen)}
-            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+            className="p-1 hover:bg-gray-700 rounded transition-colors"
             title="Open calendar"
           >
             <Calendar className="w-4 h-4 text-gray-500" />
@@ -293,7 +293,7 @@ export function DateTimePicker({
 
           <div
             ref={calendarRef}
-            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl ${
+            className={`bg-gray-800 border border-gray-700 shadow-2xl ${
               isMobile
                 ? 'fixed inset-x-0 bottom-0 rounded-t-2xl p-4 pb-safe max-h-[85vh] overflow-y-auto animate-bottom-sheet'
                 : 'absolute rounded-lg p-4'
@@ -311,7 +311,7 @@ export function DateTimePicker({
             {/* Mobile drag handle */}
             {isMobile && (
               <div className="flex justify-center mb-3">
-                <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+                <div className="w-10 h-1 bg-gray-600 rounded-full" />
               </div>
             )}
 
@@ -323,15 +323,15 @@ export function DateTimePicker({
                   <button
                     type="button"
                     onClick={goToPreviousMonth}
-                    className={`hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
+                    className={`hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
                       isMobile ? 'p-3 min-w-[44px] min-h-[44px]' : 'p-1'
                     }`}
                     title="Previous month"
                   >
-                    <ChevronLeft className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                    <ChevronLeft className={`text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
                   </button>
 
-                  <div className={`font-medium text-gray-700 dark:text-gray-300 ${isMobile ? 'text-base' : 'text-sm'}`}>
+                  <div className={`font-medium text-gray-300 ${isMobile ? 'text-base' : 'text-sm'}`}>
                     {new Date(currentYear, currentMonth).toLocaleDateString('en-US', {
                       month: 'long',
                       year: 'numeric'
@@ -341,12 +341,12 @@ export function DateTimePicker({
                   <button
                     type="button"
                     onClick={goToNextMonth}
-                    className={`hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
+                    className={`hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
                       isMobile ? 'p-3 min-w-[44px] min-h-[44px]' : 'p-1'
                     }`}
                     title="Next month"
                   >
-                    <ChevronRight className={`text-gray-600 dark:text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                    <ChevronRight className={`text-gray-400 ${isMobile ? 'w-6 h-6' : 'w-4 h-4'}`} />
                   </button>
                 </div>
 
@@ -354,7 +354,7 @@ export function DateTimePicker({
                   {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
                     <div
                       key={day}
-                      className={`text-center font-medium text-gray-500 dark:text-gray-400 ${
+                      className={`text-center font-medium text-gray-400 ${
                         isMobile ? 'p-3' : 'p-2'
                       }`}
                     >
@@ -372,11 +372,11 @@ export function DateTimePicker({
                         key={idx}
                         type="button"
                         onClick={() => handleDateChange(day.toISOString().split('T')[0])}
-                        className={`text-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
+                        className={`text-center hover:bg-gray-700 rounded-lg transition-colors active:scale-95 ${
                           isMobile ? 'p-3 min-w-[44px] min-h-[44px] text-base' : 'p-2'
                         } ${
-                          !isCurrentMonth ? 'text-gray-300 dark:text-gray-600' : 'text-gray-900 dark:text-white'
-                        } ${isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : ''} ${
+                          !isCurrentMonth ? 'text-gray-600' : 'text-white'
+                        } ${isToday ? 'bg-blue-900 text-blue-400' : ''} ${
                           isSelected ? 'bg-blue-500 text-white hover:bg-blue-600' : ''
                         }`}
                       >
@@ -389,14 +389,14 @@ export function DateTimePicker({
 
               {/* Time Picker */}
               <div>
-                <div className={`font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2 ${
+                <div className={`font-medium text-gray-300 mb-3 flex items-center gap-2 ${
                   isMobile ? 'text-base' : 'text-sm'
                 }`}>
                   <Clock className={isMobile ? 'w-5 h-5' : 'w-4 h-4'} />
                   Time
                 </div>
 
-                <div className={`overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg overscroll-contain ${
+                <div className={`overflow-y-auto border border-gray-600 rounded-lg overscroll-contain ${
                   isMobile ? 'max-h-40' : 'max-h-32'
                 }`}>
                   {timeOptions.map((time) => (
@@ -404,10 +404,10 @@ export function DateTimePicker({
                       key={time}
                       type="button"
                       onClick={() => handleTimeChange(time)}
-                      className={`w-full text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-[0.99] ${
+                      className={`w-full text-left hover:bg-gray-700 transition-colors active:scale-[0.99] ${
                         isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2 text-sm'
                       } ${
-                        selectedTime === time ? 'bg-blue-500 text-white hover:bg-blue-600' : 'text-gray-900 dark:text-white'
+                        selectedTime === time ? 'bg-blue-500 text-white hover:bg-blue-600' : 'text-white'
                       }`}
                     >
                       {time}
@@ -427,7 +427,7 @@ export function DateTimePicker({
                   handleDateChange(nowDate);
                   handleTimeChange(nowTime);
                 }}
-                className={`bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors active:scale-95 ${
+                className={`bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors active:scale-95 ${
                   isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-3 py-2 text-sm'
                 }`}
               >
@@ -438,7 +438,7 @@ export function DateTimePicker({
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className={`text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors ${
+                  className={`text-gray-400 hover:text-gray-200 transition-colors ${
                     isMobile ? 'px-4 py-3 text-base min-h-[44px]' : 'px-4 py-2 text-sm'
                   }`}
                 >

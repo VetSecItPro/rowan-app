@@ -22,7 +22,7 @@ export default function RemindersLoading() {
       {/* Reminder cards skeleton */}
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div key={i} className="bg-gray-800 rounded-xl p-4 shadow-sm">
             <div className="flex items-start gap-3">
               <SkeletonLoader className="w-6 h-6 rounded flex-shrink-0" />
               <div className="flex-1 space-y-2">

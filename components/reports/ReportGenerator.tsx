@@ -130,17 +130,17 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          <h3 className="text-lg font-medium text-white">
             Generate Report
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             Configure and generate your {template.name.toLowerCase()}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-md hover:bg-gray-700"
           >
             Cancel
           </button>
@@ -163,14 +163,14 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="bg-red-900/20 border border-red-800 rounded-lg p-4">
           <div className="flex">
             <ExclamationTriangleIcon className="h-5 w-5 text-red-400 flex-shrink-0" />
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+              <h3 className="text-sm font-medium text-red-200">
                 Generation Failed
               </h3>
-              <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+              <div className="mt-2 text-sm text-red-300">
                 {error}
               </div>
             </div>
@@ -182,17 +182,17 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
         {/* Configuration Panel */}
         <div className="space-y-6">
           {/* Template Info */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
             <div className="flex items-start">
               <DocumentTextIcon className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="ml-3">
-                <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                <h4 className="text-sm font-medium text-blue-200">
                   {template.name}
                 </h4>
-                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                <p className="text-sm text-blue-300 mt-1">
                   {template.description}
                 </p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-blue-600 dark:text-blue-400">
+                <div className="flex items-center gap-4 mt-2 text-xs text-blue-400">
                   <span>Category: {template.category}</span>
                   <span>Type: {template.report_type}</span>
                 </div>
@@ -202,32 +202,32 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
 
           {/* Report Details */}
           <div className="space-y-4">
-            <h4 className="text-md font-medium text-gray-900 dark:text-white">
+            <h4 className="text-md font-medium text-white">
               Report Details
             </h4>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Report Title
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 bg-gray-700 text-white"
                 placeholder="Enter report title"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Description (Optional)
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 bg-gray-700 text-white"
                 placeholder="Enter report description"
               />
             </div>
@@ -235,18 +235,18 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
 
           {/* Date Range */}
           <div className="space-y-4">
-            <h4 className="text-md font-medium text-gray-900 dark:text-white">
+            <h4 className="text-md font-medium text-white">
               Date Range
             </h4>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Time Period
               </label>
               <select
                 value={datePreset}
                 onChange={(e) => setDatePreset(e.target.value as DatePresetValue)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 bg-gray-700 text-white"
               >
                 {datePresets.map(preset => (
                   <option key={preset.value} value={preset.value}>
@@ -259,7 +259,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
             {datePreset === 'custom' && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Start Date
                   </label>
                   <input
@@ -269,11 +269,11 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
                       ...prev,
                       start: new Date(e.target.value)
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 bg-gray-700 text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     End Date
                   </label>
                   <input
@@ -283,17 +283,17 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
                       ...prev,
                       end: new Date(e.target.value)
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:ring-blue-500 bg-gray-700 text-white"
                   />
                 </div>
               </div>
             )}
 
             {/* Date Range Preview */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-3">
               <div className="flex items-center">
                 <CalendarIcon className="h-4 w-4 text-gray-400 mr-2" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-400">
                   {format(customDateRange.start, 'MMM d, yyyy')} - {format(customDateRange.end, 'MMM d, yyyy')}
                 </span>
               </div>
@@ -303,38 +303,38 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
 
         {/* Preview Panel */}
         <div className="space-y-6">
-          <h4 className="text-md font-medium text-gray-900 dark:text-white">
+          <h4 className="text-md font-medium text-white">
             Report Preview
           </h4>
 
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
             {/* Report Features */}
             <div className="space-y-4">
-              <h5 className="text-sm font-medium text-gray-900 dark:text-white">
+              <h5 className="text-sm font-medium text-white">
                 This report will include:
               </h5>
 
               <div className="space-y-2">
                 {template.config?.charts && (
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center text-sm text-gray-400">
                     <ChartBarIcon className="h-4 w-4 mr-2 text-blue-500" />
                     Interactive charts and visualizations
                   </div>
                 )}
 
                 {template.config?.metrics && (
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center text-sm text-gray-400">
                     <Cog6ToothIcon className="h-4 w-4 mr-2 text-green-500" />
                     Key financial metrics and insights
                   </div>
                 )}
 
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center text-sm text-gray-400">
                   <DocumentTextIcon className="h-4 w-4 mr-2 text-purple-500" />
                   Detailed data analysis and summaries
                 </div>
 
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center text-sm text-gray-400">
                   <DocumentTextIcon className="h-4 w-4 mr-2 text-orange-500" />
                   Downloadable PDF report
                 </div>
@@ -343,18 +343,18 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
 
             {/* Requirements */}
             {(template.requires_goals || template.requires_budget) && (
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              <div className="mt-6 pt-4 border-t border-gray-700">
+                <h5 className="text-sm font-medium text-white mb-2">
                   Requirements:
                 </h5>
                 <div className="space-y-1">
                   {template.requires_budget && (
-                    <div className="text-sm text-amber-600 dark:text-amber-400">
+                    <div className="text-sm text-amber-400">
                       • Active budget data is required
                     </div>
                   )}
                   {template.requires_goals && (
-                    <div className="text-sm text-amber-600 dark:text-amber-400">
+                    <div className="text-sm text-amber-400">
                       • Goals data is required
                     </div>
                   )}
@@ -363,8 +363,8 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
             )}
 
             {/* Generation Time Estimate */}
-            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="mt-6 pt-4 border-t border-gray-700">
+              <div className="flex items-center text-sm text-gray-400">
                 <ClockIcon className="h-4 w-4 mr-2" />
                 Estimated generation time: 10-30 seconds
               </div>

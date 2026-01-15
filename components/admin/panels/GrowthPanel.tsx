@@ -76,15 +76,15 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
     <div className="space-y-6">
       {/* Range Selector and Refresh */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
           {(['7d', '30d', '90d'] as const).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 range === r
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               {r === '7d' ? '7 Days' : r === '30d' ? '30 Days' : '90 Days'}
@@ -113,15 +113,15 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
           </div>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Signups</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{totalSignups}</p>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <p className="text-sm font-medium text-gray-400">Total Signups</p>
+          <p className="text-2xl font-bold text-white mt-1">{totalSignups}</p>
           <p className="text-xs text-gray-500 mt-1">Registered users</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Conversion Rate</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+        <div className="bg-gray-800 rounded-lg p-5">
+          <p className="text-sm font-medium text-gray-400">Conversion Rate</p>
+          <p className="text-2xl font-bold text-white mt-1">
             {conversionRate > 0 ? `${conversionRate}%` : '--'}
           </p>
           <p className="text-xs text-gray-500 mt-1">Visitor to signup</p>
@@ -130,55 +130,55 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
 
       {/* Sources and Referrers */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Traffic Sources</h4>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Traffic Sources</h4>
           {sources.length > 0 ? (
             <div className="space-y-3">
               {sources.map((source, idx) => (
                 <div key={idx} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{source.source}</span>
+                    <span className="text-sm text-gray-400">{source.source}</span>
                     {source.conversionRate > 0 && (
-                      <span className="text-xs text-green-600 dark:text-green-400">
+                      <span className="text-xs text-green-400">
                         ({source.conversionRate}% conv)
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{source.count}</span>
+                    <span className="text-sm font-medium text-white">{source.count}</span>
                     <span className="text-xs text-gray-500">({source.percentage}%)</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+            <p className="text-sm text-gray-400 italic">
               No source data available yet
             </p>
           )}
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Top Referrers</h4>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Top Referrers</h4>
           {referrers.length > 0 ? (
             <div className="space-y-3">
               {referrers.slice(0, 6).map((ref, idx) => (
                 <div key={idx} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ExternalLink className="w-3 h-3 text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 truncate max-w-[150px]">
+                    <span className="text-sm text-gray-400 truncate max-w-[150px]">
                       {ref.referrer}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{ref.count}</span>
+                    <span className="text-sm font-medium text-white">{ref.count}</span>
                     <span className="text-xs text-gray-500">({ref.percentage}%)</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+            <p className="text-sm text-gray-400 italic">
               No referrer data yet. Referrers appear when users arrive from external links.
             </p>
           )}
@@ -187,13 +187,13 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
 
       {/* Top Channels */}
       {topChannels.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Channel Performance</h4>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Channel Performance</h4>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {topChannels.map((channel, idx) => (
-              <div key={idx} className="p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400">{channel.channel}</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">{channel.visitors}</p>
+              <div key={idx} className="p-3 bg-gray-700 rounded-lg border border-gray-600">
+                <p className="text-sm text-gray-400">{channel.channel}</p>
+                <p className="text-xl font-bold text-white mt-1">{channel.visitors}</p>
                 {channel.trend !== 0 && (
                   <div className={`flex items-center gap-1 mt-1 ${channel.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {channel.trend > 0 ? (
@@ -212,8 +212,8 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
 
       {/* Daily Trend */}
       {dailyTrend.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Daily Acquisition Trend</h4>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Daily Acquisition Trend</h4>
           <div className="h-32 flex items-end gap-1">
             {dailyTrend.slice(-14).map((day, i) => {
               const maxVisitors = Math.max(...dailyTrend.map(d => d.visitors), 1);
@@ -237,8 +237,8 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
       )}
 
       {totalVisitors === 0 && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <p className="text-sm text-blue-700 dark:text-blue-300">
+        <div className="p-4 bg-blue-900/20 rounded-lg">
+          <p className="text-sm text-blue-300">
             <strong>Early Stage:</strong> Acquisition data will populate as visitors sign up for beta or launch notifications.
             Source tracking is captured from the source field in beta requests and launch notifications.
           </p>
@@ -255,13 +255,13 @@ const SignupsPanel = memo(function SignupsPanel() {
   return (
     <div className="space-y-4">
       {/* View Toggle */}
-      <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
+      <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1 w-fit">
         <button
           onClick={() => setView('beta')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             view === 'beta'
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              ? 'bg-gray-700 text-white shadow-sm'
+              : 'text-gray-400 hover:text-white'
           }`}
         >
           Beta Program
@@ -270,8 +270,8 @@ const SignupsPanel = memo(function SignupsPanel() {
           onClick={() => setView('launch')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             view === 'launch'
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              ? 'bg-gray-700 text-white shadow-sm'
+              : 'text-gray-400 hover:text-white'
           }`}
         >
           Launch Signups
@@ -290,7 +290,7 @@ export const GrowthPanel = memo(function GrowthPanel() {
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Sub-tab Navigation */}
-      <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-1 border-b border-gray-700">
         {SUB_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -300,8 +300,8 @@ export const GrowthPanel = memo(function GrowthPanel() {
               onClick={() => setActiveSubTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 isActive
-                  ? 'border-green-500 text-green-600 dark:text-green-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300'
+                  ? 'border-green-500 text-green-400'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
               }`}
             >
               <Icon className="w-4 h-4" />

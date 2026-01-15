@@ -78,7 +78,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -101,7 +101,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Duration Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               <Clock className="w-4 h-4 inline mr-2" />
               Event Duration
             </label>
@@ -112,13 +112,13 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
                   onClick={() => setDuration(preset.value)}
                   className={`p-3 rounded-lg border-2 transition-all text-center group relative ${
                     duration === preset.value
-                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600'
+                      ? 'border-purple-500 bg-purple-900/30'
+                      : 'border-gray-700 hover:border-purple-600'
                   }`}
                   title={preset.label}
                 >
                   <div className="text-2xl mb-1">{preset.icon}</div>
-                  <div className="text-xs font-medium text-gray-900 dark:text-white">{preset.label}</div>
+                  <div className="text-xs font-medium text-white">{preset.label}</div>
                   <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                     {preset.label}
                   </span>
@@ -129,7 +129,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
 
           {/* Date Range Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               <Calendar className="w-4 h-4 inline mr-2" />
               Search Time Range
             </label>
@@ -138,42 +138,42 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
                 onClick={() => setDateRange({ start: new Date(), end: addDays(new Date(), 3) })}
                 className={`p-3 rounded-lg border-2 transition-all ${
                   dateRange.end.getTime() === addDays(new Date(), 3).getTime()
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
+                    ? 'border-purple-500 bg-purple-900/30'
+                    : 'border-gray-700 hover:border-purple-300'
                 }`}
               >
-                <div className="text-sm font-medium text-gray-900 dark:text-white">Next 3 Days</div>
+                <div className="text-sm font-medium text-white">Next 3 Days</div>
               </button>
               <button
                 onClick={() => setDateRange({ start: new Date(), end: addDays(new Date(), 7) })}
                 className={`p-3 rounded-lg border-2 transition-all ${
                   dateRange.end.getTime() === addDays(new Date(), 7).getTime()
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
+                    ? 'border-purple-500 bg-purple-900/30'
+                    : 'border-gray-700 hover:border-purple-300'
                 }`}
               >
-                <div className="text-sm font-medium text-gray-900 dark:text-white">Next Week</div>
+                <div className="text-sm font-medium text-white">Next Week</div>
               </button>
               <button
                 onClick={() => setDateRange({ start: new Date(), end: addDays(new Date(), 14) })}
                 className={`p-3 rounded-lg border-2 transition-all ${
                   dateRange.end.getTime() === addDays(new Date(), 14).getTime()
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
+                    ? 'border-purple-500 bg-purple-900/30'
+                    : 'border-gray-700 hover:border-purple-300'
                 }`}
               >
-                <div className="text-sm font-medium text-gray-900 dark:text-white">Next 2 Weeks</div>
+                <div className="text-sm font-medium text-white">Next 2 Weeks</div>
               </button>
             </div>
           </div>
 
           {/* Participants */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               <Users className="w-4 h-4 inline mr-2" />
               Participants: {participants.length}
             </label>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-400">
               Finding times that work for all space members
             </p>
           </div>
@@ -182,14 +182,14 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
           {loading && (
             <div className="text-center py-12">
               <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Finding optimal time slots...</p>
+              <p className="mt-4 text-gray-400">Finding optimal time slots...</p>
             </div>
           )}
 
           {/* Time Slots */}
           {!loading && timeSlots.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 Suggested Time Slots ({timeSlots.length})
               </h3>
               <div className="space-y-3">
@@ -204,19 +204,19 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
                       onClick={() => handleSelectSlot(slot)}
                       className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
                         isSelected
-                          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600'
+                          ? 'border-purple-500 bg-purple-900/30 shadow-lg'
+                          : 'border-gray-700 hover:border-purple-600'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            {isSelected && <CheckCircle2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />}
-                            <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {isSelected && <CheckCircle2 className="w-5 h-5 text-purple-400" />}
+                            <div className="text-lg font-semibold text-white">
                               {slot.label}
                             </div>
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                          <div className="text-sm text-gray-400">
                             {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')} ({duration} min)
                           </div>
                         </div>
@@ -224,7 +224,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
                           <div className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getScoreColor(slot.score)}`}>
                             {getScoreLabel(slot.score)}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-gray-400">
                             Score: {slot.score}/100
                           </div>
                         </div>
@@ -240,8 +240,8 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
           {!loading && timeSlots.length === 0 && (
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No available time slots found</p>
-              <p className="text-gray-500 dark:text-gray-500 text-sm">
+              <p className="text-gray-400 text-lg mb-2">No available time slots found</p>
+              <p className="text-gray-500 text-sm">
                 Try adjusting the duration or date range
               </p>
             </div>
@@ -249,10 +249,10 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between gap-4">
+        <div className="border-t border-gray-700 p-6 flex items-center justify-between gap-4">
           <button
             onClick={onClose}
-            className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
+            className="px-6 py-3 border-2 border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-all font-medium"
           >
             Cancel
           </button>
@@ -262,7 +262,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
             className={`px-6 py-3 rounded-lg font-medium transition-all ${
               selectedSlot
                 ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-lg'
-                : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
+                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
             }`}
           >
             Create Event with Selected Time

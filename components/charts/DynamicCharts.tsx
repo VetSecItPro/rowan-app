@@ -13,7 +13,7 @@ const ChartLoader = () => (
   <div className="w-full h-64 flex items-center justify-center">
     <div className="text-center">
       <Skeleton className="w-full h-64 mb-2" />
-      <p className="text-sm text-gray-500 dark:text-gray-400">Loading chart...</p>
+      <p className="text-sm text-gray-400">Loading chart...</p>
     </div>
   </div>
 );

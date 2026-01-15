@@ -38,7 +38,7 @@ const LegendItem = memo(function LegendItem({
     <div className="flex items-center gap-2">
       <div className={`h-3 w-3 rounded-full ${colors.dot}`} />
       {showIcon && <span className="text-sm">{icon}</span>}
-      <span className="text-xs text-gray-600 dark:text-gray-400">{label}s</span>
+      <span className="text-xs text-gray-400">{label}s</span>
     </div>
   );
 });
@@ -89,13 +89,13 @@ export const UnifiedCalendarLegendCompact = memo(function UnifiedCalendarLegendC
         {itemTypes.map((type) => (
           <div
             key={type}
-            className={`h-2.5 w-2.5 rounded-full border border-white dark:border-gray-900 ${UNIFIED_ITEM_COLORS[type].dot}`}
+            className={`h-2.5 w-2.5 rounded-full border border-gray-900 ${UNIFIED_ITEM_COLORS[type].dot}`}
           />
         ))}
       </div>
 
       {/* Hover popover */}
-      <div className="pointer-events-none absolute left-0 top-full z-50 mt-2 hidden w-32 rounded-md border border-gray-200 bg-white p-2 shadow-lg group-hover:block dark:border-gray-700 dark:bg-gray-800">
+      <div className="pointer-events-none absolute left-0 top-full z-50 mt-2 hidden w-32 rounded-md border border-gray-200 bg-white p-2 shadow-lg group-hover:block bg-gray-800">
         <div className="flex flex-col gap-1.5">
           {itemTypes.map((type) => (
             <LegendItem key={type} type={type} showIcon={true} />

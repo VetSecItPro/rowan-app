@@ -231,17 +231,17 @@ export default function BadgeNotification({
       >
         <div
           className={`
-            relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl
+            relative bg-gray-800 rounded-2xl shadow-2xl
             border-4 border-transparent
             bg-gradient-to-br ${rarityColors[badge.badge.rarity]}
             p-1
           `}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6">
+          <div className="bg-gray-800 rounded-xl p-6">
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-300 transition-colors"
             >
               <svg
                 className="w-6 h-6"
@@ -280,11 +280,11 @@ export default function BadgeNotification({
 
             {/* Badge details */}
             <div className="text-center space-y-3 mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-white">
                 {badge.badge.name}
               </h2>
 
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-gray-300">
                 {badge.badge.description}
               </p>
 
@@ -299,14 +299,14 @@ export default function BadgeNotification({
                   {badge.badge.rarity}
                 </span>
 
-                <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold">
+                <span className="inline-flex items-center gap-1 text-amber-400 font-bold">
                   <span className="text-xl">⭐</span>
                   <span>+{badge.badge.points} points</span>
                 </span>
               </div>
 
               {/* Earned date */}
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Earned on {format(new Date(badge.earned_at), 'MMMM d, yyyy')}
               </p>
             </div>
@@ -315,7 +315,7 @@ export default function BadgeNotification({
             <div className="flex gap-3">
               <button
                 onClick={handleClose}
-                className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium hover:bg-gray-600 transition-colors"
               >
                 Close
               </button>

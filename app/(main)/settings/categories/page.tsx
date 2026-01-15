@@ -29,7 +29,7 @@ export default function CategoriesSettingsPage() {
       description: 'Organize your expenses for better budget tracking',
       icon: DollarSign,
       color: 'text-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-950',
+      bgColor: 'bg-green-950',
       features: ['Monthly budgets', 'Spending analytics', 'Receipt categorization', 'Expense reporting']
     },
     task: {
@@ -37,7 +37,7 @@ export default function CategoriesSettingsPage() {
       description: 'Categorize tasks for better productivity',
       icon: CheckSquare,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-950',
+      bgColor: 'bg-blue-950',
       features: ['Task filtering', 'Productivity analytics', 'Project organization', 'Time tracking']
     },
     goal: {
@@ -45,7 +45,7 @@ export default function CategoriesSettingsPage() {
       description: 'Group goals by life areas and priorities',
       icon: Target,
       color: 'text-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-950',
+      bgColor: 'bg-purple-950',
       features: ['Progress tracking', 'Achievement badges', 'Goal analytics', 'Milestone organization']
     },
     universal: {
@@ -53,7 +53,7 @@ export default function CategoriesSettingsPage() {
       description: 'Cross-feature categories for consistent organization',
       icon: Tag,
       color: 'text-orange-600',
-      bgColor: 'bg-orange-50 dark:bg-orange-950',
+      bgColor: 'bg-orange-950',
       features: ['Priority levels', 'Project grouping', 'Routine identification', 'Cross-feature filtering']
     }
   };

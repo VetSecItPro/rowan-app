@@ -90,8 +90,8 @@ export function ErrorRetry({
     <div
       className={`
         flex flex-col items-center justify-center text-center
-        bg-gray-50 dark:bg-gray-800/50
-        border border-gray-200 dark:border-gray-700
+        bg-gray-800/50
+        border border-gray-700
         rounded-xl
         ${classes.container}
         ${className}
@@ -103,7 +103,7 @@ export function ErrorRetry({
       <div
         className={`
           ${classes.icon}
-          text-gray-400 dark:text-gray-500
+          text-gray-500
           mb-4
         `}
       >
@@ -115,7 +115,7 @@ export function ErrorRetry({
         className={`
           ${classes.title}
           font-semibold
-          text-gray-900 dark:text-white
+          text-white
           mb-2
         `}
       >
@@ -126,7 +126,7 @@ export function ErrorRetry({
       <p
         className={`
           ${classes.message}
-          text-gray-600 dark:text-gray-400
+          text-gray-400
           mb-6
           max-w-sm
         `}
@@ -185,15 +185,15 @@ export function ErrorRetryInline({
     <div
       className={`
         flex items-center gap-3 p-3
-        bg-red-50 dark:bg-red-900/20
-        border border-red-200 dark:border-red-800
+        bg-red-900/20
+        border border-red-800
         rounded-lg
         ${className}
       `}
       role="alert"
     >
       <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-      <span className="text-sm text-red-700 dark:text-red-300 flex-1">
+      <span className="text-sm text-red-300 flex-1">
         {message}
       </span>
       <button
@@ -202,8 +202,8 @@ export function ErrorRetryInline({
         className="
           px-3 py-1.5 min-h-[36px]
           text-sm font-medium
-          text-red-600 dark:text-red-400
-          hover:bg-red-100 dark:hover:bg-red-900/30
+          text-red-400
+          hover:bg-red-900/30
           rounded-lg
           transition-colors
           active:scale-[0.98]

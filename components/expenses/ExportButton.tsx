@@ -61,7 +61,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="btn-touch flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full transition-all active:scale-95 hover:shadow-md"
+        className="btn-touch flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full transition-all active:scale-95 hover:shadow-md"
       >
         <Download className="w-4 h-4" />
         Export
@@ -75,28 +75,28 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
           />
 
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md">
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-6 border-b border-gray-700">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-xl font-bold text-white">
                       Export Expenses
                     </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-400">
                       Download for tax software or records
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="btn-touch w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95 hover:shadow-md"
+                  className="btn-touch w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all active:scale-95 hover:shadow-md"
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
 
@@ -104,7 +104,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
               <div className="p-6 space-y-6">
                 {/* Export Format Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     Export Format
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -112,8 +112,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                       onClick={() => setExportFormat('csv')}
                       className={`btn-touch px-4 py-3 rounded-full border-2 transition-all flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-blue active-press ${
                         exportFormat === 'csv'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
+                          ? 'border-blue-500 bg-blue-900/20 text-blue-400 hover:shadow-lg'
+                          : 'border-gray-700 text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       <FileSpreadsheet className="w-4 h-4" />
@@ -123,8 +123,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                       onClick={() => setExportFormat('pdf')}
                       className={`btn-touch px-4 py-3 rounded-full border-2 transition-all flex items-center justify-center gap-2 active:scale-95 hover-lift shimmer-blue active-press ${
                         exportFormat === 'pdf'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
+                          ? 'border-blue-500 bg-blue-900/20 text-blue-400 hover:shadow-lg'
+                          : 'border-gray-700 text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       <File className="w-4 h-4" />
@@ -135,7 +135,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
 
                 {/* Export Type Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     Export Period
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -143,8 +143,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                       onClick={() => setExportType('monthly')}
                       className={`btn-touch px-4 py-3 rounded-full border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'monthly'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
+                          ? 'border-blue-500 bg-blue-900/20 text-blue-400 hover:shadow-lg'
+                          : 'border-gray-700 text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       This Month
@@ -153,8 +153,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                       onClick={() => setExportType('yearly')}
                       className={`btn-touch px-4 py-3 rounded-full border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'yearly'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
+                          ? 'border-blue-500 bg-blue-900/20 text-blue-400 hover:shadow-lg'
+                          : 'border-gray-700 text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       Full Year
@@ -163,8 +163,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                       onClick={() => setExportType('custom')}
                       className={`btn-touch px-4 py-3 rounded-full border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'custom'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
+                          ? 'border-blue-500 bg-blue-900/20 text-blue-400 hover:shadow-lg'
+                          : 'border-gray-700 text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       Custom Range
@@ -173,8 +173,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                       onClick={() => setExportType('category')}
                       className={`btn-touch px-4 py-3 rounded-full border-2 transition-all text-sm font-medium active:scale-95 hover-lift shimmer-blue active-press ${
                         exportType === 'category'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:shadow-lg'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 hover:shadow-md'
+                          ? 'border-blue-500 bg-blue-900/20 text-blue-400 hover:shadow-lg'
+                          : 'border-gray-700 text-gray-300 hover:border-blue-300 hover:shadow-md'
                       }`}
                     >
                       By Category
@@ -186,13 +186,13 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                 {(exportType === 'monthly' || exportType === 'yearly') && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Year
                       </label>
                       <select
                         value={year}
                         onChange={(e) => setYear(parseInt(e.target.value))}
-                        className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
                           <option key={y} value={y}>
@@ -204,13 +204,13 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
 
                     {exportType === 'monthly' && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                           Month
                         </label>
                         <select
                           value={month}
                           onChange={(e) => setMonth(parseInt(e.target.value))}
-                          className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                           {[
                             'January',
@@ -240,7 +240,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                 {(exportType === 'custom' || exportType === 'category') && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Start Date
                       </label>
                       <div className="relative">
@@ -249,13 +249,13 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                           type="date"
                           value={startDate}
                           onChange={(e) => setStartDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         End Date
                       </label>
                       <div className="relative">
@@ -264,7 +264,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                           type="date"
                           value={endDate}
                           onChange={(e) => setEndDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
                     </div>
@@ -272,8 +272,8 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
                 )}
 
                 {/* Info Box */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-full p-4">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                <div className="bg-blue-900/20 border border-blue-800 rounded-full p-4">
+                  <p className="text-sm text-blue-200">
                     {exportFormat === 'pdf' ? (
                       <>
                         {exportType === 'monthly' ? (
@@ -313,11 +313,11 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
                 <button
                   onClick={() => setIsOpen(false)}
                   disabled={isExporting}
-                  className="btn-touch px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all font-medium disabled:opacity-50 active:scale-95 hover:shadow-md"
+                  className="btn-touch px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-full transition-all font-medium disabled:opacity-50 active:scale-95 hover:shadow-md"
                 >
                   Cancel
                 </button>

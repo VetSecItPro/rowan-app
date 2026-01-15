@@ -11,7 +11,7 @@ export function PainPointsSection() {
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: false }}
                     transition={{ duration: 0.8 }}
-                    className="text-lg text-gray-500 dark:text-gray-400 mb-8"
+                    className="text-lg text-gray-400 mb-8"
                 >
                     Sound familiar?
                 </motion.p>
@@ -28,7 +28,7 @@ export function PainPointsSection() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: false }}
                             transition={{ duration: 0.6, delay: index * 0.15 }}
-                            className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 font-serif italic"
+                            className="text-xl sm:text-2xl text-gray-300 font-serif italic"
                         >
                             "{quote}"
                         </motion.p>
@@ -42,7 +42,7 @@ export function PainPointsSection() {
                     transition={{ duration: 0.6, delay: 0.6 }}
                     className="mt-10"
                 >
-                    <span className="text-2xl sm:text-3xl font-display font-bold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                    <span className="text-2xl sm:text-3xl font-display font-bold tracking-tight bg-gradient-to-r from-blue-600 from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                         Rowan fixes this.
                     </span>
                 </motion.div>

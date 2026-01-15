@@ -118,15 +118,15 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   ];
 
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+    <div className="bg-gray-800/60 backdrop-blur-md rounded-lg border border-gray-700/50 shadow-lg">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="btn-touch w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="btn-touch w-full flex items-center justify-between p-4 hover:bg-gray-700 transition-colors"
       >
         <div className="flex items-center gap-2">
           <Filter className="w-5 h-5 text-gray-500" />
-          <span className="font-medium text-gray-900 dark:text-white">Filters</span>
+          <span className="font-medium text-white">Filters</span>
           {activeCount > 0 && (
             <span className="px-2 py-0.5 text-xs bg-blue-500 text-white rounded-full">
               {activeCount}
@@ -140,7 +140,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 e.stopPropagation();
                 clearFilters();
               }}
-              className="btn-touch px-3 py-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+              className="btn-touch px-3 py-1 text-xs text-gray-600 text-gray-400 hover:text-white transition-colors"
             >
               Clear all
             </button>
@@ -151,10 +151,10 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
       {/* Filter Options */}
       {isExpanded && (
-        <div className="p-4 border-t border-gray-200/50 dark:border-gray-700/50 space-y-4">
+        <div className="p-4 border-t border-gray-700/50 space-y-4">
           {/* Search */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               <Search className="w-4 h-4 inline mr-1" />
               Search
             </label>
@@ -163,13 +163,13 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               value={filters.search || ''}
               onChange={(e) => updateFilter('search', e.target.value || undefined)}
               placeholder="Search tasks..."
-              className="w-full px-3 py-2 border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
+              className="w-full px-3 py-2 border border-gray-700/50 rounded-lg bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Status
             </label>
             <div className="flex flex-wrap gap-3 sm:gap-2">
@@ -180,7 +180,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                   className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-colors ${
                     filters.status?.includes(status.value)
                       ? `${status.color} hover:shadow-md`
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                   }`}
                 >
                   {status.label}
@@ -191,7 +191,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
           {/* Priority */}
           <div>
-            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               <AlertCircle className="w-4 h-4 inline mr-1" />
               Priority
             </label>
@@ -202,8 +202,8 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                   onClick={() => toggleArrayFilter('priority', priority.value)}
                   className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-colors ${
                     filters.priority?.includes(priority.value)
-                      ? `${priority.color} bg-gray-100 dark:bg-gray-700 hover:shadow-md`
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? `${priority.color} bg-gray-700 hover:shadow-md`
+                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                   }`}
                 >
                   {priority.label}
@@ -215,7 +215,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
           {/* Assignees */}
           {members.length > 0 && (
             <div>
-              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 <User className="w-4 h-4 inline mr-1" />
                 Assignee
               </label>
@@ -223,7 +223,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 {members.map((member) => (
                   <label
                     key={member.user_id}
-                    htmlFor="field-5" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors"
+                    htmlFor="field-5" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors"
                   >
                     <input
                       type="checkbox"
@@ -232,7 +232,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               onChange={() =>  toggleArrayFilter('assignees', member.user_id)}
                       className="rounded border-gray-300 text-blue-500"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-sm text-gray-300">
                       {member.users.full_name || member.users.email}
                     </span>
                   </label>
@@ -244,7 +244,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
           {/* Categories */}
           {categories.length > 0 && (
             <div>
-              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 <Tag className="w-4 h-4 inline mr-1" />
                 Category
               </label>
@@ -256,7 +256,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                     className={`btn-touch px-3 py-1.5 text-xs rounded-lg transition-colors ${
                       filters.categories?.includes(category.id)
                         ? `bg-${category.color}-100 text-${category.color}-700 hover:shadow-md`
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                     }`}
                   >
                     {category.name}
@@ -268,7 +268,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
 
           {/* Due Date Range */}
           <div>
-            <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-7" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               <Calendar className="w-4 h-4 inline mr-1" />
               Due Date
             </label>
@@ -277,49 +277,49 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 type="date"
                 value={filters.dueDateFrom || ''}
                 onChange={(e) => updateFilter('dueDateFrom', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
+                className="px-3 py-2 text-sm border border-gray-700/50 rounded-lg bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
               />
               <input
                 type="date"
                 value={filters.dueDateTo || ''}
                 onChange={(e) => updateFilter('dueDateTo', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
+                className="px-3 py-2 text-sm border border-gray-700/50 rounded-lg bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
               />
             </div>
           </div>
 
           {/* Special Filters */}
           <div>
-            <label htmlFor="field-8" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-8" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Special Filters
             </label>
             <div className="space-y-2">
-              <label htmlFor="field-9" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors">
+              <label htmlFor="field-9" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors">
                 <input
                   type="checkbox"
                   checked={filters.isPastDue || false}
                   onChange={(e) => updateFilter('isPastDue', e.target.checked || undefined)}
                   className="rounded border-gray-300 text-blue-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Past Due</span>
+                <span className="text-sm text-gray-300">Past Due</span>
               </label>
-              <label htmlFor="field-10" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors">
+              <label htmlFor="field-10" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors">
                 <input
                   type="checkbox"
                   checked={filters.hasAttachments || false}
                   onChange={(e) => updateFilter('hasAttachments', e.target.checked || undefined)}
                   className="rounded border-gray-300 text-blue-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Has Attachments</span>
+                <span className="text-sm text-gray-300">Has Attachments</span>
               </label>
-              <label htmlFor="field-11" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded transition-colors">
+              <label htmlFor="field-11" className="btn-touch flex items-center gap-2 cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors">
                 <input
                   type="checkbox"
                   checked={filters.hasDependencies || false}
                   onChange={(e) => updateFilter('hasDependencies', e.target.checked || undefined)}
                   className="rounded border-gray-300 text-blue-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Has Dependencies</span>
+                <span className="text-sm text-gray-300">Has Dependencies</span>
               </label>
             </div>
           </div>

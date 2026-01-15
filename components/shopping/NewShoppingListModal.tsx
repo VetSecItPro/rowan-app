@@ -145,7 +145,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-5 border-b border-emerald-600">
           <h2 className="text-xl sm:text-2xl font-bold text-white">
             {editList ? 'Edit Shopping List' : 'New Shopping List'}
@@ -163,17 +163,17 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                 onClose();
                 onUseTemplate();
               }}
-              className="w-full p-3 sm:p-4 border-2 border-dashed border-emerald-300 dark:border-emerald-600 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors text-left group"
+              className="w-full p-3 sm:p-4 border-2 border-dashed border-emerald-600 rounded-lg hover:border-emerald-400 hover:bg-emerald-900/20 transition-colors text-left group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-10 h-10 bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  <h4 className="text-sm sm:text-base font-semibold text-white group-hover:text-emerald-400 transition-colors">
                     Use a Template
                   </h4>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-400">
                     Start with a pre-made list
                   </p>
                 </div>
@@ -183,36 +183,36 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
           {/* Title */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Title *</label>
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">Title *</label>
             <input
               type="text"
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Type a Title"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white placeholder-gray-500"
             />
           </div>
 
           {/* Store and Budget - Side by side on larger screens */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Store</label>
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">Store</label>
               <input
                 type="text"
                 value={formData.store_name || ''}
                 onChange={(e) => setFormData({ ...formData, store_name: e.target.value })}
                 placeholder="Type your store"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white placeholder-gray-500"
               />
             </div>
 
             <div>
-              <label htmlFor="field-budget" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-budget" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Budget (Optional)
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                 <input
                   type="number"
                   min="0"
@@ -220,7 +220,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                   value={formData.budget || ''}
                   onChange={(e) => setFormData({ ...formData, budget: e.target.value ? parseFloat(e.target.value) : undefined })}
                   placeholder="0.00"
-                  className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  className="w-full pl-8 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white placeholder-gray-500"
                 />
               </div>
             </div>
@@ -228,30 +228,30 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
           {/* Description */}
           <div>
-            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">Description</label>
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">Description</label>
             <input
               type="text"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Type a Description"
-              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              className="w-full px-4 py-2.5 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white placeholder-gray-500"
             />
           </div>
 
           {/* Items */}
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
-              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Items</label>
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-300 cursor-pointer">Items</label>
               {spaceMembers.length > 0 && items.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">Assign all:</span>
+                  <span className="text-xs text-gray-400 whitespace-nowrap">Assign all:</span>
                   <div className="w-32 sm:w-36">
                     <Dropdown
                       value={defaultAssignee}
                       onChange={(value) => handleAssignAllItems(value || undefined)}
                       options={getAssignAllOptions()}
                       placeholder="No one"
-                      className="text-xs bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 font-medium focus:ring-emerald-500"
+                      className="text-xs bg-emerald-900/20 border-emerald-700 text-emerald-300 font-medium focus:ring-emerald-500"
                     />
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
                 onChange={(e) => setNewItemName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddItem())}
                 placeholder="Add an item..."
-                className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                className="flex-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-white placeholder-gray-500"
               />
               <button
                 type="button"
@@ -280,27 +280,27 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
 
             {/* Items List */}
             {items.length > 0 && (
-              <div className="space-y-2 max-h-64 overflow-y-auto bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+              <div className="space-y-2 max-h-64 overflow-y-auto bg-gray-900/50 rounded-lg p-3 border border-gray-700">
                 {items.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div key={index} className="flex items-center gap-3 p-2 bg-gray-800 rounded-lg border border-gray-700">
                     <button
                       type="button"
                       onClick={() => handleToggleItem(index)}
                       className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                         item.checked
                           ? 'bg-green-500 border-green-500'
-                          : 'border-gray-300 dark:border-gray-600 hover:border-emerald-500'
+                          : 'border-gray-600 hover:border-emerald-500'
                       }`}
                     >
                       {item.checked && <Check className="w-3 h-3 text-white" />}
                     </button>
-                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-300'}`}>
                       {item.name}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
-                      className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                      className="p-1 text-red-500 hover:bg-red-900/20 rounded transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -311,7 +311,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
             <SecondaryButton
               type="button"
               onClick={onClose}

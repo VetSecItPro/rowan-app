@@ -129,7 +129,7 @@ export default function BudgetSetupPage() {
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-amber-600 to-amber-600 bg-clip-text text-transparent mb-2">
               Set Up Your Budget
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Choose a budget template that fits your household and customize it with your monthly
               income
             </p>
@@ -137,12 +137,12 @@ export default function BudgetSetupPage() {
 
           {/* Success Message */}
           {success && (
-            <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-xl p-6 text-center">
-              <Check className="w-12 h-12 text-green-600 dark:text-green-400 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
+            <div className="bg-green-900/20 border-2 border-green-600 rounded-xl p-6 text-center">
+              <Check className="w-12 h-12 text-green-400 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-green-100 mb-2">
                 Budget Template Applied!
               </h3>
-              <p className="text-green-700 dark:text-green-300">
+              <p className="text-green-300">
                 Redirecting you to your budget overview...
               </p>
             </div>
@@ -150,8 +150,8 @@ export default function BudgetSetupPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-xl p-4">
-              <p className="text-red-800 dark:text-red-200 text-center">{error}</p>
+            <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4">
+              <p className="text-red-200 text-center">{error}</p>
             </div>
           )}
 
@@ -161,7 +161,7 @@ export default function BudgetSetupPage() {
               {/* Left Column: Income Input & Template Selection */}
               <div className="space-y-6">
                 {/* Income Input */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                   <IncomeInput
                     value={monthlyIncome}
                     onChange={setMonthlyIncome}
@@ -172,14 +172,14 @@ export default function BudgetSetupPage() {
                 </div>
 
                 {/* Template Gallery */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+                  <h2 className="text-lg font-semibold text-white mb-4">
                     Step 2: Choose a Budget Template
                   </h2>
                   {loading ? (
                     <div className="text-center py-12">
                       <div className="animate-spin w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-3" />
-                      <p className="text-gray-600 dark:text-gray-400">Loading templates...</p>
+                      <p className="text-gray-400">Loading templates...</p>
                     </div>
                   ) : (
                     <TemplateGallery
@@ -194,13 +194,13 @@ export default function BudgetSetupPage() {
 
               {/* Right Column: Preview */}
               <div className="space-y-6">
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 sticky top-8">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 sticky top-8">
+                  <h2 className="text-lg font-semibold text-white mb-4">
                     Step 3: Review Your Budget
                   </h2>
 
                   {!selectedTemplate || monthlyIncome === 0 ? (
-                    <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                    <div className="text-center py-12 text-gray-400">
                       <Wallet className="w-16 h-16 mx-auto mb-4 opacity-50" />
                       <p>
                         {monthlyIncome === 0
@@ -234,7 +234,7 @@ export default function BudgetSetupPage() {
                         )}
                       </button>
 
-                      <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-3">
+                      <p className="text-xs text-center text-gray-400 mt-3">
                         You can adjust individual categories after applying the template
                       </p>
                     </>

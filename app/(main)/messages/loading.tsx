@@ -4,7 +4,7 @@ export default function MessagesLoading() {
   return (
     <div className="flex h-main-content animate-in fade-in duration-300">
       {/* Sidebar skeleton */}
-      <div className="w-80 border-r border-gray-200 dark:border-gray-700 p-4 space-y-4">
+      <div className="w-80 border-r border-gray-700 p-4 space-y-4">
         <div className="flex items-center justify-between">
           <SkeletonLoader className="w-24" height="h-6" />
           <SkeletonLoader className="w-8 h-8 rounded-full" />
@@ -31,7 +31,7 @@ export default function MessagesLoading() {
       {/* Main chat area skeleton */}
       <div className="flex-1 flex flex-col">
         {/* Chat header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <SkeletonLoader className="w-10 h-10 rounded-full" />
             <div className="space-y-1">
@@ -55,7 +55,7 @@ export default function MessagesLoading() {
         </div>
 
         {/* Message input */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-700">
           <div className="flex items-center gap-3">
             <SkeletonLoader className="w-10 h-10 rounded-full flex-shrink-0" />
             <SkeletonLoader className="flex-1 h-10 rounded-full" />

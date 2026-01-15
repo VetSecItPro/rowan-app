@@ -116,7 +116,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <Paperclip className="w-5 h-5 text-white" />
@@ -132,9 +132,9 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
             <div className="text-center py-8 text-gray-500">Loading attachments...</div>
           ) : (
             <>
-              <label htmlFor="field-1" className="flex items-center justify-center gap-2 p-6 mb-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <label htmlFor="field-1" className="flex items-center justify-center gap-2 p-6 mb-4 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
                 <Upload className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-400">
                   {uploading ? `Uploading... ${uploadProgress}%` : 'Click to upload file (max 50MB)'}
                 </span>
                 <input
@@ -147,7 +147,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
 
               {uploading && (
                 <div className="mb-4">
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
@@ -163,11 +163,11 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                   {attachments.map((attachment) => (
                     <div
                       key={attachment.id}
-                      className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                      className="flex items-center gap-3 p-4 bg-gray-900 rounded-lg"
                     >
                       {getFileIcon((attachment as any).mime_type)}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 dark:text-white truncate">
+                        <h4 className="font-medium text-white truncate">
                           {attachment.file_name}
                         </h4>
                         <p className="text-xs text-gray-500">
@@ -177,14 +177,14 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleDownload(attachment)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg"
+                          className="p-2 text-blue-600 hover:bg-blue-900 rounded-lg"
                           title="Download"
                         >
                           <Download className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(attachment.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
+                          className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />

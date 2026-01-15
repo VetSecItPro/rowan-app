@@ -212,7 +212,7 @@ export function ReceiptScanner({
             ref={dropZoneRef}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
+            className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
           >
             <div className="space-y-4">
@@ -253,7 +253,7 @@ export function ReceiptScanner({
                   <Loader2 className="h-5 w-5 animate-spin" />
                   <span className="font-medium">{processingState.message}</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-700 rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full transition-all duration-500"
                     style={{ width: `${processingState.progress}%` }}
@@ -373,30 +373,30 @@ export function ReceiptScanner({
             <Separator />
 
             {/* Expense Suggestion */}
-            <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-              <h4 className="font-medium text-green-800 dark:text-green-200 mb-3">
+            <div className="p-4 bg-green-950 rounded-lg">
+              <h4 className="font-medium text-green-200 mb-3">
                 Suggested Expense
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-green-700 dark:text-green-300">Title:</span>
+                  <span className="text-green-300">Title:</span>
                   <span className="font-medium">{suggestion.title}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-green-700 dark:text-green-300">Amount:</span>
+                  <span className="text-green-300">Amount:</span>
                   <span className="font-medium">{formatCurrency(suggestion.amount)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-green-700 dark:text-green-300">Category:</span>
+                  <span className="text-green-300">Category:</span>
                   <span className="font-medium">{suggestion.category}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-green-700 dark:text-green-300">Date:</span>
+                  <span className="text-green-300">Date:</span>
                   <span className="font-medium">{suggestion.date}</span>
                 </div>
                 {suggestion.description && (
                   <div className="pt-2">
-                    <span className="text-green-700 dark:text-green-300 block mb-1">Description:</span>
+                    <span className="text-green-300 block mb-1">Description:</span>
                     <span className="text-xs">{suggestion.description}</span>
                   </div>
                 )}

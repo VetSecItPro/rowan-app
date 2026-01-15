@@ -46,7 +46,7 @@ export default function RewardsPage() {
                   <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
                     Rewards Shop
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-gray-400 mt-1">
                     Earn points by completing chores and redeem them for rewards
                   </p>
                 </div>
@@ -60,8 +60,8 @@ export default function RewardsPage() {
                     onClick={() => setShowManagement(!showManagement)}
                     className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-2 text-sm ${
                       showManagement
-                        ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-amber-900/30 text-amber-300 border border-amber-700'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                     }`}
                   >
                     <Settings className="w-4 h-4" />
@@ -109,31 +109,31 @@ export default function RewardsPage() {
                   </div>
 
                   {/* How It Works Card */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+                  <div className="bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-700">
+                    <h3 className="font-semibold text-white flex items-center gap-2 mb-4">
                       <Star className="w-5 h-5 text-amber-500" />
                       How to Earn Points
                     </h3>
                     <ul className="space-y-3 text-sm">
                       <li className="flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">+10</span>
-                        <span className="text-gray-600 dark:text-gray-400">Complete a chore</span>
+                        <span className="text-gray-400">Complete a chore</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">+5</span>
-                        <span className="text-gray-600 dark:text-gray-400">Complete a task</span>
+                        <span className="text-gray-400">Complete a task</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">+5/day</span>
-                        <span className="text-gray-600 dark:text-gray-400">Daily streak bonus (max +25)</span>
+                        <span className="text-gray-400">Daily streak bonus (max +25)</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">+50</span>
-                        <span className="text-gray-600 dark:text-gray-400">Weekly chore goal</span>
+                        <span className="text-gray-400">Weekly chore goal</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">+100</span>
-                        <span className="text-gray-600 dark:text-gray-400">Perfect week (all chores done)</span>
+                        <span className="text-gray-400">Perfect week (all chores done)</span>
                       </li>
                     </ul>
                   </div>
@@ -160,17 +160,17 @@ export default function RewardsPage() {
                     />
 
                     {/* Achievement Teaser */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-                      <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+                    <div className="bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-700">
+                      <h3 className="font-semibold text-white flex items-center gap-2 mb-3">
                         <Trophy className="w-5 h-5 text-purple-500" />
                         Achievements
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <p className="text-sm text-gray-400 mb-3">
                         Complete milestones to unlock special badges and bonus points!
                       </p>
                       <Link
                         href="/achievements"
-                        className="text-sm text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
+                        className="text-sm text-purple-400 hover:underline flex items-center gap-1"
                       >
                         View all achievements
                         <span>→</span>

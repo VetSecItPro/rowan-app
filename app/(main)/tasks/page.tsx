@@ -654,7 +654,7 @@ export default function TasksPage() {
                 <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
                   Tasks & Chores
                 </h1>
-                <p className="text-xs sm:text-base text-gray-600 dark:text-gray-400 hidden sm:block">
+                <p className="text-xs sm:text-base text-gray-400 hidden sm:block">
                   Organize daily tasks and household chores together
                 </p>
               </div>
@@ -709,7 +709,7 @@ export default function TasksPage() {
             {/* Mobile toggle button - compact pill style */}
             <button
               onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
-              className="sm:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full active:scale-[0.98] transition-all"
+              className="sm:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-800 border border-gray-700 rounded-full active:scale-[0.98] transition-all"
               aria-expanded={!mobileStatsCollapsed}
               aria-label={mobileStatsCollapsed ? 'Expand Stats Overview' : 'Collapse Stats Overview'}
             >
@@ -717,7 +717,7 @@ export default function TasksPage() {
                 <div className="w-6 h-6 bg-gradient-tasks rounded-full flex items-center justify-center">
                   <CheckSquare className="w-3 h-3 text-white" />
                 </div>
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                <span className="text-xs font-medium text-gray-300">
                   {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
                 </span>
               </div>
@@ -727,17 +727,17 @@ export default function TasksPage() {
             {/* Stats cards - hidden on mobile when collapsed, always visible on desktop */}
             <div className={`stats-grid-mobile gap-4 sm:gap-6 ${mobileStatsCollapsed ? 'hidden sm:grid' : 'grid'}`}>
               {/* Pending */}
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
+                  <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-500 rounded-xl flex items-center justify-center">
                     <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                 </div>
                 <div className="flex items-end justify-between">
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.pending}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-white">{stats.pending}</p>
                   {stats.pending > 0 && (
-                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-1 text-gray-400">
                       <AlertCircle className="w-3 h-3" />
                       <span className="text-xs font-medium">To start</span>
                     </div>
@@ -746,17 +746,17 @@ export default function TasksPage() {
               </div>
 
               {/* In Progress */}
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
+                  <h3 className="text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500 rounded-xl flex items-center justify-center">
                     <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                 </div>
                 <div className="flex items-end justify-between">
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-white">{stats.inProgress}</p>
                   {stats.inProgress > 0 && (
-                    <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                    <div className="flex items-center gap-1 text-amber-400">
                       <TrendingUp className="w-3 h-3" />
                       <span className="text-xs font-medium">Active</span>
                     </div>
@@ -765,17 +765,17 @@ export default function TasksPage() {
               </div>
 
               {/* Completed */}
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
+                  <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                     <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                 </div>
                 <div className="flex items-end justify-between">
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-white">{stats.completed}</p>
                   {stats.total > 0 && (
-                    <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <div className="flex items-center gap-1 text-green-400">
                       <TrendingUp className="w-3 h-3" />
                       <span className="text-xs font-medium">
                         {(() => {
@@ -791,17 +791,17 @@ export default function TasksPage() {
               </div>
 
               {/* Total Tasks & Chores */}
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
+                  <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
                     <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                 </div>
                 <div className="flex items-end justify-between">
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-white">{stats.total}</p>
                   {stats.total > 0 && (
-                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-1 text-gray-400">
                       <Minus className="w-3 h-3" />
                       <span className="text-xs font-medium">Overall</span>
                     </div>
@@ -846,14 +846,14 @@ export default function TasksPage() {
 
             {/* Main Content - Stretch to bottom */}
             <div className={`${showFilters ? 'lg:col-span-3' : 'lg:col-span-4'} flex flex-col min-h-0`}>
-              <div className="bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-2 sm:p-4 relative flex-1 flex flex-col min-h-[50vh] sm:min-h-0" style={{zIndex: 'auto'}}>
+              <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-2 sm:p-4 relative flex-1 flex flex-col min-h-[50vh] sm:min-h-0" style={{zIndex: 'auto'}}>
                 {/* Compact Header with Status Filter */}
                 <div className="flex items-center justify-between gap-2 mb-2 sm:mb-4">
                   <div className="flex items-center gap-1.5">
-                    <h2 className="text-xs sm:text-base font-semibold text-gray-900 dark:text-white">
+                    <h2 className="text-xs sm:text-base font-semibold text-white">
                       All Tasks & Chores
                     </h2>
-                    <span className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] font-medium rounded">
+                    <span className="px-1.5 py-0.5 bg-gray-700 text-gray-300 text-[10px] font-medium rounded">
                       {filteredItems.length}
                     </span>
                   </div>
@@ -882,8 +882,8 @@ export default function TasksPage() {
                 ) : filteredItems.length === 0 ? (
                   <div className="text-center py-8 sm:py-12">
                     <CheckSquare className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-lg mb-1 sm:mb-2">No tasks or chores found</p>
-                    <p className="text-gray-500 dark:text-gray-500 text-xs sm:text-base mb-4 sm:mb-6">
+                    <p className="text-gray-400 text-sm sm:text-lg mb-1 sm:mb-2">No tasks or chores found</p>
+                    <p className="text-gray-500 text-xs sm:text-base mb-4 sm:mb-6">
                       {searchQuery || statusFilter !== 'all'
                         ? 'Try adjusting your filters'
                         : 'Create your first task or chore to get started!'}
@@ -914,8 +914,8 @@ export default function TasksPage() {
 
                     {/* Pagination Controls for Drag-and-Drop Mode */}
                     {hasMoreItems && (
-                      <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-700">
+                        <p className="text-sm text-gray-400">
                           Showing {paginatedItems.length} of {filteredItems.length} items
                           <span className="ml-1 text-gray-500">({remainingItemsCount} more)</span>
                         </p>
@@ -929,7 +929,7 @@ export default function TasksPage() {
                           </button>
                           <button
                             onClick={handleShowAll}
-                            className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors inline-flex items-center gap-2 font-medium"
+                            className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors inline-flex items-center gap-2 font-medium"
                           >
                             Show All ({remainingItemsCount})
                           </button>
@@ -957,8 +957,8 @@ export default function TasksPage() {
 
                     {/* Pagination Controls */}
                     {hasMoreItems && (
-                      <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-700">
+                        <p className="text-sm text-gray-400">
                           Showing {paginatedItems.length} of {filteredItems.length} items
                           <span className="ml-1 text-gray-500">({remainingItemsCount} more)</span>
                         </p>
@@ -972,7 +972,7 @@ export default function TasksPage() {
                           </button>
                           <button
                             onClick={handleShowAll}
-                            className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors inline-flex items-center gap-2 font-medium"
+                            className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors inline-flex items-center gap-2 font-medium"
                           >
                             Show All ({remainingItemsCount})
                           </button>

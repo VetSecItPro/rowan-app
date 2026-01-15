@@ -36,14 +36,14 @@ export default async function BadgesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <Link
               href="/goals"
-              className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="inline-flex items-center text-gray-400 hover:text-white transition-colors"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -63,10 +63,10 @@ export default async function BadgesPage() {
           <div className="flex items-center gap-4">
             <div className="text-5xl">🏆</div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-white">
                 Achievement Badges
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-gray-400 mt-1">
                 Earn badges by completing goals and reaching milestones
               </p>
             </div>

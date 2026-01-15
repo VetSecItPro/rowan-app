@@ -102,9 +102,9 @@ export function BadgeModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full sm:max-w-md transform overflow-hidden sm:rounded-2xl bg-white dark:bg-gray-800 text-left align-middle shadow-xl transition-all h-full sm:h-auto flex flex-col">
+              <Dialog.Panel className="w-full sm:max-w-md transform overflow-hidden sm:rounded-2xl bg-gray-800 text-left align-middle shadow-xl transition-all h-full sm:h-auto flex flex-col">
                 {/* Header */}
-                <div className="flex-shrink-0 flex justify-between items-start p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex-shrink-0 flex justify-between items-start p-4 sm:p-6 border-b border-gray-700">
                   <div className="flex items-center space-x-3">
                     <div className={cn(
                       'w-12 h-12 rounded-full flex items-center justify-center',
@@ -115,18 +115,18 @@ export function BadgeModal({
                     <div>
                       <Dialog.Title
                         as="h3"
-                        className="text-lg font-bold leading-6 text-gray-900 dark:text-white"
+                        className="text-lg font-bold leading-6 text-white"
                       >
                         {isLocked ? '???' : badge.name}
                       </Dialog.Title>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                      <p className="text-sm text-gray-400 capitalize">
                         {badge.category} Badge
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={onClose}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="text-gray-400 hover:text-gray-200"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -136,15 +136,15 @@ export function BadgeModal({
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 {/* Badge Status */}
                 {isEarned && (
-                  <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="mb-6 p-4 bg-green-900/20 border border-green-800 rounded-lg">
                     <div className="flex items-center space-x-2">
                       <Trophy className="w-5 h-5 text-green-600" />
-                      <span className="font-medium text-green-800 dark:text-green-200">
+                      <span className="font-medium text-green-200">
                         Badge Earned!
                       </span>
                     </div>
                     {userAchievement && (
-                      <p className="text-sm text-green-600 dark:text-green-300 mt-1">
+                      <p className="text-sm text-green-300 mt-1">
                         Earned on {new Date(userAchievement.earned_at).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'long',
@@ -157,8 +157,8 @@ export function BadgeModal({
 
                 {/* Badge Description */}
                 <div className="mb-6">
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Description</h4>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <h4 className="font-medium text-white mb-2">Description</h4>
+                  <p className="text-gray-400">
                     {isLocked ? 'This is a secret badge. Complete certain actions to reveal and earn it!' : badge.description}
                   </p>
                 </div>
@@ -166,8 +166,8 @@ export function BadgeModal({
                 {/* Requirements */}
                 {!isLocked && (
                   <div className="mb-6">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Requirements</h4>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <h4 className="font-medium text-white mb-2">Requirements</h4>
+                    <p className="text-gray-400">
                       {formatCriteria()}
                     </p>
                   </div>
@@ -176,13 +176,13 @@ export function BadgeModal({
                 {/* Progress */}
                 {progress && !isEarned && !isLocked && (
                   <div className="mb-6">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Progress</h4>
+                    <h4 className="font-medium text-white mb-2">Progress</h4>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex justify-between text-sm text-gray-400">
                         <span>{progress.current_progress} / {progress.target_progress}</span>
                         <span>{Math.round((progress.current_progress / progress.target_progress) * 100)}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className="w-full bg-gray-700 rounded-full h-2">
                         <div
                           className={cn(
                             'h-2 rounded-full transition-all duration-500',
@@ -199,25 +199,25 @@ export function BadgeModal({
 
                 {/* Badge Details */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="text-lg font-bold text-gray-900 dark:text-white">
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-lg font-bold text-white">
                       {isLocked ? '?' : badge.points}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Points</div>
+                    <div className="text-sm text-gray-400">Points</div>
                   </div>
-                  <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
                     <div className={cn('text-lg font-bold capitalize', rarityInfo.color)}>
                       {badge.rarity}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Rarity</div>
+                    <div className="text-sm text-gray-400">Rarity</div>
                   </div>
                 </div>
 
                 {/* Additional Info */}
                 {userAchievement?.progress_data && (
                   <div className="mb-6">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Achievement Details</h4>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                    <h4 className="font-medium text-white mb-2">Achievement Details</h4>
+                    <div className="text-sm text-gray-400 space-y-1">
                       {userAchievement.progress_data.trigger && (
                         <p>Trigger: {userAchievement.progress_data.trigger}</p>
                       )}
@@ -232,7 +232,7 @@ export function BadgeModal({
                 <div className="flex justify-end">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     Close
                   </button>

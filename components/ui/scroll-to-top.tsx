@@ -40,7 +40,7 @@ export function ScrollToTop() {
                     <MagneticButton strength={20}>
                         <button
                             onClick={scrollToTop}
-                            className="p-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                            className="p-3 rounded-full bg-gray-800/80 backdrop-blur-md shadow-lg border border-gray-700 text-white hover:bg-gray-800 transition-colors"
                             aria-label="Scroll to top"
                         >
                             <ArrowUp className="w-5 h-5" />

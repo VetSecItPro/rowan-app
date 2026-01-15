@@ -147,15 +147,15 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-xl sm:max-w-2xl w-full sm:max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl w-full sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-700 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-white">
             {editVendor ? 'Edit Vendor' : 'Add New Vendor'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -165,15 +165,15 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* General Error */}
           {errors.general && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-red-800 dark:text-red-200 text-sm">{errors.general}</p>
+            <div className="bg-red-900/20 border border-red-800 rounded-lg p-4">
+              <p className="text-red-200 text-sm">{errors.general}</p>
             </div>
           )}
 
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 <User className="w-4 h-4 inline mr-1" />
                 Name *
               </label>
@@ -181,8 +181,8 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.name ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.name ? 'border-red-600' : 'border-gray-600'
                 }`}
                 placeholder="John Smith"
               />
@@ -190,7 +190,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 <Building2 className="w-4 h-4 inline mr-1" />
                 Company Name
               </label>
@@ -198,7 +198,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="text"
                 value={formData.company_name}
                 onChange={(e) => handleInputChange('company_name', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Smith Construction LLC"
               />
             </div>
@@ -206,13 +206,13 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
 
           {/* Trade */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Trade/Specialty
             </label>
             <select
               value={formData.trade}
               onChange={(e) => handleInputChange('trade', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a trade...</option>
               {commonTrades.map((trade) => (
@@ -226,7 +226,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
           {/* Contact Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 <Mail className="w-4 h-4 inline mr-1" />
                 Email
               </label>
@@ -234,8 +234,8 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.email ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.email ? 'border-red-600' : 'border-gray-600'
                 }`}
                 placeholder="john@smithconstruction.com"
               />
@@ -243,7 +243,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 <Phone className="w-4 h-4 inline mr-1" />
                 Phone
               </label>
@@ -251,7 +251,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="(555) 123-4567"
               />
             </div>
@@ -259,7 +259,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
 
           {/* Address & Website */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               <MapPin className="w-4 h-4 inline mr-1" />
               Address
             </label>
@@ -267,13 +267,13 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               type="text"
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="123 Main St, City, State 12345"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               <ExternalLink className="w-4 h-4 inline mr-1" />
               Website
             </label>
@@ -281,8 +281,8 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               type="url"
               value={formData.website}
               onChange={(e) => handleInputChange('website', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.website ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+              className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.website ? 'border-red-600' : 'border-gray-600'
               }`}
               placeholder="https://smithconstruction.com"
             />
@@ -292,20 +292,20 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
           {/* Professional Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 License Number
               </label>
               <input
                 type="text"
                 value={formData.license_number}
                 onChange={(e) => handleInputChange('license_number', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="LIC123456"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 <Star className="w-4 h-4 inline mr-1" />
                 Rating (1-5)
               </label>
@@ -316,8 +316,8 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 step="0.1"
                 value={formData.rating || ''}
                 onChange={(e) => handleInputChange('rating', e.target.value ? parseFloat(e.target.value) : undefined)}
-                className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.rating ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.rating ? 'border-red-600' : 'border-gray-600'
                 }`}
                 placeholder="4.5"
               />
@@ -332,11 +332,11 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="checkbox"
                 checked={formData.insurance_verified}
                 onChange={(e) => handleInputChange('insurance_verified', e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
               />
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <Shield className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-300">
                   Insurance Verified
                 </span>
               </div>
@@ -347,11 +347,11 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="checkbox"
                 checked={formData.is_preferred}
                 onChange={(e) => handleInputChange('is_preferred', e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
               />
               <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <Star className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-300">
                   Preferred Vendor
                 </span>
               </div>
@@ -362,9 +362,9 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="checkbox"
                 checked={formData.is_active}
                 onChange={(e) => handleInputChange('is_active', e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-sm text-gray-300">
                 Active Vendor
               </span>
             </label>
@@ -372,20 +372,20 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Notes
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Any additional notes about this vendor..."
             />
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
             <SecondaryButton
               type="button"
               onClick={onClose}

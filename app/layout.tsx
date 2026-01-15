@@ -1,14 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { DeviceProvider } from "@/lib/contexts/DeviceContext";
 import { AuthProvider } from "@/lib/contexts/auth-context";
 import { SpacesProvider } from "@/lib/contexts/spaces-context";
 import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import ClientErrorBoundary from "@/components/shared/ClientErrorBoundary";
 import { NetworkStatus } from "@/components/ui/NetworkStatus";
-// import { CommandPaletteProvider } from "@/components/ui/command-palette"; // Temporarily disabled UI
 import { Toaster } from 'sonner';
 
 // Optimized font loading with Next.js font module
@@ -60,11 +58,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  viewportFit: 'cover', // Enable safe area support for notched devices
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-    { media: '(prefers-color-scheme: dark)', color: '#111827' }
-  ],
+  viewportFit: 'cover',
+  themeColor: '#111827',
 };
 
 export default function RootLayout({
@@ -73,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
       <head>
         {/* Resource hints for faster connections - preconnect to critical third-party services */}
         <link rel="preconnect" href="https://SUPABASE_PROJECT_REF.supabase.co" />
@@ -83,71 +78,35 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://vercel.live" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-
-        {/*
-          Inline script to prevent theme flash - runs before React hydrates.
-          SECURITY: This dangerouslySetInnerHTML usage is SAFE because:
-          1. Content is a hardcoded string literal (no user input interpolation)
-          2. Theme value from localStorage is validated against allowlist
-          3. Standard Next.js pattern for FOUC prevention
-        */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var stored = localStorage.getItem('rowan-theme');
-                  // SECURITY: Only allow 'light' or 'dark' - prevents injection
-                  var theme = (stored === 'light' || stored === 'dark') ? stored : 'dark';
-                  document.documentElement.classList.add(theme);
-                  document.documentElement.style.colorScheme = theme;
-                } catch (e) {
-                  document.documentElement.classList.add('dark');
-                  document.documentElement.style.colorScheme = 'dark';
-                }
-              })();
-            `,
-          }}
-        />
       </head>
-      <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-50 via-slate-50 to-stone-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-white`} style={{ scrollbarGutter: 'stable' }}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          storageKey="rowan-theme"
-          disableTransitionOnChange
-        >
-          <DeviceProvider>
-            <AuthProvider>
-              <SpacesProvider>
-                <ClientErrorBoundary>
-                  <NetworkStatus />
-                  {/* <CommandPaletteProvider> // Temporarily disabled UI */}
-                    {children}
-                  {/* </CommandPaletteProvider> */}
-                </ClientErrorBoundary>
-              </SpacesProvider>
-              <CookieConsent />
-              <Toaster
-                position="top-center"
-                duration={4000}
-                closeButton
-                richColors
-                theme="system"
-                toastOptions={{
-                  className: 'w-full max-w-md mx-4 sm:mx-0',
-                  style: {
-                    fontSize: '14px',
-                    padding: '12px 16px',
-                  },
-                }}
-                visibleToasts={3}
-                offset="16px"
-              />
-            </AuthProvider>
-          </DeviceProvider>
-        </ThemeProvider>
+      <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 text-white`} style={{ scrollbarGutter: 'stable' }}>
+        <DeviceProvider>
+          <AuthProvider>
+            <SpacesProvider>
+              <ClientErrorBoundary>
+                <NetworkStatus />
+                {children}
+              </ClientErrorBoundary>
+            </SpacesProvider>
+            <CookieConsent />
+            <Toaster
+              position="top-center"
+              duration={4000}
+              closeButton
+              richColors
+              theme="dark"
+              toastOptions={{
+                className: 'w-full max-w-md mx-4 sm:mx-0',
+                style: {
+                  fontSize: '14px',
+                  padding: '12px 16px',
+                },
+              }}
+              visibleToasts={3}
+              offset="16px"
+            />
+          </AuthProvider>
+        </DeviceProvider>
       </body>
     </html>
   );

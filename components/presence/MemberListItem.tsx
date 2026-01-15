@@ -65,7 +65,7 @@ const MemberListItem = memo(function MemberListItem({
   };
 
   return (
-    <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+    <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700 hover:shadow-md transition-shadow">
       <div className="flex items-center gap-3">
         {/* Avatar with Presence Indicator */}
         <div className="relative">
@@ -91,18 +91,18 @@ const MemberListItem = memo(function MemberListItem({
         {/* Member Info */}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+            <h4 className="text-sm font-medium text-white">
               {member.name}
               {isCurrentUser && <span className="text-gray-500"> (You)</span>}
             </h4>
             {getRoleIcon(member.role)}
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-xs text-gray-400">
             <span>{member.email}</span>
             <span>•</span>
             <span>{getRoleLabel(member.role)}</span>
             {member.presence_status === 'online' ? (
-              <span className="text-green-600 dark:text-green-400">• Online</span>
+              <span className="text-green-400">• Online</span>
             ) : (
               <span>• {formatLastActivity(member.last_activity) || 'Offline'}</span>
             )}
@@ -115,20 +115,20 @@ const MemberListItem = memo(function MemberListItem({
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="btn-icon-mobile hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors flex items-center justify-center"
+            className="btn-icon-mobile hover:bg-gray-700 rounded transition-colors flex items-center justify-center"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-[120px]">
+            <div className="absolute right-0 top-8 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-10 min-w-[120px]">
               {member.role !== 'admin' && onChangeRole && (
                 <button
                   onClick={() => {
                     onChangeRole(member.user_id, 'admin');
                     setShowMenu(false);
                   }}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
                 >
                   <Shield className="w-3 h-3" />
                   Make Admin
@@ -140,7 +140,7 @@ const MemberListItem = memo(function MemberListItem({
                     onChangeRole(member.user_id, 'member');
                     setShowMenu(false);
                   }}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
                 >
                   <User className="w-3 h-3" />
                   Make Member
@@ -152,7 +152,7 @@ const MemberListItem = memo(function MemberListItem({
                     onRemoveMember(member.user_id);
                     setShowMenu(false);
                   }}
-                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-900/20 flex items-center gap-2"
                 >
                   <Trash2 className="w-3 h-3" />
                   Remove

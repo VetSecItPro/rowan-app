@@ -57,16 +57,16 @@ export default function ShoppingAnalyticsPage() {
         {/* Header with Time Range Toggle */}
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+            <h1 className="text-3xl font-bold text-emerald-400 mb-2">
               Shopping Lists Analytics
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               Analyze shopping patterns and spending insights
             </p>
           </div>
 
           {/* Time Range Toggle */}
-          <div className="inline-flex items-center bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-1 border border-emerald-200 dark:border-emerald-800">
+          <div className="inline-flex items-center bg-emerald-900/20 rounded-lg p-1 border border-emerald-800">
             {[
               { value: '1m', label: 'Last Month' },
               { value: '3m', label: 'Last 3 Months' },
@@ -79,7 +79,7 @@ export default function ShoppingAnalyticsPage() {
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   timeRange === option.value
                     ? 'bg-emerald-500 text-white shadow-sm'
-                    : 'text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-100'
+                    : 'text-emerald-300 hover:text-emerald-100'
                 }`}
               >
                 {option.label}
@@ -95,20 +95,20 @@ export default function ShoppingAnalyticsPage() {
             return (
               <div
                 key={index}
-                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
+                className="bg-gray-800 border border-gray-700 rounded-xl p-6"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg bg-gradient-to-br ${stat.gradient} shadow-lg`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                  <span className="text-sm font-medium text-green-400">
                     {stat.change}
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                <h3 className="text-2xl font-bold text-white mb-1">
                   {stat.value}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                <p className="text-sm text-gray-400">{stat.label}</p>
               </div>
             );
           })}
@@ -117,12 +117,12 @@ export default function ShoppingAnalyticsPage() {
         {/* Metrics Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Item Categories */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Item Categories
               </h3>
-              <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-full">
+              <span className="px-3 py-1 bg-emerald-900/30 border border-emerald-700 text-emerald-300 text-sm font-medium rounded-full">
                 {format(new Date(), 'MMM yyyy')}
               </span>
             </div>
@@ -134,14 +134,14 @@ export default function ShoppingAnalyticsPage() {
               ].map((item, index) => (
                 <div key={index}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-300">
                       {item.label}
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-white">
                       {item.value}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className={`${item.color} h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${item.value}%` }}
@@ -153,12 +153,12 @@ export default function ShoppingAnalyticsPage() {
           </div>
 
           {/* Shopping Trends */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Shopping Trends
               </h3>
-              <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-full">
+              <span className="px-3 py-1 bg-emerald-900/30 border border-emerald-700 text-emerald-300 text-sm font-medium rounded-full">
                 {format(new Date(), 'MMM yyyy')}
               </span>
             </div>
@@ -170,14 +170,14 @@ export default function ShoppingAnalyticsPage() {
               ].map((item, index) => (
                 <div key={index}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-300">
                       {item.label}
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-white">
                       {item.value}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className={`${item.color} h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${item.value}%` }}

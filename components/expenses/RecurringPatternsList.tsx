@@ -107,15 +107,15 @@ export function RecurringPatternsList({
 
   if (patterns.length === 0) {
     return (
-      <div className={`bg-gray-50 dark:bg-gray-900 rounded-lg p-8 text-center ${className}`}>
+      <div className={`bg-gray-900 rounded-lg p-8 text-center ${className}`}>
         <RefreshCw className="w-12 h-12 mx-auto mb-3 text-gray-400 opacity-50" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-white mb-2">
           No Recurring Patterns Detected
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-sm text-gray-400 mb-4">
           We haven't found any recurring expense patterns yet. This could mean:
         </p>
-        <ul className="text-sm text-gray-600 dark:text-gray-400 text-left max-w-md mx-auto space-y-1 mb-4">
+        <ul className="text-sm text-gray-400 text-left max-w-md mx-auto space-y-1 mb-4">
           <li>• Not enough expense history (need at least 3 occurrences)</li>
           <li>• No expenses match recurring patterns</li>
           <li>• Analysis needs to be run</li>
@@ -146,29 +146,29 @@ export function RecurringPatternsList({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Stats Bar */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Total Patterns</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
+            <div className="text-sm text-gray-400">Total Patterns</div>
+            <div className="text-2xl font-bold text-white">{stats.total}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Needs Review</div>
+            <div className="text-sm text-gray-400">Needs Review</div>
             <div className="text-2xl font-bold text-amber-600">{stats.unconfirmed}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Confirmed</div>
+            <div className="text-sm text-gray-400">Confirmed</div>
             <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
           </div>
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Avg. Confidence</div>
+            <div className="text-sm text-gray-400">Avg. Confidence</div>
             <div className="text-2xl font-bold text-blue-600">{stats.avgConfidence}%</div>
           </div>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 space-y-3">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 space-y-3">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -177,7 +177,7 @@ export function RecurringPatternsList({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search patterns..."
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -188,7 +188,7 @@ export function RecurringPatternsList({
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-              className="px-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-1.5 text-sm bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Patterns</option>
               <option value="unconfirmed">Needs Review</option>
@@ -203,7 +203,7 @@ export function RecurringPatternsList({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="px-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-1.5 text-sm bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="confidence">Highest Confidence</option>
               <option value="amount">Highest Amount</option>
@@ -235,16 +235,16 @@ export function RecurringPatternsList({
         </div>
 
         {/* Results Count */}
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-400">
           Showing {filteredAndSortedPatterns.length} of {patterns.length} patterns
         </div>
       </div>
 
       {/* Patterns Grid */}
       {filteredAndSortedPatterns.length === 0 ? (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 text-center border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-900 rounded-lg p-8 text-center border border-gray-700">
           <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             No patterns match your search or filter criteria
           </p>
         </div>

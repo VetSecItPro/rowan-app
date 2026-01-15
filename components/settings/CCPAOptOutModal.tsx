@@ -99,21 +99,21 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden border border-gray-700 flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">CCPA Privacy Rights</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">California Consumer Privacy Act</p>
+              <h2 className="text-xl font-semibold text-white">CCPA Privacy Rights</h2>
+              <p className="text-sm text-gray-400">California Consumer Privacy Act</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg hover:bg-gray-800 flex items-center justify-center transition-colors"
             disabled={isSaving}
           >
             <X className="w-4 h-4 text-gray-500" />
@@ -125,20 +125,20 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600 dark:text-gray-400">Loading CCPA status...</span>
+              <span className="ml-3 text-gray-400">Loading CCPA status...</span>
             </div>
           ) : (
             <>
               {/* California Resident Check */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">California Residency</h3>
-                <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                  <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <h3 className="text-lg font-semibold text-white">California Residency</h3>
+                <div className="flex items-start gap-3 p-4 bg-blue-900/20 border border-blue-800 rounded-xl">
+                  <MapPin className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+                    <p className="font-medium text-blue-100 mb-2">
                       Are you a California resident?
                     </p>
-                    <p className="text-sm text-blue-800 dark:text-blue-200 mb-4">
+                    <p className="text-sm text-blue-200 mb-4">
                       CCPA rights apply to California residents. Please confirm your residency status.
                     </p>
                     <div className="flex gap-3">
@@ -147,7 +147,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           californiaResident === true
                             ? 'bg-blue-600 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700'
                         }`}
                         disabled={isSaving}
                       >
@@ -158,7 +158,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           californiaResident === false
                             ? 'bg-blue-600 text-white'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700'
                         }`}
                         disabled={isSaving}
                       >
@@ -172,30 +172,30 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
               {/* Do Not Sell Section */}
               {californiaResident === true && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Do Not Sell My Personal Information</h3>
+                  <h3 className="text-lg font-semibold text-white">Do Not Sell My Personal Information</h3>
 
                   {/* Current Status */}
                   {ccpaStatus && (
                     <div className={`flex items-center gap-3 p-4 rounded-xl border ${
                       ccpaStatus.opted_out
-                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                        : 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+                        ? 'bg-green-900/20 border-green-800'
+                        : 'bg-orange-900/20 border-orange-800'
                     }`}>
                       <CheckCircle className={`w-5 h-5 ${
-                        ccpaStatus.opted_out ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
+                        ccpaStatus.opted_out ? 'text-green-400' : 'text-orange-400'
                       }`} />
                       <div>
                         <p className={`font-medium ${
                           ccpaStatus.opted_out
-                            ? 'text-green-900 dark:text-green-100'
-                            : 'text-orange-900 dark:text-orange-100'
+                            ? 'text-green-100'
+                            : 'text-orange-100'
                         }`}>
                           {ccpaStatus.opted_out ? 'You have opted out of data sales' : 'You have not opted out of data sales'}
                         </p>
                         <p className={`text-sm ${
                           ccpaStatus.opted_out
-                            ? 'text-green-800 dark:text-green-200'
-                            : 'text-orange-800 dark:text-orange-200'
+                            ? 'text-green-200'
+                            : 'text-orange-200'
                         }`}>
                           {ccpaStatus.opted_out
                             ? 'We will not sell your personal information to third parties.'
@@ -203,7 +203,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                           }
                         </p>
                         {ccpaStatus.opt_out_date && (
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             Status changed: {new Date(ccpaStatus.opt_out_date).toLocaleDateString()}
                           </p>
                         )}
@@ -212,8 +212,8 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                   )}
 
                   {/* Information */}
-                  <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                    <h4 className="font-medium text-gray-900 dark:text-white">What this means:</h4>
+                  <div className="space-y-3 text-sm text-gray-400">
+                    <h4 className="font-medium text-white">What this means:</h4>
                     <ul className="space-y-2 ml-4">
                       <li className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
@@ -256,11 +256,11 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
 
               {/* Non-California Residents */}
               {californiaResident === false && (
-                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
-                  <AlertTriangle className="w-5 h-5 text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-3 p-4 bg-gray-800 border border-gray-700 rounded-xl">
+                  <AlertTriangle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white mb-1">CCPA Rights Not Applicable</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="font-medium text-white mb-1">CCPA Rights Not Applicable</p>
+                    <p className="text-sm text-gray-400">
                       The California Consumer Privacy Act (CCPA) applies specifically to California residents.
                       As a non-California resident, you may have other privacy rights under applicable laws.
                     </p>
@@ -270,14 +270,14 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
 
               {/* Error Display */}
               {error && (
-                <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                  <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                <div className="flex items-start gap-3 p-4 bg-red-900/20 border border-red-800 rounded-xl">
+                  <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-red-200">{error}</p>
                 </div>
               )}
 
               {/* Legal Notice */}
-              <div className="text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="text-xs text-gray-400 pt-4 border-t border-gray-700">
                 This opt-out is provided in compliance with the California Consumer Privacy Act (CCPA) Section 1798.135.
                 Your rights and our privacy practices are detailed in our Privacy Policy.
               </div>

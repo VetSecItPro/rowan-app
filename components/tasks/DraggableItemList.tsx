@@ -126,21 +126,21 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
     } else if (item.status === 'on-hold') {
       return 'bg-purple-500 border-2 border-purple-500 hover:bg-purple-600';
     } else {
-      return 'border-2 border-gray-300 dark:border-gray-600 bg-transparent hover:border-amber-400 dark:hover:border-amber-400';
+      return 'border-2 border-gray-600 bg-transparent hover:border-amber-400';
     }
   };
 
   const getStatusLabel = () => {
     if (item.status === 'completed') {
-      return { text: 'Completed', color: 'text-green-600 dark:text-green-400' };
+      return { text: 'Completed', color: 'text-green-400' };
     } else if (item.status === 'in-progress') {
-      return { text: 'In Progress', color: 'text-amber-600 dark:text-amber-400' };
+      return { text: 'In Progress', color: 'text-amber-400' };
     } else if (item.status === 'blocked') {
-      return { text: 'Blocked', color: 'text-red-600 dark:text-red-400' };
+      return { text: 'Blocked', color: 'text-red-400' };
     } else if (item.status === 'on-hold') {
-      return { text: 'On Hold', color: 'text-purple-600 dark:text-purple-400' };
+      return { text: 'On Hold', color: 'text-purple-400' };
     } else {
-      return { text: 'Pending', color: 'text-gray-600 dark:text-gray-400' };
+      return { text: 'Pending', color: 'text-gray-400' };
     }
   };
 
@@ -157,7 +157,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200"
+      className="bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200"
     >
       {/* Main row - compact single line */}
       <div className="flex items-center gap-2">
@@ -165,7 +165,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
         <button
           {...attributes}
           {...listeners}
-          className="flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing touch-manipulation"
+          className="flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-gray-400 hover:text-gray-300 cursor-grab active:cursor-grabbing touch-manipulation"
           aria-label="Drag to reorder"
         >
           <GripVertical className="w-4 h-4" />
@@ -184,7 +184,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
         </button>
 
         {/* Title */}
-        <h3 className={`flex-1 min-w-0 text-sm font-medium text-gray-900 dark:text-white truncate ${
+        <h3 className={`flex-1 min-w-0 text-sm font-medium text-white truncate ${
           item.status === 'completed' ? 'line-through opacity-60' : ''
         }`}>
           {item.title}
@@ -193,8 +193,8 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
         {/* Type Badge */}
         <span className={`flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${
           item.type === 'chore'
-            ? 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30'
-            : 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30'
+            ? 'text-amber-400 bg-amber-900/30'
+            : 'text-blue-400 bg-blue-900/30'
         }`}>
           {item.type === 'chore' ? 'Chore' : 'Task'}
         </span>
@@ -205,14 +205,14 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
         {/* Status badge */}
         <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${
           item.status === 'completed'
-            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+            ? 'bg-green-100 bg-green-900/30 text-green-400'
             : item.status === 'in-progress'
-            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+            ? 'bg-amber-100 bg-amber-900/30 text-amber-400'
             : item.status === 'blocked'
-            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+            ? 'bg-red-100 bg-red-900/30 text-red-400'
             : item.status === 'on-hold'
-            ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
-            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+            ? 'bg-purple-100 bg-purple-900/30 text-purple-400'
+            : 'bg-gray-100 bg-gray-700 text-gray-400'
         }`}>
           {item.status === 'in-progress' ? 'Active' : item.status === 'on-hold' ? 'Hold' : item.status === 'completed' ? 'Done' : item.status === 'blocked' ? 'Blocked' : 'Pending'}
         </span>
@@ -222,7 +222,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
           <button
             ref={menuButtonRef}
             onClick={handleMenuToggle}
-            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
+            className="p-1 text-gray-400 hover:text-gray-300 rounded"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -231,26 +231,26 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
             <>
               <div className="fixed inset-0 z-[9999]" onClick={() => setShowMenu(false)} />
               <div
-                className="fixed w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[10000] overflow-hidden"
+                className="fixed w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-[10000] overflow-hidden"
                 style={{ top: menuPosition.top, left: menuPosition.left }}
               >
                 {onViewDetails && item.type === 'task' && (
                   <button
                     onClick={() => { onViewDetails(item); setShowMenu(false); }}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700"
                   >
                     View Details
                   </button>
                 )}
                 <button
                   onClick={() => { onEdit?.(item); setShowMenu(false); }}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => { onDelete?.(item.id, item.type); setShowMenu(false); }}
-                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-gray-700"
                 >
                   Delete
                 </button>
@@ -263,7 +263,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
 
       {/* Description + Meta row */}
       {(item.description || item.due_date) && (
-        <div className="mt-1 ml-12 sm:ml-14 flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+        <div className="mt-1 ml-12 sm:ml-14 flex items-center gap-2 text-[11px] text-gray-400">
           {item.description && (
             <span className="truncate flex-1">{item.description}</span>
           )}
@@ -442,9 +442,9 @@ export function DraggableItemList({
       {/* Drag Overlay */}
       <DragOverlay>
         {activeItem ? (
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-95">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-800 border border-gray-700 shadow-2xl opacity-95">
             <GripVertical className="w-4 h-4 text-gray-400" />
-            <h3 className="flex-1 text-sm font-medium text-gray-900 dark:text-white truncate">
+            <h3 className="flex-1 text-sm font-medium text-white truncate">
               {activeItem.title}
             </h3>
             <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${

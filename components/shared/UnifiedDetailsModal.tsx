@@ -167,7 +167,7 @@ export function UnifiedDetailsModal({
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/60 backdrop-blur-sm">
       {/* Compact Elegant Modal - Fixed height for stability */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:h-[540px] sm:max-h-[90vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 w-full sm:max-w-lg sm:h-[540px] sm:max-h-[90vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header - Compact gradient */}
         <div className={`flex-shrink-0 px-4 py-3 ${itemType === 'task' ? 'bg-gradient-to-r from-blue-600 to-blue-500' : 'bg-gradient-to-r from-amber-600 to-amber-500'}`}>
@@ -202,7 +202,7 @@ export function UnifiedDetailsModal({
         </div>
 
         {/* Tabs - Minimal */}
-        <div className="flex border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex border-b border-gray-700 bg-gray-800/50">
           {[
             { id: 'overview', label: 'Overview', icon: FileText },
             { id: 'comments', label: `Comments`, icon: MessageSquare, badge: comments.length },
@@ -213,14 +213,14 @@ export function UnifiedDetailsModal({
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-white dark:bg-gray-900'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? 'text-blue-400 border-b-2 border-blue-400 bg-gray-900'
+                  : 'text-gray-400 hover:text-gray-300'
               }`}
             >
               <tab.icon className="w-4 h-4" />
               <span className="hidden sm:inline">{tab.label}</span>
               {tab.badge && tab.badge > 0 && (
-                <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-gray-200 dark:bg-gray-700">
+                <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-gray-700">
                   {tab.badge}
                 </span>
               )}
@@ -236,18 +236,18 @@ export function UnifiedDetailsModal({
             <div className="p-4 space-y-4">
               {/* Description */}
               <div>
-                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Description</h4>
-                <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Description</h4>
+                <p className="text-sm text-gray-300 bg-gray-800 rounded-lg p-3">
                   {item.description || 'No description provided.'}
                 </p>
               </div>
 
               {/* Quick Edit */}
               <div>
-                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Quick Edit</h4>
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Quick Edit</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Status</label>
+                    <label className="block text-xs text-gray-400 mb-1">Status</label>
                     <Dropdown
                       value={editedStatus}
                       onChange={handleStatusChange}
@@ -257,7 +257,7 @@ export function UnifiedDetailsModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Priority</label>
+                    <label className="block text-xs text-gray-400 mb-1">Priority</label>
                     <Dropdown
                       value={editedPriority}
                       onChange={handlePriorityChange}
@@ -273,47 +273,47 @@ export function UnifiedDetailsModal({
               <div className="grid grid-cols-2 gap-3">
                 {/* Due Date */}
                 {item.due_date && (
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                  <div className="p-3 bg-gray-800 rounded-lg">
+                    <div className="flex items-center gap-2 text-gray-400 mb-1">
                       <Calendar className="w-3.5 h-3.5" />
                       <span className="text-xs font-medium">Due Date</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-white">
                       {new Date(item.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
                 )}
 
                 {/* Assigned To */}
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                <div className="p-3 bg-gray-800 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-400 mb-1">
                     <User className="w-3.5 h-3.5" />
                     <span className="text-xs font-medium">Assigned To</span>
                   </div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-white">
                     {item.assigned_to ? 'Family Member' : 'Unassigned'}
                   </p>
                 </div>
 
                 {/* Category */}
                 {categoryInfo && (
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                  <div className="p-3 bg-gray-800 rounded-lg">
+                    <div className="flex items-center gap-2 text-gray-400 mb-1">
                       <span className="text-xs font-medium">Category</span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-white">
                       {categoryInfo.emoji} {categoryInfo.label}
                     </p>
                   </div>
                 )}
 
                 {/* Created */}
-                <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                <div className="p-3 bg-gray-800 rounded-lg">
+                  <div className="flex items-center gap-2 text-gray-400 mb-1">
                     <Clock className="w-3.5 h-3.5" />
                     <span className="text-xs font-medium">Created</span>
                   </div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-white">
                     {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </p>
                 </div>
@@ -327,22 +327,22 @@ export function UnifiedDetailsModal({
               {/* Comments List */}
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {comments.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="text-center py-8 text-gray-400">
                     <MessageSquare className="w-10 h-10 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No comments yet</p>
                   </div>
                 ) : (
                   comments.map((comment) => (
                     <div key={comment.id} className="flex gap-2.5">
-                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-sm flex-shrink-0">
+                      <div className="w-8 h-8 bg-blue-900/30 rounded-full flex items-center justify-center text-sm flex-shrink-0">
                         {comment.avatar}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{comment.user}</span>
+                          <span className="text-sm font-medium text-white">{comment.user}</span>
                           <span className="text-xs text-gray-400">{formatRelativeTime(comment.timestamp)}</span>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">{comment.content}</p>
+                        <p className="text-sm text-gray-300">{comment.content}</p>
                       </div>
                     </div>
                   ))
@@ -350,13 +350,13 @@ export function UnifiedDetailsModal({
               </div>
 
               {/* Add Comment */}
-              <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-2 pt-2 border-t border-gray-700">
                 <input
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Add a comment..."
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-700 rounded-lg focus:ring-2 bg-gray-800"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
                 />
                 <button
@@ -374,7 +374,7 @@ export function UnifiedDetailsModal({
           {activeTab === 'files' && (
             <div className="p-4 space-y-4">
               {/* Upload Area */}
-              <label className="block border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+              <label className="block border-2 border-dashed border-gray-700 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition-colors">
                 <input
                   type="file"
                   multiple
@@ -382,17 +382,17 @@ export function UnifiedDetailsModal({
                   className="hidden"
                 />
                 <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-500 dark:text-gray-400">Click to upload files</p>
+                <p className="text-sm text-gray-400">Click to upload files</p>
               </label>
 
               {/* Files List */}
               {attachments.length > 0 && (
                 <div className="space-y-2">
                   {attachments.map((file) => (
-                    <div key={file.id} className="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div key={file.id} className="flex items-center justify-between p-2.5 bg-gray-800 rounded-lg">
                       <div className="flex items-center gap-2 min-w-0">
                         <Paperclip className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{file.name}</span>
+                        <span className="text-sm text-gray-300 truncate">{file.name}</span>
                         <span className="text-xs text-gray-400 flex-shrink-0">
                           {(file.size / 1024).toFixed(0)} KB
                         </span>
@@ -409,7 +409,7 @@ export function UnifiedDetailsModal({
               )}
 
               {attachments.length === 0 && (
-                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-4 text-gray-400">
                   <p className="text-sm">No files attached</p>
                 </div>
               )}
@@ -418,11 +418,11 @@ export function UnifiedDetailsModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex-shrink-0 px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex-shrink-0 px-4 py-3 border-t border-gray-700 bg-gray-800/50">
           <div className="flex items-center justify-between gap-3">
             <button
               onClick={() => onEdit?.(item as any)}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"
             >
               <Edit3 className="w-4 h-4" />
               Edit
@@ -438,7 +438,7 @@ export function UnifiedDetailsModal({
               )}
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Close
               </button>

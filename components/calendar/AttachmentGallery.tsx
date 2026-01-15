@@ -153,7 +153,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-xl hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-4 py-3 border-2 border-dashed border-gray-600 text-gray-400 rounded-xl hover:border-purple-500 hover:text-purple-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {uploading ? (
               <>
@@ -181,10 +181,10 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       {/* Empty State */}
       {attachments.length === 0 && (
         <div className="text-center py-12">
-          <Paperclip className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-gray-400">No attachments yet</p>
+          <Paperclip className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+          <p className="text-gray-400">No attachments yet</p>
           {canUpload && (
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               Click the button above to add files
             </p>
           )}
@@ -194,7 +194,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       {/* Image Gallery */}
       {images.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
             <ImageIcon className="w-4 h-4" />
             Images ({images.length})
           </h4>
@@ -204,7 +204,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
               return (
                 <div
                   key={attachment.id}
-                  className="relative group aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all"
+                  className="relative group aspect-square bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:shadow-lg transition-all"
                 >
                   {url ? (
                     <img
@@ -255,7 +255,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       {/* File List */}
       {files.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Files ({files.length})
           </h4>
@@ -263,7 +263,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
             {files.map((attachment) => (
               <div
                 key={attachment.id}
-                className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+                className="bg-gray-900 rounded-xl p-4 border border-gray-700 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-3">
                   {/* File Icon */}
@@ -273,10 +273,10 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
 
                   {/* File Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-white truncate">
                       {attachment.file_name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-400">
                       {formatFileSize(attachment.file_size)}
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleDownload(attachment)}
-                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      className="p-2 text-gray-400 hover:text-purple-400 rounded-lg hover:bg-gray-800 transition-colors"
                       title="Download"
                     >
                       <Download className="w-4 h-4" />
@@ -293,7 +293,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
                     {canDelete && attachment.uploaded_by === user?.id && (
                       <button
                         onClick={() => handleDelete(attachment.id)}
-                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        className="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-gray-800 transition-colors"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />

@@ -36,7 +36,7 @@ export function TaskQuickActions({ taskId, spaceId, userId, onAction }: TaskQuic
         <button
           key={action.id}
           onClick={() => handleAction(action.id)}
-          className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
+          className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors active:scale-95"
         >
           <action.icon className={`w-3.5 h-3.5 ${action.color}`} />
           {action.label}

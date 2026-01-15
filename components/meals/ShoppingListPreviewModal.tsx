@@ -137,7 +137,7 @@ export function ShoppingListPreviewModal({
   return (
     <div className="fixed inset-0 z-[80] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header - Emerald/Shopping theme */}
         <div className="flex-shrink-0 bg-gradient-to-r from-emerald-600 to-green-600 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
@@ -162,7 +162,7 @@ export function ShoppingListPreviewModal({
         <div className="flex-1 overflow-hidden p-4 sm:p-6 flex flex-col">
           {/* List Name */}
           <div className="flex-shrink-0 mb-4">
-            <label htmlFor="listName" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+            <label htmlFor="listName" className="block text-sm font-medium mb-2 text-gray-300">
               List Name
             </label>
             <input
@@ -171,13 +171,13 @@ export function ShoppingListPreviewModal({
               value={listName}
               onChange={(e) => setListName(e.target.value)}
               placeholder="e.g., Weekend Shopping"
-              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2.5 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white"
             />
           </div>
 
           {/* Schedule Date */}
           <div className="flex-shrink-0 mb-4">
-            <label htmlFor="scheduleDate" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+            <label htmlFor="scheduleDate" className="block text-sm font-medium mb-2 text-gray-300">
               <Calendar className="w-4 h-4 inline mr-1.5" />
               Schedule Shopping Trip (Optional)
             </label>
@@ -186,21 +186,21 @@ export function ShoppingListPreviewModal({
               id="scheduleDate"
               value={scheduledDate}
               onChange={(e) => setScheduledDate(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2.5 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 text-white"
             />
           </div>
 
           {/* Create Task Checkbox - Only show if date is set */}
           {scheduledDate && (
-            <div className="flex-shrink-0 mb-4 flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+            <div className="flex-shrink-0 mb-4 flex items-center gap-3 p-3 bg-blue-900/20 border border-blue-800 rounded-xl">
               <input
                 type="checkbox"
                 id="createTask"
                 checked={createTask}
                 onChange={(e) => setCreateTask(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
               />
-              <label htmlFor="createTask" className="flex items-center gap-2 text-sm text-gray-900 dark:text-white cursor-pointer">
+              <label htmlFor="createTask" className="flex items-center gap-2 text-sm text-white cursor-pointer">
                 <ListTodo className="w-4 h-4 text-blue-600" />
                 <span>Add to Tasks as reminder</span>
               </label>
@@ -210,21 +210,21 @@ export function ShoppingListPreviewModal({
           {/* Items Section - Grows to fill remaining space */}
           <div className="flex-1 flex flex-col min-h-0">
             <div className="flex-shrink-0 flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-300">
                 Items ({selectedCount}/{simplifiedItems.length} selected)
               </span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={selectAll}
-                  className="px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors"
+                  className="px-2.5 py-1 text-xs font-medium text-emerald-300 bg-emerald-900/30 rounded-full hover:bg-emerald-900/50 transition-colors"
                 >
                   Select All
                 </button>
                 <button
                   type="button"
                   onClick={deselectAll}
-                  className="px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="px-2.5 py-1 text-xs font-medium text-gray-300 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
                 >
                   Clear
                 </button>
@@ -240,15 +240,15 @@ export function ShoppingListPreviewModal({
                   onClick={() => toggleItem(index)}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${
                     item.selected
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700'
-                      : 'bg-gray-100 dark:bg-gray-700/50 border border-transparent opacity-60'
+                      ? 'bg-emerald-900/20 border border-emerald-700'
+                      : 'bg-gray-700/50 border border-transparent opacity-60'
                   }`}
                 >
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
                       item.selected
                         ? 'bg-emerald-500 text-white'
-                        : 'bg-gray-300 dark:bg-gray-600'
+                        : 'bg-gray-600'
                     }`}
                   >
                     {item.selected && <Check className="w-3 h-3" />}
@@ -256,12 +256,12 @@ export function ShoppingListPreviewModal({
                   <div className="flex-1 min-w-0">
                     <p className={`font-medium text-sm ${
                       item.selected
-                        ? 'text-gray-900 dark:text-white'
-                        : 'text-gray-500 dark:text-gray-400 line-through'
+                        ? 'text-white'
+                        : 'text-gray-400 line-through'
                     }`}>
                       {item.simplified}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {item.original}
                     </p>
                   </div>
@@ -269,7 +269,7 @@ export function ShoppingListPreviewModal({
               ))}
 
               {simplifiedItems.length === 0 && (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-8 text-gray-400">
                   <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>No ingredients to add</p>
                 </div>
@@ -279,13 +279,13 @@ export function ShoppingListPreviewModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex-shrink-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+        <div className="flex-shrink-0 bg-gray-800 border-t border-gray-700 p-4 sm:p-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
             >
               Cancel
             </button>

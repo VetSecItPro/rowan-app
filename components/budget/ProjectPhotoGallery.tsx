@@ -78,13 +78,13 @@ export function ProjectPhotoGallery({
 
   const getPhotoTypeColor = (type: PhotoType) => {
     switch (type) {
-      case 'before': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
-      case 'during': return 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300';
-      case 'after': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
-      case 'progress': return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300';
-      case 'receipt': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300';
-      case 'damage': return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300';
-      default: return 'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300';
+      case 'before': return 'bg-blue-900/30 text-blue-300';
+      case 'during': return 'bg-orange-900/30 text-orange-300';
+      case 'after': return 'bg-green-900/30 text-green-300';
+      case 'progress': return 'bg-purple-900/30 text-purple-300';
+      case 'receipt': return 'bg-yellow-900/30 text-yellow-300';
+      case 'damage': return 'bg-red-900/30 text-red-300';
+      default: return 'bg-gray-900/30 text-gray-300';
     }
   };
 
@@ -133,7 +133,7 @@ export function ProjectPhotoGallery({
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value as PhotoType | 'all')}
-            className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+            className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm"
           >
             <option value="all">All Photos</option>
             <option value="before">Before</option>
@@ -147,20 +147,20 @@ export function ProjectPhotoGallery({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+            className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm"
           >
             <option value="date">Sort by Date</option>
             <option value="type">Sort by Type</option>
             <option value="order">Sort by Order</option>
           </select>
 
-          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <div className="flex items-center bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded ${
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-gray-600 shadow-sm'
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                  ? 'bg-gray-600 shadow-sm'
+                  : 'hover:bg-gray-600'
               } transition-colors`}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -169,8 +169,8 @@ export function ProjectPhotoGallery({
               onClick={() => setViewMode('list')}
               className={`p-2 rounded ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-gray-600 shadow-sm'
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                  ? 'bg-gray-600 shadow-sm'
+                  : 'hover:bg-gray-600'
               } transition-colors`}
             >
               <List className="w-4 h-4" />
@@ -189,9 +189,9 @@ export function ProjectPhotoGallery({
 
       {/* Photo Gallery */}
       {sortedPhotos.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+        <div className="text-center py-12 bg-gray-800 border border-gray-700 rounded-xl">
           <Camera className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
+          <p className="text-gray-400 mb-2">
             {filterType === 'all' ? 'No photos uploaded yet' : `No ${filterType} photos`}
           </p>
           <button
@@ -206,12 +206,12 @@ export function ProjectPhotoGallery({
           {sortedPhotos.map((photo) => (
             <div
               key={photo.id}
-              className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all"
+              className="group relative bg-gray-800 border border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all"
               onClick={() => handlePhotoClick(photo)}
             >
-              <div className="aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <div className="aspect-square bg-gray-700 flex items-center justify-center">
                 {/* Placeholder for actual image */}
-                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-gray-200 from-gray-600 to-gray-700 flex items-center justify-center">
                   <Image className="w-8 h-8 text-gray-400" />
                 </div>
               </div>
@@ -225,12 +225,12 @@ export function ProjectPhotoGallery({
                 </div>
 
                 {photo.title && (
-                  <h4 className="font-medium text-gray-900 dark:text-white text-sm mb-1 truncate">
+                  <h4 className="font-medium text-white text-sm mb-1 truncate">
                     {photo.title}
                   </h4>
                 )}
 
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-400">
                   {format(parseISO(photo.taken_date), 'MMM d, yyyy')}
                 </p>
               </div>
@@ -243,15 +243,15 @@ export function ProjectPhotoGallery({
           ))}
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl divide-y divide-gray-700">
           {sortedPhotos.map((photo) => (
             <div
               key={photo.id}
-              className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              className="p-4 hover:bg-gray-700 transition-colors cursor-pointer"
               onClick={() => handlePhotoClick(photo)}
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Image className="w-6 h-6 text-gray-400" />
                 </div>
 
@@ -261,19 +261,19 @@ export function ProjectPhotoGallery({
                       {getPhotoTypeIcon(photo.photo_type)}
                       {photo.photo_type}
                     </span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="text-sm text-gray-400">
                       {format(parseISO(photo.taken_date), 'MMM d, yyyy')}
                     </span>
                   </div>
 
                   {photo.title && (
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-1">
+                    <h4 className="font-medium text-white mb-1">
                       {photo.title}
                     </h4>
                   )}
 
                   {photo.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                    <p className="text-sm text-gray-400 truncate">
                       {photo.description}
                     </p>
                   )}
@@ -285,7 +285,7 @@ export function ProjectPhotoGallery({
                       e.stopPropagation();
                       // TODO: Implement download
                     }}
-                    className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:bg-gray-600 rounded-lg transition-colors"
                     title="Download"
                   >
                     <Download className="w-4 h-4" />
@@ -295,7 +295,7 @@ export function ProjectPhotoGallery({
                       e.stopPropagation();
                       handlePhotoClick(photo);
                     }}
-                    className="p-2 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition-colors"
+                    className="p-2 text-amber-400 hover:bg-amber-900/30 rounded-lg transition-colors"
                     title="View"
                   >
                     <Eye className="w-4 h-4" />
@@ -315,30 +315,30 @@ export function ProjectPhotoGallery({
             onClick={() => setSelectedPhoto(null)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-4xl max-h-[90vh] w-full overflow-hidden">
+            <div className="bg-gray-800 rounded-xl shadow-2xl max-w-4xl max-h-[90vh] w-full overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-4 border-b border-gray-700">
                 <div className="flex items-center gap-3">
                   <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getPhotoTypeColor(selectedPhoto.photo_type)}`}>
                     {getPhotoTypeIcon(selectedPhoto.photo_type)}
                     {selectedPhoto.photo_type}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-400">
                     {format(parseISO(selectedPhoto.taken_date), 'MMM d, yyyy')}
                   </span>
                 </div>
                 <button
                   onClick={() => setSelectedPhoto(null)}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Image */}
-              <div className="relative bg-gray-100 dark:bg-gray-700 aspect-video flex items-center justify-center">
+              <div className="relative bg-gray-700 aspect-video flex items-center justify-center">
                 {/* Placeholder for actual image */}
-                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-gray-200 from-gray-600 to-gray-700 flex items-center justify-center">
                   <Image className="w-16 h-16 text-gray-400" />
                 </div>
 
@@ -360,16 +360,16 @@ export function ProjectPhotoGallery({
               {/* Details */}
               <div className="p-4">
                 {selectedPhoto.title && (
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     {selectedPhoto.title}
                   </h3>
                 )}
                 {selectedPhoto.description && (
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-gray-400 mb-4">
                     {selectedPhoto.description}
                   </p>
                 )}
-                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center justify-between text-sm text-gray-400">
                   <span>
                     Photo {sortedPhotos.findIndex(p => p.id === selectedPhoto.id) + 1} of {sortedPhotos.length}
                   </span>
@@ -397,27 +397,27 @@ export function ProjectPhotoGallery({
             onClick={() => setShowUpload(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
+              <div className="p-4 border-b border-gray-700">
+                <h3 className="text-lg font-semibold text-white">
                   Upload Photos
                 </h3>
               </div>
               <div className="p-4">
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
+                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
                   <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-gray-400 mb-2">
                     Drop photos here or click to browse
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
+                  <p className="text-xs text-gray-500">
                     Supports JPG, PNG, WebP up to 10MB
                   </p>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-700">
                 <button
                   onClick={() => setShowUpload(false)}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-full transition-colors"
                 >
                   Cancel
                 </button>

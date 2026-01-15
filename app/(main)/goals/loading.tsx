@@ -15,7 +15,7 @@ export default function GoalsLoading() {
       {/* Stats skeleton */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div key={i} className="bg-gray-800 rounded-xl p-4 shadow-sm">
             <SkeletonLoader className="w-20" height="h-4" />
             <SkeletonLoader className="w-12 mt-2" height="h-8" />
           </div>
@@ -25,7 +25,7 @@ export default function GoalsLoading() {
       {/* Goal cards skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div key={i} className="bg-gray-800 rounded-xl p-4 shadow-sm">
             <div className="flex items-start justify-between mb-3">
               <div className="space-y-2 flex-1">
                 <SkeletonLoader className="w-3/4" height="h-6" />

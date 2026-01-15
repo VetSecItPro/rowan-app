@@ -26,11 +26,11 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  budget: 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400',
-  expenses: 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400',
-  goals: 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
-  trends: 'bg-purple-100 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400',
-  summary: 'bg-orange-100 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400'
+  budget: 'bg-green-100 bg-green-900/20 text-green-400',
+  expenses: 'bg-red-100 bg-red-900/20 text-red-400',
+  goals: 'bg-blue-100 bg-blue-900/20 text-blue-400',
+  trends: 'bg-purple-100 bg-purple-900/20 text-purple-400',
+  summary: 'bg-orange-100 bg-orange-900/20 text-orange-400'
 };
 
 export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTemplateSelectorProps) {
@@ -52,10 +52,10 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+        <h3 className="text-lg font-medium text-white">
           Choose a Report Template
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-sm text-gray-400 mt-1">
           Select from pre-built templates to generate financial reports
         </p>
       </div>
@@ -63,13 +63,13 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Category
           </label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-md border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="all">All Categories</option>
             {categories.map(category => (
@@ -81,13 +81,13 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
         </div>
 
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Report Type
           </label>
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-md border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="all">All Types</option>
             {reportTypes.map(type => (
@@ -103,10 +103,10 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       {filteredTemplates.length === 0 ? (
         <div className="text-center py-12">
           <FunnelIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+          <h3 className="mt-2 text-sm font-medium text-white">
             No templates found
           </h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-400">
             Try adjusting your filters to see more templates.
           </p>
         </div>
@@ -119,7 +119,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
             return (
               <div
                 key={template.id}
-                className="btn-touch bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer active:scale-[0.98]"
+                className="btn-touch bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-lg transition-all cursor-pointer active:scale-[0.98]"
                 onClick={() => onSelectTemplate(template)}
               >
                 {/* Header */}
@@ -128,17 +128,17 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
                     <Icon className="h-3 w-3 mr-1" />
                     {template.category}
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                  <span className="text-xs text-gray-400 capitalize">
                     {template.report_type}
                   </span>
                 </div>
 
                 {/* Content */}
                 <div className="mt-4">
-                  <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+                  <h4 className="text-lg font-medium text-white">
                     {template.name}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-3">
+                  <p className="text-sm text-gray-400 mt-2 line-clamp-3">
                     {template.description}
                   </p>
                 </div>
@@ -147,18 +147,18 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
                 <div className="mt-4">
                   <div className="flex flex-wrap gap-2">
                     {template.config?.charts && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 bg-blue-900/20 text-blue-400">
                         <ChartBarIcon className="h-3 w-3 mr-1" />
                         Charts
                       </span>
                     )}
                     {template.requires_goals && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-purple-100 bg-purple-900/20 text-purple-400">
                         Goals
                       </span>
                     )}
                     {template.requires_budget && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-green-100 bg-green-900/20 text-green-400">
                         Budget
                       </span>
                     )}
@@ -166,8 +166,8 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
                 </div>
 
                 {/* Action */}
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <button className="btn-touch text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors active:scale-95">
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <button className="btn-touch text-sm font-medium text-blue-600 text-blue-400 hover:text-blue-300 transition-colors active:scale-95">
                     Use Template →
                   </button>
                 </div>
@@ -178,14 +178,14 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       )}
 
       {/* System Templates Info */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
         <div className="flex">
           <CalendarIcon className="h-5 w-5 text-blue-400 flex-shrink-0" />
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+            <h3 className="text-sm font-medium text-blue-200">
               About Report Templates
             </h3>
-            <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <div className="mt-2 text-sm text-blue-300">
               <p>
                 These templates are pre-configured to generate comprehensive financial reports.
                 Each template includes specific charts, metrics, and data analysis tailored to different aspects of your finances.

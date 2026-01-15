@@ -18,10 +18,10 @@ interface WeekCalendarViewProps {
 }
 
 const MEAL_TYPE_CONFIG = {
-  breakfast: { icon: Sunrise, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-300 dark:border-orange-700', label: 'Breakfast' },
-  lunch: { icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-300 dark:border-yellow-700', label: 'Lunch' },
-  dinner: { icon: Moon, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', border: 'border-indigo-300 dark:border-indigo-700', label: 'Dinner' },
-  snack: { icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-300 dark:border-amber-700', label: 'Snack' },
+  breakfast: { icon: Sunrise, color: 'text-orange-500', bg: 'bg-orange-900/20', border: 'border-orange-700', label: 'Breakfast' },
+  lunch: { icon: Sun, color: 'text-yellow-500', bg: 'bg-yellow-900/20', border: 'border-yellow-700', label: 'Lunch' },
+  dinner: { icon: Moon, color: 'text-indigo-500', bg: 'bg-indigo-900/20', border: 'border-indigo-700', label: 'Dinner' },
+  snack: { icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-900/20', border: 'border-amber-700', label: 'Snack' },
 };
 
 export const WeekCalendarView = memo(function WeekCalendarView({
@@ -117,20 +117,20 @@ export const WeekCalendarView = memo(function WeekCalendarView({
         <div className="flex items-center justify-center sm:justify-start gap-2">
           <button
             onClick={handlePreviousWeek}
-            className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
             title="Previous week"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <ChevronLeft className="w-5 h-5 text-gray-400" />
           </button>
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+          <h3 className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">
             {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
           </h3>
           <button
             onClick={handleNextWeek}
-            className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
             title="Next week"
           >
-            <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <ChevronRight className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
@@ -164,8 +164,8 @@ export const WeekCalendarView = memo(function WeekCalendarView({
 
       {/* Bulk Action Bar */}
       {selectionMode && selectedMealIds.size > 0 && (
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-900/40 border border-red-300 dark:border-red-700 rounded-lg">
-          <span className="text-sm font-medium text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-100 from-red-900/30 to-red-900/40 border border-red-700 rounded-lg">
+          <span className="text-sm font-medium text-white">
             {selectedMealIds.size} meal{selectedMealIds.size > 1 ? 's' : ''} selected
           </span>
           <button
@@ -195,7 +195,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                 className={`py-2 px-1 rounded-lg text-center transition-all min-h-[60px] ${
                   isToday
                     ? 'bg-orange-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                    : 'bg-gray-800 text-gray-300'
                 }`}
               >
                 <div className="text-[10px] font-medium uppercase">{format(day, 'EEE')}</div>
@@ -221,15 +221,15 @@ export const WeekCalendarView = memo(function WeekCalendarView({
               id={`day-card-${format(day, 'yyyy-MM-dd')}`}
               className={`rounded-xl border-2 p-4 transition-all ${
                 isToday
-                  ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10'
-                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                  ? 'border-orange-500 bg-orange-900/10'
+                  : 'border-gray-700 bg-gray-800'
               }`}
             >
               {/* Day Header */}
-              <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-700">
                 <div className="flex items-center gap-3">
-                  <div className={`text-center ${isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-900 dark:text-white'}`}>
-                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{format(day, 'EEEE')}</div>
+                  <div className={`text-center ${isToday ? 'text-orange-400' : 'text-white'}`}>
+                    <div className="text-sm font-medium text-gray-400">{format(day, 'EEEE')}</div>
                     <div className="text-2xl font-bold">{format(day, 'd')}</div>
                   </div>
                   {isToday && (
@@ -278,14 +278,14 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                             <div className="flex items-center gap-2">
                               <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
                               {isPastMeal && (
-                                <CheckSquare className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                                <CheckSquare className="w-3.5 h-3.5 text-green-400" />
                               )}
                             </div>
-                            <p className={`font-medium text-gray-900 dark:text-white text-base ${isPastMeal ? 'line-through' : ''}`}>
+                            <p className={`font-medium text-white text-base ${isPastMeal ? 'line-through' : ''}`}>
                               {meal.recipe?.name || meal.name || 'Untitled Meal'}
                             </p>
                             {meal.notes && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                              <p className="text-sm text-gray-400 truncate mt-0.5">
                                 {meal.notes}
                               </p>
                             )}
@@ -298,7 +298,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                   <div className="py-6 text-center">
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-sm font-medium rounded-lg transition-all"
+                      className="px-4 py-2 text-gray-400 hover:text-orange-400 hover:bg-orange-900/20 text-sm font-medium rounded-lg transition-all"
                     >
                       + Add Meal
                     </button>
@@ -321,19 +321,19 @@ export const WeekCalendarView = memo(function WeekCalendarView({
               key={day.toISOString()}
               className={`min-h-[300px] rounded-lg border-2 p-3 transition-all ${
                 isToday
-                  ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10'
-                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                  ? 'border-orange-500 bg-orange-900/10'
+                  : 'border-gray-700 bg-gray-800'
               }`}
             >
               {/* Day Header */}
-              <div className="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+              <div className="mb-3 pb-2 border-b border-gray-700">
                 <div className={`text-sm font-medium ${
-                  isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'
+                  isToday ? 'text-orange-400' : 'text-gray-400'
                 }`}>
                   {format(day, 'EEE')}
                 </div>
                 <div className={`text-2xl font-bold ${
-                  isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-900 dark:text-white'
+                  isToday ? 'text-orange-400' : 'text-white'
                 }`}>
                   {format(day, 'd')}
                 </div>
@@ -372,15 +372,15 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                           <Icon className={`w-4 h-4 mt-0.5 ${config.color} ${isPastMeal ? 'opacity-70' : ''}`} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1">
-                              <p className={`font-medium text-gray-900 dark:text-white text-sm truncate ${isPastMeal ? 'line-through' : ''}`}>
+                              <p className={`font-medium text-white text-sm truncate ${isPastMeal ? 'line-through' : ''}`}>
                                 {meal.recipe?.name || meal.name || 'Untitled Meal'}
                               </p>
                               {isPastMeal && (
-                                <CheckSquare className="w-3 h-3 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                <CheckSquare className="w-3 h-3 text-green-400 flex-shrink-0" />
                               )}
                             </div>
                             {meal.notes && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                              <p className="text-xs text-gray-400 truncate mt-0.5">
                                 {meal.notes}
                               </p>
                             )}
@@ -393,7 +393,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
                   <div className="flex flex-col items-center justify-center py-8 text-center">
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-xs rounded-lg transition-all"
+                      className="px-3 py-1.5 text-gray-400 hover:text-orange-400 hover:bg-orange-900/20 text-xs rounded-lg transition-all"
                     >
                       + Add Meal
                     </button>
@@ -405,7 +405,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
               {dayMeals.length > 0 && (
                 <button
                   onClick={() => onAddMeal(day)}
-                  className="w-full mt-2 py-1.5 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-400 dark:text-gray-500 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all flex items-center justify-center"
+                  className="w-full mt-2 py-1.5 border-2 border-dashed border-gray-700 rounded-lg text-xs text-gray-500 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all flex items-center justify-center"
                 >
                   + Add
                 </button>

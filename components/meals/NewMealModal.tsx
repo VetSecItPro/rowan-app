@@ -121,7 +121,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-[90vw] sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-[90vw] sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-meals px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold text-white">{isEditing ? 'Edit Meal' : 'Plan New Meal'}</h2>
@@ -136,7 +136,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             <button
               type="button"
               onClick={() => setIsMealTypeOpen(!isMealTypeOpen)}
-              className="btn-touch w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between transition-colors"
+              className="btn-touch w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white flex items-center justify-between transition-colors"
             >
               <div className="flex items-center gap-2">
                 {(() => {
@@ -155,7 +155,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isMealTypeOpen && (
-              <div className="absolute w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
+              <div className="absolute w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
                 {mealTypeOptions.map((option) => {
                   const Icon = option.icon;
                   return (
@@ -166,10 +166,10 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         setFormData({ ...formData, meal_type: option.value as any });
                         setIsMealTypeOpen(false);
                       }}
-                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                      className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-700 transition-colors text-left"
                     >
                       <Icon className={`w-4 h-4 ${option.color}`} />
-                      <span className="text-gray-900 dark:text-white">{option.label}</span>
+                      <span className="text-white">{option.label}</span>
                     </button>
                   );
                 })}
@@ -177,11 +177,11 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             )}
           </div>
           <div className="relative z-50">
-            <label htmlFor="field-2" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Recipe (Optional)</label>
+            <label htmlFor="field-2" className="block text-sm font-medium mb-2 text-white cursor-pointer">Recipe (Optional)</label>
             <button
               type="button"
               onClick={() => setIsRecipeSelectorOpen(!isRecipeSelectorOpen)}
-              className="btn-touch w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white flex items-center justify-between transition-colors"
+              className="btn-touch w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white flex items-center justify-between transition-colors"
             >
               <div className="flex items-center gap-2">
                 <ChefHat className="w-4 h-4 text-orange-500" />
@@ -192,9 +192,9 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isRecipeSelectorOpen && (
-              <div className="absolute w-full mt-1 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
+              <div className="absolute w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
                 {/* Search Input */}
-                <div className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 z-10">
+                <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-3 z-10">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -203,7 +203,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                       value={recipeSearch}
                       id="field-2"
               onChange={(e) =>  setRecipeSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500"
+                      className="w-full pl-9 pr-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-orange-500"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -225,7 +225,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                               className={`btn-touch px-2 py-1 text-xs rounded-full transition-colors ${
                                 cuisineFilter === cuisine
                                   ? 'bg-orange-500 text-white'
-                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/30'
+                                  : 'bg-gray-700 text-gray-300 hover:bg-orange-900/30'
                               }`}
                             >
                               {cuisine}
@@ -242,7 +242,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                             e.stopPropagation();
                             clearFilters();
                           }}
-                          className="btn-touch text-xs text-orange-600 dark:text-orange-400 hover:underline px-1 py-0.5"
+                          className="btn-touch text-xs text-orange-400 hover:underline px-1 py-0.5"
                         >
                           Clear filters
                         </button>
@@ -251,7 +251,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                   )}
 
                   {/* Recipe Count */}
-                  <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="mt-2 text-xs text-gray-400">
                     {filteredRecipes.length} of {recipes.length} recipes
                   </div>
                 </div>
@@ -264,9 +264,9 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                       setFormData({ ...formData, recipe_id: undefined });
                       setIsRecipeSelectorOpen(false);
                     }}
-                    className="btn-touch w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+                    className="btn-touch w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-700 transition-colors text-left"
                   >
-                    <span className="text-gray-500 dark:text-gray-400 italic">No recipe</span>
+                    <span className="text-gray-400 italic">No recipe</span>
                   </button>
 
                   {/* Discover Recipes Button */}
@@ -279,15 +279,15 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         onOpenRecipeDiscover();
                       }
                     }}
-                    className="btn-touch w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-y border-orange-200 dark:border-orange-700 hover:from-orange-100 hover:to-red-100 dark:hover:from-orange-900/30 dark:hover:to-red-900/30 transition-all group"
+                    className="btn-touch w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-50 from-orange-900/20 to-red-900/20 border-y border-orange-700 hover:from-orange-100 hover:from-orange-900/30 hover:to-red-900/30 transition-all group"
                   >
                     <div className="flex items-center gap-2">
-                      <ChefHat className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                      <span className="text-orange-700 dark:text-orange-300 font-medium text-sm">
+                      <ChefHat className="w-4 h-4 text-orange-400" />
+                      <span className="text-orange-300 font-medium text-sm">
                         Discover Recipes
                       </span>
                     </div>
-                    <svg className="w-4 h-4 text-orange-600 dark:text-orange-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-orange-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -300,20 +300,20 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         setIsRecipeSelectorOpen(false);
                         clearFilters();
                       }}
-                      className="btn-touch w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left border-t border-gray-200 dark:border-gray-700 active-press"
+                      className="btn-touch w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-700 transition-colors text-left border-t border-gray-700 active-press"
                     >
                       <ChefHat className="w-4 h-4 text-orange-500" />
                       <div className="flex-1">
-                        <span className="text-gray-900 dark:text-white">{recipe.name}</span>
+                        <span className="text-white">{recipe.name}</span>
                         {recipe.description && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{recipe.description}</p>
+                          <p className="text-xs text-gray-400 truncate">{recipe.description}</p>
                         )}
                       </div>
                     </button>
                   ))}
                   {filteredRecipes.length === 0 && recipes.length > 0 && (
                     <div className="px-4 py-6 text-center">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <p className="text-sm text-gray-400 mb-2">
                         No recipes found
                       </p>
                       <button
@@ -322,7 +322,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                           e.stopPropagation();
                           clearFilters();
                         }}
-                        className="btn-touch text-sm text-orange-600 dark:text-orange-400 hover:underline px-2 py-1"
+                        className="btn-touch text-sm text-orange-400 hover:underline px-2 py-1"
                       >
                         Clear filters
                       </button>
@@ -330,14 +330,14 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                   )}
                   {recipes.length === 0 && (
                     <div className="px-4 py-6 text-center">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 italic mb-2">
+                      <p className="text-sm text-gray-400 italic mb-2">
                         No recipes in your library
                       </p>
                       <a
                         href="/recipes/discover"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-touch text-sm text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1 px-2 py-1 rounded-md"
+                        className="btn-touch text-sm text-orange-400 hover:underline inline-flex items-center gap-1 px-2 py-1 rounded-md"
                       >
                         <ChefHat className="w-3 h-3" />
                         Discover recipes to add
@@ -349,40 +349,40 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             )}
           </div>
           {formData.recipe_id && (
-            <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+            <div className="flex items-center gap-2 p-3 bg-emerald-900/20 border border-emerald-800 rounded-lg">
               <input
                 type="checkbox"
                 id="createShoppingList"
                 checked={createShoppingList}
                 onChange={(e) => setCreateShoppingList(e.target.checked)}
-                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded focus:ring-emerald-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
               />
-              <label htmlFor="createShoppingList" className="flex items-center gap-2 text-sm text-gray-900 dark:text-white cursor-pointer">
+              <label htmlFor="createShoppingList" className="flex items-center gap-2 text-sm text-white cursor-pointer">
                 <ShoppingCart className="w-4 h-4 text-emerald-600" />
                 <span>Add ingredients to Shopping List</span>
               </label>
             </div>
           )}
           <div>
-            <label htmlFor="field-4" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Meal Name (Optional)</label>
+            <label htmlFor="field-4" className="block text-sm font-medium mb-2 text-white cursor-pointer">Meal Name (Optional)</label>
             <input
               type="text"
               placeholder="e.g., Family Dinner, Quick Lunch"
               value={formData.name || ''}
               id="field-4"
               onChange={(e) =>  setFormData({ ...formData, name: e.target.value })}
-              className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white"
+              className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
             />
           </div>
           <div>
-            <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-900 dark:text-white cursor-pointer">Date *</label>
+            <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-white cursor-pointer">Date *</label>
             <input type="date" required value={formData.scheduled_date} id="field-5"
-              onChange={(e) =>  setFormData({ ...formData, scheduled_date: e.target.value })} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white" />
+              onChange={(e) =>  setFormData({ ...formData, scheduled_date: e.target.value })} className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white" />
           </div>
           <div>
             <label htmlFor="field-6" className="block text-sm font-medium mb-2 cursor-pointer">Notes</label>
             <textarea value={formData.notes} id="field-6"
-              onChange={(e) =>  setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900 dark:text-white resize-none" />
+              onChange={(e) =>  setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white resize-none" />
           </div>
           <div className="flex items-center justify-end gap-3 pt-4">
             <SecondaryButton

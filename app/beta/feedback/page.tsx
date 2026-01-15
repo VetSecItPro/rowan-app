@@ -46,25 +46,25 @@ interface Feedback {
 }
 
 const CATEGORIES = {
-  bug: { label: 'Bug Report', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' },
-  feature_request: { label: 'Feature Request', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' },
-  ui_ux: { label: 'UI/UX Feedback', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' },
-  performance: { label: 'Performance', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300' },
-  other: { label: 'Other', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' }
+  bug: { label: 'Bug Report', color: 'bg-red-100 bg-red-900 text-red-300' },
+  feature_request: { label: 'Feature Request', color: 'bg-blue-100 bg-blue-900 text-blue-300' },
+  ui_ux: { label: 'UI/UX Feedback', color: 'bg-purple-100 bg-purple-900 text-purple-300' },
+  performance: { label: 'Performance', color: 'bg-orange-100 bg-orange-900 text-orange-300' },
+  other: { label: 'Other', color: 'bg-gray-100 bg-gray-900 text-gray-300' }
 };
 
 const SEVERITY_COLORS = {
-  critical: 'text-red-600 dark:text-red-400',
-  high: 'text-orange-600 dark:text-orange-400',
-  medium: 'text-yellow-600 dark:text-yellow-400',
-  low: 'text-green-600 dark:text-green-400'
+  critical: 'text-red-400',
+  high: 'text-orange-400',
+  medium: 'text-yellow-400',
+  low: 'text-green-400'
 };
 
 const STATUS_COLORS = {
-  open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-  in_progress: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-  resolved: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-  closed: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+  open: 'bg-green-100 bg-green-900 text-green-300',
+  in_progress: 'bg-blue-100 bg-blue-900 text-blue-300',
+  resolved: 'bg-purple-100 bg-purple-900 text-purple-300',
+  closed: 'bg-gray-100 bg-gray-900 text-gray-300'
 };
 
 export default function BetaFeedbackPage() {
@@ -150,7 +150,7 @@ export default function BetaFeedbackPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 dark:from-gray-950 dark:via-blue-950/20 dark:to-indigo-950/20">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 from-gray-950 to-indigo-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -159,10 +159,10 @@ export default function BetaFeedbackPage() {
                 <TestTube className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-white">
                   Beta Feedback Center
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-400">
                   Share your feedback and help improve Rowan App
                 </p>
               </div>
@@ -176,8 +176,8 @@ export default function BetaFeedbackPage() {
                   onClick={() => setFilter('all')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'all'
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-blue-100 bg-blue-900 text-blue-300'
+                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   All Feedback
@@ -186,8 +186,8 @@ export default function BetaFeedbackPage() {
                   onClick={() => setFilter('bugs')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'bugs'
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-red-100 bg-red-900 text-red-300'
+                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   Bugs
@@ -196,8 +196,8 @@ export default function BetaFeedbackPage() {
                   onClick={() => setFilter('features')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'features'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-green-100 bg-green-900 text-green-300'
+                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   Features
@@ -206,8 +206,8 @@ export default function BetaFeedbackPage() {
                   onClick={() => setFilter('my_feedback')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'my_feedback'
-                      ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'bg-purple-100 bg-purple-900 text-purple-300'
+                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   My Feedback
@@ -218,7 +218,7 @@ export default function BetaFeedbackPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 rounded-lg border border-gray-600 bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
@@ -241,15 +241,15 @@ export default function BetaFeedbackPage() {
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-600 dark:text-gray-400">Loading feedback...</p>
+                <p className="text-gray-400">Loading feedback...</p>
               </div>
             ) : filteredFeedback.length === 0 ? (
-              <div className="text-center py-12 bg-white/50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div className="text-center py-12 bg-gray-800/50 rounded-2xl border border-gray-700">
                 <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   No feedback yet
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-gray-400 mb-6">
                   Be the first to submit feedback and help improve the app!
                 </p>
                 <button
@@ -264,13 +264,13 @@ export default function BetaFeedbackPage() {
               filteredFeedback.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-semibold text-white">
                           {item.title}
                         </h3>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${CATEGORIES[item.category].color}`}>
@@ -280,7 +280,7 @@ export default function BetaFeedbackPage() {
                           {item.status.replace('_', ' ')}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
                         <div className="flex items-center gap-1">
                           <User className="w-3 h-3" />
                           <span>{item.user.name}</span>
@@ -300,7 +300,7 @@ export default function BetaFeedbackPage() {
                             href={item.page_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                            className="flex items-center gap-1 text-blue-400 hover:underline"
                           >
                             <ExternalLink className="w-3 h-3" />
                             Page
@@ -315,21 +315,21 @@ export default function BetaFeedbackPage() {
                         onClick={() => handleVote(item.id, 'up')}
                         className={`p-2 rounded-lg transition-colors ${
                           item.user_vote === 'up'
-                            ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+                            ? 'bg-green-100 bg-green-900 text-green-400'
+                            : 'hover:bg-gray-700 text-gray-400'
                         }`}
                       >
                         <ChevronUp className="w-4 h-4" />
                       </button>
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[2rem] text-center">
+                      <span className="text-sm font-medium text-gray-300 min-w-[2rem] text-center">
                         {item.upvotes - item.downvotes}
                       </span>
                       <button
                         onClick={() => handleVote(item.id, 'down')}
                         className={`p-2 rounded-lg transition-colors ${
                           item.user_vote === 'down'
-                            ? 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+                            ? 'bg-red-100 bg-red-900 text-red-400'
+                            : 'hover:bg-gray-700 text-gray-400'
                         }`}
                       >
                         <ChevronDown className="w-4 h-4" />
@@ -338,16 +338,16 @@ export default function BetaFeedbackPage() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+                  <p className="text-gray-300 mb-4 leading-relaxed">
                     {item.description}
                   </p>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                    <div className="flex items-center gap-4 text-sm text-gray-400">
                       <span>Priority: {item.priority.replace('_', ' ')}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
                       <MessageSquare className="w-4 h-4" />
                       <span>{item._count.comments} comments</span>
                     </div>
@@ -362,16 +362,16 @@ export default function BetaFeedbackPage() {
       {/* Submit Feedback Modal - We'll create this as a separate component */}
       {showSubmitForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800 rounded-2xl shadow-xl">
             {/* Modal content will go here - we'll create this as a separate component */}
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-white">
                   Submit Feedback
                 </h2>
                 <button
                   onClick={() => setShowSubmitForm(false)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

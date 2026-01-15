@@ -113,14 +113,14 @@ export default function DataExportPage() {
     ]}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Download className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Export Your Data</h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <h1 className="text-2xl font-bold text-white mb-2">Export Your Data</h1>
+              <p className="text-gray-400">
                 Download your data in multiple formats. Export everything or filter by date range and data type.
               </p>
             </div>
@@ -128,9 +128,9 @@ export default function DataExportPage() {
         </div>
 
         {/* Quick Export - All Data */}
-        <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Export All Data</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Export All Data</h2>
+          <p className="text-sm text-gray-400 mb-6">
             Export all your data across all categories in a single file. Choose your preferred format below.
           </p>
 
@@ -144,14 +144,14 @@ export default function DataExportPage() {
         </div>
 
         {/* Export by Date Range */}
-        <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4 mb-6">
             <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
               <Calendar className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Export by Date Range</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h2 className="text-xl font-semibold text-white mb-1">Export by Date Range</h2>
+              <p className="text-sm text-gray-400">
                 Export specific data types within a custom date range
               </p>
             </div>
@@ -160,7 +160,7 @@ export default function DataExportPage() {
           <div className="space-y-6">
             {/* Data Type Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Select Data Type
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -170,12 +170,12 @@ export default function DataExportPage() {
                     onClick={() => setSelectedDataType(type.value)}
                     className={`p-4 rounded-xl border-2 transition-all text-left ${
                       selectedDataType === type.value
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        ? 'border-blue-500 bg-blue-900/20'
+                        : 'border-gray-700 hover:border-gray-600'
                     }`}
                   >
-                    <p className="font-medium text-gray-900 dark:text-white">{type.label}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{type.description}</p>
+                    <p className="font-medium text-white">{type.label}</p>
+                    <p className="text-xs text-gray-400 mt-1">{type.description}</p>
                   </button>
                 ))}
               </div>
@@ -183,7 +183,7 @@ export default function DataExportPage() {
 
             {/* Format Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Select Format
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -195,17 +195,17 @@ export default function DataExportPage() {
                       onClick={() => setExportFormat(format.id as any)}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         exportFormat === format.id
-                          ? `border-${format.color}-500 bg-${format.color}-50 dark:bg-${format.color}-900/20`
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? `border-${format.color}-500 bg-${format.color}-50 bg-${format.color}-900/20`
+                          : 'border-gray-700 hover:border-gray-600'
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <div className={`w-10 h-10 bg-gradient-to-br ${format.gradient} rounded-lg flex items-center justify-center`}>
                           <Icon className="w-5 h-5 text-white" />
                         </div>
-                        <p className="font-semibold text-gray-900 dark:text-white">{format.name}</p>
+                        <p className="font-semibold text-white">{format.name}</p>
                       </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{format.description}</p>
+                      <p className="text-xs text-gray-400">{format.description}</p>
                     </button>
                   );
                 })}
@@ -215,25 +215,25 @@ export default function DataExportPage() {
             {/* Date Range Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   End Date
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -260,10 +260,10 @@ export default function DataExportPage() {
         </div>
 
         {/* GDPR Info */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800 dark:text-blue-200">
+            <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-200">
               <p className="font-medium mb-1">GDPR Data Portability</p>
               <p className="text-xs">
                 This export functionality complies with GDPR Article 15 (Right of Access) and Article 20 (Right to Data Portability). Your data is provided in commonly used, machine-readable formats that you can transfer to other services.
@@ -276,27 +276,27 @@ export default function DataExportPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <a
             href="/settings/audit-log"
-            className="p-4 bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
+            className="p-4 bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">View Audit Log</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400">See all data access events</p>
+                <h3 className="font-semibold text-white mb-1">View Audit Log</h3>
+                <p className="text-xs text-gray-400">See all data access events</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" />
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-200 transition-colors" />
             </div>
           </a>
 
           <a
             href="/settings/data-privacy/bulk-operations"
-            className="p-4 bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
+            className="p-4 bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Bulk Operations</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Delete or archive old data</p>
+                <h3 className="font-semibold text-white mb-1">Bulk Operations</h3>
+                <p className="text-xs text-gray-400">Delete or archive old data</p>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors" />
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-200 transition-colors" />
             </div>
           </a>
         </div>

@@ -39,31 +39,31 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
       work: {
         icon: '💼',
         label: 'Work',
-        color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+        color: 'bg-blue-100 bg-blue-900/30 text-blue-300',
         barColor: 'bg-blue-500'
       },
       personal: {
         icon: '👤',
         label: 'Personal',
-        color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+        color: 'bg-purple-100 bg-purple-900/30 text-purple-300',
         barColor: 'bg-purple-500'
       },
       family: {
         icon: '👨‍👩‍👧‍👦',
         label: 'Family',
-        color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300',
+        color: 'bg-pink-100 bg-pink-900/30 text-pink-300',
         barColor: 'bg-pink-500'
       },
       health: {
         icon: '💪',
         label: 'Health',
-        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+        color: 'bg-green-100 bg-green-900/30 text-green-300',
         barColor: 'bg-green-500'
       },
       social: {
         icon: '🎉',
         label: 'Social',
-        color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+        color: 'bg-orange-100 bg-orange-900/30 text-orange-300',
         barColor: 'bg-orange-500'
       },
     };
@@ -78,7 +78,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 sm:bg-white/60 sm:dark:bg-gray-800/60 sm:backdrop-blur-md border border-gray-200 dark:border-gray-700 sm:border-gray-200/50 sm:dark:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-gray-800 sm:bg-white/60 sm:bg-gray-800/60 sm:backdrop-blur-md border border-gray-700 sm:border-gray-200/50 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -108,7 +108,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className={`text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate ${
+                <h3 className={`text-base sm:text-lg font-semibold text-white truncate ${
                   event.status === 'completed' ? 'line-through opacity-60' : ''
                 }`}>
                   {event.title}
@@ -118,7 +118,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                   event.status === 'completed' ? 'opacity-60' : ''
                 }`}>
                   {/* Mobile: Just icon and text */}
-                  <span className="sm:hidden text-gray-500 dark:text-gray-400">
+                  <span className="sm:hidden text-gray-400">
                     {getCategoryConfig().icon} {getCategoryConfig().label}
                   </span>
                   {/* Desktop: With background */}
@@ -127,7 +127,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                   </span>
                 </span>
               </div>
-              <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex-wrap ${
+              <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 mt-1 text-xs sm:text-sm text-gray-400 flex-wrap ${
                 event.status === 'completed' ? 'line-through opacity-60' : ''
               }`}>
                 <div className="flex items-center gap-1">
@@ -143,7 +143,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           </div>
 
           {event.description && (
-            <p className={`text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2 sm:mt-3 ml-3 sm:ml-4 break-words line-clamp-2 ${
+            <p className={`text-sm sm:text-base text-gray-400 mt-2 sm:mt-3 ml-3 sm:ml-4 break-words line-clamp-2 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
               {event.description}
@@ -151,7 +151,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           )}
 
           {event.location && (
-            <div className={`flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 ml-3 sm:ml-4 text-gray-600 dark:text-gray-400 ${
+            <div className={`flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 ml-3 sm:ml-4 text-gray-400 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
               <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -162,7 +162,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           {linkedShoppingList && (
             <Link
               href="/shopping"
-              className={`inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 mt-2 sm:mt-3 ml-3 sm:ml-4 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-md ${
+              className={`inline-flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3 mt-2 sm:mt-3 ml-3 sm:ml-4 text-emerald-400 hover:text-emerald-300 transition-colors hover:bg-emerald-900/20 rounded-md ${
                 event.status === 'completed' ? 'opacity-60' : ''
               }`}
             >
@@ -179,7 +179,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Event options menu"
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-300 transition-colors"
           >
             <MoreVertical className="w-5 h-5" />
           </button>
@@ -190,7 +190,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-xl z-20">
                 {/* Mark Bill as Paid - Only show for bill-linked events that aren't completed */}
                 {isBillEvent && onMarkBillPaid && event.linked_bill_id && event.status !== 'completed' && (
                   <button
@@ -198,7 +198,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                       onMarkBillPaid(event.id, event.linked_bill_id!);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-2 text-left text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center gap-2 rounded-t-lg transition-colors font-medium"
+                    className="w-full px-4 py-2 text-left text-green-400 hover:bg-green-900/20 flex items-center gap-2 rounded-t-lg transition-colors font-medium"
                   >
                     <DollarSign className="w-4 h-4" />
                     Mark Bill as Paid
@@ -210,7 +210,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                       onViewDetails(event);
                       setShowMenu(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
+                    className={`w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2 transition-colors ${
                       (!isBillEvent || !onMarkBillPaid || event.status === 'completed') ? 'rounded-t-lg' : ''
                     }`}
                   >
@@ -223,7 +223,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     onEdit(event);
                     setShowMenu(false);
                   }}
-                  className={`w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
+                  className={`w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2 transition-colors ${
                     !onViewDetails && (!isBillEvent || !onMarkBillPaid || event.status === 'completed') ? 'rounded-t-lg' : ''
                   }`}
                 >
@@ -235,7 +235,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                     onDelete(event.id);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
+                  className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Event

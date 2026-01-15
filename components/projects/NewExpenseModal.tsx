@@ -11,17 +11,17 @@ const EMOJIS = ['💰', '💵', '💳', '💸', '🏦', '🛒', '🍽️', '☕'
 
 // Expense categories with amber theme colors
 const EXPENSE_CATEGORIES = {
-  groceries: { emoji: '🛒', label: 'Groceries', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  utilities: { emoji: '⚡', label: 'Utilities', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  transportation: { emoji: '🚗', label: 'Transportation', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  healthcare: { emoji: '🏥', label: 'Healthcare', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  entertainment: { emoji: '🎬', label: 'Entertainment', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  dining: { emoji: '🍽️', label: 'Dining', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  shopping: { emoji: '🛍️', label: 'Shopping', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  housing: { emoji: '🏠', label: 'Housing', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  insurance: { emoji: '🛡️', label: 'Insurance', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  education: { emoji: '📚', label: 'Education', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  other: { emoji: '📌', label: 'Other', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-100 dark:bg-gray-900/30' },
+  groceries: { emoji: '🛒', label: 'Groceries', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  utilities: { emoji: '⚡', label: 'Utilities', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  transportation: { emoji: '🚗', label: 'Transportation', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  healthcare: { emoji: '🏥', label: 'Healthcare', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  entertainment: { emoji: '🎬', label: 'Entertainment', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  dining: { emoji: '🍽️', label: 'Dining', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  shopping: { emoji: '🛍️', label: 'Shopping', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  housing: { emoji: '🏠', label: 'Housing', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  insurance: { emoji: '🛡️', label: 'Insurance', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  education: { emoji: '📚', label: 'Education', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  other: { emoji: '📌', label: 'Other', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-900/30' },
 };
 
 interface NewExpenseModalProps {
@@ -68,7 +68,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header with amber gradient */}
         <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-12 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm pr-12 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
 
               {/* Emoji Picker Button */}
@@ -148,9 +148,9 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                     setShowEmojiPicker(!showEmojiPicker);
                   }}
                   title="Add emoji"
-                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
                 >
-                  <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <Smile className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
             </div>
@@ -158,7 +158,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="field-2" className="block text-sm font-medium mb-2 cursor-pointer">Amount *</label>
-              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-900 border rounded-lg" />
             </div>
             <div>
               <label htmlFor="field-3" className="block text-sm font-medium mb-2 cursor-pointer">Category</label>
@@ -199,22 +199,22 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                   setDateError('');
                 }
               }}
-              className={`w-full px-4 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white ${
-                dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
+              className={`w-full px-4 py-2 bg-gray-800/60 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white ${
+                dateError ? 'border-red-500' : 'border-gray-700/50'
               }`}
             />
             {dateError && (
-              <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <p className="mt-2 text-base md:text-sm text-red-400 flex items-center gap-1">
                 <span className="font-medium">⚠</span>
                 {dateError}
               </p>
             )}
           </div>
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
@@ -233,20 +233,20 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
       {/* Emoji Picker Portal */}
       {showEmojiPicker && emojiButtonRect && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 z-[9999] w-full sm:w-80 max-w-[calc(100vw-2rem)]"
+          className="fixed bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-[9999] w-full sm:w-80 max-w-[calc(100vw-2rem)]"
           style={{
             top: `${emojiButtonRect.bottom + 8}px`,
             left: `${Math.max(16, emojiButtonRect.right - 320)}px`,
           }}
         >
-          <h4 className="text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
+          <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>
           <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
             {EMOJIS.map((emoji, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => handleEmojiClick(emoji)}
-                className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-700 rounded-lg transition-colors"
                 title="Click to add emoji"
               >
                 {emoji}

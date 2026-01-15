@@ -322,7 +322,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
   return (
     <div className="fixed inset-0 z-[70] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden sm:overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
+      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden sm:overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="bg-gradient-meals px-4 sm:px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -340,13 +340,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
           {/* Toggle Buttons - In Content Area */}
           {!editRecipe && (
             <div className="px-4 sm:px-6 pt-4 pb-0 flex-shrink-0">
-              <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto sm:inline-flex">
+              <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto sm:inline-flex">
                 <button
                   onClick={() => setActiveTab('manual')}
                   className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${
                     activeTab === 'manual'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      : 'text-gray-300 hover:bg-gray-800/50'
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -358,7 +358,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${
                     activeTab === 'ai'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      : 'text-gray-300 hover:bg-gray-800/50'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -373,7 +373,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${
                     activeTab === 'discover'
                       ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                      : 'text-gray-300 hover:bg-gray-800/50'
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -386,9 +386,9 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
           {/* AI Import Tab */}
           {activeTab === 'ai' && !editRecipe && (
             <div className="p-6 pt-4 space-y-6 h-full">
-              <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-900 dark:text-blue-200">
+              <div className="flex items-start gap-3 p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
+                <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-blue-200">
                   <p className="font-semibold mb-1">How AI Import Works</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Paste recipe text from a website, blog, or document</li>
@@ -401,7 +401,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
               {/* Text Input */}
               <div>
-                <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Paste Recipe Text
                 </label>
                 <textarea
@@ -410,23 +410,23 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               onChange={(e) =>  setRecipeText(e.target.value)}
                   placeholder="Paste your recipe here... Include ingredients, instructions, prep time, etc."
                   rows={8}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white placeholder-gray-500 resize-none"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-500 resize-none"
                 />
               </div>
 
               {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                  <div className="w-full border-t border-gray-600"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
+                  <span className="px-4 bg-gray-800 text-gray-400">OR</span>
                 </div>
               </div>
 
               {/* Image Upload */}
               <div>
-                <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer text-center">
+                <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer text-center">
                   Upload Recipe Image
                 </label>
                 <div className="space-y-3 max-w-md mx-auto">
@@ -440,9 +440,9 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="btn-touch w-full px-4 py-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-orange-500 dark:hover:border-orange-400 transition-colors"
+                    className="btn-touch w-full px-4 py-6 border-2 border-dashed border-gray-600 rounded-lg hover:border-orange-400 transition-colors"
                   >
-                    <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
+                    <div className="flex flex-col items-center gap-2 text-gray-400">
                       <ImageIcon className="w-8 h-8" />
                       <span className="font-medium text-sm">Click to upload</span>
                       <span className="text-xs">PNG, JPG, or JPEG (max 5MB)</span>
@@ -504,7 +504,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Search recipes..."
-                  className="w-full pl-9 pr-20 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full pl-9 pr-20 py-2 text-sm bg-gray-700 border border-gray-600 rounded-full focus:ring-2 focus:ring-orange-500 text-white"
                 />
                 <button
                   onClick={handleSearch}
@@ -520,7 +520,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 <button
                   onClick={handleLoadRandom}
                   disabled={loading}
-                  className="btn-touch px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50 text-xs font-medium"
+                  className="btn-touch px-3 py-1.5 bg-purple-900/30 text-purple-300 rounded-full hover:bg-purple-900/50 transition-colors disabled:opacity-50 text-xs font-medium"
                 >
                   🎲 Random
                 </button>
@@ -530,7 +530,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <button
                     onClick={() => setShowCuisineDropdown(!showCuisineDropdown)}
                     disabled={loading}
-                    className="btn-touch px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors disabled:opacity-50 text-xs font-medium flex items-center gap-1"
+                    className="btn-touch px-3 py-1.5 bg-orange-900/30 text-orange-300 rounded-full hover:bg-orange-900/50 transition-colors disabled:opacity-50 text-xs font-medium flex items-center gap-1"
                   >
                     🍽️ Cuisine
                     <span className="text-[10px]">▼</span>
@@ -545,7 +545,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                       />
 
                       {/* Dropdown Menu */}
-                      <div className="absolute top-full left-0 mt-1 w-48 max-h-72 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20">
+                      <div className="absolute top-full left-0 mt-1 w-48 max-h-72 overflow-y-auto bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-20">
                         <div className="p-1.5 space-y-0.5">
                           {SUPPORTED_CUISINES.map((cuisine) => (
                             <button
@@ -555,7 +555,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                                 setShowCuisineDropdown(false);
                               }}
                               disabled={loading}
-                              className="btn-touch w-full px-2.5 py-1.5 text-left text-xs rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300 disabled:opacity-50"
+                              className="btn-touch w-full px-2.5 py-1.5 text-left text-xs rounded-lg hover:bg-orange-900/20 transition-colors flex items-center gap-2 text-gray-300 disabled:opacity-50"
                             >
                               <span>{cuisine.flag}</span>
                               <span>{cuisine.label}</span>
@@ -572,14 +572,14 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               {loading && (
                 <div className="flex flex-col items-center justify-center py-8 flex-1">
                   <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-2" />
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Searching...</p>
+                  <p className="text-sm text-gray-400">Searching...</p>
                 </div>
               )}
 
               {/* Results */}
               {!loading && externalRecipes.length > 0 && (
                 <div className="space-y-2 flex-1 flex flex-col min-h-0">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                  <p className="text-xs text-gray-400 flex-shrink-0">
                     {externalRecipes.length} recipe{externalRecipes.length > 1 ? 's' : ''} found
                   </p>
                   <div className="grid grid-cols-2 gap-2 flex-1 overflow-y-auto min-h-0 max-h-none sm:max-h-[350px]">
@@ -590,10 +590,10 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                           setSelectedRecipe(recipe);
                           setShowPreview(true);
                         }}
-                        className="btn-touch text-left p-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md hover:border-orange-500 dark:hover:border-orange-400 transition-all group"
+                        className="btn-touch text-left p-2 bg-gray-900 border border-gray-700 rounded-xl hover:shadow-md hover:border-orange-400 transition-all group"
                       >
                         {recipe.image_url && (
-                          <div className="w-full h-20 mb-1.5 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
+                          <div className="w-full h-20 mb-1.5 rounded-lg overflow-hidden bg-gray-700">
                             <img
                               src={recipe.image_url}
                               alt={recipe.name}
@@ -602,11 +602,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                             />
                           </div>
                         )}
-                        <h4 className="font-medium text-xs text-gray-900 dark:text-white line-clamp-2 mb-1">
+                        <h4 className="font-medium text-xs text-white line-clamp-2 mb-1">
                           {recipe.name}
                         </h4>
-                        <div className="flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400">
-                          <span className="px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded">
+                        <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+                          <span className="px-1.5 py-0.5 bg-orange-900/30 text-orange-300 rounded">
                             {recipe.source}
                           </span>
                           {recipe.cuisine && (
@@ -622,11 +622,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               {/* Empty State */}
               {!loading && externalRecipes.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-8 text-center flex-1">
-                  <Globe className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+                  <Globe className="w-12 h-12 text-gray-600 mb-3" />
+                  <h3 className="text-base font-semibold text-white mb-1">
                     Discover Recipes
                   </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 max-w-xs">
+                  <p className="text-xs text-gray-400 mb-3 max-w-xs">
                     Search or browse by cuisine to find inspiration
                   </p>
                   <button
@@ -644,7 +644,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
           {activeTab === 'manual' && (
             <form onSubmit={handleSubmit} className={`p-6 space-y-4 h-full ${!editRecipe ? 'pt-4' : ''}`}>
               <div>
-                <label htmlFor="field-3" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Recipe Name *</label>
+                <label htmlFor="field-3" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Recipe Name *</label>
                 <input
                   type="text"
                   required
@@ -654,25 +654,25 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   id="field-3"
               onChange={(e) =>  setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., Spaghetti Bolognese"
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                 />
               </div>
 
               <div>
-                <label htmlFor="field-4" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Description</label>
+                <label htmlFor="field-4" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Description</label>
                 <textarea
                   value={formData.description}
                   id="field-4"
               onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
                   rows={2}
                   placeholder="Brief description of the recipe"
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
+                  className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Prep Time (min)</label>
+                  <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Prep Time (min)</label>
                   <input
                     type="number"
                     min="0"
@@ -690,11 +690,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                         e.preventDefault();
                       }
                     }}
-                    className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="field-6" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Cook Time (min)</label>
+                  <label htmlFor="field-6" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Cook Time (min)</label>
                   <input
                     type="number"
                     min="0"
@@ -712,11 +712,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                         e.preventDefault();
                       }
                     }}
-                    className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="field-7" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Servings</label>
+                  <label htmlFor="field-7" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Servings</label>
                   <input
                     type="number"
                     min="1"
@@ -734,13 +734,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                         e.preventDefault();
                       }
                     }}
-                    className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="field-8" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Ingredients *</label>
+                <label htmlFor="field-8" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Ingredients *</label>
                 <div className="space-y-2">
                   {formData.ingredients.map((ingredient, index) => {
                     const displayValue = typeof ingredient === 'string'
@@ -757,13 +757,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                           id="field-8"
               onChange={(e) =>  updateIngredient(index, e.target.value)}
                           placeholder="e.g., 2 cups flour"
-                          className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                          className="flex-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                         />
                         {formData.ingredients.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeIngredient(index)}
-                            className="btn-touch p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="btn-touch p-2 text-red-600 hover:bg-red-900/20 rounded-lg transition-colors"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
@@ -774,7 +774,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <button
                     type="button"
                     onClick={addIngredient}
-                    className="btn-touch px-4 py-2 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
+                    className="btn-touch px-4 py-2 text-orange-400 hover:bg-orange-900/20 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Add Ingredient
@@ -783,19 +783,19 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               </div>
 
               <div>
-                <label htmlFor="field-9" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Instructions</label>
+                <label htmlFor="field-9" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Instructions</label>
                 <textarea
                   value={formData.instructions}
                   id="field-9"
               onChange={(e) =>  setFormData({ ...formData, instructions: e.target.value })}
                   rows={6}
                   placeholder="Step-by-step cooking instructions..."
-                  className="w-full input-mobile bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white resize-none"
+                  className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white resize-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="field-10" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Recipe Image</label>
+                <label htmlFor="field-10" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Recipe Image</label>
                 <div className="w-full max-w-sm">
                   <ImageUpload
                     label=""
@@ -811,7 +811,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               </div>
 
               <div>
-                <label htmlFor="field-11" className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300 cursor-pointer">Tags</label>
+                <label htmlFor="field-11" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Tags</label>
                 <div className="flex gap-2 mb-2">
                   <input
                     type="text"
@@ -820,7 +820,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
               onChange={(e) =>  setTagInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     placeholder="Add a tag (e.g., Italian, Quick, Vegetarian)"
-                    className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="flex-1 px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                   />
                   <button
                     type="button"
@@ -835,13 +835,13 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                     {formData.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1 bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 rounded-full text-sm flex items-center gap-2"
+                        className="px-3 py-1 bg-orange-900/20 text-orange-300 rounded-full text-sm flex items-center gap-2"
                       >
                         {tag}
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="btn-touch hover:text-orange-900 dark:hover:text-orange-100 transition-colors"
+                          className="btn-touch hover:text-orange-100 transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -855,7 +855,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="px-6 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors"
                 >
                   Cancel
                 </button>

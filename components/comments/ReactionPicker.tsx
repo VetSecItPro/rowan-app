@@ -56,15 +56,15 @@ export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProp
   return (
     <div
       ref={pickerRef}
-      className="rounded-lg border border-gray-200 bg-white p-2 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+      className="rounded-lg border border-gray-200 bg-white p-2 border-gray-700 bg-gray-800"
     >
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+        <span className="text-xs font-medium text-gray-300">
           Pick a reaction
         </span>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          className="text-gray-400 hover:text-gray-300"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -81,7 +81,7 @@ export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProp
           <button
             key={emoji}
             onClick={() => onSelect(emoji)}
-            className="flex h-8 w-8 items-center justify-center rounded text-lg transition-transform hover:scale-125 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="flex h-8 w-8 items-center justify-center rounded text-lg transition-transform hover:scale-125 hover:bg-gray-700"
             title={emoji}
           >
             {emoji}

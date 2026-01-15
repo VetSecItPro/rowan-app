@@ -144,7 +144,7 @@ function VerifyEmailContent() {
   // If verifying a token, show verification UI
   if (token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950 p-4">
         <div
           className={`w-full max-w-md transition-all duration-700 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -165,16 +165,16 @@ function VerifyEmailContent() {
           </div>
 
           {/* Card */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-700/50">
+          <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-700/50">
             {isVerifying && (
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center animate-pulse">
                   <Mail className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-xl font-bold text-white mb-2">
                   Verifying Your Email
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-400">
                   Please wait...
                 </p>
               </div>
@@ -185,10 +185,10 @@ function VerifyEmailContent() {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                   <CheckCircle className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-xl font-bold text-white mb-2">
                   Email Verified!
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-gray-400 mb-4">
                   Your email has been successfully verified. Redirecting you to login...
                 </p>
                 <Link
@@ -205,10 +205,10 @@ function VerifyEmailContent() {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                   <AlertCircle className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2 className="text-xl font-bold text-white mb-2">
                   Verification Failed
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-gray-400 mb-4">
                   {verificationError}
                 </p>
                 <div className="space-y-3">
@@ -218,7 +218,7 @@ function VerifyEmailContent() {
                   >
                     Go to Login
                   </Link>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     You can request a new verification email after logging in.
                   </p>
                 </div>
@@ -232,7 +232,7 @@ function VerifyEmailContent() {
 
   // Standard "waiting for verification" UI (no token)
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950 p-4">
       <div
         className={`w-full max-w-md transition-all duration-700 ease-out ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -250,16 +250,16 @@ function VerifyEmailContent() {
               priority
             />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-4">
+          <h1 className="text-2xl font-bold text-white mt-4">
             Verify Your Email
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-gray-400 mt-2">
             One more step to access Rowan
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-700/50">
+        <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-700/50">
           {/* Email Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg">
@@ -269,13 +269,13 @@ function VerifyEmailContent() {
 
           {/* Message */}
           <div className="text-center mb-6">
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-gray-300 mb-4">
               We&apos;ve sent a verification email to:
             </p>
-            <p className="font-semibold text-gray-900 dark:text-white text-lg bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2 inline-block">
+            <p className="font-semibold text-white text-lg bg-gray-700 rounded-lg px-4 py-2 inline-block">
               {email || 'your email address'}
             </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-4">
+            <p className="text-gray-400 text-sm mt-4">
               Please click the link in the email to verify your account.
               Once verified, this page will automatically redirect you to the dashboard.
             </p>
@@ -283,9 +283,9 @@ function VerifyEmailContent() {
 
           {/* Success Message */}
           {resendSuccess && (
-            <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-emerald-700 dark:text-emerald-300">
+            <div className="mb-4 p-4 bg-emerald-900/20 border border-emerald-800 rounded-lg flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-300">
                 Verification email sent! Please check your inbox (and spam folder).
               </p>
             </div>
@@ -293,9 +293,9 @@ function VerifyEmailContent() {
 
           {/* Error Message */}
           {resendError && (
-            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700 dark:text-red-300">{resendError}</p>
+            <div className="mb-4 p-4 bg-red-900/20 border border-red-800 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-300">{resendError}</p>
             </div>
           )}
 
@@ -319,11 +319,11 @@ function VerifyEmailContent() {
           </button>
 
           {/* Tips */}
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mt-6 p-4 bg-gray-700/50 rounded-lg">
+            <p className="text-sm font-medium text-gray-300 mb-2">
               Didn&apos;t receive the email?
             </p>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
+            <ul className="text-sm text-gray-400 space-y-1 list-disc list-inside">
               <li>Check your spam or junk folder</li>
               <li>Make sure you entered the correct email</li>
               <li>Wait a few minutes and try resending</li>
@@ -331,11 +331,11 @@ function VerifyEmailContent() {
           </div>
 
           {/* Sign Out Link */}
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+          <div className="mt-6 pt-6 border-t border-gray-700 text-center">
             <button
               onClick={handleSignOut}
               disabled={isSigningOut}
-              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <LogOut className="w-4 h-4" />
               {isSigningOut ? 'Signing out...' : 'Sign out and use a different account'}
@@ -344,11 +344,11 @@ function VerifyEmailContent() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
+        <p className="text-center text-sm text-gray-400 mt-8">
           Need help?{' '}
           <a
             href="mailto:support@rowan.app"
-            className="text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="text-emerald-400 hover:underline"
           >
             Contact support
           </a>
@@ -361,10 +361,10 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950">
         <div className="animate-pulse">
-          <div className="w-16 h-16 rounded-full bg-emerald-200 dark:bg-emerald-800 mx-auto mb-4" />
-          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+          <div className="w-16 h-16 rounded-full bg-emerald-800 mx-auto mb-4" />
+          <div className="h-4 w-32 bg-gray-700 rounded mx-auto" />
         </div>
       </div>
     }>

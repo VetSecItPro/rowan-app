@@ -185,17 +185,17 @@ export function NudgeCenter({
         {showHeader && (
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+              <div className="w-8 h-8 bg-gray-700 rounded-lg animate-pulse" />
               <div>
-                <div className="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                <div className="w-32 h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-1" />
+                <div className="w-24 h-4 bg-gray-700 rounded animate-pulse" />
+                <div className="w-32 h-3 bg-gray-700 rounded animate-pulse mt-1" />
               </div>
             </div>
           </div>
         )}
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+            <div key={i} className="h-24 bg-gray-700 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -211,10 +211,10 @@ export function NudgeCenter({
               <Bell className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-xl font-bold text-white">
                 Smart Nudges
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 {filteredNudges.length > 0
                   ? `${filteredNudges.length} suggestion${filteredNudges.length !== 1 ? 's' : ''} for you`
                   : 'You\'re all caught up!'
@@ -227,11 +227,11 @@ export function NudgeCenter({
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
               title="Refresh nudges"
             >
               <RefreshCw className={cn(
-                'w-4 h-4 text-gray-600 dark:text-gray-400',
+                'w-4 h-4 text-gray-400',
                 refreshing && 'animate-spin'
               )} />
             </button>
@@ -239,20 +239,20 @@ export function NudgeCenter({
             {showAnalytics && (
               <button
                 onClick={() => setShowAnalyticsModal(true)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
                 title="View analytics"
               >
-                <BarChart3 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                <BarChart3 className="w-4 h-4 text-gray-400" />
               </button>
             )}
 
             {showSettings && (
               <button
                 onClick={() => setShowSettingsModal(true)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
                 title="Nudge settings"
               >
-                <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                <Settings className="w-4 h-4 text-gray-400" />
               </button>
             )}
           </div>
@@ -262,7 +262,7 @@ export function NudgeCenter({
       {/* Priority Nudges */}
       {priorityNudges.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white flex items-center space-x-2">
+          <h3 className="text-sm font-medium text-white flex items-center space-x-2">
             <span>🔥 Priority</span>
           </h3>
           <div className="space-y-3">
@@ -283,7 +283,7 @@ export function NudgeCenter({
       {regularNudges.length > 0 && (
         <div className="space-y-3">
           {priorityNudges.length > 0 && (
-            <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+            <h3 className="text-sm font-medium text-white">
               Suggestions
             </h3>
           )}
@@ -307,10 +307,10 @@ export function NudgeCenter({
           <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lightbulb className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-medium text-white mb-2">
             All caught up!
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+          <p className="text-gray-400 max-w-md mx-auto">
             {settings?.nudges_enabled
               ? "You're doing great! No new nudges right now. Keep working on your goals and we'll help you stay on track."
               : "Smart nudges are disabled. Enable them in settings to get personalized suggestions."

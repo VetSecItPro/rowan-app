@@ -22,11 +22,11 @@ interface MilestonesBarChartProps {
 export default function MilestonesBarChart({ data }: MilestonesBarChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">
           Milestones Completion Trends
         </h3>
-        <div className="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-center h-64 text-gray-400">
           No milestones data available
         </div>
       </div>
@@ -34,8 +34,8 @@ export default function MilestonesBarChart({ data }: MilestonesBarChartProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-white mb-4">
         Milestones Completion Trends
       </h3>
       <ResponsiveContainer width="100%" height={300}>

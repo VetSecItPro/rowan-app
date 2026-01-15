@@ -174,7 +174,7 @@ export function MentionInput({
         <>
           <div
             ref={dropdownRef}
-            className="absolute z-50 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-48 overflow-y-auto"
+            className="absolute z-50 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-48 overflow-y-auto"
             style={{
               bottom: 'calc(100% + 4px)',
               left: 0,
@@ -184,9 +184,9 @@ export function MentionInput({
               <button
                 key={member.user_id}
                 onClick={() => insertMention(member)}
-                className={`w-full flex items-center gap-3 p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                className={`w-full flex items-center gap-3 p-3 hover:bg-gray-700 transition-colors ${
                   index === selectedMentionIndex
-                    ? 'bg-gray-100 dark:bg-gray-700'
+                    ? 'bg-gray-700'
                     : ''
                 }`}
               >
@@ -212,10 +212,10 @@ export function MentionInput({
 
                 {/* User Info */}
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-white">
                     {member.user.name}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-400">
                     @{member.user.name.toLowerCase().replace(/\s+/g, '')}
                   </p>
                 </div>
@@ -224,7 +224,7 @@ export function MentionInput({
           </div>
 
           {/* Hint */}
-          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-1 text-xs text-gray-400">
             Use ↑ ↓ to navigate, Enter to select, Esc to cancel
           </div>
         </>

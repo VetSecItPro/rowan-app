@@ -193,16 +193,16 @@ export default function MilestoneCelebration({
         {/* Celebration Card */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className={`relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden transition-all duration-500 ${
+          className={`relative bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden transition-all duration-500 ${
             isAnimating ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'
           }`}
         >
           {/* Close Button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 dark:bg-gray-900/80 hover:bg-white dark:hover:bg-gray-900 transition-colors"
+            className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center rounded-full bg-gray-900/80 hover:bg-gray-900 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-400" />
           </button>
 
           {/* Gradient Header */}
@@ -239,14 +239,14 @@ export default function MilestoneCelebration({
           {/* Body */}
           <div className="p-8">
             <div className="text-center">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-xl font-bold text-white mb-2">
                 {goalTitle}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">{milestoneDescription}</p>
+              <p className="text-gray-400 mb-6">{milestoneDescription}</p>
 
               {/* Motivational Message */}
-              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-4 border border-indigo-200 dark:border-indigo-800">
-                <p className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
+              <div className="bg-gradient-to-br from-indigo-50 from-indigo-900/20 to-purple-900/20 rounded-xl p-4 border border-indigo-800">
+                <p className="text-sm text-indigo-300 font-medium">
                   {percentageReached === 100
                     ? '🎊 Amazing! You have reached your goal! Time to celebrate!'
                     : percentageReached >= 75

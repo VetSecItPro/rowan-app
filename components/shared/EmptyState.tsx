@@ -23,14 +23,14 @@ export function EmptyState({
       className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}
     >
       {Icon && (
-        <div className="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 dark:from-gray-600 dark:to-gray-700 rounded-2xl flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-gradient-to-br from-gray-400 from-gray-600 to-gray-700 rounded-2xl flex items-center justify-center mb-4">
           <Icon className="w-8 h-8 text-white" />
         </div>
       )}
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+      <h3 className="text-lg font-semibold text-white mb-2">
         {title}
       </h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mb-6">
+      <p className="text-sm text-gray-400 max-w-md mb-6">
         {description}
       </p>
       {action && (

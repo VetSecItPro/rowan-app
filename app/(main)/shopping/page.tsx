@@ -658,8 +658,8 @@ export default function ShoppingPage() {
                 <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">Shopping Lists</h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Collaborative shopping made easy</p>
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white">Shopping Lists</h1>
+                <p className="text-sm sm:text-base text-gray-400">Collaborative shopping made easy</p>
               </div>
             </div>
             <button onClick={handleOpenNewListModal} className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors flex items-center justify-center gap-2 font-medium shadow-md">
@@ -677,16 +677,16 @@ export default function ShoppingPage() {
           >
             <button
               onClick={handleItemsThisWeekClick}
-              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Items This Week</h3>
+                <h3 className="text-gray-400 font-medium">Items This Week</h3>
                 <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center"><Package className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.itemsThisWeek}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.itemsThisWeek}</p>
                 {memoizedStats.itemsThisWeek > 0 && (
-                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                  <div className="flex items-center gap-1 text-purple-400">
                     <Package className="w-3 h-3" />
                     <span className="text-xs font-medium">New items</span>
                   </div>
@@ -695,16 +695,16 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleActiveListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active Lists</h3>
+                <h3 className="text-gray-400 font-medium">Active Lists</h3>
                 <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center"><Clock className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.activeLists}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.activeLists}</p>
                 {memoizedStats.activeLists > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-blue-400">
                     <Clock className="w-3 h-3" />
                     <span className="text-xs font-medium">In progress</span>
                   </div>
@@ -713,16 +713,16 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleCompletedListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed Lists</h3>
+                <h3 className="text-gray-400 font-medium">Completed Lists</h3>
                 <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center"><CheckCircle2 className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.completedLists}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.completedLists}</p>
                 {memoizedStats.totalLists > 0 && (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <div className="flex items-center gap-1 text-green-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">
                       {(() => {
@@ -738,16 +738,16 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleTotalListsClick}
-              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total Lists</h3>
+                <h3 className="text-gray-400 font-medium">Total Lists</h3>
                 <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center"><List className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{memoizedStats.totalLists}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.totalLists}</p>
                 {memoizedStats.totalLists > 0 && (
-                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <div className="flex items-center gap-1 text-emerald-400">
                     <List className="w-3 h-3" />
                     <span className="text-xs font-medium">Overall</span>
                   </div>
@@ -793,15 +793,15 @@ export default function ShoppingPage() {
           </div>
 
           {/* Shopping Lists */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 sm:p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col gap-4 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-lg sm:text-xl font-bold text-white">
                     {timeFilter === 'week' ? 'This Week\'s Lists' : 'All Shopping Lists'} ({filteredLists.length})
                   </h2>
-                  <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-medium rounded-full">
+                  <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-emerald-900/30 border border-emerald-700 text-emerald-300 text-xs sm:text-sm font-medium rounded-full">
                     {timeFilter === 'week' ? 'This Week' : format(new Date(), 'MMM yyyy')}
                   </span>
                 </div>
@@ -809,13 +809,13 @@ export default function ShoppingPage() {
 
               {/* Status Filter - Compact Segmented Buttons */}
               <div className="w-full sm:w-auto">
-                <div className="bg-gray-100/80 dark:bg-gray-900/80 rounded-full p-1 flex w-full sm:w-auto gap-0.5">
+                <div className="bg-gray-900/80 rounded-full p-1 flex w-full sm:w-auto gap-0.5">
                   <button
                     onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'all' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        : 'text-gray-400 hover:text-gray-200'
                     }`}
                   >
                     All
@@ -825,7 +825,7 @@ export default function ShoppingPage() {
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       timeFilter === 'week'
                         ? 'bg-emerald-500 text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        : 'text-gray-400 hover:text-gray-200'
                     }`}
                   >
                     Week
@@ -835,7 +835,7 @@ export default function ShoppingPage() {
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'active' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        : 'text-gray-400 hover:text-gray-200'
                     }`}
                   >
                     Active
@@ -845,7 +845,7 @@ export default function ShoppingPage() {
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'completed' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                        : 'text-gray-400 hover:text-gray-200'
                     }`}
                   >
                     Done
@@ -856,16 +856,16 @@ export default function ShoppingPage() {
             {loading ? (
               <div className="space-y-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
+                  <div key={i} className="bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-48" />
-                      <div className="h-8 bg-gray-200 dark:bg-gray-600 rounded w-24" />
+                      <div className="h-6 bg-gray-600 rounded w-48" />
+                      <div className="h-8 bg-gray-600 rounded w-24" />
                     </div>
                     <div className="space-y-3">
                       {[...Array(3)].map((_, j) => (
                         <div key={j} className="flex items-center gap-3">
-                          <div className="w-5 h-5 bg-gray-200 dark:bg-gray-600 rounded" />
-                          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded flex-1" />
+                          <div className="w-5 h-5 bg-gray-600 rounded" />
+                          <div className="h-4 bg-gray-600 rounded flex-1" />
                         </div>
                       ))}
                     </div>
@@ -875,8 +875,8 @@ export default function ShoppingPage() {
             ) : filteredLists.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No lists found</p>
-                <p className="text-gray-500 dark:text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
+                <p className="text-gray-400 text-lg mb-2">No lists found</p>
+                <p className="text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
                 {!searchQuery && statusFilter === 'active' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button onClick={handleOpenNewListModal} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors inline-flex items-center gap-2 font-medium shadow-md">

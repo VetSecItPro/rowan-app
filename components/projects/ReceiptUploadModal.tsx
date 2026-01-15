@@ -118,23 +118,23 @@ export function ReceiptUploadModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-white">
                 Upload Receipt
               </h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              <p className="text-gray-400 text-sm mt-1">
                 Take a photo or upload an image to extract details automatically
               </p>
             </div>
             <button
               onClick={handleClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
@@ -145,24 +145,24 @@ export function ReceiptUploadModal({
                 <div
                   onDrop={handleFileDrop}
                   onDragOver={(e) => e.preventDefault()}
-                  className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center hover:border-amber-500 dark:hover:border-amber-500 transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-gray-600 rounded-xl p-12 text-center hover:border-amber-500 transition-colors cursor-pointer"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-gray-400 mb-2">
                     Drag and drop your receipt here, or click to browse
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">
+                  <p className="text-sm text-gray-500">
                     Supports JPG, PNG, and PDF up to 10MB
                   </p>
                 </div>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                    <div className="w-full border-t border-gray-600"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                    <span className="px-2 bg-gray-800 text-gray-400">
                       Or
                     </span>
                   </div>
@@ -203,7 +203,7 @@ export function ReceiptUploadModal({
             ) : (
               <div className="space-y-6">
                 {/* Preview */}
-                <div className="relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900">
+                <div className="relative rounded-lg overflow-hidden bg-gray-900">
                   {previewUrl && (
                     <img
                       src={previewUrl}
@@ -228,20 +228,20 @@ export function ReceiptUploadModal({
                 </div>
 
                 {error && (
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-yellow-800 dark:text-yellow-200">{error}</p>
+                  <div className="bg-yellow-900/20 border border-yellow-800 rounded-lg p-4 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-yellow-200">{error}</p>
                   </div>
                 )}
 
                 {/* Extracted Data Form */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-semibold text-white">
                     Receipt Details
                   </h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Merchant Name
                     </label>
                     <input
@@ -249,13 +249,13 @@ export function ReceiptUploadModal({
                       value={merchantName}
                       onChange={(e) => setMerchantName(e.target.value)}
                       placeholder="e.g., Walmart, Starbucks"
-                      className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Total Amount
                       </label>
                       <div className="relative">
@@ -266,32 +266,32 @@ export function ReceiptUploadModal({
                           value={totalAmount}
                           onChange={(e) => setTotalAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                          className="w-full pl-8 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Date
                       </label>
                       <input
                         type="date"
                         value={receiptDate}
                         onChange={(e) => setReceiptDate(e.target.value)}
-                        className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                     </div>
                   </div>
 
                   <div className="relative z-50">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Category
                     </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 relative z-50"
                       style={{ position: 'relative', zIndex: 9999 }}
                     >
                       <option value="">Select category</option>
@@ -316,7 +316,7 @@ export function ReceiptUploadModal({
                     setOcrComplete(false);
                     setError(null);
                   }}
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  className="text-sm text-gray-400 hover:text-white"
                 >
                   Upload a different image
                 </button>
@@ -326,11 +326,11 @@ export function ReceiptUploadModal({
 
           {/* Footer */}
           {file && (
-            <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-700">
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                className="px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors font-medium"
                 disabled={isUploading}
               >
                 Cancel

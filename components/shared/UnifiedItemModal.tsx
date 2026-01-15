@@ -394,26 +394,26 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Enhanced Wide Modal */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:max-w-6xl sm:max-h-[95vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden" style={{ overflowX: 'visible' }}>
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:max-w-6xl sm:max-h-[95vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden" style={{ overflowX: 'visible' }}>
 
         {/* Loading Overlay for Space Creation */}
         {spaceCreationLoading && (
-          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
             <div className="text-center">
               <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">Setting up your space...</p>
+              <p className="text-sm text-gray-400">Setting up your space...</p>
             </div>
           </div>
         )}
 
         {/* Error Message */}
         {spaceError && !spaceCreationLoading && (
-          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
             <div className="text-center max-w-sm mx-4">
-              <p className="text-red-600 dark:text-red-400 mb-4">{spaceError}</p>
+              <p className="text-red-400 mb-4">{spaceError}</p>
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Close
               </button>
@@ -481,7 +481,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
           <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
 
             {/* Compact Section Navigation - Horizontal scroll on mobile */}
-            <div className="flex gap-1.5 sm:gap-2 p-1 bg-gray-100 dark:bg-gray-900 rounded-full sm:rounded-xl overflow-x-auto scrollbar-hide">
+            <div className="flex gap-1.5 sm:gap-2 p-1 bg-gray-900 rounded-full sm:rounded-xl overflow-x-auto scrollbar-hide">
               {[
                 { id: 'basic', label: 'Basics', emoji: '📝', icon: Tag },
                 { id: 'details', label: 'Details', emoji: '⚡', icon: Star },
@@ -493,8 +493,8 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                   onClick={() => setActiveSection(section.id)}
                   className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full sm:rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                     activeSection === section.id
-                      ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'bg-gray-800 text-blue-600 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200'
                   }`}
                 >
                   <span className="sm:hidden">{section.emoji}</span>
@@ -510,7 +510,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Title */}
                   <div className="lg:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Title *
                     </label>
                     <input
@@ -518,13 +518,13 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                       value={formData.title}
                       onChange={(e) => handleInputChange('title', e.target.value)}
                       placeholder={`What ${itemType} needs to be done?`}
-                      className="w-full px-4 py-3 text-lg border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 text-lg border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-500"
                     />
                   </div>
 
                   {/* Description */}
                   <div className="lg:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Description
                     </label>
                     <textarea
@@ -532,13 +532,13 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                       onChange={(e) => handleInputChange('description', e.target.value)}
                       placeholder="Add details, instructions, or notes..."
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 resize-none"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-500 resize-none"
                     />
                   </div>
 
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Category
                     </label>
                     <Dropdown
@@ -551,7 +551,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
                   {/* Priority */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Priority
                     </label>
                     <Dropdown
@@ -571,7 +571,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Status */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Status
                     </label>
                     <Dropdown
@@ -585,7 +585,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                   {/* Points Value - Only for Chores */}
                   {itemType === 'chore' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         <span className="flex items-center gap-2">
                           <Trophy className="w-4 h-4 text-amber-500" />
                           Points Reward
@@ -599,13 +599,13 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                           placeholder="10"
                           min="1"
                           max="1000"
-                          className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                          className="w-full px-4 py-3 pr-16 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-gray-900 text-white placeholder-gray-500"
                         />
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-600 dark:text-amber-400 text-sm font-medium">
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-400 text-sm font-medium">
                           pts
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-1">
                         Points earned when this chore is completed
                       </p>
                     </div>
@@ -613,7 +613,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
                   {/* Estimated Hours */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Estimated Time
                     </label>
                     <div className="relative">
@@ -624,7 +624,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                         placeholder="How long will this take?"
                         min="0"
                         step="0.5"
-                        className="w-full px-4 py-3 pr-16 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                        className="w-full px-4 py-3 pr-16 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-500"
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
                         hours
@@ -634,7 +634,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
                   {/* Tags */}
                   <div className="lg:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Tags (comma-separated)
                     </label>
                     <input
@@ -642,13 +642,13 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                       value={formData.tags}
                       onChange={(e) => handleInputChange('tags', e.target.value)}
                       placeholder="urgent, outdoor, fun, weekly..."
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-500"
                     />
                   </div>
 
                   {/* Quick Note for Collaboration */}
                   <div className="lg:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Quick Note for Family
                     </label>
                     <input
@@ -656,7 +656,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                       value={quickNote}
                       onChange={(e) => setQuickNote(e.target.value)}
                       placeholder="Leave a quick note for the family..."
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-500"
                     />
                   </div>
                 </div>
@@ -669,7 +669,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Family Member Assignment */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Assign to Family Member
                     </label>
                     <Dropdown
@@ -685,7 +685,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
                   {/* Custom Assignment */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Or Assign to Specific Person
                     </label>
                     <input
@@ -693,7 +693,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                       value={formData.assigned_to}
                       onChange={(e) => handleInputChange('assigned_to', e.target.value)}
                       placeholder="Enter name or email..."
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500"
+                      className="w-full px-4 py-3 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-500"
                     />
                   </div>
                 </div>
@@ -719,21 +719,21 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
                   {/* Calendar Sync Toggle */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    <label className="block text-sm font-medium text-gray-300 mb-3">
                       Calendar Integration
                     </label>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setCalendarSync(!calendarSync)}
                         className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          calendarSync ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                          calendarSync ? 'bg-blue-600' : 'bg-gray-700'
                         }`}
                       >
                         <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
                           calendarSync ? 'translate-x-5' : 'translate-x-0'
                         }`} />
                       </button>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-gray-400">
                         {calendarSync ? 'Sync with calendar' : 'No calendar sync'}
                       </span>
                     </div>
@@ -750,7 +750,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           isRecurring
                             ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            : 'bg-gray-700 text-gray-300'
                         }`}
                       >
                         <Repeat className="w-4 h-4" />
@@ -760,9 +760,9 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
                     {/* Recurring Options */}
                     {isRecurring && (
-                      <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                      <div className="space-y-4 p-4 bg-blue-900/20 rounded-lg border border-blue-700">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                          <label className="block text-sm font-medium text-gray-300 mb-3">
                             How often should this repeat?
                           </label>
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -787,14 +787,14 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                                   }))}
                                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                                     isSelected
-                                      ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30'
-                                      : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 bg-white dark:bg-gray-800'
+                                      ? 'border-blue-500 bg-blue-900/30'
+                                      : 'border-gray-600 hover:border-blue-600 bg-gray-800'
                                   }`}
                                 >
-                                  <div className="font-medium text-sm text-gray-900 dark:text-white">
+                                  <div className="font-medium text-sm text-white">
                                     {option.label}
                                   </div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  <div className="text-xs text-gray-400">
                                     {option.desc}
                                   </div>
                                 </button>
@@ -803,8 +803,8 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                           </div>
 
                           {/* Custom option for advanced users */}
-                          <div className="mt-4 p-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                          <div className="mt-4 p-3 rounded-lg border border-gray-600 bg-gray-700">
+                            <label className="block text-xs font-medium text-gray-300 mb-2">
                               Custom schedule (advanced)
                             </label>
                             <div className="grid grid-cols-2 gap-3">
@@ -822,7 +822,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                                 />
                               </div>
                               <div className="flex items-center gap-2 relative">
-                                <span className="text-xs text-gray-600 dark:text-gray-300">Every</span>
+                                <span className="text-xs text-gray-300">Every</span>
                                 <div className="relative">
                                   <input
                                     type="number"
@@ -857,10 +857,10 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                                         setRecurringData(prev => ({ ...prev, interval: 1 }));
                                       }
                                     }}
-                                    className={`w-16 px-2 py-1 text-sm border rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center ${
+                                    className={`w-16 px-2 py-1 text-sm border rounded bg-gray-800 text-white text-center ${
                                       getIntervalValidation().isValid
-                                        ? 'border-gray-300 dark:border-gray-500'
-                                        : 'border-red-500 dark:border-red-400'
+                                        ? 'border-gray-500'
+                                        : 'border-red-400'
                                     }`}
                                     placeholder="1"
                                   />
@@ -873,7 +873,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                                     </div>
                                   )}
                                 </div>
-                                <span className="text-xs text-gray-600 dark:text-gray-300">
+                                <span className="text-xs text-gray-300">
                                   {recurringData.pattern === 'daily' ? 'days' : recurringData.pattern === 'weekly' ? 'weeks' : 'months'}
                                 </span>
                               </div>
@@ -890,15 +890,15 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
         </div>
 
         {/* Compact Action Bar */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
+        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
+            <div className="text-xs sm:text-sm text-gray-400 hidden sm:block">
               {mode === 'create' ? 'Creating' : 'Editing'} {itemType} for your family
             </div>
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <button
                 onClick={onClose}
-                className="flex-1 sm:flex-none px-4 sm:px-5 py-2 sm:py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                className="flex-1 sm:flex-none px-4 sm:px-5 py-2 sm:py-2.5 border border-gray-600 text-gray-300 rounded-full hover:bg-gray-700 transition-colors text-sm font-medium"
               >
                 Cancel
               </button>

@@ -98,7 +98,7 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-indigo-400" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-400" />
       </div>
     );
   }
@@ -107,41 +107,41 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="text-2xl font-bold text-white">
             {stats.totalBadges}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Total Badges</div>
+          <div className="text-sm text-gray-400">Total Badges</div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="text-2xl font-bold text-amber-400">
             {stats.totalPoints}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Total Points</div>
+          <div className="text-sm text-gray-400">Total Points</div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="text-2xl font-bold text-purple-400">
             {stats.byRarity.epic + stats.byRarity.legendary}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Epic+ Badges</div>
+          <div className="text-sm text-gray-400">Epic+ Badges</div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="text-2xl font-bold text-indigo-400">
             {Math.round((stats.totalBadges / allBadges.length) * 100)}%
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Collection Progress</div>
+          <div className="text-sm text-gray-400">Collection Progress</div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Status Filter */}
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Status
             </label>
             <div className="flex gap-2">
@@ -154,7 +154,7 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
                     ${
                       filterStatus === status
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }
                   `}
                 >
@@ -166,13 +166,13 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
 
           {/* Category Filter */}
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Category
             </label>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value as FilterCategory)}
-              className="w-full px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+              className="w-full px-3 py-1.5 rounded-lg border border-gray-600 bg-gray-700 text-white text-sm"
             >
               <option value="all">All Categories</option>
               <option value="goals">Goals</option>
@@ -186,13 +186,13 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
 
           {/* Rarity Filter */}
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Rarity
             </label>
             <select
               value={filterRarity}
               onChange={(e) => setFilterRarity(e.target.value as FilterRarity)}
-              className="w-full px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+              className="w-full px-3 py-1.5 rounded-lg border border-gray-600 bg-gray-700 text-white text-sm"
             >
               <option value="all">All Rarities</option>
               <option value="common">Common</option>
@@ -209,10 +209,10 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
       {filteredBadges.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🏆</div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-white mb-2">
             No badges found
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             Try adjusting your filters or complete more goals to earn badges!
           </p>
         </div>

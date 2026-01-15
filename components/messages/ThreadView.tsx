@@ -152,28 +152,28 @@ export function ThreadView({
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-0 sm:p-4">
       {/* Thread Container */}
-      <div className="bg-white dark:bg-gray-900 w-full h-full sm:max-w-2xl sm:max-h-[90vh] sm:rounded-lg flex flex-col overflow-hidden shadow-2xl">
+      <div className="bg-gray-900 w-full h-full sm:max-w-2xl sm:max-h-[90vh] sm:rounded-lg flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Thread</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <h2 className="text-lg font-semibold text-white">Thread</h2>
+            <p className="text-xs text-gray-400">
               {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-colors"
             aria-label="Close thread"
           >
-            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
         {/* Thread Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Parent Message */}
-          <div className="pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="pb-4 border-b border-gray-700">
             <MessageCard
               message={parentMessage}
               onEdit={() => toast.info('Edit parent message not supported in thread view')}
@@ -196,8 +196,8 @@ export function ThreadView({
           {/* Replies */}
           {!loading && replies.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 text-sm">No replies yet</p>
-              <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">
+              <p className="text-gray-400 text-sm">No replies yet</p>
+              <p className="text-gray-500 text-xs mt-1">
                 Be the first to reply
               </p>
             </div>
@@ -229,7 +229,7 @@ export function ThreadView({
         {/* Reply Input */}
         <form
           onSubmit={handleSendReply}
-          className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800"
+          className="border-t border-gray-700 p-4 bg-gray-800"
         >
           <div className="flex items-end gap-2">
             <textarea
@@ -238,7 +238,7 @@ export function ThreadView({
               placeholder="Write a reply..."
               rows={2}
               disabled={sending}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600 resize-none disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600 resize-none disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
@@ -249,7 +249,7 @@ export function ThreadView({
             <button
               type="submit"
               disabled={!replyInput.trim() || sending}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors active:scale-95"
+              className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors active:scale-95"
               aria-label="Send reply"
             >
               {sending ? (
@@ -259,7 +259,7 @@ export function ThreadView({
               )}
             </button>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             Press Enter to send, Shift+Enter for new line
           </p>
         </form>

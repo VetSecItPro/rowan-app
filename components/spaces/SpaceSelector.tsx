@@ -154,7 +154,7 @@ export function SpaceSelector({
   const dropdownContent = (
     <div
       ref={dropdownRef}
-      className="fixed bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-[9999]"
+      className="fixed bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-[9999]"
       style={{
         top: `${dropdownPosition.top}px`,
         left: `${dropdownPosition.left}px`,
@@ -162,8 +162,8 @@ export function SpaceSelector({
       }}
     >
       {/* Header */}
-      <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Your Spaces</h3>
+      <div className="px-4 py-2 border-b border-gray-700">
+        <h3 className="text-sm font-semibold text-white">Your Spaces</h3>
       </div>
 
       {/* Space List */}
@@ -176,33 +176,33 @@ export function SpaceSelector({
                 onSpaceChange(space);
                 setIsOpen(false);
               }}
-              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-3">
                 {getSpaceIcon(space)}
                 <div className="text-left">
-                  <div className={`font-medium ${isPersonalWorkspace(space) ? 'text-purple-600 dark:text-purple-400' : ''}`}>
+                  <div className={`font-medium ${isPersonalWorkspace(space) ? 'text-purple-400' : ''}`}>
                     {getSpaceDisplayName(space)}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                  <div className="text-xs text-gray-400 capitalize">
                     {isPersonalWorkspace(space) ? 'Personal' : space.role}
                   </div>
                 </div>
               </div>
               {currentSpace?.id === space.id && (
-                <Check className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <Check className="w-4 h-4 text-purple-400" />
               )}
             </button>
           ))
         ) : (
-          <div className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="px-4 py-6 text-center text-sm text-gray-400">
             No spaces yet. Create one to get started!
           </div>
         )}
       </div>
 
       {/* Divider */}
-      <hr className="my-1 border-gray-200 dark:border-gray-700" />
+      <hr className="my-1 border-gray-700" />
 
       {/* Actions */}
       <div className="py-1">
@@ -211,7 +211,7 @@ export function SpaceSelector({
             onCreateSpace();
             setIsOpen(false);
           }}
-          className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create New Space
@@ -222,7 +222,7 @@ export function SpaceSelector({
               onInvitePartner();
               setIsOpen(false);
             }}
-            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
           >
             <UserPlus className="w-4 h-4" />
             Invite to Space
@@ -236,11 +236,11 @@ export function SpaceSelector({
   if (spaces.length === 1 && currentSpace) {
     const singleSpaceClasses = variant === 'header'
       ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium ${getHeaderBackgroundClass(userColorTheme)}`
-      : "flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl";
+      : "flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl";
 
     const iconClasses = variant === 'header'
       ? "w-4 h-4 text-white/90"
-      : "w-4 h-4 text-gray-600 dark:text-gray-400";
+      : "w-4 h-4 text-gray-400";
 
     const textClasses = variant === 'header'
       ? "text-sm font-medium text-white"
@@ -264,19 +264,19 @@ export function SpaceSelector({
         onClick={() => setIsOpen(!isOpen)}
         className={variant === 'header'
           ? `flex items-center gap-2 px-3 py-2 rounded-full text-white font-medium transition-all hover:opacity-90 active:scale-95 w-[160px] ${getHeaderBackgroundClass(userColorTheme)}`
-          : "flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-[160px]"
+          : "flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 transition-colors w-[160px]"
         }
       >
-        <Home className={variant === 'header' ? "w-4 h-4 text-white/90 flex-shrink-0" : "w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0"} />
+        <Home className={variant === 'header' ? "w-4 h-4 text-white/90 flex-shrink-0" : "w-4 h-4 text-gray-400 flex-shrink-0"} />
         <span className={variant === 'header'
           ? "text-sm font-medium text-white flex-1 text-center truncate"
-          : `text-sm font-bold truncate ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-gray-900 dark:text-white'}`
+          : `text-sm font-bold truncate ${currentSpace ? getThemeColorClass(userColorTheme) : 'text-white'}`
         }>
           {currentSpace ? currentSpace.name : 'No Space'}
         </span>
         <ChevronDown
           className={`w-4 h-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${
-            variant === 'header' ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'
+            variant === 'header' ? 'text-white/90' : 'text-gray-400'
           }`}
         />
       </button>

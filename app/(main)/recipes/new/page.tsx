@@ -207,7 +207,7 @@ export default function NewRecipePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -229,15 +229,15 @@ export default function NewRecipePage() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-1">
             <button
               onClick={() => setActiveTab('manual')}
               className={`px-6 py-3 font-medium transition-all border-b-2 ${
                 activeTab === 'manual'
-                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'border-orange-500 text-orange-400'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
               title="Enter recipe details manually"
             >
@@ -250,8 +250,8 @@ export default function NewRecipePage() {
               onClick={() => setActiveTab('ai')}
               className={`px-6 py-3 font-medium transition-all border-b-2 ${
                 activeTab === 'ai'
-                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'border-orange-500 text-orange-400'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
               title="Use AI to parse recipe from text or image"
             >
@@ -268,10 +268,10 @@ export default function NewRecipePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* AI Import Tab */}
         {activeTab === 'ai' && (
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
-            <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-900 dark:text-blue-200">
+          <div className="bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
+            <div className="flex items-start gap-3 p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
+              <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-200">
                 <p className="font-semibold mb-1">How AI Import Works</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>Paste recipe text from a website, blog, or document</li>
@@ -284,7 +284,7 @@ export default function NewRecipePage() {
 
             {/* Text Input */}
             <div>
-              <label htmlFor="recipe-text" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="recipe-text" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Paste Recipe Text
               </label>
               <textarea
@@ -293,23 +293,23 @@ export default function NewRecipePage() {
                 onChange={(e) => setRecipeText(e.target.value)}
                 placeholder="Paste your recipe here... Include ingredients, instructions, prep time, etc."
                 rows={10}
-                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white placeholder-gray-500"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-500"
               />
             </div>
 
             {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                <div className="w-full border-t border-gray-600"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">OR</span>
+                <span className="px-4 bg-gray-800 text-gray-400">OR</span>
               </div>
             </div>
 
             {/* Image Upload */}
             <div>
-              <label htmlFor="recipe-image-upload" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="recipe-image-upload" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Upload Recipe Image
               </label>
               <div className="space-y-3">
@@ -324,10 +324,10 @@ export default function NewRecipePage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full px-4 py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-orange-500 dark:hover:border-orange-400 transition-colors"
+                  className="w-full px-4 py-8 border-2 border-dashed border-gray-600 rounded-lg hover:border-orange-400 transition-colors"
                   title="Click to upload an image"
                 >
-                  <div className="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400">
+                  <div className="flex flex-col items-center gap-2 text-gray-400">
                     <ImageIcon className="w-10 h-10" />
                     <span className="font-medium">Click to upload image</span>
                     <span className="text-sm">PNG, JPG, or JPEG</span>
@@ -381,14 +381,14 @@ export default function NewRecipePage() {
 
         {/* Manual Entry Tab */}
         {activeTab === 'manual' && (
-          <form onSubmit={handleSubmit} className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+              <h2 className="text-lg font-semibold text-white">Basic Information</h2>
 
               {/* Recipe Name */}
               <div>
-                <label htmlFor="recipe-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="recipe-name" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Recipe Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -398,13 +398,13 @@ export default function NewRecipePage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Grandma's Apple Pie"
                   required
-                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label htmlFor="recipe-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="recipe-description" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Description
                 </label>
                 <textarea
@@ -413,13 +413,13 @@ export default function NewRecipePage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of the recipe..."
                   rows={3}
-                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                 />
               </div>
 
               {/* Image URL */}
               <div>
-                <label htmlFor="recipe-image-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="recipe-image-url" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Image URL
                 </label>
                 <input
@@ -428,7 +428,7 @@ export default function NewRecipePage() {
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                   title="Optional: Add a URL to an image for this recipe"
                 />
               </div>
@@ -437,7 +437,7 @@ export default function NewRecipePage() {
             {/* Ingredients */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-white">
                   Ingredients <span className="text-red-500">*</span>
                 </h2>
                 <button
@@ -459,14 +459,14 @@ export default function NewRecipePage() {
                       value={ingredient.name}
                       onChange={(e) => updateIngredient(index, 'name', e.target.value)}
                       placeholder="Ingredient name"
-                      className="flex-1 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      className="flex-1 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                     />
                     <input
                       type="text"
                       value={ingredient.amount}
                       onChange={(e) => updateIngredient(index, 'amount', e.target.value)}
                       placeholder="Amount"
-                      className="w-24 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      className="w-24 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                       title="e.g., 2, 1/2, 3.5"
                     />
                     <input
@@ -474,14 +474,14 @@ export default function NewRecipePage() {
                       value={ingredient.unit}
                       onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
                       placeholder="Unit"
-                      className="w-24 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                      className="w-24 px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                       title="e.g., cups, tsp, oz"
                     />
                     {ingredients.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeIngredient(index)}
-                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-900/20 rounded-lg transition-colors"
                         title="Remove this ingredient"
                       >
                         <X className="w-5 h-5" />
@@ -494,7 +494,7 @@ export default function NewRecipePage() {
 
             {/* Instructions */}
             <div>
-              <label htmlFor="recipe-instructions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="recipe-instructions" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Instructions
               </label>
               <textarea
@@ -503,18 +503,18 @@ export default function NewRecipePage() {
                 onChange={(e) => setInstructions(e.target.value)}
                 placeholder="Step-by-step cooking instructions..."
                 rows={8}
-                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm min-h-[120px] bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
               />
             </div>
 
             {/* Recipe Details */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recipe Details</h2>
+              <h2 className="text-lg font-semibold text-white">Recipe Details</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Prep Time */}
                 <div>
-                  <label htmlFor="recipe-prep-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                  <label htmlFor="recipe-prep-time" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                     Prep Time (minutes)
                   </label>
                   <input
@@ -524,14 +524,14 @@ export default function NewRecipePage() {
                     onChange={(e) => setPrepTime(e.target.value)}
                     placeholder="30"
                     min="0"
-                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                     title="Time to prepare ingredients"
                   />
                 </div>
 
                 {/* Cook Time */}
                 <div>
-                  <label htmlFor="recipe-cook-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                  <label htmlFor="recipe-cook-time" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                     Cook Time (minutes)
                   </label>
                   <input
@@ -541,14 +541,14 @@ export default function NewRecipePage() {
                     onChange={(e) => setCookTime(e.target.value)}
                     placeholder="45"
                     min="0"
-                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                     title="Time to cook the recipe"
                   />
                 </div>
 
                 {/* Servings */}
                 <div>
-                  <label htmlFor="recipe-servings" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                  <label htmlFor="recipe-servings" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                     Servings
                   </label>
                   <input
@@ -558,7 +558,7 @@ export default function NewRecipePage() {
                     onChange={(e) => setServings(e.target.value)}
                     placeholder="4"
                     min="1"
-                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                     title="Number of servings"
                   />
                 </div>
@@ -567,14 +567,14 @@ export default function NewRecipePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Difficulty */}
                 <div>
-                  <label htmlFor="recipe-difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                  <label htmlFor="recipe-difficulty" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                     Difficulty
                   </label>
                   <select
                     id="recipe-difficulty"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
-                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                     title="Recipe difficulty level"
                   >
                     <option value="">Select difficulty...</option>
@@ -586,7 +586,7 @@ export default function NewRecipePage() {
 
                 {/* Cuisine Type */}
                 <div>
-                  <label htmlFor="recipe-cuisine-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                  <label htmlFor="recipe-cuisine-type" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                     Cuisine Type
                   </label>
                   <input
@@ -595,7 +595,7 @@ export default function NewRecipePage() {
                     value={cuisineType}
                     onChange={(e) => setCuisineType(e.target.value)}
                     placeholder="e.g., Italian, Mexican, Asian"
-                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                     title="Type of cuisine"
                   />
                 </div>
@@ -603,7 +603,7 @@ export default function NewRecipePage() {
 
               {/* Tags */}
               <div>
-                <label htmlFor="recipe-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="recipe-tags" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Tags (comma-separated)
                 </label>
                 <input
@@ -612,17 +612,17 @@ export default function NewRecipePage() {
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
                   placeholder="dessert, holiday, vegetarian"
-                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 text-white"
                   title="Add tags to categorize this recipe"
                 />
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
               <Link
                 href="/recipes"
-                className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Cancel
               </Link>

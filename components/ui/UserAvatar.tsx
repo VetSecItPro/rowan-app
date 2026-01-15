@@ -15,14 +15,14 @@ const sizeClasses = {
 };
 
 const colorThemes = {
-  emerald: 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-800',
-  blue: 'bg-blue-500 ring-blue-200 dark:ring-blue-800',
-  purple: 'bg-purple-500 ring-purple-200 dark:ring-purple-800',
-  pink: 'bg-pink-500 ring-pink-200 dark:ring-pink-800',
-  orange: 'bg-orange-500 ring-orange-200 dark:ring-orange-800',
-  rose: 'bg-rose-500 ring-rose-200 dark:ring-rose-800',
-  cyan: 'bg-cyan-500 ring-cyan-200 dark:ring-cyan-800',
-  amber: 'bg-amber-500 ring-amber-200 dark:ring-amber-800',
+  emerald: 'bg-emerald-500 ring-emerald-800',
+  blue: 'bg-blue-500 ring-blue-800',
+  purple: 'bg-purple-500 ring-purple-800',
+  pink: 'bg-pink-500 ring-pink-800',
+  orange: 'bg-orange-500 ring-orange-800',
+  rose: 'bg-rose-500 ring-rose-800',
+  cyan: 'bg-cyan-500 ring-cyan-800',
+  amber: 'bg-amber-500 ring-amber-800',
 };
 
 export function UserAvatar({ name, colorTheme = 'purple', size = 'sm', className = '' }: UserAvatarProps) {
