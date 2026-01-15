@@ -6,6 +6,12 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Zod schema for accepting invitation
+const AcceptInvitationSchema = z.object({
+  token: z.string().min(1).max(500),
+}).strict();
 
 /**
  * POST /api/invitations/accept
@@ -39,17 +45,18 @@ export async function POST(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { token } = body;
+    const validationResult = AcceptInvitationSchema.safeParse(body);
 
-    if (!token || typeof token !== 'string') {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Invitation token is required' },
+        { error: 'Invalid input', details: validationResult.error.flatten() },
         { status: 400 }
       );
     }
 
+    const { token } = validationResult.data;
 
     // Accept invitation using service
     const result = await acceptInvitation(token, user.id);

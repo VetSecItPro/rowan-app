@@ -281,7 +281,7 @@ function parseICSData(icsData: string): ParsedICSEvent[] {
         const recurrence = rruleProp ? String(rruleProp.getFirstValue()) : undefined;
 
         events.push({
-          uid: event.uid || `generated-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          uid: event.uid || `generated-${crypto.randomUUID()}`,
           summary: event.summary || 'Untitled Event',
           description: event.description || undefined,
           location: event.location || undefined,

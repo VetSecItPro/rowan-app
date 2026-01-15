@@ -178,7 +178,7 @@ export default function RemindersPage(): React.JSX.Element {
         // Real-time will handle the update automatically
       } else {
         // Create new reminder with optimistic update
-        const tempId = `temp_${Date.now()}_${Math.random()}`;
+        const tempId = `temp_${crypto.randomUUID()}`;
         const optimisticReminder: Reminder = {
           id: tempId,
           ...reminderData,
