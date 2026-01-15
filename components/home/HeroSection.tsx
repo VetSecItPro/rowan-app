@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { Users, Zap, Shield, Compass as CompassIcon } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -155,19 +156,23 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                                        className="relative group p-6 rounded-2xl bg-gradient-to-br from-white/80 from-gray-800/80 to-gray-900/40 backdrop-blur-xl border border-gray-700/50 hover:scale-105 transition-all duration-300 hover:shadow-xl"
+                                        className="group"
                                     >
-                                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} p-0.5 mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                            <div className="w-full h-full rounded-xl bg-gray-900 flex items-center justify-center">
-                                                <benefit.icon className={`w-6 h-6 ${iconColorMap[benefit.gradient]}`} />
+                                        <SpotlightCard className="h-full hover:scale-105 transition-all duration-300 hover:shadow-xl rounded-2xl">
+                                            <div className="p-6">
+                                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} p-0.5 mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                                    <div className="w-full h-full rounded-xl bg-gray-900 flex items-center justify-center">
+                                                        <benefit.icon className={`w-6 h-6 ${iconColorMap[benefit.gradient]}`} />
+                                                    </div>
+                                                </div>
+                                                <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">
+                                                    {benefit.title}
+                                                </h3>
+                                                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-serif italic">
+                                                    {benefit.description}
+                                                </p>
                                             </div>
-                                        </div>
-                                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">
-                                            {benefit.title}
-                                        </h3>
-                                        <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-serif italic">
-                                            {benefit.description}
-                                        </p>
+                                        </SpotlightCard>
                                     </motion.div>
                                 );
                             })}

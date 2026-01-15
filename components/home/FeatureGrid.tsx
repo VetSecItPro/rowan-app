@@ -102,7 +102,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0], index: n
                 href={feature.href}
                 prefetch={true}
             >
-                <SpotlightCard className="h-full bg-gradient-to-br from-white/80 from-gray-800/80 to-gray-900/40 backdrop-blur-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl">
+                <SpotlightCard className="h-full transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl">
                     <div className="p-6 h-full relative z-10">
                         {/* Animated gradient background on hover */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
