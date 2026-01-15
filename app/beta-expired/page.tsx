@@ -5,10 +5,10 @@ import Link from 'next/link';
 
 export default function BetaExpiredPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-gray-50 to-slate-100 dark:from-gray-900 dark:via-black dark:to-gray-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-gray-50 from-gray-900 to-gray-950 p-4">
       <div className="max-w-md w-full">
         {/* Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 p-8">
+        <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 p-8">
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="relative">
@@ -22,26 +22,26 @@ export default function BetaExpiredPage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-3">
+          <h1 className="text-2xl font-bold text-center text-white mb-3">
             Beta Access Expired
           </h1>
 
           {/* Message */}
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-center text-gray-400 mb-6">
             Your beta testing period has ended. Thank you for helping us improve Rowan!
           </p>
 
           {/* Info Box */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-900 dark:text-blue-100">
+          <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-100">
               The beta testing program concluded on <strong>December 31, 2025 at 8:00 PM Central Time</strong>.
             </p>
           </div>
 
           {/* What's Next */}
           <div className="space-y-3 mb-6">
-            <h2 className="font-semibold text-gray-900 dark:text-white">What's next?</h2>
-            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <h2 className="font-semibold text-white">What's next?</h2>
+            <ul className="space-y-2 text-sm text-gray-400">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>
                 <span>Your feedback has been invaluable in shaping Rowan</span>
@@ -67,7 +67,7 @@ export default function BetaExpiredPage() {
             </Link>
             <Link
               href="/"
-              className="block w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 text-center"
+              className="block w-full py-3 px-4 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-all duration-200 text-center"
             >
               Return to Homepage
             </Link>
@@ -75,9 +75,9 @@ export default function BetaExpiredPage() {
         </div>
 
         {/* Support Link */}
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
+        <p className="text-center text-sm text-gray-400 mt-6">
           Questions?{' '}
-          <a href="mailto:support@rowan.app" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <a href="mailto:support@rowan.app" className="text-blue-400 hover:underline">
             Contact Support
           </a>
         </p>

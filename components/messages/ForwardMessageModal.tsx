@@ -70,7 +70,7 @@ export function ForwardMessageModal({
 
       {/* Modal */}
       <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-        <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-md sm:max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
+        <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-md sm:max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
           {/* Header */}
           <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-green-500 to-emerald-600 sm:rounded-t-2xl">
             <h2 className="text-xl font-semibold text-white">
@@ -87,8 +87,8 @@ export function ForwardMessageModal({
 
           {/* Message Preview */}
           <div className="px-6 pt-6">
-            <div className="p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
+            <div className="p-3 bg-gray-900 border border-gray-700 rounded-lg">
+              <p className="text-sm text-gray-300 line-clamp-3">
                 {messagePreview}
               </p>
             </div>
@@ -103,7 +103,7 @@ export function ForwardMessageModal({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search conversations..."
-                className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-white placeholder-gray-400"
+                className="w-full pl-10 pr-4 py-2 text-sm bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-400"
               />
             </div>
           </div>
@@ -111,7 +111,7 @@ export function ForwardMessageModal({
           {/* Conversations List */}
           <div className="px-6 pb-4 max-h-80 overflow-y-auto">
             {filteredConversations.length === 0 ? (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">
+              <p className="text-center text-gray-400 py-8 text-sm">
                 No conversations found
               </p>
             ) : (
@@ -122,15 +122,15 @@ export function ForwardMessageModal({
                     onClick={() => handleToggleConversation(conversation.id)}
                     className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
                       selectedConversations.has(conversation.id)
-                        ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-500'
-                        : 'border-2 border-transparent hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ? 'bg-green-900/20 border-2 border-green-500'
+                        : 'border-2 border-transparent hover:bg-gray-700'
                     }`}
                   >
                     {/* Checkbox */}
                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
                       selectedConversations.has(conversation.id)
                         ? 'bg-green-600 border-green-600'
-                        : 'border-gray-300 dark:border-gray-600'
+                        : 'border-gray-600'
                     }`}>
                       {selectedConversations.has(conversation.id) && (
                         <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,10 +141,10 @@ export function ForwardMessageModal({
 
                     {/* Conversation Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                      <p className="font-medium text-white text-sm truncate">
                         {conversation.title || 'Untitled Conversation'}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                      <p className="text-xs text-gray-400 capitalize">
                         {conversation.conversation_type}
                       </p>
                     </div>
@@ -155,21 +155,21 @@ export function ForwardMessageModal({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-700">
+            <p className="text-sm text-gray-400">
               {selectedConversations.size} selected
             </p>
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleForward}
                 disabled={selectedConversations.size === 0 || isForwarding}
-                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 text-white rounded-lg transition-all font-medium disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-green-500/25"
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:from-gray-700 disabled:to-gray-600 text-white rounded-lg transition-all font-medium disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-green-500/25"
               >
                 <Send className="w-4 h-4" />
                 {isForwarding ? 'Forwarding...' : 'Forward'}

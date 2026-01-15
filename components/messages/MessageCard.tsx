@@ -100,12 +100,12 @@ export function MessageCard({
   const getColorClasses = (color: string) => {
     if (isOwn) {
       return {
-        textColor: 'text-blue-600 dark:text-blue-400',
+        textColor: 'text-blue-400',
         borderColor: 'border-blue-500',
       };
     } else {
       return {
-        textColor: 'text-green-600 dark:text-green-400',
+        textColor: 'text-green-400',
         borderColor: 'border-green-500',
       };
     }
@@ -129,17 +129,17 @@ export function MessageCard({
       <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
         <div className={`relative px-3 py-2 rounded-2xl ${
           isOwn
-            ? 'bg-emerald-500/50 dark:bg-emerald-600/50 rounded-tr-sm'
-            : 'bg-gray-200 dark:bg-gray-600 rounded-tl-sm'
+            ? 'bg-emerald-600/50 rounded-tr-sm'
+            : 'bg-gray-600 rounded-tl-sm'
         }`}>
           <div className={`flex items-center gap-2 italic ${
-            isOwn ? 'text-emerald-100' : 'text-gray-500 dark:text-gray-400'
+            isOwn ? 'text-emerald-100' : 'text-gray-400'
           }`}>
             <Ban className="w-4 h-4" />
             <span className="text-sm">This message was deleted</span>
           </div>
           <div className={`flex items-center justify-end gap-1 mt-1 text-[11px] ${
-            isOwn ? 'text-emerald-200/70' : 'text-gray-400 dark:text-gray-500'
+            isOwn ? 'text-emerald-200/70' : 'text-gray-500'
           }`}>
             <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
           </div>
@@ -157,8 +157,8 @@ export function MessageCard({
           <div
             className={`absolute top-0 w-3 h-3 ${
               isOwn
-                ? '-right-1.5 bg-emerald-500 dark:bg-emerald-600'
-                : '-left-1.5 bg-white dark:bg-gray-700'
+                ? '-right-1.5 bg-emerald-600'
+                : '-left-1.5 bg-gray-700'
             }`}
             style={{
               clipPath: isOwn
@@ -169,21 +169,21 @@ export function MessageCard({
           <div
             className={`relative px-3 py-2 min-w-[80px] ${
               isOwn
-                ? 'bg-emerald-500 dark:bg-emerald-600 rounded-2xl rounded-tr-sm'
-                : 'bg-white dark:bg-gray-700 rounded-2xl rounded-tl-sm shadow-sm'
+                ? 'bg-emerald-600 rounded-2xl rounded-tr-sm'
+                : 'bg-gray-700 rounded-2xl rounded-tl-sm shadow-sm'
             }`}
           >
             {/* Message Content */}
             {message.content && (
               <div className={`relative z-10 break-words text-[15px] leading-relaxed ${
-                isOwn ? 'text-white' : 'text-gray-900 dark:text-white'
+                isOwn ? 'text-white' : 'text-white'
               }`}>
                 <MentionHighlight content={displayContent} />
                 {isLongMessage && (
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
                     className={`mt-1 text-xs font-medium hover:underline ${
-                      isOwn ? 'text-emerald-100' : 'text-emerald-600 dark:text-emerald-400'
+                      isOwn ? 'text-emerald-100' : 'text-emerald-400'
                     }`}
                   >
                     {isExpanded ? 'Show less' : 'Read more'}
@@ -207,7 +207,7 @@ export function MessageCard({
 
             {/* Timestamp and Read Status - WhatsApp Style (bottom right, inline) */}
             <div className={`relative z-10 flex items-center justify-end gap-1 mt-1 -mb-0.5 text-[11px] ${
-              isOwn ? 'text-emerald-100/80' : 'text-gray-500 dark:text-gray-400'
+              isOwn ? 'text-emerald-100/80' : 'text-gray-400'
             }`}>
               {message.updated_at && message.updated_at !== message.created_at && (
                 <span className="italic mr-1">edited</span>
@@ -236,8 +236,8 @@ export function MessageCard({
                   disabled={loadingReaction}
                   className={`flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium transition-all duration-200 ${
                     reaction.reacted_by_current_user
-                      ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                      ? 'bg-emerald-900/50 text-emerald-300 border border-emerald-700'
+                      : 'bg-gray-700 text-gray-300 border border-gray-600'
                   }`}
                 >
                   <span>{reaction.emoji}</span>
@@ -251,7 +251,7 @@ export function MessageCard({
           <div className={`absolute -top-12 z-[100] opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible hover:opacity-100 hover:visible transition-all duration-300 ease-out pointer-events-none ${
             isOwn ? 'left-0' : 'right-0'
           }`}>
-              <div className="flex items-center gap-0.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl backdrop-saturate-150 rounded-full shadow-xl shadow-black/10 dark:shadow-black/30 border border-white/50 dark:border-gray-600/50 p-1 pointer-events-auto ring-1 ring-black/5 dark:ring-white/5">
+              <div className="flex items-center gap-0.5 bg-gray-800/80 backdrop-blur-xl backdrop-saturate-150 rounded-full shadow-xl shadow-black/30 border border-gray-600/50 p-1 pointer-events-auto ring-1 ring-white/5">
                 {/* Edit Button - Always show for own messages, or if user has edit permissions */}
                 {isOwn && (
                   <button
@@ -261,9 +261,9 @@ export function MessageCard({
                     }}
                     title="Edit message"
                     aria-label="Edit message"
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/40 transition-all duration-200 group/edit"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-blue-900/40 transition-all duration-200 group/edit"
                   >
-                    <Edit3 className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/edit:text-blue-600 dark:group-hover/edit:text-blue-400 transition-colors" />
+                    <Edit3 className="w-3.5 h-3.5 text-gray-400 group-hover/edit:text-blue-600 group-hover/edit:text-blue-400 transition-colors" />
                   </button>
                 )}
 
@@ -276,9 +276,9 @@ export function MessageCard({
                     }}
                     title="Delete message"
                     aria-label="Delete message"
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/40 transition-all duration-200 group/delete"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-900/40 transition-all duration-200 group/delete"
                   >
-                    <Trash2 className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/delete:text-red-600 dark:group-hover/delete:text-red-400 transition-colors" />
+                    <Trash2 className="w-3.5 h-3.5 text-gray-400 group-hover/delete:text-red-600 group-hover/delete:text-red-400 transition-colors" />
                   </button>
                 )}
 
@@ -291,9 +291,9 @@ export function MessageCard({
                     }}
                     title="Pin message"
                     aria-label="Pin message"
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-yellow-50 dark:hover:bg-yellow-900/40 transition-all duration-200 group/pin"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-yellow-900/40 transition-all duration-200 group/pin"
                   >
-                    <Pin className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/pin:text-yellow-600 dark:group-hover/pin:text-yellow-400 transition-colors" />
+                    <Pin className="w-3.5 h-3.5 text-gray-400 group-hover/pin:text-yellow-600 group-hover/pin:text-yellow-400 transition-colors" />
                   </button>
                 )}
 
@@ -306,9 +306,9 @@ export function MessageCard({
                     }}
                     title="Forward message"
                     aria-label="Forward message"
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-50 dark:hover:bg-green-900/40 transition-all duration-200 group/forward"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-green-900/40 transition-all duration-200 group/forward"
                   >
-                    <Forward className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/forward:text-green-600 dark:group-hover/forward:text-green-400 transition-colors" />
+                    <Forward className="w-3.5 h-3.5 text-gray-400 group-hover/forward:text-green-600 group-hover/forward:text-green-400 transition-colors" />
                   </button>
                 )}
 

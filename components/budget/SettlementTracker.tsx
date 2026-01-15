@@ -110,7 +110,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
     return (
       <div className="flex items-center justify-center py-6">
         <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">Loading settlement data...</span>
+        <span className="ml-2 text-gray-400">Loading settlement data...</span>
       </div>
     );
   }
@@ -122,8 +122,8 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <CheckCircle className="w-5 h-5 text-purple-400" />
+          <h3 className="text-lg font-semibold text-white">
             Settlement Tracking
           </h3>
         </div>
@@ -140,9 +140,9 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+        <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-200">{error}</p>
         </div>
       )}
 
@@ -153,25 +153,25 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
             key={split.id}
             className={`p-4 rounded-lg border-2 ${
               split.status === 'settled'
-                ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
+                ? 'border-green-800 bg-green-900/20'
                 : split.status === 'partially-paid'
-                ? 'border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20'
-                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                ? 'border-yellow-800 bg-yellow-900/20'
+                : 'border-gray-700 bg-gray-800'
             }`}
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                <span className="font-medium text-gray-900 dark:text-white">
+                <Users className="w-4 h-4 text-gray-400" />
+                <span className="font-medium text-white">
                   {split.is_payer ? 'Paid by you' : 'You owe'}
                 </span>
               </div>
               <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                 split.status === 'settled'
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                  ? 'bg-green-900/30 text-green-300'
                   : split.status === 'partially-paid'
-                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  ? 'bg-yellow-900/30 text-yellow-300'
+                  : 'bg-gray-700 text-gray-300'
               }`}>
                 {split.status === 'settled' && <CheckCircle className="w-3 h-3" />}
                 {split.status === 'partially-paid' && <Clock className="w-3 h-3" />}
@@ -182,16 +182,16 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Amount owed:</span>
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="text-sm text-gray-400">Amount owed:</span>
+                <span className="font-semibold text-white">
                   ${split.amount_owed.toFixed(2)}
                 </span>
               </div>
 
               {split.amount_paid > 0 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Amount paid:</span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">
+                  <span className="text-sm text-gray-400">Amount paid:</span>
+                  <span className="font-semibold text-green-400">
                     ${split.amount_paid.toFixed(2)}
                   </span>
                 </div>
@@ -199,8 +199,8 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
 
               {split.status !== 'settled' && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Remaining:</span>
-                  <span className="font-semibold text-red-600 dark:text-red-400">
+                  <span className="text-sm text-gray-400">Remaining:</span>
+                  <span className="font-semibold text-red-400">
                     ${(split.amount_owed - split.amount_paid).toFixed(2)}
                   </span>
                 </div>
@@ -208,8 +208,8 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
 
               {split.percentage && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Split percentage:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="text-sm text-gray-400">Split percentage:</span>
+                  <span className="font-medium text-white">
                     {split.percentage}%
                   </span>
                 </div>
@@ -227,7 +227,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
             )}
 
             {split.settled_at && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs text-gray-400 mt-2">
                 Settled on {format(parseISO(split.settled_at), 'MMM d, yyyy')}
               </p>
             )}
@@ -238,27 +238,27 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
       {/* Settlement History */}
       {settlements.length > 0 && (
         <div className="space-y-3">
-          <h4 className="font-medium text-gray-900 dark:text-white">Settlement History</h4>
+          <h4 className="font-medium text-white">Settlement History</h4>
           <div className="space-y-2">
             {settlements.map((settlement) => (
               <div
                 key={settlement.id}
-                className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                className="p-3 bg-gray-700 rounded-lg"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
-                    <span className="font-medium text-gray-900 dark:text-white">
+                    <DollarSign className="w-4 h-4 text-green-400" />
+                    <span className="font-medium text-white">
                       ${settlement.amount.toFixed(2)}
                     </span>
                   </div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-400">
                     {format(parseISO(settlement.settlement_date), 'MMM d, yyyy')}
                   </span>
                 </div>
 
                 {settlement.payment_method && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
                     <CreditCard className="w-3 h-3" />
                     {settlement.payment_method}
                     {settlement.reference_number && (
@@ -268,7 +268,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
                 )}
 
                 {settlement.notes && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-gray-400 mt-1">
                     {settlement.notes}
                   </p>
                 )}
@@ -286,16 +286,16 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
             onClick={() => setShowNewSettlement(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
+              <div className="p-4 border-b border-gray-700">
+                <h3 className="text-lg font-semibold text-white">
                   Record Settlement Payment
                 </h3>
               </div>
 
               <div className="p-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Amount <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -306,13 +306,13 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
                       value={newSettlement.amount}
                       onChange={(e) => setNewSettlement(prev => ({ ...prev, amount: e.target.value }))}
                       placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Payment Method
                   </label>
                   <input
@@ -320,12 +320,12 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
                     value={newSettlement.paymentMethod}
                     onChange={(e) => setNewSettlement(prev => ({ ...prev, paymentMethod: e.target.value }))}
                     placeholder="Cash, Venmo, Bank Transfer, etc."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Reference Number
                   </label>
                   <input
@@ -333,12 +333,12 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
                     value={newSettlement.referenceNumber}
                     onChange={(e) => setNewSettlement(prev => ({ ...prev, referenceNumber: e.target.value }))}
                     placeholder="Transaction ID, Check #, etc."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Notes
                   </label>
                   <textarea
@@ -346,15 +346,15 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
                     onChange={(e) => setNewSettlement(prev => ({ ...prev, notes: e.target.value }))}
                     placeholder="Additional notes..."
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white resize-none"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-700">
                 <button
                   onClick={() => setShowNewSettlement(false)}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -373,11 +373,11 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
 
       {/* Summary */}
       {hasUnsettledSplits && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
+          <h4 className="font-medium text-blue-100 mb-2">
             Settlement Summary
           </h4>
-          <p className="text-sm text-blue-800 dark:text-blue-200">
+          <p className="text-sm text-blue-200">
             Total remaining to settle: <span className="font-semibold">${totalOwed.toFixed(2)}</span>
           </p>
         </div>

@@ -132,10 +132,10 @@ export function EnhancedDayView({
   const firstEventWithLocation = dayEvents.find(e => e.location);
 
   return (
-    <div className="relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+    <div className="relative bg-gray-900 rounded-xl border border-gray-700">
       {/* Weather Badge Header */}
       {firstEventWithLocation && (
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="px-4 py-3 border-b border-gray-700 bg-gray-800/50">
           <WeatherBadge
             eventTime={firstEventWithLocation.start_time}
             location={firstEventWithLocation.location}
@@ -147,14 +147,14 @@ export function EnhancedDayView({
       {/* Time column + Events container */}
       <div className="flex">
         {/* Time labels */}
-        <div className="w-20 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
+        <div className="w-20 flex-shrink-0 border-r border-gray-700">
           {HOURS.map(hour => (
             <div
               key={hour}
-              className="relative border-b border-gray-200 dark:border-gray-700"
+              className="relative border-b border-gray-700"
               style={{ height: `${HOUR_HEIGHT}px` }}
             >
-              <div className="absolute -top-2 left-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 px-1">
+              <div className="absolute -top-2 left-2 text-xs font-medium text-gray-400 bg-gray-900 px-1">
                 {format(new Date().setHours(hour, 0), 'h a')}
               </div>
             </div>
@@ -167,7 +167,7 @@ export function EnhancedDayView({
           {HOURS.map(hour => (
             <div
               key={hour}
-              className="absolute w-full border-b border-gray-100 dark:border-gray-800"
+              className="absolute w-full border-b border-gray-800"
               style={{ top: `${(hour - 6) * HOUR_HEIGHT}px` }}
             />
           ))}
@@ -200,9 +200,9 @@ export function EnhancedDayView({
             // Use purple shades for overlapping events (calendar brand color)
             const isOverlapping = maxColumns > 1;
             const purpleShades = [
-              'bg-purple-100 dark:bg-purple-900/30 border-purple-500',
-              'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-500',
-              'bg-violet-100 dark:bg-violet-900/30 border-violet-500',
+              'bg-purple-900/30 border-purple-500',
+              'bg-indigo-900/30 border-indigo-500',
+              'bg-violet-900/30 border-violet-500',
             ];
             const overlappingStyle = isOverlapping ? purpleShades[column % purpleShades.length] : '';
 
@@ -241,7 +241,7 @@ export function EnhancedDayView({
                           {event.status === 'completed' && <Check className="w-2.5 h-2.5 text-white" />}
                           {event.status === 'in-progress' && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                         </button>
-                        <div className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-1 text-xs font-medium text-gray-400">
                           <Clock className="w-3 h-3" />
                           {format(parseISO(event.start_time), 'h:mm a')}
                         </div>
@@ -255,7 +255,7 @@ export function EnhancedDayView({
                       {/* Category badge */}
                       <div className="flex items-center gap-1 mt-1 flex-wrap">
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                          isOverlapping ? 'bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-100' : categoryColor.color
+                          isOverlapping ? 'bg-purple-800 text-purple-100' : categoryColor.color
                         }`}>
                           {category.icon} {category.label}
                         </span>
@@ -263,7 +263,7 @@ export function EnhancedDayView({
 
                       {/* Location (if event is tall enough) */}
                       {event.location && parseInt(style.height) > 60 && (
-                        <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                        <div className="flex items-center gap-1 mt-1 text-[10px] text-gray-400 truncate">
                           <MapPin className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate">{event.location}</span>
                         </div>
@@ -274,17 +274,17 @@ export function EnhancedDayView({
                     <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => onViewDetails(event)}
-                        className="p-1 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded transition-colors"
+                        className="p-1 hover:bg-gray-700/50 rounded transition-colors"
                         title="View Details"
                       >
-                        <Eye className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                        <Eye className="w-3.5 h-3.5 text-gray-400" />
                       </button>
                       <button
                         onClick={() => onEditEvent(event)}
-                        className="p-1 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded transition-colors"
+                        className="p-1 hover:bg-gray-700/50 rounded transition-colors"
                         title="Edit Event"
                       >
-                        <Edit className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                        <Edit className="w-3.5 h-3.5 text-gray-400" />
                       </button>
                     </div>
                   </div>
@@ -296,7 +296,7 @@ export function EnhancedDayView({
           {/* Empty state */}
           {dayEvents.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-gray-400 dark:text-gray-500">
+              <div className="text-center text-gray-500">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm font-medium">No events scheduled</p>
                 <p className="text-xs mt-1">Press N to create a new event or Q for quick add</p>

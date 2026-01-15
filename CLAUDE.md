@@ -21,484 +21,102 @@
 - **Before refactoring:** Ensure all dependent code is identified and updated
 - **Before merging:** Verify nothing is broken in related features
 
-### Troubleshooting Approach
-1. **Go slow** - Rushed fixes create more problems
-2. **Think holistically** - Consider the entire system, not just the immediate issue
-3. **Find root causes** - Don't mask symptoms with quick patches
-4. **Test thoroughly** - Verify the fix doesn't break anything else
-5. **Document learnings** - Prevent the same issue from recurring
-
-### Strategic Bug Fixing (Pattern Recognition)
-When you discover a bug or issue in one location:
-1. **Recognize patterns** - Ask: "Is this a one-off mistake or a systemic pattern?"
-2. **Search comprehensively** - Immediately grep/search for all instances of the same pattern across the entire codebase
-3. **Fix everywhere** - Correct every occurrence, not just the one that was reported
-4. **Think about related issues** - Consider if similar logic elsewhere might have the same class of problem
-5. **Be proactive** - Don't wait for the user to point out other instances; anticipate and fix them all in one sweep
-
-**Example:** If a URL path is wrong in one email template, immediately check ALL email templates, ALL API routes that generate URLs, and ALL places that construct similar paths. Fix them all together, strategically, without breaking dependent code.
-
-**The goal:** When a bug is found, the fix should be comprehensive and complete. The user should never have to say "did you check the other places too?"
-
-### Quality Over Speed
-- A well-implemented feature that takes longer is better than a rushed feature that creates tech debt
-- Every line of code should serve a clear purpose
-- When in doubt, ask questions and clarify requirements before coding
+### Strategic Bug Fixing
+When you discover a bug, search for all instances of the same pattern across the codebase and fix everywhere. The user should never have to say "did you check the other places too?"
 
 ## Stack
 
-### Core Framework
-- **Next.js 15.4.10** (App Router) - React framework
-- **Node.js 20.x LTS** - Runtime (use `nvm use 20`)
-- **React 19** - UI library
-- **TypeScript 5** - Strict mode enabled
+- **Next.js 15.4.10** (App Router), **React 19**, **TypeScript 5** (strict)
+- **Node.js 20.x LTS** (use `nvm use 20`)
+- **Supabase** - PostgreSQL + Auth + RLS (`@supabase/supabase-js ^2.58.0`, `@supabase/ssr ^0.8.0`)
+- **Tailwind CSS 4**, **Framer Motion 12**, **Lucide React**
+- **Upstash Redis** (rate limiting), **Resend 6** (email), **Stripe 20** (payments)
+- **Sentry 10** (errors), **DOMPurify** (XSS), **Zod 4** (validation), **date-fns 4**
 
-### Database & Auth
-- **Supabase** - PostgreSQL database + Authentication + Row Level Security
-  - `@supabase/supabase-js ^2.58.0`
-  - `@supabase/ssr ^0.8.0`
+## Development Server
 
-### Styling
-- **Tailwind CSS 4** - Utility-first CSS
-- **Framer Motion 12** - Animations
-- **Lucide React** - Icon library
+> **Use `/dev` slash command** or see [dev-server.md](docs/guides/dev-server.md) for details.
 
-### Backend Services
-- **Upstash Redis** - Rate limiting & caching (`@upstash/ratelimit`, `@upstash/redis`)
-- **Resend 6** - Transactional email
-- **Stripe 20** - Payments
-
-### Monitoring & Security
-- **Sentry 10** - Error tracking
-- **DOMPurify** - XSS sanitization
-
-### Data & Forms
-- **Zod 4** - Schema validation
-- **date-fns 4** - Date utilities
-- **Sonner** - Toast notifications
-
-## Development Server Setup
-
-> **Use `/dev` slash command** or the one-liner below. See [DEV-SERVER.md](DEV-SERVER.md) if issues persist.
-
-### One Command (Use This)
 ```bash
 pkill -f "next" 2>/dev/null; rm -rf ".next 2" "node_modules 2" ".next 3" "node_modules 3" .next 2>/dev/null; PATH="$HOME/.nvm/versions/node/v20.19.6/bin:$PATH" npm run dev
 ```
 
-**What it does (~5 sec):** Kills processes → removes duplicate folders → clears cache → starts server with correct PATH.
-
-**Expected:** "Ready in ~5s" → first page compile 15-30s → http://localhost:3000
-
-### If Still Fails (Nuclear Option)
-```bash
-pkill -f "next" 2>/dev/null; rm -rf .next node_modules package-lock.json && npm install && npm run dev
-```
-
-### Environment
-- **Next.js:** 15.4.10 (NOT 15.5.x - has race conditions)
-- **Node.js:** 20.x LTS (NOT 22 - has race conditions)
-- **Node Path:** `~/.nvm/versions/node/v20.19.6/bin/`
-- **Bundler:** Webpack (NOT Turbopack)
-
-### HMR (Hot Module Replacement)
-**Don't restart server for file edits** - HMR handles it automatically. Only restart when:
-- Server crashes
-- After `npm install`
-- After changing `next.config.mjs` or env vars
-
-**Browser 500 errors after restart?** Hard refresh (Cmd+Shift+R) - it's browser cache, not server.
+**Expected:** Ready in ~5s → http://localhost:3000. HMR handles file edits - only restart after `npm install` or config changes.
 
 ## Security Rules
 
-### Authentication
-- Never bypass RLS
-- No service_role key on client
-- Always validate `auth.uid()` matches resource owner
-- Min 8 char passwords, validated client + server
-- Use crypto.randomUUID() for tokens
-
-### Data Protection
-- ALL queries filtered by `space_id`
-- RLS policies enforce space boundaries
-- No cross-space access
-
-### Input Validation
-- Validate all input with Zod schemas
-- Sanitize HTML (DOMPurify)
-- Never use `dangerouslySetInnerHTML` without sanitization
-
-### API Security
-- Rate limit all API routes (Upstash Redis)
-- No API keys in client code
-- Validate request bodies, headers, auth
-- No stack traces in production errors
-
-### Environment Variables
-- `NEXT_PUBLIC_*` = client-safe
-- No `NEXT_PUBLIC_` prefix = server-only
-- Never commit `.env.local`
+- Never bypass RLS; no service_role key on client
+- ALL queries filtered by `space_id`; RLS policies enforce space boundaries
+- Validate all input with Zod; sanitize HTML with DOMPurify
+- Rate limit all API routes; no API keys in client code
+- `NEXT_PUBLIC_*` = client-safe; never commit `.env.local`
 
 ## Code Quality
 
-### TypeScript
-- No `any` types
-- Use interfaces from `lib/types.ts`
-- `strict: true` in tsconfig
-
-### Naming
-- camelCase: variables, functions
-- PascalCase: components, types
-- UPPER_SNAKE_CASE: constants
-- Files: PascalCase (components), camelCase (utils), kebab-case (routes)
-
-### Error Handling
-```typescript
-// Service Layer
-try {
-  const validated = Schema.parse(data);
-  const { data: result, error } = await supabase...
-  if (error) throw error;
-  return { success: true, data: result };
-} catch (error) {
-  console.error('Error:', error);
-  return { success: false, error: 'Failed' };
-}
-```
-
-## Architecture
-
-### Service Layer (MANDATORY)
-ALL database operations go through `lib/services/`
-
-```typescript
-// lib/services/tasks-service.ts
-export async function getTasks(spaceId: string) {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('space_id', spaceId);
-  if (error) throw error;
-  return data;
-}
-```
-
-### Real-time Pattern
-```typescript
-useEffect(() => {
-  const channel = supabase
-    .channel('tasks')
-    .on('postgres_changes', { filter: `space_id=eq.${id}` }, callback)
-    .subscribe();
-  return () => supabase.removeChannel(channel); // MANDATORY cleanup
-}, []);
-```
-
-## Database
-
-### RLS Policy Pattern
-```sql
-ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Space access" ON tasks
-USING (space_id IN (
-  SELECT space_id FROM space_members WHERE user_id = auth.uid()
-));
-```
+- No `any` types; use interfaces from `lib/types.ts`
+- camelCase (vars/functions), PascalCase (components/types), UPPER_SNAKE_CASE (constants)
+- ALL database operations go through `lib/services/` (MANDATORY)
+- Always cleanup real-time subscriptions in useEffect return
 
 ## UI/UX Requirements
-- Loading states for all async operations
-- Empty states for list views
+
+- Loading states for async operations; empty states for lists
 - Dark mode: `dark:` variants on all colors
-- Error messages: user-friendly, no technical details
-
-### PortalDropdown Component
-**Reference Name:** "PortalDropdown" or "Use the PortalDropdown"
-**Location:** `/components/ui/Dropdown.tsx`
-
-**When to use:**
-- Any dropdown positioning issues in modals
-- Native `<select>` dropdowns that appear "off to the side"
-- Dropdowns clipped by parent container overflow
-- Z-index conflicts with modals or overlays
-
-**Key Features:**
-- Portal-based rendering at `document.body` level
-- Modal-safe positioning (never clipped)
-- Automatic placement calculation
-- Z-index management (`z-index: 10000`)
-- Responsive design
-
-**Implementation Pattern:**
-```tsx
-import { Dropdown } from '@/components/ui/Dropdown';
-
-// Replace problematic native selects with:
-<Dropdown
-  value={selectedValue}
-  onChange={(value) => setSelectedValue(value)}
-  options={[
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' }
-  ]}
-  placeholder="Select option..."
-  className="your-styling"
-/>
-```
-
-**Proven Solutions:**
-- ✅ UnifiedItemModal dropdown alignment
-- ✅ DateTimePicker calendar positioning
-- ✅ TaskCard filter dropdown issues
-- ✅ Modal overflow constraints
+- **PortalDropdown** (`/components/ui/Dropdown.tsx`): Use for dropdown positioning issues in modals
 
 ## MCP Configuration
 
-### Supabase MCP - ROWAN APP DATABASE
-> **CRITICAL**: The Rowan app uses Supabase project `SUPABASE_PROJECT_REF`. NEVER use any other project ref.
+### Supabase MCP
+> **CRITICAL**: Project `SUPABASE_PROJECT_REF` - NEVER use any other project ref.
 
-**FIRST ACTION when starting a session**: Run `mcp__supabase__get_project_url` to verify you're connected to the correct project. Expected result: `https://SUPABASE_PROJECT_REF.supabase.co`
-
-## PENDING TASKS (January 2025)
-After MCP re-authentication, complete these:
-1. ✅ MCP reconfigured - needs restart to re-authenticate
-2. ⏳ Verify MCP connects to `SUPABASE_PROJECT_REF` (run `get_project_url`)
-3. ⏳ Create `budget_templates` table with seed data
-4. ⏳ Create `budget_template_categories` table with seed data
-5. ⏳ Test BudgetTemplateModal functionality
-
-**Context**: BudgetTemplateModal wasn't working because MCP was connected to wrong Supabase project. Tables `budget_templates` and `budget_template_categories` need to be created.
-
-**Project Reference**: `SUPABASE_PROJECT_REF`
 **Project URL**: `https://SUPABASE_PROJECT_REF.supabase.co`
-**Dashboard**: `https://supabase.com/dashboard/project/SUPABASE_PROJECT_REF`
-**Authentication**: OAuth (browser-based login)
 
-**Expected Rowan Tables** (verify these exist when connected):
-- `spaces`, `space_members`, `users`
-- `tasks`, `events`, `reminders`, `messages`
-- `shopping_lists`, `shopping_items`
-- `recipes`, `meal_plans`, `meals`
-- `budgets`, `budget_categories`, `expenses`, `bills`
-- `chores`, `goals`, `daily_checkins`
+**Tables**: `spaces`, `space_members`, `users`, `tasks`, `events`, `reminders`, `messages`, `shopping_lists`, `shopping_items`, `recipes`, `meal_plans`, `meals`, `budgets`, `budget_categories`, `expenses`, `bills`, `chores`, `goals`, `daily_checkins`
 
-**If MCP returns wrong tables** (like `content`, `summaries`, `chat_threads`):
-1. The OAuth session is authenticated to a different project
-2. Run: `claude mcp remove supabase -s project`
-3. Run: `claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF" --transport http --scope project`
-4. Restart Claude Code to re-authenticate
-5. When browser opens, select the correct Supabase account/project
-
-**Correct `.mcp.json` configuration:**
-```json
-{
-  "mcpServers": {
-    "supabase": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF"
-    }
-  }
-}
-```
-
-**If "Needs authentication" appears:**
-1. Restart Claude Code (Cmd+Shift+P → "Reload Window" or restart terminal)
-2. Claude Code will open browser for Supabase OAuth login
-3. Login and authorize access
-4. MCP tools become available
-
-**DO NOT use PAT tokens** - Supabase MCP switched to OAuth in 2025. No headers needed.
-
-**Capabilities**:
-- Direct SQL queries and database operations
-- Database migration management
-- Real-time table monitoring
-- RLS policy management
-
-**Troubleshooting:**
-- If MCP won't connect, remove and re-add: `claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF" --transport http --scope project`
-- Restart Claude Code after any MCP config changes
+**If wrong tables appear**: Run `claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=SUPABASE_PROJECT_REF" --transport http --scope project`, then restart Claude Code.
 
 ### Vercel MCP
-**Status**: ✅ Connected
-**Authentication**: OAuth via Claude Code
-**Team**: VetSecItPro (`[REDACTED_TEAM_ID]`)
-**Project**: rowan-app (`[REDACTED_PROJECT_ID]`)
+**Team**: VetSecItPro (`[REDACTED_TEAM_ID]`) | **Project**: rowan-app (`[REDACTED_PROJECT_ID]`)
 
-**Capabilities**:
-- Direct deployment to Vercel (`vercel deploy`)
-- Deployment monitoring and logs
-- Protected URL access
-- Project management
+## Git Workflow
 
-## Git Workflow & Deployment
+**NEVER commit directly to main. Always use feature branches.**
 
-### Hybrid Deployment Strategy
-We use **dual deployment paths** for optimal workflow:
+> **Quick:** Use `/gh-feat` to auto-push, create branch, run CI, and monitor until green.
 
-**🚀 Direct Deployment** (Development/Testing):
-```bash
-# Quick iteration cycle
-vercel deploy          # Preview deployment for rapid testing
-vercel deploy --prod   # Direct production deployment (emergency)
-```
+### Workflow
+1. `git checkout -b feature/description` → `git push -u origin feature/description`
+2. Work and commit on feature branch
+3. Test: `npm run build && npx tsc --noEmit`
+4. **ASK USER** before creating PR: `gh pr create --title "Title" --body "Description"`
+5. GitHub Actions creates preview deployment
+6. **ASK USER** before merging to main
+7. After merge: `git checkout main && git pull && git branch -d feature/branch`
 
-**🔄 GitHub Actions** (Official Releases):
-```bash
-# Automated production pipeline
-git push origin main   # Triggers automated deployment
-```
+**Branch names**: `feature/`, `fix/`, `refactor/`, `experiment/`
+**Commit format**: `type(scope): description` (feat, fix, docs, style, refactor, test, chore)
 
-**When to use each**:
-- **Direct Deployment**: Quick prototypes, demos, emergency hotfixes, feature testing
-- **GitHub Actions**: Official releases, team collaboration, automated testing pipeline
+**Pre-approved (no permission needed)**: Git operations on feature branches, PR creation/merging, security audits, running commands during development.
 
-### CRITICAL: Branching Strategy
-**NEVER commit directly to main branch. Always use feature branches.**
-
-> **Quick:** Use `/gh-feat` to auto-push code, create branch, run CI, and monitor until green (auto-generates branch name and commit message).
-
-**Required workflow:**
-1. **Start new work:** `git checkout -b feature/description`
-2. **Push branch:** `git push -u origin feature/description`
-3. **Work and commit** on feature branch normally
-4. **Test before PR:** `npm run build && npx tsc --noEmit`
-5. **Create PR:** `gh pr create --title "Title" --body "Description"`
-6. **GitHub Actions automatically:** Creates preview deployment and posts URL in PR
-7. **Merge via GitHub UI** after review
-8. **GitHub Actions automatically:** Runs migrations, checks, and deploys to production
-
-**Branch naming conventions:**
-- `feature/task-improvements` - new features
-- `fix/authentication-bug` - bug fixes
-- `refactor/service-layer` - code refactoring
-- `experiment/ui-redesign` - experimental/risky changes
-
-**Pre-approved tasks (no permission needed):**
-- Git commits and pushes **on feature branches**
-- Feature branch creation and management
-- Pull request creation and merging
-- All GitHub Actions operations (deployments, migrations, checks)
-- **Complete security audits and code reviews**
-- **Implementing security fixes and optimizations**
-- **Running any commands (cd, npm, npx, bash, git, etc.) during audits**
-- **Systematic codebase review without approval requests**
-
-**Commit message format:** `type(scope): description`
-- feat, fix, docs, style, refactor, test, chore
-
-**Automated CI/CD Pipeline:**
-- **PR Created:** GitHub Actions deploys to Vercel preview, posts URL in PR comments
-- **PR Merged to Main:** GitHub Actions runs migrations → type checks → deploys to production
-- **No manual Vercel commands needed** - everything is automated via GitHub Actions
-- **Database migrations** are automatically applied when detected in commits
-- **Build failures** are caught in CI before deployment
-
-**Feature branch workflow:**
-1. `git checkout -b feature/description`
-2. `git push -u origin feature/description`
-3. Work and commit normally: `git add . && git commit -m "message"`
-4. `git push` (to feature branch)
-5. When work is complete: Test `npm run build && npx tsc --noEmit`
-6. **ASK USER**: "Ready to create PR for this feature?" (don't auto-create)
-7. Create PR: `gh pr create --title "Title" --body "Description"`
-8. GitHub Actions creates preview deployment automatically
-9. If local tests fail: fix on feature branch, push again
-10. **When everything runs fine with no errors and no more work needed:**
-    - Confidently advise: "This feature is complete and ready to merge"
-    - **ASK USER**: "Ready to merge PR into main?" before merging
-    - After merge: GitHub Actions automatically deploys to production
-11. **AFTER MERGE - Delete local branch:** `git checkout main && git pull && git branch -d feature/description`
-
-**Standard commit format:**
-```bash
-git commit -m "$(cat <<'EOF'
-feat(scope): description
-
-🤖 Generated with Claude Code
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-EOF
-)"
-```
-
-### Branch Cleanup (MANDATORY)
-
-**GitHub Settings:** Auto-delete on merge is ENABLED
-- Remote branches are automatically deleted when PR is merged
-- No manual remote cleanup needed
-
-**After Every PR Merge:**
-```bash
-git checkout main
-git pull origin main
-git branch -d feature/your-branch   # Delete local branch
-```
-
-**Why This Matters:**
-- Stale branches become outdated and can break code if merged later
-- Old branches may delete newer features (happened with 6,000+ lines lost)
-- Clean repo = clear understanding of what's active vs abandoned
-
-**Before Merging Any Old Branch:**
-1. Check how far behind main: `git rev-list --count branch..main`
-2. Check what would be deleted: `git diff main..branch --stat`
-3. If branch deletes files that exist in main = **DO NOT MERGE** (branch is stale)
-4. If branch is >10 commits behind = **Rebase or recreate from main**
-
-**Periodic Cleanup (if needed):**
-```bash
-# Delete all local branches already merged to main
-git branch --merged main | grep -v "main" | xargs git branch -d
-
-# Prune stale remote references
-git fetch --prune
-```
-
-**Safe Branch Analysis Before Merge:**
-```bash
-# 1. How many commits behind main?
-git rev-list --count feature/branch..main
-
-# 2. What files would change (look for deletions of main's files)?
-git diff main..feature/branch --stat
-
-# 3. Are key files identical or different?
-git diff main:path/to/file feature/branch:path/to/file
-
-# If deletions > additions AND deletes files main has = STALE, delete branch
-```
+**Branch cleanup**: Remote branches auto-delete on merge. Always delete local branch after merge. Before merging old branches, check `git rev-list --count branch..main` - if >10 commits behind, rebase or recreate.
 
 ## Feature Colors
 ```typescript
-const COLORS = {
-  tasks: 'blue', calendar: 'purple', reminders: 'pink',
-  messages: 'green', shopping: 'emerald', meals: 'orange',
-  household: 'amber', goals: 'indigo'
-};
+const COLORS = { tasks: 'blue', calendar: 'purple', reminders: 'pink', messages: 'green', shopping: 'emerald', meals: 'orange', household: 'amber', goals: 'indigo' };
 ```
 
-## Common Mistakes to Avoid
-- ❌ **Committing directly to main** → ✅ **Always use feature branches**
-- ❌ Direct Supabase calls in components → ✅ Use service layer
-- ❌ Missing subscription cleanup → ✅ Return cleanup in useEffect
-- ❌ Hardcoded IDs → ✅ From context/session
-- ❌ No input validation → ✅ Zod schemas
+## Common Mistakes
+- ❌ Committing to main → ✅ Feature branches
+- ❌ Direct Supabase in components → ✅ Service layer
+- ❌ Missing subscription cleanup → ✅ useEffect return
 - ❌ Missing space_id filter → ✅ Always filter
 - ❌ `any` types → ✅ Proper interfaces
-- ❌ Missing loading/empty states → ✅ Always include
-- ❌ Skipping build/type tests before PR → ✅ Always test before PR
+- ❌ Skip build test before PR → ✅ Always test
 
 ## Review Checklist
-- [ ] **Working on feature branch (not main)**
-- [ ] **Build passes: npm run build**
-- [ ] **TypeScript compiles: npx tsc --noEmit**
-- [ ] RLS policies on new tables
-- [ ] Zod validation
-- [ ] Rate limiting on APIs
-- [ ] Space data isolation
-- [ ] No `console.log` in production
-- [ ] Real-time cleanup
-- [ ] Dark mode tested
-- [ ] Mobile responsive
-- [ ] **PR created with proper title/description**
+- [ ] Feature branch (not main)
+- [ ] Build passes: `npm run build`
+- [ ] Types pass: `npx tsc --noEmit`
+- [ ] RLS on new tables, Zod validation, rate limiting
+- [ ] Space isolation, real-time cleanup
+- [ ] Dark mode, mobile responsive

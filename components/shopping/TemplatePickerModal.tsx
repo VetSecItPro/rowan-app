@@ -95,15 +95,15 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gray-50 dark:bg-gray-800 sm:bg-gradient-to-r sm:from-emerald-500 sm:to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 sm:border-emerald-600">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white sm:text-white">Choose a Template</h2>
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+        <div className="flex-shrink-0 bg-gray-800 sm:bg-gradient-to-r sm:from-emerald-500 sm:to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-700 sm:border-emerald-600">
+          <h2 className="text-lg sm:text-xl font-bold text-white sm:text-white">Choose a Template</h2>
           <button
             onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 sm:hover:bg-emerald-600 transition-all active:scale-95"
+            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-700 sm:hover:bg-emerald-600 transition-all active:scale-95"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400 sm:text-white" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-400 sm:text-white" />
           </button>
         </div>
 
@@ -112,12 +112,12 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
           {loading ? (
             <div className="text-center py-12">
               <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">Loading templates...</p>
+              <p className="text-gray-400">Loading templates...</p>
             </div>
           ) : templates.length > 0 ? (
             <>
               <div className="pt-4 pb-2 flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                <h3 className="text-sm font-medium text-gray-300 uppercase tracking-wide">
                   Your Templates
                 </h3>
                 <button
@@ -125,7 +125,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                   className={`text-xs px-3 py-1 rounded-full transition-colors ${
                     isReorderMode
                       ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                   }`}
                 >
                   {isReorderMode ? 'Done' : 'Reorder'}
@@ -153,28 +153,28 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         disabled={selectedTemplateId === template.id || isReorderMode}
                         className={`w-full p-3 border-2 rounded-lg transition-all text-left group disabled:cursor-not-allowed ${
                           isReorderMode
-                            ? 'border-dashed border-gray-300 dark:border-gray-600 cursor-move bg-gray-50 dark:bg-gray-700/30'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 disabled:opacity-50'
+                            ? 'border-dashed border-gray-600 cursor-move bg-gray-700/30'
+                            : 'border-gray-700 hover:border-emerald-400 hover:bg-gray-700/50 disabled:opacity-50'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           {isReorderMode && (
                             <GripVertical className="w-5 h-5 text-gray-400 flex-shrink-0" />
                           )}
-                          <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          <div className="w-9 h-9 bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <FileText className="w-4 h-4 text-emerald-400" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
+                              <h4 className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors truncate">
                                 {template.name}
                               </h4>
-                              <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium rounded-full flex-shrink-0">
+                              <span className="px-2 py-0.5 bg-emerald-900/30 text-emerald-300 text-xs font-medium rounded-full flex-shrink-0">
                                 {itemCount}
                               </span>
                             </div>
                             {template.description && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                              <p className="text-xs text-gray-400 line-clamp-1">
                                 {template.description}
                               </p>
                             )}
@@ -190,9 +190,9 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
               </div>
 
               {/* Quick Start Templates Section - also show when user has templates */}
-              <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-4 mt-4 border-t border-gray-700">
                 <div className="pb-2">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  <h3 className="text-sm font-medium text-gray-300 uppercase tracking-wide">
                     Quick Start Templates
                   </h3>
                 </div>
@@ -216,13 +216,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                       }
                     }}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                    className="w-full p-3 border border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <ShoppingCart className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <div className="w-8 h-8 bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <ShoppingCart className="w-4 h-4 text-emerald-400" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Weekly Groceries</span>
+                      <span className="text-sm font-medium text-white group-hover:text-emerald-400">Weekly Groceries</span>
                     </div>
                   </button>
                   {/* Breakfast Essentials */}
@@ -242,13 +242,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                       }
                     }}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                    className="w-full p-3 border border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                      <div className="w-8 h-8 bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-orange-400" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Breakfast Essentials</span>
+                      <span className="text-sm font-medium text-white group-hover:text-emerald-400">Breakfast Essentials</span>
                     </div>
                   </button>
                   {/* Home Essentials */}
@@ -268,13 +268,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                       }
                     }}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                    className="w-full p-3 border border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <div className="w-8 h-8 bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-blue-400" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Home Essentials</span>
+                      <span className="text-sm font-medium text-white group-hover:text-emerald-400">Home Essentials</span>
                     </div>
                   </button>
                   {/* BBQ Cookout */}
@@ -294,13 +294,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                       }
                     }}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                    className="w-full p-3 border border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <div className="w-8 h-8 bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-red-400" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">BBQ Cookout</span>
+                      <span className="text-sm font-medium text-white group-hover:text-emerald-400">BBQ Cookout</span>
                     </div>
                   </button>
                   {/* Pet Supplies */}
@@ -319,13 +319,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                       }
                     }}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                    className="w-full p-3 border border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <div className="w-8 h-8 bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-amber-400" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Pet Supplies</span>
+                      <span className="text-sm font-medium text-white group-hover:text-emerald-400">Pet Supplies</span>
                     </div>
                   </button>
                   {/* Back to School */}
@@ -344,13 +344,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                         logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                       }
                     }}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                    className="w-full p-3 border border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <div className="w-8 h-8 bg-indigo-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-4 h-4 text-indigo-400" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Back to School</span>
+                      <span className="text-sm font-medium text-white group-hover:text-emerald-400">Back to School</span>
                     </div>
                   </button>
                 </div>
@@ -359,17 +359,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
               {/* Create Custom Template Button */}
               <button
                 onClick={() => setShowCustomTemplateModal(true)}
-                className="w-full p-3 mt-3 border-2 border-dashed border-emerald-300 dark:border-emerald-600 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all text-left group"
+                className="w-full p-3 mt-3 border-2 border-dashed border-emerald-600 rounded-lg hover:border-emerald-400 hover:bg-emerald-900/20 transition-all text-left group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Plus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-9 h-9 bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Plus className="w-4 h-4 text-emerald-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    <h4 className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                       Create Custom Template
                     </h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-400">
                       Build your own reusable list
                     </p>
                   </div>
@@ -378,20 +378,20 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
             </>
           ) : (
             <div className="space-y-4">
-              <div className="text-center py-6 px-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+              <div className="text-center py-6 px-4 border border-gray-700 rounded-lg bg-gray-900/50">
                 <ShoppingCart className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600 dark:text-gray-400 mb-2">No templates saved yet</p>
-                <p className="text-sm text-gray-500 dark:text-gray-500">
+                <p className="text-gray-400 mb-2">No templates saved yet</p>
+                <p className="text-sm text-gray-500">
                   Create a shopping list and save it as a template, or try one of our quick-start templates below!
                 </p>
               </div>
 
               {/* Quick Start Templates */}
               <div className="pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                <h3 className="text-sm font-medium text-gray-300 uppercase tracking-wide">
                   Quick Start Templates
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   Click to create a pre-filled template
                 </p>
               </div>
@@ -421,17 +421,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <ShoppingCart className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-10 h-10 bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <ShoppingCart className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Weekly Groceries
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         8 essential grocery items
                       </p>
                     </div>
@@ -461,17 +461,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <div className="w-10 h-10 bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-purple-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Party Supplies
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         7 party essentials
                       </p>
                     </div>
@@ -500,17 +500,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    <div className="w-10 h-10 bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-orange-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Breakfast Essentials
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         6 breakfast staples
                       </p>
                     </div>
@@ -539,17 +539,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <div className="w-10 h-10 bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-green-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Healthy Snacks
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         6 nutritious snacks
                       </p>
                     </div>
@@ -578,17 +578,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <div className="w-10 h-10 bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-blue-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Home Essentials
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         6 household items
                       </p>
                     </div>
@@ -618,17 +618,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <div className="w-10 h-10 bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-red-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         BBQ Cookout
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         7 barbecue essentials
                       </p>
                     </div>
@@ -657,17 +657,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                    <div className="w-10 h-10 bg-pink-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-pink-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Baby Essentials
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         6 baby care items
                       </p>
                     </div>
@@ -696,17 +696,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    <div className="w-10 h-10 bg-amber-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-amber-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Pet Supplies
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         6 pet essentials
                       </p>
                     </div>
@@ -736,17 +736,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-100 dark:bg-slate-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                    <div className="w-10 h-10 bg-slate-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-slate-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Office Supplies
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         7 office essentials
                       </p>
                     </div>
@@ -776,17 +776,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                    <div className="w-10 h-10 bg-teal-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-teal-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Camping Trip
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         7 outdoor essentials
                       </p>
                     </div>
@@ -816,17 +816,17 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                       logger.error('Failed to create template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
                     }
                   }}
-                  className="w-full p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-left group"
+                  className="w-full p-4 border-2 border-gray-700 rounded-lg hover:border-emerald-400 hover:bg-gray-700/50 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    <div className="w-10 h-10 bg-indigo-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-indigo-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Back to School
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         7 school supplies
                       </p>
                     </div>
@@ -835,20 +835,20 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
               </div>
 
               {/* Create Custom Template Option */}
-              <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-4 mt-4 border-t border-gray-700">
                 <button
                   onClick={() => setShowCustomTemplateModal(true)}
-                  className="w-full p-4 border-2 border-dashed border-emerald-300 dark:border-emerald-600 rounded-lg hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all text-left group"
+                  className="w-full p-4 border-2 border-dashed border-emerald-600 rounded-lg hover:border-emerald-400 hover:bg-emerald-900/20 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Plus className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-10 h-10 bg-emerald-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Plus className="w-5 h-5 text-emerald-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-base sm:text-sm font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-base sm:text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">
                         Create Custom Template
                       </h4>
-                      <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mt-1">
+                      <p className="text-sm sm:text-xs text-gray-400 line-clamp-1 mt-1">
                         Build your own reusable shopping list
                       </p>
                     </div>
@@ -859,10 +859,10 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
           )}
         </div>
 
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-700">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+            className="w-full px-4 py-2.5 border border-gray-600 text-gray-300 rounded-full hover:bg-gray-700 transition-colors font-medium"
           >
             Cancel
           </button>

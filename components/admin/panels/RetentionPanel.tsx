@@ -129,20 +129,20 @@ const DauMauPanel = memo(function DauMauPanel() {
       </div>
 
       {/* Stickiness Explanation */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Understanding Stickiness</h3>
+      <div className="bg-gray-800 rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-white mb-3">Understanding Stickiness</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className={`p-3 rounded-lg ${stickiness < 10 && stickiness > 0 ? 'ring-2 ring-red-500' : ''} bg-red-50 dark:bg-red-900/20`}>
-            <p className="text-lg font-bold text-red-700 dark:text-red-400">&lt;10%</p>
-            <p className="text-xs text-red-600 dark:text-red-300">Needs improvement</p>
+          <div className={`p-3 rounded-lg ${stickiness < 10 && stickiness > 0 ? 'ring-2 ring-red-500' : ''} bg-red-900/20`}>
+            <p className="text-lg font-bold text-red-400">&lt;10%</p>
+            <p className="text-xs text-red-300">Needs improvement</p>
           </div>
-          <div className={`p-3 rounded-lg ${stickiness >= 10 && stickiness < 20 ? 'ring-2 ring-yellow-500' : ''} bg-yellow-50 dark:bg-yellow-900/20`}>
-            <p className="text-lg font-bold text-yellow-700 dark:text-yellow-400">10-20%</p>
-            <p className="text-xs text-yellow-600 dark:text-yellow-300">Good for most apps</p>
+          <div className={`p-3 rounded-lg ${stickiness >= 10 && stickiness < 20 ? 'ring-2 ring-yellow-500' : ''} bg-yellow-900/20`}>
+            <p className="text-lg font-bold text-yellow-400">10-20%</p>
+            <p className="text-xs text-yellow-300">Good for most apps</p>
           </div>
-          <div className={`p-3 rounded-lg ${stickiness >= 20 ? 'ring-2 ring-green-500' : ''} bg-green-50 dark:bg-green-900/20`}>
-            <p className="text-lg font-bold text-green-700 dark:text-green-400">&gt;20%</p>
-            <p className="text-xs text-green-600 dark:text-green-300">Excellent engagement</p>
+          <div className={`p-3 rounded-lg ${stickiness >= 20 ? 'ring-2 ring-green-500' : ''} bg-green-900/20`}>
+            <p className="text-lg font-bold text-green-400">&gt;20%</p>
+            <p className="text-xs text-green-300">Excellent engagement</p>
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-4">
@@ -151,9 +151,9 @@ const DauMauPanel = memo(function DauMauPanel() {
       </div>
 
       {/* Weekly Trend */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+      <div className="bg-gray-800 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Daily Active Users (Last 7 Days)</h3>
+          <h3 className="text-sm font-semibold text-white">Daily Active Users (Last 7 Days)</h3>
           <button
             onClick={() => refetch()}
             disabled={isFetching}
@@ -172,7 +172,7 @@ const DauMauPanel = memo(function DauMauPanel() {
 
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{day.count}</span>
+                  <span className="text-xs text-gray-400">{day.count}</span>
                   <div
                     className="w-full bg-purple-500 rounded-t transition-all duration-300"
                     style={{ height: `${Math.max(height, 4)}%` }}
@@ -208,20 +208,20 @@ const CohortsPanel = memo(function CohortsPanel() {
 
   // Color based on retention percentage
   const getRetentionColor = (pct: number) => {
-    if (pct < 0) return 'bg-gray-100 dark:bg-gray-700 text-gray-400';
-    if (pct >= 50) return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
-    if (pct >= 30) return 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400';
-    if (pct >= 15) return 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400';
-    return 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400';
+    if (pct < 0) return 'bg-gray-700 text-gray-400';
+    if (pct >= 50) return 'bg-green-900/30 text-green-400';
+    if (pct >= 30) return 'bg-green-900/20 text-green-400';
+    if (pct >= 15) return 'bg-yellow-900/20 text-yellow-400';
+    return 'bg-red-900/20 text-red-400';
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+      <div className="bg-gray-800 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-indigo-500" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Cohort Retention Analysis</h3>
+            <h3 className="text-lg font-semibold text-white">Cohort Retention Analysis</h3>
           </div>
           <button
             onClick={() => refetch()}
@@ -232,7 +232,7 @@ const CohortsPanel = memo(function CohortsPanel() {
           </button>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        <p className="text-sm text-gray-400 mb-6">
           Track how users from each signup week retain over time. Each row shows the percentage of users who returned.
         </p>
 
@@ -241,7 +241,7 @@ const CohortsPanel = memo(function CohortsPanel() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500 dark:text-gray-400">
+                <tr className="text-left text-gray-400">
                   <th className="pb-3 pr-4">Cohort Week</th>
                   <th className="pb-3 px-2 text-center">Users</th>
                   <th className="pb-3 px-2 text-center">Week 1</th>
@@ -250,9 +250,9 @@ const CohortsPanel = memo(function CohortsPanel() {
                   <th className="pb-3 px-2 text-center">Week 4</th>
                 </tr>
               </thead>
-              <tbody className="text-gray-900 dark:text-white">
+              <tbody className="text-white">
                 {cohorts.map((cohort, idx) => (
-                  <tr key={idx} className="border-t border-gray-200 dark:border-gray-700">
+                  <tr key={idx} className="border-t border-gray-700">
                     <td className="py-3 pr-4 font-medium">{cohort.cohort}</td>
                     <td className="py-3 px-2 text-center">{cohort.users}</td>
                     <td className="py-3 px-2 text-center">
@@ -304,8 +304,8 @@ const CohortsPanel = memo(function CohortsPanel() {
           </div>
         )}
 
-        <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-          <p className="text-sm text-indigo-700 dark:text-indigo-300">
+        <div className="mt-6 p-4 bg-indigo-900/20 rounded-lg">
+          <p className="text-sm text-indigo-300">
             <strong>How to read:</strong> Each row represents users who signed up in that week.
             The percentages show what portion returned each subsequent week. Higher is better.
           </p>
@@ -335,41 +335,41 @@ const ChurnPanel = memo(function ChurnPanel() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
             <TrendingDown className="w-4 h-4 text-red-500" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Churn Rate</span>
+            <span className="text-sm font-medium text-gray-400">Churn Rate</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+          <p className="text-3xl font-bold text-white">
             {totalUsers > 0 ? `${churnRate}%` : '--'}
           </p>
           <p className="text-xs text-gray-500 mt-1">Users inactive 30+ days</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-orange-500" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Churned Users</span>
+            <span className="text-sm font-medium text-gray-400">Churned Users</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{churned}</p>
+          <p className="text-3xl font-bold text-white">{churned}</p>
           <p className="text-xs text-gray-500 mt-1">No activity in 30 days</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
             <ArrowUpRight className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Retained Users</span>
+            <span className="text-sm font-medium text-gray-400">Retained Users</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{retained}</p>
+          <p className="text-3xl font-bold text-white">{retained}</p>
           <p className="text-xs text-gray-500 mt-1">Active in last 30 days</p>
         </div>
       </div>
 
       {/* Retention vs Churn Visual */}
       {totalUsers > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Retention Overview</h3>
+            <h3 className="text-sm font-semibold text-white">Retention Overview</h3>
             <button
               onClick={() => refetch()}
               disabled={isFetching}
@@ -378,7 +378,7 @@ const ChurnPanel = memo(function ChurnPanel() {
               <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
             </button>
           </div>
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
+          <div className="h-8 bg-gray-700 rounded-full overflow-hidden flex">
             <div
               className="bg-green-500 transition-all duration-500"
               style={{ width: `${100 - churnRate}%` }}
@@ -389,36 +389,36 @@ const ChurnPanel = memo(function ChurnPanel() {
             />
           </div>
           <div className="flex justify-between mt-2 text-xs">
-            <span className="text-green-600 dark:text-green-400">Retained: {100 - churnRate}%</span>
-            <span className="text-red-600 dark:text-red-400">Churned: {churnRate}%</span>
+            <span className="text-green-400">Retained: {100 - churnRate}%</span>
+            <span className="text-red-400">Churned: {churnRate}%</span>
           </div>
         </div>
       )}
 
       {/* Churn Definitions */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Churn Definitions</h3>
+      <div className="bg-gray-800 rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-white mb-4">Churn Definitions</h3>
 
         <div className="space-y-4">
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+          <div className="p-4 bg-red-900/20 rounded-lg">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-medium text-red-700 dark:text-red-300">Churned</h4>
+              <h4 className="text-sm font-medium text-red-300">Churned</h4>
             </div>
-            <p className="text-xs text-red-600 dark:text-red-400">
+            <p className="text-xs text-red-400">
               Users who signed up more than 60 days ago but haven't been active in the last 30 days.
             </p>
           </div>
 
-          <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-            <h4 className="text-sm font-medium text-orange-700 dark:text-orange-300 mb-2">At-Risk</h4>
-            <p className="text-xs text-orange-600 dark:text-orange-400">
+          <div className="p-4 bg-orange-900/20 rounded-lg">
+            <h4 className="text-sm font-medium text-orange-300 mb-2">At-Risk</h4>
+            <p className="text-xs text-orange-400">
               Users inactive for 14-30 days may benefit from re-engagement campaigns.
             </p>
           </div>
 
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <h4 className="text-sm font-medium text-green-700 dark:text-green-300 mb-2">Healthy Retention</h4>
-            <p className="text-xs text-green-600 dark:text-green-400">
+          <div className="p-4 bg-green-900/20 rounded-lg">
+            <h4 className="text-sm font-medium text-green-300 mb-2">Healthy Retention</h4>
+            <p className="text-xs text-green-400">
               For family apps, aim for &lt;5% monthly churn. Higher values indicate product or engagement issues.
             </p>
           </div>
@@ -434,7 +434,7 @@ export const RetentionPanel = memo(function RetentionPanel() {
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Sub-tab Navigation */}
-      <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-1 border-b border-gray-700">
         {SUB_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -444,8 +444,8 @@ export const RetentionPanel = memo(function RetentionPanel() {
               onClick={() => setActiveSubTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 isActive
-                  ? 'border-purple-500 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300'
+                  ? 'border-purple-500 text-purple-400'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
               }`}
             >
               <Icon className="w-4 h-4" />

@@ -46,7 +46,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-white" />
@@ -63,7 +63,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search templates..."
-            className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+            className="w-full px-4 py-2 mb-4 border border-gray-600 rounded-lg bg-gray-900"
           />
 
           {loading ? (
@@ -79,16 +79,16 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
                     onSelect(template.id);
                     onClose();
                   }}
-                  className="w-full flex items-start gap-3 p-4 text-left bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg transition-colors min-h-[80px]"
+                  className="w-full flex items-start gap-3 p-4 text-left bg-gray-900 hover:bg-gray-800 border-2 border-gray-700 rounded-lg transition-colors min-h-[80px]"
                 >
                   {template.is_favorite && <Star className="w-4 h-4 text-amber-500 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-sm font-medium text-gray-900 dark:text-white">{template.name}</h3>
-                    <p className="text-sm sm:text-xs text-gray-600 dark:text-gray-400 truncate">{template.title}</p>
+                    <h3 className="text-base sm:text-sm font-medium text-white">{template.name}</h3>
+                    <p className="text-sm sm:text-xs text-gray-400 truncate">{template.title}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-gray-500">Used {template.use_count} times</span>
                       {template.priority && (
-                        <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+                        <span className="text-xs px-2 py-0.5 bg-blue-900 text-blue-300 rounded">
                           {template.priority}
                         </span>
                       )}

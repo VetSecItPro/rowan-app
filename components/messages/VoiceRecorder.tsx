@@ -161,12 +161,12 @@ export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: 
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
       {/* Sending State (Auto-send in progress) */}
       {sending && !audioUrl && !isRecording && (
         <div className="flex items-center justify-center gap-3 py-2">
           <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-gray-400">
             Sending voice message...
           </span>
         </div>
@@ -183,7 +183,7 @@ export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: 
             <Mic className="w-8 h-8 text-white" />
           </button>
           <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-400">
               Tap to start recording
             </p>
           </div>
@@ -195,16 +195,16 @@ export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: 
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-lg font-mono text-gray-900 dark:text-white">
+            <span className="text-lg font-mono text-white">
               {formatDuration(recordingDuration)}
             </span>
           </div>
           <button
             onClick={handleStopRecording}
-            className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
+            className="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
             aria-label="Stop recording"
           >
-            <Square className="w-6 h-6 text-gray-900 dark:text-white" />
+            <Square className="w-6 h-6 text-white" />
           </button>
         </div>
       )}
@@ -225,10 +225,10 @@ export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: 
               )}
             </button>
             <div className="flex-1">
-              <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
                 <div className="h-full bg-green-500 w-0 transition-all" />
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 {formatDuration(recordingDuration)}
               </p>
             </div>
@@ -238,15 +238,15 @@ export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: 
             <button
               onClick={handleDelete}
               disabled={sending}
-              className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
+              className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
               aria-label="Delete recording"
             >
-              <Trash2 className="w-5 h-5 text-gray-900 dark:text-white" />
+              <Trash2 className="w-5 h-5 text-white" />
             </button>
             <button
               onClick={handleSend}
               disabled={sending}
-              className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 dark:disabled:bg-blue-800 flex items-center justify-center transition-all active:scale-95 shadow-lg"
+              className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-800 flex items-center justify-center transition-all active:scale-95 shadow-lg"
               aria-label="Send voice message"
             >
               {sending ? (
@@ -262,7 +262,7 @@ export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: 
       {/* Permission Error */}
       {permissionDenied && (
         <div className="text-center py-4">
-          <p className="text-base md:text-sm text-red-600 dark:text-red-400">
+          <p className="text-base md:text-sm text-red-400">
             Microphone permission denied. Please enable it in your browser settings.
           </p>
         </div>

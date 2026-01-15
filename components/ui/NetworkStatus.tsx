@@ -201,7 +201,7 @@ export function OfflineQueueBadge({
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs font-medium rounded-full ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2 py-1 bg-amber-900/30 text-amber-300 text-xs font-medium rounded-full ${className}`}
     >
       {isProcessing ? (
         <RefreshCw className="w-3 h-3 animate-spin" />

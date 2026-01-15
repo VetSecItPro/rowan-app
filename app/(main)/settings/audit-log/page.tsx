@@ -43,10 +43,10 @@ const ACTION_ICONS: Record<string, any> = {
 };
 
 const CATEGORY_COLORS: Record<ActionCategory, string> = {
-  data_access: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20',
-  account: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20',
-  security: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20',
-  compliance: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20',
+  data_access: 'text-blue-400 bg-blue-900/20',
+  account: 'text-green-400 bg-green-900/20',
+  security: 'text-orange-400 bg-orange-900/20',
+  compliance: 'text-purple-400 bg-purple-900/20',
 };
 
 export default function AuditLogPage() {
@@ -115,17 +115,17 @@ export default function AuditLogPage() {
     ]}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your Audit Trail</h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <h1 className="text-2xl font-bold text-white mb-2">Your Audit Trail</h1>
+              <p className="text-gray-400">
                 View all actions performed on your account. This log helps you track data access and account changes for transparency and security.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg">
+              <div className="mt-4 flex items-center gap-2 text-xs text-gray-400 bg-gray-900/50 p-3 rounded-lg">
                 <FileText className="w-4 h-4" />
                 <span>
                   <strong>GDPR Article 15:</strong> Right of Access - You have the right to know what data we have and how it's processed.
@@ -138,67 +138,67 @@ export default function AuditLogPage() {
         {/* Stats */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Events</h3>
+                <h3 className="text-sm font-medium text-gray-400">Total Events</h3>
                 <BarChart3 className="w-5 h-5 text-purple-500" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <p className="text-2xl font-bold text-white">{stats.total}</p>
             </div>
 
-            <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Recent (30d)</h3>
+                <h3 className="text-sm font-medium text-gray-400">Recent (30d)</h3>
                 <Calendar className="w-5 h-5 text-blue-500" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.recent_actions}</p>
+              <p className="text-2xl font-bold text-white">{stats.recent_actions}</p>
             </div>
 
-            <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Security Events</h3>
+                <h3 className="text-sm font-medium text-gray-400">Security Events</h3>
                 <Lock className="w-5 h-5 text-orange-500" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.by_category.security}</p>
+              <p className="text-2xl font-bold text-white">{stats.by_category.security}</p>
             </div>
 
-            <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Data Access</h3>
+                <h3 className="text-sm font-medium text-gray-400">Data Access</h3>
                 <Eye className="w-5 h-5 text-green-500" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.by_category.data_access}</p>
+              <p className="text-2xl font-bold text-white">{stats.by_category.data_access}</p>
             </div>
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl p-4">
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center justify-between w-full"
           >
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <span className="font-medium text-gray-900 dark:text-white">Filters</span>
+              <Filter className="w-5 h-5 text-gray-400" />
+              <span className="font-medium text-white">Filters</span>
               {selectedCategory !== 'all' && (
-                <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
+                <span className="px-2 py-1 bg-purple-900/30 text-purple-300 text-xs rounded-full">
                   Active
                 </span>
               )}
             </div>
-            <ChevronDown className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </button>
 
           {showFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-4 pt-4 border-t border-gray-700">
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedCategory('all')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedCategory === 'all'
                       ? 'bg-purple-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   All Events
@@ -208,7 +208,7 @@ export default function AuditLogPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedCategory === 'data_access'
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   Data Access
@@ -218,7 +218,7 @@ export default function AuditLogPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedCategory === 'account'
                       ? 'bg-green-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   Account
@@ -228,7 +228,7 @@ export default function AuditLogPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedCategory === 'security'
                       ? 'bg-orange-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   Security
@@ -238,7 +238,7 @@ export default function AuditLogPage() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     selectedCategory === 'compliance'
                       ? 'bg-purple-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   Compliance
@@ -264,7 +264,7 @@ export default function AuditLogPage() {
               return (
                 <div
                   key={entry.id}
-                  className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-xl p-4 hover:shadow-lg transition-shadow"
+                  className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${CATEGORY_COLORS[entry.action_category]}`}>
@@ -273,10 +273,10 @@ export default function AuditLogPage() {
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white">
+                          <h3 className="font-semibold text-white">
                             {formatActionName(entry.action)}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-sm text-gray-400 mt-1">
                             {entry.resource_type && (
                               <span className="capitalize">{entry.resource_type} </span>
                             )}
@@ -290,7 +290,7 @@ export default function AuditLogPage() {
                         </span>
                       </div>
                       {entry.details && Object.keys(entry.details).length > 0 && (
-                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg">
+                        <div className="mt-2 text-xs text-gray-400 bg-gray-900/50 p-2 rounded-lg">
                           <pre className="whitespace-pre-wrap break-all">
                             {JSON.stringify(entry.details, null, 2)}
                           </pre>

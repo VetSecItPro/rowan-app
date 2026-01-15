@@ -23,17 +23,17 @@ export function RecipePreviewModal({
   const getSourceBadgeColor = (source: string) => {
     switch (source) {
       case 'themealdb':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-blue-100 bg-blue-900/30 text-blue-300';
       case 'spoonacular':
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300';
+        return 'bg-emerald-100 bg-emerald-900/30 text-emerald-300';
       case 'edamam':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-100 bg-green-900/30 text-green-300';
       case 'tasty':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-orange-100 bg-orange-900/30 text-orange-300';
       case 'apininjas':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
+        return 'bg-purple-100 bg-purple-900/30 text-purple-300';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 bg-gray-800 text-gray-300';
     }
   };
 
@@ -60,11 +60,11 @@ export function RecipePreviewModal({
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-4xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-4xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header with Image */}
         <div className="relative">
           {recipe.image_url && (
-            <div className="h-64 overflow-hidden bg-gray-200 dark:bg-gray-700">
+            <div className="h-64 overflow-hidden bg-gray-700">
               <img
                 src={recipe.image_url}
                 alt={recipe.name}
@@ -98,7 +98,7 @@ export function RecipePreviewModal({
           {/* Title and Meta */}
           <div>
             <div className="flex items-start justify-between gap-4 mb-3">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-white">
                 {recipe.name}
               </h2>
               {recipe.source_url && (
@@ -115,7 +115,7 @@ export function RecipePreviewModal({
             </div>
 
             {/* Meta Info */}
-            <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-6 text-sm text-gray-400">
               {recipe.prep_time && (
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
@@ -146,10 +146,10 @@ export function RecipePreviewModal({
           {/* Description */}
           {recipe.description && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Description
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 {recipe.description}
               </p>
             </div>
@@ -158,17 +158,17 @@ export function RecipePreviewModal({
           {/* Ingredients */}
           {recipe.ingredients && recipe.ingredients.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+              <h3 className="text-lg font-semibold text-white mb-3">
                 Ingredients ({recipe.ingredients.length})
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {recipe.ingredients.map((ing, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                    className="flex items-center gap-2 p-2 bg-gray-900 rounded-lg"
                   >
                     <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-sm text-gray-300">
                       {[ing.amount, ing.unit, ing.name].filter(Boolean).join(' ')}
                     </span>
                   </div>
@@ -180,11 +180,11 @@ export function RecipePreviewModal({
           {/* Instructions */}
           {recipe.instructions && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+              <h3 className="text-lg font-semibold text-white mb-3">
                 Instructions
               </h3>
-              <div className="prose dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              <div className="prose prose-invert max-w-none">
+                <p className="text-gray-400 whitespace-pre-wrap">
                   {recipe.instructions}
                 </p>
               </div>
@@ -194,10 +194,10 @@ export function RecipePreviewModal({
           {/* Tags */}
           {recipe.cuisine && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Cuisine
               </h3>
-              <span className="inline-block px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-sm">
+              <span className="inline-block px-3 py-1 bg-orange-900/30 text-orange-300 rounded-full text-sm">
                 {recipe.cuisine}
               </span>
             </div>
@@ -205,11 +205,11 @@ export function RecipePreviewModal({
         </div>
 
         {/* Footer Actions - Mobile Optimized */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-4 sm:p-6">
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={onClose}
-              className="px-3 sm:px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium"
+              className="px-3 sm:px-6 py-2.5 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors text-sm sm:text-base font-medium"
             >
               Close
             </button>

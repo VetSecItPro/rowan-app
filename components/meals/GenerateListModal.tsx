@@ -119,9 +119,9 @@ export function GenerateListModal({
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 px-4 sm:px-6 py-4 border-b border-emerald-200 dark:border-emerald-800">
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-50 from-emerald-900/20 to-green-900/20 px-4 sm:px-6 py-4 border-b border-emerald-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 flex items-center justify-center">
@@ -131,7 +131,7 @@ export function GenerateListModal({
                 <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
                   Generate Shopping List
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                <p className="text-sm text-gray-400 mt-0.5">
                   Select meals to combine ingredients
                 </p>
               </div>
@@ -140,7 +140,7 @@ export function GenerateListModal({
               onClick={handleClose}
               disabled={isGenerating}
               aria-label="Close modal"
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all active:scale-95 text-emerald-600 dark:text-emerald-400 disabled:opacity-50"
+              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-emerald-900/30 transition-all active:scale-95 text-emerald-400 disabled:opacity-50"
             >
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
@@ -151,7 +151,7 @@ export function GenerateListModal({
         <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* List Name Input */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               List Name (optional)
             </label>
             <input
@@ -160,10 +160,10 @@ export function GenerateListModal({
               id="field-1"
               onChange={(e) =>  setListName(e.target.value)}
               placeholder="e.g., Weekly Groceries"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 text-white"
               disabled={isGenerating}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+            <p className="text-xs text-gray-400 mt-1.5">
               Leave blank to auto-generate a name
             </p>
           </div>
@@ -171,13 +171,13 @@ export function GenerateListModal({
           {/* Meal Selection */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="text-sm font-medium text-gray-300">
                 Select Meals ({selectedMealIds.length} selected)
               </label>
               <button
                 onClick={handleSelectAll}
                 disabled={isGenerating}
-                className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline disabled:opacity-50"
+                className="text-sm text-emerald-400 hover:underline disabled:opacity-50"
               >
                 {selectedMealIds.length === mealsWithRecipes.length
                   ? 'Deselect All'
@@ -186,12 +186,12 @@ export function GenerateListModal({
             </div>
 
             {mealsWithRecipes.length === 0 ? (
-              <div className="text-center py-8 px-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div className="text-center py-8 px-4 bg-gray-900/50 border border-gray-700 rounded-lg">
                 <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600 dark:text-gray-400 font-medium">
+                <p className="text-gray-400 font-medium">
                   No meals with recipes found
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Plan some meals with recipes first
                 </p>
               </div>
@@ -204,8 +204,8 @@ export function GenerateListModal({
                     disabled={isGenerating}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left flex items-center gap-3 ${
                       selectedMealIds.includes(meal.id)
-                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700'
+                        ? 'border-emerald-500 bg-emerald-900/20'
+                        : 'border-gray-700 hover:border-emerald-700'
                     } disabled:opacity-50`}
                   >
                     {/* Checkbox */}
@@ -213,7 +213,7 @@ export function GenerateListModal({
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
                         selectedMealIds.includes(meal.id)
                           ? 'border-emerald-500 bg-emerald-500'
-                          : 'border-gray-300 dark:border-gray-600'
+                          : 'border-gray-600'
                       }`}
                     >
                       {selectedMealIds.includes(meal.id) && (
@@ -224,22 +224,22 @@ export function GenerateListModal({
                     {/* Meal Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                        <p className="font-medium text-white truncate">
                           {meal.name}
                         </p>
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full ${
                             meal.meal_type === 'breakfast'
-                              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                              ? 'bg-yellow-900/30 text-yellow-300'
                               : meal.meal_type === 'lunch'
-                              ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
-                              : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                              ? 'bg-orange-900/30 text-orange-300'
+                              : 'bg-purple-900/30 text-purple-300'
                           }`}
                         >
                           {meal.meal_type}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
                         <span>
                           {formatDateString(meal.scheduled_date)}
                         </span>
@@ -259,19 +259,19 @@ export function GenerateListModal({
 
           {/* Error Message */}
           {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-base md:text-sm text-red-600 dark:text-red-400">{error}</p>
+            <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg">
+              <p className="text-base md:text-sm text-red-400">{error}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6 flex items-center justify-end gap-3">
+        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6 flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={handleClose}
             disabled={isGenerating}
-            className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+            className="px-6 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

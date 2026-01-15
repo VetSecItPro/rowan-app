@@ -120,9 +120,9 @@ export function EnhancedRecurrencePattern({
             type="checkbox"
             checked={enabled}
             onChange={(e) => onEnabledChange(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
           />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-300">
             Recurring event
           </span>
         </label>
@@ -139,21 +139,21 @@ export function EnhancedRecurrencePattern({
             type="checkbox"
             checked={enabled}
             onChange={(e) => onEnabledChange(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
           />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-300">
             Recurring event
           </span>
         </label>
       </div>
 
       {/* Recurrence Configuration */}
-      <div className="space-y-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-700">
+      <div className="space-y-4 p-4 bg-purple-900/20 rounded-xl border border-purple-700">
 
         {/* Pattern Type and Interval */}
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Repeat every
             </label>
             <div className="flex gap-2">
@@ -163,13 +163,13 @@ export function EnhancedRecurrencePattern({
                 max="99"
                 value={pattern.interval}
                 onChange={(e) => updatePattern({ interval: Math.max(1, parseInt(e.target.value) || 1) })}
-                className="w-20 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-20 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
               />
               <div className="relative flex-1">
                 <select
                   value={pattern.pattern}
                   onChange={(e) => updatePattern({ pattern: e.target.value as any })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-8"
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white appearance-none pr-8"
                 >
                   <option value="daily">day(s)</option>
                   <option value="weekly">week(s)</option>
@@ -185,7 +185,7 @@ export function EnhancedRecurrencePattern({
         {/* Weekly Options */}
         {pattern.pattern === 'weekly' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               Repeat on
             </label>
             <div className="grid grid-cols-7 gap-2">
@@ -197,7 +197,7 @@ export function EnhancedRecurrencePattern({
                   className={`px-2 py-2 rounded-lg text-sm font-medium transition-colors ${
                     pattern.days_of_week?.includes(index)
                       ? 'bg-purple-500 text-white'
-                      : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
                   }`}
                 >
                   {day}
@@ -211,7 +211,7 @@ export function EnhancedRecurrencePattern({
         {pattern.pattern === 'monthly' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Monthly repeat type
               </label>
               <div className="space-y-2">
@@ -223,7 +223,7 @@ export function EnhancedRecurrencePattern({
                     onChange={() => updatePattern({ week_of_month: undefined })}
                     className="w-4 h-4 text-purple-600 focus:ring-purple-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-300">
                     On day of month
                   </span>
                 </label>
@@ -235,7 +235,7 @@ export function EnhancedRecurrencePattern({
                     onChange={() => updatePattern({ week_of_month: [1], days_of_week: [1] })}
                     className="w-4 h-4 text-purple-600 focus:ring-purple-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-300">
                     On specific weeks
                   </span>
                 </label>
@@ -245,7 +245,7 @@ export function EnhancedRecurrencePattern({
             {!pattern.week_of_month ? (
               /* Day of Month */
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-sm font-medium text-gray-300 mb-3">
                   Day of month
                 </label>
                 <input
@@ -254,14 +254,14 @@ export function EnhancedRecurrencePattern({
                   max="31"
                   value={pattern.day_of_month || 1}
                   onChange={(e) => updatePattern({ day_of_month: Math.max(1, Math.min(31, parseInt(e.target.value) || 1)) })}
-                  className="w-20 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-20 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
                 />
               </div>
             ) : (
               /* Week of Month + Day of Week */
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     Week of month
                   </label>
                   <div className="flex gap-2">
@@ -273,7 +273,7 @@ export function EnhancedRecurrencePattern({
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           pattern.week_of_month?.includes(week)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
                         }`}
                       >
                         {week === 1 ? '1st' : week === 2 ? '2nd' : week === 3 ? '3rd' : '4th'}
@@ -283,7 +283,7 @@ export function EnhancedRecurrencePattern({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
                     Day of week
                   </label>
                   <div className="grid grid-cols-7 gap-2">
@@ -295,7 +295,7 @@ export function EnhancedRecurrencePattern({
                         className={`px-2 py-2 rounded-lg text-sm font-medium transition-colors ${
                           pattern.days_of_week?.includes(index)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600'
                         }`}
                       >
                         {day}
@@ -312,14 +312,14 @@ export function EnhancedRecurrencePattern({
         {pattern.pattern === 'yearly' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Month
               </label>
               <div className="relative">
                 <select
                   value={pattern.month || 1}
                   onChange={(e) => updatePattern({ month: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white appearance-none pr-8"
+                  className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white appearance-none pr-8"
                 >
                   {MONTHS.map((month, index) => (
                     <option key={index} value={index + 1}>{month}</option>
@@ -330,7 +330,7 @@ export function EnhancedRecurrencePattern({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Day of month
               </label>
               <input
@@ -339,7 +339,7 @@ export function EnhancedRecurrencePattern({
                 max="31"
                 value={pattern.day_of_month || 1}
                 onChange={(e) => updatePattern({ day_of_month: Math.max(1, Math.min(31, parseInt(e.target.value) || 1)) })}
-                className="w-20 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                className="w-20 px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
               />
             </div>
           </div>
@@ -347,7 +347,7 @@ export function EnhancedRecurrencePattern({
 
         {/* End Conditions */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium text-gray-300 mb-3">
             End recurrence
           </label>
           <div className="space-y-3">
@@ -360,7 +360,7 @@ export function EnhancedRecurrencePattern({
                 onChange={(e) => setEndType(e.target.value as any)}
                 className="w-4 h-4 text-purple-600 focus:ring-purple-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Never</span>
+              <span className="text-sm text-gray-300">Never</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer">
@@ -372,13 +372,13 @@ export function EnhancedRecurrencePattern({
                 onChange={(e) => setEndType(e.target.value as any)}
                 className="w-4 h-4 text-purple-600 focus:ring-purple-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">On date</span>
+              <span className="text-sm text-gray-300">On date</span>
               {endType === 'date' && (
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="ml-2 px-3 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
+                  className="ml-2 px-3 py-1 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white text-sm"
                 />
               )}
             </label>
@@ -392,7 +392,7 @@ export function EnhancedRecurrencePattern({
                 onChange={(e) => setEndType(e.target.value as any)}
                 className="w-4 h-4 text-purple-600 focus:ring-purple-500"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">After</span>
+              <span className="text-sm text-gray-300">After</span>
               {endType === 'count' && (
                 <div className="flex items-center gap-2 ml-2">
                   <input
@@ -401,9 +401,9 @@ export function EnhancedRecurrencePattern({
                     max="999"
                     value={endCount}
                     onChange={(e) => setEndCount(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-20 px-3 py-1 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white text-sm"
+                    className="w-20 px-3 py-1 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white text-sm"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">occurrences</span>
+                  <span className="text-sm text-gray-300">occurrences</span>
                 </div>
               )}
             </label>
@@ -411,8 +411,8 @@ export function EnhancedRecurrencePattern({
         </div>
 
         {/* Pattern Summary */}
-        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+          <p className="text-sm text-gray-400">
             <strong>Summary:</strong> {getPatternSummary(pattern, endType, endDate, endCount)}
           </p>
         </div>

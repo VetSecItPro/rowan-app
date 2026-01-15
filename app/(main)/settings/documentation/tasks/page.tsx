@@ -328,13 +328,13 @@ const guideSections: GuideSection[] = [
 
 export default function TasksDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-8">
+    <div className="min-h-screen bg-gray-900 p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Link
             href="/settings/documentation"
-            className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-6"
+            className="inline-flex items-center gap-2 py-2 px-3 text-gray-400 hover:text-blue-400 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Documentation
@@ -345,26 +345,26 @@ export default function TasksDocumentationPage() {
               <CheckSquare className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">
                 Tasks & Chores Guide
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-gray-400 mt-1">
                 Complete documentation for all 23 task management features
               </p>
             </div>
           </div>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+          <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-6">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <Lightbulb className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                <h3 className="text-lg font-semibold text-blue-100 mb-2">
                   Welcome to Advanced Task Management
                 </h3>
-                <p className="text-blue-800 dark:text-blue-200 mb-2">
+                <p className="text-blue-200 mb-2">
                   Rowan's task system includes everything you need to organize daily tasks and household chores:
                 </p>
-                <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1 ml-4">
+                <ul className="text-sm text-blue-300 space-y-1 ml-4">
                   <li>• <strong>Recurring tasks</strong> - Auto-generate tasks daily, weekly, or monthly</li>
                   <li>• <strong>Time tracking</strong> - Track hours spent with built-in timer</li>
                   <li>• <strong>Subtasks</strong> - Break down complex projects</li>
@@ -385,7 +385,7 @@ export default function TasksDocumentationPage() {
         {/* Guide Sections */}
         <div className="space-y-8">
           {guideSections.map((section, index) => (
-            <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div key={index} className="bg-gray-800 rounded-2xl shadow-lg border border-gray-700 overflow-hidden">
               <div className={`bg-gradient-to-r ${section.color} p-6`}>
                 <div className="flex items-center gap-3">
                   <section.icon className="w-8 h-8 text-white" />
@@ -399,20 +399,20 @@ export default function TasksDocumentationPage() {
                     <a
                       key={articleIndex}
                       href={article.href}
-                      className="block p-4 bg-gray-50 dark:bg-gray-900 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border border-gray-200 dark:border-gray-700"
+                      className="block p-4 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors border border-gray-700"
                     >
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                      <h3 className="font-semibold text-white mb-2">
                         {article.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <p className="text-sm text-gray-400 mb-3">
                         {article.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500 dark:text-gray-500 flex items-center gap-1">
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {article.readTime}
                         </span>
-                        <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                        <span className="text-xs text-blue-400 font-medium">
                           Read more →
                         </span>
                       </div>
@@ -450,17 +450,17 @@ export default function TasksDocumentationPage() {
 
         {/* Feature Count Badge */}
         <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 rounded-full border border-gray-700">
             <Zap className="w-5 h-5 text-blue-600" />
-            <span className="text-gray-900 dark:text-white font-semibold">
+            <span className="text-white font-semibold">
               23 Powerful Features
             </span>
-            <span className="text-gray-500 dark:text-gray-400">•</span>
-            <span className="text-gray-600 dark:text-gray-400">
+            <span className="text-gray-400">•</span>
+            <span className="text-gray-400">
               8,981 lines of code
             </span>
-            <span className="text-gray-500 dark:text-gray-400">•</span>
-            <span className="text-gray-600 dark:text-gray-400">
+            <span className="text-gray-400">•</span>
+            <span className="text-gray-400">
               100% complete
             </span>
           </div>

@@ -121,31 +121,31 @@ const MrrPanel = memo(function MrrPanel() {
           </div>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">ARR</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(arr)}</p>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <p className="text-sm font-medium text-gray-400">ARR</p>
+          <p className="text-2xl font-bold text-white mt-1">{formatCurrency(arr)}</p>
           <p className="text-xs text-gray-500 mt-1">Annual run rate</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">MRR Growth</p>
-          <p className={`text-2xl font-bold mt-1 ${mrrGrowth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <p className="text-sm font-medium text-gray-400">MRR Growth</p>
+          <p className={`text-2xl font-bold mt-1 ${mrrGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {mrrGrowth >= 0 ? '+' : ''}{mrrGrowth}%
           </p>
           <p className="text-xs text-gray-500 mt-1">Month over month</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">ARPU</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(arpu)}</p>
+        <div className="bg-gray-800 rounded-lg p-5">
+          <p className="text-sm font-medium text-gray-400">ARPU</p>
+          <p className="text-2xl font-bold text-white mt-1">{formatCurrency(arpu)}</p>
           <p className="text-xs text-gray-500 mt-1">Per paying user</p>
         </div>
       </div>
 
       {/* MRR Breakdown */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+      <div className="bg-gray-800 rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">MRR Movement</h3>
+          <h3 className="text-sm font-semibold text-white">MRR Movement</h3>
           <button
             onClick={() => refetch()}
             disabled={isFetching}
@@ -155,36 +155,36 @@ const MrrPanel = memo(function MrrPanel() {
           </button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
+          <div className="p-3 bg-green-900/20 rounded-lg text-center">
             <ArrowUpRight className="w-5 h-5 text-green-500 mx-auto mb-1" />
-            <p className="text-lg font-bold text-green-700 dark:text-green-400">{formatCurrency(newMrrThisMonth)}</p>
-            <p className="text-xs text-green-600 dark:text-green-300">New MRR</p>
+            <p className="text-lg font-bold text-green-400">{formatCurrency(newMrrThisMonth)}</p>
+            <p className="text-xs text-green-300">New MRR</p>
           </div>
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-center">
+          <div className="p-3 bg-blue-900/20 rounded-lg text-center">
             <TrendingUp className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-            <p className="text-lg font-bold text-blue-700 dark:text-blue-400">
+            <p className="text-lg font-bold text-blue-400">
               {netGrowth >= 0 ? '+' : ''}{netGrowth}
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-300">Net Growth</p>
+            <p className="text-xs text-blue-300">Net Growth</p>
           </div>
-          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-center">
+          <div className="p-3 bg-orange-900/20 rounded-lg text-center">
             <TrendingUp className="w-5 h-5 text-orange-500 mx-auto mb-1 rotate-180" />
-            <p className="text-lg font-bold text-orange-700 dark:text-orange-400">
+            <p className="text-lg font-bold text-orange-400">
               {metrics?.cancellationsThisMonth || 0}
             </p>
-            <p className="text-xs text-orange-600 dark:text-orange-300">Cancellations</p>
+            <p className="text-xs text-orange-300">Cancellations</p>
           </div>
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-center">
+          <div className="p-3 bg-red-900/20 rounded-lg text-center">
             <ArrowUpRight className="w-5 h-5 text-red-500 mx-auto mb-1 rotate-180" />
-            <p className="text-lg font-bold text-red-700 dark:text-red-400">{formatCurrency(churnedMrrThisMonth)}</p>
-            <p className="text-xs text-red-600 dark:text-red-300">Churned MRR</p>
+            <p className="text-lg font-bold text-red-400">{formatCurrency(churnedMrrThisMonth)}</p>
+            <p className="text-xs text-red-300">Churned MRR</p>
           </div>
         </div>
       </div>
 
       {/* MRR Chart */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">MRR Over Time (Last 30 Days)</h3>
+      <div className="bg-gray-800 rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-white mb-4">MRR Over Time (Last 30 Days)</h3>
         {dailyRevenue.length > 0 && mrr > 0 ? (
           <div className="h-48 flex items-end gap-1">
             {dailyRevenue.slice(-30).map((day, i) => {
@@ -202,7 +202,7 @@ const MrrPanel = memo(function MrrPanel() {
             })}
           </div>
         ) : (
-          <div className="h-48 flex items-center justify-center text-gray-400 text-sm border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+          <div className="h-48 flex items-center justify-center text-gray-400 text-sm border-2 border-dashed border-gray-600 rounded-lg">
             <div className="text-center">
               <DollarSign className="w-8 h-8 mx-auto mb-2 text-gray-300" />
               <p>No revenue data yet</p>
@@ -214,8 +214,8 @@ const MrrPanel = memo(function MrrPanel() {
 
       {/* Beta Phase Note */}
       {mrr === 0 && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <p className="text-sm text-blue-700 dark:text-blue-300">
+        <div className="p-4 bg-blue-900/20 rounded-lg">
+          <p className="text-sm text-blue-300">
             <strong>Beta Phase:</strong> Revenue metrics will populate once paid subscriptions are active.
             During beta, all users have free access.
           </p>
@@ -256,34 +256,34 @@ const ConversionsPanel = memo(function ConversionsPanel() {
     <div className="space-y-6">
       {/* Conversion Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
             <Repeat className="w-4 h-4 text-purple-500" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Free to Paid</span>
+            <span className="text-sm font-medium text-gray-400">Free to Paid</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+          <p className="text-3xl font-bold text-white">
             {conversionRate > 0 ? `${conversionRate}%` : '--'}
           </p>
           <p className="text-xs text-gray-500 mt-1">Conversion rate</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Upgrades</span>
+            <span className="text-sm font-medium text-gray-400">Upgrades</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+          <p className="text-3xl font-bold text-white">
             {recentEvents?.upgraded || 0}
           </p>
           <p className="text-xs text-gray-500 mt-1">This month</p>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-orange-500 rotate-180" />
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Downgrades</span>
+            <span className="text-sm font-medium text-gray-400">Downgrades</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+          <p className="text-3xl font-bold text-white">
             {recentEvents?.downgraded || 0}
           </p>
           <p className="text-xs text-gray-500 mt-1">This month</p>
@@ -292,9 +292,9 @@ const ConversionsPanel = memo(function ConversionsPanel() {
 
       {/* Event Summary */}
       {recentEvents && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
+        <div className="bg-gray-800 rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Subscription Events This Month</h3>
+            <h3 className="text-sm font-semibold text-white">Subscription Events This Month</h3>
             <button
               onClick={() => refetch()}
               disabled={isFetching}
@@ -304,25 +304,25 @@ const ConversionsPanel = memo(function ConversionsPanel() {
             </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <p className="text-2xl font-bold text-green-700 dark:text-green-400">{recentEvents.created}</p>
-              <p className="text-xs text-green-600 dark:text-green-300">New Subscriptions</p>
+            <div className="p-3 bg-green-900/20 rounded-lg">
+              <p className="text-2xl font-bold text-green-400">{recentEvents.created}</p>
+              <p className="text-xs text-green-300">New Subscriptions</p>
             </div>
-            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{recentEvents.reactivated}</p>
-              <p className="text-xs text-blue-600 dark:text-blue-300">Reactivations</p>
+            <div className="p-3 bg-blue-900/20 rounded-lg">
+              <p className="text-2xl font-bold text-blue-400">{recentEvents.reactivated}</p>
+              <p className="text-xs text-blue-300">Reactivations</p>
             </div>
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              <p className="text-2xl font-bold text-red-700 dark:text-red-400">{recentEvents.cancelled}</p>
-              <p className="text-xs text-red-600 dark:text-red-300">Cancellations</p>
+            <div className="p-3 bg-red-900/20 rounded-lg">
+              <p className="text-2xl font-bold text-red-400">{recentEvents.cancelled}</p>
+              <p className="text-xs text-red-300">Cancellations</p>
             </div>
             {recentEvents.paymentFailed > 0 && (
-              <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <div className="p-3 bg-orange-900/20 rounded-lg">
                 <div className="flex items-center gap-1">
                   <AlertCircle className="w-4 h-4 text-orange-500" />
-                  <p className="text-2xl font-bold text-orange-700 dark:text-orange-400">{recentEvents.paymentFailed}</p>
+                  <p className="text-2xl font-bold text-orange-400">{recentEvents.paymentFailed}</p>
                 </div>
-                <p className="text-xs text-orange-600 dark:text-orange-300">Payment Failures</p>
+                <p className="text-xs text-orange-300">Payment Failures</p>
               </div>
             )}
           </div>
@@ -330,12 +330,12 @@ const ConversionsPanel = memo(function ConversionsPanel() {
       )}
 
       {/* Subscription Funnel */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Subscription Funnel</h3>
+      <div className="bg-gray-800 rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-white mb-4">Subscription Funnel</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-4">
-            <div className="w-24 text-sm text-gray-600 dark:text-gray-400">Free Users</div>
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8 overflow-hidden">
+            <div className="w-24 text-sm text-gray-400">Free Users</div>
+            <div className="flex-1 bg-gray-700 rounded-full h-8 overflow-hidden">
               <div
                 className="h-8 rounded-full bg-blue-500 flex items-center justify-end px-3 transition-all duration-500"
                 style={{ width: `${Math.max(freePercent, 5)}%` }}
@@ -345,8 +345,8 @@ const ConversionsPanel = memo(function ConversionsPanel() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-24 text-sm text-gray-600 dark:text-gray-400">Trial</div>
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8 overflow-hidden">
+            <div className="w-24 text-sm text-gray-400">Trial</div>
+            <div className="flex-1 bg-gray-700 rounded-full h-8 overflow-hidden">
               <div
                 className="h-8 rounded-full bg-purple-500 flex items-center justify-end px-3 transition-all duration-500"
                 style={{ width: `${Math.max(trialPercent, 2)}%` }}
@@ -356,8 +356,8 @@ const ConversionsPanel = memo(function ConversionsPanel() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="w-24 text-sm text-gray-600 dark:text-gray-400">Paid</div>
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-8 overflow-hidden">
+            <div className="w-24 text-sm text-gray-400">Paid</div>
+            <div className="flex-1 bg-gray-700 rounded-full h-8 overflow-hidden">
               <div
                 className="h-8 rounded-full bg-green-500 flex items-center justify-end px-3 transition-all duration-500"
                 style={{ width: `${Math.max(paidPercent, 2)}%` }}
@@ -370,26 +370,26 @@ const ConversionsPanel = memo(function ConversionsPanel() {
       </div>
 
       {/* LTV Metrics - Placeholder for now since we need more historical data */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-5">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Customer Lifetime Value</h3>
+      <div className="bg-gray-800 rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-white mb-4">Customer Lifetime Value</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-500 dark:text-gray-400">LTV</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          <div className="p-4 bg-gray-700 rounded-lg border border-gray-600">
+            <p className="text-sm text-gray-400">LTV</p>
+            <p className="text-2xl font-bold text-white mt-1">
               {totalSubscribers > 0 ? formatCurrency(metrics?.arpu || 0 * 12) : '--'}
             </p>
             <p className="text-xs text-gray-500 mt-1">Estimated (ARPU x 12)</p>
           </div>
-          <div className="p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Churn Rate</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+          <div className="p-4 bg-gray-700 rounded-lg border border-gray-600">
+            <p className="text-sm text-gray-400">Churn Rate</p>
+            <p className="text-2xl font-bold text-white mt-1">
               {metrics?.churnRate !== undefined ? `${metrics.churnRate}%` : '--'}
             </p>
             <p className="text-xs text-gray-500 mt-1">Monthly</p>
           </div>
-          <div className="p-4 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Net Subscriber Growth</p>
-            <p className={`text-2xl font-bold mt-1 ${(metrics?.netGrowth || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <div className="p-4 bg-gray-700 rounded-lg border border-gray-600">
+            <p className="text-sm text-gray-400">Net Subscriber Growth</p>
+            <p className={`text-2xl font-bold mt-1 ${(metrics?.netGrowth || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {metrics?.netGrowth !== undefined ? (metrics.netGrowth >= 0 ? `+${metrics.netGrowth}` : metrics.netGrowth) : '--'}
             </p>
             <p className="text-xs text-gray-500 mt-1">This month</p>
@@ -398,8 +398,8 @@ const ConversionsPanel = memo(function ConversionsPanel() {
       </div>
 
       {totalSubscribers === 0 && (
-        <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-          <p className="text-sm text-purple-700 dark:text-purple-300">
+        <div className="p-4 bg-purple-900/20 rounded-lg">
+          <p className="text-sm text-purple-300">
             <strong>Beta Phase:</strong> All current users have free beta access.
             Conversion tracking will become more meaningful when paid plans launch.
           </p>
@@ -415,7 +415,7 @@ export const RevenuePanel = memo(function RevenuePanel() {
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Sub-tab Navigation */}
-      <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-1 border-b border-gray-700">
         {SUB_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -425,8 +425,8 @@ export const RevenuePanel = memo(function RevenuePanel() {
               onClick={() => setActiveSubTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 isActive
-                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300'
+                  ? 'border-orange-500 text-orange-400'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
               }`}
             >
               <Icon className="w-4 h-4" />

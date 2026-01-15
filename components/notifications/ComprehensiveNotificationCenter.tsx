@@ -210,7 +210,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors active:scale-95"
+        className="relative p-2 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors active:scale-95"
         aria-label="Notifications"
       >
         <Bell className="w-6 h-6" />
@@ -231,11 +231,11 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
           />
 
           {/* Panel with Glassmorphism */}
-          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
+          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between backdrop-blur-md">
+            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   Notifications
                 </h3>
                 {unreadCount > 0 && (
@@ -247,8 +247,8 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors ${
-                    showFilters ? 'bg-gray-100 dark:bg-gray-700' : ''
+                  className={`p-1.5 hover:bg-gray-700 rounded transition-colors ${
+                    showFilters ? 'bg-gray-700' : ''
                   }`}
                   aria-label="Filter notifications"
                 >
@@ -257,15 +257,15 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                    className="p-1.5 hover:bg-gray-700 rounded transition-colors"
                     aria-label="Mark all as read"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  className="p-1.5 hover:bg-gray-700 rounded transition-colors"
                   aria-label="Close notifications"
                 >
                   <X className="w-4 h-4" />
@@ -275,7 +275,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
 
             {/* Filters */}
             {showFilters && (
-              <div className="p-3 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-700/30">
+              <div className="p-3 border-b border-gray-700/50 bg-gray-700/30">
                 <div className="flex flex-wrap gap-2">
                   {filterOptions.map((option) => (
                     <button
@@ -287,7 +287,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         selectedFilter === option.value
                           ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white'
-                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
                       {option.icon && <span>{option.icon}</span>}
@@ -296,7 +296,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                         <span className={`px-1.5 py-0.5 rounded-full text-xs ${
                           selectedFilter === option.value
                             ? 'bg-white/20 text-white'
-                            : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                            : 'bg-gray-600 text-gray-300'
                         }`}>
                           {option.count}
                         </span>
@@ -310,7 +310,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
             {/* Notifications List */}
             <div className="overflow-y-auto flex-1">
               {loading ? (
-                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                <div className="p-8 text-center text-gray-400">
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
                     Loading notifications...
@@ -318,11 +318,11 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">
+                  <Bell className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                  <p className="text-gray-400 font-medium mb-1">
                     {selectedFilter === 'unread' ? 'No unread notifications' : 'No notifications'}
                   </p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                  <p className="text-sm text-gray-500">
                     {selectedFilter === 'unread'
                       ? "You're all caught up!"
                       : "We'll notify you when something happens"
@@ -330,7 +330,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                <div className="divide-y divide-gray-700">
                   {notifications.map((notification) => (
                     <NotificationItem
                       key={notification.id}
@@ -352,7 +352,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-md">
+              <div className="p-3 border-t border-gray-700/50 text-center backdrop-blur-md">
                 <button
                   onClick={() => {
                     setIsOpen(false);
@@ -390,23 +390,23 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
   const timeAgo = inAppNotificationsService.formatRelativeTime(notification.created_at);
 
   const typeColors: Record<string, string> = {
-    blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-    purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-    green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-    emerald: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-    orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
-    pink: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
-    indigo: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
-    amber: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-    red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-    cyan: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400',
-    gray: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
+    blue: 'bg-blue-900/30 text-blue-400',
+    purple: 'bg-purple-900/30 text-purple-400',
+    green: 'bg-green-900/30 text-green-400',
+    emerald: 'bg-emerald-900/30 text-emerald-400',
+    orange: 'bg-orange-900/30 text-orange-400',
+    pink: 'bg-pink-900/30 text-pink-400',
+    indigo: 'bg-indigo-900/30 text-indigo-400',
+    amber: 'bg-amber-900/30 text-amber-400',
+    red: 'bg-red-900/30 text-red-400',
+    cyan: 'bg-cyan-900/30 text-cyan-400',
+    gray: 'bg-gray-700 text-gray-400',
   };
 
   return (
     <div
-      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer relative group ${
-        !notification.is_read ? 'bg-gradient-to-r from-pink-50/50 to-purple-50/50 dark:from-pink-900/10 dark:to-purple-900/10' : ''
+      className={`p-4 hover:bg-gray-700/50 transition-colors cursor-pointer relative group ${
+        !notification.is_read ? 'bg-gradient-to-r from-pink-50/50 from-pink-900/10 to-purple-900/10' : ''
       }`}
       onClick={onClick}
     >
@@ -423,8 +423,8 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
           <div className="flex items-start justify-between">
             <p className={`text-sm ${
               !notification.is_read
-                ? 'font-semibold text-gray-900 dark:text-white'
-                : 'font-medium text-gray-700 dark:text-gray-300'
+                ? 'font-semibold text-white'
+                : 'font-medium text-gray-300'
             }`}>
               {notification.title}
             </p>
@@ -433,19 +433,19 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
             )}
           </div>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+          <p className="text-sm text-gray-400 mt-1 line-clamp-2">
             {notification.content}
           </p>
 
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center gap-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 {timeAgo}
               </p>
               {notification.space_name && (
                 <>
                   <span className="text-xs text-gray-400">•</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-400">
                     📍 {notification.space_name}
                   </p>
                 </>
@@ -453,7 +453,7 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
               {notification.sender_name && (
                 <>
                   <span className="text-xs text-gray-400">•</span>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-400">
                     👤 {notification.sender_name}
                   </p>
                 </>
@@ -471,11 +471,11 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
                 e.stopPropagation();
                 onMarkBillPaid();
               }}
-              className="p-1.5 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-full transition-colors"
+              className="p-1.5 hover:bg-green-900/20 rounded-full transition-colors"
               aria-label="Mark bill as paid"
               title="Mark bill as paid"
             >
-              <DollarSign className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+              <DollarSign className="w-3.5 h-3.5 text-green-400" />
             </button>
           )}
           {!notification.is_read && (
@@ -484,10 +484,10 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
                 e.stopPropagation();
                 onMarkAsRead();
               }}
-              className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+              className="p-1.5 hover:bg-gray-600 rounded-full transition-colors"
               aria-label="Mark as read"
             >
-              <Check className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+              <Check className="w-3.5 h-3.5 text-gray-400" />
             </button>
           )}
           <button
@@ -495,10 +495,10 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
               e.stopPropagation();
               onDelete();
             }}
-            className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-full transition-colors"
+            className="p-1.5 hover:bg-red-900/20 rounded-full transition-colors"
             aria-label="Delete notification"
           >
-            <Trash2 className="w-3.5 h-3.5 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400" />
+            <Trash2 className="w-3.5 h-3.5 text-gray-500 text-gray-400 hover:text-red-400" />
           </button>
         </div>
       </div>

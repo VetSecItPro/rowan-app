@@ -186,7 +186,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
   return (
     <div onClick={onClose} className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      <div onClick={(e) => e.stopPropagation()} className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div onClick={(e) => e.stopPropagation()} className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold">
@@ -200,7 +200,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
+            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
               Project Name *
             </label>
             <input
@@ -208,30 +208,30 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
+            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
             />
           </div>
 
           <div className="relative z-50">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
+            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
               Status
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planning' | 'in_progress' | 'completed' | 'on_hold' })}
-              className="w-full pl-1 pr-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white relative z-50"
+              className="w-full pl-1 pr-1 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white relative z-50"
               style={{ position: 'relative', zIndex: 9999 }}
             >
               <option value="planning">Planning</option>
@@ -243,31 +243,31 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
+              <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
                 Start Date
               </label>
               <input
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
+              <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
                 Target Date
               </label>
               <input
                 type="date"
                 value={formData.target_date}
                 onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 cursor-pointer">
+            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
               Budget Amount
             </label>
             <input
@@ -275,22 +275,22 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
               step="0.01"
               value={formData.budget_amount || ''}
               onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
               placeholder="$0.00"
             />
           </div>
 
           {/* Steps Section */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+          <div className="border-t border-gray-700 pt-4 mt-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-amber-500" />
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-white">
                   Steps
                 </h3>
               </div>
               {activeMilestones.length > 0 && (
-                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                <span className="text-xs font-medium text-amber-400">
                   {completedCount}/{activeMilestones.length} completed ({progressPercentage}%)
                 </span>
               )}
@@ -298,7 +298,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
 
             {/* Progress bar */}
             {activeMilestones.length > 0 && (
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+              <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
                 <div
                   className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progressPercentage}%` }}
@@ -310,7 +310,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
             {loadingMilestones ? (
               <div className="animate-pulse space-y-2">
                 {[1, 2].map(i => (
-                  <div key={i} className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                  <div key={i} className="h-10 bg-gray-700 rounded-lg" />
                 ))}
               </div>
             ) : (
@@ -322,8 +322,8 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                       key={milestone.id || index}
                       className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
                         milestone.is_completed
-                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                          : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700'
+                          ? 'bg-green-900/20 border-green-800'
+                          : 'bg-gray-900 border-gray-700'
                       }`}
                     >
                       <button
@@ -340,8 +340,8 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                       <span
                         className={`flex-1 text-sm ${
                           milestone.is_completed
-                            ? 'text-gray-500 dark:text-gray-400 line-through'
-                            : 'text-gray-900 dark:text-white'
+                            ? 'text-gray-400 line-through'
+                            : 'text-white'
                         }`}
                       >
                         {milestone.title}
@@ -372,30 +372,30 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                   }
                 }}
                 placeholder="Add a step..."
-                className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white placeholder:text-gray-400"
+                className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900 text-white placeholder:text-gray-400"
               />
               <button
                 type="button"
                 onClick={handleAddMilestone}
                 disabled={!newMilestoneTitle.trim()}
-                className="p-2 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:dark:bg-gray-700 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                className="p-2 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:bg-gray-700 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
               >
                 <Plus className="w-5 h-5" />
               </button>
             </div>
 
             {activeMilestones.length === 0 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs text-gray-400 mt-2">
                 Break your project into steps to track progress
               </p>
             )}
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>

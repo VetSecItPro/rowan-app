@@ -16,12 +16,12 @@ interface FeatureCardProps {
 export function FeatureCard({ title, description, icon: Icon, gradient, shadowColor, href }: FeatureCardProps) {
   return (
     <Link href={href} className="block group">
-      <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 transition-colors duration-200 hover:border-gray-300 dark:hover:border-gray-700">
+      <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 transition-colors duration-200 hover:border-gray-700">
         <div className={`w-[60px] h-[60px] rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4`}>
           <Icon className="w-7 h-7 text-white" />
         </div>
-        <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">{title}</h3>
-        <p className="text-gray-600 dark:text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-300 transition-colors">{description}</p>
+        <h3 className="text-white font-bold text-lg mb-2 group-hover:text-gray-200 transition-colors">{title}</h3>
+        <p className="text-gray-400 group-hover:text-gray-300 transition-colors">{description}</p>
       </div>
     </Link>
   );

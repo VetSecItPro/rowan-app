@@ -40,10 +40,10 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
 
   // Get text color for progress percentage
   const getProgressTextColor = () => {
-    if (progressPercentage >= 75) return 'text-green-600 dark:text-green-400';
-    if (progressPercentage >= 50) return 'text-blue-600 dark:text-blue-400';
-    if (progressPercentage >= 25) return 'text-blue-500 dark:text-blue-300';
-    return 'text-gray-600 dark:text-gray-400';
+    if (progressPercentage >= 75) return 'text-green-400';
+    if (progressPercentage >= 50) return 'text-blue-400';
+    if (progressPercentage >= 25) return 'text-blue-300';
+    return 'text-gray-400';
   };
 
   // Keep type-specific colors for icon badges
@@ -115,8 +115,8 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
     <div
       className={`group relative rounded-xl p-5 transition-shadow ${
         isCompleted
-          ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-          : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:shadow-md'
+          ? 'bg-green-900/20 border border-green-800'
+          : 'bg-gray-900 border border-gray-800 hover:shadow-md'
       }`}
     >
       {/* Header */}
@@ -149,14 +149,14 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
             </div>
             <h3
               className={`text-lg font-semibold ${
-                isCompleted ? 'text-green-600 dark:text-green-400 line-through' : 'text-gray-900 dark:text-white'
+                isCompleted ? 'text-green-400 line-through' : 'text-white'
               }`}
             >
-              {milestone.title} {goalTitle && <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">({goalTitle})</span>}
+              {milestone.title} {goalTitle && <span className="text-sm text-gray-400 font-normal">({goalTitle})</span>}
             </h3>
           </div>
           {milestone.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 ml-10">{milestone.description}</p>
+            <p className="text-sm text-gray-400 ml-10">{milestone.description}</p>
           )}
         </div>
 
@@ -166,9 +166,9 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Milestone options menu"
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center justify-center"
+              className="p-2 hover:bg-gray-800 rounded-lg transition-colors flex items-center justify-center"
             >
-              <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <MoreVertical className="w-5 h-5 text-gray-400" />
             </button>
             <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
               Options
@@ -177,16 +177,16 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="w-48 absolute right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
+              <div className="w-48 absolute right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
                 <button
                   onClick={() => { onEdit(milestone); setShowMenu(false); }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2"
                 >
                   Edit Milestone
                 </button>
                 <button
                   onClick={() => { onDelete(milestone.id); setShowMenu(false); }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 transition-colors flex items-center gap-2"
                 >
                   Delete Milestone
                 </button>
@@ -201,14 +201,14 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
         <div className="space-y-2">
           {/* Values */}
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Progress</span>
+            <span className="text-gray-400">Progress</span>
             <span className={`font-semibold ${getProgressTextColor()}`}>
               {formatValue(milestone.current_value)} / {formatValue(milestone.target_value)}
             </span>
           </div>
 
           {/* Progress Bar with color-coded gradient */}
-          <div className="relative w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="relative w-full h-3 bg-gray-700 rounded-full overflow-hidden">
             <div
               className={`absolute top-0 left-0 h-full bg-gradient-to-r ${getProgressColor()} transition-all duration-700 ease-out rounded-full shadow-sm`}
               style={{ width: `${progressPercentage}%` }}
@@ -223,8 +223,8 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
       {/* Date Milestone */}
       {milestone.type === 'date' && milestone.target_date && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Target Date</span>
-          <span className="font-semibold text-gray-900 dark:text-white">
+          <span className="text-gray-400">Target Date</span>
+          <span className="font-semibold text-white">
             {formatDate(milestone.target_date, 'MMM d, yyyy')}
           </span>
         </div>
@@ -232,8 +232,8 @@ export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle
 
       {/* Completion Info */}
       {isCompleted && milestone.completed_at && (
-        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+        <div className="mt-3 pt-3 border-t border-gray-700">
+          <div className="flex items-center gap-2 text-sm text-green-400">
             <CheckCircle2 className="w-4 h-4" />
             <span>Completed on {formatTimestamp(milestone.completed_at, 'MMM d, yyyy')}</span>
           </div>

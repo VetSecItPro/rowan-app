@@ -229,20 +229,20 @@ export function SearchBar() {
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-sm text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      <h4 className="font-semibold text-sm text-white group-hover:text-purple-400 transition-colors">
                         {result.title}
                       </h4>
                     </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                    <p className="text-xs text-gray-400 line-clamp-1">
                       {result.description}
                     </p>
                     <div className="mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-900/30 text-purple-300">
                         {result.category}
                       </span>
                     </div>
                   </div>
-                  <span className="text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity text-sm flex-shrink-0">
+                  <span className="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity text-sm flex-shrink-0">
                     →
                   </span>
                 </div>
@@ -251,9 +251,9 @@ export function SearchBar() {
           </div>
 
           {/* Footer hint */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-900/50">
-            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              Press <kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Enter</kbd> to navigate
+          <div className="border-t border-gray-700 p-2 bg-gray-900/50">
+            <p className="text-xs text-gray-400 text-center">
+              Press <kbd className="px-1.5 py-0.5 bg-gray-700 rounded text-xs">Enter</kbd> to navigate
             </p>
           </div>
         </div>
@@ -263,10 +263,10 @@ export function SearchBar() {
       {isOpen && query.length >= 2 && results.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 apple-search-results z-50">
           <div className="p-6 text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              No results found for <span className="font-semibold text-gray-700 dark:text-gray-300">"{query}"</span>
+            <p className="text-sm text-gray-400">
+              No results found for <span className="font-semibold text-gray-300">"{query}"</span>
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Try searching for a feature name or topic
             </p>
           </div>

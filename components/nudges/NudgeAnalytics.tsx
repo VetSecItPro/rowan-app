@@ -57,10 +57,10 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
   };
 
   const getPercentageColor = (percentage: number) => {
-    if (percentage >= 80) return 'text-green-600 dark:text-green-400';
-    if (percentage >= 60) return 'text-yellow-600 dark:text-yellow-400';
-    if (percentage >= 40) return 'text-orange-600 dark:text-orange-400';
-    return 'text-red-600 dark:text-red-400';
+    if (percentage >= 80) return 'text-green-400';
+    if (percentage >= 60) return 'text-yellow-400';
+    if (percentage >= 40) return 'text-orange-400';
+    return 'text-red-400';
   };
 
   const getCategoryIcon = (category: string) => {
@@ -103,7 +103,7 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
@@ -113,18 +113,18 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                     <div>
                       <Dialog.Title
                         as="h3"
-                        className="text-lg font-bold leading-6 text-gray-900 dark:text-white"
+                        className="text-lg font-bold leading-6 text-white"
                       >
                         Nudge Analytics
                       </Dialog.Title>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-400">
                         Your goal nudge performance insights
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={onClose}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="text-gray-400 hover:text-gray-200"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -132,13 +132,13 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
 
                 {/* Time Range Selector */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Time Range
                   </label>
                   <select
                     value={timeRange}
                     onChange={(e) => setTimeRange(parseInt(e.target.value))}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                   >
                     <option value={7}>Last 7 days</option>
                     <option value={30}>Last 30 days</option>
@@ -150,29 +150,29 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                 {loading ? (
                   <div className="space-y-4">
                     {[...Array(4)].map((_, i) => (
-                      <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                      <div key={i} className="h-16 bg-gray-700 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : analytics ? (
                   <div className="space-y-6">
                     {/* Overview Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                      <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
                         <div className="flex items-center space-x-2 mb-2">
-                          <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                          <BarChart3 className="w-4 h-4 text-blue-400" />
+                          <span className="text-xs font-medium text-blue-400">
                             Total Nudges
                           </span>
                         </div>
-                        <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                        <div className="text-2xl font-bold text-blue-300">
                           {analytics.total_nudges}
                         </div>
                       </div>
 
-                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                      <div className="bg-green-900/20 border border-green-700 rounded-lg p-4">
                         <div className="flex items-center space-x-2 mb-2">
-                          <Eye className="w-4 h-4 text-green-600 dark:text-green-400" />
-                          <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                          <Eye className="w-4 h-4 text-green-400" />
+                          <span className="text-xs font-medium text-green-400">
                             Read Rate
                           </span>
                         </div>
@@ -181,10 +181,10 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                         </div>
                       </div>
 
-                      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
+                      <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-4">
                         <div className="flex items-center space-x-2 mb-2">
-                          <MousePointer className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                          <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
+                          <MousePointer className="w-4 h-4 text-purple-400" />
+                          <span className="text-xs font-medium text-purple-400">
                             Click Rate
                           </span>
                         </div>
@@ -193,10 +193,10 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                         </div>
                       </div>
 
-                      <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg p-4">
+                      <div className="bg-orange-900/20 border border-orange-700 rounded-lg p-4">
                         <div className="flex items-center space-x-2 mb-2">
-                          <CheckCircle className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                          <span className="text-xs font-medium text-orange-600 dark:text-orange-400">
+                          <CheckCircle className="w-4 h-4 text-orange-400" />
+                          <span className="text-xs font-medium text-orange-400">
                             Effectiveness
                           </span>
                         </div>
@@ -207,38 +207,38 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                     </div>
 
                     {/* Detailed Metrics */}
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-4">
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <h4 className="font-medium text-white mb-4">
                         Detailed Breakdown
                       </h4>
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Nudges Sent</span>
-                          <span className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm text-gray-400">Nudges Sent</span>
+                          <span className="font-medium text-white">
                             {analytics.total_nudges}
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Nudges Read</span>
-                          <span className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm text-gray-400">Nudges Read</span>
+                          <span className="font-medium text-white">
                             {analytics.read_nudges} ({formatPercentage(analytics.read_rate)})
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Nudges Clicked</span>
-                          <span className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm text-gray-400">Nudges Clicked</span>
+                          <span className="font-medium text-white">
                             {analytics.clicked_nudges} ({formatPercentage(analytics.click_rate)})
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Effective Actions</span>
-                          <span className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm text-gray-400">Effective Actions</span>
+                          <span className="font-medium text-white">
                             {analytics.effective_nudges} ({formatPercentage(analytics.effectiveness_rate)})
                           </span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Dismissed</span>
-                          <span className="font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm text-gray-400">Dismissed</span>
+                          <span className="font-medium text-white">
                             {analytics.dismissed_nudges}
                           </span>
                         </div>
@@ -247,8 +247,8 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
 
                     {/* Category Breakdown */}
                     {Object.keys(analytics.category_breakdown).length > 0 && (
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-4">
+                      <div className="bg-gray-700 rounded-lg p-4">
+                        <h4 className="font-medium text-white mb-4">
                           Nudges by Category
                         </h4>
                         <div className="space-y-3">
@@ -263,18 +263,18 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                                 <div key={category} className="flex items-center justify-between">
                                   <div className="flex items-center space-x-2">
                                     <span className="text-lg">{getCategoryIcon(category)}</span>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                                    <span className="text-sm font-medium text-white capitalize">
                                       {category}
                                     </span>
                                   </div>
                                   <div className="flex items-center space-x-2">
-                                    <div className="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                    <div className="w-16 bg-gray-600 rounded-full h-2">
                                       <div
                                         className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                         style={{ width: `${percentage}%` }}
                                       />
                                     </div>
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white w-8">
+                                    <span className="text-sm font-medium text-white w-8">
                                       {count}
                                     </span>
                                   </div>
@@ -286,12 +286,12 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                     )}
 
                     {/* Insights */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2 flex items-center space-x-2">
+                    <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
+                      <h4 className="font-medium text-blue-100 mb-2 flex items-center space-x-2">
                         <TrendingUp className="w-4 h-4" />
                         <span>Insights</span>
                       </h4>
-                      <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                      <div className="space-y-2 text-sm text-blue-200">
                         {analytics.total_nudges === 0 ? (
                           <p>No nudges sent yet. Enable nudges to start tracking your progress!</p>
                         ) : (
@@ -326,17 +326,17 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                 ) : (
                   <div className="text-center py-8">
                     <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-400">
                       No analytics data available for this period.
                     </p>
                   </div>
                 )}
 
                 {/* Footer */}
-                <div className="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-end mt-6 pt-4 border-t border-gray-700">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     Close
                   </button>

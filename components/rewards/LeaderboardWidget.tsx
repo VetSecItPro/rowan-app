@@ -51,13 +51,13 @@ export function LeaderboardWidget({
   const getRankDisplay = (rank: number) => {
     switch (rank) {
       case 1:
-        return { emoji: '🥇', bg: 'bg-yellow-100 dark:bg-yellow-900/30' };
+        return { emoji: '🥇', bg: 'bg-yellow-900/30' };
       case 2:
-        return { emoji: '🥈', bg: 'bg-gray-100 dark:bg-gray-700/50' };
+        return { emoji: '🥈', bg: 'bg-gray-700/50' };
       case 3:
-        return { emoji: '🥉', bg: 'bg-amber-100 dark:bg-amber-900/30' };
+        return { emoji: '🥉', bg: 'bg-amber-900/30' };
       default:
-        return { emoji: rank.toString(), bg: 'bg-gray-50 dark:bg-gray-800' };
+        return { emoji: rank.toString(), bg: 'bg-gray-800' };
     }
   };
 
@@ -85,11 +85,11 @@ export function LeaderboardWidget({
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
+      <div className={`bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-700 ${className}`}>
         <div className="animate-pulse space-y-3">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+          <div className="h-6 bg-gray-700 rounded w-1/3" />
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded" />
+            <div key={i} className="h-12 bg-gray-700 rounded" />
           ))}
         </div>
       </div>
@@ -98,19 +98,19 @@ export function LeaderboardWidget({
 
   if (error) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{error}</p>
+      <div className={`bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-700 ${className}`}>
+        <p className="text-sm text-gray-400">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
+    <div className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 ${className}`}>
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+      <div className="px-4 py-3 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <Tooltip content="See who's earning the most points! Complete tasks and chores to climb the rankings." position="right">
-            <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-help">
+            <h3 className="font-semibold text-white flex items-center gap-2 cursor-help">
               🏆 Family Points Ranking
             </h3>
           </Tooltip>
@@ -121,8 +121,8 @@ export function LeaderboardWidget({
                 onClick={() => setActivePeriod('week')}
                 className={`px-2 py-1 text-xs rounded-md transition-colors ${
                   activePeriod === 'week'
-                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-amber-900/30 text-amber-300'
+                    : 'text-gray-400 hover:bg-gray-700'
                 }`}
               >
                 Week
@@ -133,8 +133,8 @@ export function LeaderboardWidget({
                 onClick={() => setActivePeriod('month')}
                 className={`px-2 py-1 text-xs rounded-md transition-colors ${
                   activePeriod === 'month'
-                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-amber-900/30 text-amber-300'
+                    : 'text-gray-400 hover:bg-gray-700'
                 }`}
               >
                 Month
@@ -145,8 +145,8 @@ export function LeaderboardWidget({
                 onClick={() => setActivePeriod('all')}
                 className={`px-2 py-1 text-xs rounded-md transition-colors ${
                   activePeriod === 'all'
-                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-amber-900/30 text-amber-300'
+                    : 'text-gray-400 hover:bg-gray-700'
                 }`}
               >
                 All
@@ -157,9 +157,9 @@ export function LeaderboardWidget({
       </div>
 
       {/* Leaderboard List */}
-      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="divide-y divide-gray-700">
         {entries.length === 0 ? (
-          <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
+          <div className="px-4 py-6 text-center text-gray-400">
             No activity yet this {activePeriod === 'all' ? 'period' : activePeriod}
           </div>
         ) : (
@@ -173,7 +173,7 @@ export function LeaderboardWidget({
               <div
                 key={entry.user_id}
                 className={`px-4 py-3 flex items-center gap-3 ${
-                  isCurrentUser ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''
+                  isCurrentUser ? 'bg-amber-900/10' : ''
                 }`}
               >
                 {/* Rank */}
@@ -206,13 +206,13 @@ export function LeaderboardWidget({
                 <div className="flex-1 min-w-0">
                   <p className={`font-medium truncate ${
                     isCurrentUser
-                      ? 'text-amber-700 dark:text-amber-300'
-                      : 'text-gray-900 dark:text-white'
+                      ? 'text-amber-300'
+                      : 'text-white'
                   }`}>
                     {entry.name}
                     {isCurrentUser && <span className="text-xs ml-1">(you)</span>}
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
                     <Tooltip content={`Level ${entry.level} - Keep earning points to level up!`} position="bottom">
                       <span className="cursor-help">{levelDef.name}</span>
                     </Tooltip>
@@ -229,10 +229,10 @@ export function LeaderboardWidget({
 
                 {/* Points */}
                 <div className="text-right">
-                  <p className="font-bold text-amber-600 dark:text-amber-400">
+                  <p className="font-bold text-amber-400">
                     {periodPoints.toLocaleString()}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">points</p>
+                  <p className="text-xs text-gray-400">points</p>
                 </div>
               </div>
             );

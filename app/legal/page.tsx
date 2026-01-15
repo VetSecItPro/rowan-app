@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, FileText, Shield, Cookie } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { CookieConsentBanner } from '@/components/cookies/CookieConsentBanner';
 
@@ -36,9 +35,9 @@ export default function LegalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black">
+    <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="bg-gray-50 dark:bg-black border-b border-gray-200 dark:border-gray-800">
+      <header className="bg-black border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <Link href="/" className="flex items-center gap-3 group">
@@ -53,33 +52,32 @@ export default function LegalPage() {
             </Link>
             <div className="flex items-center gap-4">
               <HamburgerMenu />
-              <ThemeToggle />
             </div>
           </div>
         </div>
       </header>
 
-      <div className="bg-gradient-to-b from-white via-gray-50/50 to-gray-100/50 dark:from-black dark:via-gray-900/30 dark:to-gray-800/20">
+      <div className="bg-gradient-to-b from-white via-gray-50/50 from-black to-gray-800/20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
 
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Legal</h1>
+          <h1 className="text-3xl font-bold text-white mb-6">Legal</h1>
 
           {/* Tab Navigation */}
-          <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+          <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-700 pb-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id
-                  ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-md'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border border-gray-700'
                   }`}
               >
                 {tab.icon}
@@ -89,7 +87,7 @@ export default function LegalPage() {
           </div>
 
           {/* Tab Content */}
-          <div className="prose dark:prose-invert max-w-none">
+          <div className="prose prose-invert max-w-none">
             {activeTab === 'terms' && <TermsContent />}
             {activeTab === 'privacy' && <PrivacyContent />}
             {activeTab === 'cookies' && <CookiesContent />}
@@ -103,21 +101,21 @@ export default function LegalPage() {
 function TermsContent() {
   return (
     <>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: January 2026</p>
+      <p className="text-gray-400 mb-8">Last updated: January 2026</p>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Agreement to Terms</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">Agreement to Terms</h2>
+        <p className="text-gray-300 mb-4">
           By accessing or using Rowan, you agree to be bound by these Terms of Service and our Privacy Policy. If you don&apos;t agree to these terms, please don&apos;t use our service.
         </p>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Description of Service</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">Description of Service</h2>
+        <p className="text-gray-300 mb-4">
           Rowan is a collaborative life management platform designed for couples and families. Our service includes:
         </p>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>Task and project management</li>
           <li>Shared calendar and scheduling</li>
           <li>Smart reminders and notifications</li>
@@ -128,14 +126,14 @@ function TermsContent() {
         </ul>
       </section>
 
-      <section className="mb-8 p-6 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Beta Program Terms</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+      <section className="mb-8 p-6 bg-amber-900/20 rounded-lg border border-amber-800">
+        <h2 className="text-2xl font-semibold text-white mb-4">Beta Program Terms</h2>
+        <p className="text-gray-300 mb-4">
           <strong>Rowan is currently in beta.</strong> By participating in our beta program, you acknowledge and agree to the following:
         </p>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Beta Status Disclaimer</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Beta Status Disclaimer</h3>
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>The service is provided in a pre-release state and may contain bugs, errors, or incomplete features</li>
           <li>Features may be added, modified, or removed without notice</li>
           <li>The service may experience unexpected downtime or performance issues</li>
@@ -143,11 +141,11 @@ function TermsContent() {
           <li>We make no guarantees regarding uptime, data retention, or feature availability during beta</li>
         </ul>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Feedback and Improvements</h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Feedback and Improvements</h3>
+        <p className="text-gray-300 mb-4">
           As a beta user, you may provide feedback, suggestions, or bug reports. By doing so:
         </p>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>You grant us a non-exclusive, perpetual, royalty-free license to use, modify, and incorporate your feedback into the service</li>
           <li>You will not be entitled to any compensation for feedback or suggestions</li>
           <li>We are not obligated to implement any feedback or suggestions</li>
@@ -155,23 +153,23 @@ function TermsContent() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Subscription and Payment</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">Subscription and Payment</h2>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Free Trial</h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Free Trial</h3>
+        <p className="text-gray-300 mb-4">
           We may offer a free trial period. You won&apos;t be charged until the trial ends unless you cancel before then.
         </p>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Billing</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Billing</h3>
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>Subscriptions are billed in advance on a recurring basis</li>
           <li>You authorize us to charge your payment method automatically</li>
           <li>Prices are subject to change with 30 days&apos; notice</li>
           <li>You&apos;re responsible for any taxes or fees</li>
         </ul>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Cancellation and Refunds</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Cancellation and Refunds</h3>
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>You can cancel your subscription at any time</li>
           <li>Cancellation takes effect at the end of the current billing period</li>
           <li>No refunds for partial months or unused portions</li>
@@ -180,24 +178,24 @@ function TermsContent() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Disclaimers and Limitations</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">Disclaimers and Limitations</h2>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Service &quot;As Is&quot;</h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Service &quot;As Is&quot;</h3>
+        <p className="text-gray-300 mb-4">
           Rowan is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or implied. We don&apos;t guarantee that the service will be uninterrupted, secure, or error-free.
         </p>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Limitation of Liability</h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Limitation of Liability</h3>
+        <p className="text-gray-300 mb-4">
           To the fullest extent permitted by law, Rowan and its team shall not be liable for:
         </p>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>Indirect, incidental, or consequential damages</li>
           <li>Loss of data, profits, or business opportunities</li>
           <li>Service interruptions or security breaches</li>
           <li>Actions of other users or third parties</li>
         </ul>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <p className="text-gray-300 mb-4">
           Our total liability to you shall not exceed the amount you paid us in the past 12 months.
         </p>
       </section>
@@ -209,14 +207,14 @@ function TermsContent() {
 function PrivacyContent() {
   return (
     <>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: January 2026</p>
+      <p className="text-gray-400 mb-8">Last updated: January 2026</p>
 
-      <section className="mb-8 p-6 bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Data Controller</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+      <section className="mb-8 p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+        <h2 className="text-2xl font-semibold text-white mb-4">Data Controller</h2>
+        <p className="text-gray-300 mb-4">
           For the purposes of GDPR and other applicable data protection laws, the data controller is:
         </p>
-        <div className="text-gray-700 dark:text-gray-300 space-y-1">
+        <div className="text-gray-300 space-y-1">
           <p><strong>Rowan App</strong></p>
           <p>Operated by VetSecItPro</p>
           <p>United States</p>
@@ -224,28 +222,28 @@ function PrivacyContent() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Our Commitment to Your Privacy</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">Our Commitment to Your Privacy</h2>
+        <p className="text-gray-300 mb-4">
           At Rowan, we understand that your personal information and family data are deeply private. We&apos;re committed to protecting your privacy and being transparent about how we collect, use, and safeguard your information.
         </p>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <p className="text-gray-300 mb-4">
           <strong>We follow a data minimization approach:</strong> We only collect data that is necessary to provide our service. We don&apos;t collect data for advertising, profiling, or sale to third parties.
         </p>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Information We Collect</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">Information We Collect</h2>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Account Information</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Account Information</h3>
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>Name and email address</li>
           <li>Profile picture (optional)</li>
           <li>Password (encrypted and never stored in plain text)</li>
           <li>Space/family name and member information</li>
         </ul>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">Content You Create</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Content You Create</h3>
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>Tasks, projects, and to-do items</li>
           <li>Calendar events and appointments</li>
           <li>Messages sent within your space</li>
@@ -256,15 +254,15 @@ function PrivacyContent() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Data Sharing</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">Data Sharing</h2>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">We DO NOT Sell Your Data</h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">We DO NOT Sell Your Data</h3>
+        <p className="text-gray-300 mb-4">
           Your personal information and family data will never be sold to third parties. Period.
         </p>
 
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">When We Share Information</h3>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">When We Share Information</h3>
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li><strong>Within Your Space:</strong> Information you create is shared with other members of your family/couple space</li>
           <li><strong>Service Providers:</strong> Trusted partners who help deliver our service (Stripe, Supabase, Vercel)</li>
           <li><strong>Legal Requirements:</strong> We may disclose information if required by law</li>
@@ -272,17 +270,17 @@ function PrivacyContent() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Your Privacy Rights</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">Your Privacy Rights</h2>
+        <p className="text-gray-300 mb-4">
           Depending on your location, you have rights including:
         </p>
-        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
+        <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li><strong>Right of Access:</strong> Request a copy of your data</li>
           <li><strong>Right to Erasure:</strong> Request deletion of your data</li>
           <li><strong>Right to Data Portability:</strong> Receive your data in a machine-readable format</li>
           <li><strong>Right to Object:</strong> Object to certain processing of your data</li>
         </ul>
-        <p className="text-gray-700 dark:text-gray-300">
+        <p className="text-gray-300">
           To exercise your rights, visit Settings &gt; Privacy in the app.
         </p>
       </section>
@@ -293,35 +291,35 @@ function PrivacyContent() {
 function CookiesContent() {
   return (
     <>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">
+      <p className="text-gray-400 mb-8">
         Learn about how we use cookies to enhance your experience.
       </p>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">What are cookies?</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">What are cookies?</h2>
+        <p className="text-gray-300 mb-4">
           Cookies are small text files that are stored on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and improving our services.
         </p>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Types of cookies we use</h2>
+        <h2 className="text-2xl font-semibold text-white mb-4">Types of cookies we use</h2>
         <div className="space-y-4">
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Essential Cookies</h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm">
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-semibold text-white mb-2">Essential Cookies</h3>
+            <p className="text-gray-300 text-sm">
               Required for the website to function properly. These cannot be disabled. They include authentication session cookies and security tokens.
             </p>
           </div>
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Functional Cookies</h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm">
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-semibold text-white mb-2">Functional Cookies</h3>
+            <p className="text-gray-300 text-sm">
               Remember your preferences and enhance your experience, such as theme preferences and language settings.
             </p>
           </div>
-          <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Analytics Cookies</h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm">
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <h3 className="font-semibold text-white mb-2">Analytics Cookies</h3>
+            <p className="text-gray-300 text-sm">
               Help us understand how you use our website to improve our services. These are optional and require your consent.
             </p>
           </div>
@@ -329,8 +327,8 @@ function CookiesContent() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Manage your preferences</h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <h2 className="text-2xl font-semibold text-white mb-4">Manage your preferences</h2>
+        <p className="text-gray-300 mb-4">
           You can control your cookie preferences at any time using the banner below, or through your browser settings.
         </p>
         <div className="mt-4">

@@ -259,7 +259,7 @@ export function ReceiptLibrary({
                       {viewMode === 'grid' ? (
                         <div className="space-y-3">
                           {/* Receipt Preview */}
-                          <div className="aspect-[3/4] bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                          <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden">
                             <img
                               src={receipt.image_url}
                               alt="Receipt"
@@ -293,7 +293,7 @@ export function ReceiptLibrary({
                       ) : (
                         <>
                           <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                            <div className="w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
                               <img
                                 src={receipt.image_url}
                                 alt="Receipt"

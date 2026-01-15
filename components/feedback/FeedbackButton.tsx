@@ -74,13 +74,13 @@ export function FeedbackButton() {
 
         {/* Dropdown Menu */}
         {showDropdown && (
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+          <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-1 z-50">
             <button
               onClick={() => {
                 setShowDropdown(false);
                 setIsOpen(true);
               }}
-              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Send Feedback
@@ -88,7 +88,7 @@ export function FeedbackButton() {
             <Link
               href="/feedback"
               onClick={() => setShowDropdown(false)}
-              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
             >
               <List className="w-4 h-4" />
               My Feedback

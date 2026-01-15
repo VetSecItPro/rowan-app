@@ -22,7 +22,7 @@ export default function MealsLoading() {
       </div>
 
       {/* Week calendar skeleton */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+      <div className="bg-gray-800 rounded-xl p-4 shadow-sm">
         <div className="grid grid-cols-7 gap-2">
           {[...Array(7)].map((_, i) => (
             <div key={i} className="text-center space-y-2">
@@ -41,7 +41,7 @@ export default function MealsLoading() {
       {/* Recipe cards skeleton */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
+          <div key={i} className="bg-gray-800 rounded-xl overflow-hidden shadow-sm">
             <SkeletonLoader className="w-full h-40" />
             <div className="p-4 space-y-2">
               <SkeletonLoader className="w-3/4" height="h-5" />

@@ -31,10 +31,10 @@ function ErrorIcon({ size = 'md', className = '' }: {
 
   return (
     <div
-      className={`flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20 ${sizeClasses[size]} ${className}`}
+      className={`flex items-center justify-center rounded-full bg-red-900/20 ${sizeClasses[size]} ${className}`}
     >
       <svg
-        className={`text-red-600 dark:text-red-400 ${size === 'sm' ? 'h-4 w-4' : size === 'md' ? 'h-6 w-6' : 'h-8 w-8'}`}
+        className={`text-red-400 ${size === 'sm' ? 'h-4 w-4' : size === 'md' ? 'h-6 w-6' : 'h-8 w-8'}`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -66,14 +66,14 @@ export function AuthErrorState({
   message?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-50 via-white from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         <ErrorIcon size="lg" className="mx-auto mb-6" />
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-white">
             {message}
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             There was a problem with your authentication. Please try again or sign out to continue.
           </p>
         </div>
@@ -90,7 +90,7 @@ export function AuthErrorState({
           {onSignOut && (
             <button
               onClick={onSignOut}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               Sign Out
             </button>
@@ -115,14 +115,14 @@ export function SpacesErrorState({
   error?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-50 via-white from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         <ErrorIcon size="lg" className="mx-auto mb-6" />
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-white">
             Workspace Loading Error
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             {error}. This might be a temporary network issue.
           </p>
         </div>
@@ -164,12 +164,12 @@ export function NoSpacesFoundState({
   userName?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-lg">
         {/* Welcome icon instead of error */}
-        <div className="flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/20 h-16 w-16 mx-auto mb-6">
+        <div className="flex items-center justify-center rounded-full bg-indigo-900/20 h-16 w-16 mx-auto mb-6">
           <svg
-            className="text-indigo-600 dark:text-indigo-400 h-8 w-8"
+            className="text-indigo-400 h-8 w-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -184,10 +184,10 @@ export function NoSpacesFoundState({
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-white">
             Welcome to Rowan, {userName}!
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md">
+          <p className="text-sm text-gray-400 max-w-md">
             It looks like you don't have any workspaces yet. Let's create your first workspace to get started with organizing your life.
           </p>
         </div>
@@ -204,7 +204,7 @@ export function NoSpacesFoundState({
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               Refresh
             </button>
@@ -227,12 +227,12 @@ export function NetworkErrorState({
   message?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-50 via-white from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         {/* Network icon */}
-        <div className="flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20 h-16 w-16 mx-auto mb-6">
+        <div className="flex items-center justify-center rounded-full bg-yellow-900/20 h-16 w-16 mx-auto mb-6">
           <svg
-            className="text-yellow-600 dark:text-yellow-400 h-8 w-8"
+            className="text-yellow-400 h-8 w-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -253,10 +253,10 @@ export function NetworkErrorState({
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-white">
             {message}
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             Please check your internet connection and try again.
           </p>
         </div>
@@ -288,12 +288,12 @@ export function PermissionDeniedState({
   resource?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-50 via-white from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         {/* Shield icon */}
-        <div className="flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20 h-16 w-16 mx-auto mb-6">
+        <div className="flex items-center justify-center rounded-full bg-red-900/20 h-16 w-16 mx-auto mb-6">
           <svg
-            className="text-red-600 dark:text-red-400 h-8 w-8"
+            className="text-red-400 h-8 w-8"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -308,10 +308,10 @@ export function PermissionDeniedState({
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-white">
             Access Denied
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             You don't have permission to access {resource}. Please contact your administrator if you believe this is an error.
           </p>
         </div>
@@ -350,11 +350,11 @@ export function InlineErrorState({
     <div className={`flex flex-col items-center justify-center p-6 ${className}`}>
       <ErrorIcon size={size} className="mb-3" />
       <div className="text-center space-y-2">
-        <p className="text-sm font-medium text-gray-900 dark:text-white">{message}</p>
+        <p className="text-sm font-medium text-white">{message}</p>
         {onRetry && (
           <button
             onClick={onRetry}
-            className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
+            className="text-sm text-indigo-600 text-indigo-400 hover:text-indigo-300 font-medium"
           >
             Try again
           </button>
@@ -381,7 +381,7 @@ export function ModalErrorState({
     <div className="flex flex-col items-center justify-center p-8">
       <ErrorIcon size="md" className="mb-4" />
       <div className="text-center space-y-3 mb-6">
-        <p className="text-sm font-medium text-gray-900 dark:text-white">{message}</p>
+        <p className="text-sm font-medium text-white">{message}</p>
       </div>
 
       <div className="flex gap-3">
@@ -396,7 +396,7 @@ export function ModalErrorState({
         {onClose && (
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 text-sm rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 text-sm rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Close
           </button>
@@ -420,21 +420,21 @@ export function AppErrorState({
   isDevelopment?: boolean;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white from-gray-900 to-gray-800 flex items-center justify-center">
       <div className="text-center p-8 max-w-lg">
         <ErrorIcon size="lg" className="mx-auto mb-6" />
 
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-white">
             Something went wrong
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             An unexpected error occurred. Our team has been notified and is working on a fix.
           </p>
 
           {isDevelopment && errorId && (
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mt-4">
-              <p className="text-xs font-mono text-gray-600 dark:text-gray-400">
+            <div className="bg-gray-800 rounded-lg p-3 mt-4">
+              <p className="text-xs font-mono text-gray-400">
                 Error ID: {errorId}
               </p>
             </div>
@@ -452,7 +452,7 @@ export function AppErrorState({
           )}
           <button
             onClick={() => window.location.href = '/'}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Go to Dashboard
           </button>

@@ -179,11 +179,11 @@ export function Dropdown({
         disabled={disabled}
         className={`
           w-full px-4 py-3 pr-10 text-left
-          bg-gray-50 dark:bg-gray-900
-          border border-gray-300 dark:border-gray-600
+          bg-gray-900
+          border border-gray-600
           rounded-xl
           focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-          text-gray-900 dark:text-white
+          text-white
           disabled:opacity-50 disabled:cursor-not-allowed
           ${className}
         `}
@@ -209,11 +209,11 @@ export function Dropdown({
         aria-expanded={isOpen}
         className={`
           relative w-full min-w-0 px-4 py-3 pr-10 text-left
-          bg-gray-50 dark:bg-gray-900
-          border border-gray-300 dark:border-gray-600
+          bg-gray-900
+          border border-gray-600
           rounded-xl
           focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-          text-gray-900 dark:text-white
+          text-white
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors
           ${isOpen ? 'ring-2 ring-indigo-500 border-transparent' : ''}
@@ -236,7 +236,7 @@ export function Dropdown({
       {isOpen && mounted && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-50"
+          className="absolute bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-50"
           style={{
             top: position.top,
             left: position.left,
@@ -253,11 +253,11 @@ export function Dropdown({
               onKeyDown={(e) => handleOptionKeyDown(e, option.value, index)}
               className={`
                 w-full px-4 py-2 text-left text-sm
-                hover:bg-gray-100 dark:hover:bg-gray-700
-                focus:bg-gray-100 dark:focus:bg-gray-700
+                hover:bg-gray-700
+                focus:bg-gray-700
                 focus:outline-none
                 transition-colors
-                ${option.value === value ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-gray-900 dark:text-white'}
+                ${option.value === value ? 'bg-indigo-900/30 text-indigo-400' : 'text-white'}
               `}
               role="option"
               aria-selected={option.value === value}

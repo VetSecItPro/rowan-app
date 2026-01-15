@@ -173,7 +173,7 @@ export function EventProposalModal({
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -203,11 +203,11 @@ export function EventProposalModal({
           /* CREATE MODE */
           <form onSubmit={handleCreateProposal} className="p-6 space-y-6">
             {/* Info Box */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-4 flex gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-800 dark:text-blue-200">
+            <div className="bg-blue-900/20 border border-blue-700 rounded-xl p-4 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-200">
                 <p className="font-medium mb-1">Propose multiple time options</p>
-                <p className="text-blue-700 dark:text-blue-300">
+                <p className="text-blue-300">
                   Suggest up to 5 different time slots. Everyone can vote on their availability, making it easy to find the perfect time.
                 </p>
               </div>
@@ -215,7 +215,7 @@ export function EventProposalModal({
 
             {/* Title */}
             <div>
-              <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Event Title *
               </label>
               <input
@@ -224,13 +224,13 @@ export function EventProposalModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Team Planning Session"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Description
               </label>
               <textarea
@@ -238,13 +238,13 @@ export function EventProposalModal({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What's this event about?"
                 rows={3}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
               />
             </div>
 
             {/* Location */}
             <div>
-              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Location
               </label>
               <input
@@ -252,28 +252,28 @@ export function EventProposalModal({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Where will this take place?"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white"
               />
             </div>
 
             {/* Time Slots */}
             <div>
-              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 cursor-pointer">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-300 mb-3 cursor-pointer">
                 Proposed Time Slots *
               </label>
               <div className="space-y-3">
                 {timeSlots.map((slot, index) => (
-                  <div key={index} className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-700">
+                  <div key={index} className="bg-purple-900/20 rounded-xl p-4 border border-purple-700">
                     <div className="flex items-center gap-2 mb-3">
-                      <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <Clock className="w-4 h-4 text-purple-400" />
+                      <span className="text-sm font-medium text-gray-300">
                         Option {index + 1}
                       </span>
                       {timeSlots.length > 1 && (
                         <button
                           type="button"
                           onClick={() => removeTimeSlot(index)}
-                          className="ml-auto text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                          className="ml-auto text-red-400 hover:text-red-300"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -281,7 +281,7 @@ export function EventProposalModal({
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label htmlFor="field-5" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
+                        <label htmlFor="field-5" className="block text-xs text-gray-400 mb-1 cursor-pointer">
                           Start Time
                         </label>
                         <input
@@ -289,11 +289,11 @@ export function EventProposalModal({
                           required
                           value={slot.start_time ? new Date(slot.start_time).toISOString().slice(0, 16) : ''}
                           onChange={(e) => updateTimeSlot(index, 'start_time', e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white text-sm"
+                          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white text-sm"
                         />
                       </div>
                       <div>
-                        <label htmlFor="field-6" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
+                        <label htmlFor="field-6" className="block text-xs text-gray-400 mb-1 cursor-pointer">
                           End Time
                         </label>
                         <input
@@ -301,7 +301,7 @@ export function EventProposalModal({
                           required
                           value={slot.end_time ? new Date(slot.end_time).toISOString().slice(0, 16) : ''}
                           onChange={(e) => updateTimeSlot(index, 'end_time', e.target.value)}
-                          className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 dark:text-white text-sm"
+                          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white text-sm"
                         />
                       </div>
                     </div>
@@ -313,7 +313,7 @@ export function EventProposalModal({
                 <button
                   type="button"
                   onClick={addTimeSlot}
-                  className="mt-3 w-full px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-xl hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  className="mt-3 w-full px-4 py-2 border-2 border-dashed border-gray-600 text-gray-400 rounded-xl hover:border-purple-500 hover:text-purple-400 transition-colors"
                 >
                   + Add Another Time Option
                 </button>
@@ -321,11 +321,11 @@ export function EventProposalModal({
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex gap-3 pt-4 border-t border-gray-700">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                className="flex-1 px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
               >
                 Cancel
               </button>
@@ -344,24 +344,24 @@ export function EventProposalModal({
           proposal && (
             <div className="p-6 space-y-6">
               {/* Event Details */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <div className="bg-gray-900 rounded-xl p-5 border border-gray-700">
+                <h3 className="text-xl font-bold text-white mb-2">
                   {proposal.title}
                 </h3>
                 {proposal.description && (
-                  <p className="text-gray-600 dark:text-gray-400 mb-3">
+                  <p className="text-gray-400 mb-3">
                     {proposal.description}
                   </p>
                 )}
               </div>
 
               {/* Voting Instructions */}
-              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-xl p-4">
+              <div className="bg-purple-900/20 border border-purple-700 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">Vote on your availability</span>
+                  <Users className="w-5 h-5 text-purple-400" />
+                  <span className="font-medium text-white">Vote on your availability</span>
                 </div>
-                <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <div className="text-sm text-gray-300 space-y-1">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
                     <span><strong>Available</strong> - This time works for you</span>
@@ -385,17 +385,17 @@ export function EventProposalModal({
                   const isCreator = proposal.proposed_by === user?.id;
 
                   return (
-                    <div key={index} className="bg-white dark:bg-gray-900 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-600 transition-colors">
+                    <div key={index} className="bg-gray-900 rounded-xl p-5 border-2 border-gray-700 hover:border-purple-600 transition-colors">
                       {/* Time Info */}
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <div className="text-lg font-semibold text-white">
                             Option {index + 1}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          <div className="text-sm text-gray-400 mt-1">
                             {format(new Date(slot.start_time), 'EEEE, MMMM d')}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-500">
+                          <div className="text-sm text-gray-500">
                             {format(new Date(slot.start_time), 'h:mm a')} {slot.end_time && `- ${format(new Date(slot.end_time), 'h:mm a')}`}
                           </div>
                         </div>
@@ -403,14 +403,14 @@ export function EventProposalModal({
                         {/* Vote Summary */}
                         {slotSummary && (
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                            <div className="text-2xl font-bold text-green-400">
                               {slotSummary.available + slotSummary.preferred}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className="text-xs text-gray-400">
                               available
                             </div>
                             {slotSummary.preferred > 0 && (
-                              <div className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center justify-end gap-1">
+                              <div className="text-xs text-yellow-400 flex items-center justify-end gap-1">
                                 <Star className="w-3 h-3" />
                                 {slotSummary.preferred} preferred
                               </div>
@@ -426,7 +426,7 @@ export function EventProposalModal({
                           className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                             userVote === 'available'
                               ? 'bg-green-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/30 border border-gray-300 dark:border-gray-600'
+                              : 'bg-gray-800 text-gray-300 hover:bg-green-900/30 border border-gray-600'
                           }`}
                         >
                           <CheckCircle2 className="w-4 h-4 mx-auto" />
@@ -436,7 +436,7 @@ export function EventProposalModal({
                           className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                             userVote === 'preferred'
                               ? 'bg-yellow-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 border border-gray-300 dark:border-gray-600'
+                              : 'bg-gray-800 text-gray-300 hover:bg-yellow-900/30 border border-gray-600'
                           }`}
                         >
                           <Star className="w-4 h-4 mx-auto" />
@@ -446,7 +446,7 @@ export function EventProposalModal({
                           className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                             userVote === 'unavailable'
                               ? 'bg-red-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 border border-gray-300 dark:border-gray-600'
+                              : 'bg-gray-800 text-gray-300 hover:bg-red-900/30 border border-gray-600'
                           }`}
                         >
                           <XCircle className="w-4 h-4 mx-auto" />
@@ -469,10 +469,10 @@ export function EventProposalModal({
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-3 pt-4 border-t border-gray-700">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Close
                 </button>

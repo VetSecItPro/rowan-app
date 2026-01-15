@@ -122,7 +122,7 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
   if (attachment.file_type === 'audio') {
     return (
       <div className="relative group">
-        <div className={`flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg ${
+        <div className={`flex items-center gap-3 p-3 bg-gray-800 border border-gray-700 rounded-lg ${
           compact ? 'w-48' : 'w-full max-w-sm'
         }`}>
           <button
@@ -133,11 +133,11 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
             {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
           </button>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
+            <p className="text-sm font-medium text-white truncate flex items-center gap-2">
               <Volume2 className="w-4 h-4 flex-shrink-0" />
               Voice Message
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-400">
               {attachment.duration ? formatDuration(attachment.duration) : 'Audio'}
             </p>
           </div>
@@ -171,20 +171,20 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
         download={attachment.file_name}
         target="_blank"
         rel="noopener noreferrer"
-        className={`flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+        className={`flex items-center gap-3 p-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors ${
           compact ? 'w-48' : 'w-full max-w-sm'
         }`}
       >
         <FileText className="w-8 h-8 text-blue-500 flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+          <p className="text-sm font-medium text-white truncate">
             {attachment.file_name}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-400">
             {formatFileSize(attachment.file_size)}
           </p>
         </div>
-        <Download className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+        <Download className="w-5 h-5 text-gray-400 flex-shrink-0" />
       </a>
       {onDelete && (
         <button

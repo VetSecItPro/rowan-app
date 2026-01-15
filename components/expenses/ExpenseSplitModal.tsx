@@ -121,23 +121,23 @@ export function ExpenseSplitModal({
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
       <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-xl shadow-2xl w-full sm:max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl shadow-2xl w-full sm:max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 sm:py-4">
+        <div className="flex-shrink-0 bg-gray-800 border-b border-gray-700 px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-white">
                   Split Expense
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                   {expenseName}
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-lg text-gray-500 hover:bg-gray-700 transition-colors"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
@@ -149,13 +149,13 @@ export function ExpenseSplitModal({
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Success Message */}
             {success && (
-              <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-lg p-4 flex items-center gap-3">
-                <Check className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <div className="bg-green-900/20 border-2 border-green-600 rounded-lg p-4 flex items-center gap-3">
+                <Check className="w-6 h-6 text-green-400 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-green-900 dark:text-green-100">
+                  <h3 className="font-semibold text-green-100">
                     Split Saved Successfully!
                   </h3>
-                  <p className="text-sm text-green-700 dark:text-green-300">
+                  <p className="text-sm text-green-300">
                     Expense splits have been calculated and saved.
                   </p>
                 </div>
@@ -164,13 +164,13 @@ export function ExpenseSplitModal({
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="bg-red-900/20 border-2 border-red-600 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-red-900 dark:text-red-100 mb-1">
+                  <h3 className="font-semibold text-red-100 mb-1">
                     Error
                   </h3>
-                  <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                  <p className="text-sm text-red-200">{error}</p>
                 </div>
               </div>
             )}
@@ -179,7 +179,7 @@ export function ExpenseSplitModal({
               <>
                 {/* Step 1: Split Type Selection */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 className="text-lg font-semibold text-white mb-3">
                     Step 1: Choose Split Method
                   </h3>
                   <SplitTypeSelector
@@ -191,7 +191,7 @@ export function ExpenseSplitModal({
 
                 {/* Step 2: Split Calculation */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 className="text-lg font-semibold text-white mb-3">
                     Step 2: Review Split
                   </h3>
                   <SplitCalculator
@@ -206,10 +206,10 @@ export function ExpenseSplitModal({
                 </div>
 
                 {/* Info Note */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
                   <div className="flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-blue-800 dark:text-blue-200">
+                    <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-blue-200">
                       <strong>Note:</strong> Saving this split will automatically calculate who owes what
                       and update your partner balance. The split will appear on both partners' dashboards.
                     </div>
@@ -221,11 +221,11 @@ export function ExpenseSplitModal({
 
           {/* Footer */}
           {!success && (
-            <div className="flex-shrink-0 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-end gap-3">
+            <div className="flex-shrink-0 bg-gray-900 border-t border-gray-700 px-6 py-4 flex items-center justify-end gap-3">
               <button
                 onClick={onClose}
                 disabled={saving}
-                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>

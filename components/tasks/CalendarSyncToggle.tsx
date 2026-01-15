@@ -100,11 +100,11 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
   return (
     <div className="space-y-3">
       {/* Sync Toggle */}
-      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-gray-900 rounded-lg">
         <div className="flex items-center gap-2">
           <Calendar className={`w-4 h-4 ${syncStatus.isSynced ? 'text-blue-500' : 'text-gray-400'}`} />
           <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
+            <p className="text-sm font-medium text-white">
               Calendar Sync
             </p>
             {syncStatus.isSynced && syncStatus.lastSyncedAt && (
@@ -119,7 +119,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
           onClick={handleToggleSync}
           disabled={syncing}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            syncStatus.isSynced ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+            syncStatus.isSynced ? 'bg-blue-500' : 'bg-gray-600'
           } ${syncing ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <span
@@ -132,13 +132,13 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
 
       {/* Sync Status Messages */}
       {syncStatus.isSynced && (
-        <div className="flex items-start gap-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+        <div className="flex items-start gap-2 p-3 bg-green-900/20 border border-green-800 rounded-lg">
           <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-xs font-medium text-green-900 dark:text-green-200">
+            <p className="text-xs font-medium text-green-200">
               Synced to Calendar
             </p>
-            <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+            <p className="text-xs text-green-300 mt-1">
               This task appears in your calendar with a 📋 prefix
             </p>
             {syncStatus.eventId && (
@@ -155,13 +155,13 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       )}
 
       {syncStatus.error && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="flex items-start gap-2 p-3 bg-red-900/20 border border-red-800 rounded-lg">
           <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-xs font-medium text-red-900 dark:text-red-200">
+            <p className="text-xs font-medium text-red-200">
               Sync Error
             </p>
-            <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+            <p className="text-xs text-red-300 mt-1">
               {syncStatus.error}
             </p>
           </div>
@@ -170,10 +170,10 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
 
       {/* Auto-Sync Preference */}
       {preferences && (
-        <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div className="pt-3 border-t border-gray-700">
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-white">
                 Auto-sync new tasks
               </p>
               <p className="text-xs text-gray-500">
@@ -183,7 +183,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
             <button
               onClick={() => handleUpdatePreferences(!preferences.auto_sync_tasks)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.auto_sync_tasks ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                preferences.auto_sync_tasks ? 'bg-blue-500' : 'bg-gray-600'
               }`}
             >
               <span
@@ -197,8 +197,8 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       )}
 
       {/* Info */}
-      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-        <p className="text-xs text-blue-700 dark:text-blue-300">
+      <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
+        <p className="text-xs text-blue-300">
           <strong>Note:</strong> Calendar sync uses your task's due date and estimated duration.
           Changes to the task will automatically update the calendar event.
         </p>

@@ -91,7 +91,7 @@ export default function GoalsAnalyticsPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Loading analytics...</p>
+            <p className="text-gray-400">Loading analytics...</p>
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@ export default function GoalsAnalyticsPage() {
   if (!analytics) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center text-gray-600 dark:text-gray-400">
+        <div className="text-center text-gray-400">
           No analytics data available
         </div>
       </div>
@@ -136,23 +136,23 @@ export default function GoalsAnalyticsPage() {
       <div className="mb-8">
         <Link
           href="/goals"
-          className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4"
+          className="inline-flex items-center text-sm text-gray-400 hover:text-white mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Goals
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-white">
               Goals Analytics
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-400">
               Track your progress and gain insights into your goal completion patterns
             </p>
           </div>
           <button
             onClick={handleExport}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 transition-colors"
           >
             <Download className="w-4 h-4 mr-2" />
             Export
@@ -162,8 +162,8 @@ export default function GoalsAnalyticsPage() {
 
       {/* Date Range Selector */}
       <div className="mb-6 flex items-center gap-2">
-        <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <Calendar className="w-5 h-5 text-gray-400" />
+        <span className="text-sm font-medium text-gray-300">
           Time Period:
         </span>
         <div className="flex gap-2">
@@ -179,7 +179,7 @@ export default function GoalsAnalyticsPage() {
               className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                 dateRangeOption === option.value
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               {option.label}

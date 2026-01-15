@@ -196,12 +196,12 @@ export function RewardsManagement({
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
+      <div className={`bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-700 ${className}`}>
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+          <div className="h-8 bg-gray-700 rounded w-1/3" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+              <div key={i} className="h-24 bg-gray-700 rounded-lg" />
             ))}
           </div>
         </div>
@@ -211,16 +211,16 @@ export function RewardsManagement({
 
   return (
     <>
-      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
+      <div className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 ${className}`}>
         {/* Header */}
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                 <Gift className="w-5 h-5 text-amber-500 flex-shrink-0" />
                 <span className="truncate">Manage Family Rewards</span>
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-400 mt-1">
                 Create rewards your family can earn by completing tasks and chores
               </p>
             </div>
@@ -236,8 +236,8 @@ export function RewardsManagement({
 
         {/* Error Message */}
         {error && (
-          <div className="mx-4 sm:mx-6 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <div className="mx-4 sm:mx-6 mt-4 p-3 bg-red-900/20 border border-red-800 rounded-lg">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
@@ -245,11 +245,11 @@ export function RewardsManagement({
         <div className="p-4 sm:p-6">
           {rewards.length === 0 ? (
             <div className="text-center py-12">
-              <Gift className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <Gift className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">
                 No rewards yet
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4">
                 Create rewards that your family can redeem with their earned points
               </p>
               <button
@@ -267,14 +267,14 @@ export function RewardsManagement({
                   key={reward.id}
                   className={`relative p-4 rounded-lg border transition-all ${
                     reward.is_active
-                      ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50'
-                      : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 opacity-60'
+                      ? 'border-gray-700 bg-gray-900/50'
+                      : 'border-gray-700 bg-gray-800 opacity-60'
                   }`}
                 >
                   {/* Status Badge */}
                   {!reward.is_active && (
                     <div className="absolute top-2 right-2">
-                      <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-gray-700 text-gray-400 px-2 py-0.5 rounded">
                         Inactive
                       </span>
                     </div>
@@ -284,23 +284,23 @@ export function RewardsManagement({
                   <div className="flex items-start gap-3">
                     <span className="text-3xl">{reward.emoji}</span>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 dark:text-white truncate">
+                      <h4 className="font-medium text-white truncate">
                         {reward.name}
                       </h4>
                       {reward.description && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">
+                        <p className="text-sm text-gray-400 line-clamp-2 mt-1">
                           {reward.description}
                         </p>
                       )}
                       <div className="flex items-center gap-3 mt-2">
-                        <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                        <span className="text-sm font-semibold text-amber-400">
                           {reward.cost_points} pts
                         </span>
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                        <span className="text-xs text-gray-500">
                           {CATEGORY_OPTIONS.find(c => c.value === reward.category)?.label || reward.category}
                         </span>
                         {reward.max_redemptions_per_week && (
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                          <span className="text-xs text-gray-500">
                             {reward.max_redemptions_per_week}/wk
                           </span>
                         )}
@@ -309,13 +309,13 @@ export function RewardsManagement({
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-700">
                     <button
                       onClick={() => handleToggleActive(reward)}
                       className={`flex-1 text-xs py-1.5 rounded transition-colors ${
                         reward.is_active
-                          ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
-                          : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
+                          ? 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                          : 'bg-green-900/30 text-green-400 hover:bg-green-900/50'
                       }`}
                     >
                       {reward.is_active ? 'Deactivate' : 'Activate'}
@@ -323,7 +323,7 @@ export function RewardsManagement({
                     <Tooltip content="Edit reward" position="top">
                       <button
                         onClick={() => openEditModal(reward)}
-                        className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-blue-400 transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -331,7 +331,7 @@ export function RewardsManagement({
                     <Tooltip content="Delete reward" position="top">
                       <button
                         onClick={() => setDeleteConfirm(reward.id)}
-                        className="p-1.5 text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -348,15 +348,15 @@ export function RewardsManagement({
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => !saving && setShowModal(false)} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl max-w-lg w-full shadow-xl">
+          <div className="relative bg-gray-800 rounded-xl max-w-lg w-full shadow-xl">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
+              <h3 className="text-lg font-semibold text-white">
                 {editingReward ? 'Edit Reward' : 'Create New Reward'}
               </h3>
               <button
                 onClick={() => !saving && setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-gray-400 hover:text-gray-300"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -366,7 +366,7 @@ export function RewardsManagement({
             <div className="px-6 py-4 space-y-4 max-h-[60vh] overflow-y-auto">
               {/* Emoji Picker */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Icon
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -377,8 +377,8 @@ export function RewardsManagement({
                       onClick={() => setFormData(prev => ({ ...prev, emoji }))}
                       className={`w-10 h-10 text-xl rounded-lg border-2 transition-colors ${
                         formData.emoji === emoji
-                          ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-amber-300'
+                          ? 'border-amber-500 bg-amber-900/30'
+                          : 'border-gray-700 hover:border-amber-300'
                       }`}
                     >
                       {emoji}
@@ -389,7 +389,7 @@ export function RewardsManagement({
 
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Reward Name *
                 </label>
                 <input
@@ -398,8 +398,8 @@ export function RewardsManagement({
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., 30 min screen time, Ice cream trip"
                   maxLength={100}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 ${
-                    formErrors.name ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+                  className={`w-full px-3 py-2 border rounded-lg bg-gray-900 text-white focus:ring-2 focus:ring-amber-500 ${
+                    formErrors.name ? 'border-red-500' : 'border-gray-700'
                   }`}
                 />
                 {formErrors.name && (
@@ -409,7 +409,7 @@ export function RewardsManagement({
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Description (optional)
                 </label>
                 <textarea
@@ -418,8 +418,8 @@ export function RewardsManagement({
                   placeholder="Describe this reward..."
                   rows={2}
                   maxLength={500}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-amber-500 ${
-                    formErrors.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+                  className={`w-full px-3 py-2 border rounded-lg bg-gray-900 text-white resize-none focus:ring-2 focus:ring-amber-500 ${
+                    formErrors.description ? 'border-red-500' : 'border-gray-700'
                   }`}
                 />
                 {formErrors.description && (
@@ -429,7 +429,7 @@ export function RewardsManagement({
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Category
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -440,12 +440,12 @@ export function RewardsManagement({
                       onClick={() => setFormData(prev => ({ ...prev, category: cat.value }))}
                       className={`p-2 text-sm rounded-lg border-2 text-left transition-colors ${
                         formData.category === cat.value
-                          ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-amber-300'
+                          ? 'border-amber-500 bg-amber-900/30'
+                          : 'border-gray-700 hover:border-amber-300'
                       }`}
                     >
                       <span className="text-lg">{cat.icon}</span>
-                      <div className="text-xs font-medium text-gray-900 dark:text-white mt-1">
+                      <div className="text-xs font-medium text-white mt-1">
                         {cat.label}
                       </div>
                     </button>
@@ -455,7 +455,7 @@ export function RewardsManagement({
 
               {/* Cost */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Point Cost *
                 </label>
                 <div className="flex items-center gap-2">
@@ -465,23 +465,23 @@ export function RewardsManagement({
                     onChange={(e) => setFormData(prev => ({ ...prev, cost_points: parseInt(e.target.value) || 0 }))}
                     min={1}
                     max={10000}
-                    className={`w-32 px-3 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 ${
-                      formErrors.cost_points ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+                    className={`w-32 px-3 py-2 border rounded-lg bg-gray-900 text-white focus:ring-2 focus:ring-amber-500 ${
+                      formErrors.cost_points ? 'border-red-500' : 'border-gray-700'
                     }`}
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">points</span>
+                  <span className="text-sm text-gray-400">points</span>
                 </div>
                 {formErrors.cost_points && (
                   <p className="text-xs text-red-500 mt-1">{formErrors.cost_points}</p>
                 )}
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   Tip: Easy chores earn ~10 pts, harder ones ~25+ pts
                 </p>
               </div>
 
               {/* Weekly Limit */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
                   Weekly Redemption Limit (optional)
                 </label>
                 <div className="flex items-center gap-2">
@@ -495,11 +495,11 @@ export function RewardsManagement({
                     placeholder="No limit"
                     min={1}
                     max={99}
-                    className={`w-32 px-3 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 ${
-                      formErrors.max_redemptions_per_week ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+                    className={`w-32 px-3 py-2 border rounded-lg bg-gray-900 text-white focus:ring-2 focus:ring-amber-500 ${
+                      formErrors.max_redemptions_per_week ? 'border-red-500' : 'border-gray-700'
                     }`}
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">times per week</span>
+                  <span className="text-sm text-gray-400">times per week</span>
                 </div>
                 {formErrors.max_redemptions_per_week && (
                   <p className="text-xs text-red-500 mt-1">{formErrors.max_redemptions_per_week}</p>
@@ -508,11 +508,11 @@ export function RewardsManagement({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-700">
               <button
                 onClick={() => !saving && setShowModal(false)}
                 disabled={saving}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -542,18 +542,18 @@ export function RewardsManagement({
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => !saving && setDeleteConfirm(null)} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="relative bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-white mb-2">
               Delete Reward?
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-400 mb-4">
               This reward will be permanently removed. Any pending redemptions will be cancelled.
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
                 disabled={saving}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Cancel
               </button>

@@ -15,34 +15,34 @@ interface BadgeCardProps {
 
 const rarityStyles = {
   common: {
-    border: 'border-gray-400 dark:border-gray-600',
-    bg: 'bg-gray-50 dark:bg-gray-800/50',
+    border: 'border-gray-600',
+    bg: 'bg-gray-800/50',
     glow: '',
-    text: 'text-gray-700 dark:text-gray-300',
+    text: 'text-gray-300',
   },
   uncommon: {
-    border: 'border-green-400 dark:border-green-600',
-    bg: 'bg-green-50 dark:bg-green-900/20',
+    border: 'border-green-600',
+    bg: 'bg-green-900/20',
     glow: 'shadow-md shadow-green-500/20',
-    text: 'text-green-700 dark:text-green-300',
+    text: 'text-green-300',
   },
   rare: {
-    border: 'border-blue-400 dark:border-blue-600',
-    bg: 'bg-blue-50 dark:bg-blue-900/20',
+    border: 'border-blue-600',
+    bg: 'bg-blue-900/20',
     glow: 'shadow-lg shadow-blue-500/20',
-    text: 'text-blue-700 dark:text-blue-300',
+    text: 'text-blue-300',
   },
   epic: {
-    border: 'border-purple-400 dark:border-purple-600',
-    bg: 'bg-purple-50 dark:bg-purple-900/20',
+    border: 'border-purple-600',
+    bg: 'bg-purple-900/20',
     glow: 'shadow-lg shadow-purple-500/30',
-    text: 'text-purple-700 dark:text-purple-300',
+    text: 'text-purple-300',
   },
   legendary: {
-    border: 'border-amber-400 dark:border-amber-600',
-    bg: 'bg-amber-50 dark:bg-amber-900/20',
+    border: 'border-amber-600',
+    bg: 'bg-amber-900/20',
     glow: 'shadow-xl shadow-amber-500/40 animate-pulse',
-    text: 'text-amber-700 dark:text-amber-300',
+    text: 'text-amber-300',
   },
 };
 
@@ -86,7 +86,7 @@ export default function BadgeCard({
         ${rarity.border} ${rarity.bg} ${isEarned ? rarity.glow : ''}
         ${sizing.container}
         ${isEarned ? 'opacity-100' : 'opacity-60 hover:opacity-80'}
-        ${showDetails ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-gray-900' : ''}
+        ${showDetails ? 'ring-2 ring-offset-2 ring-offset-gray-900' : ''}
         cursor-pointer hover:scale-105
       `}
       onClick={() => setShowDetails(!showDetails)}
@@ -121,7 +121,7 @@ export default function BadgeCard({
         <h3
           className={`
             font-semibold ${sizing.title}
-            ${isEarned ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400'}
+            ${isEarned ? 'text-white' : 'text-gray-400'}
           `}
         >
           {badge.name}
@@ -130,21 +130,21 @@ export default function BadgeCard({
         <p
           className={`
             ${sizing.description}
-            ${isEarned ? 'text-gray-600 dark:text-gray-300' : 'text-gray-500 dark:text-gray-500'}
+            ${isEarned ? 'text-gray-300' : 'text-gray-500'}
           `}
         >
           {badge.description}
         </p>
 
         {/* Points */}
-        <div className="flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-center gap-1 text-xs text-gray-400">
           <span>⭐</span>
           <span>{badge.points} points</span>
         </div>
 
         {/* Earned date */}
         {isEarned && userBadge && (
-          <p className="text-xs text-green-600 dark:text-green-400 font-medium mt-2">
+          <p className="text-xs text-green-400 font-medium mt-2">
             Earned {format(new Date(userBadge.earned_at), 'MMM d, yyyy')}
           </p>
         )}
@@ -152,13 +152,13 @@ export default function BadgeCard({
         {/* Progress bar */}
         {!isEarned && showProgress && progress && progress.current > 0 && (
           <div className="mt-3 space-y-1">
-            <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+            <div className="flex justify-between text-xs text-gray-400">
               <span>
                 {progress.current} / {progress.target}
               </span>
               <span>{Math.round(progress.percentage)}%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
                   badge.rarity === 'legendary'
@@ -185,8 +185,8 @@ export default function BadgeCard({
 
       {/* Detailed view */}
       {showDetails && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+        <div className="mt-4 pt-4 border-t border-gray-700">
+          <div className="space-y-2 text-xs text-gray-400">
             <div>
               <span className="font-medium">Category:</span> {badge.category}
             </div>

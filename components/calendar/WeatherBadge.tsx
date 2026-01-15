@@ -133,7 +133,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-2">
+      <div className="flex items-center gap-2 text-xs text-gray-400 py-2">
         <div className="animate-spin rounded-full h-3 w-3 border-2 border-purple-500 border-t-transparent"></div>
         Loading weather...
       </div>
@@ -142,7 +142,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
 
   if (!weather) {
     return (
-      <div className="text-xs text-gray-500 dark:text-gray-400 py-2">
+      <div className="text-xs text-gray-400 py-2">
         Weather unavailable
       </div>
     );
@@ -162,11 +162,11 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
     return (
       <div className="flex items-center gap-3 text-sm">
         <span className="text-base">{emoji}</span>
-        <span className="font-semibold text-gray-900 dark:text-white">{tempF}°F</span>
-        <span className="text-gray-500 dark:text-gray-400 text-xs">feels {feelsLikeF}°</span>
-        <span className="text-gray-500 dark:text-gray-400 text-xs capitalize">{weather.description}</span>
-        <span className="text-gray-400 dark:text-gray-500 text-xs">💧{weather.humidity}%</span>
-        <span className="text-gray-400 dark:text-gray-500 text-xs">💨{windMph}mph</span>
+        <span className="font-semibold text-white">{tempF}°F</span>
+        <span className="text-gray-400 text-xs">feels {feelsLikeF}°</span>
+        <span className="text-gray-400 text-xs capitalize">{weather.description}</span>
+        <span className="text-gray-500 text-xs">💧{weather.humidity}%</span>
+        <span className="text-gray-500 text-xs">💨{windMph}mph</span>
         {alert && (
           <span title={alert.title}>
             <AlertTriangle
@@ -186,7 +186,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
 
   if (display === 'compact') {
     return (
-      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+      <div className="flex items-center gap-1 text-xs text-gray-400">
         <span className="text-sm">{emoji}</span>
         <span>{tempF}°F</span>
         {alert && (
@@ -212,21 +212,21 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
           <span className="text-lg">{emoji}</span>
           <div className="flex-1">
             <div className="flex items-baseline gap-1">
-              <span className="text-lg font-semibold text-gray-900 dark:text-white">
+              <span className="text-lg font-semibold text-white">
                 {tempF}°F
               </span>
-              <span className="text-xs text-gray-600 dark:text-gray-400">
+              <span className="text-xs text-gray-400">
                 feels {feelsLikeF}°F
               </span>
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400 capitalize">
+            <div className="text-xs text-gray-400 capitalize">
               {weather.description}
             </div>
           </div>
         </div>
 
         {/* Additional details */}
-        <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+        <div className="flex justify-between text-xs text-gray-400">
           <div className="flex items-center gap-1">
             <span>💧</span>
             <span>{weather.humidity}%</span>
@@ -249,7 +249,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
                   : 'text-blue-500'
               }`}
             />
-            <span className="text-gray-600 dark:text-gray-400">{alert.title}</span>
+            <span className="text-gray-400">{alert.title}</span>
           </div>
         )}
       </div>
@@ -259,22 +259,22 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
   return (
     <div className="space-y-2">
       {/* Weather Summary */}
-      <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+      <div className="flex items-center gap-2 p-2 bg-blue-900/20 border border-blue-800 rounded-lg">
         <span className="text-2xl">{emoji}</span>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className="font-semibold text-white">
               {tempF}°F
             </span>
-            <span className="text-xs text-gray-600 dark:text-gray-400">
+            <span className="text-xs text-gray-400">
               Feels like {feelsLikeF}°F
             </span>
           </div>
-          <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">
+          <p className="text-xs text-gray-400 capitalize">
             {weather.description}
           </p>
         </div>
-        <div className="text-xs text-gray-600 dark:text-gray-400 text-right">
+        <div className="text-xs text-gray-400 text-right">
           <div>💧 {weather.humidity}%</div>
           <div>💨 {windMph} mph</div>
         </div>
@@ -285,10 +285,10 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
         <div
           className={`p-3 rounded-lg border ${
             alert.severity === 'severe'
-              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+              ? 'bg-red-900/20 border-red-800'
               : alert.severity === 'warning'
-              ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
-              : 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+              ? 'bg-orange-900/20 border-orange-800'
+              : 'bg-blue-900/20 border-blue-800'
           }`}
         >
           <div className="flex items-start gap-2">
@@ -296,21 +296,21 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
               <AlertTriangle
                 className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
                   alert.severity === 'severe'
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-orange-600 dark:text-orange-400'
+                    ? 'text-red-400'
+                    : 'text-orange-400'
                 }`}
               />
             ) : (
-              <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+              <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-400" />
             )}
             <div className="flex-1 min-w-0">
               <h4
                 className={`text-sm font-semibold ${
                   alert.severity === 'severe'
-                    ? 'text-red-900 dark:text-red-200'
+                    ? 'text-red-200'
                     : alert.severity === 'warning'
-                    ? 'text-orange-900 dark:text-orange-200'
-                    : 'text-blue-900 dark:text-blue-200'
+                    ? 'text-orange-200'
+                    : 'text-blue-200'
                 }`}
               >
                 {alert.title}
@@ -318,10 +318,10 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
               <p
                 className={`text-xs mt-1 ${
                   alert.severity === 'severe'
-                    ? 'text-red-800 dark:text-red-300'
+                    ? 'text-red-300'
                     : alert.severity === 'warning'
-                    ? 'text-orange-800 dark:text-orange-300'
-                    : 'text-blue-800 dark:text-blue-300'
+                    ? 'text-orange-300'
+                    : 'text-blue-300'
                 }`}
               >
                 {alert.message}
@@ -330,10 +330,10 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
                 <p
                   className={`text-xs mt-2 font-medium ${
                     alert.severity === 'severe'
-                      ? 'text-red-900 dark:text-red-200'
+                      ? 'text-red-200'
                       : alert.severity === 'warning'
-                      ? 'text-orange-900 dark:text-orange-200'
-                      : 'text-blue-900 dark:text-blue-200'
+                      ? 'text-orange-200'
+                      : 'text-blue-200'
                   }`}
                 >
                   💡 {alert.recommendation}

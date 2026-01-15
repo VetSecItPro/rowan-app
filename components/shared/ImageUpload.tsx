@@ -200,7 +200,7 @@ export default function ImageUpload({
     <div className={`w-full ${className}`}>
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           {label}
         </label>
       )}
@@ -217,11 +217,11 @@ export default function ImageUpload({
           ${
             isDragging
               ? borderColor === 'orange'
-                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                : 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                ? 'border-orange-500 bg-orange-900/20'
+                : 'border-purple-500 bg-purple-900/20'
               : borderColor === 'orange'
-                ? 'border-gray-300 dark:border-gray-600 hover:border-orange-400 dark:hover:border-orange-500'
-                : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500'
+                ? 'border-gray-600 hover:border-orange-500'
+                : 'border-gray-600 hover:border-purple-500'
           }
           ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
@@ -268,23 +268,23 @@ export default function ImageUpload({
             {isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mb-3" />
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   Uploading...
                 </p>
               </>
             ) : (
               <>
-                <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-full mb-3">
+                <div className="p-3 bg-gray-800 rounded-full mb-3">
                   {error ? (
                     <X className="w-8 h-8 text-red-500" />
                   ) : (
-                    <Upload className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+                    <Upload className="w-8 h-8 text-gray-400" />
                   )}
                 </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                <p className="text-sm font-medium text-white mb-1">
                   {error || description}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-400">
                   {error
                     ? 'Click to try again'
                     : `Max ${maxSizeMB}MB • JPG, PNG, WEBP, GIF`}
@@ -307,7 +307,7 @@ export default function ImageUpload({
 
       {/* Error message */}
       {error && (
-        <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-2 text-base md:text-sm text-red-400">{error}</p>
       )}
     </div>
   );

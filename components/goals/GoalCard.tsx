@@ -39,10 +39,10 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
 
   // Get text color for progress percentage
   const getProgressTextColor = () => {
-    if (goal.progress >= 75) return 'text-green-600 dark:text-green-400';
-    if (goal.progress >= 50) return 'text-blue-600 dark:text-blue-400';
-    if (goal.progress >= 25) return 'text-blue-500 dark:text-blue-300';
-    return 'text-gray-600 dark:text-gray-400';
+    if (goal.progress >= 75) return 'text-green-400';
+    if (goal.progress >= 50) return 'text-blue-400';
+    if (goal.progress >= 25) return 'text-blue-300';
+    return 'text-gray-400';
   };
 
   const handleCheckboxClick = () => {
@@ -55,7 +55,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
   };
 
   return (
-    <div className="group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:shadow-md transition-shadow">
+    <div className="group relative bg-gray-900 border border-gray-800 rounded-xl p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3 mb-4">
         {/* Three-state checkbox */}
         <div className="relative group">
@@ -67,7 +67,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 ? 'bg-green-500 border-green-500'
                 : goalState === 'in-progress'
                 ? 'bg-amber-500 border-amber-500'
-                : 'bg-transparent border-gray-300 dark:border-gray-600'
+                : 'bg-transparent border-gray-600'
             }`}
           >
             {goalState === 'completed' && <Check className="w-4 h-4 text-white" />}
@@ -83,9 +83,9 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             <div className="w-8 h-8 bg-gradient-goals rounded-lg flex items-center justify-center flex-shrink-0">
               <Target className="w-4 h-4 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">{goal.title}</h3>
+            <h3 className="text-lg font-semibold text-white truncate">{goal.title}</h3>
           </div>
-          {goal.description && <p className="text-sm text-gray-600 dark:text-gray-400 ml-10 break-words line-clamp-2">{goal.description}</p>}
+          {goal.description && <p className="text-sm text-gray-400 ml-10 break-words line-clamp-2">{goal.description}</p>}
         </div>
 
         {/* Three-dot menu */}
@@ -94,7 +94,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Goal options menu"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-300 transition-colors"
             >
               <MoreVertical className="w-5 h-5" />
             </button>
@@ -105,11 +105,11 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="w-48 absolute right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
+              <div className="w-48 absolute right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
                 {onCheckIn && goal.status === 'active' && (
                   <button
                     onClick={() => { onCheckIn(goal); setShowMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-blue-400 hover:bg-blue-900/20 transition-colors flex items-center gap-2"
                   >
                     Check In
                   </button>
@@ -117,7 +117,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 {onShowHistory && (
                   <button
                     onClick={() => { onShowHistory(goal); setShowMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-purple-400 hover:bg-purple-900/20 transition-colors flex items-center gap-2"
                   >
                     <History className="w-4 h-4" />
                     Check-In History
@@ -126,7 +126,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 {onFrequencySettings && goal.status === 'active' && (
                   <button
                     onClick={() => { onFrequencySettings(goal); setShowMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-indigo-400 hover:bg-indigo-900/20 transition-colors flex items-center gap-2"
                   >
                     <Settings className="w-4 h-4" />
                     Check-In Settings
@@ -134,13 +134,13 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                 )}
                 <button
                   onClick={() => { onEdit(goal); setShowMenu(false); }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2"
                 >
                   Edit Goal
                 </button>
                 <button
                   onClick={() => { onDelete(goal.id); setShowMenu(false); }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 transition-colors flex items-center gap-2"
                 >
                   Delete Goal
                 </button>
@@ -152,10 +152,10 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
       <div className="space-y-3">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Progress</span>
+            <span className="text-sm text-gray-400">Progress</span>
             <span className={`text-sm font-bold ${getProgressTextColor()}`}>{goal.progress}%</span>
           </div>
-          <div className="h-3 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+          <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
             <div
               className={`h-full bg-gradient-to-r ${getProgressColor()} transition-all duration-700 ease-out rounded-full shadow-sm`}
               style={{ width: `${goal.progress}%` }}
@@ -165,12 +165,12 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-              goal.status === 'completed' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
-              goal.status === 'active' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' :
-              'bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-300'
+              goal.status === 'completed' ? 'bg-green-900/30 text-green-300' :
+              goal.status === 'active' ? 'bg-blue-900/30 text-blue-300' :
+              'bg-gray-900/30 text-gray-300'
             }`}>{goal.status}</span>
             {goal.assignee && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-900/30 rounded-full">
                 {goal.assignee.avatar_url ? (
                   <img src={goal.assignee.avatar_url} alt={goal.assignee.name} className="w-4 h-4 rounded-full object-cover" />
                 ) : (
@@ -180,7 +180,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
                     </span>
                   </div>
                 )}
-                <span className="text-xs text-indigo-700 dark:text-indigo-300 font-medium">{goal.assignee.name}</span>
+                <span className="text-xs text-indigo-300 font-medium">{goal.assignee.name}</span>
               </div>
             )}
           </div>

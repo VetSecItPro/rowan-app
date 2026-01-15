@@ -115,7 +115,7 @@ export function UserPicker({
   return (
     <div className={`relative ${className}`}>
       {/* Label */}
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <label className="block text-sm font-medium text-gray-300 mb-2">
         {label}
       </label>
 
@@ -123,7 +123,7 @@ export function UserPicker({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-left flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-left flex items-center justify-between hover:bg-gray-800 transition-colors"
       >
         {selectedMember ? (
           <div className="flex items-center gap-3">
@@ -141,12 +141,12 @@ export function UserPicker({
                 {getInitials(selectedMember.users?.name || 'U')}
               </div>
             )}
-            <span className="text-gray-900 dark:text-white font-medium">
+            <span className="text-white font-medium">
               {selectedMember.users?.name}
             </span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-gray-400">
             <User className="w-5 h-5" />
             <span>Unassigned</span>
           </div>
@@ -165,9 +165,9 @@ export function UserPicker({
           />
 
           {/* Dropdown Panel */}
-          <div className="absolute z-20 mt-2 w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl max-h-80 overflow-hidden">
+          <div className="absolute z-20 mt-2 w-full bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-80 overflow-hidden">
             {/* Search Input */}
-            <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-3 border-b border-gray-700">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -175,7 +175,7 @@ export function UserPicker({
                   placeholder="Search members..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent text-white"
                   autoFocus
                 />
               </div>
@@ -184,11 +184,11 @@ export function UserPicker({
             {/* Members List */}
             <div className="max-h-60 overflow-y-auto">
               {loading ? (
-                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                <div className="p-4 text-center text-gray-400">
                   Loading members...
                 </div>
               ) : filteredMembers.length === 0 ? (
-                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                <div className="p-4 text-center text-gray-400">
                   {searchQuery ? 'No members found' : 'No members in this space'}
                 </div>
               ) : (
@@ -196,23 +196,23 @@ export function UserPicker({
                   {/* Unassigned Option */}
                   <button
                     onClick={() => handleSelect(null)}
-                    className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-                      !selectedUserId ? 'bg-pink-50 dark:bg-pink-900/20' : ''
+                    className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors ${
+                      !selectedUserId ? 'bg-pink-900/20' : ''
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                      <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                      <X className="w-5 h-5 text-gray-300" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-white">
                         Unassigned
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-400">
                         No one assigned
                       </p>
                     </div>
                     {!selectedUserId && (
-                      <UserCheck className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                      <UserCheck className="w-5 h-5 text-pink-400" />
                     )}
                   </button>
 
@@ -221,9 +221,9 @@ export function UserPicker({
                     <button
                       key={member.user_id}
                       onClick={() => handleSelect(member.user_id)}
-                      className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                      className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors ${
                         selectedUserId === member.user_id
-                          ? 'bg-pink-50 dark:bg-pink-900/20'
+                          ? 'bg-pink-900/20'
                           : ''
                       }`}
                     >
@@ -244,17 +244,17 @@ export function UserPicker({
 
                       {/* User Info */}
                       <div className="flex-1 text-left">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-white">
                           {member.users?.name}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-400">
                           {member.users?.email}
                         </p>
                       </div>
 
                       {/* Selected Indicator */}
                       {selectedUserId === member.user_id && (
-                        <UserCheck className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                        <UserCheck className="w-5 h-5 text-pink-400" />
                       )}
                     </button>
                   ))}

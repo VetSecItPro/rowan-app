@@ -45,7 +45,7 @@ export function ButtonAnimationDemo() {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           🎯 Dynamic Button Animation System
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
+        <p className="text-lg text-gray-300">
           Apple-inspired micro-interactions with feature-aware styling
         </p>
       </div>
@@ -58,9 +58,9 @@ export function ButtonAnimationDemo() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Basic</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
+            <h3 className="font-semibold text-white">Basic</h3>
+            <p className="text-sm text-gray-300">
               Standard transitions only
             </p>
             <EnhancedButton animationLevel="basic">
@@ -68,9 +68,9 @@ export function ButtonAnimationDemo() {
             </EnhancedButton>
           </div>
 
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Enhanced</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
+            <h3 className="font-semibold text-white">Enhanced</h3>
+            <p className="text-sm text-gray-300">
               Hover scale + glow effects
             </p>
             <EnhancedButton animationLevel="enhanced">
@@ -78,9 +78,9 @@ export function ButtonAnimationDemo() {
             </EnhancedButton>
           </div>
 
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Dynamic</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
+            <h3 className="font-semibold text-white">Dynamic</h3>
+            <p className="text-sm text-gray-300">
               + Ripple effects + breathing
             </p>
             <EnhancedButton animationLevel="dynamic" breathing>
@@ -88,9 +88,9 @@ export function ButtonAnimationDemo() {
             </EnhancedButton>
           </div>
 
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Premium</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
+            <h3 className="font-semibold text-white">Premium</h3>
+            <p className="text-sm text-gray-300">
               + Magnetic attraction + gradient shift
             </p>
             <PremiumButton>
@@ -142,7 +142,7 @@ export function ButtonAnimationDemo() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
             <h3 className="font-semibold">Success Celebration</h3>
             <CTAButton
               success={successStates.success}
@@ -153,7 +153,7 @@ export function ButtonAnimationDemo() {
             </CTAButton>
           </div>
 
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
             <h3 className="font-semibold">Loading State</h3>
             <CTAButton
               loading={loadingStates.loading}
@@ -164,7 +164,7 @@ export function ButtonAnimationDemo() {
             </CTAButton>
           </div>
 
-          <div className="space-y-4 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+          <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
             <h3 className="font-semibold">Magnetic Attraction</h3>
             <PremiumButton
               size="lg"
@@ -218,12 +218,12 @@ export function ButtonAnimationDemo() {
         </h2>
 
         <div className="space-y-4">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-300">
             Use hooks to enhance existing buttons without rewriting components:
           </p>
 
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6">
-            <pre className="text-sm text-gray-800 dark:text-gray-200">
+          <div className="bg-gray-800 rounded-lg p-6">
+            <pre className="text-sm text-gray-200">
 {`// Enhance existing buttons with hooks
 import { useButtonAnimations } from '@/hooks/useButtonAnimations';
 
@@ -246,11 +246,11 @@ function ExistingComponent() {
       </section>
 
       {/* Performance Note */}
-      <section className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+      <section className="bg-blue-900/20 rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-blue-100 mb-2">
           🚀 Performance & Accessibility
         </h3>
-        <ul className="text-blue-800 dark:text-blue-200 space-y-1 text-sm">
+        <ul className="text-blue-200 space-y-1 text-sm">
           <li>• All animations are GPU-accelerated using CSS transforms</li>
           <li>• Respects <code>prefers-reduced-motion</code> for accessibility</li>
           <li>• Debounced for 60fps performance</li>

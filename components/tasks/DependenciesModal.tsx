@@ -105,10 +105,10 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
 
   function getStatusColor(status: string) {
     switch (status) {
-      case 'completed': return 'text-green-600 bg-green-50 dark:bg-green-900/20';
-      case 'in-progress': return 'text-blue-600 bg-blue-50 dark:bg-blue-900/20';
-      case 'blocked': return 'text-red-600 bg-red-50 dark:bg-red-900/20';
-      default: return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20';
+      case 'completed': return 'text-green-600 bg-green-900/20';
+      case 'in-progress': return 'text-blue-600 bg-blue-900/20';
+      case 'blocked': return 'text-red-600 bg-red-900/20';
+      default: return 'text-gray-600 bg-gray-900/20';
     }
   }
 
@@ -130,7 +130,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <Link2 className="w-5 h-5 text-white" />
@@ -147,8 +147,8 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
           ) : (
             <>
               {/* Add Dependency Section */}
-              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <div className="mb-6 p-4 bg-gray-900 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-300 mb-3">
                   Add Dependency
                 </h3>
 
@@ -158,7 +158,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                     className={`px-3 py-1.5 text-sm rounded-lg ${
                       dependencyType === 'blocks'
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        : 'bg-gray-700 text-gray-300'
                     }`}
                   >
                     Blocks
@@ -168,7 +168,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                     className={`px-3 py-1.5 text-sm rounded-lg ${
                       dependencyType === 'relates_to'
                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        : 'bg-gray-700 text-gray-300'
                     }`}
                   >
                     Relates To
@@ -182,21 +182,21 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search for tasks to link..."
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
+                    className="w-full pl-9 pr-4 py-2 border border-gray-600 rounded-lg bg-gray-800"
                   />
                 </div>
 
                 {searchResults.length > 0 && (
-                  <div className="mt-2 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  <div className="mt-2 border border-gray-700 rounded-lg overflow-hidden">
                     {searchResults.map((task) => (
                       <button
                         key={task.id}
                         onClick={() => addDependency(task.id)}
                         disabled={adding}
-                        className="w-full flex items-center justify-between p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                        className="w-full flex items-center justify-between p-3 hover:bg-gray-800 transition-colors text-left"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 dark:text-white truncate">
+                          <p className="font-medium text-white truncate">
                             {task.title}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
@@ -215,9 +215,9 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
               </div>
 
               {/* Circular Dependency Warning */}
-              <div className="flex items-start gap-2 p-3 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <div className="flex items-start gap-2 p-3 mb-4 bg-amber-900/20 border border-amber-800 rounded-lg">
                 <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-amber-800 dark:text-amber-200">
+                <p className="text-xs text-amber-200">
                   Circular dependencies are automatically prevented. If a task cannot be added, it would create a dependency loop.
                 </p>
               </div>
@@ -225,17 +225,17 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
               {/* Blocking Dependencies */}
               {blocksDependencies.length > 0 && (
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <h3 className="text-sm font-medium text-gray-300 mb-2">
                     Blocking Tasks ({blocksDependencies.length})
                   </h3>
                   <div className="space-y-2">
                     {blocksDependencies.map((dep) => (
                       <div
                         key={dep.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-900 rounded-lg"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="font-medium text-white">
                             {dep.dependent_task?.title || 'Unknown Task'}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
@@ -244,7 +244,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                         </div>
                         <button
                           onClick={() => removeDependency(dep.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
+                          className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -257,17 +257,17 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
               {/* Related Dependencies */}
               {relatedDependencies.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <h3 className="text-sm font-medium text-gray-300 mb-2">
                     Related Tasks ({relatedDependencies.length})
                   </h3>
                   <div className="space-y-2">
                     {relatedDependencies.map((dep) => (
                       <div
                         key={dep.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-900 rounded-lg"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="font-medium text-white">
                             {dep.dependent_task?.title || 'Unknown Task'}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
@@ -276,7 +276,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                         </div>
                         <button
                           onClick={() => removeDependency(dep.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
+                          className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

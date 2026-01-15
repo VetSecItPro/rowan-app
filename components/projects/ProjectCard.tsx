@@ -16,11 +16,11 @@ interface ProjectCardProps {
 }
 
 const statusConfig = {
-  planning: { label: 'Planning', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-  'in-progress': { label: 'In Progress', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' },
-  completed: { label: 'Completed', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
-  'on-hold': { label: 'On Hold', color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400' },
-  cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+  planning: { label: 'Planning', color: 'bg-blue-100 bg-blue-900/30 text-blue-400' },
+  'in-progress': { label: 'In Progress', color: 'bg-yellow-100 bg-yellow-900/30 text-yellow-400' },
+  completed: { label: 'Completed', color: 'bg-green-100 bg-green-900/30 text-green-400' },
+  'on-hold': { label: 'On Hold', color: 'bg-gray-100 bg-gray-900/30 text-gray-400' },
+  cancelled: { label: 'Cancelled', color: 'bg-red-100 bg-red-900/30 text-red-400' },
 };
 
 const priorityConfig = {
@@ -86,7 +86,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
 
   const CardContent = () => (
     <div
-      className={`bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow ${onEdit ? 'cursor-pointer hover:border-amber-300 dark:hover:border-amber-600' : ''}`}
+      className={`bg-gray-800 border border-gray-700 rounded-xl p-6 hover:shadow-lg transition-shadow ${onEdit ? 'cursor-pointer hover:border-amber-600' : ''}`}
       onClick={handleCardClick}
     >
       <div className="flex items-start justify-between mb-4">
@@ -96,7 +96,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900 dark:text-white truncate">{project.name}</h3>
+              <h3 className="font-semibold text-white truncate">{project.name}</h3>
               <span className={`text-xs ${priorityInfo.color}`}>
                 {priorityInfo.icon}
               </span>
@@ -106,7 +106,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                 {statusInfo.label}
               </span>
               {project.location && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-400">
                   📍 {project.location}
                 </span>
               )}
@@ -118,18 +118,18 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
             <button
               onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
               aria-label="Project options menu"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-300 transition-colors"
             >
               <MoreVertical className="w-5 h-5" />
             </button>
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20" onClick={(e) => e.stopPropagation()}>
+                <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20" onClick={(e) => e.stopPropagation()}>
                   {onEdit && (
                     <button
                       onClick={() => { onEdit(project); setShowMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg text-gray-900 dark:text-white transition-colors"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 rounded-t-lg text-white transition-colors"
                     >
                       Edit
                     </button>
@@ -137,7 +137,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                   <button
                     onClick={handleExportPDF}
                     disabled={isExporting}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white transition-colors flex items-center gap-2 disabled:opacity-50"
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 text-white transition-colors flex items-center gap-2 disabled:opacity-50"
                   >
                     <FileText className="w-4 h-4" />
                     {isExporting ? 'Exporting...' : 'Export PDF'}
@@ -145,7 +145,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
                   {onDelete && (
                     <button
                       onClick={() => { onDelete(project.id); setShowMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors"
+                      className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 rounded-b-lg transition-colors"
                     >
                       Delete
                     </button>
@@ -158,7 +158,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
       </div>
 
       {project.description && (
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+        <p className="text-sm text-gray-400 mb-4 line-clamp-2">
           {project.description}
         </p>
       )}
@@ -167,14 +167,14 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
       {project.estimated_budget && (
         <div className="mb-4 grid grid-cols-2 gap-3">
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Estimated</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+            <p className="text-xs text-gray-400">Estimated</p>
+            <p className="text-sm font-semibold text-white">
               ${project.estimated_budget.toLocaleString()}
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Actual</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+            <p className="text-xs text-gray-400">Actual</p>
+            <p className="text-sm font-semibold text-white">
               ${project.actual_cost.toLocaleString()}
             </p>
           </div>
@@ -183,25 +183,25 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
 
       {/* Budget Variance */}
       {isOverBudget && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 px-3 py-2">
-          <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-          <span className="text-xs font-medium text-red-600 dark:text-red-400">
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-900/20 px-3 py-2">
+          <AlertTriangle className="h-4 w-4 text-red-400" />
+          <span className="text-xs font-medium text-red-400">
             Over budget by ${Math.abs(project.budget_variance).toLocaleString()} ({Math.abs(project.variance_percentage)}%)
           </span>
         </div>
       )}
 
       {isUnderBudget && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 px-3 py-2">
-          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <span className="text-xs font-medium text-green-600 dark:text-green-400">
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-900/20 px-3 py-2">
+          <CheckCircle className="h-4 w-4 text-green-400" />
+          <span className="text-xs font-medium text-green-400">
             Under budget by ${project.budget_variance.toLocaleString()} ({project.variance_percentage}%)
           </span>
         </div>
       )}
 
       {/* Timeline */}
-      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
         {project.start_date && (
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
@@ -218,19 +218,19 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
 
       {/* Steps Progress */}
       {milestoneProgress && (
-        <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+        <div className="mb-4 p-3 rounded-lg bg-amber-900/20 border border-amber-800">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+              <Target className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-medium text-amber-300">
                 Steps
               </span>
             </div>
-            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+            <span className="text-xs font-semibold text-amber-400">
               {milestoneProgress.completed}/{milestoneProgress.total}
             </span>
           </div>
-          <div className="w-full bg-amber-200 dark:bg-amber-900/50 rounded-full h-1.5">
+          <div className="w-full bg-amber-900/50 rounded-full h-1.5">
             <div
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 milestoneProgress.percentage === 100
@@ -249,13 +249,13 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
           {project.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+              className="rounded-full bg-gray-100 px-2 py-0.5 text-xs bg-gray-700 text-gray-300"
             >
               #{tag}
             </span>
           ))}
           {project.tags.length > 3 && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs bg-gray-700 text-gray-300">
               +{project.tags.length - 3}
             </span>
           )}
@@ -266,10 +266,10 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
       {project.estimated_budget && (
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Budget Used</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">{budgetProgress.toFixed(0)}%</span>
+            <span className="text-sm font-medium text-gray-300">Budget Used</span>
+            <span className="text-sm font-medium text-white">{budgetProgress.toFixed(0)}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-500 ${
                 isOverBudget ? 'bg-red-500' : 'bg-gradient-to-r from-amber-500 to-amber-600'

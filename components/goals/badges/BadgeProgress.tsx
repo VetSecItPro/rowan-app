@@ -45,7 +45,7 @@ export default function BadgeProgress({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400" />
       </div>
     );
   }
@@ -54,7 +54,7 @@ export default function BadgeProgress({
     return (
       <div className="text-center py-8">
         <div className="text-4xl mb-3">🎯</div>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+        <p className="text-gray-400 text-sm">
           Start completing goals to make progress toward badges!
         </p>
       </div>
@@ -63,28 +63,28 @@ export default function BadgeProgress({
 
   const rarityColors: Record<string, { bg: string; text: string; progress: string }> = {
     common: {
-      bg: 'bg-gray-100 dark:bg-gray-700',
-      text: 'text-gray-700 dark:text-gray-300',
+      bg: 'bg-gray-700',
+      text: 'text-gray-300',
       progress: 'bg-gray-400',
     },
     uncommon: {
-      bg: 'bg-green-50 dark:bg-green-900/20',
-      text: 'text-green-700 dark:text-green-300',
+      bg: 'bg-green-900/20',
+      text: 'text-green-300',
       progress: 'bg-gradient-to-r from-green-400 to-green-600',
     },
     rare: {
-      bg: 'bg-blue-50 dark:bg-blue-900/20',
-      text: 'text-blue-700 dark:text-blue-300',
+      bg: 'bg-blue-900/20',
+      text: 'text-blue-300',
       progress: 'bg-gradient-to-r from-blue-400 to-blue-600',
     },
     epic: {
-      bg: 'bg-purple-50 dark:bg-purple-900/20',
-      text: 'text-purple-700 dark:text-purple-300',
+      bg: 'bg-purple-900/20',
+      text: 'text-purple-300',
       progress: 'bg-gradient-to-r from-purple-400 to-purple-600',
     },
     legendary: {
-      bg: 'bg-amber-50 dark:bg-amber-900/20',
-      text: 'text-amber-700 dark:text-amber-300',
+      bg: 'bg-amber-900/20',
+      text: 'text-amber-300',
       progress: 'bg-gradient-to-r from-amber-400 to-amber-600',
     },
   };
@@ -92,10 +92,10 @@ export default function BadgeProgress({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-white">
           Next Achievements
         </h3>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <span className="text-sm text-gray-400">
           {badges.length} in progress
         </span>
       </div>
@@ -109,7 +109,7 @@ export default function BadgeProgress({
               key={badge.id}
               className={`
                 ${colors.bg}
-                rounded-lg p-4 border border-gray-200 dark:border-gray-700
+                rounded-lg p-4 border border-gray-700
                 hover:shadow-lg transition-shadow duration-200
               `}
             >
@@ -121,10 +121,10 @@ export default function BadgeProgress({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                      <h4 className="font-semibold text-white text-sm">
                         {badge.name}
                       </h4>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                      <p className="text-xs text-gray-400 line-clamp-1">
                         {badge.description}
                       </p>
                     </div>
@@ -142,7 +142,7 @@ export default function BadgeProgress({
                   {/* Progress bar */}
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className="text-gray-400">
                         {badge.progress.current} / {badge.progress.target}
                       </span>
                       <span className={`font-medium ${colors.text}`}>
@@ -150,7 +150,7 @@ export default function BadgeProgress({
                       </span>
                     </div>
 
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-full ${colors.progress} transition-all duration-500 rounded-full`}
                         style={{ width: `${badge.progress.percentage}%` }}
@@ -159,7 +159,7 @@ export default function BadgeProgress({
                   </div>
 
                   {/* Points reward */}
-                  <div className="flex items-center gap-1 mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  <div className="flex items-center gap-1 mt-2 text-xs text-amber-400">
                     <span>⭐</span>
                     <span className="font-medium">+{badge.points} points</span>
                   </div>

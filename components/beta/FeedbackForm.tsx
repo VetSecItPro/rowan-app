@@ -114,14 +114,14 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <div className="p-3 rounded-lg bg-red-900/20 border border-red-800">
+          <p className="text-sm text-red-400">{error}</p>
         </div>
       )}
 
       {/* Title */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-2">
           Title <span className="text-red-500">*</span>
         </label>
         <input
@@ -130,18 +130,18 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           placeholder="Brief description of your feedback..."
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           maxLength={200}
           required
         />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 mt-1">
           {formData.title.length}/200 characters
         </p>
       </div>
 
       {/* Category Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-300 mb-2">
           Category <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -155,7 +155,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
                 className={`p-3 rounded-lg border-2 transition-all text-left ${
                   formData.category === category.value
                     ? category.color + ' border-opacity-100'
-                    : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : 'bg-gray-800 border-gray-600 hover:bg-gray-700'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -170,7 +170,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
 
       {/* Severity Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-300 mb-2">
           Severity <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
@@ -179,8 +179,8 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
               key={severity.value}
               className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                 formData.severity === severity.value
-                  ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700'
-                  : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-blue-900/20 border-blue-700'
+                  : 'bg-gray-800 border-gray-600 hover:bg-gray-700'
               }`}
             >
               <input
@@ -196,7 +196,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
                 <div className={`font-medium ${severity.color}`}>
                   {severity.label}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-400">
                   {severity.description}
                 </div>
               </div>
@@ -207,14 +207,14 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
 
       {/* Priority */}
       <div>
-        <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="priority" className="block text-sm font-medium text-gray-300 mb-2">
           Priority
         </label>
         <select
           id="priority"
           value={formData.priority}
           onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {PRIORITIES.map((priority) => (
             <option key={priority.value} value={priority.value}>
@@ -226,7 +226,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
           Description <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -235,18 +235,18 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           placeholder="Please provide detailed feedback..."
           rows={5}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
+          className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
           maxLength={2000}
           required
         />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 mt-1">
           {formData.description.length}/2000 characters
         </p>
       </div>
 
       {/* Page URL */}
       <div>
-        <label htmlFor="page_url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="page_url" className="block text-sm font-medium text-gray-300 mb-2">
           Page URL (Optional)
         </label>
         <div className="flex items-center gap-2">
@@ -257,10 +257,10 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
             value={formData.page_url}
             onChange={(e) => setFormData({ ...formData, page_url: e.target.value })}
             placeholder="https://..."
-            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 mt-1">
           URL where you encountered the issue (auto-filled)
         </p>
       </div>
@@ -284,7 +284,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          className="px-6 py-3 border border-gray-600 text-gray-300 rounded-lg font-medium hover:bg-gray-800 transition-colors"
         >
           Cancel
         </button>

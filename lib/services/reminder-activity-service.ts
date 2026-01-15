@@ -307,21 +307,21 @@ export const reminderActivityService = {
    */
   getActivityColor(action: ActivityAction): string {
     const colorMap: Record<ActivityAction, string> = {
-      created: 'text-green-600 dark:text-green-400',
-      updated: 'text-blue-600 dark:text-blue-400',
-      completed: 'text-green-600 dark:text-green-400',
-      uncompleted: 'text-gray-600 dark:text-gray-400',
-      snoozed: 'text-purple-600 dark:text-purple-400',
-      unsnoozed: 'text-blue-600 dark:text-blue-400',
-      assigned: 'text-indigo-600 dark:text-indigo-400',
-      unassigned: 'text-gray-600 dark:text-gray-400',
-      deleted: 'text-red-600 dark:text-red-400',
-      commented: 'text-pink-600 dark:text-pink-400',
-      status_changed: 'text-blue-600 dark:text-blue-400',
-      priority_changed: 'text-orange-600 dark:text-orange-400',
-      category_changed: 'text-purple-600 dark:text-purple-400',
+      created: 'text-green-400',
+      updated: 'text-blue-400',
+      completed: 'text-green-400',
+      uncompleted: 'text-gray-400',
+      snoozed: 'text-purple-400',
+      unsnoozed: 'text-blue-400',
+      assigned: 'text-indigo-400',
+      unassigned: 'text-gray-400',
+      deleted: 'text-red-400',
+      commented: 'text-pink-400',
+      status_changed: 'text-blue-400',
+      priority_changed: 'text-orange-400',
+      category_changed: 'text-purple-400',
     };
 
-    return colorMap[action] || 'text-gray-600 dark:text-gray-400';
+    return colorMap[action] || 'text-gray-400';
   },
 };

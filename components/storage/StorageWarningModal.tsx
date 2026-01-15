@@ -54,27 +54,27 @@ export function StorageWarningModal({
   const getColorClasses = () => {
     if (percentageUsed >= 100) {
       return {
-        bg: 'bg-red-50 dark:bg-red-900/20',
-        border: 'border-red-200 dark:border-red-800',
-        icon: 'text-red-600 dark:text-red-400',
-        accent: 'text-red-700 dark:text-red-300',
-        button: 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600',
+        bg: 'bg-red-900/20',
+        border: 'border-red-800',
+        icon: 'text-red-400',
+        accent: 'text-red-300',
+        button: 'bg-red-600 bg-red-500 hover:bg-red-600',
       };
     } else if (percentageUsed >= 90) {
       return {
-        bg: 'bg-orange-50 dark:bg-orange-900/20',
-        border: 'border-orange-200 dark:border-orange-800',
-        icon: 'text-orange-600 dark:text-orange-400',
-        accent: 'text-orange-700 dark:text-orange-300',
-        button: 'bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600',
+        bg: 'bg-orange-900/20',
+        border: 'border-orange-800',
+        icon: 'text-orange-400',
+        accent: 'text-orange-300',
+        button: 'bg-orange-600 bg-orange-500 hover:bg-orange-600',
       };
     } else {
       return {
-        bg: 'bg-amber-50 dark:bg-amber-900/20',
-        border: 'border-amber-200 dark:border-amber-800',
-        icon: 'text-amber-600 dark:text-amber-400',
-        accent: 'text-amber-700 dark:text-amber-300',
-        button: 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600',
+        bg: 'bg-amber-900/20',
+        border: 'border-amber-800',
+        icon: 'text-amber-400',
+        accent: 'text-amber-300',
+        button: 'bg-amber-600 bg-amber-500 hover:bg-amber-600',
       };
     }
   };
@@ -87,7 +87,7 @@ export function StorageWarningModal({
       <div
         className={`
           absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto
-          bg-white dark:bg-gray-800
+          bg-gray-800
           sm:rounded-2xl
           shadow-2xl
           sm:max-w-md
@@ -119,26 +119,26 @@ export function StorageWarningModal({
               )}
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              <h3 className="text-lg font-semibold text-white mb-1">
                 {percentageUsed >= 100
                   ? 'Storage Full'
                   : percentageUsed >= 90
                     ? 'Storage Almost Full'
                     : 'Storage Running Low'}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
+              <p className="text-sm text-gray-400">{message}</p>
             </div>
           </div>
 
           {/* Progress Bar */}
           <div className="mb-6">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-gray-600 dark:text-gray-400">Storage Used</span>
+              <span className="text-gray-400">Storage Used</span>
               <span className={`font-semibold ${colors.accent}`}>
                 {Math.round(percentageUsed)}%
               </span>
             </div>
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${colors.button}`}
                 style={{ width: `${Math.min(percentageUsed, 100)}%` }}
@@ -148,7 +148,7 @@ export function StorageWarningModal({
 
           {/* Help Text */}
           <div className={`mb-6 p-4 rounded-lg ${colors.bg}`}>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-gray-300">
               <Settings className="w-4 h-4 inline mr-2" />
               You can manage your files and free up space in your Data Management settings.
             </p>
@@ -166,12 +166,9 @@ export function StorageWarningModal({
                 rounded-lg
                 text-sm
                 font-medium
-                text-gray-700
-                dark:text-gray-300
-                bg-gray-100
-                dark:bg-gray-700
-                hover:bg-gray-200
-                dark:hover:bg-gray-600
+                text-gray-300
+                bg-gray-700
+                hover:bg-gray-600
                 transition-colors
                 disabled:opacity-50
                 disabled:cursor-not-allowed

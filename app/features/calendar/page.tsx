@@ -52,7 +52,7 @@ export default function CalendarFeaturePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-900 overflow-x-hidden">
       <Header
         onBetaClick={() => setIsBetaModalOpen(true)}
         onLaunchClick={() => setIsLaunchModalOpen(true)}
@@ -62,7 +62,7 @@ export default function CalendarFeaturePage() {
       <main>
         {/* Hero Section */}
         <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.1),transparent)] dark:bg-[radial-gradient(45%_45%_at_50%_0%,rgba(5,150,105,0.05),transparent)]" />
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.1),transparent)] bg-[radial-gradient(45%_45%_at_50%_0%,rgba(5,150,105,0.05),transparent)]" />
 
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -71,21 +71,21 @@ export default function CalendarFeaturePage() {
               variants={containerVariants}
               className="text-center"
             >
-              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-8">
+              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/30 text-emerald-300 text-sm font-medium mb-8">
                 <Sparkles className="w-4 h-4" />
                 <span>Always In Sync</span>
               </motion.div>
 
               <motion.h1
                 variants={itemVariants}
-                className="text-5xl sm:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6"
+                className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6"
               >
                 Family <span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 bg-clip-text text-transparent">Calendar</span>
               </motion.h1>
 
               <motion.p
                 variants={itemVariants}
-                className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10"
+                className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-light mb-10"
               >
                 A shared space for everyone&apos;s schedule. From school events to doctor
                 appointments, keep your family organized and your time protected.
@@ -103,7 +103,7 @@ export default function CalendarFeaturePage() {
                 </MagneticButton>
 
                 <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
-                  <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
                     Get Notified on Launch
                   </div>
                 </MagneticButton>
@@ -147,8 +147,8 @@ export default function CalendarFeaturePage() {
                     <div className={`w-12 h-12 rounded-2xl bg-${item.color}-500/10 flex items-center justify-center mb-6`}>
                       <item.icon className={`w-6 h-6 text-${item.color}-500`} />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <h3 className="text-2xl font-bold text-white mb-3">{item.title}</h3>
+                    <p className="text-gray-400 leading-relaxed">
                       {item.description}
                     </p>
                   </SpotlightCard>
@@ -159,7 +159,7 @@ export default function CalendarFeaturePage() {
         </section>
 
         {/* Details Section */}
-        <section className="py-20 bg-gray-100/50 dark:bg-gray-800/50">
+        <section className="py-20 bg-gray-800/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
@@ -168,7 +168,7 @@ export default function CalendarFeaturePage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                <h2 className="text-4xl font-bold text-white mb-8">
                   Your Family Life, Organized
                 </h2>
                 <div className="space-y-6">
@@ -181,9 +181,9 @@ export default function CalendarFeaturePage() {
                   ].map((feature, i) => (
                     <div key={i} className="flex items-center gap-4">
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                        <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <Check className="w-4 h-4 text-emerald-400" />
                       </div>
-                      <span className="text-lg text-gray-700 dark:text-gray-300 font-medium">{feature}</span>
+                      <span className="text-lg text-gray-300 font-medium">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -210,7 +210,7 @@ export default function CalendarFeaturePage() {
         {/* Call to Action */}
         <section className="py-24 text-center">
           <div className="max-w-4xl mx-auto px-4">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-8">
               Ready to sync your family?
             </h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -222,7 +222,7 @@ export default function CalendarFeaturePage() {
               </MagneticButton>
 
               <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
-                <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
                   Get Notified on Launch
                 </div>
               </MagneticButton>

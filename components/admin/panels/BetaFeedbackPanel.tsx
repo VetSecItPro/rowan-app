@@ -41,10 +41,10 @@ const getTypeIcon = (type: FeedbackType | null, size: string = 'w-3 h-3') => {
 
 const getStatusBadge = (status: FeedbackStatus) => {
   const config: Record<FeedbackStatus, { bg: string; text: string; icon: typeof Clock }> = {
-    [FeedbackStatus.NEW]: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400', icon: Clock },
-    [FeedbackStatus.IN_PROGRESS]: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-400', icon: AlertCircle },
-    [FeedbackStatus.RESOLVED]: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400', icon: CheckCircle },
-    [FeedbackStatus.WONT_FIX]: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-700 dark:text-gray-400', icon: XCircle },
+    [FeedbackStatus.NEW]: { bg: 'bg-blue-900/30', text: 'text-blue-400', icon: Clock },
+    [FeedbackStatus.IN_PROGRESS]: { bg: 'bg-yellow-900/30', text: 'text-yellow-400', icon: AlertCircle },
+    [FeedbackStatus.RESOLVED]: { bg: 'bg-green-900/30', text: 'text-green-400', icon: CheckCircle },
+    [FeedbackStatus.WONT_FIX]: { bg: 'bg-gray-700', text: 'text-gray-400', icon: XCircle },
   };
 
   const { bg, text, icon: Icon } = config[status];
@@ -195,7 +195,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Loading beta feedback...</span>
+        <span className="ml-3 text-sm text-gray-400">Loading beta feedback...</span>
       </div>
     );
   }
@@ -204,47 +204,47 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Stats Row */}
       <div className="grid grid-cols-7 gap-2 flex-shrink-0">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-gray-900 dark:text-white">{stats.total}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Total</p>
+        <div className="bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-white">{stats.total}</p>
+          <p className="text-xs text-gray-400">Total</p>
         </div>
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-2 text-center border border-indigo-200 dark:border-indigo-800">
-          <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{stats.active}</p>
-          <p className="text-xs text-indigo-600 dark:text-indigo-400">Active</p>
+        <div className="bg-indigo-900/20 rounded-lg p-2 text-center border border-indigo-800">
+          <p className="text-lg font-bold text-indigo-400">{stats.active}</p>
+          <p className="text-xs text-indigo-400">Active</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{stats.new}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">New</p>
+        <div className="bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-blue-400">{stats.new}</p>
+          <p className="text-xs text-gray-400">New</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{stats.inProgress}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Progress</p>
+        <div className="bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-yellow-400">{stats.inProgress}</p>
+          <p className="text-xs text-gray-400">Progress</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-green-600 dark:text-green-400">{stats.resolved}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Resolved</p>
+        <div className="bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-green-400">{stats.resolved}</p>
+          <p className="text-xs text-gray-400">Resolved</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-red-600 dark:text-red-400">{stats.bugs}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Bugs</p>
+        <div className="bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-red-400">{stats.bugs}</p>
+          <p className="text-xs text-gray-400">Bugs</p>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-purple-600 dark:text-purple-400">{stats.features}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Features</p>
+        <div className="bg-gray-800 rounded-lg p-2 text-center">
+          <p className="text-lg font-bold text-purple-400">{stats.features}</p>
+          <p className="text-xs text-gray-400">Features</p>
         </div>
       </div>
 
       {/* Filters Row */}
       <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
         {/* Hide Resolved Toggle */}
-        <label className="flex items-center gap-1.5 px-2 py-1.5 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg cursor-pointer text-xs">
+        <label className="flex items-center gap-1.5 px-2 py-1.5 bg-indigo-900/20 border border-indigo-700 rounded-lg cursor-pointer text-xs">
           <input
             type="checkbox"
             checked={hideResolved}
             onChange={(e) => setHideResolved(e.target.checked)}
             className="w-3 h-3 text-indigo-600 rounded focus:ring-indigo-500"
           />
-          <span className="text-indigo-700 dark:text-indigo-300">Hide Done</span>
+          <span className="text-indigo-300">Hide Done</span>
         </label>
 
         {/* Category Filters */}
@@ -255,8 +255,8 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               onClick={() => setFilter(f)}
               className={`px-2 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                 filter === f
-                  ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-violet-100 bg-violet-900/30 text-violet-400'
+                  : 'text-gray-400 hover:bg-gray-700'
               }`}
             >
               {f === 'all' ? 'All' : f === 'new' ? 'New' : f === 'in_progress' ? 'In Progress' : f === 'bugs' ? 'Bugs' : 'Features'}
@@ -272,20 +272,20 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-7 pr-2 py-1.5 text-xs bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-1 focus:ring-violet-500 text-gray-900 dark:text-white"
+            className="w-full pl-7 pr-2 py-1.5 text-xs bg-gray-700 border border-gray-600 rounded-lg focus:ring-1 focus:ring-violet-500 text-white"
           />
         </div>
 
         {/* Time Range Filter */}
-        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+        <div className="flex items-center gap-1 bg-gray-700 rounded-lg p-0.5">
           {(['7d', '30d', '90d'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
               className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
                 timeRange === range
-                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-gray-600 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               {range === '7d' ? '7d' : range === '30d' ? '30d' : '90d'}
@@ -296,64 +296,64 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
         {/* Actions */}
         <button
           onClick={exportToCSV}
-          className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
           title="Export CSV"
         >
           <Download className="w-3 h-3" />
         </button>
         <button
           onClick={fetchData}
-          className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
         >
           <RefreshCw className="w-3 h-3" />
         </button>
       </div>
 
       {/* Feedback Table */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+      <div className="border border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
         {/* Table Header - Fixed */}
-        <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className="bg-gray-800 border-b border-gray-700 flex-shrink-0">
           <div className="grid grid-cols-[80px_150px_120px_1fr_120px_80px] gap-2 px-3 py-2">
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</div>
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">User</div>
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Type</div>
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</div>
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</div>
-            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase text-center">Actions</div>
+            <div className="text-xs font-medium text-gray-400 uppercase">Date</div>
+            <div className="text-xs font-medium text-gray-400 uppercase">User</div>
+            <div className="text-xs font-medium text-gray-400 uppercase">Type</div>
+            <div className="text-xs font-medium text-gray-400 uppercase">Description</div>
+            <div className="text-xs font-medium text-gray-400 uppercase">Status</div>
+            <div className="text-xs font-medium text-gray-400 uppercase text-center">Actions</div>
           </div>
         </div>
 
         {/* Table Body - Scrollable and fills remaining space */}
         <div className="flex-1 overflow-y-auto min-h-0">
           {filteredFeedback.length > 0 ? (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="divide-y divide-gray-700">
               {filteredFeedback.map((item) => (
-                <div key={item.id} className="grid grid-cols-[80px_150px_120px_1fr_120px_80px] gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 items-center">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                <div key={item.id} className="grid grid-cols-[80px_150px_120px_1fr_120px_80px] gap-2 px-3 py-2 hover:bg-gray-800/50 items-center">
+                  <div className="text-xs text-gray-400 whitespace-nowrap">
                     {formatDate(item.created_at)}
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-violet-100 dark:bg-violet-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                      <User className="w-3 h-3 text-violet-600 dark:text-violet-400" />
+                    <div className="w-6 h-6 bg-violet-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="w-3 h-3 text-violet-400" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-xs font-medium text-white truncate">
                         {item.user?.name || item.user?.email?.split('@')[0] || 'Unknown'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {getTypeIcon(item.feedback_type)}
-                    <span className="text-xs text-gray-700 dark:text-gray-300 capitalize truncate">
+                    <span className="text-xs text-gray-300 capitalize truncate">
                       {item.feedback_type?.replace('_', ' ') || 'General'}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-gray-900 dark:text-white truncate">
+                    <p className="text-xs text-white truncate">
                       {item.description}
                     </p>
                     {item.feature_name && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      <p className="text-xs text-gray-400 truncate">
                         {item.feature_name}
                       </p>
                     )}
@@ -362,7 +362,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
                     <select
                       value={item.status}
                       onChange={(e) => updateStatus(item.id, e.target.value as FeedbackStatus)}
-                      className="text-xs px-2 py-1 border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-violet-500 w-full"
+                      className="text-xs px-2 py-1 border border-gray-600 rounded bg-gray-700 text-gray-300 focus:ring-1 focus:ring-violet-500 w-full"
                     >
                       <option value={FeedbackStatus.NEW}>New</option>
                       <option value={FeedbackStatus.IN_PROGRESS}>In Progress</option>
@@ -390,7 +390,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               ))}
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 py-12">
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 py-12">
               <MessageSquare className="w-12 h-12 mb-3 opacity-30" />
               <p className="text-sm font-medium">No feedback found</p>
               <p className="text-xs mt-1">Feedback from beta users will appear here</p>
@@ -402,8 +402,8 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
       {/* Detail Modal */}
       {selectedFeedback && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-violet-600 rounded-t-xl">
+          <div className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto bg-gray-900 rounded-xl shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-800 bg-violet-600 rounded-t-xl">
               <h2 className="text-lg font-bold text-white">Feedback Details</h2>
               <button
                 onClick={() => setSelectedFeedback(null)}
@@ -430,10 +430,10 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
                   </div>
                 )}
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white">
+                  <div className="font-medium text-white">
                     {selectedFeedback.user?.name || 'Unknown User'}
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-sm text-gray-400">
                     {selectedFeedback.user?.email || 'No email'}
                   </div>
                 </div>
@@ -442,27 +442,27 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               {/* Metadata */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Type</h3>
+                  <h3 className="text-xs font-medium text-gray-400 mb-1">Type</h3>
                   <div className="flex items-center gap-2">
                     {getTypeIcon(selectedFeedback.feedback_type, 'w-4 h-4')}
-                    <span className="text-sm text-gray-900 dark:text-white capitalize">
+                    <span className="text-sm text-white capitalize">
                       {selectedFeedback.feedback_type?.replace('_', ' ') || 'Not specified'}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Status</h3>
+                  <h3 className="text-xs font-medium text-gray-400 mb-1">Status</h3>
                   {getStatusBadge(selectedFeedback.status)}
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Feature</h3>
-                  <span className="text-sm text-gray-900 dark:text-white">
+                  <h3 className="text-xs font-medium text-gray-400 mb-1">Feature</h3>
+                  <span className="text-sm text-white">
                     {selectedFeedback.feature_name || 'Not specified'}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Submitted</h3>
-                  <span className="text-sm text-gray-900 dark:text-white">
+                  <h3 className="text-xs font-medium text-gray-400 mb-1">Submitted</h3>
+                  <span className="text-sm text-white">
                     {new Date(selectedFeedback.created_at).toLocaleString()}
                   </span>
                 </div>
@@ -471,7 +471,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               {/* Page URL */}
               {selectedFeedback.page_url && (
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Page URL</h3>
+                  <h3 className="text-xs font-medium text-gray-400 mb-1">Page URL</h3>
                   <a
                     href={selectedFeedback.page_url}
                     target="_blank"
@@ -486,8 +486,8 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
 
               {/* Description */}
               <div>
-                <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</h3>
-                <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                <h3 className="text-xs font-medium text-gray-400 mb-1">Description</h3>
+                <p className="text-sm text-white whitespace-pre-wrap bg-gray-800 rounded-lg p-3">
                   {selectedFeedback.description}
                 </p>
               </div>
@@ -495,8 +495,8 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               {/* Screenshot */}
               {selectedFeedback.screenshot_url && (
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Screenshot</h3>
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-2">
+                  <h3 className="text-xs font-medium text-gray-400 mb-1">Screenshot</h3>
+                  <div className="border border-gray-700 rounded-lg p-2">
                     <Image
                       src={selectedFeedback.screenshot_url}
                       alt="Feedback screenshot"
@@ -509,7 +509,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex items-center justify-between pt-3 border-t border-gray-800">
                 <button
                   onClick={() => {
                     deleteFeedback(selectedFeedback.id);
@@ -524,7 +524,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
                     onChange={(e) => {
                       updateStatus(selectedFeedback.id, e.target.value as FeedbackStatus);
                     }}
-                    className="text-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-violet-500"
+                    className="text-sm px-3 py-1.5 border border-gray-600 rounded-lg bg-gray-700 text-gray-300 focus:ring-2 focus:ring-violet-500"
                   >
                     <option value={FeedbackStatus.NEW}>New</option>
                     <option value={FeedbackStatus.IN_PROGRESS}>In Progress</option>
@@ -533,7 +533,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
                   </select>
                   <button
                     onClick={() => setSelectedFeedback(null)}
-                    className="px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    className="px-3 py-1.5 text-sm bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     Close
                   </button>

@@ -24,7 +24,7 @@ const features = [
     gradient: 'from-blue-500 to-blue-600',
     bgColor: 'bg-blue-500',
     textColor: 'text-blue-600',
-    darkBgColor: 'dark:bg-blue-900/30',
+    darkBgColor: 'bg-blue-900/30',
     shadowColor: 'shadow-blue-500/20',
     href: '/settings/analytics/tasks',
     metrics: [
@@ -42,7 +42,7 @@ const features = [
     gradient: 'from-purple-500 to-purple-600',
     bgColor: 'bg-purple-500',
     textColor: 'text-purple-600',
-    darkBgColor: 'dark:bg-purple-900/30',
+    darkBgColor: 'bg-purple-900/30',
     shadowColor: 'shadow-purple-500/20',
     href: '/settings/analytics/calendar',
     metrics: [
@@ -60,7 +60,7 @@ const features = [
     gradient: 'from-pink-500 to-pink-600',
     bgColor: 'bg-pink-500',
     textColor: 'text-pink-600',
-    darkBgColor: 'dark:bg-pink-900/30',
+    darkBgColor: 'bg-pink-900/30',
     shadowColor: 'shadow-pink-500/20',
     href: '/settings/analytics/reminders',
     metrics: [
@@ -78,7 +78,7 @@ const features = [
     gradient: 'from-green-500 to-green-600',
     bgColor: 'bg-green-500',
     textColor: 'text-green-600',
-    darkBgColor: 'dark:bg-green-900/30',
+    darkBgColor: 'bg-green-900/30',
     shadowColor: 'shadow-green-500/20',
     href: '/settings/analytics/messages',
     metrics: [
@@ -96,7 +96,7 @@ const features = [
     gradient: 'from-emerald-500 to-emerald-600',
     bgColor: 'bg-emerald-500',
     textColor: 'text-emerald-600',
-    darkBgColor: 'dark:bg-emerald-900/30',
+    darkBgColor: 'bg-emerald-900/30',
     shadowColor: 'shadow-emerald-500/20',
     href: '/settings/analytics/shopping',
     metrics: [
@@ -114,7 +114,7 @@ const features = [
     gradient: 'from-orange-500 to-orange-600',
     bgColor: 'bg-orange-500',
     textColor: 'text-orange-600',
-    darkBgColor: 'dark:bg-orange-900/30',
+    darkBgColor: 'bg-orange-900/30',
     shadowColor: 'shadow-orange-500/20',
     href: '/settings/analytics/meals',
     metrics: [
@@ -132,7 +132,7 @@ const features = [
     gradient: 'from-amber-500 to-amber-600',
     bgColor: 'bg-amber-500',
     textColor: 'text-amber-600',
-    darkBgColor: 'dark:bg-amber-900/30',
+    darkBgColor: 'bg-amber-900/30',
     shadowColor: 'shadow-amber-500/20',
     href: '/settings/analytics/budget',
     metrics: [
@@ -150,7 +150,7 @@ const features = [
     gradient: 'from-indigo-500 to-indigo-600',
     bgColor: 'bg-indigo-500',
     textColor: 'text-indigo-600',
-    darkBgColor: 'dark:bg-indigo-900/30',
+    darkBgColor: 'bg-indigo-900/30',
     shadowColor: 'shadow-indigo-500/20',
     href: '/settings/analytics/goals',
     metrics: [
@@ -179,25 +179,25 @@ export default function AnalyticsPage() {
               <Link
                 key={feature.id}
                 href={feature.href}
-                className={`bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
+                className={`bg-gray-800 border border-gray-700 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group`}
               >
                 {/* Icon and Title */}
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`p-3 rounded-lg bg-gradient-to-br ${feature.gradient} ${feature.shadowColor} shadow-lg`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{feature.title}</h3>
+                  <h3 className="text-lg font-bold text-white">{feature.title}</h3>
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-400 mb-4">
                   {feature.description}
                 </p>
 
                 {/* Metrics */}
                 <ul className="space-y-2 mb-4">
                   {feature.metrics.map((metric, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <li key={index} className="flex items-center gap-2 text-sm text-gray-300">
                       <div className={`w-1.5 h-1.5 rounded-full ${feature.bgColor}`} />
                       {metric}
                     </li>

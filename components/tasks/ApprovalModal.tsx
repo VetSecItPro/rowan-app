@@ -135,21 +135,21 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     switch (status) {
       case 'pending':
         return (
-          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 rounded-full">
+          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-amber-900/20 text-amber-300 rounded-full">
             <Clock className="w-3 h-3" />
             Pending
           </span>
         );
       case 'approved':
         return (
-          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-full">
+          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-green-900/20 text-green-300 rounded-full">
             <CheckCircle className="w-3 h-3" />
             Approved
           </span>
         );
       case 'rejected':
         return (
-          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-full">
+          <span className="flex items-center gap-1 text-xs px-2 py-1 bg-red-900/20 text-red-300 rounded-full">
             <XCircle className="w-3 h-3" />
             Rejected
           </span>
@@ -168,7 +168,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-white" />
@@ -185,15 +185,15 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
           ) : (
             <>
               {/* Request Approval Section */}
-              <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <div className="mb-6 p-4 bg-gray-900 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-300 mb-3">
                   Request Approval
                 </h3>
                 <div className="flex gap-2">
                   <select
                     value={selectedApprover}
                     onChange={(e) => setSelectedApprover(e.target.value)}
-                    className="flex-1 pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
+                    className="flex-1 pl-3 pr-10 py-2 border border-gray-600 rounded-lg bg-gray-800"
                   >
                     <option value="">Select approver...</option>
                     {spaceMembers.map((member) => (
@@ -215,18 +215,18 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
               {/* My Pending Approvals */}
               {myPendingApprovals.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <h3 className="text-sm font-medium text-gray-300 mb-3">
                     Awaiting Your Approval ({myPendingApprovals.length})
                   </h3>
                   <div className="space-y-3">
                     {myPendingApprovals.map((approval) => (
                       <div
                         key={approval.id}
-                        className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg"
+                        className="p-4 bg-amber-900/10 border border-amber-800 rounded-lg"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                            <p className="text-sm text-gray-300">
                               Requested by: <span className="font-medium">{approval.requested_by_user?.email}</span>
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
@@ -237,7 +237,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                         </div>
 
                         <div className="mb-3">
-                          <label htmlFor="field-1" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
+                          <label htmlFor="field-1" className="block text-xs text-gray-400 mb-1 cursor-pointer">
                             Review Note
                           </label>
                           <textarea
@@ -245,7 +245,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                             onChange={(e) => setReviewNote(e.target.value)}
                             placeholder="Add your review comments..."
                             rows={2}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
+                            className="w-full px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-800"
                           />
                         </div>
 
@@ -274,7 +274,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
               {/* Pending Approvals */}
               {pendingApprovals.filter(a => a.approver_id !== currentUserId).length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <h3 className="text-sm font-medium text-gray-300 mb-3">
                     Pending Approvals
                   </h3>
                   <div className="space-y-2">
@@ -283,10 +283,10 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                       .map((approval) => (
                         <div
                           key={approval.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                          className="flex items-center justify-between p-3 bg-gray-900 rounded-lg"
                         >
                           <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            <p className="text-sm font-medium text-white">
                               {approval.approver_user?.full_name || approval.approver_user?.email}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
@@ -303,25 +303,25 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
               {/* Completed Approvals */}
               {completedApprovals.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <h3 className="text-sm font-medium text-gray-300 mb-3">
                     Approval History
                   </h3>
                   <div className="space-y-2">
                     {completedApprovals.map((approval) => (
                       <div
                         key={approval.id}
-                        className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                        className="p-3 bg-gray-900 rounded-lg"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          <p className="text-sm font-medium text-white">
                             {approval.approver_user?.full_name || approval.approver_user?.email}
                           </p>
                           {getStatusBadge(approval.status)}
                         </div>
                         {approval.review_note && (
-                          <div className="flex items-start gap-2 mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                          <div className="flex items-start gap-2 mt-2 p-2 bg-gray-800 rounded">
                             <MessageSquare className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                            <p className="text-xs text-gray-400">
                               {approval.review_note}
                             </p>
                           </div>

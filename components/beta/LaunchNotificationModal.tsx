@@ -96,22 +96,22 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
         {isSuccess ? (
           /* Success State */
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
+              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               You're on the list! 🎉
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               Thanks for your interest in Rowan! We'll notify you as soon as we launch.
             </p>
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-left">
-              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
+            <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg text-left">
+              <h4 className="text-sm font-medium text-blue-200 mb-2">
                 What happens next:
               </h4>
-              <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+              <ul className="text-sm text-blue-300 space-y-1">
                 <li>• You'll receive a launch notification email</li>
                 <li>• Get early access to premium features</li>
                 <li>• No spam, just important updates</li>
@@ -130,10 +130,10 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
           <>
             {/* Header */}
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Be first to know when we launch! 🚀
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Join our exclusive launch list and get notified the moment Rowan goes live.
               </p>
             </div>
@@ -142,7 +142,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name Field */}
               <div>
-                <label htmlFor="notification-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="notification-name" className="block text-sm font-medium text-gray-300 mb-2">
                   First Name
                 </label>
                 <input
@@ -151,7 +151,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Enter your first name"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white"
                   required
                   disabled={isLoading}
                 />
@@ -159,7 +159,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
 
               {/* Email Field */}
               <div>
-                <label htmlFor="notification-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="notification-email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email Address
                 </label>
                 <input
@@ -168,14 +168,14 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
                   value={formData.email}
                   onChange={(e) => handleEmailChange(e.target.value)}
                   placeholder="Enter your email address"
-                  className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 dark:text-white ${
-                    emailError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'
+                  className={`w-full px-4 py-3 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white ${
+                    emailError ? 'border-red-500' : 'border-gray-600'
                   }`}
                   required
                   disabled={isLoading}
                 />
                 {emailError && (
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-2 text-sm text-red-400">
                     {emailError}
                   </p>
                 )}
@@ -183,19 +183,19 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
 
               {/* Error Message */}
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+                  <p className="text-red-400 text-sm font-medium">
                     {error}
                   </p>
                 </div>
               )}
 
               {/* Benefits */}
-              <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <h4 className="text-sm font-medium text-green-900 dark:text-green-200 mb-2">
+              <div className="p-4 bg-green-900/20 border border-green-800 rounded-lg">
+                <h4 className="text-sm font-medium text-green-200 mb-2">
                   Why join our launch list?
                 </h4>
-                <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                <ul className="text-sm text-green-300 space-y-1">
                   <li>• Be among the first to try Rowan</li>
                   <li>• Get exclusive early-bird pricing</li>
                   <li>• Access to premium features at launch</li>
@@ -204,7 +204,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
               </div>
 
               {/* Privacy Notice */}
-              <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              <p className="text-xs text-gray-400 text-center">
                 We respect your privacy. Your email will only be used for launch notifications and important updates.
                 You can unsubscribe at any time.
               </p>
@@ -215,7 +215,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
                   type="button"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                  className="px-6 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>

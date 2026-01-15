@@ -89,11 +89,11 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 p-6">
+      <div className="min-h-screen bg-gray-900 p-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-1/3"></div>
-            <div className="h-64 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            <div className="h-8 bg-gray-800 rounded w-1/3"></div>
+            <div className="h-64 bg-gray-800 rounded"></div>
           </div>
         </div>
       </div>
@@ -102,11 +102,11 @@ export default function ProjectDetailPage() {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 p-6">
+      <div className="min-h-screen bg-gray-900 p-6">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
-            <p className="text-red-600 dark:text-red-400">{error || 'Project not found'}</p>
-            <Link href="/projects" className="text-red-600 dark:text-red-400 underline mt-4 inline-block">
+          <div className="bg-red-900/20 border border-red-800 rounded-xl p-6">
+            <p className="text-red-400">{error || 'Project not found'}</p>
+            <Link href="/projects" className="text-red-400 underline mt-4 inline-block">
               ← Back to Projects
             </Link>
           </div>
@@ -116,11 +116,11 @@ export default function ProjectDetailPage() {
   }
 
   const statusConfig = {
-    planning: { label: 'Planning', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-    'in-progress': { label: 'In Progress', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' },
-    completed: { label: 'Completed', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
-    'on-hold': { label: 'On Hold', color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400' },
-    cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+    planning: { label: 'Planning', color: 'bg-blue-100 bg-blue-900/30 text-blue-400' },
+    'in-progress': { label: 'In Progress', color: 'bg-yellow-100 bg-yellow-900/30 text-yellow-400' },
+    completed: { label: 'Completed', color: 'bg-green-100 bg-green-900/30 text-green-400' },
+    'on-hold': { label: 'On Hold', color: 'bg-gray-100 bg-gray-900/30 text-gray-400' },
+    cancelled: { label: 'Cancelled', color: 'bg-red-100 bg-red-900/30 text-red-400' },
   };
 
   const priorityConfig = {
@@ -138,16 +138,16 @@ export default function ProjectDetailPage() {
   const isOverBudget = project.budget_variance < 0;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/projects"
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-800 transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ArrowLeft className="w-5 h-5 text-gray-400" />
             </Link>
             <div>
               <div className="flex items-center gap-3">
@@ -156,7 +156,7 @@ export default function ProjectDetailPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{project.name}</h1>
+                    <h1 className="text-2xl font-bold text-white">{project.name}</h1>
                     <span className={priorityInfo.color}>{priorityInfo.icon}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
@@ -164,7 +164,7 @@ export default function ProjectDetailPage() {
                       {statusInfo.label}
                     </span>
                     {project.location && (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-gray-400">
                         📍 {project.location}
                       </span>
                     )}
@@ -177,14 +177,14 @@ export default function ProjectDetailPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => router.push(`/projects/${projectId}/edit`)}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-2"
             >
               <Edit className="w-4 h-4" />
               Edit
             </button>
             <button
               onClick={handleDelete}
-              className="px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -194,30 +194,30 @@ export default function ProjectDetailPage() {
 
         {/* Budget Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Estimated Budget</p>
+              <p className="text-sm text-gray-400">Estimated Budget</p>
               <DollarSign className="w-4 h-4 text-gray-400" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-white">
               ${project.estimated_budget?.toLocaleString() || '0'}
             </p>
           </div>
 
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Actual Cost</p>
+              <p className="text-sm text-gray-400">Actual Cost</p>
               <DollarSign className="w-4 h-4 text-gray-400" />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-white">
               ${project.actual_cost.toLocaleString()}
             </p>
             <div className="mt-2">
               <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-gray-500 dark:text-gray-400">Budget Used</span>
+                <span className="text-gray-400">Budget Used</span>
                 <span className="font-medium">{budgetProgress.toFixed(0)}%</span>
               </div>
-              <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all ${
                     isOverBudget ? 'bg-red-500' : 'bg-gradient-to-r from-amber-500 to-amber-600'
@@ -230,12 +230,12 @@ export default function ProjectDetailPage() {
 
           <div className={`rounded-xl p-6 ${
             isOverBudget
-              ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-              : 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+              ? 'bg-red-900/20 border border-red-800'
+              : 'bg-green-900/20 border border-green-800'
           }`}>
             <div className="flex items-center justify-between mb-2">
               <p className={`text-sm font-medium ${
-                isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+                isOverBudget ? 'text-red-400' : 'text-green-400'
               }`}>
                 Variance
               </p>
@@ -246,12 +246,12 @@ export default function ProjectDetailPage() {
               )}
             </div>
             <p className={`text-2xl font-bold ${
-              isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+              isOverBudget ? 'text-red-400' : 'text-green-400'
             }`}>
               {isOverBudget ? '-' : '+'}${Math.abs(project.budget_variance).toLocaleString()}
             </p>
             <p className="text-xs mt-1">
-              <span className={isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+              <span className={isOverBudget ? 'text-red-400' : 'text-green-400'}>
                 {Math.abs(project.variance_percentage)}% {isOverBudget ? 'over' : 'under'} budget
               </span>
             </p>
@@ -259,7 +259,7 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-gray-700">
           <div className="flex gap-6">
             {[
               { id: 'overview' as TabType, label: 'Overview', icon: FileText },
@@ -271,14 +271,14 @@ export default function ProjectDetailPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-amber-500 text-amber-600 dark:text-amber-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? 'border-amber-500 text-amber-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
                 {tab.count !== undefined && (
-                  <span className="ml-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-medium">
+                  <span className="ml-1 px-2 py-0.5 rounded-full bg-gray-800 text-xs font-medium">
                     {tab.count}
                   </span>
                 )}
@@ -292,21 +292,21 @@ export default function ProjectDetailPage() {
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {project.description && (
-                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Description</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{project.description}</p>
+                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                  <h3 className="font-semibold text-white mb-3">Description</h3>
+                  <p className="text-gray-400">{project.description}</p>
                 </div>
               )}
 
-              <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Timeline</h3>
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                <h3 className="font-semibold text-white mb-4">Timeline</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {project.start_date && (
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Start Date</p>
+                      <p className="text-sm text-gray-400 mb-1">Start Date</p>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        <p className="text-gray-900 dark:text-white">
+                        <p className="text-white">
                           {new Date(project.start_date).toLocaleDateString()}
                         </p>
                       </div>
@@ -314,10 +314,10 @@ export default function ProjectDetailPage() {
                   )}
                   {project.estimated_completion_date && (
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Estimated Completion</p>
+                      <p className="text-sm text-gray-400 mb-1">Estimated Completion</p>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        <p className="text-gray-900 dark:text-white">
+                        <p className="text-white">
                           {new Date(project.estimated_completion_date).toLocaleDateString()}
                         </p>
                       </div>
@@ -325,10 +325,10 @@ export default function ProjectDetailPage() {
                   )}
                   {project.actual_completion_date && (
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Actual Completion</p>
+                      <p className="text-sm text-gray-400 mb-1">Actual Completion</p>
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-green-500" />
-                        <p className="text-gray-900 dark:text-white">
+                        <p className="text-white">
                           {new Date(project.actual_completion_date).toLocaleDateString()}
                         </p>
                       </div>
@@ -338,13 +338,13 @@ export default function ProjectDetailPage() {
               </div>
 
               {project.tags && project.tags.length > 0 && (
-                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Tags</h3>
+                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                  <h3 className="font-semibold text-white mb-3">Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300"
+                        className="px-3 py-1 rounded-full bg-gray-700 text-sm text-gray-300"
                       >
                         #{tag}
                       </span>
@@ -358,25 +358,25 @@ export default function ProjectDetailPage() {
           {activeTab === 'expenses' && (
             <div className="space-y-4">
               {expenses.length === 0 ? (
-                <div className="bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center">
+                <div className="bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl p-12 text-center">
                   <Receipt className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No expenses yet</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <h3 className="text-lg font-semibold text-white mb-2">No expenses yet</h3>
+                  <p className="text-sm text-gray-400">
                     Link expenses to this project to track costs
                   </p>
                 </div>
               ) : (
-                <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl divide-y divide-gray-200 dark:divide-gray-700">
+                <div className="bg-gray-800 border border-gray-700 rounded-xl divide-y divide-gray-700">
                   {expenses.map((expense) => (
-                    <div key={expense.id} className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                    <div key={expense.id} className="p-4 hover:bg-gray-700/50 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white">{expense.description}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="font-medium text-white">{expense.description}</p>
+                          <p className="text-sm text-gray-400 mt-1">
                             {expense.date ? new Date(expense.date).toLocaleDateString() : 'N/A'} • {expense.category}
                           </p>
                         </div>
-                        <p className="text-lg font-bold text-gray-900 dark:text-white">
+                        <p className="text-lg font-bold text-white">
                           ${expense.amount.toLocaleString()}
                         </p>
                       </div>
@@ -390,18 +390,18 @@ export default function ProjectDetailPage() {
           {activeTab === 'photos' && (
             <div>
               {photos.length === 0 ? (
-                <div className="bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center">
+                <div className="bg-gray-800 border-2 border-dashed border-gray-600 rounded-xl p-12 text-center">
                   <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No photos yet</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <h3 className="text-lg font-semibold text-white mb-2">No photos yet</h3>
+                  <p className="text-sm text-gray-400">
                     Add before/after photos to document your project
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {photos.map((photo) => (
-                    <div key={photo.id} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                      <div className="aspect-video bg-gray-200 dark:bg-gray-700">
+                    <div key={photo.id} className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
+                      <div className="aspect-video bg-gray-700">
                         {/* Photo image would go here */}
                         <div className="w-full h-full flex items-center justify-center">
                           <ImageIcon className="w-12 h-12 text-gray-400" />
@@ -409,9 +409,9 @@ export default function ProjectDetailPage() {
                       </div>
                       <div className="p-4">
                         {photo.title && (
-                          <p className="font-medium text-gray-900 dark:text-white mb-1">{photo.title}</p>
+                          <p className="font-medium text-white mb-1">{photo.title}</p>
                         )}
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-gray-400">
                           {photo.photo_type} • {new Date(photo.taken_date).toLocaleDateString()}
                         </p>
                       </div>

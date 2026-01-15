@@ -33,20 +33,20 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
 
   const colorMap = {
     green: {
-      bg: 'bg-green-100 dark:bg-green-900/30',
-      text: 'text-green-700 dark:text-green-300',
+      bg: 'bg-green-900/30',
+      text: 'text-green-300',
       ring: 'ring-green-500',
       bar: 'bg-green-500',
     },
     amber: {
-      bg: 'bg-amber-100 dark:bg-amber-900/30',
-      text: 'text-amber-700 dark:text-amber-300',
+      bg: 'bg-amber-900/30',
+      text: 'text-amber-300',
       ring: 'ring-amber-500',
       bar: 'bg-amber-500',
     },
     red: {
-      bg: 'bg-red-100 dark:bg-red-900/30',
-      text: 'text-red-700 dark:text-red-300',
+      bg: 'bg-red-900/30',
+      text: 'text-red-300',
       ring: 'ring-red-500',
       bar: 'bg-red-500',
     },
@@ -65,22 +65,22 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg p-5 border-2 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all ${className}`}
+      className={`bg-gray-800 rounded-lg p-5 border-2 border-gray-700 hover:shadow-lg transition-all ${className}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 truncate">
+          <h3 className="text-lg font-semibold text-white mb-1 truncate">
             {pattern.pattern_name}
           </h3>
           {pattern.merchant_name && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+            <p className="text-sm text-gray-400 truncate">
               {pattern.merchant_name}
             </p>
           )}
           {pattern.category && (
             <div className="inline-block mt-1">
-              <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+              <span className="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded-full">
                 {pattern.category}
               </span>
             </div>
@@ -102,7 +102,7 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
 
       {/* Confidence Bar */}
       <div className="mb-4">
-        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
           <div
             className={`h-full ${confidenceColors.bar} transition-all`}
             style={{ width: `${pattern.confidence_score}%` }}
@@ -113,42 +113,42 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
       {/* Pattern Details Grid */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         {/* Average Amount */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+        <div className="bg-gray-900 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <DollarSign className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Avg. Amount</span>
+            <span className="text-xs text-gray-400">Avg. Amount</span>
           </div>
-          <div className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-lg font-bold text-white">
             ${pattern.average_amount.toLocaleString()}
           </div>
           {pattern.amount_variance > 0 && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-400">
               ±${pattern.amount_variance.toFixed(2)}
             </div>
           )}
         </div>
 
         {/* Frequency */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+        <div className="bg-gray-900 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <RefreshCw className="w-4 h-4 text-blue-600" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Frequency</span>
+            <span className="text-xs text-gray-400">Frequency</span>
           </div>
-          <div className="text-sm font-semibold text-gray-900 dark:text-white">
+          <div className="text-sm font-semibold text-white">
             {FREQUENCY_LABELS[pattern.frequency] || pattern.frequency}
           </div>
         </div>
 
         {/* Occurrences */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+        <div className="bg-gray-900 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="w-4 h-4 text-purple-600" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Occurrences</span>
+            <span className="text-xs text-gray-400">Occurrences</span>
           </div>
-          <div className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-lg font-bold text-white">
             {pattern.occurrence_count}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-400">
             {new Date(pattern.first_occurrence).toLocaleDateString('en-US', {
               month: 'short',
               year: 'numeric',
@@ -162,14 +162,14 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
         </div>
 
         {/* Next Expected */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+        <div className="bg-gray-900 rounded-lg p-3">
           <div className="flex items-center gap-2 mb-1">
             <Calendar className="w-4 h-4 text-amber-600" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Next Expected</span>
+            <span className="text-xs text-gray-400">Next Expected</span>
           </div>
-          <div className="text-sm font-semibold text-gray-900 dark:text-white">{nextDate}</div>
+          <div className="text-sm font-semibold text-white">{nextDate}</div>
           {pattern.next_expected_amount && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-400">
               ~${pattern.next_expected_amount.toLocaleString()}
             </div>
           )}
@@ -179,19 +179,19 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
       {/* Status Indicators */}
       <div className="flex items-center gap-2 mb-4 text-xs">
         {pattern.user_confirmed && (
-          <div className="flex items-center gap-1 px-2 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-full">
+          <div className="flex items-center gap-1 px-2 py-1 bg-green-900/20 text-green-300 rounded-full">
             <CheckCircle2 className="w-3 h-3" />
             <span>Confirmed</span>
           </div>
         )}
         {pattern.user_ignored && (
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-700 text-gray-400 rounded-full">
             <AlertCircle className="w-3 h-3" />
             <span>Ignored</span>
           </div>
         )}
         {pattern.auto_created && (
-          <div className="flex items-center gap-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full">
+          <div className="flex items-center gap-1 px-2 py-1 bg-blue-900/20 text-blue-300 rounded-full">
             <span>Auto-detected</span>
           </div>
         )}
@@ -217,7 +217,7 @@ export function PatternCard({ pattern, onAction, isProcessing = false, className
           <button
             onClick={() => onAction('ignore')}
             disabled={isProcessing}
-            className="px-3 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Ignore
           </button>

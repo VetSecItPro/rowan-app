@@ -37,7 +37,7 @@ export function MentionHighlight({
           return (
             <span
               key={index}
-              className="font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-1 rounded cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+              className="font-semibold text-green-400 bg-green-900/20 px-1 rounded cursor-pointer hover:bg-green-900/30 transition-colors"
               title={`Mentioned: ${mentionText}`}
             >
               {part}

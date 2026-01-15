@@ -102,13 +102,13 @@ const MetricCard = memo(function MetricCard({
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+    <div className="bg-gray-800 rounded-lg p-4">
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 truncate">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{value}</p>
+          <p className="text-xs font-medium text-gray-400 truncate">{title}</p>
+          <p className="text-2xl font-bold text-white mt-1">{value}</p>
           {subtitle && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
           )}
         </div>
         <div className={`w-10 h-10 ${colorClasses[color].bg} rounded-lg flex items-center justify-center flex-shrink-0 opacity-80`}>
@@ -138,7 +138,7 @@ const TrafficChart = memo(function TrafficChart({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-center justify-between text-xs text-gray-400">
         <span>Page views over time</span>
         <span className="font-medium">{totalViews} total</span>
       </div>
@@ -210,14 +210,14 @@ const HorizontalBarChart = memo(function HorizontalBarChart({
       {slicedData.map((item, i) => (
         <div key={i} className="space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-700 dark:text-gray-300 truncate max-w-[120px]">
+            <span className="text-gray-300 truncate max-w-[120px]">
               {item[labelKey]}
             </span>
-            <span className="text-gray-500 dark:text-gray-400 font-medium">
+            <span className="text-gray-400 font-medium">
               {item[valueKey]} ({item.percentage}%)
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+          <div className="w-full bg-gray-700 rounded-full h-1.5">
             <div
               className={`h-1.5 rounded-full transition-all duration-500 ${colorClasses[color]}`}
               style={{ width: `${((item[valueKey] as number) / maxValue) * 100}%` }}
@@ -243,19 +243,19 @@ const TopPagesChart = memo(function TopPagesChart({ pages }: { pages: TopPage[] 
     <div className="space-y-2">
       {pages.slice(0, 6).map((page, i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-xs font-medium text-cyan-700 dark:text-cyan-400">
+          <div className="w-6 h-6 rounded-full bg-cyan-900/30 flex items-center justify-center text-xs font-medium text-cyan-400">
             {i + 1}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+              <span className="text-sm text-gray-300 truncate">
                 {page.page}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+              <span className="text-xs text-gray-400 ml-2">
                 {page.views} views
               </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 mt-1">
+            <div className="w-full bg-gray-700 rounded-full h-1 mt-1">
               <div
                 className="h-1 rounded-full bg-cyan-500 transition-all duration-500"
                 style={{ width: `${(page.views / maxViews) * 100}%` }}
@@ -366,7 +366,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Loading analytics...</span>
+        <span className="ml-3 text-sm text-gray-400">Loading analytics...</span>
       </div>
     );
   }
@@ -382,8 +382,8 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 timeRange === range
-                  ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-cyan-100 bg-cyan-900/30 text-cyan-400'
+                  : 'text-gray-400 hover:bg-gray-700'
               }`}
             >
               {range === '7d' ? '7 days' : range === '30d' ? '30 days' : '90 days'}
@@ -392,7 +392,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
         </div>
         <button
           onClick={handleRefresh}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh
@@ -403,7 +403,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Eye className="w-4 h-4 text-cyan-500" />
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Traffic Overview</h3>
+          <h3 className="text-sm font-semibold text-white">Traffic Overview</h3>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <MetricCard
@@ -438,10 +438,10 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       </div>
 
       {/* Traffic Chart */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      <div className="bg-gray-800 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp className="w-4 h-4 text-cyan-500" />
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Traffic Trends</h3>
+          <h3 className="text-sm font-semibold text-white">Traffic Trends</h3>
         </div>
         <TrafficChart data={data.trafficTrends || []} />
       </div>
@@ -449,19 +449,19 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       {/* Two Column Layout for breakdowns */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Top Pages */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <MousePointer className="w-4 h-4 text-cyan-500" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Top Pages</h3>
+            <h3 className="text-sm font-semibold text-white">Top Pages</h3>
           </div>
           <TopPagesChart pages={data.topPages || []} />
         </div>
 
         {/* Hourly Activity */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Clock className="w-4 h-4 text-purple-500" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Activity by Hour</h3>
+            <h3 className="text-sm font-semibold text-white">Activity by Hour</h3>
           </div>
           <HourlyActivityChart data={data.hourlyActivity || []} />
         </div>
@@ -470,10 +470,10 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       {/* Three Column Layout for device/browser/OS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Device Breakdown */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Monitor className="w-4 h-4 text-blue-500" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Devices</h3>
+            <h3 className="text-sm font-semibold text-white">Devices</h3>
           </div>
           <HorizontalBarChart
             data={data.deviceBreakdown || []}
@@ -484,10 +484,10 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
         </div>
 
         {/* Browser Breakdown */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Globe className="w-4 h-4 text-green-500" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Browsers</h3>
+            <h3 className="text-sm font-semibold text-white">Browsers</h3>
           </div>
           <HorizontalBarChart
             data={data.browserBreakdown || []}
@@ -498,10 +498,10 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
         </div>
 
         {/* OS Breakdown */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+        <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Layers className="w-4 h-4 text-orange-500" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Operating Systems</h3>
+            <h3 className="text-sm font-semibold text-white">Operating Systems</h3>
           </div>
           <HorizontalBarChart
             data={data.osBreakdown || []}
@@ -513,41 +513,41 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       </div>
 
       {/* Beta Program Summary */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      <div className="bg-gray-800 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
           <BarChart3 className="w-4 h-4 text-pink-500" />
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Beta Program Summary</h3>
+          <h3 className="text-sm font-semibold text-white">Beta Program Summary</h3>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-white">
               {data.summary.totalBetaRequests}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Beta Requests</p>
+            <p className="text-xs text-gray-400">Beta Requests</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-white">
               {data.summary.activeBetaUsers}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Active Users</p>
+            <p className="text-xs text-gray-400">Active Users</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-white">
               {data.betaMetrics.approvalRate}%
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Approval Rate</p>
+            <p className="text-xs text-gray-400">Approval Rate</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-white">
               {data.betaMetrics.conversionRate}%
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Conversion Rate</p>
+            <p className="text-xs text-gray-400">Conversion Rate</p>
           </div>
         </div>
       </div>
 
       {/* Data Note */}
-      <div className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
+      <div className="text-xs text-gray-500 text-center py-2">
         Analytics data is cached for 15 minutes. Click refresh to get latest data.
       </div>
     </div>

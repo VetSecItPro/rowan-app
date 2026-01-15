@@ -116,13 +116,13 @@ export default function MyFeedbackPage() {
   const getStatusColor = (status: FeedbackStatus) => {
     switch (status) {
       case FeedbackStatus.NEW:
-        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+        return 'bg-blue-900 text-blue-200';
       case FeedbackStatus.IN_PROGRESS:
-        return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+        return 'bg-yellow-900 text-yellow-200';
       case FeedbackStatus.RESOLVED:
-        return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+        return 'bg-green-900 text-green-200';
       case FeedbackStatus.WONT_FIX:
-        return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+        return 'bg-gray-700 text-gray-200';
     }
   };
 
@@ -130,7 +130,7 @@ export default function MyFeedbackPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
         </div>
       </>
@@ -140,7 +140,7 @@ export default function MyFeedbackPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -149,10 +149,10 @@ export default function MyFeedbackPage() {
                 <MessageSquare className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-white">
                   My Feedback
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-400">
                   View and manage your feedback submissions
                 </p>
               </div>
@@ -161,12 +161,12 @@ export default function MyFeedbackPage() {
 
           {/* Feedback List */}
           {feedback.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-12 text-center">
               <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 No feedback submitted yet
               </h3>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-400">
                 Click the feedback button in the header to submit your first feedback
               </p>
             </div>
@@ -175,13 +175,13 @@ export default function MyFeedbackPage() {
               {feedback.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+                  className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:shadow-lg transition-shadow"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
                       {getTypeIcon(item.feedback_type)}
-                      <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                      <span className="text-sm font-medium text-white capitalize">
                         {item.feedback_type?.replace('_', ' ') || 'General'}
                       </span>
                     </div>
@@ -217,18 +217,18 @@ export default function MyFeedbackPage() {
                   {/* Feature */}
                   {item.feature_name && (
                     <div className="mb-3">
-                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Feature: </span>
-                      <span className="text-sm text-gray-900 dark:text-white">{item.feature_name}</span>
+                      <span className="text-xs font-medium text-gray-400">Feature: </span>
+                      <span className="text-sm text-white">{item.feature_name}</span>
                     </div>
                   )}
 
                   {/* Description */}
-                  <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 mb-4">
+                  <p className="text-sm text-gray-300 line-clamp-3 mb-4">
                     {item.description}
                   </p>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between text-xs text-gray-400 pt-4 border-t border-gray-700">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {new Date(item.created_at).toLocaleDateString()}
@@ -243,9 +243,9 @@ export default function MyFeedbackPage() {
 
                   {/* Admin Notes Preview */}
                   {item.admin_notes && (
-                    <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                      <div className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1">Admin Response:</div>
-                      <p className="text-xs text-purple-600 dark:text-purple-400 line-clamp-2">{item.admin_notes}</p>
+                    <div className="mt-3 p-3 bg-purple-900/20 rounded-lg border border-purple-800">
+                      <div className="text-xs font-medium text-purple-300 mb-1">Admin Response:</div>
+                      <p className="text-xs text-purple-400 line-clamp-2">{item.admin_notes}</p>
                     </div>
                   )}
                 </div>
@@ -258,12 +258,12 @@ export default function MyFeedbackPage() {
       {/* Detail Modal */}
       {showDetailModal && selectedFeedback && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Feedback Details</h2>
+          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-xl shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-gray-800 bg-gray-900">
+              <h2 className="text-2xl font-bold text-white">Feedback Details</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-lg text-gray-400 hover:bg-gray-800 transition-colors"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -273,30 +273,30 @@ export default function MyFeedbackPage() {
               {/* Metadata */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Type</h3>
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Type</h3>
                   <div className="flex items-center gap-2">
                     {getTypeIcon(selectedFeedback.feedback_type)}
-                    <span className="text-gray-900 dark:text-white capitalize">
+                    <span className="text-white capitalize">
                       {selectedFeedback.feedback_type?.replace('_', ' ') || 'General'}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</h3>
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Status</h3>
                   <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedFeedback.status)}`}>
                     {getStatusIcon(selectedFeedback.status)}
                     {getStatusLabel(selectedFeedback.status)}
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Feature/Page</h3>
-                  <span className="text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Feature/Page</h3>
+                  <span className="text-white">
                     {selectedFeedback.feature_name || 'Not specified'}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Submitted</h3>
-                  <span className="text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Submitted</h3>
+                  <span className="text-white">
                     {new Date(selectedFeedback.created_at).toLocaleString()}
                   </span>
                 </div>
@@ -305,7 +305,7 @@ export default function MyFeedbackPage() {
               {/* Page URL */}
               {selectedFeedback.page_url && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Page URL</h3>
+                  <h3 className="text-sm font-medium text-gray-400 mb-1">Page URL</h3>
                   <a
                     href={selectedFeedback.page_url}
                     target="_blank"
@@ -320,8 +320,8 @@ export default function MyFeedbackPage() {
 
               {/* Description */}
               <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Description</h3>
-                <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                <h3 className="text-sm font-medium text-gray-400 mb-2">Description</h3>
+                <p className="text-white whitespace-pre-wrap">
                   {selectedFeedback.description}
                 </p>
               </div>
@@ -329,8 +329,8 @@ export default function MyFeedbackPage() {
               {/* Screenshot */}
               {selectedFeedback.screenshot_url && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Screenshot</h3>
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-2">
+                  <h3 className="text-sm font-medium text-gray-400 mb-2">Screenshot</h3>
+                  <div className="border border-gray-700 rounded-lg p-2">
                     <Image
                       src={selectedFeedback.screenshot_url}
                       alt="Feedback screenshot"
@@ -344,16 +344,16 @@ export default function MyFeedbackPage() {
 
               {/* Admin Notes */}
               {selectedFeedback.admin_notes && (
-                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-                  <h3 className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-2">Admin Response</h3>
-                  <p className="text-gray-900 dark:text-white whitespace-pre-wrap">
+                <div className="bg-purple-900/20 rounded-lg p-4 border border-purple-800">
+                  <h3 className="text-sm font-medium text-purple-300 mb-2">Admin Response</h3>
+                  <p className="text-white whitespace-pre-wrap">
                     {selectedFeedback.admin_notes}
                   </p>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-800">
                 <button
                   onClick={() => deleteFeedback(selectedFeedback.id)}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
@@ -362,7 +362,7 @@ export default function MyFeedbackPage() {
                 </button>
                 <button
                   onClick={() => setShowDetailModal(false)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  className="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   Close
                 </button>

@@ -231,11 +231,11 @@ export default function LoginPage() {
   // Show loading state when processing auth callback (magic link, OAuth)
   if (isProcessingCallback) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950 dark:via-teal-950 dark:to-cyan-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 from-emerald-950 to-cyan-950">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Signing you in...</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Please wait a moment</p>
+          <h2 className="text-xl font-semibold text-white">Signing you in...</h2>
+          <p className="text-gray-400 mt-2">Please wait a moment</p>
         </div>
       </div>
     );
@@ -245,7 +245,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col lg:flex-row transition-all duration-500">
       {/* Mobile Header - Green section with logo */}
       <div
-        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
       >
         <Link href="/" className="flex flex-col items-center group">
@@ -264,7 +264,7 @@ export default function LoginPage() {
 
       {/* Desktop Left side - Branding */}
       <div
-        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
           }`}
       >
 
@@ -284,10 +284,10 @@ export default function LoginPage() {
             </h1>
           </Link>
 
-          <p className="text-lg xl:text-xl text-emerald-100 dark:text-emerald-200 mb-8 text-center px-4">
+          <p className="text-lg xl:text-xl text-emerald-200 mb-8 text-center px-4">
             Collaborative life management for couples and families
           </p>
-          <div className="space-y-4 text-lg text-emerald-100 dark:text-emerald-200 max-w-md mx-auto">
+          <div className="space-y-4 text-lg text-emerald-200 max-w-md mx-auto">
             <p className="flex items-center gap-3">
               <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Shared calendars & task management
@@ -306,20 +306,20 @@ export default function LoginPage() {
 
       {/* Right side - Login form */}
       <div
-        className="flex-1 lg:w-1/2 bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4 sm:p-8"
+        className="flex-1 lg:w-1/2 bg-gray-950 flex items-center justify-center p-4 sm:p-8"
       >
         <motion.div
-          className="w-full max-w-md bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800/50"
+          className="w-full max-w-md bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-800/50"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           {/* Header */}
           <motion.div className="mb-8" variants={itemVariants}>
-            <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
+            <h2 className="text-4xl font-extrabold text-white mb-2 tracking-tight">
               Welcome Back
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-gray-400 text-lg">
               Sign in to continue your journey
             </p>
           </motion.div>
@@ -331,7 +331,7 @@ export default function LoginPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-6 bg-green-50/50 dark:bg-green-900/10 border border-green-200/50 dark:border-green-800/50 text-green-600 dark:text-green-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
+                className="mb-6 bg-green-900/10 border border-green-800/50 text-green-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
               >
                 {successMessage}
               </motion.div>
@@ -345,7 +345,7 @@ export default function LoginPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mb-6 bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/50 text-red-600 dark:text-red-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
+                className="mb-6 bg-red-900/10 border border-red-800/50 text-red-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
               >
                 {error}
               </motion.div>
@@ -356,16 +356,16 @@ export default function LoginPage() {
           {magicLinkSent ? (
             <motion.div className="space-y-6" variants={itemVariants}>
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-xl font-semibold text-white mb-2">
                   Check your email!
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  We sent a magic link to <strong className="text-gray-900 dark:text-white">{email}</strong>
+                <p className="text-gray-400 mb-4">
+                  We sent a magic link to <strong className="text-white">{email}</strong>
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-500">
+                <p className="text-sm text-gray-500">
                   Click the link in your email to sign in instantly. The link expires in 15 minutes.
                 </p>
               </div>
@@ -376,7 +376,7 @@ export default function LoginPage() {
                   setUseMagicLink(false);
                   setEmail('');
                 }}
-                className="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
+                className="w-full text-gray-400 hover:text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to login options
@@ -387,7 +387,7 @@ export default function LoginPage() {
             <motion.form onSubmit={handleMagicLinkRequest} className="space-y-6" variants={itemVariants}>
               {/* Email field */}
               <div>
-                <label htmlFor="magic-email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                <label htmlFor="magic-email" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                   Email Address
                 </label>
                 <div className="relative group">
@@ -398,7 +398,7 @@ export default function LoginPage() {
                     inputMode="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                    className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                     placeholder="john@example.com"
                     required
                     autoComplete="email"
@@ -406,7 +406,7 @@ export default function LoginPage() {
                     autoFocus
                   />
                 </div>
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 ml-1">
+                <p className="mt-2 text-xs text-gray-400 ml-1">
                   We'll send you a link to sign in without a password.
                 </p>
               </div>
@@ -415,7 +415,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
+                className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -434,7 +434,7 @@ export default function LoginPage() {
                   setUseMagicLink(false);
                   setError('');
                 }}
-                className="w-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-semibold py-2 transition-all duration-200 flex items-center justify-center gap-2"
+                className="w-full text-gray-400 hover:text-white font-semibold py-2 transition-all duration-200 flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Sign in with password instead
@@ -445,7 +445,7 @@ export default function LoginPage() {
             <motion.form onSubmit={handleSubmit} className="space-y-6" variants={itemVariants}>
               {/* Email field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                   Email Address
                 </label>
                 <div className="relative group">
@@ -456,7 +456,7 @@ export default function LoginPage() {
                     inputMode="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                    className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                     placeholder="john@example.com"
                     required
                     autoComplete="email"
@@ -467,7 +467,7 @@ export default function LoginPage() {
 
               {/* Password field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                   Password
                 </label>
                 <div className="relative group">
@@ -477,7 +477,7 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-14 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                    className="w-full pl-12 pr-14 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                     placeholder="••••••••"
                     required
                     autoComplete="current-password"
@@ -485,7 +485,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 p-2"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors duration-200 p-2"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
@@ -501,7 +501,7 @@ export default function LoginPage() {
               <div className="flex justify-end pr-1">
                 <Link
                   href="/forgot-password"
-                  className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-200"
+                  className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors duration-200"
                 >
                   Forgot password?
                 </Link>
@@ -511,7 +511,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -526,10 +526,10 @@ export default function LoginPage() {
               {/* Divider */}
               <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                  <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm text-gray-500 dark:text-gray-400 font-medium tracking-wider uppercase text-[10px]">or continued with</span>
+                  <span className="px-4 bg-gray-900/70 backdrop-blur-sm text-gray-400 font-medium tracking-wider uppercase text-[10px]">or continued with</span>
                 </div>
               </div>
 
@@ -540,7 +540,7 @@ export default function LoginPage() {
                   setUseMagicLink(true);
                   setError('');
                 }}
-                className="w-full bg-gray-100/50 dark:bg-gray-800/50 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-700 shadow-sm transform hover:-translate-y-0.5"
+                className="w-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-300 font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 border border-gray-700 shadow-sm transform hover:-translate-y-0.5"
               >
                 <Sparkles className="w-5 h-5 text-purple-500" />
                 Sign in with Magic Link
@@ -550,11 +550,11 @@ export default function LoginPage() {
 
           {/* Sign up link */}
           <motion.div className="mt-8 text-center" variants={itemVariants}>
-            <p className="text-gray-600 dark:text-gray-400 text-md">
+            <p className="text-gray-400 text-md">
               Don't have an account?{' '}
               <Link
                 href="/signup"
-                className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold transition-all duration-200 hover:underline"
+                className="text-emerald-400 hover:text-emerald-300 font-bold transition-all duration-200 hover:underline"
               >
                 Create Account
               </Link>

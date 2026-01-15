@@ -145,7 +145,7 @@ export function GoalCheckInModal({
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -167,7 +167,7 @@ export function GoalCheckInModal({
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Progress Slider */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               How's your progress? ({formData.progress_percentage}%)
             </label>
             <div className="space-y-4">
@@ -178,12 +178,12 @@ export function GoalCheckInModal({
                 step="5"
                 value={formData.progress_percentage}
                 onChange={(e) => setFormData({ ...formData, progress_percentage: parseInt(e.target.value) })}
-                className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                 style={{
                   background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${formData.progress_percentage}%, #e5e7eb ${formData.progress_percentage}%, #e5e7eb 100%)`
                 }}
               />
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex justify-between text-xs text-gray-400">
                 <span>0%</span>
                 <span>25%</span>
                 <span>50%</span>
@@ -195,7 +195,7 @@ export function GoalCheckInModal({
 
           {/* Mood Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               How are you feeling about this goal?
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -206,8 +206,8 @@ export function GoalCheckInModal({
                   onClick={() => setFormData({ ...formData, mood: mood.value })}
                   className={`p-4 rounded-xl border-2 transition-all text-center ${
                     formData.mood === mood.value
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                      ? 'border-blue-500 bg-blue-900/30'
+                      : 'border-gray-600 hover:border-gray-500'
                   }`}
                 >
                   <div className="text-2xl mb-2">{mood.emoji}</div>
@@ -219,7 +219,7 @@ export function GoalCheckInModal({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Progress Notes
             </label>
             <textarea
@@ -227,13 +227,13 @@ export function GoalCheckInModal({
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Share what you've accomplished, what's working well, or any insights..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white"
             />
           </div>
 
           {/* Blockers */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Any challenges or blockers?
             </label>
             <textarea
@@ -241,17 +241,17 @@ export function GoalCheckInModal({
               onChange={(e) => setFormData({ ...formData, blockers: e.target.value })}
               placeholder="What's standing in your way? What obstacles have you encountered?"
               rows={2}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white"
             />
           </div>
 
           {/* Need Help Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-900 rounded-xl">
+          <div className="flex items-center justify-between p-4 bg-gray-900 rounded-xl">
             <div>
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="text-sm font-medium text-gray-300">
                 Need help from your partner?
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <div className="text-xs text-gray-400 mt-1">
                 They'll be notified and can offer support
               </div>
             </div>
@@ -261,7 +261,7 @@ export function GoalCheckInModal({
               className={`relative w-12 h-6 rounded-full transition-colors ${
                 formData.need_help_from_partner
                   ? 'bg-blue-600'
-                  : 'bg-gray-300 dark:bg-gray-600'
+                  : 'bg-gray-600'
               }`}
             >
               <div
@@ -274,7 +274,7 @@ export function GoalCheckInModal({
 
           {/* Voice Note Section */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               Voice Note (Optional)
             </label>
 
@@ -282,7 +282,7 @@ export function GoalCheckInModal({
               <button
                 type="button"
                 onClick={() => setShowVoiceRecorder(true)}
-                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400"
+                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-400"
               >
                 <Plus className="w-5 h-5" />
                 <span>Add Voice Check-In</span>
@@ -298,22 +298,22 @@ export function GoalCheckInModal({
             )}
 
             {voiceNoteBlob && !showVoiceRecorder && (
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+              <div className="p-4 bg-gradient-to-r from-blue-50 from-blue-900/20 to-indigo-900/20 rounded-xl border border-blue-800">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                       <Camera className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                      <div className="text-sm font-medium text-white flex items-center gap-2">
                         Advanced Voice Check-In
                         {voiceNoteMetadata?.category && voiceNoteMetadata.category !== 'general' && (
-                          <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-md capitalize">
+                          <span className="px-2 py-1 text-xs bg-blue-900/30 text-blue-400 rounded-md capitalize">
                             {voiceNoteMetadata.category}
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                      <div className="text-xs text-gray-400 flex items-center gap-2">
                         Duration: {formatDuration(voiceNoteDuration)}
                         {voiceNoteMetadata?.transcription && (
                           <>
@@ -333,24 +333,24 @@ export function GoalCheckInModal({
                   <button
                     type="button"
                     onClick={removeVoiceNote}
-                    className="btn-touch p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors active-press"
+                    className="btn-touch p-2 text-red-600 hover:bg-red-900/30 rounded-lg transition-colors active-press"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
                 {voiceNoteMetadata?.transcription && (
-                  <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-700">
-                    <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
+                  <div className="mt-3 p-3 bg-gray-800 rounded-lg border border-blue-700">
+                    <div className="text-xs font-medium text-blue-400 mb-1">
                       Transcription ({Math.round((voiceNoteMetadata.confidence || 0) * 100)}% confidence):
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <p className="text-sm text-gray-300">
                       {voiceNoteMetadata.transcription}
                     </p>
                     {voiceNoteMetadata.keywords && voiceNoteMetadata.keywords.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {voiceNoteMetadata.keywords.slice(0, 5).map((keyword: string, index: number) => (
-                          <span key={index} className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                          <span key={index} className="px-2 py-1 text-xs bg-gray-700 text-gray-400 rounded">
                             {keyword}
                           </span>
                         ))}
@@ -364,7 +364,7 @@ export function GoalCheckInModal({
 
           {/* Photo Upload Section */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               Progress Photos (Optional)
             </label>
 
@@ -381,7 +381,7 @@ export function GoalCheckInModal({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-600 dark:text-gray-400"
+                className="w-full p-4 rounded-xl border-2 border-dashed border-gray-600 hover:border-blue-400 transition-all flex items-center justify-center gap-3 text-gray-400"
               >
                 <Camera className="w-5 h-5" />
                 <span>Add Progress Photos</span>
@@ -411,7 +411,7 @@ export function GoalCheckInModal({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-gray-700">
             <SecondaryButton
               type="button"
               onClick={onClose}

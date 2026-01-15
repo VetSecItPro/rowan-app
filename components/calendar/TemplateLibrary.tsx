@@ -90,7 +90,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="bg-purple-600 p-6 flex items-center justify-between">
           <div>
@@ -106,7 +106,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
         </div>
 
         {/* Category Filter */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-700">
           <div className="flex gap-2 flex-wrap">
             {categories.map(cat => (
               <button
@@ -115,7 +115,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === cat.value
                     ? 'bg-purple-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
                 <span className="mr-2">{cat.icon}</span>
@@ -136,7 +136,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
               {/* System Templates */}
               {systemTemplates.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
                     <Star className="w-5 h-5 text-yellow-500" />
                     Pre-built Templates
                   </h3>
@@ -145,20 +145,20 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
                       <button
                         key={template.id}
                         onClick={() => handleSelectTemplate(template)}
-                        className="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all text-left group"
+                        className="p-4 border-2 border-gray-700 rounded-xl hover:border-purple-600 hover:bg-purple-900/20 transition-all text-left group"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3 flex-1">
                             <div className="text-3xl">{template.icon || '📅'}</div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-300">
+                              <h4 className="font-semibold text-white group-hover:text-purple-300">
                                 {template.name}
                               </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-gray-400 mt-1">
                                 {template.description}
                               </p>
                               {template.default_duration && (
-                                <div className="flex items-center gap-1 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
                                   <Clock className="w-3 h-3" />
                                   {template.default_duration >= 60
                                     ? `${Math.floor(template.default_duration / 60)}h ${template.default_duration % 60 > 0 ? `${template.default_duration % 60}m` : ''}`
@@ -169,7 +169,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
                             </div>
                           </div>
                           {template.use_count > 0 && (
-                            <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                            <div className="text-xs text-purple-400 font-medium">
                               Used {template.use_count}x
                             </div>
                           )}
@@ -183,7 +183,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
               {/* Custom Templates */}
               {customTemplates.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
                     <Plus className="w-5 h-5 text-purple-600" />
                     Your Custom Templates
                   </h3>
@@ -192,20 +192,20 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
                       <button
                         key={template.id}
                         onClick={() => handleSelectTemplate(template)}
-                        className="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all text-left group relative"
+                        className="p-4 border-2 border-gray-700 rounded-xl hover:border-purple-600 hover:bg-purple-900/20 transition-all text-left group relative"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3 flex-1">
                             <div className="text-3xl">{template.icon || '📅'}</div>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-300">
+                              <h4 className="font-semibold text-white group-hover:text-purple-300">
                                 {template.name}
                               </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-gray-400 mt-1">
                                 {template.description}
                               </p>
                               {template.default_duration && (
-                                <div className="flex items-center gap-1 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
                                   <Clock className="w-3 h-3" />
                                   {template.default_duration >= 60
                                     ? `${Math.floor(template.default_duration / 60)}h ${template.default_duration % 60 > 0 ? `${template.default_duration % 60}m` : ''}`
@@ -217,14 +217,14 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
                           </div>
                           <button
                             onClick={(e) => handleDeleteTemplate(template.id, e)}
-                            className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                            className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-900/30 rounded-lg transition-all"
                             title="Delete template"
                           >
-                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                            <Trash2 className="w-4 h-4 text-red-400" />
                           </button>
                         </div>
                         {template.use_count > 0 && (
-                          <div className="absolute top-3 right-3 text-xs text-purple-600 dark:text-purple-400 font-medium">
+                          <div className="absolute top-3 right-3 text-xs text-purple-400 font-medium">
                             Used {template.use_count}x
                           </div>
                         )}
@@ -238,7 +238,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
               {filteredTemplates.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">📋</div>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-400">
                     No templates found in this category
                   </p>
                 </div>
@@ -248,8 +248,8 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+        <div className="px-6 py-4 border-t border-gray-700 bg-gray-900/50">
+          <p className="text-sm text-gray-400 text-center">
             💡 Tip: Custom templates coming soon! Save your frequently used events as templates.
           </p>
         </div>

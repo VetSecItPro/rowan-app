@@ -175,23 +175,23 @@ export function EditSeriesModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <Calendar className="w-6 h-6 text-purple-600" />
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-xl font-semibold text-white">
                 {isDeleteAction ? 'Delete Recurring Event' : 'Edit Recurring Event'}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 "{event.title}" is part of a recurring series
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+            className="p-2 hover:bg-gray-700 rounded-xl transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -200,16 +200,16 @@ export function EditSeriesModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {isDeleteAction && (
-            <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-              <div className="text-sm text-red-800 dark:text-red-200">
+            <div className="flex items-center gap-3 p-4 bg-red-900/20 border border-red-800 rounded-xl">
+              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <div className="text-sm text-red-200">
                 <strong>Warning:</strong> This action cannot be undone. Choose carefully which events to delete.
               </div>
             </div>
           )}
 
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-gray-300">
               {isDeleteAction
                 ? 'Which events would you like to delete?'
                 : 'Which events would you like to modify?'
@@ -221,12 +221,12 @@ export function EditSeriesModal({
               return (
                 <label
                   key={action}
-                  className={`block cursor-pointer p-4 border-2 rounded-xl transition-all hover:border-purple-300 dark:hover:border-purple-600 ${
+                  className={`block cursor-pointer p-4 border-2 rounded-xl transition-all hover:border-purple-600 ${
                     selectedAction === action
                       ? actionInfo.destructive
-                        ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                        : 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                      : 'border-gray-200 dark:border-gray-600'
+                        ? 'border-red-500 bg-red-900/20'
+                        : 'border-purple-500 bg-purple-900/20'
+                      : 'border-gray-600'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -240,23 +240,23 @@ export function EditSeriesModal({
                         actionInfo.destructive
                           ? 'text-red-600 focus:ring-red-500'
                           : 'text-purple-600 focus:ring-purple-500'
-                      } bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600`}
+                      } bg-gray-100 bg-gray-700 border-gray-600`}
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         {actionInfo.icon}
                         <span className={`font-medium ${
                           actionInfo.destructive
-                            ? 'text-red-900 dark:text-red-100'
-                            : 'text-gray-900 dark:text-white'
+                            ? 'text-red-100'
+                            : 'text-white'
                         }`}>
                           {actionInfo.title}
                         </span>
                       </div>
                       <p className={`text-sm ${
                         actionInfo.destructive
-                          ? 'text-red-700 dark:text-red-200'
-                          : 'text-gray-600 dark:text-gray-300'
+                          ? 'text-red-200'
+                          : 'text-gray-300'
                       }`}>
                         {actionInfo.description}
                       </p>
@@ -268,18 +268,18 @@ export function EditSeriesModal({
           </div>
 
           {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+            <div className="p-4 bg-red-900/20 border border-red-800 rounded-xl">
+              <p className="text-sm text-red-200">{error}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex justify-end gap-3 p-6 border-t border-gray-700">
           <button
             onClick={onClose}
             disabled={isProcessing}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-xl transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

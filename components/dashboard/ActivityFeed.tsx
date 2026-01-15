@@ -143,10 +143,10 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
     return (
       <div className="text-center py-12">
         <Activity className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+        <p className="text-gray-400 text-sm">
           No recent activity yet
         </p>
-        <p className="text-gray-500 dark:text-gray-500 text-xs mt-1">
+        <p className="text-gray-500 text-xs mt-1">
           Activity from your space will appear here
         </p>
       </div>
@@ -175,7 +175,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
             className="block group"
             style={{ animationDelay: `${index * 50}ms` }}
           >
-            <div className="flex items-start gap-3 p-3 rounded-xl bg-white/40 dark:bg-gray-800/40 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-gray-800/80 border border-white/20 dark:border-gray-700/30 hover:border-indigo-500/30 dark:hover:border-indigo-400/30 transition-all duration-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] group-hover:translate-x-1">
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-800/40 backdrop-blur-sm hover:bg-gray-800/80 border border-gray-700/30 hover:border-indigo-400/30 transition-all duration-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] group-hover:translate-x-1">
               {/* Icon */}
               <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform`}>
                 <Icon className="w-4 h-4 text-white" />
@@ -199,12 +199,12 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
                         </span>
                       </div>
                     )}
-                    <span className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                    <span className="text-xs font-medium text-white truncate">
                       {activity.user_name}
                     </span>
                   </div>
                   {/* Time */}
-                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 flex-shrink-0">
+                  <div className="flex items-center gap-1 text-gray-400 flex-shrink-0">
                     <Clock className="w-3 h-3" />
                     <span className="text-[10px]">
                       {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
@@ -213,15 +213,15 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
                 </div>
 
                 {/* Action and Title */}
-                <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
-                  <span className="text-gray-500 dark:text-gray-400">{getActionLabel(activity.action)}</span>
+                <p className="text-sm text-gray-300 line-clamp-2">
+                  <span className="text-gray-400">{getActionLabel(activity.action)}</span>
                   {' '}
                   <span className="font-medium">{activity.title}</span>
                 </p>
               </div>
 
               {/* Arrow */}
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 group-hover:translate-x-1 transition-all flex-shrink-0 mt-2" />
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-300 group-hover:translate-x-1 transition-all flex-shrink-0 mt-2" />
             </div>
           </Link>
         );
@@ -230,7 +230,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
       {/* Loading indicator for infinite scroll */}
       {displayCount < activities.length && (
         <div className="flex items-center justify-center py-4">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-400">
             Scroll for more · {displayCount} of {activities.length}
           </div>
         </div>
@@ -239,7 +239,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
       {/* End of list indicator */}
       {displayCount >= activities.length && activities.length > 10 && (
         <div className="flex items-center justify-center py-4">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-400">
             All activities loaded · {activities.length} total
           </div>
         </div>

@@ -24,36 +24,36 @@ const PROVIDER_CONFIG = {
   google: {
     name: 'Google Calendar',
     icon: '/icons/google-calendar.svg',
-    color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-900/20',
     description: 'Sync events with your Google Calendar',
   },
   apple: {
     name: 'Apple Calendar',
     icon: '/icons/apple-calendar.svg',
-    color: 'text-gray-700 dark:text-gray-300',
-    bgColor: 'bg-gray-50 dark:bg-gray-800/50',
+    color: 'text-gray-300',
+    bgColor: 'bg-gray-800/50',
     description: 'Sync with iCloud Calendar via CalDAV',
   },
   outlook: {
     name: 'Microsoft Outlook',
     icon: '/icons/outlook-calendar.svg',
-    color: 'text-sky-600 dark:text-sky-400',
-    bgColor: 'bg-sky-50 dark:bg-sky-900/20',
+    color: 'text-sky-400',
+    bgColor: 'bg-sky-900/20',
     description: 'Sync with Outlook.com or Microsoft 365 Calendar',
   },
   ics: {
     name: 'ICS Feed',
     icon: '/icons/ics-feed.svg',
-    color: 'text-purple-600 dark:text-purple-400',
-    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-900/20',
     description: 'Import from any ICS calendar feed URL',
   },
   cozi: {
     name: 'Cozi',
     icon: '/icons/cozi.svg',
-    color: 'text-orange-600 dark:text-orange-400',
-    bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-900/20',
     description: 'Import events from your Cozi family calendar',
   },
 };
@@ -61,28 +61,28 @@ const PROVIDER_CONFIG = {
 const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle; color: string; label: string; animate?: boolean }> = {
   active: {
     icon: CheckCircle,
-    color: 'text-green-600 dark:text-green-400',
+    color: 'text-green-400',
     label: 'Connected',
   },
   syncing: {
     icon: RefreshCw,
-    color: 'text-blue-600 dark:text-blue-400',
+    color: 'text-blue-400',
     label: 'Syncing...',
     animate: true,
   },
   error: {
     icon: AlertCircle,
-    color: 'text-red-600 dark:text-red-400',
+    color: 'text-red-400',
     label: 'Error',
   },
   token_expired: {
     icon: Clock,
-    color: 'text-amber-600 dark:text-amber-400',
+    color: 'text-amber-400',
     label: 'Reconnect Required',
   },
   disconnected: {
     icon: Unlink,
-    color: 'text-gray-500 dark:text-gray-400',
+    color: 'text-gray-400',
     label: 'Disconnected',
   },
 };
@@ -611,25 +611,25 @@ export const CalendarConnections = memo(function CalendarConnections() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-white">
           Calendar Integrations
         </h3>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-1 text-sm text-gray-400">
           Connect external calendars to sync events with Rowan. External calendars take priority in case of conflicts.
         </p>
       </div>
 
       {/* Alerts */}
       {error && (
-        <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+        <div className="rounded-lg bg-red-900/20 p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
-            <p className="text-sm text-red-700 dark:text-red-300 mt-1">{error}</p>
+            <p className="text-sm font-medium text-red-200">Error</p>
+            <p className="text-sm text-red-300 mt-1">{error}</p>
           </div>
           <button
             onClick={() => setError(null)}
-            className="ml-auto text-red-600 dark:text-red-400 hover:text-red-800"
+            className="ml-auto text-red-400 hover:text-red-800"
           >
             &times;
           </button>
@@ -637,12 +637,12 @@ export const CalendarConnections = memo(function CalendarConnections() {
       )}
 
       {success && (
-        <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-4 flex items-start gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-green-700 dark:text-green-300">{success}</p>
+        <div className="rounded-lg bg-green-900/20 p-4 flex items-start gap-3">
+          <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-green-300">{success}</p>
           <button
             onClick={() => setSuccess(null)}
-            className="ml-auto text-green-600 dark:text-green-400 hover:text-green-800"
+            className="ml-auto text-green-400 hover:text-green-800"
           >
             &times;
           </button>
@@ -663,8 +663,8 @@ export const CalendarConnections = memo(function CalendarConnections() {
               key={provider}
               className={`rounded-xl border ${
                 isConnected
-                  ? 'border-gray-200 dark:border-gray-700'
-                  : 'border-dashed border-gray-300 dark:border-gray-600'
+                  ? 'border-gray-700'
+                  : 'border-dashed border-gray-600'
               } p-4 transition-all hover:shadow-sm`}
             >
               <div className="flex items-start justify-between">
@@ -676,10 +676,10 @@ export const CalendarConnections = memo(function CalendarConnections() {
 
                   {/* Provider Info */}
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">
+                    <h4 className="font-medium text-white">
                       {config.name}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                    <p className="text-sm text-gray-400 mt-0.5">
                       {config.description}
                     </p>
 
@@ -700,13 +700,13 @@ export const CalendarConnections = memo(function CalendarConnections() {
                         </div>
 
                         {/* Last Sync */}
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-400">
                           Last sync: {formatLastSync(connection.last_sync_at)}
                         </span>
 
                         {/* Account */}
                         {connection.provider_account_id && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-gray-400">
                             {connection.provider_account_id}
                           </span>
                         )}
@@ -715,7 +715,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
 
                     {/* Error Message */}
                     {connection?.last_error_message && connection.sync_status === 'error' && (
-                      <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                      <p className="text-xs text-red-400 mt-2">
                         {connection.last_error_message}
                       </p>
                     )}
@@ -730,7 +730,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                       <button
                         onClick={() => handleSync(connection.id)}
                         disabled={syncing === connection.id || connection.sync_status === 'syncing'}
-                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors disabled:opacity-50"
+                        className="p-2 text-gray-400 hover:text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors disabled:opacity-50"
                         title="Sync now"
                       >
                         <RefreshCw
@@ -746,7 +746,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                       <button
                         onClick={() => handleDisconnect(connection.id)}
                         disabled={disconnecting === connection.id}
-                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                        className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                         title="Disconnect"
                       >
                         {disconnecting === connection.id ? (
@@ -780,11 +780,11 @@ export const CalendarConnections = memo(function CalendarConnections() {
       </div>
 
       {/* Info Box */}
-      <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-4">
-        <h4 className="text-sm font-medium text-purple-900 dark:text-purple-200">
+      <div className="rounded-lg bg-purple-900/20 p-4">
+        <h4 className="text-sm font-medium text-purple-200">
           How Calendar Sync Works
         </h4>
-        <ul className="mt-2 text-sm text-purple-800 dark:text-purple-300 space-y-1">
+        <ul className="mt-2 text-sm text-purple-300 space-y-1">
           <li>• Events from connected calendars are synced to your Rowan calendar</li>
           <li>• Changes in external calendars automatically update in Rowan</li>
           <li>• If there&apos;s a conflict, external calendar events take priority</li>
@@ -800,7 +800,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -810,13 +810,13 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Calendar className={`h-5 w-5 ${PROVIDER_CONFIG[selectedProvider].color}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-white">
                     Connect {PROVIDER_CONFIG[selectedProvider].name}
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowEmailModal(false)}
-                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -826,15 +826,15 @@ export const CalendarConnections = memo(function CalendarConnections() {
             {/* Modal Body */}
             <form onSubmit={handleEmailSubmit} className="p-6 space-y-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-400 mb-4">
                   Enter the email address associated with the {PROVIDER_CONFIG[selectedProvider].name} account you want to connect.
                   {selectedProvider === 'google' && (
-                    <span className="block mt-2 text-xs text-gray-500 dark:text-gray-500">
+                    <span className="block mt-2 text-xs text-gray-500">
                       This can be a Gmail address or a Google Workspace account.
                     </span>
                   )}
                   {selectedProvider === 'outlook' && (
-                    <span className="block mt-2 text-xs text-gray-500 dark:text-gray-500">
+                    <span className="block mt-2 text-xs text-gray-500">
                       This can be an Outlook.com, Hotmail, Live, or Microsoft 365 account.
                     </span>
                   )}
@@ -842,7 +842,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
 
                 <label
                   htmlFor="calendar-email"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   {selectedProvider === 'google' ? 'Google Account Email' : selectedProvider === 'outlook' ? 'Microsoft Account Email' : 'Email Address'}
                 </label>
@@ -854,7 +854,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder={selectedProvider === 'google' ? 'yourname@gmail.com' : selectedProvider === 'outlook' ? 'yourname@outlook.com' : 'email@example.com'}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
                     autoFocus
                     autoComplete="email"
                   />
@@ -866,7 +866,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <button
                   type="button"
                   onClick={() => setShowEmailModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -879,7 +879,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </button>
               </div>
 
-              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-center text-gray-400">
                 You&apos;ll be redirected to {selectedProvider === 'google' ? 'Google' : selectedProvider === 'outlook' ? 'Microsoft' : 'the provider'} to authorize access to your calendar.
               </p>
             </form>
@@ -895,7 +895,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -905,13 +905,13 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Calendar className={`h-5 w-5 ${PROVIDER_CONFIG.apple.color}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-white">
                     Connect Apple Calendar
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowAppleModal(false)}
-                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -920,17 +920,17 @@ export const CalendarConnections = memo(function CalendarConnections() {
 
             {/* Modal Body */}
             <form onSubmit={handleAppleConnect} className="p-6 space-y-4">
-              <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-3 text-sm">
-                <p className="font-medium text-amber-800 dark:text-amber-200 mb-1">
+              <div className="rounded-lg bg-amber-900/20 p-3 text-sm">
+                <p className="font-medium text-amber-200 mb-1">
                   App-Specific Password Required
                 </p>
-                <p className="text-amber-700 dark:text-amber-300 text-xs">
+                <p className="text-amber-300 text-xs">
                   Apple Calendar requires an app-specific password for third-party apps.
                   <a
                     href="https://appleid.apple.com/account/manage"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 ml-1 text-amber-800 dark:text-amber-200 underline hover:no-underline"
+                    className="inline-flex items-center gap-1 ml-1 text-amber-200 underline hover:no-underline"
                   >
                     Generate one at appleid.apple.com
                     <ExternalLink className="h-3 w-3" />
@@ -942,7 +942,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
               <div>
                 <label
                   htmlFor="apple-email"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Apple ID Email
                 </label>
@@ -954,7 +954,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                     value={appleEmail}
                     onChange={(e) => setAppleEmail(e.target.value)}
                     placeholder="yourname@icloud.com"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
                     autoFocus
                     autoComplete="email"
                   />
@@ -965,7 +965,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
               <div>
                 <label
                   htmlFor="apple-password"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   App-Specific Password
                 </label>
@@ -977,11 +977,11 @@ export const CalendarConnections = memo(function CalendarConnections() {
                     value={applePassword}
                     onChange={(e) => setApplePassword(e.target.value)}
                     placeholder="xxxx-xxxx-xxxx-xxxx"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400 font-mono"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400 font-mono"
                     autoComplete="off"
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-gray-400">
                   Format: xxxx-xxxx-xxxx-xxxx (16 lowercase letters with dashes)
                 </p>
               </div>
@@ -991,7 +991,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <button
                   type="button"
                   onClick={() => setShowAppleModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -1004,7 +1004,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </button>
               </div>
 
-              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-center text-gray-400">
                 Your credentials are encrypted and stored securely. We never see your password.
               </p>
             </form>
@@ -1020,7 +1020,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1030,13 +1030,13 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Link className={`h-5 w-5 ${PROVIDER_CONFIG.ics.color}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-white">
                     Import ICS Calendar Feed
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowIcsModal(false)}
-                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -1046,14 +1046,14 @@ export const CalendarConnections = memo(function CalendarConnections() {
             {/* Modal Body */}
             <form onSubmit={handleIcsConnect} className="p-6 space-y-4">
               {/* Mode Toggle */}
-              <div className="flex rounded-xl bg-gray-100 dark:bg-gray-700 p-1">
+              <div className="flex rounded-xl bg-gray-700 p-1">
                 <button
                   type="button"
                   onClick={() => setIcsMode('url')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                     icsMode === 'url'
-                      ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'bg-gray-800 text-purple-400 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200'
                   }`}
                 >
                   <Link className="h-4 w-4" />
@@ -1064,8 +1064,8 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   onClick={() => setIcsMode('file')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
                     icsMode === 'file'
-                      ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      ? 'bg-gray-800 text-purple-400 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200'
                   }`}
                 >
                   <Upload className="h-4 w-4" />
@@ -1073,11 +1073,11 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </button>
               </div>
 
-              <div className="rounded-lg bg-purple-50 dark:bg-purple-900/20 p-3 text-sm">
-                <p className="font-medium text-purple-800 dark:text-purple-200 mb-1">
+              <div className="rounded-lg bg-purple-900/20 p-3 text-sm">
+                <p className="font-medium text-purple-200 mb-1">
                   {icsMode === 'url' ? 'One-Way Subscription' : 'One-Time Import'}
                 </p>
-                <p className="text-purple-700 dark:text-purple-300 text-xs">
+                <p className="text-purple-300 text-xs">
                   {icsMode === 'url'
                     ? 'Events from the ICS feed will be imported into Rowan and synced every 15 minutes. Changes you make in Rowan won\'t sync back.'
                     : 'Events from the ICS file will be imported once. Upload new files to add more events.'
@@ -1089,7 +1089,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
               <div>
                 <label
                   htmlFor="ics-name"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Calendar Name
                 </label>
@@ -1099,7 +1099,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   value={icsName}
                   onChange={(e) => setIcsName(e.target.value)}
                   placeholder="e.g., Work Calendar, Sports Schedule"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
                   autoFocus
                 />
               </div>
@@ -1109,7 +1109,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <div>
                   <label
                     htmlFor="ics-url"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-300 mb-2"
                   >
                     ICS Feed URL
                   </label>
@@ -1121,10 +1121,10 @@ export const CalendarConnections = memo(function CalendarConnections() {
                       value={icsUrl}
                       onChange={(e) => setIcsUrl(e.target.value)}
                       placeholder="https://example.com/calendar.ics or webcal://..."
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-gray-400">
                     Supports HTTPS and webcal:// URLs. The feed will be synced every 15 minutes.
                   </p>
                 </div>
@@ -1135,7 +1135,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <div>
                   <label
                     htmlFor="ics-file"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-300 mb-2"
                   >
                     ICS File
                   </label>
@@ -1143,27 +1143,27 @@ export const CalendarConnections = memo(function CalendarConnections() {
                     htmlFor="ics-file"
                     className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
                       icsFile
-                        ? 'border-purple-400 bg-purple-50 dark:bg-purple-900/20'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-purple-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                        ? 'border-purple-400 bg-purple-900/20'
+                        : 'border-gray-600 hover:border-purple-400 hover:bg-gray-700'
                     }`}
                   >
                     {icsFile ? (
                       <div className="flex flex-col items-center gap-2">
                         <FileText className="h-8 w-8 text-purple-500" />
-                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                        <span className="text-sm font-medium text-purple-400">
                           {icsFile.name}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-400">
                           Click to change file
                         </span>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-2">
                         <Upload className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        <span className="text-sm font-medium text-gray-300">
                           Drop .ics file here or click to browse
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-400">
                           Maximum file size: 1MB
                         </span>
                       </div>
@@ -1176,7 +1176,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                       onChange={handleIcsFileSelect}
                     />
                   </label>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-gray-400">
                     Upload .ics files from email invites or exported calendars.
                   </p>
                 </div>
@@ -1187,7 +1187,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <button
                   type="button"
                   onClick={() => setShowIcsModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -1204,7 +1204,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </button>
               </div>
 
-              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-center text-gray-400">
                 {icsMode === 'url'
                   ? 'Common sources: Google Calendar, Outlook, school/organization calendars, sports schedules'
                   : 'Upload .ics files from email invites, exported calendars, or calendar apps'
@@ -1223,7 +1223,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
-            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1233,13 +1233,13 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Calendar className={`h-5 w-5 ${PROVIDER_CONFIG.cozi.color}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-white">
                     Connect Cozi Calendar
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowCoziModal(false)}
-                  className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -1248,20 +1248,20 @@ export const CalendarConnections = memo(function CalendarConnections() {
 
             {/* Modal Body */}
             <form onSubmit={handleCoziConnect} className="p-6 space-y-4">
-              <div className="rounded-lg bg-orange-50 dark:bg-orange-900/20 p-3 text-sm">
-                <p className="font-medium text-orange-800 dark:text-orange-200 mb-1">
+              <div className="rounded-lg bg-orange-900/20 p-3 text-sm">
+                <p className="font-medium text-orange-200 mb-1">
                   One-Way Import from Cozi
                 </p>
-                <p className="text-orange-700 dark:text-orange-300 text-xs">
+                <p className="text-orange-300 text-xs">
                   Events from your Cozi calendar will be imported into Rowan. Changes you make in Rowan won&apos;t sync back to Cozi.
                 </p>
               </div>
 
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 text-sm">
-                <p className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+              <div className="rounded-lg bg-blue-900/20 p-3 text-sm">
+                <p className="font-medium text-blue-200 mb-2">
                   How to get your Cozi calendar URL:
                 </p>
-                <ol className="text-blue-700 dark:text-blue-300 text-xs space-y-1 list-decimal list-inside">
+                <ol className="text-blue-300 text-xs space-y-1 list-decimal list-inside">
                   <li>Sign in to <a href="https://my.cozi.com" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">my.cozi.com</a></li>
                   <li>Go to <strong>Settings → Shared Cozi Calendars</strong></li>
                   <li>Toggle sharing to &quot;Shared&quot; for the calendar you want</li>
@@ -1273,7 +1273,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
               <div>
                 <label
                   htmlFor="cozi-member"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Family Member (Optional)
                 </label>
@@ -1283,9 +1283,9 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   value={coziFamilyMember}
                   onChange={(e) => setCoziFamilyMember(e.target.value)}
                   placeholder="e.g., Mom, Dad, Kids, All Family"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white placeholder-gray-400"
                 />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-gray-400">
                   Leave blank for &quot;Cozi Family Calendar&quot;
                 </p>
               </div>
@@ -1294,7 +1294,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
               <div>
                 <label
                   htmlFor="cozi-url"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
                   Cozi Calendar URL
                 </label>
@@ -1306,7 +1306,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                     value={coziUrl}
                     onChange={(e) => setCoziUrl(e.target.value)}
                     placeholder="https://...cozi.com/..."
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-400"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white placeholder-gray-400"
                     autoFocus
                   />
                 </div>
@@ -1317,7 +1317,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <button
                   type="button"
                   onClick={() => setShowCoziModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -1330,7 +1330,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </button>
               </div>
 
-              <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-center text-gray-400">
                 The calendar will sync automatically every 15 minutes
               </p>
             </form>

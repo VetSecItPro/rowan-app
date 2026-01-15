@@ -40,7 +40,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
   if (loading || !safeToSpendInfo) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+        <div className="h-32 bg-gray-700 rounded-xl" />
       </div>
     );
   }
@@ -52,41 +52,41 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
     switch (status) {
       case 'safe':
         return {
-          gradient: 'from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-800/20',
-          border: 'border-green-200 dark:border-green-700',
-          textColor: 'text-green-700 dark:text-green-300',
+          gradient: 'from-green-50 from-green-900/20 to-emerald-800/20',
+          border: 'border-green-700',
+          textColor: 'text-green-300',
           icon: CheckCircle,
-          iconColor: 'text-green-600 dark:text-green-400',
+          iconColor: 'text-green-400',
           label: 'Safe to Spend',
           message: 'You\'re on track with your budget!',
         };
       case 'warning':
         return {
-          gradient: 'from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20',
-          border: 'border-yellow-200 dark:border-yellow-700',
-          textColor: 'text-yellow-700 dark:text-yellow-300',
+          gradient: 'from-yellow-50 from-yellow-900/20 to-orange-800/20',
+          border: 'border-yellow-700',
+          textColor: 'text-yellow-300',
           icon: AlertCircle,
-          iconColor: 'text-yellow-600 dark:text-yellow-400',
+          iconColor: 'text-yellow-400',
           label: 'Approaching Limit',
           message: 'You\'ve used 75% of your budget.',
         };
       case 'danger':
         return {
-          gradient: 'from-orange-50 to-red-100 dark:from-orange-900/20 dark:to-red-800/20',
-          border: 'border-orange-200 dark:border-orange-700',
-          textColor: 'text-orange-700 dark:text-orange-300',
+          gradient: 'from-orange-50 from-orange-900/20 to-red-800/20',
+          border: 'border-orange-700',
+          textColor: 'text-orange-300',
           icon: TrendingDown,
-          iconColor: 'text-orange-600 dark:text-orange-400',
+          iconColor: 'text-orange-400',
           label: 'Budget Alert',
           message: 'You\'ve used 90% of your budget!',
         };
       case 'over':
         return {
-          gradient: 'from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30',
-          border: 'border-red-300 dark:border-red-700',
-          textColor: 'text-red-700 dark:text-red-300',
+          gradient: 'from-red-50 from-red-900/30 to-red-800/30',
+          border: 'border-red-700',
+          textColor: 'text-red-300',
           icon: TrendingDown,
-          iconColor: 'text-red-600 dark:text-red-400',
+          iconColor: 'text-red-400',
           label: 'Over Budget',
           message: 'You\'ve exceeded your monthly budget.',
         };
@@ -101,12 +101,12 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center`}>
+          <div className={`w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center`}>
             <Icon className={`w-6 h-6 ${config.iconColor}`} />
           </div>
           <div>
             <p className={`text-sm font-medium ${config.textColor}`}>{config.label}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400">{config.message}</p>
+            <p className="text-xs text-gray-400">{config.message}</p>
           </div>
         </div>
       </div>
@@ -124,16 +124,16 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
             </span>
           )}
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-400">
           {status === 'over' ? 'Amount over budget' : 'Remaining this month'}
         </p>
       </div>
 
       {/* Daily Budget Guidance */}
       {status !== 'over' && (
-        <div className="flex items-center gap-2 pt-2 border-t border-gray-300 dark:border-gray-600">
+        <div className="flex items-center gap-2 pt-2 border-t border-gray-600">
           <Calendar className={`w-4 h-4 ${config.iconColor}`} />
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <p className="text-sm text-gray-300">
             <span className="font-semibold">${dailyBudget.toFixed(2)}/day</span>
             {' '}for the next {daysLeftInMonth} {daysLeftInMonth === 1 ? 'day' : 'days'}
           </p>

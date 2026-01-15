@@ -215,7 +215,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
     if (data?.need_help === true) {
       metadata.push(
-        <span key="help" className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs rounded-full border border-orange-200 dark:border-orange-700">
+        <span key="help" className="px-2 py-1 bg-orange-900/30 text-orange-300 text-xs rounded-full border border-orange-700">
           Needs Help
         </span>
       );
@@ -233,14 +233,14 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 ${className}`}>
+      <div className={`bg-gray-800 border border-gray-700 rounded-xl p-6 ${className}`}>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+              <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2" />
+                <div className="h-4 bg-gray-700 rounded animate-pulse w-3/4" />
+                <div className="h-3 bg-gray-700 rounded animate-pulse w-1/2" />
               </div>
             </div>
           ))}
@@ -250,7 +250,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl ${className}`}>
+    <div className={`bg-gray-800 border border-gray-700 rounded-xl ${className}`}>
       <div className="max-h-96 overflow-y-auto">
         <div className="p-6">
           <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
@@ -259,7 +259,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
           </h3>
 
           {activities.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-gray-400">
               <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No activity yet</p>
               <p className="text-sm">Start by creating goals and checking in on progress!</p>
@@ -270,7 +270,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                 <div key={activity.id}>
                   <div className="flex items-start space-x-3">
                     {/* Avatar */}
-                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-300">
                       {activity.user?.avatar_url ? (
                         <img
                           src={activity.user.avatar_url}
@@ -290,13 +290,13 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                             {activity.user?.full_name}
                           </span>
                           {' '}
-                          <span className="text-gray-600 dark:text-gray-400">
+                          <span className="text-gray-400">
                             {getActivityDescription(activity)}
                           </span>
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
                         <span>{formatDistanceToNow(new Date(activity.created_at))} ago</span>
                         {getActivityMetadata(activity).map((meta, i) => (
                           <span key={i}>{meta}</span>
@@ -306,7 +306,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => toggleComments(activity.id)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-gray-200 transition-colors"
                         >
                           <MessageCircle className="h-3 w-3" />
                           {comments[activity.id]?.length || 0} Comments
@@ -314,10 +314,10 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                       </div>
 
                       {showComments[activity.id] && (
-                        <div className="mt-3 space-y-3 pl-4 border-l border-gray-200 dark:border-gray-700">
+                        <div className="mt-3 space-y-3 pl-4 border-l border-gray-700">
                           {comments[activity.id]?.map((comment) => (
                             <div key={comment.id} className="flex items-start space-x-2">
-                              <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
+                              <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
                                 {comment.user?.avatar_url ? (
                                   <img
                                     src={comment.user.avatar_url}
@@ -329,14 +329,14 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                 )}
                               </div>
                               <div className="flex-1">
-                                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg px-3 py-2">
+                                <div className="bg-gray-800 rounded-lg px-3 py-2">
                                   <p className="text-xs font-medium mb-1">
                                     {comment.user?.full_name}
                                   </p>
                                   <p className="text-sm">{comment.content}</p>
                                 </div>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  <span className="text-xs text-gray-400">
                                     {formatDistanceToNow(new Date(comment.created_at))} ago
                                   </span>
                                   <div className="flex gap-1">
@@ -344,7 +344,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                       <button
                                         key={emoji}
                                         onClick={() => handleReaction(comment.id, emoji)}
-                                        className="w-5 h-5 p-0 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                        className="w-5 h-5 p-0 text-xs hover:bg-gray-700 rounded transition-colors"
                                       >
                                         {emoji}
                                       </button>
@@ -356,7 +356,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                           ))}
 
                           <div className="flex items-start space-x-2">
-                            <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300">
+                            <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
                               {user?.avatar_url ? (
                                 <img
                                   src={user.avatar_url}
@@ -375,7 +375,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                   ...prev,
                                   [activity.id]: e.target.value
                                 }))}
-                                className="flex-1 min-h-[60px] text-sm resize-none p-2 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="flex-1 min-h-[60px] text-sm resize-none p-2 border border-gray-700 rounded-md bg-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                 onKeyDown={(e) => {
                                   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                                     handleAddComment(activity.id);
@@ -385,7 +385,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                               <button
                                 onClick={() => handleAddComment(activity.id)}
                                 disabled={!newComment[activity.id]?.trim() || isSubmitting}
-                                className="px-3 py-2 bg-indigo-500 text-white text-sm rounded-md hover:bg-indigo-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                                className="px-3 py-2 bg-indigo-500 text-white text-sm rounded-md hover:bg-indigo-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
                               >
                                 Post
                               </button>
@@ -397,7 +397,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                   </div>
 
                   {index < activities.length - 1 && (
-                    <div className="my-4 border-t border-gray-200 dark:border-gray-700" />
+                    <div className="my-4 border-t border-gray-700" />
                   )}
                 </div>
               ))}

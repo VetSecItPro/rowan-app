@@ -7,7 +7,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white/80 dark:bg-black/80 backdrop-blur-lg border-t border-gray-200/50 dark:border-gray-800/50 mt-auto">
+    <footer className="bg-black/80 backdrop-blur-lg border-t border-gray-800/50 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo and Brand */}
@@ -21,7 +21,7 @@ export function Footer() {
             />
             <div className="flex flex-col items-start">
               <span className="text-lg font-semibold gradient-text">Rowan</span>
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span>© {currentYear}</span>
                 <span>•</span>
                 <span>Veteran Owned Business</span>
@@ -33,13 +33,13 @@ export function Footer() {
           <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-6">
             <Link
               href="/legal"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm text-gray-400 hover:text-white transition-colors"
             >
               Legal
             </Link>
             <Link
               href="/settings/documentation"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm text-gray-400 hover:text-white transition-colors"
             >
               Docs
             </Link>

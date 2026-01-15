@@ -106,7 +106,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-white" />
@@ -120,7 +120,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
         <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
           {/* Quick Options */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <h3 className="text-sm font-medium text-gray-300 mb-3">
               Quick Snooze
             </h3>
             <div className="grid grid-cols-2 gap-2">
@@ -129,7 +129,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                   key={option.label}
                   onClick={() => handleSnooze(option.date)}
                   disabled={loading}
-                  className="px-4 py-3 text-sm font-medium bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
+                  className="px-4 py-3 text-sm font-medium bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {option.label}
                 </button>
@@ -139,36 +139,36 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
 
           {/* Custom Date/Time */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <h3 className="text-sm font-medium text-gray-300 mb-3">
               Custom Date & Time
             </h3>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label htmlFor="field-1" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
+                <label htmlFor="field-1" className="block text-xs text-gray-400 mb-1 cursor-pointer">
                   Date
                 </label>
                 <input
                   type="date"
                   value={customDate}
                   onChange={(e) => setCustomDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-900"
                 />
               </div>
               <div>
-                <label htmlFor="field-2" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
+                <label htmlFor="field-2" className="block text-xs text-gray-400 mb-1 cursor-pointer">
                   Time
                 </label>
                 <input
                   type="time"
                   value={customTime}
                   onChange={(e) => setCustomTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                  className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-900"
                 />
               </div>
             </div>
 
             <div className="mb-3">
-              <label htmlFor="field-3" className="block text-xs text-gray-600 dark:text-gray-400 mb-1 cursor-pointer">
+              <label htmlFor="field-3" className="block text-xs text-gray-400 mb-1 cursor-pointer">
                 Reason (Optional)
               </label>
               <input
@@ -176,7 +176,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Why are you snoozing this task?"
-                className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                className="w-full px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900"
               />
             </div>
 
@@ -192,7 +192,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
           {/* History Toggle */}
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200"
           >
             <History className="w-4 h-4" />
             {showHistory ? 'Hide' : 'Show'} Snooze History
@@ -200,7 +200,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
 
           {/* Snooze History */}
           {showHistory && (
-            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg max-h-48 overflow-y-auto">
+            <div className="mt-4 p-4 bg-gray-900 rounded-lg max-h-48 overflow-y-auto">
               {history.length === 0 ? (
                 <p className="text-xs text-gray-500 text-center">No snooze history</p>
               ) : (
@@ -208,10 +208,10 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                   {history.map((item) => (
                     <div key={item.id} className="text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <span className="text-gray-300">
                           Snoozed until {new Date(item.snoozed_until).toLocaleString()}
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300">
+                        <span className="px-2 py-0.5 rounded bg-amber-900/20 text-amber-300">
                           Snoozed
                         </span>
                       </div>

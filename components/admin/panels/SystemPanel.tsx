@@ -20,7 +20,7 @@ export const SystemPanel = memo(function SystemPanel() {
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Sub-tab Navigation */}
-      <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-1 border-b border-gray-700">
         {SUB_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -30,8 +30,8 @@ export const SystemPanel = memo(function SystemPanel() {
               onClick={() => setActiveSubTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 isActive
-                  ? 'border-gray-700 dark:border-gray-300 text-gray-900 dark:text-white'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-300'
+                  ? 'border-gray-300 text-white'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
               }`}
             >
               <Icon className="w-4 h-4" />
