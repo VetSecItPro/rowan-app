@@ -1048,7 +1048,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">Settings</h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">Manage your account and preferences</p>
+                <p className="text-sm sm:text-base text-gray-400 mt-1">Manage your account and preferences</p>
               </div>
             </div>
           </div>
@@ -1056,7 +1056,7 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Sidebar Navigation */}
             <div className="lg:col-span-1">
-              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
+              <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
                 {/* Mobile: Horizontal scrolling tabs */}
                 <nav className="lg:space-y-1 flex lg:flex-col overflow-x-auto lg:overflow-x-visible -mx-3 px-3 lg:mx-0 lg:px-0 pb-2 lg:pb-0 gap-2 lg:gap-0">
                   {tabs.map((tab) => {
@@ -1069,7 +1069,7 @@ export default function SettingsPage() {
                         className={`btn-touch flex-shrink-0 lg:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all active:scale-95 ${
                           isActive
                             ? 'bg-purple-600 text-white shadow-lg hover:bg-purple-700 hover:shadow-xl'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md hover:scale-105'
+                            : 'text-gray-300 hover:bg-gray-700 hover:shadow-md hover:scale-105'
                         }`}
                       >
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1083,13 +1083,13 @@ export default function SettingsPage() {
 
             {/* Content Area */}
             <div className="lg:col-span-3">
-              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
+              <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
                 {/* Profile Tab */}
                 {activeTab === 'profile' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Profile & Spaces</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Update your personal information and manage your spaces</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Profile & Spaces</h2>
+                      <p className="text-sm sm:text-base text-gray-400">Update your personal information and manage your spaces</p>
                     </div>
 
                     {/* Avatar Upload */}
@@ -1115,15 +1115,15 @@ export default function SettingsPage() {
                         </button>
                       </div>
                       <div className="text-center sm:text-left">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{profileData.name}</h3>
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{profileData.email}</p>
+                        <h3 className="text-base sm:text-lg font-semibold text-white">{profileData.name}</h3>
+                        <p className="text-xs sm:text-sm text-gray-400">{profileData.email}</p>
                         <button
                           onClick={() => profileImageInputRef.current?.click()}
-                          className="btn-touch mt-2 text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline transition-all active:scale-95 hover:text-purple-700 dark:hover:text-purple-300"
+                          className="btn-touch mt-2 text-xs sm:text-sm text-purple-400 hover:underline transition-all active:scale-95 hover:text-purple-300"
                         >
                           Change profile picture
                         </button>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 mt-1">
                           Max 2MB • JPG, PNG, WebP • 100-2000px
                         </p>
                       </div>
@@ -1141,7 +1141,7 @@ export default function SettingsPage() {
                     {/* Form Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                       <div>
-                        <label htmlFor="field-1" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                        <label htmlFor="field-1" className="block text-xs sm:text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                           Full Name
                         </label>
                         <input
@@ -1149,12 +1149,12 @@ export default function SettingsPage() {
                           value={profileData.name}
                           id="field-1"
               onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-900 border border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white transition-all"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="field-2" className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                        <label htmlFor="field-2" className="block text-xs sm:text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                           Email Address
                         </label>
                         <input
@@ -1162,7 +1162,7 @@ export default function SettingsPage() {
                           value={profileData.email}
                           id="field-2"
               onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white transition-all"
+                          className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-gray-900 border border-gray-600 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white transition-all"
                         />
                       </div>
 
@@ -1170,21 +1170,21 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Spaces Management Section */}
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-6 sm:pt-8">
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">Your Spaces</h3>
+                    <div className="border-t border-gray-700 pt-6 sm:pt-8">
+                      <h3 className="text-lg sm:text-xl font-bold text-white mb-4">Your Spaces</h3>
 
                       {/* Switch Space - Only show when user has multiple spaces */}
                       {spaces && spaces.length > 1 && (
                         <div className="mb-6">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-3">Switch Space</h4>
+                          <h4 className="text-base font-semibold text-white mb-3">Switch Space</h4>
                           <div className="space-y-3">
                             {spaces.map((space) => (
                               <div
                                 key={space.id}
                                 className={`btn-touch p-4 rounded-xl border transition-all cursor-pointer active:scale-95 ${
                                   currentSpace?.id === space.id
-                                    ? 'bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-800 shadow-lg hover:shadow-xl'
-                                    : 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800 hover:shadow-md hover:scale-105'
+                                    ? 'bg-gradient-to-br from-purple-50 from-purple-900/20 to-blue-900/20 border-purple-800 shadow-lg hover:shadow-xl'
+                                    : 'bg-gray-900/50 border-gray-700 hover:border-purple-800 hover:shadow-md hover:scale-105'
                                 }`}
                                 onClick={() => switchSpace(space)}
                               >
@@ -1194,15 +1194,15 @@ export default function SettingsPage() {
                                       {space.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white">{space.name}</p>
-                                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                                      <p className="text-sm font-medium text-white">{space.name}</p>
+                                      <p className="text-xs text-gray-400">
                                         {space.role === 'owner' ? 'Owner' : 'Member'}
                                         {currentSpace?.id === space.id && ' • Active'}
                                       </p>
                                     </div>
                                   </div>
                                   {currentSpace?.id === space.id && (
-                                    <Check className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                                    <Check className="w-5 h-5 text-purple-400" />
                                   )}
                                 </div>
                               </div>
@@ -1213,24 +1213,24 @@ export default function SettingsPage() {
 
                       {/* Current Space Actions */}
                       {currentSpace && (
-                        <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-xl">
+                        <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
                                 {currentSpace.name.charAt(0).toUpperCase()}
                               </div>
                               <div>
-                                <h4 className="text-base font-semibold text-gray-900 dark:text-white">
+                                <h4 className="text-base font-semibold text-white">
                                   {!isRenamingSpace ? currentSpace.name : 'Renaming...'}
                                 </h4>
-                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                <p className="text-xs text-gray-400">
                                   Current Space
                                 </p>
                               </div>
                             </div>
                             {!isRenamingSpace && (
                               <Edit
-                                className="w-5 h-5 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors cursor-pointer"
+                                className="w-5 h-5 text-purple-400 hover:text-purple-300 transition-colors cursor-pointer"
                                 onClick={() => {
                                   setIsRenamingSpace(true);
                                   setNewSpaceNameEdit(currentSpace.name);
@@ -1247,7 +1247,7 @@ export default function SettingsPage() {
                                   value={newSpaceNameEdit}
                                   onChange={(e) => setNewSpaceNameEdit(e.target.value)}
                                   placeholder="Enter new space name"
-                                  className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-purple-300 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                                  className="w-full px-3 py-2 text-sm bg-gray-800 border border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
                                   autoFocus
                                 />
                               </div>
@@ -1275,7 +1275,7 @@ export default function SettingsPage() {
                                     setNewSpaceNameEdit('');
                                   }}
                                   disabled={isSavingSpaceName}
-                                  className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm disabled:opacity-50"
+                                  className="px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors text-sm disabled:opacity-50"
                                 >
                                   Cancel
                                 </button>
@@ -1310,24 +1310,24 @@ export default function SettingsPage() {
 
                       {/* Pending Invitations - Only visible to owners and admins */}
                       {spaceId && (currentSpace?.role === 'owner' || currentSpace?.role === 'admin') && (
-                        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                        <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700 rounded-xl">
+                          <h4 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
                             <Mail className="w-4 h-4 text-purple-600" />
                             Pending Invitations
                             {pendingInvitations.length > 0 && (
-                              <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs rounded-full">
+                              <span className="px-2 py-0.5 bg-purple-900/30 text-purple-400 text-xs rounded-full">
                                 {pendingInvitations.length}
                               </span>
                             )}
                           </h4>
 
                           {isLoadingInvitations ? (
-                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 py-4">
+                            <div className="flex items-center gap-2 text-gray-400 py-4">
                               <Loader2 className="w-4 h-4 animate-spin" />
                               <span className="text-sm">Loading invitations...</span>
                             </div>
                           ) : pendingInvitations.length === 0 ? (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                            <p className="text-sm text-gray-400 py-2">
                               No pending invitations. Use the button above to invite members.
                             </p>
                           ) : (
@@ -1339,17 +1339,17 @@ export default function SettingsPage() {
                                 return (
                                   <div
                                     key={invitation.id}
-                                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"
                                   >
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                      <p className="text-sm font-medium text-white truncate">
                                         {invitation.email}
                                       </p>
                                       <div className="flex items-center gap-2 mt-1">
-                                        <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                                        <span className="text-xs px-2 py-0.5 bg-gray-700 text-gray-400 rounded">
                                           {invitation.role}
                                         </span>
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        <span className="text-xs text-gray-400">
                                           Expires in {daysLeft} {daysLeft === 1 ? 'day' : 'days'}
                                         </span>
                                       </div>
@@ -1359,7 +1359,7 @@ export default function SettingsPage() {
                                       {/* Copy URL Button */}
                                       <button
                                         onClick={() => handleCopyInvitationUrl(invitation.id, invitation.invitation_url)}
-                                        className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                                        className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-900/20 rounded-lg transition-colors"
                                         title="Copy invitation link"
                                       >
                                         {copiedInvitationId === invitation.id ? (
@@ -1373,7 +1373,7 @@ export default function SettingsPage() {
                                       <button
                                         onClick={() => handleResendInvitation(invitation.id)}
                                         disabled={resendingInvitationId === invitation.id}
-                                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
                                         title="Resend invitation"
                                       >
                                         {resendingInvitationId === invitation.id ? (
@@ -1387,7 +1387,7 @@ export default function SettingsPage() {
                                       <button
                                         onClick={() => handleCancelInvitation(invitation.id)}
                                         disabled={cancellingInvitationId === invitation.id}
-                                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                                         title="Cancel invitation"
                                       >
                                         {cancellingInvitationId === invitation.id ? (
@@ -1407,24 +1407,24 @@ export default function SettingsPage() {
 
                       {/* Space Members */}
                       {spaceId && (currentSpace?.role === 'owner' || spaceMembers.some(m => m.isCurrentUser && m.role === 'Admin')) && (
-                        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                        <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700 rounded-xl">
+                          <h4 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
                             <Users className="w-4 h-4 text-purple-600" />
                             Space Members
                             {spaceMembers.length > 0 && (
-                              <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs rounded-full">
+                              <span className="px-2 py-0.5 bg-purple-900/30 text-purple-400 text-xs rounded-full">
                                 {spaceMembers.length}
                               </span>
                             )}
                           </h4>
 
                           {isLoadingMembers ? (
-                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 py-4">
+                            <div className="flex items-center gap-2 text-gray-400 py-4">
                               <Loader2 className="w-4 h-4 animate-spin" />
                               <span className="text-sm">Loading members...</span>
                             </div>
                           ) : spaceMembers.length === 0 ? (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                            <p className="text-sm text-gray-400 py-2">
                               No members yet. Invite someone to join your space!
                             </p>
                           ) : (
@@ -1434,8 +1434,8 @@ export default function SettingsPage() {
                                   key={member.id}
                                   className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border transition-all ${
                                     member.isCurrentUser
-                                      ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800'
-                                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                                      ? 'bg-purple-900/20 border-purple-800'
+                                      : 'bg-gray-800 border-gray-700'
                                   }`}
                                 >
                                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1450,10 +1450,10 @@ export default function SettingsPage() {
                                       {member.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="min-w-0">
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
+                                      <p className="text-sm font-medium text-white truncate flex items-center gap-2">
                                         {member.name}
                                         {member.isCurrentUser && (
-                                          <span className="text-xs px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded">
+                                          <span className="text-xs px-1.5 py-0.5 bg-purple-900/30 text-purple-400 rounded">
                                             You
                                           </span>
                                         )}
@@ -1461,7 +1461,7 @@ export default function SettingsPage() {
                                           <Crown className="w-3.5 h-3.5 text-amber-500" />
                                         )}
                                       </p>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                      <p className="text-xs text-gray-400 truncate">
                                         {member.email}
                                       </p>
                                     </div>
@@ -1476,7 +1476,7 @@ export default function SettingsPage() {
                                           value={member.role}
                                           onChange={(e) => handleUpdateMemberRole(member.id, e.target.value as UserRole)}
                                           disabled={isUpdatingRole === member.id}
-                                          className="text-xs px-2 py-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                                          className="text-xs px-2 py-1 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                                         >
                                           <option value="Member">Member</option>
                                           <option value="Admin">Admin</option>
@@ -1491,8 +1491,8 @@ export default function SettingsPage() {
                                     {(member.role === 'Admin' || member.isCurrentUser || currentSpace?.role !== 'owner') && (
                                       <span className={`text-xs px-2 py-1 rounded ${
                                         member.role === 'Admin'
-                                          ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                          ? 'bg-amber-900/30 text-amber-400'
+                                          : 'bg-gray-700 text-gray-400'
                                       }`}>
                                         {member.role}
                                       </span>
@@ -1502,7 +1502,7 @@ export default function SettingsPage() {
                                     {!member.isCurrentUser && member.role !== 'Admin' && currentSpace?.role === 'owner' && (
                                       <button
                                         onClick={() => handleRemoveMember(member.id)}
-                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-900/20 rounded-lg transition-colors"
                                         title="Remove member"
                                       >
                                         <Trash2 className="w-4 h-4" />
@@ -1517,9 +1517,9 @@ export default function SettingsPage() {
                       )}
 
                       {/* Create New Space */}
-                      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
-                        <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Create New Space</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700 rounded-xl">
+                        <h4 className="text-base font-semibold text-white mb-2">Create New Space</h4>
+                        <p className="text-sm text-gray-400 mb-3">
                           Start a new space for work or a different purpose
                           {maxSpaces !== Infinity && (
                             <span className="ml-2 text-xs text-gray-500">
@@ -1569,39 +1569,39 @@ export default function SettingsPage() {
                 {activeTab === 'security' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Security Settings</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your password and authentication methods</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Security Settings</h2>
+                      <p className="text-sm sm:text-base text-gray-400">Manage your password and authentication methods</p>
                     </div>
 
                     {/* Password Reset */}
-                    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
+                    <div className="bg-gray-900/50 border border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                          <Key className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                          <Key className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
                         </div>
                         <div className="flex-1 w-full">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Reset Password</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+                          <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Reset Password</h3>
+                          <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
                             We'll send you an email with a secure link to reset your password
                           </p>
 
                           {resetEmailSent ? (
-                            <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-3">
+                            <div className="p-4 bg-green-900/20 border border-green-800 rounded-lg mb-3">
                               <div className="flex items-start gap-2">
-                                <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                                <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                                 <div>
-                                  <p className="text-sm font-medium text-green-800 dark:text-green-200">Password reset email sent!</p>
-                                  <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                                  <p className="text-sm font-medium text-green-200">Password reset email sent!</p>
+                                  <p className="text-xs text-green-300 mt-1">
                                     Check your inbox at <span className="font-semibold">{user?.email}</span> for instructions to reset your password.
                                   </p>
-                                  <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                                  <p className="text-xs text-green-400 mt-2">
                                     Didn't receive it? Check your spam folder or{' '}
                                     <button
                                       onClick={() => {
                                         setResetEmailSent(false);
                                         handleRequestPasswordReset();
                                       }}
-                                      className="btn-touch underline hover:no-underline font-medium transition-all active:scale-95 text-green-700 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
+                                      className="btn-touch underline hover:no-underline font-medium transition-all active:scale-95 text-green-400 hover:text-green-300"
                                     >
                                       resend the email
                                     </button>
@@ -1611,11 +1611,11 @@ export default function SettingsPage() {
                             </div>
                           ) : (
                             <>
-                              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg mb-4">
-                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                              <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg mb-4">
+                                <p className="text-xs text-blue-300">
                                   <strong>Reset link will be sent to:</strong> {user?.email}
                                 </p>
-                                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                <p className="text-xs text-blue-400 mt-1">
                                   For security, password reset is only allowed for your current email address.
                                 </p>
                               </div>
@@ -1652,12 +1652,12 @@ export default function SettingsPage() {
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Active Sessions</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Sessions are automatically tracked when you sign in</p>
+                          <h3 className="text-lg font-semibold text-white">Active Sessions</h3>
+                          <p className="text-sm text-gray-400">Sessions are automatically tracked when you sign in</p>
                         </div>
                         <button
                           onClick={fetchActiveSessions}
-                          className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                          className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
                         >
                           Refresh
                         </button>
@@ -1665,33 +1665,33 @@ export default function SettingsPage() {
                       {isLoadingSessions ? (
                         <div className="space-y-3">
                           {[...Array(3)].map((_, i) => (
-                            <div key={i} className="h-20 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl animate-pulse" />
+                            <div key={i} className="h-20 bg-gray-900/50 border border-gray-700 rounded-xl animate-pulse" />
                           ))}
                         </div>
                       ) : activeSessions.length === 0 ? (
-                        <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center">
-                          <p className="text-sm text-gray-600 dark:text-gray-400">No active sessions found</p>
+                        <div className="p-6 bg-gray-900/50 border border-gray-700 rounded-xl text-center">
+                          <p className="text-sm text-gray-400">No active sessions found</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           {activeSessions.map((session) => (
-                            <div key={session.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl">
+                            <div key={session.id} className="flex items-center justify-between p-4 bg-gray-900/50 border border-gray-700 rounded-xl">
                               <div className="flex items-center gap-3">
-                                <Monitor className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                <Monitor className="w-5 h-5 text-gray-400" />
                                 <div>
-                                  <p className="text-sm font-medium text-gray-900 dark:text-white">{session.device}</p>
-                                  <p className="text-xs text-gray-600 dark:text-gray-400">{session.location} • {session.lastActive}</p>
+                                  <p className="text-sm font-medium text-white">{session.device}</p>
+                                  <p className="text-xs text-gray-400">{session.location} • {session.lastActive}</p>
                                 </div>
                               </div>
                               {session.isCurrent ? (
-                                <span className="text-xs text-green-600 dark:text-green-400 font-medium">Current</span>
+                                <span className="text-xs text-green-400 font-medium">Current</span>
                               ) : (
                                 <button
                                   onClick={() => {
                                     setSessionToRevoke(session.id);
                                     setShowRevokeSessionModal(true);
                                   }}
-                                  className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                                  className="text-xs text-red-400 hover:text-red-300 transition-colors"
                                 >
                                   Revoke
                                 </button>
@@ -1722,8 +1722,8 @@ export default function SettingsPage() {
                 {activeTab === 'analytics' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Analytics & Insights</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">View your productivity trends and completion rates across all features</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Analytics & Insights</h2>
+                      <p className="text-sm sm:text-base text-gray-400">View your productivity trends and completion rates across all features</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -1734,8 +1734,8 @@ export default function SettingsPage() {
                           icon: CheckSquare,
                           href: '/settings/analytics/tasks',
                           gradient: 'from-blue-500 to-blue-600',
-                          textColor: 'text-blue-600 dark:text-blue-400',
-                          shadowColor: 'hover:shadow-blue-200 dark:hover:shadow-blue-900/50',
+                          textColor: 'text-blue-400',
+                          shadowColor: 'hover:shadow-blue-900/50',
                           description: 'Track task completion and productivity'
                         },
                         {
@@ -1744,8 +1744,8 @@ export default function SettingsPage() {
                           icon: Calendar,
                           href: '/settings/analytics/calendar',
                           gradient: 'from-purple-500 to-purple-600',
-                          textColor: 'text-purple-600 dark:text-purple-400',
-                          shadowColor: 'hover:shadow-purple-200 dark:hover:shadow-purple-900/50',
+                          textColor: 'text-purple-400',
+                          shadowColor: 'hover:shadow-purple-900/50',
                           description: 'Monitor event attendance and planning'
                         },
                         {
@@ -1754,8 +1754,8 @@ export default function SettingsPage() {
                           icon: Bell,
                           href: '/settings/analytics/reminders',
                           gradient: 'from-pink-500 to-pink-600',
-                          textColor: 'text-pink-600 dark:text-pink-400',
-                          shadowColor: 'hover:shadow-pink-200 dark:hover:shadow-pink-900/50',
+                          textColor: 'text-pink-400',
+                          shadowColor: 'hover:shadow-pink-900/50',
                           description: 'Analyze reminder effectiveness'
                         },
                         {
@@ -1764,8 +1764,8 @@ export default function SettingsPage() {
                           icon: MessageSquare,
                           href: '/settings/analytics/messages',
                           gradient: 'from-green-500 to-green-600',
-                          textColor: 'text-green-600 dark:text-green-400',
-                          shadowColor: 'hover:shadow-green-200 dark:hover:shadow-green-900/50',
+                          textColor: 'text-green-400',
+                          shadowColor: 'hover:shadow-green-900/50',
                           description: 'View messaging trends and activity'
                         },
                         {
@@ -1774,8 +1774,8 @@ export default function SettingsPage() {
                           icon: ShoppingCart,
                           href: '/settings/analytics/shopping',
                           gradient: 'from-emerald-500 to-emerald-600',
-                          textColor: 'text-emerald-600 dark:text-emerald-400',
-                          shadowColor: 'hover:shadow-emerald-200 dark:hover:shadow-emerald-900/50',
+                          textColor: 'text-emerald-400',
+                          shadowColor: 'hover:shadow-emerald-900/50',
                           description: 'Track shopping habits and savings'
                         },
                         {
@@ -1784,8 +1784,8 @@ export default function SettingsPage() {
                           icon: UtensilsCrossed,
                           href: '/settings/analytics/meals',
                           gradient: 'from-orange-500 to-orange-600',
-                          textColor: 'text-orange-600 dark:text-orange-400',
-                          shadowColor: 'hover:shadow-orange-200 dark:hover:shadow-orange-900/50',
+                          textColor: 'text-orange-400',
+                          shadowColor: 'hover:shadow-orange-900/50',
                           description: 'Review meal planning patterns'
                         },
                         {
@@ -1794,8 +1794,8 @@ export default function SettingsPage() {
                           icon: DollarSign,
                           href: '/settings/analytics/budget',
                           gradient: 'from-amber-500 to-amber-600',
-                          textColor: 'text-amber-600 dark:text-amber-400',
-                          shadowColor: 'hover:shadow-amber-200 dark:hover:shadow-amber-900/50',
+                          textColor: 'text-amber-400',
+                          shadowColor: 'hover:shadow-amber-900/50',
                           description: 'Monitor spending and budgets'
                         },
                         {
@@ -1804,8 +1804,8 @@ export default function SettingsPage() {
                           icon: Target,
                           href: '/settings/analytics/goals',
                           gradient: 'from-indigo-500 to-indigo-600',
-                          textColor: 'text-indigo-600 dark:text-indigo-400',
-                          shadowColor: 'hover:shadow-indigo-200 dark:hover:shadow-indigo-900/50',
+                          textColor: 'text-indigo-400',
+                          shadowColor: 'hover:shadow-indigo-900/50',
                           description: 'Track goal progress and achievements'
                         },
                       ].map((feature) => {
@@ -1814,7 +1814,7 @@ export default function SettingsPage() {
                           <Link
                             key={feature.id}
                             href={feature.href}
-                            className={`btn-touch bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group active:scale-95`}
+                            className={`btn-touch bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group active:scale-95`}
                           >
                             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
                               <Icon className="w-7 h-7 text-white" />
@@ -1822,7 +1822,7 @@ export default function SettingsPage() {
                             <h3 className={`text-lg font-semibold ${feature.textColor} mb-2 transition-all`}>
                               {feature.name}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            <p className="text-sm text-gray-400 mb-4">
                               {feature.description}
                             </p>
                             <div className={`flex items-center text-sm font-medium ${feature.textColor}`}>
@@ -1840,22 +1840,22 @@ export default function SettingsPage() {
                 {false && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Data & Storage</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Export your data or delete your account</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Data & Storage</h2>
+                      <p className="text-sm sm:text-base text-gray-400">Export your data or delete your account</p>
                     </div>
 
                     {/* Export Data - GDPR Compliant */}
-                    <div className="p-4 sm:p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg sm:rounded-xl">
+                    <div className="p-4 sm:p-6 bg-blue-900/20 border border-blue-800 rounded-lg sm:rounded-xl">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <Download className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-900/30 flex items-center justify-center">
+                          <Download className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                         </div>
                         <div className="flex-1 w-full">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Export Your Data</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+                          <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Export Your Data</h3>
+                          <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
                             Download a complete copy of all your data in JSON format. This includes expenses, budgets, tasks, messages, and more.
                           </p>
-                          <p className="text-xs text-blue-700 dark:text-blue-300 mb-4 bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg">
+                          <p className="text-xs text-blue-300 mb-4 bg-blue-900/40 p-3 rounded-lg">
                             <strong>GDPR Compliance:</strong> This export fulfills your Right to Data Portability (Article 20).
                             The download starts immediately and includes all personal data we hold about you.
                           </p>
@@ -1888,17 +1888,17 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Delete Account - GDPR Compliant */}
-                    <div className="p-4 sm:p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg sm:rounded-xl">
+                    <div className="p-4 sm:p-6 bg-red-900/20 border border-red-800 rounded-lg sm:rounded-xl">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                          <Trash2 className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-red-900/30 flex items-center justify-center">
+                          <Trash2 className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
                         </div>
                         <div className="flex-1 w-full">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Delete Account</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+                          <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Delete Account</h3>
+                          <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
                             Permanently delete your account with a 30-day grace period. You can cancel anytime within 30 days.
                           </p>
-                          <p className="text-xs text-red-700 dark:text-red-300 mb-4 bg-red-100 dark:bg-red-900/40 p-3 rounded-lg">
+                          <p className="text-xs text-red-300 mb-4 bg-red-900/40 p-3 rounded-lg">
                             <strong>GDPR Compliance:</strong> This fulfills your Right to Erasure (Article 17).
                             All personal data will be deleted after a 30-day grace period with email notifications.
                           </p>
@@ -1914,15 +1914,15 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Sign Out */}
-                    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl">
+                    <div className="p-4 sm:p-6 bg-gray-900/50 border border-gray-700 rounded-lg sm:rounded-xl">
                       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                          <LogOut className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 dark:text-gray-400" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gray-800 flex items-center justify-center">
+                          <LogOut className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
                         </div>
                         <div className="flex-1 w-full">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Sign Out</h3>
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">Sign out from all devices and sessions</p>
-                          <button className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full hover:opacity-90 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 shimmer-gray">
+                          <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Sign Out</h3>
+                          <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">Sign out from all devices and sessions</p>
+                          <button className="btn-touch w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-white text-gray-900 rounded-full hover:opacity-90 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 active:scale-95 shimmer-gray">
                             <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Sign Out Everywhere
                           </button>
@@ -1936,24 +1936,24 @@ export default function SettingsPage() {
                 {activeTab === 'documentation' && (
                   <div className="space-y-6 sm:space-y-8">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Feature Manuals</h2>
-                      <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
+                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Feature Manuals</h2>
+                      <p className="text-sm sm:text-base text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
                     </div>
 
                     {/* Search Bar */}
                     <div className="relative max-w-xl">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                       <input
                         type="text"
                         placeholder="Search feature manuals... (e.g., 'expenses', 'billing', 'meal planning')"
                         value={docSearchQuery}
                         onChange={(e) => setDocSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-colors"
+                        className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-700 bg-gray-800 text-white placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-colors"
                       />
                       {docSearchQuery && (
                         <button
                           onClick={() => setDocSearchQuery('')}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -1982,18 +1982,18 @@ export default function SettingsPage() {
                             <Link
                               key={feature.id}
                               href={feature.href}
-                              className={`btn-touch group relative p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2 border-gray-200/60 dark:border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105 active:scale-95`}
+                              className={`btn-touch group relative p-6 bg-gray-800/70 backdrop-blur-sm border-2 border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105 active:scale-95`}
                             >
                               <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
                                 <Icon className="w-7 h-7 text-white" />
                               </div>
-                              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">
                                 {feature.name}
                               </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                              <p className="text-sm text-gray-400 leading-relaxed mb-4">
                                 {feature.description}
                               </p>
-                              <div className="flex items-center text-sm font-semibold text-purple-600 dark:text-purple-400">
+                              <div className="flex items-center text-sm font-semibold text-purple-400">
                                 Read guides
                                 <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
                               </div>
@@ -2003,18 +2003,18 @@ export default function SettingsPage() {
                           return (
                             <div
                               key={feature.id}
-                              className="relative p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl opacity-60"
+                              className="relative p-6 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl opacity-60"
                             >
                               <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
                                 <Icon className="w-7 h-7 text-white" />
                               </div>
-                              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                              <h3 className="text-xl font-bold text-white mb-3">
                                 {feature.name}
                               </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                              <p className="text-sm text-gray-400 leading-relaxed mb-4">
                                 {feature.description}
                               </p>
-                              <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                              <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400">
                                 Coming Soon
                               </div>
                             </div>
@@ -2034,45 +2034,45 @@ export default function SettingsPage() {
 
       {/* Quick Links - Mobile Only (footer links are hidden on mobile) */}
       <div className="md:hidden px-4 pb-6">
-        <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+        <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
             <Link2 className="w-4 h-4" />
             Quick Links
           </h3>
           <div className="grid grid-cols-2 gap-2">
             <Link
               href="/legal"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Legal
             </Link>
             <Link
               href="/settings/documentation"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Documentation
             </Link>
             <Link
               href="/privacy"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Privacy
             </Link>
             <Link
               href="/terms"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Terms
             </Link>
             <Link
               href="/security"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Security
             </Link>
             <Link
               href="/feedback"
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
             >
               Feedback
             </Link>
@@ -2111,31 +2111,31 @@ export default function SettingsPage() {
       {/* Delete Account Modal */}
       {showDeleteAccountModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full p-6">
+          <div className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                <div className="w-10 h-10 rounded-xl bg-red-900/30 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Delete Account</h3>
+                <h3 className="text-xl font-bold text-white">Delete Account</h3>
               </div>
-              <button onClick={() => setShowDeleteAccountModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              <button onClick={() => setShowDeleteAccountModal(false)} className="text-gray-500 text-gray-400 hover:text-gray-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <p className="text-sm text-red-800 dark:text-red-200 font-semibold">
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-4">
+                <p className="text-sm text-red-200 font-semibold">
                   Warning: This action cannot be undone
                 </p>
-                <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                <p className="text-xs text-red-300 mt-1">
                   All your data will be permanently deleted, including tasks, events, messages, and all other content.
                 </p>
               </div>
 
               <div>
-                <label htmlFor="field-15" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="field-15" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Enter your password to confirm
                 </label>
                 <input
@@ -2145,12 +2145,12 @@ export default function SettingsPage() {
                   autoComplete="current-password"
                   onChange={(e) => setDeletePassword(e.target.value)}
                   placeholder="Your password"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
                 />
               </div>
 
               <div>
-                <label htmlFor="field-16" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+                <label htmlFor="field-16" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                   Type DELETE to confirm
                 </label>
                 <input
@@ -2159,7 +2159,7 @@ export default function SettingsPage() {
                   id="field-16"
               onChange={(e) =>  setDeleteConfirmText(e.target.value)}
                   placeholder="DELETE"
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
                 />
               </div>
 
@@ -2171,7 +2171,7 @@ export default function SettingsPage() {
               onChange={(e) =>  setDeleteAcknowledged(e.target.checked)}
                   className="mt-1 w-4 h-4 text-red-600 rounded focus:ring-red-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-300">
                   I understand this action is permanent and cannot be reversed
                 </span>
               </label>
@@ -2179,7 +2179,7 @@ export default function SettingsPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setShowDeleteAccountModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -2207,27 +2207,27 @@ export default function SettingsPage() {
       {/* Revoke Session Modal */}
       {showRevokeSessionModal && sessionToRevoke && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-md w-full p-6">
+          <div className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                <div className="w-10 h-10 rounded-xl bg-yellow-900/30 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-yellow-400" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Revoke Session</h3>
+                <h3 className="text-xl font-bold text-white">Revoke Session</h3>
               </div>
-              <button onClick={() => setShowRevokeSessionModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              <button onClick={() => setShowRevokeSessionModal(false)} className="text-gray-500 text-gray-400 hover:text-gray-200">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               Are you sure you want to revoke this session? The device will be logged out immediately.
             </p>
 
             <div className="flex gap-3">
               <button
                 onClick={() => setShowRevokeSessionModal(false)}
-                className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors"
               >
                 Cancel
               </button>

@@ -14,20 +14,20 @@ export default function CookiesPage() {
       <div className="p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-3xl font-bold text-white mb-4">
               Cookie Policy
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-lg text-gray-400">
               Learn about how we use cookies to enhance your experience.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 space-y-6">
+          <div className="bg-gray-800 rounded-xl p-6 space-y-6">
             <section>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              <h2 className="text-xl font-semibold text-white mb-3">
                 What are cookies?
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Cookies are small text files that are stored on your device when you visit our website.
                 They help us provide you with a better experience by remembering your preferences and
                 improving our services.
@@ -35,25 +35,25 @@ export default function CookiesPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              <h2 className="text-xl font-semibold text-white mb-3">
                 Types of cookies we use
               </h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">Essential Cookies</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  <h3 className="font-medium text-white">Essential Cookies</h3>
+                  <p className="text-gray-400 text-sm">
                     Required for the website to function properly. These cannot be disabled.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">Functional Cookies</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  <h3 className="font-medium text-white">Functional Cookies</h3>
+                  <p className="text-gray-400 text-sm">
                     Remember your preferences and enhance your experience.
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">Analytics Cookies</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  <h3 className="font-medium text-white">Analytics Cookies</h3>
+                  <p className="text-gray-400 text-sm">
                     Help us understand how you use our website to improve our services.
                   </p>
                 </div>
@@ -61,10 +61,10 @@ export default function CookiesPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+              <h2 className="text-xl font-semibold text-white mb-3">
                 Manage your preferences
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4">
                 You can control your cookie preferences at any time using the banner below.
               </p>
               <CookieConsentBanner />

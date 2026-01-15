@@ -190,8 +190,8 @@ export function MentionInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="w-full px-2 py-3 bg-transparent text-gray-900 dark:text-white
-            placeholder-gray-500 dark:placeholder-gray-400
+          className="w-full px-2 py-3 bg-transparent text-white
+            placeholder-gray-400
             focus:outline-none resize-none min-h-[44px] max-h-[120px]"
           style={{
             height: 'auto',
@@ -204,12 +204,12 @@ export function MentionInput({
       {showAutocomplete && filteredUsers.length > 0 && (
         <div
           ref={autocompleteRef}
-          className="absolute bottom-full left-0 right-0 mb-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg
-            border border-gray-200/50 dark:border-gray-700/50 rounded-lg shadow-xl z-50
+          className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800/80 backdrop-blur-lg
+            border border-gray-700/50 rounded-lg shadow-xl z-50
             max-h-60 overflow-y-auto"
         >
           <div className="p-2">
-            <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
               <AtSign className="w-4 h-4" />
               <span>Mention someone</span>
             </div>
@@ -219,8 +219,8 @@ export function MentionInput({
                 onClick={() => insertMention(user)}
                 className={`w-full flex items-center gap-3 px-3 py-2 mt-1 rounded-lg text-left transition-colors ${
                   index === selectedIndex
-                    ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white'
+                    ? 'bg-green-900/20 text-green-400'
+                    : 'hover:bg-gray-700 text-white'
                 }`}
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
@@ -228,7 +228,7 @@ export function MentionInput({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">{user.display_name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-gray-400 truncate">
                     {user.email}
                   </p>
                 </div>

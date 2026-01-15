@@ -57,10 +57,10 @@ export default function UpcomingBillsWidget({
   };
 
   const getUrgencyColor = (daysUntilDue: number) => {
-    if (daysUntilDue < 0) return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20';
-    if (daysUntilDue <= 3) return 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20';
-    if (daysUntilDue <= 7) return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20';
-    return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20';
+    if (daysUntilDue < 0) return 'text-red-400 bg-red-900/20';
+    if (daysUntilDue <= 3) return 'text-orange-400 bg-orange-900/20';
+    if (daysUntilDue <= 7) return 'text-yellow-400 bg-yellow-900/20';
+    return 'text-blue-400 bg-blue-900/20';
   };
 
   const getUrgencyIcon = (daysUntilDue: number) => {
@@ -80,7 +80,7 @@ export default function UpcomingBillsWidget({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-red-500 to-orange-600 p-6 text-white">
         <div className="flex items-center justify-between mb-4">
@@ -119,7 +119,7 @@ export default function UpcomingBillsWidget({
       {/* Bills List */}
       <div className="p-6">
         {loading ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-gray-400">
             Loading bills...
           </div>
         ) : (
@@ -127,20 +127,20 @@ export default function UpcomingBillsWidget({
             {/* Overdue Bills */}
             {showOverdue && overdueBills.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   Overdue Bills
                 </h3>
                 {overdueBills.map((bill) => (
                   <div
                     key={bill.event_id}
-                    className="flex items-start justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border-2 border-red-200 dark:border-red-800 mb-2"
+                    className="flex items-start justify-between p-4 bg-red-900/20 rounded-lg border-2 border-red-800 mb-2"
                   >
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                      <h4 className="font-semibold text-white mb-1">
                         {bill.title.replace('💰 Bill Due: ', '')}
                       </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      <p className="text-sm text-gray-400 mb-2">
                         {bill.category} • {bill.payment_method || 'No payment method'}
                       </p>
                       <div className="flex items-center gap-2">
@@ -150,12 +150,12 @@ export default function UpcomingBillsWidget({
                       </div>
                     </div>
                     <div className="text-right ml-4">
-                      <p className="text-xl font-bold text-red-600 dark:text-red-400">
+                      <p className="text-xl font-bold text-red-400">
                         ${bill.amount.toLocaleString()}
                       </p>
                       <button
                         onClick={() => handleMarkAsPaid(bill.expense_id)}
-                        className="mt-2 text-xs text-red-600 dark:text-red-400 hover:underline"
+                        className="mt-2 text-xs text-red-400 hover:underline"
                       >
                         Mark as Paid
                       </button>
@@ -170,13 +170,13 @@ export default function UpcomingBillsWidget({
               upcomingBills.map((bill) => (
                 <div
                   key={bill.event_id}
-                  className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all"
+                  className="flex items-start justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700 hover:shadow-md transition-all"
                 >
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                    <h4 className="font-semibold text-white mb-1">
                       {bill.title.replace('💰 Bill Due: ', '')}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-sm text-gray-400 mb-2">
                       {bill.category} • {bill.payment_method || 'No payment method'}
                     </p>
                     <div className="flex items-center gap-2">
@@ -193,12 +193,12 @@ export default function UpcomingBillsWidget({
                     </div>
                   </div>
                   <div className="text-right ml-4">
-                    <p className="text-xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-xl font-bold text-white">
                       ${bill.amount.toLocaleString()}
                     </p>
                     <button
                       onClick={() => handleMarkAsPaid(bill.expense_id)}
-                      className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 ml-auto"
+                      className="mt-2 text-xs text-blue-400 hover:underline flex items-center gap-1 ml-auto"
                     >
                       <CheckCircle className="w-3 h-3" />
                       Mark as Paid
@@ -208,8 +208,8 @@ export default function UpcomingBillsWidget({
               ))
             ) : (
               <div className="text-center py-12">
-                <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <Calendar className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400">
                   No bills due in the next {daysAhead} days
                 </p>
               </div>

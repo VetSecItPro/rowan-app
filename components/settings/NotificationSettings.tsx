@@ -95,7 +95,7 @@ const Toggle = memo(function Toggle({
       className={`
         relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent
         transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2
-        ${enabled ? 'bg-purple-600' : 'bg-gray-200 dark:bg-gray-700'}
+        ${enabled ? 'bg-purple-600' : 'bg-gray-700'}
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
       role="switch"
@@ -125,16 +125,16 @@ const Section = memo(function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div className="px-4 py-4 sm:px-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="px-4 py-4 sm:px-6 border-b border-gray-700 bg-gray-800/50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-            <Icon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center">
+            <Icon className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+            <h3 className="text-lg font-semibold text-white">{title}</h3>
             {description && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
+              <p className="text-sm text-gray-400">{description}</p>
             )}
           </div>
         </div>
@@ -160,12 +160,12 @@ const SettingRow = memo(function SettingRow({
     <div className="flex items-center justify-between gap-4 py-2">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {Icon && (
-          <Icon className="w-5 h-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+          <Icon className="w-5 h-5 text-gray-500 flex-shrink-0" />
         )}
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+          <p className="text-sm font-medium text-white">{label}</p>
           {description && (
-            <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
+            <p className="text-xs text-gray-400">{description}</p>
           )}
         </div>
       </div>
@@ -191,8 +191,8 @@ const TimePicker = memo(function TimePicker({
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
       className={`
-        px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+        px-3 py-1.5 text-sm border border-gray-600 rounded-lg
+        bg-gray-700 text-white
         focus:ring-2 focus:ring-purple-500 focus:border-transparent
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
@@ -229,8 +229,8 @@ const TimezoneSelector = memo(function TimezoneSelector({
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
       className={`
-        px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg
-        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+        px-3 py-1.5 text-sm border border-gray-600 rounded-lg
+        bg-gray-700 text-white
         focus:ring-2 focus:ring-purple-500 focus:border-transparent
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
@@ -446,7 +446,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
-        <span className="ml-3 text-gray-600 dark:text-gray-400">Loading notification settings...</span>
+        <span className="ml-3 text-gray-400">Loading notification settings...</span>
       </div>
     );
   }
@@ -469,8 +469,8 @@ export const NotificationSettings = memo(function NotificationSettings() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Notification Settings</h2>
-          <p className="text-gray-600 dark:text-gray-400">Manage how and when you receive notifications</p>
+          <h2 className="text-2xl font-bold text-white">Notification Settings</h2>
+          <p className="text-gray-400">Manage how and when you receive notifications</p>
         </div>
         <button
           onClick={savePreferences}
@@ -479,7 +479,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
             inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
             ${hasChanges
               ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              : 'bg-gray-800 text-gray-500 cursor-not-allowed'
             }
           `}
         >
@@ -504,7 +504,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
 
       {/* Error message */}
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 flex items-center gap-2">
+        <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg text-red-300 flex items-center gap-2">
           <AlertCircle className="w-5 h-5" />
           {error}
         </div>
@@ -517,24 +517,24 @@ export const NotificationSettings = memo(function NotificationSettings() {
         icon={BellRing}
       >
         {!pushSupported ? (
-          <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="p-4 bg-amber-900/20 border border-amber-800 rounded-lg">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-amber-800 dark:text-amber-200">Not Supported</p>
-                <p className="text-amber-700 dark:text-amber-300">
+                <p className="font-medium text-amber-200">Not Supported</p>
+                <p className="text-amber-300">
                   Push notifications are not supported in this browser. Try using Chrome, Firefox, or Safari.
                 </p>
               </div>
             </div>
           </div>
         ) : pushPermission === 'denied' ? (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg">
             <div className="flex items-start gap-3">
-              <BellOff className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <BellOff className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-red-800 dark:text-red-200">Notifications Blocked</p>
-                <p className="text-red-700 dark:text-red-300">
+                <p className="font-medium text-red-200">Notifications Blocked</p>
+                <p className="text-red-300">
                   Push notifications have been blocked. To enable them, click the lock icon in your browser&apos;s address bar and allow notifications.
                 </p>
               </div>
@@ -557,7 +557,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
             </SettingRow>
 
             {pushSubscribed && (
-              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-3 border-t border-gray-700">
                 <SettingRow
                   label="Test Notification"
                   description="Send a test push to verify it's working"
@@ -568,8 +568,8 @@ export const NotificationSettings = memo(function NotificationSettings() {
                     disabled={pushTestLoading}
                     className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                       pushTestSuccess
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                        : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50'
+                        ? 'bg-green-900/30 text-green-400'
+                        : 'bg-purple-900/30 text-purple-400 hover:bg-purple-900/50'
                     }`}
                   >
                     {pushTestLoading ? (
@@ -594,7 +594,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
             )}
 
             {pushError && (
-              <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
+              <div className="mt-3 p-3 bg-red-900/20 border border-red-800 rounded-lg text-sm text-red-300 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 {pushError}
               </div>
@@ -676,26 +676,26 @@ export const NotificationSettings = memo(function NotificationSettings() {
         description="Your personalized morning assistant"
         icon={Calendar}
       >
-        <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-200 dark:border-purple-800 rounded-xl mb-4">
+        <div className="p-4 bg-gradient-to-r from-purple-50 from-purple-900/20 to-indigo-900/20 border border-purple-800 rounded-xl mb-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
               <span className="text-lg">✨</span>
             </div>
             <div className="text-sm">
-              <p className="font-semibold text-purple-900 dark:text-purple-100">JARVIS-Style Morning Briefing</p>
-              <p className="text-purple-700 dark:text-purple-300 mt-1">
+              <p className="font-semibold text-purple-100">JARVIS-Style Morning Briefing</p>
+              <p className="text-purple-300 mt-1">
                 Wake up to a personalized email that reads like your own AI assistant. Get a conversational
                 summary of your day followed by a quick-reference schedule - events, tasks, meals, and reminders
                 all in one beautiful email.
               </p>
               <div className="flex flex-wrap gap-2 mt-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-800 text-purple-300">
                   AI-Powered
                 </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-800 text-indigo-300">
                   Personalized
                 </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-300">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-800 text-blue-300">
                   Once Daily
                 </span>
               </div>
@@ -759,7 +759,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
         <div className={`flex items-center gap-4 pt-2 ${!preferences.quiet_hours_enabled ? 'opacity-50 pointer-events-none' : ''}`}>
           <div className="flex items-center gap-2">
             <Moon className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">From</span>
+            <span className="text-sm text-gray-400">From</span>
             <TimePicker
               value={preferences.quiet_hours_start || '22:00'}
               onChange={(v) => updatePreference('quiet_hours_start', v)}
@@ -768,7 +768,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
           </div>
           <div className="flex items-center gap-2">
             <Sun className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">To</span>
+            <span className="text-sm text-gray-400">To</span>
             <TimePicker
               value={preferences.quiet_hours_end || '07:00'}
               onChange={(v) => updatePreference('quiet_hours_end', v)}

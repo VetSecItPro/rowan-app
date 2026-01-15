@@ -74,25 +74,25 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
+    <div className="bg-gray-900/50 border border-gray-700 rounded-lg sm:rounded-xl p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-          <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+          <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
         </div>
         <div className="flex-1 w-full">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1">Change Password</h3>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Change Password</h3>
+          <p className="text-xs sm:text-sm text-gray-400 mb-4">
             Update your password directly. You'll need to enter your current password for verification.
           </p>
 
           {/* Success Message */}
           {success && (
-            <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="mb-4 p-4 bg-green-900/20 border border-green-800 rounded-lg">
               <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-green-800 dark:text-green-200">Password changed successfully!</p>
-                  <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                  <p className="text-sm font-medium text-green-200">Password changed successfully!</p>
+                  <p className="text-xs text-green-300 mt-1">
                     Your password has been updated. Use your new password for future sign-ins.
                   </p>
                 </div>
@@ -102,12 +102,12 @@ export function ChangePasswordForm() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="mb-4 p-4 bg-red-900/20 border border-red-800 rounded-lg">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
-                  <p className="text-xs text-red-700 dark:text-red-300 mt-1">{error}</p>
+                  <p className="text-sm font-medium text-red-200">Error</p>
+                  <p className="text-xs text-red-300 mt-1">{error}</p>
                 </div>
               </div>
             </div>
@@ -116,7 +116,7 @@ export function ChangePasswordForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Current Password */}
             <div>
-              <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="current-password" className="block text-sm font-medium text-gray-300 mb-2">
                 Current Password
               </label>
               <div className="relative">
@@ -125,14 +125,14 @@ export function ChangePasswordForm() {
                   type={showCurrentPassword ? 'text' : 'password'}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
                   placeholder="Enter current password"
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -141,7 +141,7 @@ export function ChangePasswordForm() {
 
             {/* New Password */}
             <div>
-              <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="new-password" className="block text-sm font-medium text-gray-300 mb-2">
                 New Password
               </label>
               <div className="relative">
@@ -150,14 +150,14 @@ export function ChangePasswordForm() {
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
                   placeholder="Enter new password"
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -166,7 +166,7 @@ export function ChangePasswordForm() {
 
             {/* Confirm New Password */}
             <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-300 mb-2">
                 Confirm New Password
               </label>
               <div className="relative">
@@ -175,14 +175,14 @@ export function ChangePasswordForm() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
                   placeholder="Confirm new password"
                   autoComplete="new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
                 >
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -191,17 +191,17 @@ export function ChangePasswordForm() {
 
             {/* Password Requirements */}
             {newPassword.length > 0 && (
-              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Password requirements:</p>
+              <div className="p-3 bg-gray-800 rounded-lg">
+                <p className="text-xs font-medium text-gray-300 mb-2">Password requirements:</p>
                 <ul className="space-y-1">
                   {requirements.map((req, index) => (
                     <li key={index} className="flex items-center gap-2 text-xs">
                       {req.met ? (
                         <Check className="w-3.5 h-3.5 text-green-500" />
                       ) : (
-                        <div className="w-3.5 h-3.5 rounded-full border border-gray-400 dark:border-gray-500" />
+                        <div className="w-3.5 h-3.5 rounded-full border border-gray-500" />
                       )}
-                      <span className={req.met ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}>
+                      <span className={req.met ? 'text-green-400' : 'text-gray-400'}>
                         {req.label}
                       </span>
                     </li>

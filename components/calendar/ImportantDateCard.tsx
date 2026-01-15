@@ -99,12 +99,12 @@ export function ImportantDateCard({ date, onClick }: ImportantDateCardProps) {
   return (
     <button
       onClick={onClick}
-      className="group relative w-full overflow-hidden rounded-xl border border-gray-200/50 p-3 text-left transition-all duration-200 hover:scale-[1.02] hover:shadow-md dark:border-gray-700/50"
+      className="group relative w-full overflow-hidden rounded-xl border border-gray-200/50 p-3 text-left transition-all duration-200 hover:scale-[1.02] border-gray-700/50"
       style={{ background: gradientStyle.background }}
     >
       {/* Dark mode overlay */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 dark:opacity-100"
+        className="pointer-events-none absolute inset-0 opacity-0 opacity-100"
         style={{ background: gradientStyle.darkBackground }}
       />
 
@@ -113,7 +113,7 @@ export function ImportantDateCard({ date, onClick }: ImportantDateCardProps) {
         {/* Emoji or Icon */}
         <div className="flex items-center gap-1">
           {is_today && (
-            <Sparkles className="h-4 w-4 animate-pulse text-amber-600 dark:text-amber-400" />
+            <Sparkles className="h-4 w-4 animate-pulse text-amber-400" />
           )}
           <span className="text-2xl">{emoji}</span>
         </div>
@@ -123,12 +123,12 @@ export function ImportantDateCard({ date, onClick }: ImportantDateCardProps) {
           <span
             className={`text-lg font-bold ${
               is_today
-                ? 'text-amber-700 dark:text-amber-300'
+                ? 'text-amber-300'
                 : days_until <= 3
-                  ? 'text-red-700 dark:text-red-300'
+                  ? 'text-red-300'
                   : days_until <= 7
-                    ? 'text-purple-700 dark:text-purple-300'
-                    : 'text-gray-700 dark:text-gray-300'
+                    ? 'text-purple-300'
+                    : 'text-gray-300'
             }`}
           >
             {is_today ? 'Today!' : days_until === 1 ? '1 day' : `${days_until} days`}
@@ -136,19 +136,19 @@ export function ImportantDateCard({ date, onClick }: ImportantDateCardProps) {
         </div>
 
         {/* Name/Title */}
-        <p className="mt-1 w-full truncate text-xs font-semibold text-gray-800 dark:text-gray-200">
+        <p className="mt-1 w-full truncate text-xs font-semibold text-gray-200">
           {displayName}
         </p>
 
         {/* Years display if available */}
         {yearsDisplay && (
-          <p className="text-[10px] font-medium text-gray-600 dark:text-gray-400">
+          <p className="text-[10px] font-medium text-gray-400">
             {yearsDisplay}
           </p>
         )}
 
         {/* Date */}
-        <p className="text-[10px] text-gray-500 dark:text-gray-400">{nextDate}</p>
+        <p className="text-[10px] text-gray-400">{nextDate}</p>
       </div>
     </button>
   );

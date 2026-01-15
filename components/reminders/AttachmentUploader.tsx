@@ -130,8 +130,8 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
         onDrop={handleDrop}
         className={`relative border-2 border-dashed rounded-lg p-6 transition-colors ${
           isDragging
-            ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/10'
-            : 'border-gray-300 dark:border-gray-700 hover:border-pink-400 dark:hover:border-pink-600'
+            ? 'border-pink-500 bg-pink-900/10'
+            : 'border-gray-700 hover:border-pink-600'
         } ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
       >
         <input
@@ -146,23 +146,23 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
         <div className="text-center">
           {isUploading ? (
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-8 h-8 text-pink-600 dark:text-pink-400 animate-spin" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">Uploading...</p>
+              <Loader2 className="w-8 h-8 text-pink-400 animate-spin" />
+              <p className="text-sm text-gray-400">Uploading...</p>
             </div>
           ) : (
             <>
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <p className="text-sm text-gray-400 mb-2">
                 Drag and drop files here, or{' '}
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-pink-600 dark:text-pink-400 font-medium hover:underline"
+                  className="text-pink-400 font-medium hover:underline"
                 >
                   browse
                 </button>
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-500">
+              <p className="text-xs text-gray-500">
                 Max 2MB • Images, PDFs, Documents
               </p>
             </>
@@ -176,15 +176,15 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
           type="button"
           onClick={() => setShowUrlInput(true)}
           disabled={isUploading}
-          className="w-full px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+          className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50"
         >
           <LinkIcon className="w-4 h-4" />
           Add Link
         </button>
       ) : (
-        <div className="space-y-2 p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <div className="space-y-2 p-4 bg-gray-900 border border-gray-700 rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-gray-300">
               Add URL
             </span>
             <button
@@ -194,7 +194,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
                 setUrlValue('');
                 setUrlDisplayName('');
               }}
-              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+              className="p-1 hover:bg-gray-700 rounded transition-colors"
             >
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -205,7 +205,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
             value={urlValue}
             onChange={(e) => setUrlValue(e.target.value)}
             placeholder="https://example.com"
-            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-white placeholder-gray-500"
             disabled={isUploading}
           />
 
@@ -214,7 +214,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
             value={urlDisplayName}
             onChange={(e) => setUrlDisplayName(e.target.value)}
             placeholder="Display name (optional)"
-            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-white placeholder-gray-500"
             disabled={isUploading}
           />
 

@@ -69,10 +69,10 @@ export function CircularProgress({
 
   // Get text color for percentage display
   const getTextColor = () => {
-    if (progress >= 75) return 'text-green-600 dark:text-green-400';
-    if (progress >= 50) return 'text-blue-600 dark:text-blue-400';
-    if (progress >= 25) return 'text-blue-500 dark:text-blue-300';
-    return 'text-gray-600 dark:text-gray-400';
+    if (progress >= 75) return 'text-green-400';
+    if (progress >= 50) return 'text-blue-400';
+    if (progress >= 25) return 'text-blue-300';
+    return 'text-gray-400';
   };
 
   return (
@@ -120,7 +120,7 @@ export function CircularProgress({
           strokeWidth={strokeWidth}
           stroke="currentColor"
           fill="none"
-          className="text-gray-200/50 dark:text-gray-700/50"
+          className="text-gray-700/50"
         />
 
         {/* Progress circle */}
@@ -154,7 +154,7 @@ export function CircularProgress({
           </span>
         )}
         {subLabel && (
-          <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center px-2">
+          <span className="text-xs text-gray-400 mt-1 text-center px-2">
             {subLabel}
           </span>
         )}
@@ -213,7 +213,7 @@ export function MultiRingProgress({
               strokeWidth={strokeWidth}
               stroke="currentColor"
               fill="none"
-              className="text-gray-200/30 dark:text-gray-700/30"
+              className="text-gray-700/30"
             />
 
             {/* Progress circle */}
@@ -239,7 +239,7 @@ export function MultiRingProgress({
       {/* Center legend */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-sm font-medium text-gray-900 dark:text-white">
+          <div className="text-sm font-medium text-white">
             Progress
           </div>
           <div className="flex gap-2 mt-2">
@@ -249,7 +249,7 @@ export function MultiRingProgress({
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: ring.color }}
                 />
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="text-xs text-gray-400">
                   {Math.round(ring.value)}%
                 </span>
               </div>

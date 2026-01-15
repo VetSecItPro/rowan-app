@@ -103,13 +103,13 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
   if (loading) {
     return (
       <div className={`space-y-6 ${className}`}>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+            <div className="h-8 bg-gray-700 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-700 rounded w-2/3"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div key={i} className="h-32 bg-gray-700 rounded"></div>
               ))}
             </div>
           </div>
@@ -121,13 +121,13 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-semibold text-white">
               Financial Reports
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-gray-400 mt-1">
               Generate detailed financial reports and insights
             </p>
           </div>
@@ -142,8 +142,8 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 rounded-lg border border-gray-700">
+        <div className="border-b border-gray-700">
           <nav className="flex space-x-8 px-6" aria-label="Tabs">
             {tabs.filter(tab => !tab.hidden).map((tab) => {
               const Icon = tab.icon;
@@ -156,8 +156,8 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
                   className={`
                     py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap
                     ${isActive
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 text-gray-400 hover:text-gray-300'
                     }
                   `}
                 >

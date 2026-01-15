@@ -210,7 +210,7 @@ export function PrivacyDataManager() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">Failed to load privacy settings</p>
+        <p className="text-gray-400">Failed to load privacy settings</p>
         <button
           onClick={loadAllData}
           className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
@@ -225,57 +225,57 @@ export function PrivacyDataManager() {
     <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
           Privacy & Data Management
         </h2>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+        <p className="text-sm sm:text-base text-gray-400">
           Control your privacy preferences, manage your data, and understand your rights
         </p>
       </div>
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+        <div className="p-4 bg-green-900/20 border border-green-800 rounded-xl">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <p className="text-sm text-green-800 dark:text-green-200">{success}</p>
+            <CheckCircle className="w-4 h-4 text-green-400" />
+            <p className="text-sm text-green-200">{success}</p>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+        <div className="p-4 bg-red-900/20 border border-red-800 rounded-xl">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-            <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+            <AlertCircle className="w-4 h-4 text-red-400" />
+            <p className="text-sm text-red-200">{error}</p>
           </div>
         </div>
       )}
 
 
       {/* Legal Compliance Section */}
-      <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+      <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Privacy Rights</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">CCPA and GDPR privacy controls</p>
+            <h3 className="text-lg font-semibold text-white mb-1">Privacy Rights</h3>
+            <p className="text-sm text-gray-400">CCPA and GDPR privacy controls</p>
           </div>
         </div>
 
         <div className="space-y-6">
           {/* CCPA Do Not Sell */}
-          <div className={`p-4 border border-orange-200 dark:border-orange-800 rounded-xl ${
+          <div className={`p-4 border border-orange-800 rounded-xl ${
             preferences.ccpa_do_not_sell
-              ? 'bg-gray-50 dark:bg-gray-900/20'
-              : 'bg-orange-50 dark:bg-orange-900/20'
+              ? 'bg-gray-900/20'
+              : 'bg-orange-900/20'
           }`}>
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">CCPA: Do Not Sell My Personal Information</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Prevent sharing your data with third parties for monetary gain</p>
+                <p className="font-medium text-white">CCPA: Do Not Sell My Personal Information</p>
+                <p className="text-xs text-gray-400 mt-1">Prevent sharing your data with third parties for monetary gain</p>
               </div>
               <Toggle
                 id="ccpa-do-not-sell"
@@ -286,7 +286,7 @@ export function PrivacyDataManager() {
                 color="orange"
               />
             </div>
-            <div className="text-xs text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 p-3 rounded-lg">
+            <div className="text-xs text-orange-300 bg-orange-900/30 p-3 rounded-lg">
               <strong>California residents:</strong> When enabled, we will not share your personal information with third parties for monetary or other valuable consideration.
             </div>
           </div>
@@ -295,32 +295,32 @@ export function PrivacyDataManager() {
       </div>
 
       {/* Data Management Section */}
-      <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
+      <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
             <Database className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Your Data</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Export, delete, or manage your personal data</p>
+            <h3 className="text-lg font-semibold text-white mb-1">Your Data</h3>
+            <p className="text-sm text-gray-400">Export, delete, or manage your personal data</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Export Data */}
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+          <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-xl">
             <div className="flex items-start gap-3 mb-4">
-              <Download className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <Download className="w-5 h-5 text-blue-400 mt-0.5" />
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Export Your Data</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Download all your personal data</p>
+                <h4 className="font-medium text-white">Export Your Data</h4>
+                <p className="text-xs text-gray-400 mt-1">Download all your personal data</p>
               </div>
             </div>
-            <div className="text-xs text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg mb-4">
+            <div className="text-xs text-blue-300 bg-blue-900/30 p-3 rounded-lg mb-4">
               Includes your profile, tasks, messages, calendar events, and all personal data. You'll receive an email when your export is ready.
             </div>
             {exportStatus?.hasActiveRequest ? (
-              <div className="text-xs text-blue-700 dark:text-blue-300 mb-4">
+              <div className="text-xs text-blue-300 mb-4">
                 Status: {exportStatus.status} - Check your email for updates
               </div>
             ) : null}
@@ -339,20 +339,20 @@ export function PrivacyDataManager() {
           </div>
 
           {/* Delete Account */}
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+          <div className="p-4 bg-red-900/20 border border-red-800 rounded-xl">
             <div className="flex items-start gap-3 mb-4">
-              <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+              <Trash2 className="w-5 h-5 text-red-400 mt-0.5" />
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white">Delete Account</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Permanently delete your account</p>
+                <h4 className="font-medium text-white">Delete Account</h4>
+                <p className="text-xs text-gray-400 mt-1">Permanently delete your account</p>
               </div>
             </div>
-            <div className="text-xs text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30 p-3 rounded-lg mb-4">
+            <div className="text-xs text-red-300 bg-red-900/30 p-3 rounded-lg mb-4">
               <strong>Important:</strong> Account deletion has a 30-day grace period. You'll receive email reminders and can cancel anytime before the final deletion.
             </div>
             {deletionStatus?.hasActiveRequest ? (
               <div className="mb-4">
-                <div className="text-xs text-red-700 dark:text-red-300 mb-2">
+                <div className="text-xs text-red-300 mb-2">
                   Scheduled deletion: {deletionStatus.scheduledDate ? new Date(deletionStatus.scheduledDate).toLocaleDateString() : 'Unknown'}
                 </div>
                 <button

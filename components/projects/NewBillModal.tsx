@@ -140,7 +140,7 @@ export function NewBillModal({
       />
 
       <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-        <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-4xl sm:max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
+        <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-4xl sm:max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
           <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-amber-500 to-amber-600 sm:rounded-t-2xl">
             <h2 className="text-xl font-semibold text-white">
               {editBill ? 'Edit Bill' : 'New Bill'}
@@ -157,17 +157,17 @@ export function NewBillModal({
           <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* General Error Banner */}
             {generalError && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-800 dark:text-red-200">{generalError}</p>
+                  <p className="text-sm font-medium text-red-200">{generalError}</p>
                 </div>
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                   Bill Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -176,20 +176,20 @@ export function NewBillModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Electric Bill, Netflix, Rent"
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                  className={`w-full px-4 py-3 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                     errors.name
-                      ? 'border-red-500 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
+                      ? 'border-red-500'
+                      : 'border-gray-600'
                   }`}
                   required
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+                  <p className="mt-1 text-sm text-red-400">{errors.name}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="amount" className="block text-sm font-medium text-gray-300 mb-2">
                   Amount <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -203,21 +203,21 @@ export function NewBillModal({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className={`w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                    className={`w-full pl-8 pr-4 py-3 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                       errors.amount
-                        ? 'border-red-500 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
+                        ? 'border-red-500'
+                        : 'border-gray-600'
                     }`}
                     required
                   />
                 </div>
                 {errors.amount && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.amount}</p>
+                  <p className="mt-1 text-sm text-red-400">{errors.amount}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="dueDate" className="block text-sm font-medium text-gray-300 mb-2">
                   Due Date <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -225,20 +225,20 @@ export function NewBillModal({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                  className={`w-full px-4 py-3 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                     errors.due_date
-                      ? 'border-red-500 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
+                      ? 'border-red-500'
+                      : 'border-gray-600'
                   }`}
                   required
                 />
                 {errors.due_date && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.due_date}</p>
+                  <p className="mt-1 text-sm text-red-400">{errors.due_date}</p>
                 )}
               </div>
 
               <div className="relative">
-                <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="frequency" className="block text-sm font-medium text-gray-300 mb-2">
                   Frequency
                 </label>
                 <div className="relative">
@@ -246,7 +246,7 @@ export function NewBillModal({
                     id="frequency"
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value as BillFrequency)}
-                    className="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
+                    className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
                   >
                     {frequencies.map((freq) => (
                       <option key={freq.value} value={freq.value}>
@@ -259,7 +259,7 @@ export function NewBillModal({
               </div>
 
               <div className="relative">
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-300 mb-2">
                   Category
                 </label>
                 <div className="relative">
@@ -267,10 +267,10 @@ export function NewBillModal({
                     id="category"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className={`w-full px-4 py-3 pr-12 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none ${
+                    className={`w-full px-4 py-3 pr-12 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none ${
                       errors.category
-                        ? 'border-red-500 dark:border-red-500'
-                        : 'border-gray-300 dark:border-gray-600'
+                        ? 'border-red-500'
+                        : 'border-gray-600'
                     }`}
                   >
                     <option value="">Select category...</option>
@@ -283,12 +283,12 @@ export function NewBillModal({
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
                 {errors.category && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.category}</p>
+                  <p className="mt-1 text-sm text-red-400">{errors.category}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="payee" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="payee" className="block text-sm font-medium text-gray-300 mb-2">
                   Payee
                 </label>
                 <input
@@ -298,19 +298,19 @@ export function NewBillModal({
                   onChange={(e) => setPayee(e.target.value)}
                   placeholder="Who to pay"
                   maxLength={255}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
+                  className={`w-full px-4 py-3 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 ${
                     errors.payee
-                      ? 'border-red-500 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
+                      ? 'border-red-500'
+                      : 'border-gray-600'
                   }`}
                 />
                 {errors.payee && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.payee}</p>
+                  <p className="mt-1 text-sm text-red-400">{errors.payee}</p>
                 )}
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-2">
                   Notes
                 </label>
                 <textarea
@@ -320,18 +320,18 @@ export function NewBillModal({
                   placeholder="Additional notes..."
                   rows={3}
                   maxLength={1000}
-                  className={`w-full px-4 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none ${
+                  className={`w-full px-4 py-3 bg-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none ${
                     errors.notes
-                      ? 'border-red-500 dark:border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
+                      ? 'border-red-500'
+                      : 'border-gray-600'
                   }`}
                 />
                 {errors.notes && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.notes}</p>
+                  <p className="mt-1 text-sm text-red-400">{errors.notes}</p>
                 )}
               </div>
 
-              <div className="md:col-span-2 space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="md:col-span-2 space-y-3 pt-4 border-t border-gray-700">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -339,14 +339,14 @@ export function NewBillModal({
                     onChange={(e) => setReminderEnabled(e.target.checked)}
                     className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-medium text-gray-300">
                     Enable Reminder
                   </span>
                 </label>
 
                 {reminderEnabled && (
                   <div className="ml-8">
-                    <label htmlFor="reminderDays" className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <label htmlFor="reminderDays" className="block text-sm text-gray-400 mb-2">
                       Remind me {reminderDays} day{reminderDays !== 1 ? 's' : ''} before
                     </label>
                     <input
@@ -359,7 +359,7 @@ export function NewBillModal({
                       className="w-full"
                     />
                     {errors.reminder_days_before && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-400">
                         {errors.reminder_days_before}
                       </p>
                     )}

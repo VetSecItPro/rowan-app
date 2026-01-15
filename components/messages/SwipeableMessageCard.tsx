@@ -157,7 +157,7 @@ export function SwipeableMessageCard({
       <div className="absolute inset-0 overflow-hidden rounded-2xl">
         {/* Edit Background (Right Swipe) */}
         <div
-          className="absolute inset-0 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 transition-all duration-300"
+          className="absolute inset-0 bg-gradient-to-r from-blue-50 from-blue-950/30 to-blue-900/30 transition-all duration-300"
           style={{
             opacity: Math.max(0, Math.min(1, offsetX / EDIT_THRESHOLD)),
             transform: `translateX(${offsetX > 0 ? 0 : '-100%'})`,
@@ -165,7 +165,7 @@ export function SwipeableMessageCard({
         />
         {/* Delete Background (Left Swipe) */}
         <div
-          className="absolute inset-0 bg-gradient-to-l from-red-50 to-red-100 dark:from-red-950/30 dark:to-red-900/30 transition-all duration-300"
+          className="absolute inset-0 bg-gradient-to-l from-red-50 from-red-950/30 to-red-900/30 transition-all duration-300"
           style={{
             opacity: Math.max(0, Math.min(1, Math.abs(offsetX / DELETE_THRESHOLD))),
             transform: `translateX(${offsetX < 0 ? 0 : '100%'})`,

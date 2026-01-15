@@ -183,7 +183,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+      <div className="flex items-center gap-2 text-gray-300">
         <MessageCircle className="w-5 h-5" />
         <h3 className="font-semibold">
           Comments {comments.length > 0 && `(${comments.length})`}
@@ -192,11 +192,11 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
 
       {/* Comments List */}
       {loading ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-400">
           Loading comments...
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-400">
           No comments yet. Be the first to comment!
         </div>
       ) : (
@@ -249,7 +249,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
               onChange={setNewCommentContent}
               spaceId={spaceId}
               placeholder="Write a comment... Type @ to mention someone"
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 resize-none"
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 resize-none"
               rows={2}
               maxLength={5000}
               disabled={submitting}
@@ -259,7 +259,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
 
         {/* Actions */}
         <div className="flex items-center justify-between pl-11">
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-gray-400">
             {newCommentContent.length}/5000
           </span>
           <button
@@ -348,14 +348,14 @@ function CommentItem({
 
       {/* Comment Content */}
       <div className="flex-1 min-w-0">
-        <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg p-3">
           {/* Header */}
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-gray-900 dark:text-white text-sm">
+              <span className="font-semibold text-white text-sm">
                 {comment.user?.name || 'Unknown User'}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-gray-400">
                 {timeAgo}
                 {wasEdited && ' (edited)'}
               </span>
@@ -366,17 +366,17 @@ function CommentItem({
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={onStartEdit}
-                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                  className="p-1 hover:bg-gray-700 rounded transition-colors"
                   aria-label="Edit comment"
                 >
-                  <Edit className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                  <Edit className="w-3 h-3 text-gray-400" />
                 </button>
                 <button
                   onClick={onDelete}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  className="p-1 hover:bg-gray-700 rounded transition-colors"
                   aria-label="Delete comment"
                 >
-                  <Trash2 className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                  <Trash2 className="w-3 h-3 text-gray-400" />
                 </button>
               </div>
             )}
@@ -390,14 +390,14 @@ function CommentItem({
                 onChange={onEditContentChange}
                 spaceId={spaceId}
                 placeholder="Edit comment... Type @ to mention someone"
-                className="w-full px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-900 dark:text-white resize-none"
+                className="w-full px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-white resize-none"
                 rows={3}
                 maxLength={5000}
               />
               <div className="flex items-center justify-end gap-2">
                 <button
                   onClick={onCancelEdit}
-                  className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                  className="px-3 py-1 text-sm text-gray-400 hover:bg-gray-700 rounded transition-colors"
                 >
                   Cancel
                 </button>
@@ -411,7 +411,7 @@ function CommentItem({
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
+            <p className="text-sm text-gray-300 whitespace-pre-wrap break-words">
               {comment.content}
             </p>
           )}

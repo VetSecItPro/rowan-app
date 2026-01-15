@@ -165,14 +165,14 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Repeat className="w-5 h-5 text-purple-500" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-white">
             Chore Rotation
           </h3>
           {isConfigured && (
             <span className={`px-2 py-0.5 text-xs rounded-full ${
               rotation.is_active
-                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                : 'bg-gray-100 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300'
+                ? 'bg-green-900/20 text-green-300'
+                : 'bg-gray-900/20 text-gray-300'
             }`}>
               {rotation.is_active ? 'Active' : 'Inactive'}
             </span>
@@ -183,20 +183,20 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
           <div className="flex items-center gap-2">
             <button
               onClick={toggleActive}
-              className="p-2 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              className="p-2 text-gray-600 hover:bg-gray-700 rounded-lg"
               title={rotation.is_active ? 'Pause rotation' : 'Resume rotation'}
             >
               {rotation.is_active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </button>
             <button
               onClick={() => setEditing(true)}
-              className="p-2 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              className="p-2 text-gray-600 hover:bg-gray-700 rounded-lg"
             >
               <Settings className="w-4 h-4" />
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
+              className="p-2 text-red-600 hover:bg-red-900 rounded-lg"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -207,17 +207,17 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       {/* Display Mode */}
       {isConfigured && !editing ? (
         <div className="space-y-3">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <div className="p-4 bg-gray-900 rounded-lg">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-gray-500">Rotation Type</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                <p className="text-sm font-medium text-white capitalize">
                   {rotation.rotation_type.replace('-', ' ')}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Interval</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-white">
                   Every {rotation.interval_value} {rotation.interval_type.replace('ly', '')}
                   {rotation.interval_value > 1 ? 's' : ''}
                 </p>
@@ -232,7 +232,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                   .map((member) => (
                     <span
                       key={member.user_id}
-                      className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded"
+                      className="px-2 py-1 text-xs bg-purple-900/20 text-purple-300 rounded"
                     >
                       {member.users.full_name || member.users.email}
                     </span>
@@ -246,7 +246,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
         <div className="space-y-4">
           {/* Rotation Type */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Rotation Type
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -254,22 +254,22 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                 onClick={() => setFormData(prev => ({ ...prev, rotation_type: 'round-robin' }))}
                 className={`p-3 text-left border rounded-lg transition-colors ${
                   formData.rotation_type === 'round-robin'
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    ? 'border-purple-500 bg-purple-900/20'
+                    : 'border-gray-600'
                 }`}
               >
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Round Robin</p>
+                <p className="text-sm font-medium text-white">Round Robin</p>
                 <p className="text-xs text-gray-500">Rotate in order</p>
               </button>
               <button
                 onClick={() => setFormData(prev => ({ ...prev, rotation_type: 'random' }))}
                 className={`p-3 text-left border rounded-lg transition-colors ${
                   formData.rotation_type === 'random'
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-gray-300 dark:border-gray-600'
+                    ? 'border-purple-500 bg-purple-900/20'
+                    : 'border-gray-600'
                 }`}
               >
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Random</p>
+                <p className="text-sm font-medium text-white">Random</p>
                 <p className="text-xs text-gray-500">Random assignment</p>
               </button>
             </div>
@@ -277,7 +277,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
 
           {/* Interval */}
           <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               <Calendar className="w-4 h-4 inline mr-1" />
               Rotation Interval
             </label>
@@ -287,12 +287,12 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                 min="1"
                 value={formData.interval_value}
                 onChange={(e) => setFormData(prev => ({ ...prev, interval_value: parseInt(e.target.value) }))}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                className="px-3 py-2 border border-gray-600 rounded-lg bg-gray-900"
               />
               <select
                 value={formData.interval_type}
                 onChange={(e) => setFormData(prev => ({ ...prev, interval_type: e.target.value as any }))}
-                className="pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+                className="pl-3 pr-10 py-2 border border-gray-600 rounded-lg bg-gray-900"
               >
                 <option value="daily">Day(s)</option>
                 <option value="weekly">Week(s)</option>
@@ -303,15 +303,15 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
 
           {/* Members */}
           <div>
-            <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-3" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               <Users className="w-4 h-4 inline mr-1" />
               Select Members ({formData.member_ids.length} selected)
             </label>
-            <div className="space-y-2 max-h-48 overflow-y-auto p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+            <div className="space-y-2 max-h-48 overflow-y-auto p-3 bg-gray-900 rounded-lg">
               {spaceMembers.map((member) => (
                 <label
                   key={member.user_id}
-                  htmlFor="field-4" className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded"
+                  htmlFor="field-4" className="flex items-center gap-2 cursor-pointer hover:bg-gray-800 p-2 rounded"
                 >
                   <input
                     type="checkbox"
@@ -320,7 +320,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
               onChange={() =>  toggleMember(member.user_id)}
                     className="rounded border-gray-300 text-purple-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-300">
                     {member.users.full_name || member.users.email}
                   </span>
                 </label>
@@ -343,7 +343,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                   setEditing(false);
                   if (rotation) setFormData(rotation);
                 }}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg"
               >
                 Cancel
               </button>
@@ -353,8 +353,8 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       )}
 
       {/* Info */}
-      <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-        <p className="text-xs text-blue-700 dark:text-blue-300">
+      <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
+        <p className="text-xs text-blue-300">
           <strong>How it works:</strong> This chore will automatically rotate to the next member
           based on the interval you set. Members will be notified when assigned.
         </p>

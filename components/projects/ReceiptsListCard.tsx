@@ -63,29 +63,29 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-6 bg-gray-700 rounded w-1/3"></div>
+          <div className="h-32 bg-gray-700 rounded"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-6 border-b border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-              <ReceiptIcon className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <div className="w-10 h-10 rounded-lg bg-amber-900/30 flex items-center justify-center">
+              <ReceiptIcon className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Receipts ({receipts.length})
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 View and search your uploaded receipts
               </p>
             </div>
@@ -102,7 +102,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
               value={merchantQuery}
               onChange={(e) => setMerchantQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-900 border-2 border-amber-300 dark:border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full pl-10 pr-4 py-2 bg-gray-900 border-2 border-amber-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             />
           </div>
           <button
@@ -117,7 +117,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
       {/* Receipts List */}
       <div className="p-6">
         {receipts.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 text-gray-400">
             <ReceiptIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>No receipts found</p>
             {merchantQuery && (
@@ -126,7 +126,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
                   setMerchantQuery('');
                   setSearchParams({});
                 }}
-                className="text-sm text-amber-600 dark:text-amber-400 hover:underline mt-2"
+                className="text-sm text-amber-400 hover:underline mt-2"
               >
                 Clear search
               </button>
@@ -137,15 +137,15 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
             {receipts.map((receipt) => (
               <div
                 key={receipt.id}
-                className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="bg-gray-900 border border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                    <h4 className="font-semibold text-white mb-1">
                       {receipt.merchant_name || 'Unknown Merchant'}
                     </h4>
                     {receipt.category && (
-                      <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-1 text-xs text-gray-400">
                         <Tag className="w-3 h-3" />
                         {receipt.category}
                       </div>
@@ -153,7 +153,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
                   </div>
                   <button
                     onClick={() => handleDelete(receipt.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-900/30 text-red-400 transition-colors"
                     title="Delete receipt"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -164,13 +164,13 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
                   {receipt.total_amount && (
                     <div className="flex items-center gap-2 text-sm">
                       <DollarSign className="w-4 h-4 text-gray-400" />
-                      <span className="font-semibold text-gray-900 dark:text-white">
+                      <span className="font-semibold text-white">
                         ${receipt.total_amount.toFixed(2)}
                       </span>
                     </div>
                   )}
                   {receipt.receipt_date && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Calendar className="w-4 h-4" />
                       {format(new Date(receipt.receipt_date), 'MMM d, yyyy')}
                     </div>
@@ -179,14 +179,14 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
 
                 <button
                   onClick={() => handleViewReceipt(receipt)}
-                  className="w-full py-2 px-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 px-3 bg-gray-800 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <ExternalLink className="w-4 h-4" />
                   View Receipt
                 </button>
 
                 {receipt.ocr_confidence && (
-                  <div className="mt-2 text-xs text-gray-500 dark:text-gray-500 text-center">
+                  <div className="mt-2 text-xs text-gray-500 text-center">
                     OCR Confidence: {receipt.ocr_confidence.toFixed(0)}%
                   </div>
                 )}

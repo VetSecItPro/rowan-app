@@ -80,7 +80,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-white" />
@@ -94,13 +94,13 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
         <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
           {/* Export Format */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <h3 className="text-sm font-medium text-gray-300 mb-3">
               Export Format
             </h3>
-            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
               <FileText className="w-5 h-5 text-green-500" />
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">CSV (Comma Separated Values)</p>
+                <p className="text-sm font-medium text-white">CSV (Comma Separated Values)</p>
                 <p className="text-xs text-gray-500">Compatible with Excel, Google Sheets, and other spreadsheet apps</p>
               </div>
             </div>
@@ -109,7 +109,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
           {/* Column Selection */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <h3 className="text-sm font-medium text-gray-300">
                 Select Columns to Export
               </h3>
               <span className="text-xs text-gray-500">
@@ -117,11 +117,11 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-3 bg-gray-900 rounded-lg">
               {availableColumns.map((column) => (
                 <label
                   key={column.key}
-                  htmlFor="field-1" className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                  htmlFor="field-1" className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-800 ${
                     column.required ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -133,7 +133,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
                     disabled={column.required}
                     className="rounded border-gray-300 text-blue-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="text-sm text-gray-300">
                     {column.label}
                     {column.required && <span className="text-xs text-gray-400 ml-1">(required)</span>}
                   </span>
@@ -144,14 +144,14 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
 
           {/* Applied Filters Info */}
           {currentFilters && Object.keys(currentFilters).length > 0 && (
-            <div className="mb-6 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="mb-6 p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
               <div className="flex items-start gap-2">
                 <CheckSquare className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs font-medium text-blue-900 dark:text-blue-200">
+                  <p className="text-xs font-medium text-blue-200">
                     Current Filters Applied
                   </p>
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  <p className="text-xs text-blue-300 mt-1">
                     Only tasks matching your current filters will be exported
                   </p>
                 </div>
@@ -160,11 +160,11 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
           )}
 
           {/* Export Preview Info */}
-          <div className="mb-6 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-6 p-3 bg-gray-900 rounded-lg">
+            <h4 className="text-xs font-medium text-gray-300 mb-2">
               What will be exported:
             </h4>
-            <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+            <ul className="text-xs text-gray-400 space-y-1">
               <li>• All tasks matching your current filters (if any)</li>
               <li>• Selected columns with headers</li>
               <li>• UTF-8 encoded for international characters</li>
@@ -185,7 +185,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
             <button
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              className="px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg"
             >
               Cancel
             </button>

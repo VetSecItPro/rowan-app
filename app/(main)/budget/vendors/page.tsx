@@ -213,17 +213,17 @@ export default function VendorManagementPage() {
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-600 bg-clip-text text-transparent mb-2">
               Vendor Management
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Manage your contractors, suppliers, and service providers all in one place
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-xl p-4">
+            <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <p className="text-red-800 dark:text-red-200">{error}</p>
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                <p className="text-red-200">{error}</p>
               </div>
             </div>
           )}
@@ -237,58 +237,58 @@ export default function VendorManagementPage() {
               iconGradient="bg-gradient-to-br from-blue-500 to-blue-600"
               gridClassName="grid stats-grid-mobile gap-6"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
                     <Users className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     {stats.total}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Vendors</h3>
+                <h3 className="text-sm font-medium text-gray-400">Total Vendors</h3>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-yellow-500 to-yellow-600 shadow-lg">
                     <Star className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     {stats.preferred}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Preferred</h3>
+                <h3 className="text-sm font-medium text-gray-400">Preferred</h3>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
                     <Shield className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     {stats.active}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Active</h3>
+                <h3 className="text-sm font-medium text-gray-400">Active</h3>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     ${stats.totalSpend.toLocaleString()}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Spend</h3>
+                <h3 className="text-sm font-medium text-gray-400">Total Spend</h3>
               </div>
             </CollapsibleStatsGrid>
           )}
 
           {/* Controls */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
             <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
               {/* Filters */}
               <div className="flex flex-col sm:flex-row gap-4 flex-1">
@@ -300,7 +300,7 @@ export default function VendorManagementPage() {
                     placeholder="Search vendors..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -308,7 +308,7 @@ export default function VendorManagementPage() {
                 <select
                   value={tradeFilter}
                   onChange={(e) => setTradeFilter(e.target.value)}
-                  className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                  className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm"
                 >
                   <option value="all">All Trades</option>
                   {trades.map((trade) => (
@@ -322,7 +322,7 @@ export default function VendorManagementPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+                  className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm"
                 >
                   <option value="all">All Status</option>
                   <option value="preferred">Preferred</option>
@@ -346,15 +346,15 @@ export default function VendorManagementPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">Loading vendors...</p>
+              <p className="text-gray-400">Loading vendors...</p>
             </div>
           ) : filteredVendors.length === 0 ? (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="text-center py-12 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
               <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-medium text-white mb-2">
                 {vendors.length === 0 ? 'No Vendors Yet' : 'No Vendors Found'}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4">
                 {vendors.length === 0
                   ? 'Get started by adding your first vendor'
                   : 'Try adjusting your search or filter criteria'
@@ -408,33 +408,33 @@ interface VendorCardProps {
 
 function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
+    <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700 hover:shadow-xl transition-shadow">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+            <h3 className="text-lg font-semibold text-white truncate">
               {vendor.name}
             </h3>
             {vendor.is_preferred && (
               <Star className="w-4 h-4 text-yellow-500 fill-current" />
             )}
             {!vendor.is_active && (
-              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded">
+              <span className="px-2 py-1 bg-gray-700 text-gray-400 text-xs rounded">
                 Inactive
               </span>
             )}
           </div>
 
           {vendor.company_name && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+            <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
               <Building2 className="w-4 h-4" />
               <span className="truncate">{vendor.company_name}</span>
             </div>
           )}
 
           {vendor.trade && (
-            <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs rounded">
+            <span className="inline-block px-2 py-1 bg-blue-900/30 text-blue-300 text-xs rounded">
               {vendor.trade}
             </span>
           )}
@@ -444,14 +444,14 @@ function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(vendor)}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
             title="Edit vendor"
           >
             <Edit3 className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(vendor.id)}
-            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+            className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
             title="Delete vendor"
           >
             <Trash2 className="w-4 h-4" />
@@ -462,34 +462,34 @@ function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
       {/* Contact Info */}
       <div className="space-y-2 mb-4">
         {vendor.phone && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <Phone className="w-4 h-4" />
             <span>{vendor.phone}</span>
           </div>
         )}
 
         {vendor.email && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <Mail className="w-4 h-4" />
             <span className="truncate">{vendor.email}</span>
           </div>
         )}
 
         {vendor.address && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <MapPin className="w-4 h-4" />
             <span className="truncate">{vendor.address}</span>
           </div>
         )}
 
         {vendor.website && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <ExternalLink className="w-4 h-4" />
             <a
               href={vendor.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline truncate"
+              className="text-blue-400 hover:underline truncate"
             >
               {vendor.website}
             </a>
@@ -498,10 +498,10 @@ function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
       </div>
 
       {/* Footer Stats */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between pt-4 border-t border-gray-700">
         <div className="text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Total Spend: </span>
-          <span className="font-semibold text-gray-900 dark:text-white">
+          <span className="text-gray-400">Total Spend: </span>
+          <span className="font-semibold text-white">
             ${(vendor.totalSpent || 0).toLocaleString()}
           </span>
         </div>
@@ -509,7 +509,7 @@ function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
         {vendor.rating && (
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            <span className="text-sm font-medium text-gray-900 dark:text-white">
+            <span className="text-sm font-medium text-white">
               {vendor.rating.toFixed(1)}
             </span>
           </div>
@@ -518,9 +518,9 @@ function VendorCard({ vendor, onEdit, onDelete }: VendorCardProps) {
 
       {/* Insurance Badge */}
       {vendor.insurance_verified && (
-        <div className="mt-3 flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
-          <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
-          <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+        <div className="mt-3 flex items-center gap-2 p-2 bg-green-900/20 rounded-lg">
+          <Shield className="w-4 h-4 text-green-400" />
+          <span className="text-xs text-green-300 font-medium">
             Insurance Verified
           </span>
         </div>

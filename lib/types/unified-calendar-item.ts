@@ -27,33 +27,33 @@ export type UnifiedItemType = 'event' | 'task' | 'meal' | 'reminder' | 'goal';
  */
 export const UNIFIED_ITEM_COLORS: Record<UnifiedItemType, { bg: string; border: string; text: string; dot: string }> = {
   event: {
-    bg: 'bg-purple-100 dark:bg-purple-900/30',
-    border: 'border-purple-300 dark:border-purple-700',
-    text: 'text-purple-800 dark:text-purple-200',
+    bg: 'bg-purple-900/30',
+    border: 'border-purple-700',
+    text: 'text-purple-200',
     dot: 'bg-purple-500',
   },
   task: {
-    bg: 'bg-blue-100 dark:bg-blue-900/30',
-    border: 'border-blue-300 dark:border-blue-700',
-    text: 'text-blue-800 dark:text-blue-200',
+    bg: 'bg-blue-900/30',
+    border: 'border-blue-700',
+    text: 'text-blue-200',
     dot: 'bg-blue-500',
   },
   meal: {
-    bg: 'bg-orange-100 dark:bg-orange-900/30',
-    border: 'border-orange-300 dark:border-orange-700',
-    text: 'text-orange-800 dark:text-orange-200',
+    bg: 'bg-orange-900/30',
+    border: 'border-orange-700',
+    text: 'text-orange-200',
     dot: 'bg-orange-500',
   },
   reminder: {
-    bg: 'bg-pink-100 dark:bg-pink-900/30',
-    border: 'border-pink-300 dark:border-pink-700',
-    text: 'text-pink-800 dark:text-pink-200',
+    bg: 'bg-pink-900/30',
+    border: 'border-pink-700',
+    text: 'text-pink-200',
     dot: 'bg-pink-500',
   },
   goal: {
-    bg: 'bg-indigo-100 dark:bg-indigo-900/30',
-    border: 'border-indigo-300 dark:border-indigo-700',
-    text: 'text-indigo-800 dark:text-indigo-200',
+    bg: 'bg-indigo-900/30',
+    border: 'border-indigo-700',
+    text: 'text-indigo-200',
     dot: 'bg-indigo-500',
   },
 };

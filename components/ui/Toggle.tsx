@@ -68,7 +68,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
               relative
               ${sizeClasses[size].container}
               ${sizeClasses[size].padding}
-              ${checked ? colorClasses[color] : 'bg-gray-300 dark:bg-gray-600'}
+              ${checked ? colorClasses[color] : 'bg-gray-600'}
               rounded-full
               transition-all
               duration-300
@@ -107,13 +107,13 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             {label && (
               <label
                 htmlFor={id}
-                className="text-sm font-medium text-gray-900 dark:text-white cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                className="text-sm font-medium text-white cursor-pointer hover:text-purple-400 transition-colors"
               >
                 {label}
               </label>
             )}
             {description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+              <p className="text-xs text-gray-400 mt-0.5">
                 {description}
               </p>
             )}

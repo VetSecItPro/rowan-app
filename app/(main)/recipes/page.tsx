@@ -125,7 +125,7 @@ export default function RecipesPage() {
   const hasActiveFilters = searchQuery || selectedCuisine || selectedDifficulty;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -189,15 +189,15 @@ export default function RecipesPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 mb-3">
-            <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters:</span>
+            <Filter className="w-5 h-5 text-gray-400" />
+            <span className="text-sm font-medium text-gray-300">Filters:</span>
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="text-sm px-3 py-1 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors"
               >
                 ✕ Clear all
               </button>
@@ -208,7 +208,7 @@ export default function RecipesPage() {
             {/* Cuisine Filter */}
             {cuisines.length > 0 && (
               <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <label htmlFor="cuisine-filter-mobile" className="text-sm font-medium text-gray-600 dark:text-gray-400 md:font-normal">Cuisine:</label>
+                <label htmlFor="cuisine-filter-mobile" className="text-sm font-medium text-gray-400 md:font-normal">Cuisine:</label>
 
                 {/* Mobile: Dropdown if 3+ options */}
                 {cuisines.length >= 3 ? (
@@ -216,7 +216,7 @@ export default function RecipesPage() {
                     id="cuisine-filter-mobile"
                     value={selectedCuisine || ''}
                     onChange={(e) => setSelectedCuisine(e.target.value || null)}
-                    className="md:hidden w-full px-4 py-3 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                    className="md:hidden w-full px-4 py-3 text-base bg-gray-700 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white font-medium appearance-none cursor-pointer"
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                   >
                     <option value="">All Cuisines</option>
@@ -234,7 +234,7 @@ export default function RecipesPage() {
                         className={`px-4 py-2.5 text-sm min-h-[44px] rounded-full font-medium transition-colors ${
                           selectedCuisine === cuisine
                             ? 'bg-orange-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         }`}
                       >
                         {cuisine}
@@ -252,7 +252,7 @@ export default function RecipesPage() {
                       className={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
                         selectedCuisine === cuisine
                           ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
                       {cuisine}
@@ -265,7 +265,7 @@ export default function RecipesPage() {
             {/* Difficulty Filter */}
             {difficulties.length > 0 && (
               <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <label htmlFor="difficulty-filter-mobile" className="text-sm font-medium text-gray-600 dark:text-gray-400 md:font-normal">Difficulty:</label>
+                <label htmlFor="difficulty-filter-mobile" className="text-sm font-medium text-gray-400 md:font-normal">Difficulty:</label>
 
                 {/* Mobile: Dropdown if 3+ options */}
                 {difficulties.length >= 3 ? (
@@ -273,7 +273,7 @@ export default function RecipesPage() {
                     id="difficulty-filter-mobile"
                     value={selectedDifficulty || ''}
                     onChange={(e) => setSelectedDifficulty(e.target.value || null)}
-                    className="md:hidden w-full px-4 py-3 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-white font-medium appearance-none cursor-pointer"
+                    className="md:hidden w-full px-4 py-3 text-base bg-gray-700 border-2 border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-white font-medium appearance-none cursor-pointer"
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
                   >
                     <option value="">All Difficulties</option>
@@ -291,7 +291,7 @@ export default function RecipesPage() {
                         className={`px-4 py-2.5 text-sm min-h-[44px] rounded-full font-medium transition-colors ${
                           selectedDifficulty === difficulty
                             ? 'bg-orange-500 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         }`}
                       >
                         {difficulty}
@@ -309,7 +309,7 @@ export default function RecipesPage() {
                       className={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
                         selectedDifficulty === difficulty
                           ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
                       {difficulty}
@@ -326,7 +326,7 @@ export default function RecipesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
         <div className="mb-6 flex items-center justify-between">
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             {filteredRecipes.length === recipes.length
               ? `${recipes.length} ${recipes.length === 1 ? 'recipe' : 'recipes'}`
               : `${filteredRecipes.length} of ${recipes.length} recipes`}
@@ -337,7 +337,7 @@ export default function RecipesPage() {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600" />
-            <span className="ml-3 text-gray-600 dark:text-gray-400">Loading recipes...</span>
+            <span className="ml-3 text-gray-400">Loading recipes...</span>
           </div>
         )}
 
@@ -345,10 +345,10 @@ export default function RecipesPage() {
         {!loading && recipes.length === 0 && (
           <div className="text-center py-12">
             <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               No recipes yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-400 mb-6">
               Start building your recipe collection
             </p>
             <div className="flex items-center justify-center gap-4">
@@ -360,7 +360,7 @@ export default function RecipesPage() {
               </Link>
               <Link
                 href="/recipes/new"
-                className="px-6 py-3 bg-gray-50 dark:bg-gray-800 text-orange-600 dark:text-orange-400 border-2 border-orange-600 dark:border-orange-400 rounded-lg font-medium hover:bg-orange-50 dark:hover:bg-gray-700 transition-all"
+                className="px-6 py-3 bg-gray-800 text-orange-400 border-2 border-orange-400 rounded-lg font-medium hover:bg-gray-700 transition-all"
               >
                 Create Recipe
               </Link>
@@ -372,10 +372,10 @@ export default function RecipesPage() {
         {!loading && recipes.length > 0 && filteredRecipes.length === 0 && (
           <div className="text-center py-12">
             <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               No recipes found
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-400 mb-4">
               Try adjusting your filters or search query
             </p>
             <button
@@ -393,11 +393,11 @@ export default function RecipesPage() {
             {filteredRecipes.map((recipe) => (
               <div
                 key={recipe.id}
-                className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                className="bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
               >
                 {/* Recipe Image */}
                 {recipe.image_url ? (
-                  <div className="h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                  <div className="h-48 overflow-hidden bg-gray-700">
                     <img
                       src={recipe.image_url}
                       alt={recipe.name}
@@ -417,19 +417,19 @@ export default function RecipesPage() {
 
                 <div className="p-5">
                   {/* Recipe Name */}
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                  <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
                     {recipe.name}
                   </h3>
 
                   {/* Description */}
                   {recipe.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                       {recipe.description}
                     </p>
                   )}
 
                   {/* Meta Info */}
-                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
                     {(() => {
                       const totalTime = (recipe.prep_time || 0) + (recipe.cook_time || 0);
                       if (totalTime > 0) {
@@ -453,12 +453,12 @@ export default function RecipesPage() {
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
                     {recipe.cuisine_type && (
-                      <span className="text-xs px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full">
+                      <span className="text-xs px-2 py-1 bg-orange-900/30 text-orange-300 rounded-full">
                         {recipe.cuisine_type}
                       </span>
                     )}
                     {recipe.difficulty && (
-                      <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
+                      <span className="text-xs px-2 py-1 bg-blue-900/30 text-blue-300 rounded-full">
                         {recipe.difficulty}
                       </span>
                     )}
@@ -477,7 +477,7 @@ export default function RecipesPage() {
                         href={recipe.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        className="p-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
                         title="View original source"
                       >
                         <ExternalLink className="w-5 h-5" />
@@ -486,7 +486,7 @@ export default function RecipesPage() {
                     <button
                       onClick={() => handleDelete(recipe.id)}
                       disabled={deletingId === recipe.id}
-                      className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 bg-red-900/30 text-red-400 rounded-lg hover:bg-red-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Delete recipe"
                     >
                       <Trash2 className="w-5 h-5" />

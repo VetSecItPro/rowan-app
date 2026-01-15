@@ -223,39 +223,39 @@ export function BulkEventManager({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+      <div className="relative bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
               <Archive className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-white">
                 Manage Events
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Bulk delete or restore calendar events
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="px-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-6 border-b border-gray-700">
           <div className="flex gap-4">
             <button
               onClick={() => setActiveTab('manage')}
               className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                 activeTab === 'manage'
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'border-purple-600 text-purple-400'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -267,15 +267,15 @@ export function BulkEventManager({
               onClick={() => setActiveTab('trash')}
               className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                 activeTab === 'trash'
-                  ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'border-purple-600 text-purple-400'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
             >
               <div className="flex items-center gap-2">
                 <Trash2 className="w-4 h-4" />
                 <span>Trash</span>
                 {deletedEvents.length > 0 && (
-                  <span className="px-1.5 py-0.5 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full">
+                  <span className="px-1.5 py-0.5 text-xs bg-red-900/30 text-red-300 rounded-full">
                     {deletedEvents.length}
                   </span>
                 )}
@@ -288,8 +288,8 @@ export function BulkEventManager({
         {operationResult && (
           <div className={`mx-6 mt-4 p-3 rounded-lg flex items-center gap-2 ${
             operationResult.type === 'success'
-              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+              ? 'bg-green-900/30 text-green-300'
+              : 'bg-red-900/30 text-red-300'
           }`}>
             {operationResult.type === 'success' ? (
               <Check className="w-4 h-4 flex-shrink-0" />
@@ -312,16 +312,16 @@ export function BulkEventManager({
             <div className="space-y-6">
               {/* Delete by Source */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   Delete by Source
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-400 mb-4">
                   Remove all events imported from a specific calendar source.
                 </p>
 
                 {eventSources.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="text-center py-8 text-gray-400">
                     <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No events to manage</p>
                   </div>
@@ -330,15 +330,15 @@ export function BulkEventManager({
                     {eventSources.map(source => (
                       <div
                         key={source.source}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{source.icon}</span>
                           <div>
-                            <div className="font-medium text-gray-900 dark:text-white">
+                            <div className="font-medium text-white">
                               {source.label}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                            <div className="text-sm text-gray-400">
                               {source.count} event{source.count !== 1 ? 's' : ''}
                             </div>
                           </div>
@@ -346,13 +346,13 @@ export function BulkEventManager({
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => selectAllFromSource(source.source)}
-                            className="px-3 py-1.5 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                            className="px-3 py-1.5 text-sm text-purple-400 hover:bg-purple-900/30 rounded-lg transition-colors"
                           >
                             Select All
                           </button>
                           <button
                             onClick={() => setConfirmDelete({ source: source.source, count: source.count })}
-                            className="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center gap-1"
+                            className="px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/30 rounded-lg transition-colors flex items-center gap-1"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             Delete All
@@ -366,18 +366,18 @@ export function BulkEventManager({
 
               {/* Selected Events Actions */}
               {selectedEvents.size > 0 && (
-                <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Check className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                      <span className="font-medium text-purple-900 dark:text-purple-100">
+                      <Check className="w-5 h-5 text-purple-400" />
+                      <span className="font-medium text-purple-100">
                         {selectedEvents.size} event{selectedEvents.size !== 1 ? 's' : ''} selected
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={clearSelection}
-                        className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
                       >
                         Clear
                       </button>
@@ -406,7 +406,7 @@ export function BulkEventManager({
                   <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
                 </div>
               ) : deletedEvents.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <div className="text-center py-8 text-gray-400">
                   <Trash2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p>Trash is empty</p>
                   <p className="text-sm mt-1">Deleted events appear here for 30 days</p>
@@ -414,13 +414,13 @@ export function BulkEventManager({
               ) : (
                 <>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-400">
                       {deletedEvents.length} event{deletedEvents.length !== 1 ? 's' : ''} in trash
                     </p>
                     <button
                       onClick={handlePurgeAll}
                       disabled={isDeleting}
-                      className="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center gap-1"
+                      className="px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/30 rounded-lg transition-colors flex items-center gap-1"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Empty Trash
@@ -431,13 +431,13 @@ export function BulkEventManager({
                     {deletedEvents.map(event => (
                       <div
                         key={event.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-700/50 rounded-lg"
                       >
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-900 dark:text-white truncate">
+                          <div className="font-medium text-white truncate">
                             {event.title}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                          <div className="text-sm text-gray-400 flex items-center gap-2">
                             <span>{format(parseISO(event.start_time), 'MMM d, yyyy')}</span>
                             {event.deleted_at && (
                               <>
@@ -450,14 +450,14 @@ export function BulkEventManager({
                         <div className="flex items-center gap-2 ml-4">
                           <button
                             onClick={() => handleRestoreEvent(event.id)}
-                            className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+                            className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-colors"
                             title="Restore event"
                           >
                             <RotateCcw className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handlePermanentDelete(event.id)}
-                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                            className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                             title="Delete permanently"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -473,10 +473,10 @@ export function BulkEventManager({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+        <div className="px-6 py-4 border-t border-gray-700 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
           >
             Close
           </button>
@@ -487,22 +487,22 @@ export function BulkEventManager({
       {confirmDelete && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmDelete(null)} />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
+          <div className="relative bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="text-center">
-              <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+              <div className="mx-auto w-12 h-12 bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Delete All Events?
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-400 mb-6">
                 This will move <strong>{confirmDelete.count}</strong> events from this source to trash.
                 You can restore them within 30 days.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setConfirmDelete(null)}
-                  className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="flex-1 px-4 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
                 >
                   Cancel
                 </button>

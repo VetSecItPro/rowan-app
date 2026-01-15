@@ -164,9 +164,9 @@ export default function DataManagementPage() {
   };
 
   const getPercentageColor = (percentage: number) => {
-    if (percentage >= 90) return 'bg-red-600 dark:bg-red-500';
-    if (percentage >= 80) return 'bg-orange-600 dark:bg-orange-500';
-    return 'bg-emerald-600 dark:bg-emerald-500';
+    if (percentage >= 90) return 'bg-red-500';
+    if (percentage >= 80) return 'bg-orange-500';
+    return 'bg-emerald-500';
   };
 
   if (authLoading) {
@@ -183,7 +183,7 @@ export default function DataManagementPage() {
     return (
       <FeatureLayout breadcrumbItems={[{ label: 'Settings', href: '/settings' }, { label: 'Data Management' }]}>
         <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400">Please sign in to manage your data.</p>
+          <p className="text-gray-400">Please sign in to manage your data.</p>
         </div>
       </FeatureLayout>
     );
@@ -195,7 +195,7 @@ export default function DataManagementPage() {
         {/* Back Button */}
         <button
           onClick={() => router.push('/settings')}
-          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Settings
@@ -203,27 +203,27 @@ export default function DataManagementPage() {
 
         {/* Error Alert */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-medium text-red-900 dark:text-red-100 mb-1">Error</h4>
-              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+              <h4 className="font-medium text-red-100 mb-1">Error</h4>
+              <p className="text-sm text-red-300">{error}</p>
             </div>
           </div>
         )}
 
         {/* Storage Usage Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 rounded-xl border border-gray-700 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <HardDrive className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <HardDrive className="w-5 h-5 text-gray-400" />
                 Storage Usage
               </h2>
               <button
                 onClick={loadStorageUsage}
                 disabled={isLoadingUsage}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${isLoadingUsage ? 'animate-spin' : ''}`} />
                 Refresh
@@ -239,14 +239,14 @@ export default function DataManagementPage() {
                 {/* Usage Bar */}
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className="text-gray-400">
                       {formatBytes(storageUsage.totalBytes)} of {formatBytes(storageUsage.limitBytes)}
                     </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="font-semibold text-white">
                       {Math.round(storageUsage.percentageUsed)}%
                     </span>
                   </div>
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-500 ${getPercentageColor(storageUsage.percentageUsed)}`}
                       style={{ width: `${Math.min(storageUsage.percentageUsed, 100)}%` }}
@@ -256,15 +256,15 @@ export default function DataManagementPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Total Files</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="bg-gray-900 rounded-lg p-4">
+                    <p className="text-xs text-gray-400 mb-1">Total Files</p>
+                    <p className="text-2xl font-bold text-white">
                       {storageUsage.fileCount}
                     </p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Available</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="bg-gray-900 rounded-lg p-4">
+                    <p className="text-xs text-gray-400 mb-1">Available</p>
+                    <p className="text-2xl font-bold text-white">
                       {formatBytes(storageUsage.limitBytes - storageUsage.totalBytes)}
                     </p>
                   </div>
@@ -274,13 +274,13 @@ export default function DataManagementPage() {
                 {storageUsage.percentageUsed >= 80 && (
                   <div className={`p-4 rounded-lg ${
                     storageUsage.percentageUsed >= 90
-                      ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-                      : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
+                      ? 'bg-red-900/20 border border-red-800'
+                      : 'bg-amber-900/20 border border-amber-800'
                   }`}>
                     <p className={`text-sm ${
                       storageUsage.percentageUsed >= 90
-                        ? 'text-red-700 dark:text-red-300'
-                        : 'text-amber-700 dark:text-amber-300'
+                        ? 'text-red-300'
+                        : 'text-amber-300'
                     }`}>
                       {storageUsage.percentageUsed >= 100
                         ? 'Your storage is full! Delete files to free up space.'
@@ -292,7 +292,7 @@ export default function DataManagementPage() {
                 )}
               </div>
             ) : (
-              <p className="text-center text-gray-600 dark:text-gray-400 py-8">
+              <p className="text-center text-gray-400 py-8">
                 No storage data available
               </p>
             )}
@@ -300,11 +300,11 @@ export default function DataManagementPage() {
         </div>
 
         {/* Files List Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 rounded-xl border border-gray-700 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-700">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <FileImage className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <FileImage className="w-5 h-5 text-gray-400" />
                 Files ({files.length})
               </h2>
               {selectedFiles.size > 0 && (
@@ -332,22 +332,22 @@ export default function DataManagementPage() {
             ) : files.length === 0 ? (
               <div className="text-center py-12">
                 <FileImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400">No files found</p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                <p className="text-gray-400">No files found</p>
+                <p className="text-sm text-gray-500 mt-1">
                   Files you upload will appear here
                 </p>
               </div>
             ) : (
               <div className="space-y-2">
                 {/* Select All */}
-                <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
                   <input
                     type="checkbox"
                     checked={selectedFiles.size === files.length}
                     onChange={toggleSelectAll}
                     className="w-4 h-4 text-emerald-600 rounded focus:ring-2 focus:ring-emerald-500"
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <span className="text-sm font-medium text-gray-300">
                     Select All
                   </span>
                 </div>
@@ -356,7 +356,7 @@ export default function DataManagementPage() {
                 {files.map((file) => (
                   <div
                     key={file.id}
-                    className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                    className="flex items-center gap-3 p-4 border border-gray-700 rounded-lg hover:bg-gray-900 transition-colors"
                   >
                     <input
                       type="checkbox"
@@ -366,10 +366,10 @@ export default function DataManagementPage() {
                     />
                     <File className="w-5 h-5 text-gray-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-sm font-medium text-white truncate">
                         {file.name}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-400">
                         {formatBytes(file.size)} • {new Date(file.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -381,16 +381,16 @@ export default function DataManagementPage() {
         </div>
 
         {/* Help Card */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-6">
+          <h3 className="font-semibold text-blue-100 mb-2">
             Need More Space?
           </h3>
-          <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
+          <p className="text-sm text-blue-300 mb-4">
             Upgrade to Pro for 2GB or Family for 5GB of storage space.
           </p>
           <button
             onClick={() => router.push('/pricing')}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-blue-600 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
           >
             View Pricing
           </button>

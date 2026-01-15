@@ -59,15 +59,15 @@ const MetricIcon = memo(function MetricIcon({ name }: { name: string }) {
 });
 
 const statusColors = {
-  healthy: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
-  warning: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800',
-  critical: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+  healthy: 'bg-green-900/20 border-green-800',
+  warning: 'bg-yellow-900/20 border-yellow-800',
+  critical: 'bg-red-900/20 border-red-800',
 };
 
 const statusTextColors = {
-  healthy: 'text-green-700 dark:text-green-400',
-  warning: 'text-yellow-700 dark:text-yellow-400',
-  critical: 'text-red-700 dark:text-red-400',
+  healthy: 'text-green-400',
+  warning: 'text-yellow-400',
+  critical: 'text-red-400',
 };
 
 export const HealthPanel = memo(function HealthPanel() {
@@ -99,7 +99,7 @@ export const HealthPanel = memo(function HealthPanel() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Checking system health...</span>
+        <span className="ml-3 text-sm text-gray-400">Checking system health...</span>
       </div>
     );
   }
@@ -108,7 +108,7 @@ export const HealthPanel = memo(function HealthPanel() {
     return (
       <div className="text-center py-12">
         <XCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-        <p className="text-gray-500 dark:text-gray-400">Unable to fetch health data</p>
+        <p className="text-gray-400">Unable to fetch health data</p>
         <button onClick={fetchData} className="mt-3 text-blue-600 hover:underline text-sm">
           Try again
         </button>
@@ -126,13 +126,13 @@ export const HealthPanel = memo(function HealthPanel() {
             <span className={`text-sm font-semibold ${statusTextColors[health.overall]}`}>
               System {health.overall.charAt(0).toUpperCase() + health.overall.slice(1)}
             </span>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-400">
               Response: {health.responseTime}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-right text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-right text-xs text-gray-400">
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               Uptime: {health.uptime}
@@ -142,7 +142,7 @@ export const HealthPanel = memo(function HealthPanel() {
           <button
             onClick={fetchData}
             disabled={isFetching}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
@@ -166,7 +166,7 @@ export const HealthPanel = memo(function HealthPanel() {
             <p className={`text-lg font-bold ${statusTextColors[metric.status]}`}>
               {metric.value}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+            <p className="text-xs text-gray-400 mt-1 truncate">
               {metric.description}
             </p>
           </div>
@@ -174,31 +174,31 @@ export const HealthPanel = memo(function HealthPanel() {
       </div>
 
       {/* Performance Metrics Table */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="border border-gray-700 rounded-lg overflow-hidden">
+        <div className="bg-gray-800 px-4 py-2 border-b border-gray-700">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-blue-500" />
-            <span className="text-sm font-medium text-gray-900 dark:text-white">API Performance</span>
+            <span className="text-sm font-medium text-white">API Performance</span>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 dark:bg-gray-800/50">
+            <thead className="bg-gray-800/50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Endpoint</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Avg Response</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Error Rate</th>
-                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Requests</th>
-                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase">Endpoint</th>
+                <th className="px-4 py-2 text-right text-xs font-medium text-gray-400 uppercase">Avg Response</th>
+                <th className="px-4 py-2 text-right text-xs font-medium text-gray-400 uppercase">Error Rate</th>
+                <th className="px-4 py-2 text-right text-xs font-medium text-gray-400 uppercase">Requests</th>
+                <th className="px-4 py-2 text-center text-xs font-medium text-gray-400 uppercase">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-700">
               {performance.map((metric) => (
-                <tr key={metric.endpoint} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                  <td className="px-4 py-2 font-mono text-xs text-gray-900 dark:text-white">
+                <tr key={metric.endpoint} className="hover:bg-gray-800/50">
+                  <td className="px-4 py-2 font-mono text-xs text-white">
                     {metric.endpoint}
                   </td>
-                  <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">
+                  <td className="px-4 py-2 text-right text-gray-400">
                     {metric.avgResponseTime}ms
                   </td>
                   <td className="px-4 py-2 text-right">
@@ -206,7 +206,7 @@ export const HealthPanel = memo(function HealthPanel() {
                       {metric.errorRate.toFixed(2)}%
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400">
+                  <td className="px-4 py-2 text-right text-gray-400">
                     {metric.requestCount.toLocaleString()}
                   </td>
                   <td className="px-4 py-2 text-center">

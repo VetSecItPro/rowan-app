@@ -38,9 +38,9 @@ interface GoalNode extends Goal {
 }
 
 const DEPENDENCY_COLORS = {
-  prerequisite: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30',
-  trigger: 'text-green-600 bg-green-100 dark:bg-green-900/30',
-  blocking: 'text-red-600 bg-red-100 dark:bg-red-900/30'
+  prerequisite: 'text-blue-600 bg-blue-900/30',
+  trigger: 'text-green-600 bg-green-900/30',
+  blocking: 'text-red-600 bg-red-900/30'
 };
 
 const DEPENDENCY_ICONS = {
@@ -195,29 +195,29 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl p-6 ${className}`}>
+      <div className={`bg-gray-800 rounded-xl p-6 ${className}`}>
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-6 bg-gray-700 rounded w-1/3"></div>
+          <div className="h-64 bg-gray-700 rounded"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-gray-800 rounded-xl border border-gray-700 ${className}`}>
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-6 border-b border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
               <GitBranch className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Goal Dependencies
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Visualize relationships between your goals
               </p>
             </div>
@@ -226,7 +226,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowCompleted(!showCompleted)}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
             >
               {showCompleted ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               {showCompleted ? 'Hide' : 'Show'} Completed
@@ -235,7 +235,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
             <select
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value as 'tree' | 'network')}
-              className="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg"
+              className="px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-lg"
             >
               <option value="tree">Tree View</option>
               <option value="network">Network View</option>
@@ -247,28 +247,28 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              <div className="text-2xl font-bold text-indigo-400">
                 {stats.total_dependencies}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Total</div>
+              <div className="text-sm text-gray-400">Total</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className="text-2xl font-bold text-green-400">
                 {stats.satisfied_dependencies}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Satisfied</div>
+              <div className="text-sm text-gray-400">Satisfied</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <div className="text-2xl font-bold text-orange-400">
                 {stats.blocked_goals}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Blocked</div>
+              <div className="text-sm text-gray-400">Blocked</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <div className="text-2xl font-bold text-purple-400">
                 {stats.unlockable_goals}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Unlockable</div>
+              <div className="text-sm text-gray-400">Unlockable</div>
             </div>
           </div>
         )}
@@ -279,10 +279,10 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
         {goalNodes.length === 0 ? (
           <div className="text-center py-12">
             <GitBranch className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <h4 className="text-lg font-medium text-white mb-2">
               No Dependencies Found
             </h4>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               Start connecting your goals with dependencies to see the visualization here
             </p>
           </div>
@@ -292,7 +292,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
               width="100%"
               height="400"
               viewBox="0 0 500 400"
-              className="border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+              className="border border-gray-600 rounded-lg bg-gray-700"
             >
               {/* Dependency Lines */}
               {goalNodes.map(node =>
@@ -387,7 +387,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
                     x={node.x}
                     y={node.y + 40}
                     textAnchor="middle"
-                    className="text-xs fill-gray-700 dark:fill-gray-300 pointer-events-none"
+                    className="text-xs fill-gray-300 pointer-events-none"
                     style={{ fontSize: '10px' }}
                   >
                     {node.title.length > 15 ? `${node.title.substring(0, 15)}...` : node.title}
@@ -398,7 +398,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
 
             {/* Selected Goal Details */}
             {selectedGoalId && (
-              <div className="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div className="mt-6 bg-gray-700 rounded-lg p-4">
                 {(() => {
                   const selectedGoal = goalNodes.find(n => n.id === selectedGoalId);
                   if (!selectedGoal) return null;
@@ -407,10 +407,10 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
                     <div>
                       <div className="flex items-center gap-3 mb-3">
                         {getGoalStatusIcon(selectedGoal)}
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h4 className="text-lg font-semibold text-white">
                           {selectedGoal.title}
                         </h4>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-sm text-gray-400">
                           {selectedGoal.progress}% complete
                         </span>
                       </div>
@@ -418,18 +418,18 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Dependencies */}
                         <div>
-                          <h5 className="font-medium text-gray-900 dark:text-white mb-2">
+                          <h5 className="font-medium text-white mb-2">
                             Dependencies ({selectedGoal.dependencies.length})
                           </h5>
                           {selectedGoal.dependencies.length === 0 ? (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">No dependencies</p>
+                            <p className="text-sm text-gray-400">No dependencies</p>
                           ) : (
                             <div className="space-y-2">
                               {selectedGoal.dependencies.map(dep => {
                                 const Icon = DEPENDENCY_ICONS[dep.dependency_type];
                                 return (
                                   <div key={dep.depends_on_goal_id} className="flex items-center gap-2 text-sm">
-                                    <Icon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                    <Icon className="w-4 h-4 text-gray-400" />
                                     <span className="flex-1">{dep.depends_on_title}</span>
                                     <span className={`text-xs ${getDependencyStatusColor(dep.status)}`}>
                                       {dep.status}
@@ -443,18 +443,18 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
 
                         {/* Dependents */}
                         <div>
-                          <h5 className="font-medium text-gray-900 dark:text-white mb-2">
+                          <h5 className="font-medium text-white mb-2">
                             Dependents ({selectedGoal.dependents.length})
                           </h5>
                           {selectedGoal.dependents.length === 0 ? (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">No dependents</p>
+                            <p className="text-sm text-gray-400">No dependents</p>
                           ) : (
                             <div className="space-y-2">
                               {selectedGoal.dependents.map(dep => {
                                 const Icon = DEPENDENCY_ICONS[dep.dependency_type];
                                 return (
                                   <div key={dep.goal_id} className="flex items-center gap-2 text-sm">
-                                    <Icon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                    <Icon className="w-4 h-4 text-gray-400" />
                                     <span className="flex-1">{dep.goal_title}</span>
                                     <span className={`text-xs ${getDependencyStatusColor(dep.status)}`}>
                                       {dep.status}

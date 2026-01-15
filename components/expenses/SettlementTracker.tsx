@@ -77,8 +77,8 @@ export function SettlementTracker({
 
   if (settlements.length === 0) {
     return (
-      <div className={`bg-gray-50 dark:bg-gray-900 rounded-lg p-6 ${className}`}>
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+      <div className={`bg-gray-900 rounded-lg p-6 ${className}`}>
+        <div className="text-center py-8 text-gray-400">
           <History className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p className="text-sm">No settlement history yet</p>
           <p className="text-xs mt-1">Settlements will appear here when payments are recorded</p>
@@ -88,22 +88,22 @@ export function SettlementTracker({
   }
 
   return (
-    <div className={`bg-gray-50 dark:bg-gray-900 rounded-lg p-6 space-y-4 ${className}`}>
+    <div className={`bg-gray-900 rounded-lg p-6 space-y-4 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <History className="w-5 h-5 text-emerald-600" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Settlement History</h3>
+          <h3 className="text-lg font-semibold text-white">Settlement History</h3>
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-400">
           {settlements.length} settlement{settlements.length !== 1 ? 's' : ''}
         </div>
       </div>
 
       {/* Total Settled */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Total Settled</span>
+          <span className="text-sm text-gray-400">Total Settled</span>
           <span className="text-2xl font-bold text-emerald-600">
             ${totalSettled.toLocaleString()}
           </span>
@@ -112,9 +112,9 @@ export function SettlementTracker({
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-          <span className="text-sm text-red-800 dark:text-red-200">{error}</span>
+        <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <span className="text-sm text-red-200">{error}</span>
         </div>
       )}
 
@@ -123,10 +123,10 @@ export function SettlementTracker({
         {Object.entries(settlementsByMonth).map(([month, monthSettlements]) => (
           <div key={month}>
             {/* Month Header */}
-            <div className="flex items-center gap-2 mb-2 sticky top-0 bg-gray-50 dark:bg-gray-900 py-2 z-10">
+            <div className="flex items-center gap-2 mb-2 sticky top-0 bg-gray-900 py-2 z-10">
               <Calendar className="w-4 h-4 text-gray-500" />
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{month}</h4>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <h4 className="text-sm font-semibold text-gray-300">{month}</h4>
+              <div className="text-xs text-gray-400">
                 ({monthSettlements.length})
               </div>
             </div>
@@ -140,7 +140,7 @@ export function SettlementTracker({
                 return (
                   <div
                     key={settlement.id}
-                    className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+                    className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between gap-3">
                       {/* Settlement Info */}
@@ -149,11 +149,11 @@ export function SettlementTracker({
                           <ArrowRightLeft
                             className={`w-4 h-4 flex-shrink-0 ${
                               isFromCurrentUser
-                                ? 'text-red-500 dark:text-red-400'
-                                : 'text-green-500 dark:text-green-400'
+                                ? 'text-red-400'
+                                : 'text-green-400'
                             }`}
                           />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm font-medium text-white">
                             {isFromCurrentUser ? 'You paid' : 'You received'}
                           </span>
                           <span className="text-lg font-bold text-emerald-600">
@@ -161,7 +161,7 @@ export function SettlementTracker({
                           </span>
                         </div>
 
-                        <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                        <div className="text-xs text-gray-400 space-y-1">
                           <div>
                             {new Date(settlement.settlement_date).toLocaleDateString('en-US', {
                               weekday: 'short',
@@ -183,13 +183,13 @@ export function SettlementTracker({
                           )}
 
                           {settlement.notes && (
-                            <div className="text-gray-500 dark:text-gray-400 italic">
+                            <div className="text-gray-400 italic">
                               {settlement.notes}
                             </div>
                           )}
 
                           {settlement.expense_ids && settlement.expense_ids.length > 0 && (
-                            <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                            <div className="flex items-center gap-1 text-amber-400">
                               <span>{settlement.expense_ids.length} expense{settlement.expense_ids.length !== 1 ? 's' : ''} settled</span>
                             </div>
                           )}
@@ -201,7 +201,7 @@ export function SettlementTracker({
                         <button
                           onClick={() => handleDelete(settlement.id)}
                           disabled={isDeleting}
-                          className="flex-shrink-0 p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-shrink-0 p-2 rounded-lg text-red-400 hover:bg-red-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           aria-label="Delete settlement"
                           title="Delete settlement"
                         >

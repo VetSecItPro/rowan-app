@@ -1,9 +1,10 @@
 {
-  "auditDate": "2026-01-08T23:46:08.000Z",
+  "auditDate": "2026-01-14T17:30:00.000Z",
+  "project": "rowan-app",
   "summary": {
-    "critical": 0,
-    "high": 2,
-    "medium": 4,
+    "critical": 1,
+    "high": 4,
+    "medium": 5,
     "low": 2,
     "info": 3,
     "autoFixed": 0
@@ -12,141 +13,171 @@
   "findings": [
     {
       "id": "FIX-001",
-      "category": "input-validation",
-      "severity": "high",
-      "title": "API Routes Missing Input Validation",
-      "files": [
-        "app/api/beta/transition/route.ts",
-        "app/api/beta/validate/route.ts",
-        "app/api/settings/privacy-data/route.ts",
-        "app/api/bulk/archive-old-data/route.ts",
-        "app/api/bulk/export-by-date/route.ts",
-        "app/api/messages/[id]/route.ts",
-        "app/api/shopping/[id]/sharing/route.ts",
-        "app/api/shopping/[id]/route.ts",
-        "app/api/test-sentry/route.ts",
-        "app/api/test/email-templates/route.ts",
-        "app/api/year-in-review/route.ts",
-        "app/api/auth/resend-verification/route.ts",
-        "app/api/auth/mfa/enroll/route.ts",
-        "app/api/auth/signout/route.ts",
-        "app/api/auth/cleanup-orphaned-user/route.ts",
-        "app/api/launch/notify/route.ts",
-        "app/api/expenses/[id]/route.ts",
-        "app/api/projects/[id]/route.ts",
-        "app/api/spaces/[spaceId]/delete/route.ts",
-        "app/api/spaces/[spaceId]/export/route.ts",
-        "app/api/spaces/route.ts",
-        "app/api/spaces/invitations/route.ts",
-        "app/api/admin/beta/feedback/route.ts",
-        "app/api/admin/beta/requests/route.ts",
-        "app/api/admin/beta/users/route.ts",
-        "app/api/admin/beta/stats/route.ts",
-        "app/api/admin/feature-usage/route.ts",
-        "app/api/admin/auth/login/route.ts",
-        "app/api/admin/activity/route.ts",
-        "app/api/admin/health/route.ts"
-      ],
-      "description": "These API routes do not use Zod schema validation for request bodies/parameters",
-      "remediation": "Add Zod schema validation to all API routes"
+      "category": "dependencies",
+      "severity": "critical",
+      "title": "jsPDF Local File Inclusion/Path Traversal Vulnerability",
+      "file": "package.json",
+      "line": null,
+      "code": "\"jspdf\": \"^3.0.3\"",
+      "description": "jsPDF version <=3.0.4 has a Local File Inclusion/Path Traversal vulnerability (GHSA-f8cm-6447-x5h2) that could allow attackers to access files outside intended directories.",
+      "remediation": "Update to jspdf@4.0.0 (breaking change). Run: npm audit fix --force",
+      "suggestedFix": "\"jspdf\": \"^4.0.0\""
     },
     {
       "id": "FIX-002",
-      "category": "authentication",
+      "category": "rls_policy",
       "severity": "high",
-      "title": "API Routes Without Explicit Authentication Checks",
-      "files": [
-        "app/api/beta/request/route.ts",
-        "app/api/settings/privacy-data/route.ts",
-        "app/api/test-sentry/route.ts",
-        "app/api/test-cookies/route.ts",
-        "app/api/geolocation/route.ts",
-        "app/api/weather/forecast/route.ts",
-        "app/api/weather/user-location/route.ts",
-        "app/api/weather/geocode/route.ts",
-        "app/api/webhooks/stripe/route.ts",
-        "app/api/cookies/route.ts",
-        "app/api/stripe/webhook/route.ts"
-      ],
-      "description": "These API routes don't have explicit authentication imports. Some may be intentionally public (webhooks), but others should be reviewed.",
-      "remediation": "Review each route and add authentication where required"
+      "title": "Overly Permissive RLS Policy on active_chat_prompt",
+      "file": "supabase/migrations",
+      "line": null,
+      "code": "Policy: Allow authenticated update chat prompt for UPDATE with USING(true)",
+      "description": "Table public.active_chat_prompt has an RLS policy that allows unrestricted UPDATE access for authenticated users.",
+      "remediation": "Restrict the policy to admin users only.",
+      "suggestedFix": "ALTER POLICY \"Allow authenticated update chat prompt\" ON active_chat_prompt USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));"
     },
     {
       "id": "FIX-003",
-      "category": "cryptography",
-      "severity": "medium",
-      "title": "Math.random() Used for ID Generation",
-      "files": [
-        "app/api/recipes/external/apininjas/search/route.ts:81",
-        "app/(main)/messages/page.tsx:420",
-        "app/(main)/reminders/page.tsx:181",
-        "components/shared/UnifiedDetailsModal.tsx:87",
-        "lib/hooks/useOfflineQueue.ts:159"
-      ],
-      "description": "Math.random() is not cryptographically secure and should not be used for generating IDs",
-      "remediation": "Use crypto.randomUUID() for unique identifiers"
+      "category": "rls_policy",
+      "severity": "high",
+      "title": "Overly Permissive RLS Policy on active_summarizer_prompt",
+      "file": "supabase/migrations",
+      "line": null,
+      "code": "Policy: Allow authenticated modify summarizer prompt for ALL with USING(true)",
+      "description": "Table public.active_summarizer_prompt has an RLS policy that allows unrestricted access for ALL operations to authenticated users.",
+      "remediation": "Restrict the policy to admin users only.",
+      "suggestedFix": "ALTER POLICY \"Allow authenticated modify summarizer prompt\" ON active_summarizer_prompt USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));"
     },
     {
       "id": "FIX-004",
-      "category": "security-headers",
-      "severity": "medium",
-      "title": "CSP Uses unsafe-inline and unsafe-eval",
-      "files": [
-        "next.config.mjs:120-143"
-      ],
-      "description": "The Content Security Policy includes unsafe-inline and unsafe-eval directives. Documented as necessary for Next.js.",
-      "remediation": "Implement nonce-based CSP when Next.js support stabilizes"
+      "category": "auth_config",
+      "severity": "high",
+      "title": "OTP Expiry Time Too Long",
+      "file": "Supabase Auth Configuration",
+      "line": null,
+      "code": "OTP expiry > 1 hour",
+      "description": "The email provider OTP expiry is set to more than 1 hour, increasing risk of OTP interception attacks.",
+      "remediation": "Set OTP expiry to less than 1 hour in Supabase Dashboard > Authentication > Email"
     },
     {
       "id": "FIX-005",
-      "category": "information-disclosure",
-      "severity": "medium",
-      "title": "Console.log Statements in Production Code",
-      "count": 14,
-      "description": "Console.log statements found. Removed in production builds via next.config.mjs.",
-      "remediation": "Already handled by compiler.removeConsole setting"
+      "category": "auth_config",
+      "severity": "high",
+      "title": "Leaked Password Protection Disabled",
+      "file": "Supabase Auth Configuration",
+      "line": null,
+      "code": "Leaked password protection: disabled",
+      "description": "Supabase Auth leaked password protection is disabled. Enable to prevent use of compromised passwords.",
+      "remediation": "Enable in Supabase Dashboard > Authentication > Password Security"
     },
     {
       "id": "FIX-006",
-      "category": "security-headers",
+      "category": "database",
       "severity": "medium",
-      "title": "Security Headers Not Applied in Development",
-      "files": [
-        "next.config.mjs:104-106"
-      ],
-      "description": "Security headers are disabled in development mode",
-      "remediation": "Consider enabling permissive security headers in development"
+      "title": "PostgreSQL Security Patches Available",
+      "file": "Supabase Infrastructure",
+      "line": null,
+      "code": "supabase-postgres-17.4.1.041",
+      "description": "Current PostgreSQL version has outstanding security patches available.",
+      "remediation": "Upgrade via Supabase Dashboard: https://supabase.com/docs/guides/platform/upgrading"
     },
     {
       "id": "FIX-007",
-      "category": "client-storage",
-      "severity": "low",
-      "title": "LocalStorage Used for Non-Sensitive Data",
-      "description": "LocalStorage is used for UI preferences and caching. No sensitive data stored.",
-      "status": "acceptable"
+      "category": "rls_policy",
+      "severity": "medium",
+      "title": "Permissive INSERT Policy on api_usage",
+      "file": "supabase/migrations",
+      "line": null,
+      "code": "Policy: System can insert api_usage with WITH CHECK(true)",
+      "description": "Table api_usage has an INSERT policy allowing unrestricted inserts.",
+      "remediation": "Consider restricting to service_role or specific conditions"
     },
     {
       "id": "FIX-008",
-      "category": "client-storage",
+      "category": "rls_policy",
+      "severity": "medium",
+      "title": "Permissive INSERT Policy on processing_metrics",
+      "file": "supabase/migrations",
+      "line": null,
+      "code": "Policy: System can insert processing_metrics with WITH CHECK(true)",
+      "description": "Table processing_metrics has an INSERT policy allowing unrestricted inserts.",
+      "remediation": "Consider restricting to service_role or specific conditions"
+    },
+    {
+      "id": "FIX-009",
+      "category": "cryptography",
+      "severity": "medium",
+      "title": "Insecure Random Number Generation",
+      "file": "Multiple files",
+      "line": null,
+      "code": "Math.random()",
+      "description": "Math.random() used for generating IDs and filenames. Not cryptographically secure.",
+      "remediation": "Use crypto.randomUUID() or crypto.getRandomValues() for security-sensitive operations"
+    },
+    {
+      "id": "FIX-010",
+      "category": "api_security",
+      "severity": "medium",
+      "title": "Some API Routes Missing Input Validation",
+      "file": "app/api/",
+      "line": null,
+      "code": "~73 routes without explicit Zod validation",
+      "description": "While 78 API routes have Zod validation, approximately 73 routes lack explicit schema validation.",
+      "remediation": "Add Zod schema validation to all API routes that accept user input"
+    },
+    {
+      "id": "FIX-011",
+      "category": "environment",
       "severity": "low",
-      "title": "CSRF Token in SessionStorage",
-      "files": [
-        "lib/hooks/useCsrfToken.ts:48"
-      ],
-      "description": "CSRF token stored in sessionStorage - valid approach",
-      "status": "acceptable"
+      "title": ".env.local File Present",
+      "file": ".env.local",
+      "line": null,
+      "code": ".env.local exists",
+      "description": "A .env.local file is present. Verify it is not tracked in git.",
+      "remediation": "Run: git status .env.local to verify it is not tracked"
+    },
+    {
+      "id": "FIX-012",
+      "category": "security_headers",
+      "severity": "low",
+      "title": "Security Headers Disabled in Development",
+      "file": "next.config.mjs:104",
+      "line": 104,
+      "code": "return [] in development",
+      "description": "All security headers disabled in development mode.",
+      "remediation": "Consider enabling basic security headers in dev for testing"
+    },
+    {
+      "id": "FIX-013",
+      "category": "security_headers",
+      "severity": "info",
+      "title": "CSP Uses unsafe-inline and unsafe-eval",
+      "file": "next.config.mjs:120",
+      "line": 120,
+      "code": "script-src unsafe-inline unsafe-eval",
+      "description": "CSP includes unsafe-inline and unsafe-eval (documented as necessary for Next.js).",
+      "remediation": "Consider nonce-based CSP when Next.js support stabilizes"
+    },
+    {
+      "id": "FIX-014",
+      "category": "api_security",
+      "severity": "info",
+      "title": "Service Role Key Usage in Server Code",
+      "file": "Multiple server files",
+      "line": null,
+      "code": "SUPABASE_SERVICE_ROLE_KEY usage",
+      "description": "Service role key used in server-side code. Acceptable for admin operations.",
+      "remediation": "Audit usage to ensure service role operations are properly protected"
+    },
+    {
+      "id": "FIX-015",
+      "category": "logging",
+      "severity": "info",
+      "title": "Console.log Statements in Production Code",
+      "file": "lib/, components/",
+      "line": null,
+      "code": "~14 console.log statements",
+      "description": "Console.log statements found. Production builds strip these via compiler config.",
+      "remediation": "Review and remove unnecessary console.log statements"
     }
-  ],
-  "positiveFindings": [
-    "All 178 tables have RLS enabled",
-    "Security headers configured in production",
-    "Rate limiting implemented across API routes",
-    "No hardcoded secrets detected",
-    "No SQL injection vulnerabilities",
-    "No XSS vulnerabilities",
-    "No command injection",
-    "No eval() usage",
-    "Image optimization secure (SVG disabled)",
-    "Environment files in .gitignore"
   ]
 }

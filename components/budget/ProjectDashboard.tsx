@@ -79,22 +79,22 @@ export function ProjectDashboard({
       {/* Project Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Financial Summary */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-green-50 from-green-900/20 to-emerald-900/20 border border-green-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
               <DollarSign className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-medium text-green-600 dark:text-green-400">
+            <span className="text-sm font-medium text-green-400">
               {project.variance_percentage > 0 ? 'Under Budget' : 'Over Budget'}
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-1">
+          <h3 className="text-2xl font-bold text-green-100 mb-1">
             ${totalActual.toLocaleString()}
           </h3>
-          <p className="text-sm text-green-700 dark:text-green-300">
+          <p className="text-sm text-green-300">
             of ${totalEstimated.toLocaleString()} estimated
           </p>
-          <div className="w-full bg-green-200 dark:bg-green-800 rounded-full h-2 mt-3">
+          <div className="w-full bg-green-800 rounded-full h-2 mt-3">
             <div
               className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${Math.min(100, progressPercentage)}%` }}
@@ -103,22 +103,22 @@ export function ProjectDashboard({
         </div>
 
         {/* Payment Status */}
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-blue-50 from-blue-900/20 to-cyan-900/20 border border-blue-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
               <CheckCircle className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+            <span className="text-sm font-medium text-blue-400">
               {completedItems} of {lineItems.length}
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-blue-900 dark:text-blue-100 mb-1">
+          <h3 className="text-2xl font-bold text-blue-100 mb-1">
             ${totalPaid.toLocaleString()}
           </h3>
-          <p className="text-sm text-blue-700 dark:text-blue-300">
+          <p className="text-sm text-blue-300">
             Paid ({paymentPercentage.toFixed(1)}%)
           </p>
-          <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2 mt-3">
+          <div className="w-full bg-blue-800 rounded-full h-2 mt-3">
             <div
               className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${paymentPercentage}%` }}
@@ -129,8 +129,8 @@ export function ProjectDashboard({
         {/* Timeline Status */}
         <div className={`bg-gradient-to-br ${
           isOverdue
-            ? 'from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-red-200 dark:border-red-800'
-            : 'from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-800'
+            ? 'from-red-50 from-red-900/20 to-orange-900/20 border-red-800'
+            : 'from-purple-50 from-purple-900/20 to-indigo-900/20 border-purple-800'
         } border rounded-xl p-6`}>
           <div className="flex items-center justify-between mb-4">
             <div className={`p-3 rounded-lg bg-gradient-to-br ${
@@ -146,16 +146,16 @@ export function ProjectDashboard({
             </div>
             <span className={`text-sm font-medium ${
               isOverdue
-                ? 'text-red-600 dark:text-red-400'
-                : 'text-purple-600 dark:text-purple-400'
+                ? 'text-red-400'
+                : 'text-purple-400'
             }`}>
               {isOverdue ? 'Overdue' : 'On Track'}
             </span>
           </div>
           <h3 className={`text-2xl font-bold mb-1 ${
             isOverdue
-              ? 'text-red-900 dark:text-red-100'
-              : 'text-purple-900 dark:text-purple-100'
+              ? 'text-red-100'
+              : 'text-purple-100'
           }`}>
             {daysRemaining !== null
               ? `${Math.abs(daysRemaining)} days`
@@ -163,8 +163,8 @@ export function ProjectDashboard({
           </h3>
           <p className={`text-sm ${
             isOverdue
-              ? 'text-red-700 dark:text-red-300'
-              : 'text-purple-700 dark:text-purple-300'
+              ? 'text-red-300'
+              : 'text-purple-300'
           }`}>
             {daysRemaining !== null
               ? (daysRemaining >= 0 ? 'remaining' : 'overdue')
@@ -173,22 +173,22 @@ export function ProjectDashboard({
         </div>
 
         {/* Items Status */}
-        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-amber-50 from-amber-900/20 to-yellow-900/20 border border-amber-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg">
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-medium text-amber-600 dark:text-amber-400">
+            <span className="text-sm font-medium text-amber-400">
               {lineItems.length} total
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-amber-900 dark:text-amber-100 mb-1">
+          <h3 className="text-2xl font-bold text-amber-100 mb-1">
             {completedItems}
           </h3>
-          <p className="text-sm text-amber-700 dark:text-amber-300">
+          <p className="text-sm text-amber-300">
             Items completed
           </p>
-          <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mt-3">
+          <div className="w-full bg-amber-800 rounded-full h-2 mt-3">
             <div
               className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${lineItems.length > 0 ? (completedItems / lineItems.length) * 100 : 0}%` }}
@@ -200,12 +200,12 @@ export function ProjectDashboard({
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Cost Breakdown by Category */}
-        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               Cost by Category
             </h3>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-gray-400">
               {costBreakdown.length} categories
             </span>
           </div>
@@ -223,18 +223,18 @@ export function ProjectDashboard({
           ) : (
             <div className="text-center py-12">
               <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">No cost data available</p>
+              <p className="text-gray-400">No cost data available</p>
             </div>
           )}
         </div>
 
         {/* Payment Status Pie Chart */}
-        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               Payment Status
             </h3>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-gray-400">
               {lineItems.length} items
             </span>
           </div>
@@ -248,16 +248,16 @@ export function ProjectDashboard({
           ) : (
             <div className="text-center py-12">
               <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">No items to track</p>
+              <p className="text-gray-400">No items to track</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Project Details */}
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-amber-50 from-amber-900/20 to-orange-900/20 border border-amber-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+          <h3 className="text-lg font-semibold text-amber-100">
             Project Details
           </h3>
           <button
@@ -272,30 +272,30 @@ export function ProjectDashboard({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Timeline</span>
+              <Calendar className="w-4 h-4 text-amber-400" />
+              <span className="text-sm font-medium text-amber-300">Timeline</span>
             </div>
             <div className="space-y-2 text-sm">
               {project.start_date && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Started:</span>
-                  <span className="text-gray-900 dark:text-white">
+                  <span className="text-gray-400">Started:</span>
+                  <span className="text-white">
                     {format(parseISO(project.start_date), 'MMM d, yyyy')}
                   </span>
                 </div>
               )}
               {project.estimated_completion_date && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Target:</span>
-                  <span className="text-gray-900 dark:text-white">
+                  <span className="text-gray-400">Target:</span>
+                  <span className="text-white">
                     {format(parseISO(project.estimated_completion_date), 'MMM d, yyyy')}
                   </span>
                 </div>
               )}
               {project.actual_completion_date && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Completed:</span>
-                  <span className="text-gray-900 dark:text-white">
+                  <span className="text-gray-400">Completed:</span>
+                  <span className="text-white">
                     {format(parseISO(project.actual_completion_date), 'MMM d, yyyy')}
                   </span>
                 </div>
@@ -305,24 +305,24 @@ export function ProjectDashboard({
 
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Location & Tags</span>
+              <MapPin className="w-4 h-4 text-amber-400" />
+              <span className="text-sm font-medium text-amber-300">Location & Tags</span>
             </div>
             <div className="space-y-2 text-sm">
               {project.location && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Location:</span>
-                  <span className="text-gray-900 dark:text-white">{project.location}</span>
+                  <span className="text-gray-400">Location:</span>
+                  <span className="text-white">{project.location}</span>
                 </div>
               )}
               {project.tags && project.tags.length > 0 && (
                 <div className="space-y-1">
-                  <span className="text-gray-600 dark:text-gray-400">Tags:</span>
+                  <span className="text-gray-400">Tags:</span>
                   <div className="flex flex-wrap gap-1">
                     {project.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full"
+                        className="px-2 py-1 bg-amber-900/30 text-amber-300 text-xs rounded-full"
                       >
                         {tag}
                       </span>
@@ -335,28 +335,28 @@ export function ProjectDashboard({
 
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Budget Summary</span>
+              <DollarSign className="w-4 h-4 text-amber-400" />
+              <span className="text-sm font-medium text-amber-300">Budget Summary</span>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Estimated:</span>
-                <span className="text-gray-900 dark:text-white">
+                <span className="text-gray-400">Estimated:</span>
+                <span className="text-white">
                   ${project.estimated_budget?.toLocaleString() || 'Not set'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Actual:</span>
-                <span className="text-gray-900 dark:text-white">
+                <span className="text-gray-400">Actual:</span>
+                <span className="text-white">
                   ${project.actual_cost.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Variance:</span>
+                <span className="text-gray-400">Variance:</span>
                 <span className={`font-medium ${
                   project.budget_variance >= 0
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'text-green-400'
+                    : 'text-red-400'
                 }`}>
                   {project.budget_variance >= 0 ? '+' : ''}${project.budget_variance.toLocaleString()}
                 </span>
@@ -368,27 +368,27 @@ export function ProjectDashboard({
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-          <Plus className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        <button className="flex items-center gap-3 p-4 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700 transition-colors">
+          <Plus className="w-5 h-5 text-amber-400" />
           <div className="text-left">
-            <p className="font-medium text-gray-900 dark:text-white">Add Line Item</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Track new project expense</p>
+            <p className="font-medium text-white">Add Line Item</p>
+            <p className="text-sm text-gray-400">Track new project expense</p>
           </div>
         </button>
 
-        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-          <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        <button className="flex items-center gap-3 p-4 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700 transition-colors">
+          <Users className="w-5 h-5 text-amber-400" />
           <div className="text-left">
-            <p className="font-medium text-gray-900 dark:text-white">Manage Vendors</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Add or update vendor info</p>
+            <p className="font-medium text-white">Manage Vendors</p>
+            <p className="text-sm text-gray-400">Add or update vendor info</p>
           </div>
         </button>
 
-        <button className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-          <BarChart3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+        <button className="flex items-center gap-3 p-4 bg-gray-800 border border-gray-700 rounded-full hover:bg-gray-700 transition-colors">
+          <BarChart3 className="w-5 h-5 text-amber-400" />
           <div className="text-left">
-            <p className="font-medium text-gray-900 dark:text-white">View Reports</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Generate cost analysis</p>
+            <p className="font-medium text-white">View Reports</p>
+            <p className="text-sm text-gray-400">Generate cost analysis</p>
           </div>
         </button>
       </div>

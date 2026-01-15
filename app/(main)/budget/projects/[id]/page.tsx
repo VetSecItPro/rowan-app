@@ -102,7 +102,7 @@ export default function ProjectTrackingPage() {
       >
         <div className="flex items-center justify-center py-16">
           <div className="animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full" />
-          <span className="ml-3 text-gray-600 dark:text-gray-400">Loading project data...</span>
+          <span className="ml-3 text-gray-400">Loading project data...</span>
         </div>
       </FeatureLayout>
     );
@@ -118,7 +118,7 @@ export default function ProjectTrackingPage() {
         ]}
       >
         <div className="text-center py-16">
-          <div className="text-red-600 dark:text-red-400 mb-2">
+          <div className="text-red-400 mb-2">
             {error || 'Project not found'}
           </div>
           <button
@@ -147,22 +147,22 @@ export default function ProjectTrackingPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'planning': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200';
-      case 'in-progress': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
-      case 'on-hold': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200';
-      case 'completed': return 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200';
-      case 'cancelled': return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200';
-      default: return 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200';
+      case 'planning': return 'bg-blue-900/30 text-blue-200';
+      case 'in-progress': return 'bg-green-900/30 text-green-200';
+      case 'on-hold': return 'bg-yellow-900/30 text-yellow-200';
+      case 'completed': return 'bg-emerald-900/30 text-emerald-200';
+      case 'cancelled': return 'bg-red-900/30 text-red-200';
+      default: return 'bg-gray-900/30 text-gray-200';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200';
-      case 'high': return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200';
-      case 'medium': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200';
-      case 'low': return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200';
-      default: return 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200';
+      case 'urgent': return 'bg-red-900/30 text-red-200';
+      case 'high': return 'bg-orange-900/30 text-orange-200';
+      case 'medium': return 'bg-yellow-900/30 text-yellow-200';
+      case 'low': return 'bg-green-900/30 text-green-200';
+      default: return 'bg-gray-900/30 text-gray-200';
     }
   };
 
@@ -183,12 +183,12 @@ export default function ProjectTrackingPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
                   <Hammer className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                <h1 className="text-3xl font-bold text-amber-400">
                   {project.name}
                 </h1>
               </div>
               {project.description && (
-                <p className="text-gray-600 dark:text-gray-400 mb-3">
+                <p className="text-gray-400 mb-3">
                   {project.description}
                 </p>
               )}
@@ -200,7 +200,7 @@ export default function ProjectTrackingPage() {
                   {project.priority} priority
                 </span>
                 {project.location && (
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-400">
                     📍 {project.location}
                   </span>
                 )}
@@ -208,11 +208,11 @@ export default function ProjectTrackingPage() {
             </div>
 
             <div className="text-right">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Progress</div>
-              <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+              <div className="text-sm text-gray-400 mb-1">Progress</div>
+              <div className="text-2xl font-bold text-amber-400">
                 {progressPercentage.toFixed(1)}%
               </div>
-              <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+              <div className="w-24 bg-gray-700 rounded-full h-2 mt-2">
                 <div
                   className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progressPercentage}%` }}
@@ -223,66 +223,66 @@ export default function ProjectTrackingPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Budget</span>
+                <DollarSign className="w-4 h-4 text-green-400" />
+                <span className="text-sm font-medium text-gray-300">Budget</span>
               </div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-xl font-bold text-white">
                 ${project.estimated_budget?.toLocaleString() || 'Not set'}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 Spent: ${project.actual_cost.toLocaleString()}
               </p>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 {isOverBudget ? (
-                  <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  <TrendingDown className="w-4 h-4 text-red-400" />
                 ) : (
-                  <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <TrendingUp className="w-4 h-4 text-green-400" />
                 )}
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Variance</span>
+                <span className="text-sm font-medium text-gray-300">Variance</span>
               </div>
               <p className={`text-xl font-bold ${
                 isOverBudget
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-green-600 dark:text-green-400'
+                  ? 'text-red-400'
+                  : 'text-green-400'
               }`}>
                 {isOverBudget ? '-' : '+'}${Math.abs(project.budget_variance).toLocaleString()}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 {project.variance_percentage.toFixed(1)}% {isOverBudget ? 'over' : 'under'}
               </p>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Timeline</span>
+                <Calendar className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium text-gray-300">Timeline</span>
               </div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-xl font-bold text-white">
                 {project.estimated_completion_date
                   ? format(parseISO(project.estimated_completion_date), 'MMM d')
                   : 'Not set'}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 {project.start_date
                   ? `Started ${format(parseISO(project.start_date), 'MMM d')}`
                   : 'Start date TBD'}
               </p>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Items</span>
+                <FileText className="w-4 h-4 text-purple-400" />
+                <span className="text-sm font-medium text-gray-300">Items</span>
               </div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">
+              <p className="text-xl font-bold text-white">
                 {lineItems.length}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 {lineItems.filter(item => item.is_paid).length} paid
               </p>
             </div>
@@ -290,7 +290,7 @@ export default function ProjectTrackingPage() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <div className="border-b border-gray-700 mb-6">
           <nav className="-mb-px flex space-x-8">
             {[
               { id: 'overview', label: 'Overview', icon: Hammer },
@@ -303,19 +303,19 @@ export default function ProjectTrackingPage() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'border-amber-500 text-amber-600 dark:text-amber-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'
+                    ? 'border-amber-500 text-amber-400'
+                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
                 {tab.id === 'photos' && photos.length > 0 && (
-                  <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full">
+                  <span className="bg-amber-900/30 text-amber-400 text-xs px-2 py-0.5 rounded-full">
                     {photos.length}
                   </span>
                 )}
                 {tab.id === 'expenses' && expenses.length > 0 && (
-                  <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs px-2 py-0.5 rounded-full">
+                  <span className="bg-amber-900/30 text-amber-400 text-xs px-2 py-0.5 rounded-full">
                     {expenses.length}
                   </span>
                 )}
@@ -356,10 +356,10 @@ export default function ProjectTrackingPage() {
           {activeTab === 'expenses' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   Linked Expenses
                 </h3>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-400">
                   {expenses.length} expense{expenses.length !== 1 ? 's' : ''} linked
                 </span>
               </div>
@@ -367,8 +367,8 @@ export default function ProjectTrackingPage() {
               {expenses.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">No expenses linked yet</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">
+                  <p className="text-gray-400 mb-2">No expenses linked yet</p>
+                  <p className="text-sm text-gray-500">
                     Link expenses to this project from the main expenses page
                   </p>
                 </div>
@@ -377,20 +377,20 @@ export default function ProjectTrackingPage() {
                   {expenses.map((expense) => (
                     <div
                       key={expense.id}
-                      className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                      className="bg-gray-800 border border-gray-700 rounded-lg p-4"
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900 dark:text-white">
+                        <h4 className="font-medium text-white">
                           {expense.description}
                         </h4>
-                        <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
+                        <span className="text-lg font-bold text-amber-400">
                           ${expense.amount.toFixed(2)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
                         <span>{format(parseISO(expense.date), 'MMM d, yyyy')}</span>
                         {expense.category && (
-                          <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-xs">
+                          <span className="px-2 py-1 bg-gray-700 rounded text-xs">
                             {expense.category}
                           </span>
                         )}

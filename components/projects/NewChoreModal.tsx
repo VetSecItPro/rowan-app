@@ -10,16 +10,16 @@ const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝'
 
 // Chore category configuration with colors and emojis
 export const CHORE_CATEGORIES = {
-  cleaning: { emoji: '🧹', label: 'Cleaning', color: 'bg-cyan-500', textColor: 'text-cyan-600', lightBg: 'bg-cyan-100 dark:bg-cyan-900/30' },
-  laundry: { emoji: '👕', label: 'Laundry', color: 'bg-blue-500', textColor: 'text-blue-600', lightBg: 'bg-blue-100 dark:bg-blue-900/30' },
-  dishes: { emoji: '🍽️', label: 'Dishes', color: 'bg-teal-500', textColor: 'text-teal-600', lightBg: 'bg-teal-100 dark:bg-teal-900/30' },
-  cooking: { emoji: '🍳', label: 'Cooking', color: 'bg-orange-500', textColor: 'text-orange-600', lightBg: 'bg-orange-100 dark:bg-orange-900/30' },
-  yard_work: { emoji: '🌿', label: 'Yard Work', color: 'bg-green-500', textColor: 'text-green-600', lightBg: 'bg-green-100 dark:bg-green-900/30' },
-  maintenance: { emoji: '🔧', label: 'Maintenance', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-100 dark:bg-gray-900/30' },
-  pet_care: { emoji: '🐾', label: 'Pet Care', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  organizing: { emoji: '📦', label: 'Organizing', color: 'bg-purple-500', textColor: 'text-purple-600', lightBg: 'bg-purple-100 dark:bg-purple-900/30' },
-  trash: { emoji: '🗑️', label: 'Trash/Recycling', color: 'bg-emerald-500', textColor: 'text-emerald-600', lightBg: 'bg-emerald-100 dark:bg-emerald-900/30' },
-  other: { emoji: '🏠', label: 'Other', color: 'bg-indigo-500', textColor: 'text-indigo-600', lightBg: 'bg-indigo-100 dark:bg-indigo-900/30' },
+  cleaning: { emoji: '🧹', label: 'Cleaning', color: 'bg-cyan-500', textColor: 'text-cyan-600', lightBg: 'bg-cyan-900/30' },
+  laundry: { emoji: '👕', label: 'Laundry', color: 'bg-blue-500', textColor: 'text-blue-600', lightBg: 'bg-blue-900/30' },
+  dishes: { emoji: '🍽️', label: 'Dishes', color: 'bg-teal-500', textColor: 'text-teal-600', lightBg: 'bg-teal-900/30' },
+  cooking: { emoji: '🍳', label: 'Cooking', color: 'bg-orange-500', textColor: 'text-orange-600', lightBg: 'bg-orange-900/30' },
+  yard_work: { emoji: '🌿', label: 'Yard Work', color: 'bg-green-500', textColor: 'text-green-600', lightBg: 'bg-green-900/30' },
+  maintenance: { emoji: '🔧', label: 'Maintenance', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-900/30' },
+  pet_care: { emoji: '🐾', label: 'Pet Care', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  organizing: { emoji: '📦', label: 'Organizing', color: 'bg-purple-500', textColor: 'text-purple-600', lightBg: 'bg-purple-900/30' },
+  trash: { emoji: '🗑️', label: 'Trash/Recycling', color: 'bg-emerald-500', textColor: 'text-emerald-600', lightBg: 'bg-emerald-900/30' },
+  other: { emoji: '🏠', label: 'Other', color: 'bg-indigo-500', textColor: 'text-indigo-600', lightBg: 'bg-indigo-900/30' },
 };
 
 interface NewChoreModalProps {
@@ -116,7 +116,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
       onClick={onClose}
     >
       <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -142,7 +142,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6">
           {/* Title */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Chore Title *
             </label>
             <div className="relative">
@@ -153,7 +153,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 id="field-1"
               onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Clean the kitchen"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -162,22 +162,22 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
                 >
-                  <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <Smile className="w-5 h-5 text-gray-400" />
                 </button>
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 z-10 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
-                    <h4 className="text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
+                  <div className="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-10 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+                    <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>
                     <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {EMOJIS.map((emoji, idx) => (
                         <button
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-700 rounded-lg transition-colors"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -192,7 +192,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
 
           {/* Description */}
           <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -201,7 +201,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
               onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this chore..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
             />
           </div>
 
@@ -209,7 +209,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
           <div className="grid grid-cols-2 gap-4">
             {/* Category */}
             <div className="relative z-50">
-              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Category
               </label>
               <div className="relative">
@@ -217,7 +217,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   value={category}
                   id="field-3"
               onChange={(e) =>  setCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white appearance-none relative z-50"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
                   <option value="">Select category...</option>
@@ -238,7 +238,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
 
             {/* Frequency */}
             <div className="relative z-50">
-              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Frequency
               </label>
               <div className="relative">
@@ -246,7 +246,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   value={formData.frequency}
                   id="field-4"
               onChange={(e) =>  setFormData({ ...formData, frequency: e.target.value as any })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white appearance-none relative z-50"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
                   <option value="daily">Daily</option>
@@ -263,7 +263,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
           {/* Day Selection for Weekly and Biweekly */}
           {(formData.frequency === 'weekly' || formData.frequency === 'biweekly') && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Select Days of Week {formData.frequency === 'biweekly' && '(Every Other Week)'}
               </label>
               <div className="grid grid-cols-7 gap-2">
@@ -281,7 +281,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedDaysOfWeek.includes(index)
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
                     {day}
@@ -289,7 +289,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 ))}
               </div>
               {formData.frequency === 'biweekly' && (
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-sm text-gray-400">
                   This chore will repeat every two weeks on the selected days.
                 </p>
               )}
@@ -299,7 +299,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
           {/* Day Selection for Monthly */}
           {formData.frequency === 'monthly' && (
             <div>
-              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 cursor-pointer">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-300 mb-3 cursor-pointer">
                 Select Days of Month
               </label>
               <div className="grid grid-cols-7 gap-2">
@@ -317,7 +317,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedDaysOfMonth.includes(day)
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
                     {day}
@@ -331,7 +331,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
           <div className="grid grid-cols-2 gap-4">
             {/* Status */}
             <div className="relative z-50">
-              <label htmlFor="field-7" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-7" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Status
               </label>
               <div className="relative">
@@ -339,7 +339,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                   value={formData.status}
                   id="field-7"
               onChange={(e) =>  setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white appearance-none relative z-50"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
                   <option value="pending">Pending</option>
@@ -354,7 +354,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
 
             {/* Due Date */}
             <div>
-              <label htmlFor="field-8" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-8" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Due Date
               </label>
               <input
@@ -379,12 +379,12 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white ${
-                  dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
+                className={`w-full px-4 py-3 bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white ${
+                  dateError ? 'border-red-500' : 'border-gray-700/50'
                 }`}
               />
               {dateError && (
-                <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                <p className="mt-2 text-base md:text-sm text-red-400 flex items-center gap-1">
                   <span className="font-medium">⚠</span>
                   {dateError}
                 </p>
@@ -393,11 +393,11 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>

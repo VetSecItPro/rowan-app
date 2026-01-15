@@ -34,11 +34,11 @@ const statusColors = {
 };
 
 const categoryConfig = {
-  bills: { label: 'Bills', icon: '💰', color: 'bg-green-500', textColor: 'text-green-700 dark:text-green-300', bgColor: 'bg-green-100 dark:bg-green-900/30' },
-  health: { label: 'Health', icon: '💊', color: 'bg-red-500', textColor: 'text-red-700 dark:text-red-300', bgColor: 'bg-red-100 dark:bg-red-900/30' },
-  work: { label: 'Work', icon: '💼', color: 'bg-blue-500', textColor: 'text-blue-700 dark:text-blue-300', bgColor: 'bg-blue-100 dark:bg-blue-900/30' },
-  personal: { label: 'Personal', icon: '👤', color: 'bg-purple-500', textColor: 'text-purple-700 dark:text-purple-300', bgColor: 'bg-purple-100 dark:bg-purple-900/30' },
-  household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-700 dark:text-amber-300', bgColor: 'bg-amber-100 dark:bg-amber-900/30' },
+  bills: { label: 'Bills', icon: '💰', color: 'bg-green-500', textColor: 'text-green-300', bgColor: 'bg-green-900/30' },
+  health: { label: 'Health', icon: '💊', color: 'bg-red-500', textColor: 'text-red-300', bgColor: 'bg-red-900/30' },
+  work: { label: 'Work', icon: '💼', color: 'bg-blue-500', textColor: 'text-blue-300', bgColor: 'bg-blue-900/30' },
+  personal: { label: 'Personal', icon: '👤', color: 'bg-purple-500', textColor: 'text-purple-300', bgColor: 'bg-purple-900/30' },
+  household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-300', bgColor: 'bg-amber-900/30' },
 };
 
 export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
@@ -67,8 +67,8 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
   };
 
   return (
-    <div className={`bg-gray-50 dark:bg-gray-800 border-2 rounded-lg p-2.5 sm:p-4 hover:shadow-lg transition-all duration-200 group ${
-      selected ? 'border-blue-500 dark:border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' : 'border-transparent'
+    <div className={`bg-gray-800 border-2 rounded-lg p-2.5 sm:p-4 hover:shadow-lg transition-all duration-200 group ${
+      selected ? 'border-blue-500 ring-2 ring-blue-800' : 'border-transparent'
     }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-1.5 sm:mb-3">
@@ -81,7 +81,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
               className={`mt-0.5 w-6 h-6 sm:w-7 sm:h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
                 selected
                   ? 'bg-blue-500 border-blue-500'
-                  : 'bg-transparent border-gray-400 dark:border-gray-500 hover:border-blue-500'
+                  : 'bg-transparent border-gray-500 hover:border-blue-500'
               }`}
             >
               {selected && <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />}
@@ -98,17 +98,17 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                   ? 'bg-green-500 border-green-500'
                   : reminder.status === 'snoozed'
                   ? 'bg-purple-500 border-purple-500'
-                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-pink-400 dark:hover:border-pink-500'
+                  : 'bg-gray-800 border-gray-600 hover:border-pink-500'
               }`}
             >
               {reminder.status === 'completed' && <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />}
               {reminder.status === 'snoozed' && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full" />}
             </button>
             {/* Improved tooltip positioning */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[99999] shadow-xl border border-gray-700 dark:border-gray-600">
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[99999] shadow-xl border border-gray-600">
               {reminder.status === 'active' ? 'Active - Click to snooze' : reminder.status === 'snoozed' ? 'Snoozed - Click to complete' : 'Completed - Click to reactivate'}
               {/* Tooltip arrow pointing up */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 dark:border-b-gray-700"></div>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-700"></div>
             </div>
           </div>
 
@@ -124,8 +124,8 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                   <h3 className={`text-sm sm:text-base font-semibold truncate ${
                     reminder.status === 'completed'
-                      ? 'line-through opacity-60 text-gray-900 dark:text-white'
-                      : categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor || 'text-gray-900 dark:text-white'
+                      ? 'line-through opacity-60 text-white'
+                      : categoryConfig[reminder.category as keyof typeof categoryConfig]?.textColor || 'text-white'
                   }`}>
                     {reminder.title}
                   </h3>
@@ -148,10 +148,10 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                       alt={reminder.assignee.name}
                       loading="lazy"
                       decoding="async"
-                      className="w-6 h-6 rounded-full object-cover border-2 border-white dark:border-gray-800"
+                      className="w-6 h-6 rounded-full object-cover border-2 border-gray-800"
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-white dark:border-gray-800">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-bold border-2 border-gray-800">
                       {reminder.assignee.name
                         .split(' ')
                         .map((n) => n[0])
@@ -168,7 +168,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
               )}
             </div>
             {reminder.description && (
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-1 sm:line-clamp-2">
+              <p className="text-xs sm:text-sm text-gray-400 line-clamp-1 sm:line-clamp-2">
                 {reminder.description}
               </p>
             )}
@@ -180,7 +180,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Reminder options menu"
-            className="p-1 sm:p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-1 sm:p-2 text-gray-400 hover:text-gray-300 transition-colors"
           >
             <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
@@ -191,7 +191,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                 {/* Mark Bill as Paid - Only show for bill-linked reminders */}
                 {reminder.linked_bill_id && onMarkBillPaid && reminder.status !== 'completed' && (
                   <button
@@ -199,7 +199,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                       onMarkBillPaid(reminder.id);
                       setShowMenu(false);
                     }}
-                    className="w-full px-4 py-3 text-left text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center gap-2 rounded-t-lg transition-colors font-medium"
+                    className="w-full px-4 py-3 text-left text-sm text-green-400 hover:bg-green-900/20 flex items-center gap-2 rounded-t-lg transition-colors font-medium"
                   >
                     <DollarSign className="w-4 h-4" />
                     Mark Bill as Paid
@@ -210,7 +210,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     onEdit(reminder);
                     setShowMenu(false);
                   }}
-                  className={`w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors ${
+                  className={`w-full px-4 py-3 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2 transition-colors ${
                     !reminder.linked_bill_id || !onMarkBillPaid || reminder.status === 'completed' ? 'rounded-t-lg' : ''
                   }`}
                 >
@@ -224,7 +224,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
                     }
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-3 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
+                  className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Reminder
@@ -239,7 +239,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-[10px] sm:text-xs">
         {/* Time */}
         {reminder.reminder_time && (
-          <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}`}>
+          <div className={`flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-gray-400'}`}>
             <Clock className="w-3 h-3" />
             <span>{formatTimestamp(reminder.reminder_time, 'MMM d, h:mm a')}</span>
             {isOverdue && <span className="font-semibold">Overdue</span>}
@@ -249,18 +249,18 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {/* Priority */}
         <div className="flex items-center gap-1">
           <Flag className={`w-3 h-3 ${priorityColor.replace('bg-', 'text-')}`} />
-          <span className="text-gray-600 dark:text-gray-400 capitalize">{reminder.priority}</span>
+          <span className="text-gray-400 capitalize">{reminder.priority}</span>
         </div>
       </div>
 
       {/* Snoozed Until */}
       {reminder.status === 'snoozed' && reminder.snooze_until && (
-        <div className="mt-2 text-xs text-purple-600 dark:text-purple-400 flex items-center gap-1">
+        <div className="mt-2 text-xs text-purple-400 flex items-center gap-1">
           <span>
             Snoozed until {formatTimestamp(reminder.snooze_until, 'MMM d, h:mm a')}
           </span>
           {reminder.snoozer && (
-            <span className="text-gray-600 dark:text-gray-400">
+            <span className="text-gray-400">
               by {reminder.snoozer.name}
             </span>
           )}
@@ -272,9 +272,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {/* Attachments Toggle */}
         <button
           onClick={() => setShowAttachments(!showAttachments)}
-          className="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+          className="w-full flex items-center justify-between p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
             <Paperclip className="w-3.5 h-3.5" />
             <span>Attachments</span>
           </div>
@@ -290,9 +290,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {/* Activity Timeline Toggle */}
         <button
           onClick={() => setShowActivity(!showActivity)}
-          className="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+          className="w-full flex items-center justify-between p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
             <Activity className="w-3.5 h-3.5" />
             <span>Activity Timeline</span>
           </div>
@@ -308,9 +308,9 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
         {/* Comments Section Toggle */}
         <button
           onClick={() => setShowComments(!showComments)}
-          className="w-full flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors text-left"
+          className="w-full flex items-center justify-between p-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-xs font-medium text-gray-400">
             <MessageCircle className="w-3.5 h-3.5" />
             <span>Comments</span>
           </div>

@@ -87,7 +87,7 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Loading funnel data...</span>
+        <span className="ml-3 text-sm text-gray-400">Loading funnel data...</span>
       </div>
     );
   }
@@ -118,31 +118,31 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
 
   const stepColors: Record<string, { bg: string; text: string; border: string }> = {
     blue: {
-      bg: 'bg-blue-100 dark:bg-blue-900/30',
-      text: 'text-blue-600 dark:text-blue-400',
-      border: 'border-blue-200 dark:border-blue-800',
+      bg: 'bg-blue-900/30',
+      text: 'text-blue-400',
+      border: 'border-blue-800',
     },
     purple: {
-      bg: 'bg-purple-100 dark:bg-purple-900/30',
-      text: 'text-purple-600 dark:text-purple-400',
-      border: 'border-purple-200 dark:border-purple-800',
+      bg: 'bg-purple-900/30',
+      text: 'text-purple-400',
+      border: 'border-purple-800',
     },
     green: {
-      bg: 'bg-green-100 dark:bg-green-900/30',
-      text: 'text-green-600 dark:text-green-400',
-      border: 'border-green-200 dark:border-green-800',
+      bg: 'bg-green-900/30',
+      text: 'text-green-400',
+      border: 'border-green-800',
     },
     emerald: {
-      bg: 'bg-emerald-100 dark:bg-emerald-900/30',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      border: 'border-emerald-200 dark:border-emerald-800',
+      bg: 'bg-emerald-900/30',
+      text: 'text-emerald-400',
+      border: 'border-emerald-800',
     },
   };
 
   const getConversionColor = (rate: number) => {
-    if (rate >= 50) return 'text-green-600 dark:text-green-400';
-    if (rate >= 25) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+    if (rate >= 50) return 'text-green-400';
+    if (rate >= 25) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
   return (
@@ -154,10 +154,10 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-sm font-semibold text-white">
               Conversion Funnel
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-400">
               Beta signup journey from request to active user
             </p>
           </div>
@@ -165,7 +165,7 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
         <button
           onClick={fetchData}
           disabled={isFetching}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
         </button>
@@ -185,21 +185,21 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
                 {/* Connector Arrow */}
                 {index < funnel.steps.length - 1 && (
                   <div className="absolute -right-3 top-1/2 -translate-y-1/2 z-10">
-                    <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                    <ArrowRight className="w-4 h-4 text-gray-600" />
                   </div>
                 )}
 
                 <div className={`p-3 rounded-lg border ${colors.border} ${colors.bg}`}>
                   <div className="flex items-center gap-2 mb-2">
                     <Icon className={`w-4 h-4 ${colors.text}`} />
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-400">
                       {step.label}
                     </span>
                   </div>
                   <p className={`text-2xl font-bold ${colors.text}`}>
                     {step.count}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     {step.description}
                   </p>
                 </div>
@@ -211,46 +211,46 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
 
       {/* Conversion Rates */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+        <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+          <p className="text-xs font-medium text-gray-400 mb-1">
             Request → Code
           </p>
           <p className={`text-xl font-bold ${getConversionColor(funnel.conversionRates.requestToCode)}`}>
             {funnel.conversionRates.requestToCode}%
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 mt-0.5">
             of requests get codes
           </p>
         </div>
-        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+        <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+          <p className="text-xs font-medium text-gray-400 mb-1">
             Code → Signup
           </p>
           <p className={`text-xl font-bold ${getConversionColor(funnel.conversionRates.codeToSignup)}`}>
             {funnel.conversionRates.codeToSignup}%
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 mt-0.5">
             of codes become users
           </p>
         </div>
-        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+        <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+          <p className="text-xs font-medium text-gray-400 mb-1">
             Overall Conversion
           </p>
           <p className={`text-xl font-bold ${getConversionColor(funnel.conversionRates.overallConversion)}`}>
             {funnel.conversionRates.overallConversion}%
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 mt-0.5">
             request to active user
           </p>
         </div>
       </div>
 
       {/* Recent Conversions */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+      <div className="border border-gray-700 rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+        <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+            <span className="text-xs font-medium text-gray-400 uppercase">
               Recent Activity
             </span>
             <span className="text-xs text-gray-400">Last 7 days</span>
@@ -258,21 +258,21 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
         </div>
         <div className="flex-1 overflow-y-auto min-h-0">
           {funnel.recentConversions.length > 0 ? (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="divide-y divide-gray-700">
               {funnel.recentConversions.map((conversion, index) => (
                 <div
                   key={index}
-                  className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  className="px-4 py-3 flex items-center justify-between hover:bg-gray-800/50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    <div className="w-8 h-8 bg-green-900/30 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-green-400" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-white">
                         {conversion.email.replace(/(.{2}).*(@.*)/, '$1***$2')}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-400">
                         {conversion.step}
                       </p>
                     </div>
@@ -285,7 +285,7 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+            <div className="p-8 text-center text-gray-400">
               <TrendingUp className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No recent conversions</p>
               <p className="text-xs mt-1">Activity will appear as users progress through the funnel</p>

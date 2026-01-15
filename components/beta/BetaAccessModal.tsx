@@ -179,15 +179,15 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
         maxWidth="md"
       >
         <div className="space-y-6 text-center">
-          <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/20 rounded-full flex items-center justify-center mx-auto">
-            <Users className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+          <div className="w-16 h-16 bg-amber-900/20 rounded-full flex items-center justify-center mx-auto">
+            <Users className="w-8 h-8 text-amber-400" />
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               {betaStatus.beta_ended ? 'Beta Program Has Ended' : 'Beta Program Full'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               {betaStatus.beta_ended
                 ? 'The beta testing period has concluded. Thank you to all our testers!'
                 : `We've reached our limit of ${betaStatus.max_users} beta testers. Thank you for your interest!`
@@ -195,11 +195,11 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             </p>
           </div>
 
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
+          <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-200 mb-2">
               Don't miss our launch!
             </h4>
-            <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+            <p className="text-sm text-blue-300 mb-3">
               Sign up to be notified when Rowan officially launches with all features.
             </p>
             <button
@@ -215,7 +215,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
 
           <button
             onClick={handleClose}
-            className="w-full px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="w-full px-4 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
           >
             Close
           </button>
@@ -234,32 +234,32 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
         maxWidth="md"
       >
         <div className="space-y-6 text-center">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+          <div className="w-16 h-16 bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               Your invite code is on its way!
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              We've sent a beta invite code to <span className="font-medium text-gray-900 dark:text-white">{email}</span>
+            <p className="text-gray-400">
+              We've sent a beta invite code to <span className="font-medium text-white">{email}</span>
             </p>
           </div>
 
           {/* Spam folder notice */}
-          <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg flex items-start gap-3">
+          <div className="p-3 bg-amber-900/20 border border-amber-700 rounded-lg flex items-start gap-3">
             <span className="text-amber-500 text-lg">📬</span>
-            <div className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="text-sm text-amber-200">
               <span className="font-medium">Can't find it?</span> Check your spam or junk folder. Emails sometimes end up there by mistake.
             </div>
           </div>
 
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-left">
-            <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
+          <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg text-left">
+            <h4 className="text-sm font-medium text-blue-200 mb-2">
               What's next:
             </h4>
-            <ol className="text-sm text-blue-700 dark:text-blue-300 space-y-2 list-decimal list-inside">
+            <ol className="text-sm text-blue-300 space-y-2 list-decimal list-inside">
               <li>Check your inbox (and spam folder)</li>
               <li>Copy the invite code from the email</li>
               <li>Click the link in the email or return here</li>
@@ -279,7 +279,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             </button>
             <button
               onClick={handleClose}
-              className="w-full px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="w-full px-4 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
             >
               Done
             </button>
@@ -300,27 +300,27 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
         {/* Beta Stats */}
         {!isLoadingStatus && betaStatus && (
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg text-center">
-              <div className="flex items-center justify-center gap-1 text-emerald-600 dark:text-emerald-400 mb-1">
+            <div className="p-3 bg-emerald-900/20 border border-emerald-800 rounded-lg text-center">
+              <div className="flex items-center justify-center gap-1 text-emerald-400 mb-1">
                 <Users className="w-4 h-4" />
                 <span className="text-sm font-medium">Spots Left</span>
               </div>
-              <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+              <p className="text-2xl font-bold text-emerald-300">
                 {betaStatus.slots_remaining}
               </p>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400">
+              <p className="text-xs text-emerald-400">
                 of {betaStatus.max_users}
               </p>
             </div>
-            <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg text-center">
-              <div className="flex items-center justify-center gap-1 text-purple-600 dark:text-purple-400 mb-1">
+            <div className="p-3 bg-purple-900/20 border border-purple-800 rounded-lg text-center">
+              <div className="flex items-center justify-center gap-1 text-purple-400 mb-1">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm font-medium">Ends On</span>
               </div>
-              <p className="text-lg font-bold text-purple-700 dark:text-purple-300">
+              <p className="text-lg font-bold text-purple-300">
                 Feb 15
               </p>
-              <p className="text-xs text-purple-600 dark:text-purple-400">
+              <p className="text-xs text-purple-400">
                 2026
               </p>
             </div>
@@ -331,10 +331,10 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
         {viewMode === 'choice' && (
           <>
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Join Rowan Beta!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Be one of 100 early testers with full access to all features.
               </p>
             </div>
@@ -343,17 +343,17 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
               {/* Request via Email */}
               <button
                 onClick={() => setViewMode('email')}
-                className="w-full p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-700 rounded-xl hover:border-blue-400 dark:hover:border-blue-500 transition-all group text-left"
+                className="w-full p-4 bg-gradient-to-r from-blue-50 from-blue-900/20 to-cyan-900/20 border border-blue-700 rounded-xl hover:border-blue-500 transition-all group text-left"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
                       Request an Invite Code
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-400 mt-1">
                       Enter your email and we'll send you an invite code instantly
                     </p>
                   </div>
@@ -363,17 +363,17 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
               {/* Already have a code */}
               <button
                 onClick={() => setViewMode('code')}
-                className="w-full p-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-gray-400 dark:hover:border-gray-500 transition-all group text-left"
+                className="w-full p-4 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-gray-500 transition-all group text-left"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Ticket className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                  <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Ticket className="w-6 h-6 text-gray-400" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                    <h4 className="font-semibold text-white group-hover:text-gray-300 transition-colors">
                       I Have an Invite Code
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-400 mt-1">
                       Already received a code? Enter it here to join
                     </p>
                   </div>
@@ -382,15 +382,15 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             </div>
 
             {/* Alternative */}
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+            <div className="pt-4 border-t border-gray-700">
+              <p className="text-sm text-gray-400 text-center">
                 Just want to stay updated?{' '}
                 <button
                   onClick={() => {
                     handleClose();
                     onSwitchToLaunch?.();
                   }}
-                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                  className="text-blue-400 hover:underline font-medium"
                 >
                   Get launch notifications
                 </button>
@@ -404,17 +404,17 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
           <>
             <button
               onClick={handleBack}
-              className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
 
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Get Your Invite Code
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Enter your email and we'll send you an invite code right away.
               </p>
             </div>
@@ -423,7 +423,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="beta-first-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="beta-first-name" className="block text-sm font-medium text-gray-300 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -432,13 +432,13 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First name"
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                     disabled={isLoading}
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="beta-last-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label htmlFor="beta-last-name" className="block text-sm font-medium text-gray-300 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -447,7 +447,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last name"
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                     disabled={isLoading}
                     required
                   />
@@ -456,7 +456,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
 
               {/* Email Field */}
               <div>
-                <label htmlFor="beta-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="beta-email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email Address <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -470,20 +470,20 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                       setError('');
                     }}
                     placeholder="you@example.com"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                     required
                     disabled={isLoading}
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-gray-400">
                   We'll send your invite code to this address
                 </p>
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+                  <p className="text-red-400 text-sm font-medium">
                     {error}
                   </p>
                 </div>
@@ -495,7 +495,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                   type="button"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                  className="px-6 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -526,24 +526,24 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
           <>
             <button
               onClick={handleBack}
-              className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
 
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Enter Your Invite Code
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Enter the 12-character code from your invitation email.
               </p>
             </div>
 
             <form onSubmit={handleCodeSubmit} className="space-y-4">
               <div>
-                <label htmlFor="invite-code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="invite-code" className="block text-sm font-medium text-gray-300 mb-2">
                   Invite Code
                 </label>
                 <div className="relative">
@@ -554,7 +554,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                     value={inviteCode}
                     onChange={(e) => handleCodeChange(e.target.value)}
                     placeholder="XXXX-XXXX-XXXX"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white font-mono text-lg tracking-wider text-center uppercase"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white font-mono text-lg tracking-wider text-center uppercase"
                     required
                     disabled={isLoading}
                     maxLength={14}
@@ -566,19 +566,19 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
 
               {/* Error Message */}
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-red-600 dark:text-red-400 text-sm font-medium">
+                <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+                  <p className="text-red-400 text-sm font-medium">
                     {error}
                   </p>
                 </div>
               )}
 
               {/* Info Box */}
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-1">
+              <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
+                <h4 className="text-sm font-medium text-blue-200 mb-1">
                   What to expect in beta:
                 </h4>
-                <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <ul className="text-sm text-blue-300 space-y-1">
                   <li>• Full access to all features until Feb 15, 2026</li>
                   <li>• Limited to 100 beta testers</li>
                   <li>• Your feedback shapes the final product</li>
@@ -592,7 +592,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                   type="button"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                  className="px-6 py-2 text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -617,12 +617,12 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             </form>
 
             {/* Alternative */}
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+            <div className="pt-4 border-t border-gray-700">
+              <p className="text-sm text-gray-400 text-center">
                 Don't have an invite code?{' '}
                 <button
                   onClick={() => setViewMode('email')}
-                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                  className="text-blue-400 hover:underline font-medium"
                 >
                   Request one now
                 </button>

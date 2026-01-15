@@ -82,12 +82,12 @@ export function AchievementNotification({
     >
       <div className="fixed bottom-4 right-4 z-50 max-w-sm">
         <div className={cn(
-          'relative bg-white dark:bg-gray-800 border-2 rounded-xl p-4 shadow-2xl',
+          'relative bg-gray-800 border-2 rounded-xl p-4 shadow-2xl',
           `border-transparent bg-gradient-to-r ${rarityStyles.gradient}`,
           rarityStyles.glow
         )}>
           {/* Background overlay for content readability */}
-          <div className="absolute inset-1 bg-white dark:bg-gray-800 rounded-lg" />
+          <div className="absolute inset-1 bg-gray-800 rounded-lg" />
 
           {/* Content */}
           <div className="relative z-10">
@@ -97,7 +97,7 @@ export function AchievementNotification({
                 setIsShowing(false);
                 setTimeout(onClose, 300);
               }}
-              className="absolute top-0 right-0 -mt-1 -mr-1 w-6 h-6 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="absolute top-0 right-0 -mt-1 -mr-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
             >
               <X className="w-3 h-3 text-gray-500" />
             </button>
@@ -112,10 +112,10 @@ export function AchievementNotification({
                 <Trophy className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 dark:text-white text-sm">
+                <h3 className="font-bold text-white text-sm">
                   Achievement Unlocked!
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-400">
                   {achievement.badge.points} points earned
                 </p>
               </div>
@@ -131,10 +131,10 @@ export function AchievementNotification({
                   <Star className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-gray-900 dark:text-white truncate">
+                  <h4 className="font-bold text-white truncate">
                     {achievement.badge.name}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                  <p className="text-sm text-gray-400 line-clamp-2">
                     {achievement.badge.description}
                   </p>
                 </div>

@@ -143,30 +143,30 @@ export default function RecurringExpensesPage() {
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Recurring Expenses
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Automatically detect and manage your recurring expenses and subscriptions
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-xl p-4">
+            <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <p className="text-red-800 dark:text-red-200">{error}</p>
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                <p className="text-red-200">{error}</p>
               </div>
             </div>
           )}
 
           {/* Info Banner */}
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-purple-50 from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl p-6">
             <div className="flex items-start gap-4">
-              <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-1" />
+              <Sparkles className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                <h3 className="text-lg font-semibold text-purple-100 mb-2">
                   AI-Powered Pattern Detection
                 </h3>
-                <p className="text-sm text-purple-800 dark:text-purple-200 mb-3">
+                <p className="text-sm text-purple-200 mb-3">
                   Our ML algorithm analyzes your expense history to automatically detect recurring
                   patterns like subscriptions, bills, and regular payments. Review and confirm
                   patterns to improve accuracy over time.
@@ -205,7 +205,7 @@ export default function RecurringExpensesPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">Loading recurring patterns...</p>
+              <p className="text-gray-400">Loading recurring patterns...</p>
             </div>
           ) : (
             <RecurringPatternsList

@@ -57,16 +57,16 @@ export default function MessagesAnalyticsPage() {
         {/* Header with Time Range Toggle */}
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+            <h1 className="text-3xl font-bold text-green-400 mb-2">
               Messages Analytics
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               Review messaging activity and communication trends
             </p>
           </div>
 
           {/* Time Range Toggle */}
-          <div className="inline-flex items-center bg-green-50 dark:bg-green-900/20 rounded-lg p-1 border border-green-200 dark:border-green-800">
+          <div className="inline-flex items-center bg-green-900/20 rounded-lg p-1 border border-green-800">
             {[
               { value: '1m', label: 'Last Month' },
               { value: '3m', label: 'Last 3 Months' },
@@ -79,7 +79,7 @@ export default function MessagesAnalyticsPage() {
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   timeRange === option.value
                     ? 'bg-green-500 text-white shadow-sm'
-                    : 'text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100'
+                    : 'text-green-300 hover:text-green-100'
                 }`}
               >
                 {option.label}
@@ -95,20 +95,20 @@ export default function MessagesAnalyticsPage() {
             return (
               <div
                 key={index}
-                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
+                className="bg-gray-800 border border-gray-700 rounded-xl p-6"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-lg bg-gradient-to-br ${stat.gradient} shadow-lg`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                  <span className="text-sm font-medium text-green-400">
                     {stat.change}
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                <h3 className="text-2xl font-bold text-white mb-1">
                   {stat.value}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                <p className="text-sm text-gray-400">{stat.label}</p>
               </div>
             );
           })}
@@ -117,12 +117,12 @@ export default function MessagesAnalyticsPage() {
         {/* Metrics Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Message Volume */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Message Volume
               </h3>
-              <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 text-sm font-medium rounded-full">
+              <span className="px-3 py-1 bg-green-900/30 border border-green-700 text-green-300 text-sm font-medium rounded-full">
                 {format(new Date(), 'MMM yyyy')}
               </span>
             </div>
@@ -134,14 +134,14 @@ export default function MessagesAnalyticsPage() {
               ].map((item, index) => (
                 <div key={index}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-300">
                       {item.label}
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-white">
                       {item.value}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className={`${item.color} h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${item.value}%` }}
@@ -153,12 +153,12 @@ export default function MessagesAnalyticsPage() {
           </div>
 
           {/* Peak Activity Hours */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Peak Activity Hours
               </h3>
-              <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 text-sm font-medium rounded-full">
+              <span className="px-3 py-1 bg-green-900/30 border border-green-700 text-green-300 text-sm font-medium rounded-full">
                 {format(new Date(), 'MMM yyyy')}
               </span>
             </div>
@@ -170,14 +170,14 @@ export default function MessagesAnalyticsPage() {
               ].map((item, index) => (
                 <div key={index}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-300">
                       {item.label}
                     </span>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-white">
                       {item.value}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className={`${item.color} h-2 rounded-full transition-all duration-300`}
                       style={{ width: `${item.value}%` }}

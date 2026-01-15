@@ -97,39 +97,39 @@ export function CountdownCard({ countdown, onClick }: CountdownCardProps) {
 
   // Get text color based on state
   const textColorClass = useMemo(() => {
-    if (isToday) return 'text-amber-700 dark:text-amber-300';
+    if (isToday) return 'text-amber-300';
 
     if (isImportantDate && dateType) {
       switch (dateType) {
         case 'birthday':
-          return 'text-pink-700 dark:text-pink-300';
+          return 'text-pink-300';
         case 'anniversary':
-          return 'text-red-700 dark:text-red-300';
+          return 'text-red-300';
         case 'memorial':
-          return 'text-purple-700 dark:text-purple-300';
+          return 'text-purple-300';
         case 'renewal':
-          return 'text-amber-700 dark:text-amber-300';
+          return 'text-amber-300';
         case 'appointment':
-          return 'text-sky-700 dark:text-sky-300';
+          return 'text-sky-300';
         default:
-          return 'text-indigo-700 dark:text-indigo-300';
+          return 'text-indigo-300';
       }
     }
 
-    if (daysRemaining <= 3) return 'text-red-700 dark:text-red-300';
-    if (daysRemaining <= 7) return 'text-purple-700 dark:text-purple-300';
-    return 'text-sky-700 dark:text-sky-300';
+    if (daysRemaining <= 3) return 'text-red-300';
+    if (daysRemaining <= 7) return 'text-purple-300';
+    return 'text-sky-300';
   }, [isToday, daysRemaining, isImportantDate, dateType]);
 
   return (
     <button
       onClick={onClick}
-      className="group relative w-full overflow-hidden rounded-xl border border-gray-200/50 p-3 text-left transition-all duration-200 hover:scale-[1.02] hover:shadow-md dark:border-gray-700/50"
+      className="group relative w-full overflow-hidden rounded-xl border border-gray-200/50 p-3 text-left transition-all duration-200 hover:scale-[1.02] border-gray-700/50"
       style={{ background: gradientStyle.background }}
     >
       {/* Dark mode overlay */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 dark:opacity-100"
+        className="pointer-events-none absolute inset-0 opacity-0 opacity-100"
         style={{ background: gradientStyle.darkBackground }}
       />
 
@@ -138,7 +138,7 @@ export function CountdownCard({ countdown, onClick }: CountdownCardProps) {
         {/* Top row: emoji (for important dates) or countdown number */}
         <div className="flex items-center gap-1">
           {isToday && (
-            <Sparkles className="h-4 w-4 animate-pulse text-amber-600 dark:text-amber-400" />
+            <Sparkles className="h-4 w-4 animate-pulse text-amber-400" />
           )}
           {isImportantDate && emoji ? (
             <span className="text-2xl">{emoji}</span>
@@ -156,19 +156,19 @@ export function CountdownCard({ countdown, onClick }: CountdownCardProps) {
           </span>
         ) : (
           !isToday && (
-            <span className="text-[10px] font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
+            <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">
               {daysRemaining === 1 ? 'day' : 'days'}
             </span>
           )
         )}
 
         {/* Label - truncated */}
-        <p className="mt-1.5 w-full truncate text-xs font-semibold text-gray-800 dark:text-gray-200">
+        <p className="mt-1.5 w-full truncate text-xs font-semibold text-gray-200">
           {label}
         </p>
 
         {/* Date */}
-        <p className="text-[10px] text-gray-500 dark:text-gray-400">{displayDate}</p>
+        <p className="text-[10px] text-gray-400">{displayDate}</p>
       </div>
     </button>
   );

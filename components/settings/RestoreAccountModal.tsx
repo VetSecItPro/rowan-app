@@ -57,20 +57,20 @@ export function RestoreAccountModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden border border-gray-700 flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-white">
               Account Marked for Deletion
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg hover:bg-gray-800 flex items-center justify-center transition-colors"
             disabled={isRestoring}
           >
             <X className="w-4 h-4 text-gray-500" />
@@ -80,17 +80,17 @@ export function RestoreAccountModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Warning Notice */}
-          <div className="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
-            <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-3 p-4 bg-orange-900/20 border border-orange-800 rounded-xl">
+            <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
             <div>
-              <h3 className="font-medium text-orange-800 dark:text-orange-200 mb-1">
+              <h3 className="font-medium text-orange-200 mb-1">
                 Your account is scheduled for deletion
               </h3>
-              <p className="text-sm text-orange-700 dark:text-orange-300">
+              <p className="text-sm text-orange-300">
                 You requested account deletion on{' '}
                 <strong>{new Date(deletionRequestedAt).toLocaleDateString()}</strong>.
                 Your account will be permanently deleted in{' '}
-                <strong className="text-orange-900 dark:text-orange-100">{daysRemaining} days</strong>{' '}
+                <strong className="text-orange-100">{daysRemaining} days</strong>{' '}
                 on <strong>{new Date(permanentDeletionAt).toLocaleDateString()}</strong>.
               </p>
             </div>
@@ -98,36 +98,36 @@ export function RestoreAccountModal({
 
           {/* What happens if you restore */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               Restore your account now
             </h3>
 
             <div className="grid gap-3">
-              <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3 bg-green-900/20 border border-green-800 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Cancel Deletion</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="font-medium text-white">Cancel Deletion</p>
+                  <p className="text-sm text-gray-400">
                     Your deletion request will be cancelled immediately.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
+                <RefreshCw className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Full Access Restored</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="font-medium text-white">Full Access Restored</p>
+                  <p className="text-sm text-gray-400">
                     Continue using Rowan normally with all your data intact.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3 bg-purple-900/20 border border-purple-800 rounded-lg">
+                <Calendar className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">No Data Loss</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="font-medium text-white">No Data Loss</p>
+                  <p className="text-sm text-gray-400">
                     All your expenses, tasks, messages, and other data will remain available.
                   </p>
                 </div>
@@ -137,16 +137,16 @@ export function RestoreAccountModal({
 
           {/* Error message */}
           {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex gap-3 pt-4 border-t border-gray-700">
             <button
               onClick={onClose}
-              className="flex-1 px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl font-medium transition-colors"
+              className="flex-1 px-6 py-3 text-gray-300 bg-gray-800 hover:bg-gray-700 rounded-xl font-medium transition-colors"
               disabled={isRestoring}
             >
               Continue to Dashboard
@@ -171,7 +171,7 @@ export function RestoreAccountModal({
           </div>
 
           {/* Info Note */}
-          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <div className="text-xs text-gray-400 text-center">
             By restoring your account, you confirm that you want to continue using Rowan.
             You can request deletion again anytime from your account settings.
           </div>

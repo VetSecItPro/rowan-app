@@ -165,7 +165,7 @@ export function BillsList({
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
-        <span className="ml-3 text-gray-600 dark:text-gray-400">Loading bills...</span>
+        <span className="ml-3 text-gray-400">Loading bills...</span>
       </div>
     );
   }
@@ -176,8 +176,8 @@ export function BillsList({
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-          <p className="text-gray-900 dark:text-white font-medium mb-2">Error Loading Bills</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <p className="text-white font-medium mb-2">Error Loading Bills</p>
+          <p className="text-sm text-gray-400 mb-4">{error}</p>
           <button
             onClick={fetchBills}
             className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
@@ -192,7 +192,7 @@ export function BillsList({
   return (
     <div className="space-y-4">
       {/* Header with Controls */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-700">
         {/* Search */}
         <div className="mb-3">
           <input
@@ -200,7 +200,7 @@ export function BillsList({
             placeholder="Search bills..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-5 py-2.5 border-2 border-amber-300 dark:border-amber-600 rounded-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm"
+            className="w-full px-5 py-2.5 border-2 border-amber-600 rounded-full bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm"
           />
         </div>
 
@@ -216,7 +216,7 @@ export function BillsList({
                   className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
                     statusFilter === option.value
                       ? 'bg-amber-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   {option.label}
@@ -227,13 +227,13 @@ export function BillsList({
 
           {/* Sort Options - Compact pill buttons */}
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Sort:</span>
+            <span className="text-xs text-gray-400">Sort:</span>
             <button
               onClick={() => toggleSort('due_date')}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 sortBy === 'due_date'
                   ? 'bg-amber-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
               Date
@@ -249,7 +249,7 @@ export function BillsList({
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 sortBy === 'amount'
                   ? 'bg-amber-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
               Amount
@@ -265,7 +265,7 @@ export function BillsList({
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 ${
                 sortBy === 'name'
                   ? 'bg-amber-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
               Name
@@ -282,12 +282,12 @@ export function BillsList({
 
       {/* Bills Grid */}
       {processedBills.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="text-center py-12 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-medium text-white mb-2">
             No Bills Found
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-gray-400 mb-4">
             {searchQuery
               ? 'No bills match your search criteria.'
               : statusFilter !== 'all'
@@ -306,7 +306,7 @@ export function BillsList({
         </div>
       ) : (
         <>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-gray-400">
             Showing {processedBills.length} {processedBills.length === 1 ? 'bill' : 'bills'}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -78,18 +78,18 @@ export function PasswordConfirmModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden border border-gray-700 flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
               <Lock className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
+            <h2 className="text-xl font-semibold text-white">{title}</h2>
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg hover:bg-gray-800 flex items-center justify-center transition-colors"
             disabled={isVerifying}
           >
             <X className="w-4 h-4 text-gray-500" />
@@ -98,15 +98,15 @@ export function PasswordConfirmModal({
 
         {/* Content */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
-          <div className="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
-            <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-orange-800 dark:text-orange-200">
+          <div className="flex items-start gap-3 p-4 bg-orange-900/20 border border-orange-800 rounded-xl">
+            <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-orange-200">
               {description}
             </p>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
               Current Password
             </label>
             <input
@@ -115,13 +115,13 @@ export function PasswordConfirmModal({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white placeholder-gray-500"
               placeholder="Enter your password"
               disabled={isVerifying}
               autoFocus
             />
             {error && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+              <p className="mt-2 text-sm text-red-400">{error}</p>
             )}
           </div>
 

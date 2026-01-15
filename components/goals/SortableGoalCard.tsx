@@ -23,10 +23,10 @@ interface SortableGoalCardProps {
 }
 
 const priorityConfig = {
-  p1: { label: 'P1', color: 'bg-red-500 text-white', textColor: 'text-red-600 dark:text-red-400' },
-  p2: { label: 'P2', color: 'bg-orange-500 text-white', textColor: 'text-orange-600 dark:text-orange-400' },
-  p3: { label: 'P3', color: 'bg-yellow-500 text-white', textColor: 'text-yellow-600 dark:text-yellow-400' },
-  p4: { label: 'P4', color: 'bg-blue-500 text-white', textColor: 'text-blue-600 dark:text-blue-400' },
+  p1: { label: 'P1', color: 'bg-red-500 text-white', textColor: 'text-red-400' },
+  p2: { label: 'P2', color: 'bg-orange-500 text-white', textColor: 'text-orange-400' },
+  p3: { label: 'P3', color: 'bg-yellow-500 text-white', textColor: 'text-yellow-400' },
+  p4: { label: 'P4', color: 'bg-blue-500 text-white', textColor: 'text-blue-400' },
   none: { label: '', color: '', textColor: '' },
 };
 
@@ -92,8 +92,8 @@ export function SortableGoalCard({
         {...listeners}
         className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pr-2 opacity-0 group-hover/sortable:opacity-100 transition-opacity cursor-grab active:cursor-grabbing z-10"
       >
-        <div className="w-8 h-8 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-          <GripVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+          <GripVertical className="w-5 h-5 text-gray-400" />
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export function SortableGoalCard({
             className={`p-2 flex items-center justify-center rounded-lg transition-colors ${
               goal.is_pinned
                 ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
             }`}
             title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
           >
@@ -121,7 +121,7 @@ export function SortableGoalCard({
             className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors ${
               priorityInfo.color
                 ? priorityInfo.color
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
             }`}
             title="Click to change priority"
           >

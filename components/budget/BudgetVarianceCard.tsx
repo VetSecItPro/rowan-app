@@ -96,35 +96,35 @@ export function BudgetVarianceCard({
   return (
     <div className={`border rounded-xl p-6 ${
       isOverBudget
-        ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800'
-        : 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800'
+        ? 'bg-red-900/10 border-red-800'
+        : 'bg-orange-900/10 border-orange-800'
     }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={`p-3 rounded-lg ${
             isOverBudget
-              ? 'bg-red-100 dark:bg-red-900/30'
-              : 'bg-orange-100 dark:bg-orange-900/30'
+              ? 'bg-red-900/30'
+              : 'bg-orange-900/30'
           }`}>
             <AlertTriangle className={`w-6 h-6 ${
               isOverBudget
-                ? 'text-red-600 dark:text-red-400'
-                : 'text-orange-600 dark:text-orange-400'
+                ? 'text-red-400'
+                : 'text-orange-400'
             }`} />
           </div>
           <div>
             <h3 className={`text-lg font-semibold ${
               isOverBudget
-                ? 'text-red-900 dark:text-red-100'
-                : 'text-orange-900 dark:text-orange-100'
+                ? 'text-red-100'
+                : 'text-orange-100'
             }`}>
               Budget Variance Alert
             </h3>
             <p className={`text-sm ${
               isOverBudget
-                ? 'text-red-700 dark:text-red-300'
-                : 'text-orange-700 dark:text-orange-300'
+                ? 'text-red-300'
+                : 'text-orange-300'
             }`}>
               Project is ${Math.abs(variance).toLocaleString()} ({Math.abs(variancePercentage).toFixed(1)}%) {isOverBudget ? 'over' : 'approaching'} budget
             </p>
@@ -136,8 +136,8 @@ export function BudgetVarianceCard({
             onClick={() => setShowBudgetAdjust(true)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-colors ${
               isOverBudget
-                ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50'
-                : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-200 dark:hover:bg-orange-900/50'
+                ? 'bg-red-900/30 text-red-300 hover:bg-red-900/50'
+                : 'bg-orange-900/30 text-orange-300 hover:bg-orange-900/50'
             }`}
           >
             <Edit3 className="w-4 h-4" />
@@ -161,64 +161,64 @@ export function BudgetVarianceCard({
         <div className="text-center p-2">
           <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${
             isOverBudget
-              ? 'text-red-600 dark:text-red-400'
-              : 'text-orange-600 dark:text-orange-400'
+              ? 'text-red-400'
+              : 'text-orange-400'
           }`}>
             ${Math.abs(variance).toLocaleString()}
           </div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Variance</div>
+          <div className="text-xs sm:text-sm text-gray-400">Variance</div>
         </div>
 
         <div className="text-center p-2">
-          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             ${project.actual_cost.toLocaleString()}
           </div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Spent</div>
+          <div className="text-xs sm:text-sm text-gray-400">Spent</div>
         </div>
 
         <div className="text-center p-2">
-          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-400">
             ${projectedTotal.toLocaleString()}
           </div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Projected</div>
+          <div className="text-xs sm:text-sm text-gray-400">Projected</div>
         </div>
 
         <div className="text-center p-2">
           <div className={`text-lg sm:text-xl lg:text-2xl font-bold ${
             projectedVariance > 0
-              ? 'text-red-600 dark:text-red-400'
-              : 'text-green-600 dark:text-green-400'
+              ? 'text-red-400'
+              : 'text-green-400'
           }`}>
             {projectedVariance > 0 ? '+' : ''}${projectedVariance.toLocaleString()}
           </div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Final Variance</div>
+          <div className="text-xs sm:text-sm text-gray-400">Final Variance</div>
         </div>
       </div>
 
       {/* Recommendations */}
       <div className={`p-4 rounded-lg mb-4 ${
         isOverBudget
-          ? 'bg-red-100 dark:bg-red-900/20'
-          : 'bg-orange-100 dark:bg-orange-900/20'
+          ? 'bg-red-900/20'
+          : 'bg-orange-900/20'
       }`}>
         <div className="flex items-start gap-3">
           <Lightbulb className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
             isOverBudget
-              ? 'text-red-600 dark:text-red-400'
-              : 'text-orange-600 dark:text-orange-400'
+              ? 'text-red-400'
+              : 'text-orange-400'
           }`} />
           <div>
             <h4 className={`font-medium mb-2 ${
               isOverBudget
-                ? 'text-red-900 dark:text-red-100'
-                : 'text-orange-900 dark:text-orange-100'
+                ? 'text-red-100'
+                : 'text-orange-100'
             }`}>
               Recommended Actions
             </h4>
             <ul className={`space-y-1 text-sm ${
               isOverBudget
-                ? 'text-red-800 dark:text-red-200'
-                : 'text-orange-800 dark:text-orange-200'
+                ? 'text-red-200'
+                : 'text-orange-200'
             }`}>
               {isOverBudget ? (
                 <>
@@ -244,11 +244,11 @@ export function BudgetVarianceCard({
 
       {/* Detailed Analysis */}
       {showDetails && (
-        <div className="space-y-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+        <div className="space-y-6 border-t border-gray-700 pt-6">
           {/* Budget vs Actual Chart */}
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-4">
+              <h4 className="font-medium text-white mb-4">
                 Budget Comparison
               </h4>
               <DynamicBarChart
@@ -265,7 +265,7 @@ export function BudgetVarianceCard({
             {/* Category Variances */}
             {overBudgetCategories.length > 0 && (
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white mb-4">
+                <h4 className="font-medium text-white mb-4">
                   Over-Budget Categories
                 </h4>
                 <DynamicPieChart
@@ -280,39 +280,39 @@ export function BudgetVarianceCard({
           {/* Category Breakdown Table */}
           {overBudgetCategories.length > 0 && (
             <div>
-              <h4 className="font-medium text-gray-900 dark:text-white mb-4">
+              <h4 className="font-medium text-white mb-4">
                 Category Analysis
               </h4>
-              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-thumb-gray-600">
                 <table className="w-full min-w-[500px]">
                   <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="text-left py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Category</th>
-                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Budgeted</th>
-                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Actual</th>
-                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Variance</th>
-                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">%</th>
+                    <tr className="border-b border-gray-700">
+                      <th className="text-left py-3 px-2 text-xs sm:text-sm font-medium text-gray-300">Category</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-300">Budgeted</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-300">Actual</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-300">Variance</th>
+                      <th className="text-right py-3 px-2 text-xs sm:text-sm font-medium text-gray-300">%</th>
                     </tr>
                   </thead>
                   <tbody>
                     {overBudgetCategories.map((category) => (
-                      <tr key={category.category} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                        <td className="py-3 px-2 text-xs sm:text-sm text-gray-900 dark:text-white">
+                      <tr key={category.category} className="border-b border-gray-800 hover:bg-gray-800/50">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-white">
                           <div className="font-medium">{category.category}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-gray-400">
                             ({category.count} items)
                           </div>
                         </td>
-                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-white">
                           ${category.estimated.toLocaleString()}
                         </td>
-                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-gray-900 dark:text-white">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-white">
                           ${category.actual.toLocaleString()}
                         </td>
-                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-red-600 dark:text-red-400 font-medium">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-red-400 font-medium">
                           +${category.variance.toLocaleString()}
                         </td>
-                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-red-600 dark:text-red-400 font-medium">
+                        <td className="py-3 px-2 text-xs sm:text-sm text-right text-red-400 font-medium">
                           +{category.percentage.toFixed(1)}%
                         </td>
                       </tr>
@@ -333,14 +333,14 @@ export function BudgetVarianceCard({
             onClick={() => setShowBudgetAdjust(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
+              <div className="flex items-center justify-between p-4 border-b border-gray-700">
+                <h3 className="text-lg font-semibold text-white">
                   Adjust Project Budget
                 </h3>
                 <button
                   onClick={() => setShowBudgetAdjust(false)}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -348,28 +348,28 @@ export function BudgetVarianceCard({
 
               <div className="p-4 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Current Budget
                   </label>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-2xl font-bold text-white">
                     ${project.estimated_budget?.toLocaleString() || 'Not set'}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Recommended Budget
                   </label>
-                  <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                  <div className="text-lg font-semibold text-blue-400">
                     ${projectedTotal.toLocaleString()}
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-gray-400">
                     Based on current spending and remaining estimates
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     New Budget <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -380,16 +380,16 @@ export function BudgetVarianceCard({
                       value={newBudget}
                       onChange={(e) => setNewBudget(e.target.value)}
                       placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-700">
                 <button
                   onClick={() => setShowBudgetAdjust(false)}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
                 >
                   Cancel
                 </button>

@@ -66,11 +66,11 @@ export function SplitTypeSelector({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-white">
           How should this be split?
         </h3>
         {suggestedType && (
-          <div className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium rounded-full">
+          <div className="flex items-center gap-1 px-2 py-1 bg-green-900/30 text-green-300 text-xs font-medium rounded-full">
             <Info className="w-3 h-3" />
             {suggestedType === 'equal' ? 'Equal' : 'Income-based'} recommended
           </div>
@@ -90,10 +90,10 @@ export function SplitTypeSelector({
               disabled={isDisabled}
               className={`btn-touch relative p-4 rounded-lg border-2 text-left transition-all ${
                 isDisabled
-                  ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 opacity-50 cursor-not-allowed'
+                  ? 'border-gray-700 bg-gray-800 opacity-50 cursor-not-allowed'
                   : isSelected
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 hover:shadow-lg'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md active:scale-[0.98] hover-lift shimmer-purple active-press'
+                  ? 'border-purple-500 bg-purple-900/20 hover:shadow-lg'
+                  : 'border-gray-700 hover:border-gray-600 hover:shadow-md active:scale-[0.98] hover-lift shimmer-purple active-press'
               }`}
             >
               {/* Recommended Badge */}
@@ -106,17 +106,17 @@ export function SplitTypeSelector({
               <div className="flex items-start gap-3">
                 <div className={`p-2 rounded-lg ${
                   isDisabled
-                    ? 'bg-gray-200 dark:bg-gray-700'
+                    ? 'bg-gray-700'
                     : isSelected
                     ? 'bg-purple-500'
-                    : 'bg-gray-100 dark:bg-gray-600'
+                    : 'bg-gray-600'
                 }`}>
                   <Icon className={`w-5 h-5 ${
                     isDisabled
                       ? 'text-gray-400'
                       : isSelected
                       ? 'text-white'
-                      : 'text-gray-600 dark:text-gray-300'
+                      : 'text-gray-300'
                   }`} />
                 </div>
 
@@ -125,8 +125,8 @@ export function SplitTypeSelector({
                     isDisabled
                       ? 'text-gray-400'
                       : isSelected
-                      ? 'text-purple-900 dark:text-purple-100'
-                      : 'text-gray-900 dark:text-white'
+                      ? 'text-purple-100'
+                      : 'text-white'
                   }`}>
                     {type.label}
                   </h4>
@@ -135,8 +135,8 @@ export function SplitTypeSelector({
                     isDisabled
                       ? 'text-gray-400'
                       : isSelected
-                      ? 'text-purple-700 dark:text-purple-300'
-                      : 'text-gray-600 dark:text-gray-400'
+                      ? 'text-purple-300'
+                      : 'text-gray-400'
                   }`}>
                     {type.description}
                   </p>
@@ -145,8 +145,8 @@ export function SplitTypeSelector({
                     isDisabled
                       ? 'text-gray-400'
                       : isSelected
-                      ? 'text-purple-600 dark:text-purple-400'
-                      : 'text-gray-500 dark:text-gray-500'
+                      ? 'text-purple-400'
+                      : 'text-gray-500'
                   }`}>
                     {type.example}
                   </p>
@@ -155,8 +155,8 @@ export function SplitTypeSelector({
 
               {/* Income Setup Warning */}
               {type.value === 'income-based' && isDisabled && (
-                <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-xs">
-                  <div className="flex items-center gap-1 text-yellow-700 dark:text-yellow-300">
+                <div className="mt-3 p-2 bg-yellow-900/20 border border-yellow-800 rounded text-xs">
+                  <div className="flex items-center gap-1 text-yellow-300">
                     <Info className="w-3 h-3" />
                     Setup partner incomes to enable this option
                   </div>
@@ -169,14 +169,14 @@ export function SplitTypeSelector({
 
       {/* Income-Based Info Panel */}
       {selectedType === 'income-based' && partnership?.user1_income && partnership?.user2_income && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <h4 className="font-medium text-blue-900 dark:text-blue-100">
+            <TrendingUp className="w-4 h-4 text-blue-400" />
+            <h4 className="font-medium text-blue-100">
               Income-Based Calculation
             </h4>
           </div>
-          <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+          <div className="text-sm text-blue-200 space-y-1">
             <p>Partner 1: ${partnership.user1_income.toLocaleString()}/month</p>
             <p>Partner 2: ${partnership.user2_income.toLocaleString()}/month</p>
             <p className="pt-1 font-medium">

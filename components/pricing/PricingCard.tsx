@@ -43,16 +43,16 @@ export function PricingCard({
     <div
       className={`relative flex flex-col rounded-2xl border-2 p-8 shadow-lg transition-all duration-300 hover:-translate-y-1 ${
         popular
-          ? 'border-emerald-500 dark:border-emerald-400 hover:shadow-emerald-500/50 hover:shadow-2xl'
+          ? 'border-emerald-400 hover:shadow-emerald-500/50 hover:shadow-2xl'
           : tier === 'family'
-            ? 'border-gray-200 dark:border-gray-700 hover:shadow-indigo-500/30 hover:shadow-2xl'
-            : 'border-gray-200 dark:border-gray-700 hover:shadow-gray-400/40 hover:shadow-2xl'
-      } ${isFree ? 'bg-white dark:bg-gray-800' : 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900'}`}
+            ? 'border-gray-700 hover:shadow-indigo-500/30 hover:shadow-2xl'
+            : 'border-gray-700 hover:shadow-gray-400/40 hover:shadow-2xl'
+      } ${isFree ? 'bg-gray-800' : 'bg-gradient-to-br from-white from-gray-800 to-gray-900'}`}
     >
       {/* Popular Badge */}
       {popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-500 dark:to-teal-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
+          <span className="rounded-full bg-gradient-to-r from-emerald-600 from-emerald-500 to-teal-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
             Most Popular
           </span>
         </div>
@@ -60,27 +60,27 @@ export function PricingCard({
 
       {/* Header */}
       <div className="mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h3>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{description}</p>
+        <h3 className="text-2xl font-bold text-white">{title}</h3>
+        <p className="mt-2 text-sm text-gray-400">{description}</p>
       </div>
 
       {/* Price */}
       <div className="mb-6 min-h-[120px]">
         {isFree ? (
           <div className="flex items-baseline">
-            <span className="text-5xl font-bold text-gray-900 dark:text-white">Free</span>
+            <span className="text-5xl font-bold text-white">Free</span>
           </div>
         ) : (
           <>
             <div className="flex items-baseline">
-              <span className="text-5xl font-bold text-gray-900 dark:text-white">${price}</span>
-              <span className="ml-2 text-gray-600 dark:text-gray-400">
+              <span className="text-5xl font-bold text-white">${price}</span>
+              <span className="ml-2 text-gray-400">
                 /{period === 'monthly' ? 'mo' : 'year'}
               </span>
             </div>
             <div className="mt-1 h-5">
               {period === 'annual' && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   ${(annualPrice / 12).toFixed(2)}/mo billed annually
                 </p>
               )}
@@ -95,10 +95,10 @@ export function PricingCard({
         disabled={loading || disabled}
         className={`mb-6 w-full rounded-lg px-6 py-3 text-base font-semibold transition-all flex items-center justify-center gap-2 ${
           popular
-            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-500 dark:to-teal-500 dark:hover:from-emerald-600 dark:hover:to-teal-600 shadow-md hover:shadow-lg'
+            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 from-emerald-500 hover:from-emerald-600 hover:to-teal-600 shadow-md hover:shadow-lg'
             : isFree
-              ? 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
-              : 'bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600'
+              ? 'bg-gray-200 text-gray-900 bg-gray-700 hover:bg-gray-600'
+              : 'bg-gray-900 text-white bg-gray-700 hover:bg-gray-600'
         } ${(loading || disabled) ? 'opacity-60 cursor-not-allowed' : ''}`}
         aria-label={`${cta} for ${title} plan`}
       >
@@ -112,10 +112,10 @@ export function PricingCard({
           {features.map((feature, index) => (
             <li key={index} className="flex items-start gap-3">
               <Check
-                className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600 dark:text-emerald-400"
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-400"
                 aria-hidden="true"
               />
-              <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+              <span className="text-sm text-gray-300">{feature}</span>
             </li>
           ))}
         </ul>

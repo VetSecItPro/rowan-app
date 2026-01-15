@@ -69,31 +69,31 @@ export default function ForgotPasswordPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 from-slate-950 to-zinc-950 p-4">
         <motion.div
-          className="w-full max-w-md bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/20 dark:border-gray-800/50"
+          className="w-full max-w-md bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           <motion.div className="flex items-center justify-center mb-8" variants={itemVariants}>
-            <div className="w-20 h-20 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center shadow-inner">
-              <Check className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-20 h-20 bg-emerald-900/20 rounded-full flex items-center justify-center shadow-inner">
+              <Check className="w-10 h-10 text-emerald-400" />
             </div>
           </motion.div>
-          <motion.h2 className="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3" variants={itemVariants}>
+          <motion.h2 className="text-3xl font-extrabold text-center text-white mb-3" variants={itemVariants}>
             Check Your Email
           </motion.h2>
-          <motion.p className="text-center text-gray-600 dark:text-gray-400 mb-8 text-lg" variants={itemVariants}>
-            We've sent a password reset link to <span className="font-bold text-emerald-600 dark:text-emerald-400">{email}</span>
+          <motion.p className="text-center text-gray-400 mb-8 text-lg" variants={itemVariants}>
+            We've sent a password reset link to <span className="font-bold text-emerald-400">{email}</span>
           </motion.p>
-          <motion.p className="text-center text-sm text-gray-500 dark:text-gray-500 mb-8 leading-relaxed" variants={itemVariants}>
+          <motion.p className="text-center text-sm text-gray-500 mb-8 leading-relaxed" variants={itemVariants}>
             Didn't receive the email? Check your spam folder or try again with a different email address.
           </motion.p>
           <motion.div className="flex justify-center" variants={itemVariants}>
             <Link
               href="/login"
-              className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-md font-bold flex items-center gap-2 group transition-all"
+              className="text-emerald-400 hover:text-emerald-300 text-md font-bold flex items-center gap-2 group transition-all"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Back to Login
@@ -105,24 +105,24 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950 dark:via-gray-950 dark:to-zinc-950 p-4 font-inter">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 from-slate-950 to-zinc-950 p-4 font-inter">
       <motion.div
-        className="w-full max-w-md bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-white/20 dark:border-gray-800/50"
+        className="w-full max-w-md bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
         {/* Header */}
         <motion.div className="flex items-center justify-center mb-8" variants={itemVariants}>
-          <div className="w-20 h-20 bg-emerald-100/50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center shadow-inner">
-            <Mail className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+          <div className="w-20 h-20 bg-emerald-900/20 rounded-full flex items-center justify-center shadow-inner">
+            <Mail className="w-10 h-10 text-emerald-400" />
           </div>
         </motion.div>
 
-        <motion.h2 className="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-3 tracking-tight" variants={itemVariants}>
+        <motion.h2 className="text-3xl font-extrabold text-center text-white mb-3 tracking-tight" variants={itemVariants}>
           Forgot Password?
         </motion.h2>
-        <motion.p className="text-center text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed" variants={itemVariants}>
+        <motion.p className="text-center text-gray-400 mb-10 text-lg leading-relaxed" variants={itemVariants}>
           Enter your email address and we'll send you a link to reset your password.
         </motion.p>
 
@@ -133,13 +133,13 @@ export default function ForgotPasswordPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8 p-5 bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/50 rounded-2xl overflow-hidden"
+              className="mb-8 p-5 bg-red-900/10 border border-red-800/50 rounded-2xl overflow-hidden"
             >
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-red-800 dark:text-red-200">Error</p>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-1 leading-relaxed font-medium">{error}</p>
+                  <p className="text-sm font-bold text-red-200">Error</p>
+                  <p className="text-sm text-red-300 mt-1 leading-relaxed font-medium">{error}</p>
                 </div>
               </div>
             </motion.div>
@@ -149,7 +149,7 @@ export default function ForgotPasswordPage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-8">
           <motion.div variants={itemVariants}>
-            <label htmlFor="email" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 ml-1">
+            <label htmlFor="email" className="block text-sm font-bold text-gray-300 mb-3 ml-1">
               Email Address
             </label>
             <div className="relative group">
@@ -159,7 +159,7 @@ export default function ForgotPasswordPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:outline-none text-gray-900 dark:text-white placeholder-gray-400 transition-all duration-300 text-base md:text-sm shadow-sm"
+                className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 focus:outline-none text-white placeholder-gray-400 transition-all duration-300 text-base md:text-sm shadow-sm"
                 placeholder="john@example.com"
                 required
                 autoComplete="email"
@@ -171,7 +171,7 @@ export default function ForgotPasswordPage() {
             variants={itemVariants}
             type="submit"
             disabled={isLoading}
-            className="w-full px-4 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:-translate-y-0.5 mt-2"
+            className="w-full px-4 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-bold hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-gray-900 transform hover:-translate-y-0.5 mt-2"
           >
             {isLoading ? (
               <>
@@ -191,7 +191,7 @@ export default function ForgotPasswordPage() {
         <motion.div className="mt-10 text-center" variants={itemVariants}>
           <Link
             href="/login"
-            className="text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold flex items-center justify-center gap-2 group transition-all"
+            className="text-gray-400 hover:text-emerald-400 font-bold flex items-center justify-center gap-2 group transition-all"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Login

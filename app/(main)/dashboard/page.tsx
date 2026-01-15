@@ -150,14 +150,14 @@ const ProgressBar = memo(function ProgressBar({ value, max, color = 'blue', show
 
   return (
     <div className="w-full">
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div className="w-full bg-gray-700 rounded-full h-2">
         <div
           className={`${colorClasses[color as keyof typeof colorClasses]} h-2 rounded-full transition-all duration-500`}
           style={{ width: `${percentage}%` }}
         />
       </div>
       {showLabel && (
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{percentage}% complete</p>
+        <p className="text-xs text-gray-400 mt-1">{percentage}% complete</p>
       )}
     </div>
   );
@@ -169,7 +169,7 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 
   const isPositive = value > 0;
   const Icon = isPositive ? TrendingUp : TrendingDown;
-  const colorClass = isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+  const colorClass = isPositive ? 'text-green-400' : 'text-red-400';
 
   return (
     <div className={`flex items-center gap-1 text-xs ${colorClass} font-medium`}>
@@ -392,10 +392,10 @@ export default function DashboardPage() {
   // Show loading state while checking authentication
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-gray-50 to-slate-100 dark:from-black dark:via-gray-900 dark:to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-gray-50 from-black to-slate-900">
         <div className="text-center">
           <div className="inline-block w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-gray-400">Loading...</p>
         </div>
       </div>
     );
@@ -435,8 +435,8 @@ export default function DashboardPage() {
                 {loading ? (
                   <div className="grid stats-grid-mobile gap-4 sm:gap-6">
                     {[...Array(8)].map((_, i) => (
-                      <div key={i} className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-md border border-white/20 dark:border-gray-700/20 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
-                        <div className="h-28 sm:h-32 bg-gray-200 dark:bg-gray-700 rounded" />
+                      <div key={i} className="bg-gray-800/40 backdrop-blur-md border border-gray-700/20 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
+                        <div className="h-28 sm:h-32 bg-gray-700 rounded" />
                       </div>
                     ))}
                   </div>
@@ -446,19 +446,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={0}>
                       <Link
                         href="/tasks"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-blue-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-3 sm:mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1 sm:mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">Tasks & Chores</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-blue-400">Tasks & Chores</h3>
                               {stats.tasks.trend !== 0 && <TrendIndicator value={stats.tasks.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.tasks.pending}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">pending</p>
+                              <p className="text-sm text-gray-400">pending</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -468,22 +468,22 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.tasks.pending} pending</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.tasks.inProgress} in progress</span>
+                            <span className="text-gray-400">{stats.tasks.pending} pending</span>
+                            <span className="text-gray-400">{stats.tasks.inProgress} in progress</span>
                           </div>
                           {stats.tasks.dueToday > 0 && (
-                            <p className="text-sm text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium">
+                            <p className="text-sm text-orange-400 flex items-center gap-1 font-medium">
                               <Clock className="w-3 h-3" />
                               {stats.tasks.dueToday} due today
                             </p>
                           )}
                           {stats.tasks.overdue > 0 && (
-                            <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
+                            <p className="text-sm text-red-400 flex items-center gap-1 font-medium">
                               <AlertCircle className="w-3 h-3" />
                               {stats.tasks.overdue} overdue
                             </p>
                           )}
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             {stats.tasks.highPriority} high priority • {stats.tasks.assignedToMe} assigned to you
                           </p>
                         </div>
@@ -491,17 +491,17 @@ export default function DashboardPage() {
                         <ProgressBar value={stats.tasks.completed} max={stats.tasks.total} color="blue" />
 
                         {stats.tasks.recentTasks.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Recent:</p>
+                          <div className="mt-3 pt-3 border-t border-gray-700">
+                            <p className="text-xs text-gray-400 mb-2 font-medium">Recent:</p>
                             {stats.tasks.recentTasks.slice(0, 2).map(task => (
-                              <p key={task.id} className="text-xs text-gray-700 dark:text-gray-300 truncate">
+                              <p key={task.id} className="text-xs text-gray-300 truncate">
                                 • {task.title}
                               </p>
                             ))}
                           </div>
                         )}
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-blue-600 dark:text-blue-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-blue-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -512,19 +512,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={1}>
                       <Link
                         href="/calendar"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-purple-500 dark:hover:border-purple-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-purple-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400">Calendar</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-purple-400">Calendar</h3>
                               {stats.events.trend !== 0 && <TrendIndicator value={stats.events.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.events.upcoming}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">upcoming</p>
+                              <p className="text-sm text-gray-400">upcoming</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -534,27 +534,27 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.events.today} today</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.events.thisWeek} this week</span>
+                            <span className="text-gray-400">{stats.events.today} today</span>
+                            <span className="text-gray-400">{stats.events.thisWeek} this week</span>
                           </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             {stats.events.personal} personal • {stats.events.shared} shared
                           </p>
                         </div>
 
                         {stats.events.nextEvent && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg mb-3">
-                            <p className="text-xs text-purple-700 dark:text-purple-300 font-medium mb-1">Next event:</p>
-                            <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                          <div className="p-3 bg-purple-900/20 rounded-lg mb-3">
+                            <p className="text-xs text-purple-300 font-medium mb-1">Next event:</p>
+                            <p className="text-sm text-white font-medium truncate">
                               {stats.events.nextEvent.title}
                             </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                            <p className="text-xs text-gray-400">
                               {formatTimestamp(stats.events.nextEvent.start_time, 'MMM d, h:mm a')}
                             </p>
                           </div>
                         )}
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-purple-600 dark:text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-purple-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -565,19 +565,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={2}>
                       <Link
                         href="/reminders"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-pink-500 dark:hover:border-pink-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-pink-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-pink-600 dark:text-pink-400">Reminders</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-pink-400">Reminders</h3>
                               {stats.reminders.trend !== 0 && <TrendIndicator value={stats.reminders.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.reminders.active}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
+                              <p className="text-sm text-gray-400">active</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -587,35 +587,35 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           {stats.reminders.overdue > 0 && (
-                            <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1 font-medium">
+                            <p className="text-sm text-red-400 flex items-center gap-1 font-medium">
                               <AlertCircle className="w-3 h-3" />
                               {stats.reminders.overdue} overdue
                             </p>
                           )}
                           {stats.reminders.dueToday > 0 && (
-                            <p className="text-sm text-pink-600 dark:text-pink-400 flex items-center gap-1 font-medium">
+                            <p className="text-sm text-pink-400 flex items-center gap-1 font-medium">
                               <Clock className="w-3 h-3" />
                               {stats.reminders.dueToday} due today
                             </p>
                           )}
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             {stats.reminders.completed} completed • {stats.reminders.total} total
                           </p>
                         </div>
 
                         {stats.reminders.nextDue && (
-                          <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg mb-3">
-                            <p className="text-xs text-orange-700 dark:text-orange-300 font-medium mb-1">Next due:</p>
-                            <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                          <div className="p-3 bg-orange-900/20 rounded-lg mb-3">
+                            <p className="text-xs text-orange-300 font-medium mb-1">Next due:</p>
+                            <p className="text-sm text-white font-medium truncate">
                               {stats.reminders.nextDue.title}
                             </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                            <p className="text-xs text-gray-400">
                               {formatTimestamp(stats.reminders.nextDue.reminder_time, 'MMM d, h:mm a')}
                             </p>
                           </div>
                         )}
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-orange-600 dark:text-orange-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-orange-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -626,19 +626,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={3}>
                       <Link
                         href="/messages"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-green-500 dark:hover:border-green-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-green-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-green-600 dark:text-green-400">Messages</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-green-400">Messages</h3>
                               {stats.messages.trend !== 0 && <TrendIndicator value={stats.messages.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.messages.total}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">total</p>
+                              <p className="text-sm text-gray-400">total</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -648,11 +648,11 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.messages.today} today</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.messages.conversations} conversations</span>
+                            <span className="text-gray-400">{stats.messages.today} today</span>
+                            <span className="text-gray-400">{stats.messages.conversations} conversations</span>
                           </div>
                           {stats.messages.unread > 0 && (
-                            <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1 font-medium">
+                            <p className="text-sm text-green-400 flex items-center gap-1 font-medium">
                               <AlertCircle className="w-3 h-3" />
                               {stats.messages.unread} unread
                             </p>
@@ -660,20 +660,20 @@ export default function DashboardPage() {
                         </div>
 
                         {stats.messages.lastMessage && (
-                          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg mb-3">
-                            <p className="text-xs text-green-700 dark:text-green-300 font-medium mb-1">
+                          <div className="p-3 bg-green-900/20 rounded-lg mb-3">
+                            <p className="text-xs text-green-300 font-medium mb-1">
                               {stats.messages.lastMessage.sender}:
                             </p>
-                            <p className="text-sm text-gray-900 dark:text-white truncate">
+                            <p className="text-sm text-white truncate">
                               "{stats.messages.lastMessage.content}"
                             </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               {formatTimestamp(stats.messages.lastMessage.created_at, 'h:mm a')}
                             </p>
                           </div>
                         )}
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-green-600 dark:text-green-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-green-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -684,19 +684,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={4}>
                       <Link
                         href="/shopping"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-teal-500 dark:hover:border-teal-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-teal-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-teal-600 dark:text-teal-400">Shopping</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-teal-400">Shopping</h3>
                               {stats.shopping.trend !== 0 && <TrendIndicator value={stats.shopping.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.shopping.uncheckedItems}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">remaining</p>
+                              <p className="text-sm text-gray-400">remaining</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -706,28 +706,28 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.shopping.totalLists} lists</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.shopping.activeLists} active</span>
+                            <span className="text-gray-400">{stats.shopping.totalLists} lists</span>
+                            <span className="text-gray-400">{stats.shopping.activeLists} active</span>
                           </div>
-                          <p className="text-sm text-teal-600 dark:text-teal-400 flex items-center gap-1">
+                          <p className="text-sm text-teal-400 flex items-center gap-1">
                             <CheckSquare className="w-3 h-3" />
                             {stats.shopping.checkedToday} checked today
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             {stats.shopping.uncheckedItems} items remaining
                           </p>
                         </div>
 
                         {stats.shopping.urgentList && (
-                          <div className="p-3 bg-teal-50 dark:bg-teal-900/20 rounded-lg mb-3">
-                            <p className="text-xs text-teal-700 dark:text-teal-300 font-medium mb-1">Urgent:</p>
-                            <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                          <div className="p-3 bg-teal-900/20 rounded-lg mb-3">
+                            <p className="text-xs text-teal-300 font-medium mb-1">Urgent:</p>
+                            <p className="text-sm text-white font-medium truncate">
                               {stats.shopping.uncheckedItems} items for "{stats.shopping.urgentList}"
                             </p>
                           </div>
                         )}
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-teal-600 dark:text-teal-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-teal-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -738,19 +738,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={5}>
                       <Link
                         href="/meals"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-orange-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-red-600 dark:text-red-400">Meals</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-red-400">Meals</h3>
                               {stats.meals.trend !== 0 && <TrendIndicator value={stats.meals.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.meals.thisWeek}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">this week</p>
+                              <p className="text-sm text-gray-400">this week</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -760,27 +760,27 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.meals.mealsToday} today</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.meals.thisWeek} this week</span>
+                            <span className="text-gray-400">{stats.meals.mealsToday} today</span>
+                            <span className="text-gray-400">{stats.meals.thisWeek} this week</span>
                           </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             {stats.meals.savedRecipes} saved recipes
                           </p>
                         </div>
 
                         {stats.meals.nextMeal && (
-                          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg mb-3">
-                            <p className="text-xs text-red-700 dark:text-red-300 font-medium mb-1">Next meal:</p>
-                            <p className="text-sm text-gray-900 dark:text-white font-medium truncate">
+                          <div className="p-3 bg-red-900/20 rounded-lg mb-3">
+                            <p className="text-xs text-red-300 font-medium mb-1">Next meal:</p>
+                            <p className="text-sm text-white font-medium truncate">
                               {stats.meals.nextMeal.title}
                             </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                            <p className="text-xs text-gray-400">
                               {formatTimestamp(stats.meals.nextMeal.scheduled_date, 'MMM d, h:mm a')}
                             </p>
                           </div>
                         )}
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-red-600 dark:text-red-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-red-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -791,19 +791,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={6}>
                       <Link
                         href="/projects"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-yellow-500 dark:hover:border-yellow-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-yellow-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">Projects & Budget</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-amber-400">Projects & Budget</h3>
                               {stats.projects.trend !== 0 && <TrendIndicator value={stats.projects.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.projects.inProgress}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
+                              <p className="text-sm text-gray-400">active</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -813,23 +813,23 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.projects.inProgress} in progress</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.projects.completed} completed</span>
+                            <span className="text-gray-400">{stats.projects.inProgress} in progress</span>
+                            <span className="text-gray-400">{stats.projects.completed} completed</span>
                           </div>
                           {(stats.projects.planning > 0 || stats.projects.onHold > 0) && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-gray-400">
                               {stats.projects.planning} planning • {stats.projects.onHold} on hold
                             </p>
                           )}
                         </div>
 
-                        <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg mb-3">
-                          <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mb-1">Monthly Budget:</p>
+                        <div className="p-3 bg-amber-900/20 rounded-lg mb-3">
+                          <p className="text-xs text-amber-300 font-medium mb-1">Monthly Budget:</p>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-900 dark:text-white font-bold">
+                            <span className="text-sm text-white font-bold">
                               ${stats.household.spent.toLocaleString()}
                             </span>
-                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                            <span className="text-xs text-gray-400">
                               / ${stats.household.monthlyBudget.toLocaleString()}
                             </span>
                           </div>
@@ -839,12 +839,12 @@ export default function DashboardPage() {
                             color="amber"
                             showLabel={false}
                           />
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             {stats.household.pendingBills} pending {stats.household.pendingBills === 1 ? 'bill' : 'bills'} • ${stats.projects.totalExpenses.toLocaleString()} total expenses
                           </p>
                         </div>
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-amber-600 dark:text-amber-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-amber-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -855,19 +855,19 @@ export default function DashboardPage() {
                     <AnimatedCard index={7}>
                       <Link
                         href="/goals"
-                        className="group bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border-2 border-white/20 dark:border-gray-700/20 hover:border-indigo-500 dark:hover:border-indigo-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-indigo-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400">Goals</h3>
+                              <h3 className="text-base sm:text-lg font-bold text-indigo-400">Goals</h3>
                               {stats.goals.trend !== 0 && <TrendIndicator value={stats.goals.trend} label="this week" />}
                             </div>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-2xl sm:text-3xl font-bold text-white">
                                 {stats.goals.active}
                               </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">active</p>
+                              <p className="text-sm text-gray-400">active</p>
                             </div>
                           </div>
                           <div className="w-10 h-10 xl:w-12 xl:h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl xl:rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
@@ -877,15 +877,15 @@ export default function DashboardPage() {
 
                         <div className="space-y-2 mb-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{stats.goals.inProgress} in progress</span>
-                            <span className="text-gray-600 dark:text-gray-400">{stats.goals.completed} completed</span>
+                            <span className="text-gray-400">{stats.goals.inProgress} in progress</span>
+                            <span className="text-gray-400">{stats.goals.completed} completed</span>
                           </div>
                         </div>
 
                         {stats.goals.topGoal && (
-                          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg mb-3">
-                            <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-1">Top goal:</p>
-                            <p className="text-sm text-gray-900 dark:text-white font-medium truncate mb-2">
+                          <div className="p-3 bg-indigo-900/20 rounded-lg mb-3">
+                            <p className="text-xs text-indigo-300 font-medium mb-1">Top goal:</p>
+                            <p className="text-sm text-white font-medium truncate mb-2">
                               {stats.goals.topGoal.title}
                             </p>
                             <ProgressBar
@@ -894,16 +894,16 @@ export default function DashboardPage() {
                               color="indigo"
                               showLabel={false}
                             />
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               {stats.goals.topGoal.progress}% complete
                             </p>
                           </div>
                         )}
 
-                        <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg mb-3">
-                          <p className="text-xs text-indigo-700 dark:text-indigo-300 font-medium mb-1">Overall progress:</p>
+                        <div className="p-3 bg-indigo-900/20 rounded-lg mb-3">
+                          <p className="text-xs text-indigo-300 font-medium mb-1">Overall progress:</p>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-900 dark:text-white font-bold">
+                            <span className="text-sm text-white font-bold">
                               {stats.goals.overallProgress}%
                             </span>
                           </div>
@@ -913,12 +913,12 @@ export default function DashboardPage() {
                             color="indigo"
                             showLabel={false}
                           />
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             {stats.goals.total} total goals
                           </p>
                         </div>
 
-                        <div className="mt-auto pt-3 flex items-center justify-end text-indigo-600 dark:text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
+                        <div className="mt-auto pt-3 flex items-center justify-end text-indigo-400 text-sm font-medium group-hover:gap-2 transition-all">
                           <span>View all</span>
                           <ChevronRight className="w-4 h-4" />
                         </div>
@@ -929,7 +929,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Real-time updates indicator */}
-              <div className="flex items-center justify-end gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 -mt-2">
+              <div className="flex items-center justify-end gap-2 text-xs sm:text-sm text-gray-400 -mt-2">
                 <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 animate-pulse" />
                 <span>Real-time updates</span>
               </div>
@@ -957,26 +957,26 @@ export default function DashboardPage() {
                 {/* Left: Daily Check-In */}
                 <div
                   id="daily-checkin"
-                  className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 to-blue-50/50 dark:from-pink-900/10 dark:via-purple-900/10 dark:to-blue-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-200/20 dark:border-pink-500/20 hover:border-pink-400/50 dark:hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
+                  className="group bg-gradient-to-br from-pink-50/50 via-purple-50/50 from-pink-900/10 to-blue-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-500/20 hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
                   {/* Compact Header with Date, Toggle, and Streak Badge */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <Heart className="w-5 h-5 text-pink-500 fill-pink-500" />
-                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Daily Check-In</h2>
+                        <h2 className="text-lg sm:text-xl font-bold text-white">Daily Check-In</h2>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 ml-7">{formatDate(getCurrentDateString(), 'EEEE, MMMM d, yyyy')}</p>
+                      <p className="text-xs text-gray-400 ml-7">{formatDate(getCurrentDateString(), 'EEEE, MMMM d, yyyy')}</p>
                     </div>
 
                     <div className="flex items-center gap-2">
                       {/* Mode Toggle - Compact Pill Design */}
-                      <div className="flex items-center gap-0.5 p-0.5 bg-gray-100 dark:bg-gray-800/50 rounded-full border border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center gap-0.5 p-0.5 bg-gray-800/50 rounded-full border border-gray-700">
                         <Tooltip content="Record your mood and share highlights">
                           <button
                             onClick={() => setViewMode('checkin')}
                             className={`px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all text-xs font-medium ${viewMode === 'checkin'
                               ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-sm'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                              : 'text-gray-400 hover:text-white'
                               }`}
                           >
                             <Heart className="w-3 h-3" />
@@ -988,7 +988,7 @@ export default function DashboardPage() {
                             onClick={() => setViewMode('journal')}
                             className={`px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all text-xs font-medium ${viewMode === 'journal'
                               ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-sm'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                              : 'text-gray-400 hover:text-white'
                               }`}
                           >
                             <Sparkles className="w-3 h-3" />
@@ -1003,25 +1003,25 @@ export default function DashboardPage() {
                           {/* Current Streak or Days Since Last Check-in */}
                           {checkInStats.currentStreak > 0 ? (
                             <Tooltip content={`You've checked in ${checkInStats.currentStreak} days in a row!${checkInStats.longestStreak > checkInStats.currentStreak ? ` Best: ${checkInStats.longestStreak} days` : ' This is your best streak!'}`}>
-                              <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help">
+                              <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-orange-100 from-orange-900/30 to-yellow-900/30 rounded-full cursor-help">
                                 <Zap className="w-3.5 h-3.5 text-orange-500" />
-                                <span className="text-sm font-bold text-orange-600 dark:text-orange-400">{checkInStats.currentStreak}</span>
-                                <span className="text-xs text-gray-600 dark:text-gray-400">day streak</span>
+                                <span className="text-sm font-bold text-orange-400">{checkInStats.currentStreak}</span>
+                                <span className="text-xs text-gray-400">day streak</span>
                               </div>
                             </Tooltip>
                           ) : checkInStats.daysSinceLastCheckIn !== null && checkInStats.daysSinceLastCheckIn > 0 ? (
                             <Tooltip content={`Last check-in was ${checkInStats.daysSinceLastCheckIn} day${checkInStats.daysSinceLastCheckIn === 1 ? '' : 's'} ago. Check in today to restart your streak!${checkInStats.longestStreak > 0 ? ` Your best: ${checkInStats.longestStreak} days` : ''}`}>
-                              <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-gray-100 to-slate-100 dark:from-gray-800/50 dark:to-slate-800/50 rounded-full cursor-help border border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-gray-100 from-gray-800/50 to-slate-800/50 rounded-full cursor-help border border-gray-700">
                                 <Clock className="w-3.5 h-3.5 text-gray-500" />
-                                <span className="text-sm font-bold text-gray-600 dark:text-gray-400">{checkInStats.daysSinceLastCheckIn}</span>
-                                <span className="text-xs text-gray-500 dark:text-gray-500">day{checkInStats.daysSinceLastCheckIn === 1 ? '' : 's'} ago</span>
+                                <span className="text-sm font-bold text-gray-400">{checkInStats.daysSinceLastCheckIn}</span>
+                                <span className="text-xs text-gray-500">day{checkInStats.daysSinceLastCheckIn === 1 ? '' : 's'} ago</span>
                               </div>
                             </Tooltip>
                           ) : (
                             <Tooltip content="Start your check-in streak today!">
-                              <div className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-full cursor-help whitespace-nowrap">
+                              <div className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-yellow-900/30 rounded-full cursor-help whitespace-nowrap">
                                 <Zap className="w-3 h-3 text-orange-500 flex-shrink-0" />
-                                <span className="text-xs text-gray-600 dark:text-gray-400">Start Streak</span>
+                                <span className="text-xs text-gray-400">Start Streak</span>
                               </div>
                             </Tooltip>
                           )}
@@ -1029,10 +1029,10 @@ export default function DashboardPage() {
                           {/* Longest Streak Badge (show when there's a record) */}
                           {checkInStats.longestStreak > 0 && checkInStats.currentStreak === 0 && (
                             <Tooltip content={`Your best streak: ${checkInStats.longestStreak} consecutive days!`}>
-                              <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full cursor-help">
+                              <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-purple-100 from-purple-900/30 to-pink-900/30 rounded-full cursor-help">
                                 <Trophy className="w-3.5 h-3.5 text-purple-500" />
-                                <span className="text-sm font-bold text-purple-600 dark:text-purple-400">{checkInStats.longestStreak}</span>
-                                <span className="text-xs text-gray-600 dark:text-gray-400">best</span>
+                                <span className="text-sm font-bold text-purple-400">{checkInStats.longestStreak}</span>
+                                <span className="text-xs text-gray-400">best</span>
                               </div>
                             </Tooltip>
                           )}
@@ -1056,37 +1056,37 @@ export default function DashboardPage() {
                           return (
                             <>
                               {userEmoji && (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-full border border-pink-200/50 dark:border-pink-700/50">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/60 backdrop-blur-md rounded-full border border-pink-700/50">
                                   <span className="text-xl">{userEmoji}</span>
-                                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">You</span>
+                                  <span className="text-xs font-medium text-gray-300">You</span>
                                 </div>
                               )}
 
                               {/* Partner mood or placeholder */}
                               {partnerEmoji && partnerToday ? (
                                 <>
-                                  <div className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-full border border-purple-200/50 dark:border-purple-700/50">
+                                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/60 backdrop-blur-md rounded-full border border-purple-700/50">
                                     <span className="text-xl">{partnerEmoji}</span>
-                                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Partner</span>
+                                    <span className="text-xs font-medium text-gray-300">Partner</span>
                                   </div>
 
                                   {/* Reaction Buttons */}
                                   <div className="flex items-center gap-1">
                                     {checkInReactions[partnerToday.id]?.length > 0 ? (
-                                      <div className="flex items-center gap-1 px-2 py-1 bg-pink-100 dark:bg-pink-900/30 rounded-full border border-pink-300 dark:border-pink-700">
+                                      <div className="flex items-center gap-1 px-2 py-1 bg-pink-900/30 rounded-full border border-pink-700">
                                         <span className="text-sm">
                                           {checkInReactions[partnerToday.id][0].reaction_type === 'heart' && '❤️'}
                                           {checkInReactions[partnerToday.id][0].reaction_type === 'hug' && '🤗'}
                                           {checkInReactions[partnerToday.id][0].reaction_type === 'strength' && '💪'}
                                         </span>
-                                        <span className="text-xs text-pink-600 dark:text-pink-400 font-medium">Sent</span>
+                                        <span className="text-xs text-pink-400 font-medium">Sent</span>
                                       </div>
                                     ) : (
                                       <>
                                         <button
                                           onClick={() => handleSendReaction(partnerToday.id, 'heart')}
                                           disabled={partnerReactionLoading}
-                                          className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                                          className="p-2 hover:bg-pink-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
                                           title="Send love"
                                         >
                                           <span className="text-lg">❤️</span>
@@ -1094,7 +1094,7 @@ export default function DashboardPage() {
                                         <button
                                           onClick={() => handleSendReaction(partnerToday.id, 'hug')}
                                           disabled={partnerReactionLoading}
-                                          className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                                          className="p-2 hover:bg-purple-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
                                           title="Send hug"
                                         >
                                           <span className="text-lg">🤗</span>
@@ -1102,7 +1102,7 @@ export default function DashboardPage() {
                                         <button
                                           onClick={() => handleSendReaction(partnerToday.id, 'strength')}
                                           disabled={partnerReactionLoading}
-                                          className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                                          className="p-2 hover:bg-blue-900/30 rounded-full transition-all duration-200 transform hover:scale-110 active:scale-95 disabled:opacity-50"
                                           title="Send strength"
                                         >
                                           <span className="text-lg">💪</span>
@@ -1112,9 +1112,9 @@ export default function DashboardPage() {
                                   </div>
                                 </>
                               ) : userEmoji ? (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-100/60 dark:bg-gray-700/60 backdrop-blur-md rounded-full border border-gray-300/50 dark:border-gray-600/50">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-700/60 backdrop-blur-md rounded-full border border-gray-600/50">
                                   <span className="text-xl">💭</span>
-                                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Partner hasn't checked in yet</span>
+                                  <span className="text-xs font-medium text-gray-400">Partner hasn't checked in yet</span>
                                 </div>
                               ) : null}
                             </>
@@ -1131,36 +1131,36 @@ export default function DashboardPage() {
                               gradient: 'from-green-400 to-emerald-500',
                               glow: 'shadow-green-500/30',
                               ring: 'ring-green-400/50',
-                              bgActive: 'bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40',
-                              bgHover: 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
+                              bgActive: 'bg-gradient-to-br from-green-100 from-green-900/40 to-emerald-900/40',
+                              bgHover: 'bg-gradient-to-br from-green-50 from-green-900/20 to-emerald-900/20'
                             },
                             good: {
                               gradient: 'from-blue-400 to-cyan-500',
                               glow: 'shadow-blue-500/30',
                               ring: 'ring-blue-400/50',
-                              bgActive: 'bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/40 dark:to-cyan-900/40',
-                              bgHover: 'bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20'
+                              bgActive: 'bg-gradient-to-br from-blue-100 from-blue-900/40 to-cyan-900/40',
+                              bgHover: 'bg-gradient-to-br from-blue-50 from-blue-900/20 to-cyan-900/20'
                             },
                             okay: {
                               gradient: 'from-gray-400 to-slate-500',
                               glow: 'shadow-gray-500/30',
                               ring: 'ring-gray-400/50',
-                              bgActive: 'bg-gradient-to-br from-gray-100 to-slate-100 dark:from-gray-800/60 dark:to-slate-800/60',
-                              bgHover: 'bg-gradient-to-br from-gray-50 to-slate-50 dark:from-gray-800/40 dark:to-slate-800/40'
+                              bgActive: 'bg-gradient-to-br from-gray-100 from-gray-800/60 to-slate-800/60',
+                              bgHover: 'bg-gradient-to-br from-gray-50 from-gray-800/40 to-slate-800/40'
                             },
                             meh: {
                               gradient: 'from-amber-400 to-orange-500',
                               glow: 'shadow-amber-500/30',
                               ring: 'ring-amber-400/50',
-                              bgActive: 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40',
-                              bgHover: 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
+                              bgActive: 'bg-gradient-to-br from-amber-100 from-amber-900/40 to-orange-900/40',
+                              bgHover: 'bg-gradient-to-br from-amber-50 from-amber-900/20 to-orange-900/20'
                             },
                             rough: {
                               gradient: 'from-purple-400 to-pink-500',
                               glow: 'shadow-purple-500/30',
                               ring: 'ring-purple-400/50',
-                              bgActive: 'bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40',
-                              bgHover: 'bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20'
+                              bgActive: 'bg-gradient-to-br from-purple-100 from-purple-900/40 to-pink-900/40',
+                              bgHover: 'bg-gradient-to-br from-purple-50 from-purple-900/20 to-pink-900/20'
                             }
                           };
 
@@ -1203,8 +1203,8 @@ export default function DashboardPage() {
                                 <span className={`
                         text-xs sm:text-sm font-medium transition-all duration-200
                         ${isSelected
-                                    ? 'opacity-100 text-gray-900 dark:text-white'
-                                    : 'opacity-0 sm:group-hover:opacity-70 text-gray-600 dark:text-gray-400'
+                                    ? 'opacity-100 text-white'
+                                    : 'opacity-0 sm:group-hover:opacity-70 text-gray-400'
                                   }
                       `}>
                                   {mood.label}
@@ -1223,15 +1223,15 @@ export default function DashboardPage() {
 
                         if (todayCheckIn && !selectedMood) {
                           return (
-                            <div className="mt-4 p-4 bg-gradient-to-br from-white/60 to-purple-50/60 dark:from-gray-800/60 dark:to-purple-900/20 backdrop-blur-sm rounded-xl border border-purple-200/50 dark:border-purple-700/30">
+                            <div className="mt-4 p-4 bg-gradient-to-br from-white/60 from-gray-800/60 to-purple-900/20 backdrop-blur-sm rounded-xl border border-purple-700/30">
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                   <span className="text-2xl">{moodOptions.find(m => m.value === todayCheckIn.mood)?.emoji}</span>
                                   <div>
-                                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    <p className="text-sm font-semibold text-white">
                                       Feeling {moodOptions.find(m => m.value === todayCheckIn.mood)?.label} today
                                     </p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    <p className="text-xs text-gray-400">
                                       Checked in {formatTimestamp(todayCheckIn.created_at, 'h:mm a')}
                                     </p>
                                   </div>
@@ -1241,7 +1241,7 @@ export default function DashboardPage() {
                                     setSelectedMood(todayCheckIn.mood as typeof selectedMood);
                                     setCheckInExpanded(true);
                                   }}
-                                  className="px-3 py-1.5 text-xs font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                                  className="px-3 py-1.5 text-xs font-medium text-purple-400 hover:bg-purple-900/30 rounded-lg transition-colors"
                                 >
                                   Update
                                 </button>
@@ -1249,22 +1249,22 @@ export default function DashboardPage() {
 
                               {/* Show gratitude/highlights if exists */}
                               {todayCheckIn.gratitude && (
-                                <div className="mt-3 p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-200 dark:border-pink-700/30">
-                                  <p className="text-xs font-medium text-pink-700 dark:text-pink-300 mb-1 flex items-center gap-1">
+                                <div className="mt-3 p-3 bg-pink-900/20 rounded-lg border border-pink-700/30">
+                                  <p className="text-xs font-medium text-pink-300 mb-1 flex items-center gap-1">
                                     <Heart className="w-3 h-3" />
                                     Grateful for:
                                   </p>
-                                  <p className="text-sm text-gray-700 dark:text-gray-300">{todayCheckIn.gratitude}</p>
+                                  <p className="text-sm text-gray-300">{todayCheckIn.gratitude}</p>
                                 </div>
                               )}
 
                               {todayCheckIn.highlights && (
-                                <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700/30">
-                                  <p className="text-xs font-medium text-yellow-700 dark:text-yellow-300 mb-1 flex items-center gap-1">
+                                <div className="mt-2 p-3 bg-yellow-900/20 rounded-lg border border-yellow-700/30">
+                                  <p className="text-xs font-medium text-yellow-300 mb-1 flex items-center gap-1">
                                     <Sparkles className="w-3 h-3" />
                                     Highlight:
                                   </p>
-                                  <p className="text-sm text-gray-700 dark:text-gray-300">{todayCheckIn.highlights}</p>
+                                  <p className="text-sm text-gray-300">{todayCheckIn.highlights}</p>
                                 </div>
                               )}
                             </div>
@@ -1274,8 +1274,8 @@ export default function DashboardPage() {
                         // If not checked in today, show 7-day mood trend
                         if (!todayCheckIn && last7Days.length > 0) {
                           return (
-                            <div className="mt-4 p-4 bg-gradient-to-br from-white/60 to-blue-50/60 dark:from-gray-800/60 dark:to-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-200/50 dark:border-blue-700/30">
-                              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-3">
+                            <div className="mt-4 p-4 bg-gradient-to-br from-white/60 from-gray-800/60 to-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-700/30">
+                              <p className="text-xs font-medium text-gray-400 mb-3">
                                 Your mood over the last 7 days
                               </p>
                               <div className="flex items-end justify-between gap-1 h-16 mb-2">
@@ -1315,7 +1315,7 @@ export default function DashboardPage() {
                           {(selectedMood === 'great' || selectedMood === 'good') && (
                             <div className="space-y-3">
                               <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-1.5">
+                                <label className="text-sm font-medium text-gray-300 mb-1.5 block flex items-center gap-1.5">
                                   <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
                                   What went well today? (Optional)
                                 </label>
@@ -1324,12 +1324,12 @@ export default function DashboardPage() {
                                   value={checkInHighlights}
                                   onChange={(e) => setCheckInHighlights(e.target.value)}
                                   maxLength={150}
-                                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-green-200 dark:border-green-800 rounded-xl resize-none focus:outline-none focus:border-green-500 dark:focus:border-green-500 text-gray-900 dark:text-white text-sm transition-all"
+                                  className="w-full px-3 py-2 bg-gray-900 border border-green-800 rounded-xl resize-none focus:outline-none focus:border-green-500 text-white text-sm transition-all"
                                   rows={2}
                                 />
                               </div>
                               <div>
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-1.5">
+                                <label className="text-sm font-medium text-gray-300 mb-1.5 block flex items-center gap-1.5">
                                   <Heart className="w-3.5 h-3.5 text-pink-500" />
                                   What are you grateful for? (Optional)
                                 </label>
@@ -1338,7 +1338,7 @@ export default function DashboardPage() {
                                   value={checkInGratitude}
                                   onChange={(e) => setCheckInGratitude(e.target.value)}
                                   maxLength={150}
-                                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-pink-200 dark:border-pink-800 rounded-xl resize-none focus:outline-none focus:border-pink-500 dark:focus:border-pink-500 text-gray-900 dark:text-white text-sm transition-all"
+                                  className="w-full px-3 py-2 bg-gray-900 border border-pink-800 rounded-xl resize-none focus:outline-none focus:border-pink-500 text-white text-sm transition-all"
                                   rows={2}
                                 />
                               </div>
@@ -1348,11 +1348,11 @@ export default function DashboardPage() {
                           {/* Negative moods: Meh/Rough → Support/Challenges prompt */}
                           {(selectedMood === 'meh' || selectedMood === 'rough') && (
                             <div>
-                              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-1.5">
+                              <label className="text-sm font-medium text-gray-300 mb-1.5 block flex items-center gap-1.5">
                                 <Heart className="w-3.5 h-3.5 text-blue-500" />
                                 What's been challenging? (Optional)
                               </label>
-                              <p className="text-xs text-blue-600 dark:text-blue-400 mb-2 italic">
+                              <p className="text-xs text-blue-400 mb-2 italic">
                                 It's okay to not be okay. You're not alone.
                               </p>
                               <textarea
@@ -1360,7 +1360,7 @@ export default function DashboardPage() {
                                 value={checkInChallenges}
                                 onChange={(e) => setCheckInChallenges(e.target.value)}
                                 maxLength={150}
-                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded-xl resize-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                                className="w-full px-3 py-2 bg-gray-900 border border-blue-800 rounded-xl resize-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white text-sm transition-all"
                                 rows={2}
                               />
                             </div>
@@ -1369,7 +1369,7 @@ export default function DashboardPage() {
                           {/* Neutral mood: Okay → Optional note */}
                           {selectedMood === 'okay' && (
                             <div>
-                              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+                              <label className="text-sm font-medium text-gray-300 mb-1.5 block">
                                 Anything on your mind? (Optional)
                               </label>
                               <textarea
@@ -1377,7 +1377,7 @@ export default function DashboardPage() {
                                 value={checkInNote}
                                 onChange={(e) => setCheckInNote(e.target.value)}
                                 maxLength={150}
-                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl resize-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-gray-900 dark:text-white text-sm transition-all"
+                                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-xl resize-none focus:ring-2 focus:ring-gray-400 focus:border-transparent text-white text-sm transition-all"
                                 rows={2}
                               />
                             </div>
@@ -1390,7 +1390,7 @@ export default function DashboardPage() {
                               disabled={checkInSaving}
                               className={`px-5 py-2 rounded-full text-white text-sm font-semibold transition-all transform flex items-center gap-2 ${!checkInSaving
                                 ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 hover:scale-105 shadow-md'
-                                : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'
+                                : 'bg-gray-700 cursor-not-allowed opacity-50'
                                 }`}
                             >
                               {checkInSaving ? (
@@ -1415,12 +1415,12 @@ export default function DashboardPage() {
                   {viewMode === 'journal' && (
                     <div className="space-y-4">
                       {/* Journal View Toggle - Calendar on Left, List on Right */}
-                      <div className="inline-flex items-center gap-1 p-1 bg-gradient-to-r from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 rounded-lg border border-pink-200 dark:border-pink-700">
+                      <div className="inline-flex items-center gap-1 p-1 bg-gradient-to-r from-pink-100 from-pink-900/30 to-purple-900/30 rounded-lg border border-pink-700">
                         <button
                           onClick={() => setJournalView('calendar')}
                           className={`px-2 sm:px-3 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all font-medium ${journalView === 'calendar'
                             ? 'bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 text-white shadow-md'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                            : 'text-gray-300 hover:bg-gray-800/50'
                             }`}
                         >
                           <Calendar className="w-3.5 h-3.5" />
@@ -1430,7 +1430,7 @@ export default function DashboardPage() {
                           onClick={() => setJournalView('list')}
                           className={`px-2 sm:px-3 py-1.5 rounded-md flex items-center justify-center gap-1 transition-all font-medium ${journalView === 'list'
                             ? 'bg-gradient-to-r from-pink-500 via-pink-600 to-purple-600 text-white shadow-md'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                            : 'text-gray-300 hover:bg-gray-800/50'
                             }`}
                         >
                           <List className="w-3.5 h-3.5" />
@@ -1448,18 +1448,18 @@ export default function DashboardPage() {
                           <div className="flex items-center justify-between px-2">
                             <button
                               onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                              className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-colors"
+                              className="p-2 hover:bg-pink-900/30 rounded-lg transition-colors"
                             >
-                              <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                              <ChevronLeft className="w-5 h-5 text-gray-300" />
                             </button>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h3 className="text-lg font-semibold text-white">
                               {format(calendarMonth, 'MMMM yyyy')}
                             </h3>
                             <button
                               onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                              className="p-2 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-colors"
+                              className="p-2 hover:bg-pink-900/30 rounded-lg transition-colors"
                             >
-                              <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                              <ChevronRight className="w-5 h-5 text-gray-300" />
                             </button>
                           </div>
 
@@ -1467,7 +1467,7 @@ export default function DashboardPage() {
                           <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                             {/* Day Headers */}
                             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
-                              <div key={day} className="text-center text-xs font-semibold text-gray-500 dark:text-gray-400 py-1 sm:py-2">
+                              <div key={day} className="text-center text-xs font-semibold text-gray-400 py-1 sm:py-2">
                                 <span className="hidden sm:inline">{day}</span>
                                 <span className="sm:hidden">{day.charAt(0)}</span>
                               </div>
@@ -1496,11 +1496,11 @@ export default function DashboardPage() {
                                   <div
                                     key={day}
                                     className={`aspect-square p-0.5 sm:p-1 rounded border sm:rounded-lg transition-all ${isToday
-                                      ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20'
-                                      : 'border-gray-200 dark:border-gray-700 hover:border-pink-300 dark:hover:border-pink-600'
+                                      ? 'border-pink-500 bg-pink-900/20'
+                                      : 'border-gray-700 hover:border-pink-600'
                                       }`}
                                   >
-                                    <div className="text-[10px] sm:text-xs text-gray-700 dark:text-gray-300 font-medium mb-0.5">
+                                    <div className="text-[10px] sm:text-xs text-gray-300 font-medium mb-0.5">
                                       {day}
                                     </div>
                                     <div className="flex flex-col gap-0.5">
@@ -1511,13 +1511,13 @@ export default function DashboardPage() {
                                           <div
                                             key={idx}
                                             className={`flex items-center gap-1 px-1.5 py-1 rounded text-[9px] sm:text-[10px] ${isUser
-                                              ? 'bg-pink-100 dark:bg-pink-900/40 border border-pink-200 dark:border-pink-700/50'
-                                              : 'bg-purple-100 dark:bg-purple-900/40 border border-purple-200 dark:border-purple-700/50'
+                                              ? 'bg-pink-900/40 border border-pink-700/50'
+                                              : 'bg-purple-900/40 border border-purple-700/50'
                                               }`}
                                             title={isUser ? 'You' : 'Partner'}
                                           >
                                             <span className="text-sm sm:text-base leading-none">{moodEmoji}</span>
-                                            <span className="text-[9px] sm:text-[10px] text-gray-700 dark:text-gray-300 truncate font-medium">
+                                            <span className="text-[9px] sm:text-[10px] text-gray-300 truncate font-medium">
                                               {isUser ? 'You' : 'Partner'}
                                             </span>
                                           </div>
@@ -1539,9 +1539,9 @@ export default function DashboardPage() {
                         <div className="max-h-96 overflow-y-auto space-y-4 pr-2">
                           {recentCheckIns.length === 0 ? (
                             <div className="text-center py-12">
-                              <Heart className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                              <p className="text-sm text-gray-500 dark:text-gray-400">No check-ins yet</p>
-                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Start checking in to build your journal</p>
+                              <Heart className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                              <p className="text-sm text-gray-400">No check-ins yet</p>
+                              <p className="text-xs text-gray-500 mt-1">Start checking in to build your journal</p>
                             </div>
                           ) : (
                             (() => {
@@ -1559,8 +1559,8 @@ export default function DashboardPage() {
                               return sortedDates.map(date => (
                                 <div key={date} className="space-y-2">
                                   {/* Date Header */}
-                                  <div className="sticky top-0 bg-gradient-to-r from-pink-100/80 to-purple-100/80 dark:from-pink-900/20 dark:to-purple-900/20 backdrop-blur-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-pink-200/50 dark:border-pink-700/50">
-                                    <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                                  <div className="sticky top-0 bg-gradient-to-r from-pink-100/80 from-pink-900/20 to-purple-900/20 backdrop-blur-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-pink-700/50">
+                                    <p className="text-xs sm:text-sm font-semibold text-white">
                                       {formatDate(date, 'EEEE, MMMM d, yyyy')}
                                     </p>
                                   </div>
@@ -1570,15 +1570,15 @@ export default function DashboardPage() {
                                     const moodEmoji = moodOptions.find(m => m.value === checkIn.mood)?.emoji;
                                     const isUser = checkIn.user_id === user?.id;
                                     return (
-                                      <div key={checkIn.id} className="bg-white/60 dark:bg-gray-800/60 rounded-lg p-4 border border-gray-200 dark:border-gray-700 ml-2">
+                                      <div key={checkIn.id} className="bg-gray-800/60 rounded-lg p-4 border border-gray-700 ml-2">
                                         <div className="flex items-start justify-between mb-2">
                                           <div className="flex items-center gap-3">
                                             <span className="text-3xl sm:text-4xl">{moodEmoji}</span>
                                             <div>
-                                              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                              <p className="text-sm font-semibold text-white">
                                                 {isUser ? 'You' : 'Partner'}
                                               </p>
-                                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                              <p className="text-xs text-gray-400">
                                                 {moodOptions.find(m => m.value === checkIn.mood)?.label}
                                               </p>
                                             </div>
@@ -1588,33 +1588,33 @@ export default function DashboardPage() {
                                           <div className="mt-3">
                                             <div className="flex items-center gap-1.5 mb-1">
                                               <Sparkles className="w-3 h-3 text-yellow-500" />
-                                              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Highlights</p>
+                                              <p className="text-xs font-semibold text-gray-300">Highlights</p>
                                             </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 ml-5">{checkIn.highlights}</p>
+                                            <p className="text-sm text-gray-400 ml-5">{checkIn.highlights}</p>
                                           </div>
                                         )}
                                         {checkIn.challenges && (
                                           <div className="mt-3">
                                             <div className="flex items-center gap-1.5 mb-1">
                                               <Heart className="w-3 h-3 text-blue-500" />
-                                              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Challenges</p>
+                                              <p className="text-xs font-semibold text-gray-300">Challenges</p>
                                             </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 ml-5">{checkIn.challenges}</p>
+                                            <p className="text-sm text-gray-400 ml-5">{checkIn.challenges}</p>
                                           </div>
                                         )}
                                         {checkIn.gratitude && (
                                           <div className="mt-3">
                                             <div className="flex items-center gap-1.5 mb-1">
                                               <Heart className="w-3 h-3 text-pink-500" />
-                                              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">Grateful For</p>
+                                              <p className="text-xs font-semibold text-gray-300">Grateful For</p>
                                             </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 ml-5">{checkIn.gratitude}</p>
+                                            <p className="text-sm text-gray-400 ml-5">{checkIn.gratitude}</p>
                                           </div>
                                         )}
                                         {checkIn.note && (
                                           <div className="mt-3">
-                                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Note</p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">{checkIn.note}</p>
+                                            <p className="text-xs font-semibold text-gray-300 mb-1">Note</p>
+                                            <p className="text-sm text-gray-400">{checkIn.note}</p>
                                           </div>
                                         )}
                                       </div>
@@ -1631,11 +1631,11 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Right: Activity Feed */}
-                <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 to-stone-50/50 dark:from-slate-900/10 dark:via-gray-900/10 dark:to-stone-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-200/20 dark:border-gray-500/20 hover:border-gray-400/50 dark:hover:border-gray-400/50 transition-all duration-300 flex flex-col">
+                <div className="group bg-gradient-to-br from-slate-50/50 via-gray-50/50 from-slate-900/10 to-stone-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-500/20 hover:border-gray-400/50 transition-all duration-300 flex flex-col">
                   {/* Header */}
                   <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-                    <Activity className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h2>
+                    <Activity className="w-5 h-5 text-purple-400" />
+                    <h2 className="text-lg sm:text-xl font-bold text-white">Recent Activity</h2>
                   </div>
 
                   {/* Activity Feed Component - Scrollable */}

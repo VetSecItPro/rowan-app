@@ -20,27 +20,27 @@ import { logger } from '@/lib/logger';
 
 // Dynamic imports for heavy modal components (load only when opened)
 const NewGoalModal = dynamicImport(() => import('@/components/goals/NewGoalModal').then(mod => ({ default: mod.NewGoalModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
 const NewMilestoneModal = dynamicImport(() => import('@/components/goals/NewMilestoneModal').then(mod => ({ default: mod.NewMilestoneModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
 const NewHabitModal = dynamicImport(() => import('@/components/goals/NewHabitModal').then(mod => ({ default: mod.NewHabitModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
 const TemplateSelectionModal = dynamicImport(() => import('@/components/goals/TemplateSelectionModal').then(mod => ({ default: mod.TemplateSelectionModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
 const GoalCheckInModal = dynamicImport(() => import('@/components/goals/GoalCheckInModal').then(mod => ({ default: mod.GoalCheckInModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
 const CheckInFrequencyModal = dynamicImport(() => import('@/components/goals/CheckInFrequencyModal').then(mod => ({ default: mod.CheckInFrequencyModal })), {
-  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-white dark:bg-gray-800 rounded-lg p-4">Loading...</div></div>
+  loading: () => <div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="bg-gray-800 rounded-lg p-4">Loading...</div></div>
 });
 
 // Dynamic imports for heavy view components (load only when active)
@@ -684,7 +684,7 @@ export default function GoalsPage() {
                 <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
                   Goals & Milestones
                 </h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                <p className="text-sm sm:text-base text-gray-400">
                   Achieve your dreams together
                 </p>
               </div>
@@ -698,14 +698,14 @@ export default function GoalsPage() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* Simplified Navigation - Core tabs only */}
-              <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 rounded-xl border border-indigo-200 dark:border-indigo-700 sm:min-w-[380px]">
+              <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 from-indigo-900/30 to-indigo-800/30 rounded-xl border border-indigo-700 sm:min-w-[380px]">
                 <Tooltip content="View and manage your goals" position="bottom">
                   <button
                     onClick={() => handleViewModeChange('goals')}
                     className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                       viewMode === 'goals'
                         ? 'bg-gradient-goals text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                        : 'text-gray-300 hover:bg-gray-800/50'
                     }`}
                   >
                     <LayoutGrid className="w-4 h-4" />
@@ -718,7 +718,7 @@ export default function GoalsPage() {
                     className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                       viewMode === 'milestones'
                         ? 'bg-gradient-goals text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                        : 'text-gray-300 hover:bg-gray-800/50'
                     }`}
                   >
                     <List className="w-4 h-4" />
@@ -731,7 +731,7 @@ export default function GoalsPage() {
                     className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                       viewMode === 'habits'
                         ? 'bg-gradient-goals text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                        : 'text-gray-300 hover:bg-gray-800/50'
                     }`}
                   >
                     <Target className="w-4 h-4" />
@@ -744,7 +744,7 @@ export default function GoalsPage() {
                     className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
                       viewMode === 'activity'
                         ? 'bg-gradient-goals text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-800/50'
+                        : 'text-gray-300 hover:bg-gray-800/50'
                     }`}
                   >
                     <MessageCircle className="w-4 h-4" />
@@ -779,17 +779,17 @@ export default function GoalsPage() {
             ) : (
               <>
             {/* Active Goals */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Active Goals</h3>
+                <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Active Goals</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-goals rounded-xl flex items-center justify-center">
                   <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.active}</p>
                 {stats.active > 0 && (
-                  <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
+                  <div className="flex items-center gap-1 text-indigo-400">
                     <Target className="w-3 h-3" />
                     <span className="text-xs font-medium">Ongoing</span>
                   </div>
@@ -798,17 +798,17 @@ export default function GoalsPage() {
             </div>
 
             {/* In Progress */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
+                <h3 className="text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.inProgress}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.inProgress}</p>
                 {stats.inProgress > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-blue-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">Working on it</span>
                   </div>
@@ -817,17 +817,17 @@ export default function GoalsPage() {
             </div>
 
             {/* Milestones */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
+                <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-500 rounded-xl flex items-center justify-center">
                   <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.milestonesReached}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.milestonesReached}</p>
                 {stats.milestonesReached > 0 && (
-                  <div className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
+                  <div className="flex items-center gap-1 text-indigo-400">
                     <Award className="w-3 h-3" />
                     <span className="text-xs font-medium">Reached!</span>
                   </div>
@@ -836,17 +836,17 @@ export default function GoalsPage() {
             </div>
 
             {/* Completed */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
+                <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.completed}</p>
                 {(stats.active + stats.completed) > 0 && (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <div className="flex items-center gap-1 text-green-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">
                       {(() => {
@@ -866,7 +866,7 @@ export default function GoalsPage() {
           </CollapsibleStatsGrid>
 
           {/* Search Bar */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
             <div className={`apple-search-container goals-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
               <input
@@ -894,17 +894,17 @@ export default function GoalsPage() {
           </div>
 
           {/* Goals/Milestones List */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter - Hide for habits since it has custom header */}
             {viewMode !== 'habits' && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-lg sm:text-xl font-bold text-white">
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` :
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
                    'Activity Feed'}
                 </h2>
-                <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-indigo-900/30 border border-indigo-700 text-indigo-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
               </div>
@@ -913,7 +913,7 @@ export default function GoalsPage() {
               {viewMode === 'goals' && (
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   {/* Combined Filter - Mobile: single row with all options, Desktop: two separate rows */}
-                  <div className="bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 w-full sm:w-auto">
+                  <div className="bg-gray-900 border-2 border-indigo-700 rounded-lg p-1 w-full sm:w-auto">
                     {/* Mobile: Combined single-row filter */}
                     <div className="grid grid-cols-5 gap-0.5 sm:hidden">
                       <button
@@ -921,7 +921,7 @@ export default function GoalsPage() {
                         className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                           statusFilter === 'all' && assignmentFilter === 'all' && !focusMode
                             ? 'bg-gradient-goals text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         All
@@ -931,7 +931,7 @@ export default function GoalsPage() {
                         className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                           statusFilter === 'active' && assignmentFilter === 'all' && !focusMode
                             ? 'bg-gradient-goals text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         Active
@@ -941,7 +941,7 @@ export default function GoalsPage() {
                         className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                           statusFilter === 'completed' && assignmentFilter === 'all' && !focusMode
                             ? 'bg-gradient-goals text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         Done
@@ -951,7 +951,7 @@ export default function GoalsPage() {
                         className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
                           assignmentFilter === 'assigned-to-me' && !focusMode
                             ? 'bg-gradient-goals text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         Mine
@@ -961,7 +961,7 @@ export default function GoalsPage() {
                         className={`px-2 py-2.5 text-xs font-medium rounded-md transition-all whitespace-nowrap flex items-center justify-center gap-1 ${
                           focusMode
                             ? 'bg-gradient-goals text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                         title="Focus on top 3 priority goals"
                       >
@@ -977,7 +977,7 @@ export default function GoalsPage() {
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                           statusFilter === 'all'
                             ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         All
@@ -987,7 +987,7 @@ export default function GoalsPage() {
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                           statusFilter === 'active'
                             ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         Active
@@ -997,7 +997,7 @@ export default function GoalsPage() {
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                           statusFilter === 'completed'
                             ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                            : 'text-gray-400 hover:bg-indigo-900/20'
                         }`}
                       >
                         Completed
@@ -1006,13 +1006,13 @@ export default function GoalsPage() {
                   </div>
 
                   {/* Desktop: Assignment Filter */}
-                  <div className="hidden sm:flex bg-gray-50 dark:bg-gray-900 border-2 border-indigo-200 dark:border-indigo-700 rounded-lg p-1 gap-1">
+                  <div className="hidden sm:flex bg-gray-900 border-2 border-indigo-700 rounded-lg p-1 gap-1">
                     <button
                       onClick={() => setAssignmentFilter('all')}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                         assignmentFilter === 'all'
                           ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                          : 'text-gray-400 hover:bg-indigo-900/20'
                       }`}
                     >
                       All
@@ -1022,7 +1022,7 @@ export default function GoalsPage() {
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                         assignmentFilter === 'assigned-to-me'
                           ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                          : 'text-gray-400 hover:bg-indigo-900/20'
                       }`}
                     >
                       Mine
@@ -1032,7 +1032,7 @@ export default function GoalsPage() {
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[90px] ${
                         assignmentFilter === 'unassigned'
                           ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                          : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'
+                          : 'text-gray-400 hover:bg-indigo-900/20'
                       }`}
                     >
                       Unassigned
@@ -1048,7 +1048,7 @@ export default function GoalsPage() {
                   className={`hidden sm:flex px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap items-center gap-2 ${
                     focusMode
                       ? 'bg-indigo-600 text-white shadow-md'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 border border-indigo-300 dark:border-indigo-700'
+                      : 'text-gray-400 hover:bg-indigo-900/20 border border-indigo-700'
                   }`}
                   title="Show only top 3 priority goals"
                 >
@@ -1072,8 +1072,8 @@ export default function GoalsPage() {
               filteredGoals.length === 0 ? (
                 <div className="text-center py-12">
                   <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No goals found</p>
-                  <p className="text-gray-500 dark:text-gray-500 mb-6">
+                  <p className="text-gray-400 text-lg mb-2">No goals found</p>
+                  <p className="text-gray-500 mb-6">
                     {searchQuery ? 'Try adjusting your search' : 'Set your first goal to get started!'}
                   </p>
                   {!searchQuery && (
@@ -1110,8 +1110,8 @@ export default function GoalsPage() {
               filteredMilestones.length === 0 ? (
                 <div className="text-center py-12">
                   <Award className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No milestones found</p>
-                  <p className="text-gray-500 dark:text-gray-500">Try adjusting your search</p>
+                  <p className="text-gray-400 text-lg mb-2">No milestones found</p>
+                  <p className="text-gray-500">Try adjusting your search</p>
                 </div>
               ) : (
                 <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
@@ -1138,14 +1138,14 @@ export default function GoalsPage() {
                   <div className="flex items-center gap-3">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                        <h2 className="text-lg sm:text-xl font-bold text-white">
                           Habit Tracker
                         </h2>
-                        <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full">
+                        <span className="px-3 py-1 bg-indigo-900/30 border border-indigo-700 text-indigo-300 text-sm font-medium rounded-full">
                           {format(new Date(), 'MMM yyyy')}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-400">
                         Build consistent healthy habits daily
                       </p>
                     </div>

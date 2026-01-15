@@ -76,8 +76,8 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-4 sm:p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg transition-all ${
-        isDragging ? 'opacity-50 shadow-2xl scale-105 z-50' : 'hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-600'
+      className={`flex items-center gap-3 p-4 sm:p-3 bg-gray-800 border border-gray-700 rounded-lg transition-all ${
+        isDragging ? 'opacity-50 shadow-2xl scale-105 z-50' : 'hover:shadow-md hover:border-emerald-600'
       }`}
     >
       {/* Drag Handle - Optimized for touch */}
@@ -88,13 +88,13 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchCancel}
-          className={`cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-all touch-none ${
-            isDragReady ? 'bg-emerald-100 dark:bg-emerald-900/30 scale-110' : ''
+          className={`cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-700 rounded transition-all touch-none ${
+            isDragReady ? 'bg-emerald-900/30 scale-110' : ''
           }`}
           aria-label="Drag to reorder item (long-press on mobile)"
         >
           <GripVertical className={`w-6 h-6 md:w-4 md:h-4 transition-colors ${
-            isDragReady ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500'
+            isDragReady ? 'text-emerald-400' : 'text-gray-500'
           }`} />
         </button>
       </Tooltip>
@@ -106,7 +106,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
           className={`flex-shrink-0 w-11 h-11 sm:w-8 sm:h-8 md:w-6 md:h-6 rounded flex items-center justify-center transition-all ${
             item.checked
               ? 'bg-green-500 border-green-500'
-              : 'border-2 border-gray-300 dark:border-gray-600 hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              : 'border-2 border-gray-600 hover:border-emerald-400 hover:bg-gray-700'
           }`}
           aria-label={`Toggle item: ${item.name}`}
         >
@@ -119,15 +119,15 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
 
       {/* Item Details */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-medium ${item.checked ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+        <p className={`text-sm font-medium ${item.checked ? 'line-through text-gray-500' : 'text-white'}`}>
           {item.name}
         </p>
         <div className="flex items-center gap-2">
           {item.quantity > 1 && (
-            <p className="text-xs text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
+            <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
           )}
           {item.assignee && (
-            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
+            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-900/30 rounded-full">
               {item.assignee.avatar_url ? (
                 <img src={item.assignee.avatar_url} alt={item.assignee.name} className="w-3 h-3 rounded-full object-cover" />
               ) : (
@@ -137,7 +137,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
                   </span>
                 </div>
               )}
-              <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-medium">{item.assignee.name}</span>
+              <span className="text-[10px] text-emerald-300 font-medium">{item.assignee.name}</span>
             </div>
           )}
         </div>
@@ -216,10 +216,10 @@ export function DraggableItemsList({ items, onReorder, onToggleItem }: Draggable
             {/* Category Header */}
             <div className="flex items-center gap-2 px-2">
               <span className="text-lg">{getCategoryIcon(category as any)}</span>
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
                 {getCategoryLabel(category as any)}
               </h4>
-              <span className="text-xs text-gray-500 dark:text-gray-400">({categoryItems.length})</span>
+              <span className="text-xs text-gray-400">({categoryItems.length})</span>
             </div>
 
             {/* Sortable Items */}

@@ -16,7 +16,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   // Admin layout is nested under root layout - don't define html/body
-  // The root layout already provides ThemeProvider and base styling
+  // The root layout already provides base styling (dark mode only)
   return (
     <AdminQueryProvider>
       <div className="min-h-screen bg-gray-900">

@@ -18,7 +18,7 @@ export function TypingIndicator({ userName = 'Someone', userColor = '#34D399' }:
 
         {/* Typing Bubble */}
         <div
-          className="rounded-2xl rounded-tl-sm px-4 py-3 bg-gray-50 dark:bg-gray-800"
+          className="rounded-2xl rounded-tl-sm px-4 py-3 bg-gray-800"
           style={{
             borderWidth: '2px',
             borderStyle: 'solid',

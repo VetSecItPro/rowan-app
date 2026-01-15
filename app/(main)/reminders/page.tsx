@@ -354,11 +354,11 @@ export default function RemindersPage(): React.JSX.Element {
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
           {/* Error State */}
           {realtimeError && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-red-900 dark:text-red-100 font-semibold">Connection Error</h3>
-                <p className="text-red-700 dark:text-red-300 text-sm mt-1">
+                <h3 className="text-red-100 font-semibold">Connection Error</h3>
+                <p className="text-red-300 text-sm mt-1">
                   {realtimeError.message || 'Failed to connect to real-time updates. Your data may not be up to date.'}
                 </p>
               </div>
@@ -372,10 +372,10 @@ export default function RemindersPage(): React.JSX.Element {
                 <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white">
                   Reminders
                 </h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                <p className="text-sm sm:text-base text-gray-400">
                   Never forget important moments
                 </p>
               </div>
@@ -401,17 +401,17 @@ export default function RemindersPage(): React.JSX.Element {
             iconGradient="bg-gradient-reminders"
           >
             {/* Active */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Active</h3>
+                <h3 className="text-gray-400 font-medium">Active</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.active}</p>
                 {stats.active > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-blue-400">
                     <Clock className="w-3 h-3" />
                     <span className="text-xs font-medium">Pending</span>
                   </div>
@@ -420,17 +420,17 @@ export default function RemindersPage(): React.JSX.Element {
             </div>
 
             {/* Overdue */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Overdue</h3>
+                <h3 className="text-gray-400 font-medium">Overdue</h3>
                 <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.overdue}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.overdue}</p>
                 {stats.overdue > 0 && (
-                  <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
+                  <div className="flex items-center gap-1 text-red-400">
                     <AlertCircle className="w-3 h-3" />
                     <span className="text-xs font-medium">Urgent!</span>
                   </div>
@@ -439,17 +439,17 @@ export default function RemindersPage(): React.JSX.Element {
             </div>
 
             {/* Completed */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Completed</h3>
+                <h3 className="text-gray-400 font-medium">Completed</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <CheckCircle2 className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.completed}</p>
                 {stats.total > 0 && (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <div className="flex items-center gap-1 text-green-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">
                       {(() => {
@@ -465,17 +465,17 @@ export default function RemindersPage(): React.JSX.Element {
             </div>
 
             {/* Total */}
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Total</h3>
+                <h3 className="text-gray-400 font-medium">Total</h3>
                 <div className="w-12 h-12 bg-gradient-reminders rounded-xl flex items-center justify-center">
                   <Bell className="w-6 h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.total}</p>
                 {stats.total > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-blue-400">
                     <Bell className="w-3 h-3" />
                     <span className="text-xs font-medium">Overall</span>
                   </div>
@@ -485,7 +485,7 @@ export default function RemindersPage(): React.JSX.Element {
           </CollapsibleStatsGrid>
 
           {/* Search & Filter Bar - No box on mobile, box on desktop for filters */}
-          <div className="sm:bg-gray-50 sm:dark:bg-gray-800 sm:border sm:border-gray-200 sm:dark:border-gray-700 sm:rounded-xl sm:p-4 space-y-2 sm:space-y-3">
+          <div className="sm:bg-gray-50 sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4 space-y-2 sm:space-y-3">
                 {/* Search and Sort Row */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   {/* Search */}
@@ -521,7 +521,7 @@ export default function RemindersPage(): React.JSX.Element {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="appearance-none pl-4 pr-10 py-2 bg-white dark:bg-gray-900 border-2 border-pink-200 dark:border-pink-700 rounded-lg text-sm font-medium text-gray-900 dark:text-white hover:border-pink-300 dark:hover:border-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors cursor-pointer"
+                      className="appearance-none pl-4 pr-10 py-2 bg-gray-900 border-2 border-pink-700 rounded-lg text-sm font-medium text-white hover:border-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors cursor-pointer"
                     >
                       <option value="due_date">Sort: Due Date</option>
                       <option value="priority">Sort: Priority</option>
@@ -536,7 +536,7 @@ export default function RemindersPage(): React.JSX.Element {
                 <div className="hidden sm:flex sm:flex-row sm:items-end sm:justify-between gap-3">
                   {/* Category Filter Pills */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                       Category
                     </label>
                     <div className="flex gap-1.5">
@@ -546,7 +546,7 @@ export default function RemindersPage(): React.JSX.Element {
                           className={`flex-1 px-2 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                             categoryFilter === 'bills'
                               ? 'bg-green-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/20'
+                              : 'bg-gray-700 text-gray-300 hover:bg-green-900/20'
                           }`}
                         >
                           💰 Bills
@@ -558,7 +558,7 @@ export default function RemindersPage(): React.JSX.Element {
                           className={`flex-1 px-2 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                             categoryFilter === 'health'
                               ? 'bg-red-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
+                              : 'bg-gray-700 text-gray-300 hover:bg-red-900/20'
                           }`}
                         >
                           ❤️ Health
@@ -570,7 +570,7 @@ export default function RemindersPage(): React.JSX.Element {
                           className={`flex-1 px-2 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                             categoryFilter === 'work'
                               ? 'bg-blue-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
+                              : 'bg-gray-700 text-gray-300 hover:bg-blue-900/20'
                           }`}
                         >
                           💼 Work
@@ -582,7 +582,7 @@ export default function RemindersPage(): React.JSX.Element {
                           className={`flex-1 px-2 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                             categoryFilter === 'personal'
                               ? 'bg-purple-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900/20'
+                              : 'bg-gray-700 text-gray-300 hover:bg-purple-900/20'
                           }`}
                         >
                           ✨ Me
@@ -594,7 +594,7 @@ export default function RemindersPage(): React.JSX.Element {
                           className={`flex-1 px-2 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                             categoryFilter === 'household'
                               ? 'bg-amber-500 text-white shadow-md'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/20'
+                              : 'bg-gray-700 text-gray-300 hover:bg-amber-900/20'
                           }`}
                         >
                           🏠 Home
@@ -605,7 +605,7 @@ export default function RemindersPage(): React.JSX.Element {
 
                   {/* Priority Filter Pills */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                       Priority
                     </label>
                     <div className="flex gap-1.5">
@@ -614,7 +614,7 @@ export default function RemindersPage(): React.JSX.Element {
                         className={`px-3 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                           priorityFilter === 'urgent'
                             ? 'bg-red-600 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/20'
+                            : 'bg-gray-700 text-gray-300 hover:bg-red-900/20'
                         }`}
                       >
                         🔴 Urgent
@@ -624,7 +624,7 @@ export default function RemindersPage(): React.JSX.Element {
                         className={`px-3 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                           priorityFilter === 'high'
                             ? 'bg-orange-500 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/20'
+                            : 'bg-gray-700 text-gray-300 hover:bg-orange-900/20'
                         }`}
                       >
                         🟠 High
@@ -634,7 +634,7 @@ export default function RemindersPage(): React.JSX.Element {
                         className={`px-3 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                           priorityFilter === 'medium'
                             ? 'bg-yellow-500 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-yellow-900/20'
+                            : 'bg-gray-700 text-gray-300 hover:bg-yellow-900/20'
                         }`}
                       >
                         🟡 Med
@@ -644,7 +644,7 @@ export default function RemindersPage(): React.JSX.Element {
                         className={`px-3 py-2 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1 ${
                           priorityFilter === 'low'
                             ? 'bg-gray-500 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         }`}
                       >
                         ⚪ Low
@@ -655,21 +655,21 @@ export default function RemindersPage(): React.JSX.Element {
               </div>
 
           {/* Reminders List */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 sm:p-6">
             {/* Header with Month Badge and Filters - Now with filters on the right */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
               {/* Left side: Title and month badge */}
               <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold text-white">
                   All Reminders ({filteredReminders.length})
                 </h2>
-                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-blue-900/30 border border-blue-700 text-blue-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
                 {selectionMode && filteredReminders.length > 0 && (
                   <button
                     onClick={handleSelectAll}
-                    className="px-4 py-2 md:px-3 md:py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors min-h-[44px] md:min-h-0"
+                    className="px-4 py-2 md:px-3 md:py-1 bg-blue-900/30 border border-blue-700 text-blue-300 text-sm font-medium rounded-full hover:bg-blue-900/50 transition-colors min-h-[44px] md:min-h-0"
                   >
                     {selectedReminderIds.size === filteredReminders.length ? 'Deselect All' : 'Select All'}
                   </button>
@@ -684,7 +684,7 @@ export default function RemindersPage(): React.JSX.Element {
                   className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
                     assignmentFilter === 'mine'
                       ? 'bg-pink-500 text-white shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-pink-100 dark:hover:bg-pink-900/20'
+                      : 'bg-gray-700 text-gray-300 hover:bg-pink-900/20'
                   }`}
                 >
                   👤 Mine
@@ -694,14 +694,14 @@ export default function RemindersPage(): React.JSX.Element {
                   className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
                     assignmentFilter === 'unassigned'
                       ? 'bg-gray-500 text-white shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   ❓ Unassigned
                 </button>
 
                 {/* Divider */}
-                <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center mx-1 hidden sm:block" />
+                <div className="w-px h-6 bg-gray-600 self-center mx-1 hidden sm:block" />
 
                 {/* Status Pills */}
                 <button
@@ -709,7 +709,7 @@ export default function RemindersPage(): React.JSX.Element {
                   className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
                     statusFilter === 'active'
                       ? 'bg-blue-500 text-white shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900/20'
+                      : 'bg-gray-700 text-gray-300 hover:bg-blue-900/20'
                   }`}
                 >
                   ⏰ Active
@@ -719,7 +719,7 @@ export default function RemindersPage(): React.JSX.Element {
                   className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
                     statusFilter === 'snoozed'
                       ? 'bg-yellow-500 text-white shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-yellow-100 dark:hover:bg-yellow-900/20'
+                      : 'bg-gray-700 text-gray-300 hover:bg-yellow-900/20'
                   }`}
                 >
                   😴 Snoozed
@@ -730,18 +730,18 @@ export default function RemindersPage(): React.JSX.Element {
             {loading ? (
               <div className="space-y-4">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
+                  <div key={i} className="bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 bg-gray-200 dark:bg-gray-600 rounded" />
-                        <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-56" />
+                        <div className="w-5 h-5 bg-gray-600 rounded" />
+                        <div className="h-5 bg-gray-600 rounded w-56" />
                       </div>
-                      <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-24" />
+                      <div className="h-6 bg-gray-600 rounded w-24" />
                     </div>
-                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
+                    <div className="h-4 bg-gray-600 rounded w-full mb-2" />
                     <div className="flex items-center gap-3 mt-3">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32" />
-                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-40" />
+                      <div className="h-4 bg-gray-600 rounded w-32" />
+                      <div className="h-4 bg-gray-600 rounded w-40" />
                     </div>
                   </div>
                 ))}
@@ -749,8 +749,8 @@ export default function RemindersPage(): React.JSX.Element {
             ) : filteredReminders.length === 0 ? (
               <div className="text-center py-12">
                 <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">No reminders found</p>
-                <p className="text-gray-500 dark:text-gray-500 mb-6">
+                <p className="text-gray-400 text-lg mb-2">No reminders found</p>
+                <p className="text-gray-500 mb-6">
                   {searchQuery || statusFilter !== 'all'
                     ? 'Try adjusting your filters'
                     : 'Create your first reminder to get started!'}
@@ -788,8 +788,8 @@ export default function RemindersPage(): React.JSX.Element {
 
                 {/* Pagination Controls */}
                 {hasMoreReminders && (
-                  <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-700">
+                    <p className="text-sm text-gray-400">
                       Showing {paginatedReminders.length} of {filteredReminders.length} reminders
                       <span className="ml-1 text-gray-500">({remainingCount} more)</span>
                     </p>
@@ -803,7 +803,7 @@ export default function RemindersPage(): React.JSX.Element {
                       </button>
                       <button
                         onClick={handleShowAll}
-                        className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all inline-flex items-center gap-2 font-medium"
+                        className="px-6 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-all inline-flex items-center gap-2 font-medium"
                       >
                         Show All ({remainingCount})
                       </button>
@@ -830,9 +830,9 @@ export default function RemindersPage(): React.JSX.Element {
         isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={handleCloseModal} />
-            <div className="relative bg-gray-50 dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">No Space Available</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+              <h3 className="text-xl font-bold text-white mb-4">No Space Available</h3>
+              <p className="text-gray-400 mb-6">
                 You need to create or join a space before creating reminders.
               </p>
               <button

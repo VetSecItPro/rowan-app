@@ -56,7 +56,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
     } else if (task.status === 'in-progress') {
       return 'bg-amber-500 border-amber-500 hover:bg-amber-600';
     }
-    return 'border-gray-300 dark:border-gray-600 bg-transparent hover:border-amber-400';
+    return 'border-gray-600 bg-transparent hover:border-amber-400';
   };
 
   const getStatusTooltip = () => {
@@ -66,7 +66,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   };
 
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200">
+    <div className="bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200">
       {/* Main row */}
       <div className="flex items-center gap-2">
         {/* Checkbox */}
@@ -80,7 +80,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         </button>
 
         {/* Title */}
-        <h3 className={`flex-1 min-w-0 text-sm font-medium text-gray-900 dark:text-white truncate ${
+        <h3 className={`flex-1 min-w-0 text-sm font-medium text-white truncate ${
           task.status === 'completed' ? 'line-through opacity-60' : ''
         }`}>
           {task.title}
@@ -89,8 +89,8 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         {/* Type Badge */}
         <span className={`flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium ${
           task.type === 'chore'
-            ? 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30'
-            : 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30'
+            ? 'text-amber-400 bg-amber-900/30'
+            : 'text-blue-400 bg-blue-900/30'
         }`}>
           {task.type === 'chore' ? 'Chore' : 'Task'}
         </span>
@@ -101,10 +101,10 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         {/* Status badge */}
         <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${
           task.status === 'completed'
-            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+            ? 'bg-green-100 bg-green-900/30 text-green-400'
             : task.status === 'in-progress'
-            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+            ? 'bg-amber-100 bg-amber-900/30 text-amber-400'
+            : 'bg-gray-100 bg-gray-700 text-gray-400'
         }`}>
           {task.status === 'in-progress' ? 'Active' : task.status === 'completed' ? 'Done' : 'Pending'}
         </span>
@@ -113,7 +113,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         <div className="relative flex-shrink-0">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
+            className="p-1 text-gray-400 hover:text-gray-300 rounded"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -121,25 +121,25 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
                 {onViewDetails && task.type === 'task' && (
                   <button
                     onClick={() => { onViewDetails(task); setShowMenu(false); }}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700"
                   >
                     View Details
                   </button>
                 )}
                 <button
                   onClick={() => { onEdit(task); setShowMenu(false); }}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700"
                 >
                   Edit
                 </button>
                 {onSaveAsTemplate && task.type === 'task' && (
                   <button
                     onClick={() => { onSaveAsTemplate(task); setShowMenu(false); }}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-purple-600 dark:text-purple-400"
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-purple-400"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     Save as Template
@@ -147,7 +147,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
                 )}
                 <button
                   onClick={() => { onDelete(task.id, task.type); setShowMenu(false); }}
-                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-gray-700"
                 >
                   Delete
                 </button>
@@ -159,7 +159,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
 
       {/* Description + Meta row */}
       {(task.description || task.due_date || task.category) && (
-        <div className="mt-1 ml-7 sm:ml-8 flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+        <div className="mt-1 ml-7 sm:ml-8 flex items-center gap-2 text-[11px] text-gray-400">
           {task.description && (
             <span className="truncate flex-1">{task.description}</span>
           )}
@@ -181,7 +181,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
       {linkedShoppingList && (
         <Link
           href="/shopping"
-          className="mt-1.5 ml-7 sm:ml-8 inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline"
+          className="mt-1.5 ml-7 sm:ml-8 inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:underline"
         >
           <ShoppingCart className="w-3 h-3" />
           {linkedShoppingList.title}

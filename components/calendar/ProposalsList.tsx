@@ -117,11 +117,11 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-400" />
             Event Proposals
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             Collaborate on finding the perfect time for events
           </p>
         </div>
@@ -141,7 +141,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       </div>
 
       {/* Status Filter */}
-      <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-2 border-b border-gray-700">
         {[
           { key: 'pending', label: 'Pending', count: statusCounts.pending },
           { key: 'approved', label: 'Approved', count: statusCounts.approved },
@@ -153,12 +153,12 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
             onClick={() => setSelectedStatus(tab.key as any)}
             className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
               selectedStatus === tab.key
-                ? 'border-purple-600 text-purple-600 dark:text-purple-400'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                ? 'border-purple-600 text-purple-400'
+                : 'border-transparent text-gray-400 hover:text-white'
             }`}
           >
             {tab.label}
-            <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700">
+            <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-700">
               {tab.count}
             </span>
           </button>
@@ -169,7 +169,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       {loading && (
         <div className="text-center py-12">
           <div className="inline-block w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading proposals...</p>
+          <p className="mt-4 text-gray-400">Loading proposals...</p>
         </div>
       )}
 
@@ -192,13 +192,13 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       {!loading && filteredProposals.length === 0 && (
         <div className="text-center py-12">
           <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">
+          <p className="text-gray-400 text-lg mb-2">
             {selectedStatus === 'pending' && 'No pending proposals'}
             {selectedStatus === 'approved' && 'No approved proposals'}
             {selectedStatus === 'rejected' && 'No rejected proposals'}
             {selectedStatus === 'all' && 'No proposals yet'}
           </p>
-          <p className="text-gray-500 dark:text-gray-500 text-sm mb-6">
+          <p className="text-gray-500 text-sm mb-6">
             {selectedStatus === 'pending' && 'Create a new proposal to suggest event times to your space members'}
             {selectedStatus === 'approved' && 'Approved proposals will appear here once created'}
             {selectedStatus === 'rejected' && 'Rejected proposals will appear here'}

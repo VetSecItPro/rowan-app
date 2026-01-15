@@ -68,7 +68,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h4 className="text-sm font-medium text-gray-300">
           Subtasks {subtasks.length > 0 && `(${completionPercentage}% complete)`}
         </h4>
       </div>
@@ -79,7 +79,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
           value={newSubtaskTitle}
           onChange={(e) => setNewSubtaskTitle(e.target.value)}
           placeholder="Add a subtask..."
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+          className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900"
         />
         <CTAButton
           type="submit"
@@ -95,7 +95,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
           {subtasks.map((subtask) => (
             <div
               key={subtask.id}
-              className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              className="flex items-center gap-2 p-2 bg-gray-800 rounded-lg"
             >
               <button
                 onClick={() => toggleSubtask(subtask.id, subtask.status)}

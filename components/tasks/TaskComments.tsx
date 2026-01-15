@@ -63,18 +63,18 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <MessageSquare className="w-4 h-4 text-gray-500" />
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h4 className="text-sm font-medium text-gray-300">
           Comments ({comments.length})
         </h4>
         <div className="group relative">
           <button
             type="button"
-            className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-xs text-gray-400 hover:text-gray-300"
             aria-label="Comments help"
           >
             ⓘ
           </button>
-          <div className="absolute left-0 top-6 hidden group-hover:block z-50 w-64 p-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg">
+          <div className="absolute left-0 top-6 hidden group-hover:block z-50 w-64 p-2 bg-gray-700 text-white text-xs rounded-lg shadow-lg">
             Add comments to collaborate with your team. React with emojis to show support or acknowledgment.
           </div>
         </div>
@@ -82,8 +82,8 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
 
       <div className="space-y-3">
         {comments.map((comment) => (
-          <div key={comment.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-700 dark:text-gray-300">{comment.content}</p>
+          <div key={comment.id} className="p-3 bg-gray-800 rounded-lg">
+            <p className="text-sm text-gray-300">{comment.content}</p>
             <div className="flex items-center gap-2 mt-2">
               <button
                 onClick={() => addReaction(comment.id, '👍')}
@@ -116,7 +116,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
           title="Type your comment here and press Send"
-          className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900"
+          className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900"
         />
         <CTAButton
           type="submit"

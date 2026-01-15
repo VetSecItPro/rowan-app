@@ -193,15 +193,15 @@ export function CCPACompactNotice({ onDismiss }: { onDismiss?: () => void }) {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-40">
+    <div className="fixed bottom-4 right-4 max-w-sm bg-gray-800 border border-gray-700 rounded-xl shadow-lg z-40">
       <div className="p-4">
         <div className="flex items-start gap-3">
           <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+            <h4 className="text-sm font-semibold text-white mb-1">
               California Privacy Rights
             </h4>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-xs text-gray-400 mb-3">
               You have the right to opt-out of personal information sales under CCPA.
             </p>
             <div className="flex gap-2">
@@ -213,7 +213,7 @@ export function CCPACompactNotice({ onDismiss }: { onDismiss?: () => void }) {
               </a>
               <button
                 onClick={handleDismiss}
-                className="text-xs px-2 py-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="text-xs px-2 py-1 text-gray-500 text-gray-400 hover:text-gray-200"
               >
                 Dismiss
               </button>

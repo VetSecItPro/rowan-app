@@ -41,13 +41,13 @@ export function ProgressiveContentLoader({
       {/* Progressive stage indicator */}
       <div className="flex items-center gap-3">
         <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-        <span className="text-sm text-gray-600 dark:text-gray-400 transition-all duration-300">
+        <span className="text-sm text-gray-400 transition-all duration-300">
           {stages[currentStage]}
         </span>
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+      <div className="w-full bg-gray-700 rounded-full h-1.5 overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-700 ease-out"
           style={{
@@ -61,7 +61,7 @@ export function ProgressiveContentLoader({
         {Array.from({ length: Math.min(currentStage + 2, 4) }).map((_, i) => (
           <div
             key={i}
-            className={`h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse transition-opacity duration-500 ${
+            className={`h-4 bg-gray-700 rounded animate-pulse transition-opacity duration-500 ${
               i <= currentStage ? 'opacity-100' : 'opacity-40'
             }`}
             style={{
@@ -111,15 +111,15 @@ export function EnhancedModalSkeleton({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full p-6 transform transition-all duration-300 ${sizeClasses[size]}`}>
+      <div className={`bg-gray-800 rounded-2xl shadow-2xl w-full p-6 transform transition-all duration-300 ${sizeClasses[size]}`}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center animate-pulse">
-            {Icon && <Icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />}
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-200 from-gray-700 to-gray-600 flex items-center justify-center animate-pulse">
+            {Icon && <Icon className="w-5 h-5 text-gray-400" />}
           </div>
           <div className="flex-1">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-40" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-32 mt-2" />
+            <div className="h-6 bg-gray-700 rounded animate-pulse w-40" />
+            <div className="h-3 bg-gray-700 rounded animate-pulse w-32 mt-2" />
           </div>
         </div>
 
@@ -142,15 +142,15 @@ export function EnhancedModalSkeleton({
                 }`}
                 style={{ animationDelay: `${i * 200}ms` }}
               >
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse" />
-                <div className="h-10 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-2 border-gray-200 dark:border-gray-600 animate-pulse" />
+                <div className="h-4 bg-gray-700 rounded w-24 animate-pulse" />
+                <div className="h-10 bg-gray-700/50 rounded-lg border-2 border-gray-600 animate-pulse" />
               </div>
             ))}
 
             {/* Action buttons */}
-            <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
-              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg w-20 animate-pulse" />
-              <div className="h-10 bg-blue-200 dark:bg-blue-800/50 rounded-lg w-24 animate-pulse" />
+            <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-600">
+              <div className="h-10 bg-gray-700 rounded-lg w-20 animate-pulse" />
+              <div className="h-10 bg-blue-800/50 rounded-lg w-24 animate-pulse" />
             </div>
           </div>
         </ProgressiveContentLoader>
@@ -191,20 +191,20 @@ export function ProgressiveTableSkeleton({
       {/* Header */}
       <div className="flex items-center gap-3">
         <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-        <span className="text-sm font-medium text-gray-900 dark:text-white">
+        <span className="text-sm font-medium text-white">
           Loading {title}...
         </span>
       </div>
 
       {/* Table */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div className="border border-gray-700 rounded-lg overflow-hidden">
         {/* Table Header */}
-        <div className="bg-gray-50 dark:bg-gray-700 px-6 py-3 border-b border-gray-200 dark:border-gray-600">
+        <div className="bg-gray-700 px-6 py-3 border-b border-gray-600">
           <div className="flex gap-8">
             {Array.from({ length: columns }).map((_, i) => (
               <div
                 key={i}
-                className="h-4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"
+                className="h-4 bg-gray-600 rounded animate-pulse"
                 style={{ width: `${Math.random() * 60 + 80}px` }}
               />
             ))}
@@ -212,7 +212,7 @@ export function ProgressiveTableSkeleton({
         </div>
 
         {/* Table Rows */}
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="divide-y divide-gray-700">
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <div
               key={rowIndex}
@@ -224,7 +224,7 @@ export function ProgressiveTableSkeleton({
                 {Array.from({ length: columns }).map((_, colIndex) => (
                   <div
                     key={colIndex}
-                    className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+                    className="h-4 bg-gray-700 rounded animate-pulse"
                     style={{
                       width: `${Math.random() * 80 + 60}px`,
                       animationDelay: `${colIndex * 50 + rowIndex * 100}ms`,
@@ -270,9 +270,9 @@ export function ProgressiveCalendarSkeleton({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" />
+          <div className="h-6 bg-gray-700 rounded w-32 animate-pulse" />
         </div>
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse" />
+        <div className="h-8 bg-gray-700 rounded w-24 animate-pulse" />
       </div>
 
       {/* Calendar Grid */}
@@ -280,7 +280,7 @@ export function ProgressiveCalendarSkeleton({
         {Array.from({ length: totalDays }).map((_, i) => (
           <div
             key={i}
-            className={`h-24 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 p-2 transition-all duration-200 ${
+            className={`h-24 bg-gray-700 rounded-lg border-2 border-gray-600 p-2 transition-all duration-200 ${
               i < loadedDays
                 ? 'opacity-100 transform scale-100'
                 : 'opacity-30 transform scale-95'
@@ -290,9 +290,9 @@ export function ProgressiveCalendarSkeleton({
             }}
           >
             <div className="space-y-1">
-              <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-6 animate-pulse" />
-              <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded w-12 animate-pulse" />
-              <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded w-8 animate-pulse" />
+              <div className="h-3 bg-gray-600 rounded w-6 animate-pulse" />
+              <div className="h-2 bg-gray-600 rounded w-12 animate-pulse" />
+              <div className="h-2 bg-gray-600 rounded w-8 animate-pulse" />
             </div>
           </div>
         ))}

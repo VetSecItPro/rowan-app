@@ -112,14 +112,14 @@ export function OptimizedImage({
       <div
         className={`
           flex items-center justify-center
-          bg-gray-100 dark:bg-gray-800
+          bg-gray-800
           ${roundedClasses[rounded]}
           ${aspectRatioClasses[aspectRatio]}
           ${wrapperClassName}
         `}
         style={!fill && width && height ? { width, height } : undefined}
       >
-        <ImageOff className="w-1/4 h-1/4 text-gray-400 dark:text-gray-600" />
+        <ImageOff className="w-1/4 h-1/4 text-gray-600" />
       </div>
     );
   }
@@ -163,7 +163,7 @@ export function OptimizedImage({
         <div
           className={`
             absolute inset-0
-            bg-gray-200 dark:bg-gray-700
+            bg-gray-700
             animate-pulse
             ${roundedClasses[rounded]}
           `}

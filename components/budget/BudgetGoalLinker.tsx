@@ -59,7 +59,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
       description: 'Stay within your monthly budget for this category',
       icon: Target,
       color: 'text-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-950',
+      bgColor: 'bg-blue-950',
       example: 'Track spending to not exceed $500/month on groceries'
     },
     savings_target: {
@@ -67,7 +67,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
       description: 'Save a specific amount of money over time',
       icon: PiggyBank,
       color: 'text-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-950',
+      bgColor: 'bg-green-950',
       example: 'Save $5,000 for emergency fund by end of year'
     },
     spending_reduction: {
@@ -75,7 +75,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
       description: 'Reduce spending by a target percentage',
       icon: TrendingDown,
       color: 'text-orange-600',
-      bgColor: 'bg-orange-50 dark:bg-orange-950',
+      bgColor: 'bg-orange-950',
       example: 'Reduce dining expenses by 20% this month'
     },
     expense_tracking: {
@@ -83,7 +83,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
       description: 'Monitor and track expenses in this category',
       icon: DollarSign,
       color: 'text-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-950',
+      bgColor: 'bg-purple-950',
       example: 'Track all healthcare expenses for tax purposes'
     }
   };

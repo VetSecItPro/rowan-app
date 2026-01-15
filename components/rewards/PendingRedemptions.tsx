@@ -120,14 +120,14 @@ export function PendingRedemptions({
     switch (status) {
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-300">
             <Clock className="w-3 h-3" />
             Awaiting Approval
           </span>
         );
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-900/30 text-blue-300">
             <Check className="w-3 h-3" />
             Approved - Ready to Give
           </span>
@@ -160,12 +160,12 @@ export function PendingRedemptions({
   if (loading) {
     return (
       <div
-        className={`bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}
+        className={`bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-700 ${className}`}
       >
         <div className="animate-pulse space-y-3">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-          <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded" />
-          <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="h-6 bg-gray-700 rounded w-1/2" />
+          <div className="h-16 bg-gray-700 rounded" />
+          <div className="h-16 bg-gray-700 rounded" />
         </div>
       </div>
     );
@@ -173,19 +173,19 @@ export function PendingRedemptions({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}
+      className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 ${className}`}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
         <Tooltip
           content="Reward requests from family members waiting for your approval"
           position="right"
         >
-          <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 cursor-help">
+          <h3 className="font-semibold text-white flex items-center gap-2 cursor-help">
             <Clock className="w-5 h-5 text-yellow-500" />
             Pending Requests
             {redemptions.length > 0 && (
-              <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-yellow-900/30 text-yellow-300 text-xs font-bold px-2 py-0.5 rounded-full">
                 {redemptions.length}
               </span>
             )}
@@ -194,7 +194,7 @@ export function PendingRedemptions({
         <button
           onClick={loadRedemptions}
           disabled={loading}
-          className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="p-1.5 text-gray-500 hover:text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -202,8 +202,8 @@ export function PendingRedemptions({
 
       {/* Error display */}
       {error && (
-        <div className="px-4 py-3 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-800">
-          <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+        <div className="px-4 py-3 bg-red-900/20 border-b border-red-800">
+          <p className="text-sm text-red-400 flex items-center gap-2">
             <AlertCircle className="w-4 h-4" />
             {error}
           </p>
@@ -211,14 +211,14 @@ export function PendingRedemptions({
       )}
 
       {/* Content */}
-      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="divide-y divide-gray-700">
         {redemptions.length === 0 ? (
           <div className="px-4 py-8 text-center">
-            <Gift className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400">
+            <Gift className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-400">
               No pending reward requests
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               Requests will appear here when family members redeem rewards
             </p>
           </div>
@@ -253,17 +253,17 @@ export function PendingRedemptions({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-white">
                           {user?.name || 'Family Member'}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-400">
                           wants{' '}
                           <span className="font-medium">
                             {reward?.emoji} {reward?.name || 'Reward'}
                           </span>
                         </p>
                       </div>
-                      <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
+                      <span className="text-xs text-gray-500 flex-shrink-0">
                         {formatTimeAgo(redemption.created_at)}
                       </span>
                     </div>
@@ -272,7 +272,7 @@ export function PendingRedemptions({
                     <div className="mt-1">{getStatusBadge(redemption.status)}</div>
 
                     {/* Points Cost */}
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 mt-1">
                       {redemption.points_spent} points spent
                     </p>
 
@@ -284,7 +284,7 @@ export function PendingRedemptions({
                             <button
                               onClick={() => handleApprove(redemption.id)}
                               disabled={isProcessing}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-green-900/30 text-green-300 hover:bg-green-900/50 transition-colors disabled:opacity-50"
                             >
                               {isProcessing ? (
                                 <RefreshCw className="w-3 h-3 animate-spin" />
@@ -306,7 +306,7 @@ export function PendingRedemptions({
                                 })
                               }
                               disabled={isProcessing}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-900/30 text-red-300 hover:bg-red-900/50 transition-colors disabled:opacity-50"
                             >
                               <X className="w-3 h-3" />
                               Deny
@@ -322,7 +322,7 @@ export function PendingRedemptions({
                           <button
                             onClick={() => handleFulfill(redemption.id)}
                             disabled={isProcessing}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-900/30 text-blue-300 hover:bg-blue-900/50 transition-colors disabled:opacity-50"
                           >
                             {isProcessing ? (
                               <RefreshCw className="w-3 h-3 animate-spin" />
@@ -343,7 +343,7 @@ export function PendingRedemptions({
             {hasMore && (
               <button
                 onClick={() => setShowAll(!showAll)}
-                className="w-full px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center justify-center gap-1 transition-colors"
+                className="w-full px-4 py-2 text-sm text-gray-400 hover:bg-gray-700/50 flex items-center justify-center gap-1 transition-colors"
               >
                 {showAll ? (
                   <>
@@ -365,18 +365,18 @@ export function PendingRedemptions({
       {/* Deny Reason Modal */}
       {denyReasonModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-xl">
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-xl">
+            <h4 className="text-lg font-semibold text-white mb-2">
               Deny Request
             </h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-400 mb-4">
               Are you sure you want to deny the request for{' '}
               <strong>{denyReasonModal.rewardName}</strong>? Points will be
               refunded.
             </p>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Reason (optional)
               </label>
               <input
@@ -385,7 +385,7 @@ export function PendingRedemptions({
                 onChange={(e) => setDenyReason(e.target.value)}
                 placeholder="e.g., Not enough chores done this week"
                 maxLength={200}
-                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400"
+                className="w-full px-3 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-gray-900 text-white placeholder-gray-400"
               />
             </div>
 
@@ -395,7 +395,7 @@ export function PendingRedemptions({
                   setDenyReasonModal(null);
                   setDenyReason('');
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 Cancel
               </button>

@@ -15,7 +15,7 @@ export default function ExpensesLoading() {
       {/* Stats cards skeleton */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div key={i} className="bg-gray-800 rounded-xl p-4 shadow-sm">
             <SkeletonLoader className="w-24" height="h-4" />
             <SkeletonLoader className="w-20 mt-2" height="h-7" />
             <SkeletonLoader className="w-16 mt-1" height="h-3" />
@@ -24,7 +24,7 @@ export default function ExpensesLoading() {
       </div>
 
       {/* Chart skeleton */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+      <div className="bg-gray-800 rounded-xl p-4 shadow-sm">
         <SkeletonLoader className="w-40 mb-4" height="h-6" />
         <SkeletonLoader className="w-full h-48 rounded-lg" />
       </div>
@@ -32,7 +32,7 @@ export default function ExpensesLoading() {
       {/* Expense list skeleton */}
       <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+          <div key={i} className="bg-gray-800 rounded-xl p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <SkeletonLoader className="w-10 h-10 rounded-full" />

@@ -24,7 +24,7 @@ const SettingsLoadingFallback = ({
         <Icon className="w-8 h-8 text-purple-500" />
         <Loader2 className="w-4 h-4 absolute -top-1 -right-1 animate-spin text-purple-600" />
       </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400">{text}</p>
+      <p className="text-sm text-gray-400">{text}</p>
     </div>
   </div>
 );
@@ -34,12 +34,12 @@ const SettingsLoadingFallback = ({
  */
 const SettingsModalSkeleton = ({ title, icon: Icon = Shield }: { title: string; icon?: any }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
+    <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-          <Icon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+        <div className="w-10 h-10 rounded-xl bg-purple-900/30 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-purple-400" />
         </div>
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-40" />
+        <div className="h-6 bg-gray-700 rounded animate-pulse w-40" />
       </div>
       <SettingsLoadingFallback text={`Loading ${title}...`} icon={Icon} />
     </div>
@@ -115,16 +115,16 @@ export const PrivacyDataManager = dynamic(
   {
     loading: () => (
       <div className="space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
           <SettingsLoadingFallback text="Loading privacy settings..." icon={Lock} />
           <div className="space-y-4 mt-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex items-center justify-between py-4">
                 <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" />
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
+                  <div className="h-4 bg-gray-700 rounded w-32 animate-pulse" />
+                  <div className="h-3 bg-gray-700 rounded w-48 animate-pulse" />
                 </div>
-                <div className="w-12 h-6 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                <div className="w-12 h-6 bg-gray-700 rounded-full animate-pulse" />
               </div>
             ))}
           </div>
@@ -149,17 +149,17 @@ export const TwoFactorAuth = dynamic(
   () => import('@/components/settings/TwoFactorAuth').then(mod => ({ default: mod.TwoFactorAuth })),
   {
     loading: () => (
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
         <SettingsLoadingFallback text="Loading two-factor authentication..." icon={Shield} />
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-40 animate-pulse" />
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse" />
+              <div className="h-4 bg-gray-700 rounded w-40 animate-pulse" />
+              <div className="h-3 bg-gray-700 rounded w-64 animate-pulse" />
             </div>
-            <div className="w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="w-16 h-8 bg-gray-700 rounded animate-pulse" />
           </div>
-          <div className="w-48 h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mx-auto" />
+          <div className="w-48 h-48 bg-gray-700 rounded-lg animate-pulse mx-auto" />
         </div>
       </div>
     ),
@@ -208,10 +208,10 @@ export const SettingsSectionLoader = ({
   if (error) {
     return (
       <div className="text-center py-8">
-        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
-          <span className="text-red-600 dark:text-red-400 text-xl">⚠️</span>
+        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-900/20 flex items-center justify-center">
+          <span className="text-red-400 text-xl">⚠️</span>
         </div>
-        <p className="text-sm text-red-600 dark:text-red-400 mb-4">{error}</p>
+        <p className="text-sm text-red-400 mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

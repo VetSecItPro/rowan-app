@@ -94,21 +94,21 @@ export function EnhancedMemberManagement({
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
-        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Loading members...</span>
+        <span className="ml-2 text-sm text-gray-400">Loading members...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+      <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg">
+        <div className="flex items-center gap-2 text-red-400">
           <AlertCircle className="w-4 h-4" />
           <span className="text-sm">{error}</span>
         </div>
         <button
           onClick={refreshPresence}
-          className="mt-2 text-sm text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
+          className="mt-2 text-sm text-red-400 hover:underline flex items-center gap-1"
         >
           <RefreshCw className="w-3 h-3" />
           Try again
@@ -120,22 +120,22 @@ export function EnhancedMemberManagement({
   return (
     <div className="space-y-6">
       {/* Member Overview */}
-      <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
+      <div className="bg-gradient-to-br from-purple-50 from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <h4 className="text-lg font-semibold text-white flex items-center gap-2">
             <Users className="w-5 h-5" />
             Space Members
           </h4>
           <button
             onClick={refreshPresence}
-            className="p-1 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded transition-colors"
+            className="p-1 hover:bg-gray-800/50 rounded transition-colors"
             title="Refresh presence data"
           >
-            <RefreshCw className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <RefreshCw className="w-4 h-4 text-gray-400" />
           </button>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-gray-400">
           <div className="flex items-center gap-2">
             <PresenceIndicator status={PresenceStatus.ONLINE} size="sm" />
             <span>{onlineCount} online</span>
@@ -152,7 +152,7 @@ export function EnhancedMemberManagement({
       {/* Members List */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h5 className="text-base font-medium text-gray-900 dark:text-white">Active Members</h5>
+          <h5 className="text-base font-medium text-white">Active Members</h5>
           <button
             onClick={onInviteClick}
             className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm flex items-center gap-2"
@@ -163,8 +163,8 @@ export function EnhancedMemberManagement({
         </div>
 
         {members.length === 0 ? (
-          <div className="p-6 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">No members found.</p>
+          <div className="p-6 bg-gray-900/50 border border-gray-700 rounded-xl text-center">
+            <p className="text-sm text-gray-400">No members found.</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -186,22 +186,22 @@ export function EnhancedMemberManagement({
       {/* Pending Invitations */}
       {pendingInvitations.length > 0 && (
         <div className="space-y-3">
-          <h5 className="text-base font-medium text-gray-900 dark:text-white">Pending Invitations</h5>
+          <h5 className="text-base font-medium text-white">Pending Invitations</h5>
           <div className="space-y-2">
             {pendingInvitations.map((invitation) => (
               <div
                 key={invitation.id}
-                className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+                className="flex items-center justify-between p-3 bg-yellow-900/20 border border-yellow-800 rounded-lg"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-white">
                     {invitation.email}
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-gray-400">
                     Invited as {invitation.role} • Expires {new Date(invitation.expires_at).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">
+                <div className="text-xs text-yellow-400 font-medium">
                   Pending
                 </div>
               </div>

@@ -102,7 +102,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0], index: n
                 href={feature.href}
                 prefetch={true}
             >
-                <SpotlightCard className="h-full bg-gradient-to-br from-white/80 to-white/40 dark:from-gray-800/80 dark:to-gray-900/40 backdrop-blur-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl">
+                <SpotlightCard className="h-full bg-gradient-to-br from-white/80 from-gray-800/80 to-gray-900/40 backdrop-blur-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl">
                     <div className="p-6 h-full relative z-10">
                         {/* Animated gradient background on hover */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
@@ -111,23 +111,23 @@ function FeatureCard({ feature, index }: { feature: typeof features[0], index: n
                         <div className="relative flex items-center gap-4 mb-4">
                             {/* Glassmorphic icon container */}
                             <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.gradient} p-0.5 shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
-                                <div className="w-full h-full rounded-2xl bg-white dark:bg-gray-900 flex items-center justify-center">
-                                    <Icon className="w-7 h-7 text-gray-900 dark:text-white" />
+                                <div className="w-full h-full rounded-2xl bg-gray-900 flex items-center justify-center">
+                                    <Icon className="w-7 h-7 text-white" />
                                 </div>
                             </div>
-                            <h3 className="text-2xl font-display font-bold tracking-tight text-gray-900 dark:text-white group-hover:translate-x-1 transition-transform duration-300">
+                            <h3 className="text-2xl font-display font-bold tracking-tight text-white group-hover:translate-x-1 transition-transform duration-300">
                                 {feature.title}
                             </h3>
                         </div>
 
                         {/* Description below */}
-                        <p className="relative text-gray-600 dark:text-gray-300 leading-relaxed group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors duration-300 font-serif italic">
+                        <p className="relative text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors duration-300 font-serif italic">
                             {feature.description}
                         </p>
 
                         {/* Arrow icon that appears on hover */}
                         <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                            <ArrowRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                            <ArrowRight className="w-5 h-5 text-gray-500" />
                         </div>
                     </div>
                 </SpotlightCard>
@@ -152,7 +152,7 @@ export function FeatureGrid() {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: false }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-4xl sm:text-5xl font-display font-extrabold tracking-tight text-gray-900 dark:text-white mb-4"
+                        className="text-4xl sm:text-5xl font-display font-extrabold tracking-tight text-white mb-4"
                     >
                         Everything You Need
                     </motion.h2>
@@ -161,7 +161,7 @@ export function FeatureGrid() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: false }}
                         transition={{ duration: 0.6, delay: 0.4 }}
-                        className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto font-light"
+                        className="text-xl text-gray-300 max-w-2xl mx-auto font-light"
                     >
                         Powerful features designed to simplify your family's daily life
                     </motion.p>

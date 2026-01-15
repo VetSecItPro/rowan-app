@@ -23,7 +23,7 @@ export default function CalendarLoading() {
       </div>
 
       {/* Calendar grid skeleton */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+      <div className="bg-gray-800 rounded-xl p-4 shadow-sm">
         {/* Days of week */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
@@ -36,7 +36,7 @@ export default function CalendarLoading() {
         {/* Calendar days */}
         <div className="grid grid-cols-7 gap-1">
           {[...Array(35)].map((_, i) => (
-            <div key={i} className="aspect-square p-1 rounded-lg border border-gray-100 dark:border-gray-700">
+            <div key={i} className="aspect-square p-1 rounded-lg border border-gray-700">
               <SkeletonLoader className="w-6" height="h-4" />
               <div className="mt-1 space-y-1">
                 <SkeletonLoader height="h-2" />

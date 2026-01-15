@@ -12,16 +12,16 @@ const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝'
 
 // Category configuration with colors and emojis
 export const TASK_CATEGORIES = {
-  work: { emoji: '💼', label: 'Work', color: 'bg-blue-500', textColor: 'text-blue-600', lightBg: 'bg-blue-100 dark:bg-blue-900/30' },
-  personal: { emoji: '👤', label: 'Personal', color: 'bg-purple-500', textColor: 'text-purple-600', lightBg: 'bg-purple-100 dark:bg-purple-900/30' },
-  home: { emoji: '🏠', label: 'Home', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-100 dark:bg-amber-900/30' },
-  shopping: { emoji: '🛒', label: 'Shopping', color: 'bg-emerald-500', textColor: 'text-emerald-600', lightBg: 'bg-emerald-100 dark:bg-emerald-900/30' },
-  health: { emoji: '💪', label: 'Health & Fitness', color: 'bg-green-500', textColor: 'text-green-600', lightBg: 'bg-green-100 dark:bg-green-900/30' },
-  finance: { emoji: '💰', label: 'Finance', color: 'bg-yellow-500', textColor: 'text-yellow-600', lightBg: 'bg-yellow-100 dark:bg-yellow-900/30' },
-  education: { emoji: '📚', label: 'Education', color: 'bg-indigo-500', textColor: 'text-indigo-600', lightBg: 'bg-indigo-100 dark:bg-indigo-900/30' },
-  family: { emoji: '👨‍👩‍👧‍👦', label: 'Family', color: 'bg-pink-500', textColor: 'text-pink-600', lightBg: 'bg-pink-100 dark:bg-pink-900/30' },
-  social: { emoji: '🎉', label: 'Social', color: 'bg-orange-500', textColor: 'text-orange-600', lightBg: 'bg-orange-100 dark:bg-orange-900/30' },
-  other: { emoji: '📌', label: 'Other', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-100 dark:bg-gray-900/30' },
+  work: { emoji: '💼', label: 'Work', color: 'bg-blue-500', textColor: 'text-blue-600', lightBg: 'bg-blue-900/30' },
+  personal: { emoji: '👤', label: 'Personal', color: 'bg-purple-500', textColor: 'text-purple-600', lightBg: 'bg-purple-900/30' },
+  home: { emoji: '🏠', label: 'Home', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
+  shopping: { emoji: '🛒', label: 'Shopping', color: 'bg-emerald-500', textColor: 'text-emerald-600', lightBg: 'bg-emerald-900/30' },
+  health: { emoji: '💪', label: 'Health & Fitness', color: 'bg-green-500', textColor: 'text-green-600', lightBg: 'bg-green-900/30' },
+  finance: { emoji: '💰', label: 'Finance', color: 'bg-yellow-500', textColor: 'text-yellow-600', lightBg: 'bg-yellow-900/30' },
+  education: { emoji: '📚', label: 'Education', color: 'bg-indigo-500', textColor: 'text-indigo-600', lightBg: 'bg-indigo-900/30' },
+  family: { emoji: '👨‍👩‍👧‍👦', label: 'Family', color: 'bg-pink-500', textColor: 'text-pink-600', lightBg: 'bg-pink-900/30' },
+  social: { emoji: '🎉', label: 'Social', color: 'bg-orange-500', textColor: 'text-orange-600', lightBg: 'bg-orange-900/30' },
+  other: { emoji: '📌', label: 'Other', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-900/30' },
 };
 
 interface NewTaskModalProps {
@@ -201,26 +201,26 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
 
         {/* Loading Overlay for Space Creation */}
         {spaceCreationLoading && (
-          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
             <div className="text-center">
               <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">Setting up your space...</p>
+              <p className="text-sm text-gray-400">Setting up your space...</p>
             </div>
           </div>
         )}
 
         {/* Error Message */}
         {spaceError && !spaceCreationLoading && (
-          <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
             <div className="text-center max-w-sm mx-4">
-              <p className="text-red-600 dark:text-red-400 mb-4">{spaceError}</p>
+              <p className="text-red-400 mb-4">{spaceError}</p>
               <button
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Close
               </button>
@@ -247,7 +247,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Title */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Task Title *
             </label>
             <div className="relative">
@@ -257,7 +257,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Complete project report"
-                className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
               />
 
               {/* Emoji Picker Button */}
@@ -266,21 +266,21 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                   title="Add emoji"
-                  className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="p-1.5 rounded-md hover:bg-gray-700 transition-colors"
                 >
-                  <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <Smile className="w-5 h-5 text-gray-400" />
                 </button>
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-3 z-50 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+                  <div className="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-3 z-50 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
                     <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {EMOJIS.map((emoji, idx) => (
                         <button
                           key={idx}
                           type="button"
                           onClick={() => handleEmojiClick(emoji)}
-                          className="w-10 h-10 text-xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                          className="w-10 h-10 text-xl flex items-center justify-center hover:bg-gray-700 rounded-md transition-colors"
                           title="Click to add emoji"
                         >
                           {emoji}
@@ -295,7 +295,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
           {/* Description */}
           <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -303,7 +303,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this task..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
             />
           </div>
 
@@ -311,14 +311,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Priority */}
             <div className="relative z-50">
-              <label htmlFor="field-3" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-3" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Priority
               </label>
               <div className="relative">
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white relative z-50"
+                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="low">Low</option>
@@ -332,14 +332,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
             {/* Status */}
             <div className="relative z-50">
-              <label htmlFor="field-4" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-4" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Status
               </label>
               <div className="relative">
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white relative z-50"
+                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="pending">Pending</option>
@@ -357,14 +357,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Category */}
             <div className="relative z-50">
-              <label htmlFor="field-5" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-5" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Category
               </label>
               <div className="relative">
                 <select
                   value={formData.category || ''}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white relative z-50"
+                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-50"
                   style={{ position: 'relative', zIndex: 9999 }}
                 >
                   <option value="">Select category...</option>
@@ -385,7 +385,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
             {/* Due Date */}
             <div>
-              <label htmlFor="field-6" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-6" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Due Date
               </label>
               <input
@@ -409,12 +409,12 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white ${
-                  dateError ? 'border-red-500 dark:border-red-500' : 'border-gray-200/50 dark:border-gray-700/50'
+                className={`w-full px-4 py-3 bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
+                  dateError ? 'border-red-500' : 'border-gray-700/50'
                 }`}
               />
               {dateError && (
-                <p className="mt-2 text-base md:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                <p className="mt-2 text-base md:text-sm text-red-400 flex items-center gap-1">
                   <span className="font-medium">⚠</span>
                   {dateError}
                 </p>
@@ -431,14 +431,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border-2 ${
                   isRecurring
                     ? 'bg-blue-600 text-white border-blue-500'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                    : 'bg-gray-700 text-gray-300 border-gray-600'
                 }`}
               >
                 <Repeat className="w-4 h-4" />
                 <span>Repeat</span>
               </button>
               {isRecurring && (
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-gray-400">
                   Create recurring task
                 </span>
               )}
@@ -446,12 +446,12 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
             {/* Recurring Options - Collapsible */}
             {isRecurring && (
-              <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-900 rounded-lg border border-gray-700">
                 {/* Pattern and Interval Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {/* Pattern */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Pattern
                     </label>
                     <div className="relative">
@@ -462,7 +462,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                           pattern: e.target.value as any,
                           daysOfWeek: [] // Reset days when pattern changes
                         })}
-                        className="w-full pl-4 pr-12 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white appearance-none"
+                        className="w-full pl-4 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white appearance-none"
                       >
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
@@ -476,7 +476,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
 
                   {/* Interval */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Every
                     </label>
                     <input
@@ -488,7 +488,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                         ...recurringData,
                         interval: Math.max(1, parseInt(e.target.value) || 1)
                       })}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                     />
                   </div>
                 </div>
@@ -496,7 +496,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                 {/* Days of Week - Show for weekly and biweekly patterns */}
                 {(recurringData.pattern === 'weekly' || recurringData.pattern === 'biweekly') && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                    <label className="block text-sm font-medium text-gray-300 mb-2 sm:mb-3">
                       Days of Week
                     </label>
                     <div className="flex gap-1.5 sm:gap-2 flex-wrap">
@@ -513,7 +513,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                           className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all text-xs sm:text-sm font-medium border-2 ${
                             recurringData.daysOfWeek.includes(idx)
                               ? 'bg-blue-500 text-white border-blue-400'
-                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600'
+                              : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
                           }`}
                         >
                           {day}
@@ -527,11 +527,11 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>
