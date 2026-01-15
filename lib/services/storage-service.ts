@@ -70,7 +70,7 @@ function validateFile(
  */
 function generateFilePath(userId: string, fileName: string): string {
   const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 15);
+  const randomString = crypto.randomUUID();
   const extension = fileName.split('.').pop();
   return `${userId}/${timestamp}-${randomString}.${extension}`;
 }

@@ -7,6 +7,19 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Zod schema for expense updates
+const UpdateExpenseSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  amount: z.number().min(0).optional(),
+  category: z.string().max(100).optional().nullable(),
+  payment_method: z.string().max(50).optional().nullable(),
+  paid_by: z.string().uuid().optional().nullable(),
+  status: z.enum(['pending', 'paid', 'overdue']).optional(),
+  due_date: z.string().optional().nullable(),
+  recurring: z.boolean().optional(),
+}).strict();
 
 /**
  * GET /api/expenses/[id]
@@ -120,38 +133,29 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const {
-      title,
-      amount,
-      category,
-      payment_method,
-      paid_by,
-      status,
-      due_date,
-      recurring,
-    } = body;
+    const validationResult = UpdateExpenseSchema.safeParse(body);
 
-    // Prepare updates object
-    const updates: any = {};
-    if (title !== undefined) updates.title = title.trim();
-    if (amount !== undefined) {
-      const expenseAmount = Number(amount);
-      if (isNaN(expenseAmount)) {
-        return NextResponse.json(
-          { error: 'amount must be a valid number' },
-          { status: 400 }
-        );
-      }
-      updates.amount = expenseAmount;
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validationResult.error.flatten() },
+        { status: 400 }
+      );
     }
-    if (category !== undefined) updates.category = category;
-    if (payment_method !== undefined) updates.payment_method = payment_method;
-    if (paid_by !== undefined) updates.paid_by = paid_by;
-    if (status !== undefined) updates.status = status;
-    if (due_date !== undefined) updates.due_date = due_date;
-    if (recurring !== undefined) updates.recurring = recurring;
+
+    const validatedData = validationResult.data;
+
+    // Prepare updates object (only include defined fields)
+    const updates: Record<string, unknown> = {};
+    if (validatedData.title !== undefined) updates.title = validatedData.title.trim();
+    if (validatedData.amount !== undefined) updates.amount = validatedData.amount;
+    if (validatedData.category !== undefined) updates.category = validatedData.category;
+    if (validatedData.payment_method !== undefined) updates.payment_method = validatedData.payment_method;
+    if (validatedData.paid_by !== undefined) updates.paid_by = validatedData.paid_by;
+    if (validatedData.status !== undefined) updates.status = validatedData.status;
+    if (validatedData.due_date !== undefined) updates.due_date = validatedData.due_date;
+    if (validatedData.recurring !== undefined) updates.recurring = validatedData.recurring;
 
     // Get expense first to verify access
     const existingExpense = await projectsService.getExpenseById(params.id);

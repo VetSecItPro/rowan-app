@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
         })) || [];
 
       return {
-        id: `apininjas-${sanitizePlainText(recipe.title)}-${Date.now()}-${Math.random()}`,
+        id: `apininjas-${sanitizePlainText(recipe.title)}-${crypto.randomUUID()}`,
         source: 'apininjas',
         name: sanitizePlainText(recipe.title),
         servings: recipe.servings ? parseInt(recipe.servings) : undefined,
