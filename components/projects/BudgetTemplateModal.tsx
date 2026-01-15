@@ -80,7 +80,7 @@ export function BudgetTemplateModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-6xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-6xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-amber-500 to-orange-500">
             <div>
@@ -105,7 +105,7 @@ export function BudgetTemplateModal({
               {/* Left Column: Template Selection */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Monthly Income <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -117,23 +117,23 @@ export function BudgetTemplateModal({
                       value={monthlyIncome}
                       onChange={(e) => setMonthlyIncome(e.target.value)}
                       placeholder="5000"
-                      className="w-full pl-8 pr-4 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      className="w-full pl-8 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     Enter your total monthly household income
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Filter by Household Type
                   </label>
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="w-full px-4 pr-12 py-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white text-left"
+                      className="w-full px-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white text-left"
                     >
                       {householdFilter === 'all' ? 'All Templates' : householdLabels[householdFilter]}
                     </button>
@@ -148,7 +148,7 @@ export function BudgetTemplateModal({
                           className="fixed inset-0 z-40"
                           onClick={() => setIsDropdownOpen(false)}
                         />
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
                           <div className="py-2">
                             <button
                               type="button"
@@ -158,8 +158,8 @@ export function BudgetTemplateModal({
                               }}
                               className={`w-full px-4 py-3 text-left text-base flex items-center gap-3 transition-colors ${
                                 householdFilter === 'all'
-                                  ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                                  : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                                  ? 'bg-amber-900/20 text-amber-300'
+                                  : 'text-white hover:bg-gray-700'
                               }`}
                             >
                               {householdFilter === 'all' && <Check className="w-4 h-4" />}
@@ -175,8 +175,8 @@ export function BudgetTemplateModal({
                                 }}
                                 className={`w-full px-4 py-3 text-left text-base flex items-center gap-3 transition-colors ${
                                   householdFilter === key
-                                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                                    : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    ? 'bg-amber-900/20 text-amber-300'
+                                    : 'text-white hover:bg-gray-700'
                                 }`}
                               >
                                 {householdFilter === key && <Check className="w-4 h-4" />}
@@ -204,31 +204,31 @@ export function BudgetTemplateModal({
                         onClick={() => setSelectedTemplate(template)}
                         className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                           isSelected
-                            ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-700'
+                            ? 'border-amber-500 bg-amber-900/20'
+                            : 'border-gray-700 hover:border-amber-700'
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3 flex-1">
                             <span className="text-3xl">{template.icon}</span>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                              <h3 className="font-semibold text-white flex items-center gap-2">
                                 {template.name}
                                 {isSelected && <Check className="w-4 h-4 text-amber-600" />}
                               </h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-gray-400 mt-1">
                                 {template.description}
                               </p>
                               <div className="flex items-center gap-2 mt-2">
-                                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400">
+                                <span className="px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-400">
                                   {householdLabels[template.household_type]}
                                 </span>
                                 {template.recommended_income_min && template.recommended_income_max && (
                                   <span
                                     className={`px-2 py-0.5 rounded text-xs ${
                                       incomeInRange
-                                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                                        ? 'bg-green-900/30 text-green-300'
+                                        : 'bg-yellow-900/30 text-yellow-300'
                                     }`}
                                   >
                                     ${template.recommended_income_min.toLocaleString()} - ${template.recommended_income_max.toLocaleString()}/mo
@@ -245,27 +245,27 @@ export function BudgetTemplateModal({
               </div>
 
               {/* Right Column: Preview */}
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <div className="bg-gray-900 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-amber-600" />
                   Budget Preview
                 </h3>
 
                 {!selectedTemplate || !monthlyIncome ? (
-                  <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <div className="text-center py-12 text-gray-400">
                     <Info className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>Select a template and enter your monthly income to see the preview</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Total Budget</span>
+                        <span className="text-sm text-gray-400">Total Budget</span>
                         <span className="text-2xl font-bold text-amber-600">
                           ${parseFloat(monthlyIncome).toLocaleString()}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <div className="flex items-center justify-between text-xs text-gray-400">
                         <span>Total Allocated</span>
                         <span>{totalPercentage}%</span>
                       </div>
@@ -275,21 +275,21 @@ export function BudgetTemplateModal({
                       {previewCategories.map((category) => (
                         <div
                           key={category.id}
-                          className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700"
+                          className="bg-gray-800 rounded-lg p-3 border border-gray-700"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               {category.icon && <span className="text-lg">{category.icon}</span>}
-                              <span className="font-medium text-gray-900 dark:text-white text-sm">
+                              <span className="font-medium text-white text-sm">
                                 {category.category_name}
                               </span>
                             </div>
-                            <span className="font-bold text-gray-900 dark:text-white">
+                            <span className="font-bold text-white">
                               ${category.calculated_amount.toLocaleString()}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-400">
                               {category.description}
                             </span>
                             <span className="text-xs font-medium text-amber-600">
@@ -306,11 +306,11 @@ export function BudgetTemplateModal({
           </div>
 
           {/* Footer */}
-          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full transition-colors font-medium"
+              className="px-6 py-2.5 bg-gray-700 text-gray-300 hover:bg-gray-600 rounded-full transition-colors font-medium"
             >
               Cancel
             </button>

@@ -95,15 +95,15 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          <h3 className="text-lg font-medium text-white">
             Report Library
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             View and manage your generated reports
           </p>
         </div>
         <div className="mt-3 sm:mt-0 flex items-center space-x-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-400">
             {reports.length} report{reports.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -119,7 +119,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
               placeholder="Search reports..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
@@ -128,7 +128,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-blue-500 focus:ring-blue-500"
+            className="rounded-md border-gray-600 text-white text-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="all">All Status</option>
             {statuses.map(status => (
@@ -141,7 +141,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:border-blue-500 focus:ring-blue-500"
+            className="rounded-md border-gray-600 text-white text-sm focus:border-blue-500 focus:ring-blue-500"
           >
             <option value="all">All Types</option>
             {reportTypes.map(type => (
@@ -159,20 +159,20 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
           {searchQuery || selectedStatus !== 'all' || selectedType !== 'all' ? (
             <>
               <FunnelIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              <h3 className="mt-2 text-sm font-medium text-white">
                 No reports found
               </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-gray-400">
                 Try adjusting your search or filters.
               </p>
             </>
           ) : (
             <>
               <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              <h3 className="mt-2 text-sm font-medium text-white">
                 No reports yet
               </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-gray-400">
                 Generate your first report to get started.
               </p>
             </>
@@ -183,7 +183,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
           {filteredReports.map((report) => (
             <div
               key={report.id}
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-shadow"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -191,11 +191,11 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                   <div className="flex items-start gap-3">
                     <DocumentTextIcon className="h-6 w-6 text-gray-400 flex-shrink-0 mt-1" />
                     <div className="flex-1">
-                      <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+                      <h4 className="text-lg font-medium text-white">
                         {report.title}
                       </h4>
                       {report.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-sm text-gray-400 mt-1">
                           {report.description}
                         </p>
                       )}
@@ -209,7 +209,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                   </div>
 
                   {/* Metadata */}
-                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-400">
                     <div className="flex items-center gap-1">
                       <CalendarIcon className="h-4 w-4" />
                       {new Date(report.date_range_start).toLocaleDateString()} - {new Date(report.date_range_end).toLocaleDateString()}
@@ -232,22 +232,22 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                   {/* Status and Stats */}
                   <div className="flex items-center gap-4 mt-3">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      report.status === 'generated' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
-                      report.status === 'generating' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
-                      report.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                      report.status === 'generated' ? 'bg-green-100 bg-green-900/20 text-green-400' :
+                      report.status === 'generating' ? 'bg-yellow-100 bg-yellow-900/20 text-yellow-400' :
+                      report.status === 'failed' ? 'bg-red-100 bg-red-900/20 text-red-400' :
+                      'bg-gray-100 bg-gray-900/20 text-gray-400'
                     }`}>
                       {report.status}
                     </span>
 
                     {report.view_count > 0 && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-gray-400">
                         {report.view_count} view{report.view_count !== 1 ? 's' : ''}
                       </span>
                     )}
 
                     {report.download_count > 0 && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-gray-400">
                         {report.download_count} download{report.download_count !== 1 ? 's' : ''}
                       </span>
                     )}
@@ -258,7 +258,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                 <div className="flex items-center gap-2 ml-4">
                   <button
                     onClick={() => onViewReport(report)}
-                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     <EyeIcon className="h-4 w-4 mr-1" />
                     View
@@ -268,7 +268,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                     <button
                       onClick={() => handleDownload(report)}
                       disabled={loading === report.id}
-                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                      className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                     >
                       <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
                       {loading === report.id ? 'Downloading...' : 'Download'}
@@ -278,7 +278,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                   <button
                     onClick={() => handleDelete(report)}
                     disabled={loading === report.id}
-                    className="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 shadow-sm text-sm font-medium rounded-md text-red-700 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                    className="inline-flex items-center px-3 py-1.5 border border-red-600 shadow-sm text-sm font-medium rounded-md text-red-400 bg-gray-700 hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                   >
                     <TrashIcon className="h-4 w-4 mr-1" />
                     Delete

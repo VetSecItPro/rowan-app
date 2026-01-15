@@ -26,11 +26,11 @@ export default function CompletionRateChart({
 
   if (total === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">
           Goal Status Distribution
         </h3>
-        <div className="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-center h-64 text-gray-400">
           No goals data available
         </div>
       </div>
@@ -38,8 +38,8 @@ export default function CompletionRateChart({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+      <h3 className="text-lg font-semibold text-white mb-4">
         Goal Status Distribution
       </h3>
       <ResponsiveContainer width="100%" height={300}>
@@ -83,11 +83,11 @@ export default function CompletionRateChart({
                 className="w-3 h-3 rounded-full mr-2"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-gray-400">
                 {item.name}
               </span>
             </div>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            <span className="text-sm font-semibold text-white">
               {item.value}
             </span>
           </div>

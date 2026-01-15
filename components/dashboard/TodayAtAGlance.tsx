@@ -61,8 +61,8 @@ const PriorityBadge = memo(function PriorityBadge({ priority }: { priority?: str
   if (!priority || priority === 'low' || priority === 'medium') return null;
 
   const colors = {
-    high: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
-    urgent: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+    high: 'bg-orange-100 bg-orange-900/30 text-orange-300',
+    urgent: 'bg-red-100 bg-red-900/30 text-red-300'
   };
 
   return (
@@ -83,7 +83,7 @@ const MealTypeIcon = memo(function MealTypeIcon({ type }: { type: string }) {
 
   const config = icons[type] || icons.snack;
   return (
-    <span className="text-orange-600 dark:text-orange-400" title={config.label}>
+    <span className="text-orange-400" title={config.label}>
       {config.icon}
     </span>
   );
@@ -108,10 +108,10 @@ const Section = memo(function Section({
   isEmpty: boolean;
 }) {
   const colorClasses: Record<string, string> = {
-    purple: 'text-purple-600 dark:text-purple-400',
-    blue: 'text-blue-600 dark:text-blue-400',
-    orange: 'text-orange-600 dark:text-orange-400',
-    pink: 'text-pink-600 dark:text-pink-400'
+    purple: 'text-purple-400',
+    blue: 'text-blue-400',
+    orange: 'text-orange-400',
+    pink: 'text-pink-400'
   };
 
   const spotlightColors: Record<string, string> = {
@@ -123,25 +123,25 @@ const Section = memo(function Section({
 
   return (
     <SpotlightCard
-      className="flex flex-col h-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-0"
+      className="flex flex-col h-full bg-gray-800/50 backdrop-blur-sm border-0"
       spotlightColor={spotlightColors[color]}
     >
       <div className="p-4 flex flex-col h-full">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className={colorClasses[color]}>{icon}</span>
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+            <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
               {title}
             </h4>
             {count > 0 && (
-              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold bg-gray-800 text-gray-300`}>
                 {count}
               </span>
             )}
           </div>
           <Link
             href={href}
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-0.5"
+            className="text-xs text-gray-400 hover:text-gray-200 flex items-center gap-0.5"
           >
             View all
             <ChevronRight className="w-3 h-3" />
@@ -149,7 +149,7 @@ const Section = memo(function Section({
         </div>
         <div className="flex-1 space-y-1.5">
           {isEmpty ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500 italic py-2">
+            <p className="text-sm text-gray-500 italic py-2">
               Nothing scheduled
             </p>
           ) : (
@@ -166,16 +166,16 @@ const EventItem = memo(function EventItem({ event }: { event: CalendarEvent }) {
   const startTime = parseISO(event.start_time);
 
   return (
-    <div className="flex items-start gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-      <span className="text-xs font-medium text-purple-600 dark:text-purple-400 min-w-[52px]">
+    <div className="flex items-start gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors">
+      <span className="text-xs font-medium text-purple-400 min-w-[52px]">
         {format(startTime, 'h:mm a')}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
+        <p className="text-sm text-gray-200 truncate">
           {event.title}
         </p>
         {event.location && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 truncate">
+          <p className="text-xs text-gray-400 flex items-center gap-1 truncate">
             <MapPin className="w-3 h-3" />
             {event.location}
           </p>
@@ -188,17 +188,17 @@ const EventItem = memo(function EventItem({ event }: { event: CalendarEvent }) {
 // Task item component
 const TaskItem = memo(function TaskItem({ task, isOverdue }: { task: Task; isOverdue?: boolean }) {
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
+    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
       }`}>
       <PriorityBadge priority={task.priority} />
       <p className={`text-sm flex-1 truncate ${isOverdue
-        ? 'text-red-700 dark:text-red-400'
-        : 'text-gray-800 dark:text-gray-200'
+        ? 'text-red-400'
+        : 'text-gray-200'
         }`}>
         {task.title}
       </p>
       {task.due_date && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-gray-400">
           {format(parseISO(task.due_date), 'h:mm a')}
         </span>
       )}
@@ -211,12 +211,12 @@ const MealItem = memo(function MealItem({ meal }: { meal: Meal }) {
   const mealName = meal.name || meal.recipe?.name || 'Unnamed meal';
 
   return (
-    <div className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+    <div className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors">
       <MealTypeIcon type={meal.meal_type} />
-      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 capitalize min-w-[60px]">
+      <span className="text-xs font-medium text-gray-400 capitalize min-w-[60px]">
         {meal.meal_type}
       </span>
-      <p className="text-sm text-gray-800 dark:text-gray-200 flex-1 truncate">
+      <p className="text-sm text-gray-200 flex-1 truncate">
         {mealName}
       </p>
     </div>
@@ -229,17 +229,17 @@ const ReminderItem = memo(function ReminderItem({ reminder, isOverdue }: { remin
   const remindAt = reminder.remind_at || reminder.reminder_time;
 
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
+    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
       }`}>
       {reminder.emoji && <span className="text-sm">{reminder.emoji}</span>}
       <p className={`text-sm flex-1 truncate ${isOverdue
-        ? 'text-red-700 dark:text-red-400'
-        : 'text-gray-800 dark:text-gray-200'
+        ? 'text-red-400'
+        : 'text-gray-200'
         }`}>
         {reminder.title}
       </p>
       {remindAt && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-gray-400">
           {format(parseISO(remindAt), 'h:mm a')}
         </span>
       )}
@@ -262,11 +262,11 @@ const OverdueSection = memo(function OverdueSection({
   return (
     <motion.div
       variants={itemVariants}
-      className="col-span-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4"
+      className="col-span-full bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4"
     >
       <div className="flex items-center gap-2 mb-2">
-        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-        <h4 className="text-sm font-semibold text-red-700 dark:text-red-300">
+        <AlertCircle className="w-4 h-4 text-red-400" />
+        <h4 className="text-sm font-semibold text-red-300">
           Overdue ({totalOverdue})
         </h4>
       </div>
@@ -278,7 +278,7 @@ const OverdueSection = memo(function OverdueSection({
           <ReminderItem key={reminder.id} reminder={reminder} isOverdue />
         ))}
         {totalOverdue > 6 && (
-          <p className="text-xs text-red-600 dark:text-red-400 col-span-full">
+          <p className="text-xs text-red-400 col-span-full">
             +{totalOverdue - 6} more overdue items
           </p>
         )}
@@ -388,9 +388,9 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
 
   if (loading) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}>
+      <div className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 overflow-hidden ${className}`}>
         {/* Header Skeleton */}
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700/50">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Skeleton className="w-10 h-10 rounded-full" />
@@ -409,7 +409,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
         {/* Grid Skeleton */}
         <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-48 rounded-3xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-4 space-y-4">
+            <div key={i} className="h-48 rounded-3xl border border-gray-800 bg-gray-900/50 p-4 space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                   <Skeleton className="w-5 h-5 rounded" />
@@ -431,7 +431,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
 
   if (error) {
     return (
-      <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+      <div className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 p-6 ${className}`}>
         <div className="flex items-center justify-center py-8 text-red-500">
           <AlertCircle className="w-5 h-5 mr-2" />
           {error}
@@ -455,20 +455,20 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}
+      className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 overflow-hidden ${className}`}
     >
       {/* Header */}
-      <div className="px-4 sm:px-6 py-4 border-b border-teal-100 dark:border-teal-800/50 bg-gradient-to-r from-teal-100 via-cyan-100 to-sky-100 dark:from-teal-900/40 dark:via-cyan-900/40 dark:to-sky-900/40">
+      <div className="px-4 sm:px-6 py-4 border-b border-teal-800/50 bg-gradient-to-r from-teal-100 via-cyan-100 from-teal-900/40 to-sky-900/40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-              <Sun className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+            <div className="w-10 h-10 rounded-full bg-teal-900/30 flex items-center justify-center">
+              <Sun className="w-5 h-5 text-teal-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Today at a Glance
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 {format(new Date(), 'EEEE, MMMM d, yyyy')}
               </p>
             </div>
@@ -482,7 +482,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
               display="header"
             />
             {/* Time */}
-            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 border-l border-gray-200 dark:border-gray-700 pl-4">
+            <div className="flex items-center gap-1.5 text-sm text-gray-400 border-l border-gray-700 pl-4">
               <Clock className="w-4 h-4" />
               <span className="font-medium">{format(new Date(), 'h:mm a')}</span>
             </div>
@@ -494,13 +494,13 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
       <div className="p-4 sm:p-6">
         {!hasAnyContent ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-              <Calendar className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
+              <Calendar className="w-8 h-8 text-gray-500" />
             </div>
-            <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <h4 className="text-lg font-medium text-gray-300 mb-1">
               Your day is clear!
             </h4>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-400">
               No events, tasks, or meals scheduled for today.
             </p>
           </div>
@@ -528,7 +528,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
                     <EventItem key={event.id} event={event} />
                   ))}
                   {data.events.length > 4 && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                    <p className="text-xs text-gray-400 pt-1">
                       +{data.events.length - 4} more events
                     </p>
                   )}
@@ -549,7 +549,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
                     <TaskItem key={task.id} task={task} />
                   ))}
                   {data.tasks.length > 4 && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                    <p className="text-xs text-gray-400 pt-1">
                       +{data.tasks.length - 4} more tasks
                     </p>
                   )}
@@ -586,7 +586,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
                     <ReminderItem key={reminder.id} reminder={reminder} />
                   ))}
                   {data.reminders.length > 4 && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                    <p className="text-xs text-gray-400 pt-1">
                       +{data.reminders.length - 4} more reminders
                     </p>
                   )}

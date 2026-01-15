@@ -109,24 +109,24 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-gray-800 border-t border-gray-700 shadow-lg pb-safe">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
+              <span className="text-sm font-medium text-white">
                 {selectedTaskIds.length} task{selectedTaskIds.length !== 1 ? 's' : ''} selected
               </span>
               <button
                 onClick={onClearSelection}
-                className="btn-touch p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors active:scale-95 rounded"
+                className="btn-touch p-1 text-gray-400 hover:text-gray-300 transition-colors active:scale-95 rounded"
                 title="Clear selection"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+            <div className="h-6 w-px bg-gray-600" />
 
             <div className="flex items-center gap-3 sm:gap-2">
               {/* Quick Actions */}
@@ -153,7 +153,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
               <div className="relative">
                 <button
                   onClick={() => setShowMoreActions(!showMoreActions)}
-                  className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors active:scale-95"
+                  className="btn-touch flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors active:scale-95"
                 >
                   <MoreHorizontal className="w-4 h-4" />
                   More
@@ -165,10 +165,10 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                       className="fixed inset-0 z-10"
                       onClick={() => setShowMoreActions(false)}
                     />
-                    <div className="absolute bottom-full mb-2 left-0 w-56 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+                    <div className="absolute bottom-full mb-2 left-0 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                       {/* Status Options */}
-                      <div className="p-2 border-b border-gray-200 dark:border-gray-700">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
+                      <div className="p-2 border-b border-gray-700">
+                        <p className="text-xs font-medium text-gray-400 px-2 py-1">
                           Set Status
                         </p>
                         <button
@@ -176,7 +176,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdateStatus('in-progress');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded transition-colors"
                         >
                           In Progress
                         </button>
@@ -185,7 +185,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdateStatus('blocked');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded transition-colors"
                         >
                           Blocked
                         </button>
@@ -194,7 +194,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdateStatus('on-hold');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded transition-colors"
                         >
                           On Hold
                         </button>
@@ -202,7 +202,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
 
                       {/* Priority Options */}
                       <div className="p-2">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
+                        <p className="text-xs font-medium text-gray-400 px-2 py-1">
                           Set Priority
                         </p>
                         <button
@@ -210,7 +210,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('urgent');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           Urgent
@@ -220,7 +220,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('high');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-orange-600 hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           High
@@ -230,7 +230,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('medium');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-yellow-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-yellow-600 hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           Medium
@@ -240,7 +240,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                             bulkUpdatePriority('low');
                             setShowMoreActions(false);
                           }}
-                          className="btn-touch w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                          className="btn-touch w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-gray-700 rounded transition-colors"
                         >
                           <AlertCircle className="w-3 h-3 inline mr-2" />
                           Low
@@ -253,7 +253,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
             </div>
           </div>
 
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-400">
             {loading ? 'Processing...' : 'Select tasks to perform bulk actions'}
           </div>
         </div>

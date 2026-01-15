@@ -82,11 +82,11 @@ const KPICard = memo(function KPICard({
   const isPositive = trend !== undefined && trend >= 0;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+    <div className="bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-700">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{value}</p>
+          <p className="text-sm font-medium text-gray-400">{title}</p>
+          <p className="text-3xl font-bold text-white mt-2">{value}</p>
           {trend !== undefined && (
             <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
               {isPositive ? (
@@ -95,7 +95,7 @@ const KPICard = memo(function KPICard({
                 <ArrowDownRight className="w-4 h-4" />
               )}
               <span>{Math.abs(trend)}%</span>
-              {trendLabel && <span className="text-gray-500 dark:text-gray-400">{trendLabel}</span>}
+              {trendLabel && <span className="text-gray-400">{trendLabel}</span>}
             </div>
           )}
         </div>
@@ -116,9 +116,9 @@ const HealthStatus = memo(function HealthStatus({
   uptime: number;
 }) {
   const statusConfig = {
-    healthy: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30', label: 'All Systems Operational' },
-    degraded: { icon: AlertCircle, color: 'text-yellow-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30', label: 'Degraded Performance' },
-    down: { icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', label: 'System Issues' },
+    healthy: { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-900/30', label: 'All Systems Operational' },
+    degraded: { icon: AlertCircle, color: 'text-yellow-500', bg: 'bg-yellow-900/30', label: 'Degraded Performance' },
+    down: { icon: AlertCircle, color: 'text-red-500', bg: 'bg-red-900/30', label: 'System Issues' },
   };
 
   const config = statusConfig[status];
@@ -130,11 +130,11 @@ const HealthStatus = memo(function HealthStatus({
         <StatusIcon className={`w-6 h-6 ${config.color}`} />
         <div>
           <p className={`font-medium ${config.color}`}>{config.label}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Uptime: {uptime}%</p>
+          <p className="text-sm text-gray-400">Uptime: {uptime}%</p>
         </div>
       </div>
       <div className="text-right">
-        <p className="text-2xl font-bold text-gray-900 dark:text-white">{uptime}%</p>
+        <p className="text-2xl font-bold text-white">{uptime}%</p>
         <p className="text-xs text-gray-500">Last 30 days</p>
       </div>
     </div>
@@ -152,9 +152,9 @@ const QuickStat = memo(function QuickStat({
   subValue?: string;
 }) {
   return (
-    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-      <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+    <div className="text-center p-3 bg-gray-800 rounded-lg">
+      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-xs text-gray-400">{label}</p>
       {subValue && <p className="text-xs text-gray-400 mt-0.5">{subValue}</p>}
     </div>
   );
@@ -192,7 +192,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <span className="ml-3 text-sm text-gray-600 dark:text-gray-400">Loading overview...</span>
+        <span className="ml-3 text-sm text-gray-400">Loading overview...</span>
       </div>
     );
   }
@@ -211,7 +211,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
 
       {/* Primary KPIs */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Key Metrics</h3>
+        <h3 className="text-sm font-semibold text-gray-300 mb-3">Key Metrics</h3>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Total Users"
@@ -244,7 +244,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
 
       {/* Secondary Metrics Grid */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Growth & Acquisition</h3>
+        <h3 className="text-sm font-semibold text-gray-300 mb-3">Growth & Acquisition</h3>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           <QuickStat label="Beta Requests" value={stats.betaRequests || 0} />
           <QuickStat label="Codes Sent" value={stats.codesSent || 0} />
@@ -279,26 +279,26 @@ export const OverviewPanel = memo(function OverviewPanel() {
 
       {/* Quick Actions / What to Look At */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Quick Navigation</h3>
+        <h3 className="text-sm font-semibold text-gray-300 mb-3">Quick Navigation</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
             <TrendingUp className="w-5 h-5 text-green-500 mb-2" />
-            <p className="text-sm font-medium text-gray-900 dark:text-white">Growth</p>
+            <p className="text-sm font-medium text-white">Growth</p>
             <p className="text-xs text-gray-500">View acquisition funnel</p>
           </button>
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
             <Activity className="w-5 h-5 text-cyan-500 mb-2" />
-            <p className="text-sm font-medium text-gray-900 dark:text-white">Engagement</p>
+            <p className="text-sm font-medium text-white">Engagement</p>
             <p className="text-xs text-gray-500">See user activity</p>
           </button>
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
             <UserCheck className="w-5 h-5 text-purple-500 mb-2" />
-            <p className="text-sm font-medium text-gray-900 dark:text-white">Retention</p>
+            <p className="text-sm font-medium text-white">Retention</p>
             <p className="text-xs text-gray-500">Check cohort data</p>
           </button>
-          <button className="p-4 bg-gray-50 dark:bg-gray-800 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left">
+          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
             <DollarSign className="w-5 h-5 text-orange-500 mb-2" />
-            <p className="text-sm font-medium text-gray-900 dark:text-white">Revenue</p>
+            <p className="text-sm font-medium text-white">Revenue</p>
             <p className="text-xs text-gray-500">View MRR trends</p>
           </button>
         </div>

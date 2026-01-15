@@ -112,66 +112,66 @@ export function ProjectLineItems({
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Calculator className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Estimated Total</span>
+            <Calculator className="w-4 h-4 text-blue-400" />
+            <span className="text-sm font-medium text-blue-300">Estimated Total</span>
           </div>
-          <p className="text-xl font-bold text-blue-900 dark:text-blue-100">
+          <p className="text-xl font-bold text-blue-100">
             ${totalEstimated.toLocaleString()}
           </p>
         </div>
 
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+        <div className="bg-green-900/20 border border-green-800 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="text-sm font-medium text-green-700 dark:text-green-300">Paid</span>
+            <CheckCircle className="w-4 h-4 text-green-400" />
+            <span className="text-sm font-medium text-green-300">Paid</span>
           </div>
-          <p className="text-xl font-bold text-green-900 dark:text-green-100">
+          <p className="text-xl font-bold text-green-100">
             ${totalPaid.toLocaleString()}
           </p>
         </div>
 
-        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
+        <div className="bg-orange-900/20 border border-orange-800 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-            <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Unpaid</span>
+            <Clock className="w-4 h-4 text-orange-400" />
+            <span className="text-sm font-medium text-orange-300">Unpaid</span>
           </div>
-          <p className="text-xl font-bold text-orange-900 dark:text-orange-100">
+          <p className="text-xl font-bold text-orange-100">
             ${totalUnpaid.toLocaleString()}
           </p>
         </div>
 
         <div className={`border rounded-xl p-4 ${
           variance >= 0
-            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+            ? 'bg-green-900/20 border-green-800'
+            : 'bg-red-900/20 border-red-800'
         }`}>
           <div className="flex items-center gap-2 mb-2">
             {variance >= 0 ? (
-              <TrendingDown className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <TrendingDown className="w-4 h-4 text-green-400" />
             ) : (
-              <TrendingUp className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <TrendingUp className="w-4 h-4 text-red-400" />
             )}
             <span className={`text-sm font-medium ${
               variance >= 0
-                ? 'text-green-700 dark:text-green-300'
-                : 'text-red-700 dark:text-red-300'
+                ? 'text-green-300'
+                : 'text-red-300'
             }`}>
               Variance
             </span>
           </div>
           <p className={`text-xl font-bold ${
             variance >= 0
-              ? 'text-green-900 dark:text-green-100'
-              : 'text-red-900 dark:text-red-100'
+              ? 'text-green-100'
+              : 'text-red-100'
           }`}>
             {variance >= 0 ? '-' : '+'}${Math.abs(variance).toLocaleString()}
           </p>
           <p className={`text-xs ${
             variance >= 0
-              ? 'text-green-600 dark:text-green-400'
-              : 'text-red-600 dark:text-red-400'
+              ? 'text-green-400'
+              : 'text-red-400'
           }`}>
             {variancePercentage.toFixed(1)}% {variance >= 0 ? 'under' : 'over'}
           </p>
@@ -184,7 +184,7 @@ export function ProjectLineItems({
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+            className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm"
           >
             <option value="all">All Categories</option>
             {categories.map((category) => (
@@ -197,7 +197,7 @@ export function ProjectLineItems({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'category' | 'cost' | 'date')}
-            className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
+            className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm"
           >
             <option value="category">Sort by Category</option>
             <option value="cost">Sort by Cost</option>
@@ -206,7 +206,7 @@ export function ProjectLineItems({
 
           <button
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm hover:bg-gray-600 transition-colors"
           >
             {sortOrder === 'asc' ? '↑' : '↓'} {sortOrder.toUpperCase()}
           </button>
@@ -223,27 +223,27 @@ export function ProjectLineItems({
 
       {/* Cost Breakdown by Category */}
       {costBreakdown.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">
             Cost Breakdown by Category
           </h3>
           <div className="space-y-3">
             {costBreakdown.map((category) => (
-              <div key={category.category} className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded-lg">
+              <div key={category.category} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Package className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <Package className="w-4 h-4 text-gray-400" />
+                  <span className="font-medium text-white">
                     {category.category}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-gray-400">
                     ({category.item_count} items)
                   </span>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-gray-900 dark:text-white">
+                  <div className="text-lg font-bold text-white">
                     ${category.total_actual.toLocaleString()}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-400">
                     Est: ${category.total_estimated.toLocaleString()}
                   </div>
                 </div>
@@ -254,13 +254,13 @@ export function ProjectLineItems({
       )}
 
       {/* Line Items List */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 border border-gray-700 rounded-xl">
+        <div className="p-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               Line Items
             </h3>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-gray-400">
               {sortedItems.length} of {lineItems.length} items
             </span>
           </div>
@@ -269,7 +269,7 @@ export function ProjectLineItems({
         {sortedItems.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-gray-400 mb-2">
               {selectedCategory === 'all' ? 'No line items yet' : `No items in ${selectedCategory}`}
             </p>
             <button
@@ -280,29 +280,29 @@ export function ProjectLineItems({
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="divide-y divide-gray-700">
             {sortedItems.map((item) => (
-              <div key={item.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div key={item.id} className="p-6 hover:bg-gray-700 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className={`p-2 rounded-lg ${
                         item.is_paid
-                          ? 'bg-green-100 dark:bg-green-900/30'
-                          : 'bg-orange-100 dark:bg-orange-900/30'
+                          ? 'bg-green-900/30'
+                          : 'bg-orange-900/30'
                       }`}>
                         {item.is_paid ? (
-                          <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          <CheckCircle className="w-4 h-4 text-green-400" />
                         ) : (
-                          <Clock className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                          <Clock className="w-4 h-4 text-orange-400" />
                         )}
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900 dark:text-white">
+                        <h4 className="font-medium text-white">
                           {item.description}
                         </h4>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                          <span className="px-2 py-1 bg-gray-700 rounded text-xs">
                             {item.category}
                           </span>
                           {item.quantity > 1 && (
@@ -316,7 +316,7 @@ export function ProjectLineItems({
                     </div>
 
                     {item.notes && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 ml-11">
+                      <p className="text-sm text-gray-400 mt-2 ml-11">
                         {item.notes}
                       </p>
                     )}
@@ -324,16 +324,16 @@ export function ProjectLineItems({
 
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                      <div className="text-lg font-bold text-white">
                         ${item.actual_cost > 0 ? item.actual_cost.toFixed(2) : item.estimated_cost.toFixed(2)}
                       </div>
                       {item.actual_cost > 0 && item.actual_cost !== item.estimated_cost && (
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-gray-400">
                           Est: ${item.estimated_cost.toFixed(2)}
                         </div>
                       )}
                       {item.is_paid && item.paid_date && (
-                        <div className="text-xs text-green-600 dark:text-green-400">
+                        <div className="text-xs text-green-400">
                           Paid {format(parseISO(item.paid_date), 'MMM d')}
                         </div>
                       )}
@@ -343,7 +343,7 @@ export function ProjectLineItems({
                       {!item.is_paid && (
                         <button
                           onClick={() => handleMarkPaid(item.id)}
-                          className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+                          className="p-2 text-green-400 hover:bg-green-900/30 rounded-lg transition-colors"
                           title="Mark as paid"
                         >
                           <CheckCircle className="w-4 h-4" />
@@ -351,14 +351,14 @@ export function ProjectLineItems({
                       )}
                       <button
                         onClick={() => handleEditItem(item)}
-                        className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="p-2 text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
                         title="Edit item"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteItem(item.id)}
-                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                        className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
                         title="Delete item"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -374,14 +374,14 @@ export function ProjectLineItems({
 
       {/* Variance Alert */}
       {variance < 0 && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+        <div className="bg-red-900/20 border border-red-800 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-medium text-red-900 dark:text-red-100 mb-1">
+              <h4 className="font-medium text-red-100 mb-1">
                 Project Over Budget
               </h4>
-              <p className="text-sm text-red-800 dark:text-red-200">
+              <p className="text-sm text-red-200">
                 This project is ${Math.abs(variance).toLocaleString()} ({Math.abs(variancePercentage).toFixed(1)}%) over the estimated budget.
                 Consider reviewing line items or adjusting the project scope.
               </p>

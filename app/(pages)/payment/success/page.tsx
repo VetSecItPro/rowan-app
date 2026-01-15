@@ -39,7 +39,7 @@ export default function PaymentSuccessPage() {
   const periodLabel = period === 'annual' ? 'annual' : 'monthly';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white dark:from-gray-900 dark:to-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 from-gray-900 to-gray-950 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -61,7 +61,7 @@ export default function PaymentSuccessPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+          className="text-3xl font-bold text-white mb-2"
         >
           Welcome to Rowan {tierName}!
         </motion.h1>
@@ -71,7 +71,7 @@ export default function PaymentSuccessPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-gray-600 dark:text-gray-400 mb-8"
+          className="text-gray-400 mb-8"
         >
           Your {periodLabel} subscription is now active. You have full access to all {tierName} features.
         </motion.p>
@@ -81,13 +81,13 @@ export default function PaymentSuccessPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg mb-8 text-left"
+          className="bg-gray-800 rounded-xl p-6 shadow-lg mb-8 text-left"
         >
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-emerald-500" />
-            <span className="font-semibold text-gray-900 dark:text-white">What's unlocked:</span>
+            <span className="font-semibold text-white">What's unlocked:</span>
           </div>
-          <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+          <ul className="space-y-2 text-sm text-gray-400">
             <li className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
               <span>Unlimited tasks & calendar events</span>
@@ -134,7 +134,7 @@ export default function PaymentSuccessPage() {
             <ArrowRight className="h-4 w-4" />
           </Link>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2">
+          <p className="text-sm text-gray-400 flex items-center justify-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Redirecting in {countdown} seconds...
           </p>
@@ -145,7 +145,7 @@ export default function PaymentSuccessPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-6 text-xs text-gray-400 dark:text-gray-500"
+          className="mt-6 text-xs text-gray-500"
         >
           A receipt has been sent to your email address.
         </motion.p>

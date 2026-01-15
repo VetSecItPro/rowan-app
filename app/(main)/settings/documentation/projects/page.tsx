@@ -252,13 +252,13 @@ const guideSections: GuideSection[] = [
 
 export default function ProjectsDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-cyan-50/30 to-blue-50/30 dark:from-gray-950 dark:via-cyan-950/20 dark:to-blue-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-cyan-50/30 from-gray-950 to-blue-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
             <Link
               href="/settings/documentation"
-              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-400 hover:text-white transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Documentation
@@ -267,10 +267,10 @@ export default function ProjectsDocumentationPage() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <FolderOpen className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
                 Projects & Budgets
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
                 Master project management with comprehensive budget tracking and vendor management
               </p>
             </div>
@@ -281,7 +281,7 @@ export default function ProjectsDocumentationPage() {
             {guideSections.map((section) => {
               const Icon = section.icon;
               return (
-                <div key={section.title} className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
+                <div key={section.title} className="bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
                   {/* Section Header */}
                   <div className={`p-8 bg-gradient-to-r ${section.color} text-white`}>
                     <div className="flex items-center gap-4">
@@ -302,16 +302,16 @@ export default function ProjectsDocumentationPage() {
                         <a
                           key={article.title}
                           href={article.href}
-                          className="group p-6 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-cyan-300 dark:hover:border-cyan-600 transition-all duration-200 hover:-translate-y-1"
+                          className="group p-6 bg-gray-800 rounded-2xl border border-gray-700 hover:shadow-lg hover:border-cyan-600 transition-all duration-200 hover:-translate-y-1"
                         >
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                          <h3 className="font-semibold text-white mb-3 group-hover:text-cyan-400 transition-colors">
                             {article.title}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+                          <p className="text-sm text-gray-400 mb-4 leading-relaxed">
                             {article.description}
                           </p>
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+                            <span className="text-cyan-400 font-medium">
                               {article.readTime}
                             </span>
                             <Clock className="w-3 h-3 text-gray-400" />
@@ -326,9 +326,9 @@ export default function ProjectsDocumentationPage() {
           </div>
 
           {/* Pro Tips */}
-          <div className="mt-12 p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl border border-green-200 dark:border-green-800">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">💡 Pro Tips</h3>
-            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+          <div className="mt-12 p-6 bg-gradient-to-br from-green-50 from-green-900/20 to-green-800/20 rounded-2xl border border-green-800">
+            <h3 className="text-lg font-semibold text-white mb-4">💡 Pro Tips</h3>
+            <div className="space-y-3 text-sm text-gray-300">
               <div className="flex items-start gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
                 <p><strong>Start with planning:</strong> Spend time in the planning phase to define clear scope and realistic budgets</p>
@@ -357,27 +357,27 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
                   <FolderOpen className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Understanding Project Management</h2>
+                <h2 className="text-2xl font-bold text-white">Understanding Project Management</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Projects in Rowan help you manage large undertakings that have defined budgets, timelines, and multiple expenses. Unlike simple expense tracking, projects give you a comprehensive view of your spending against planned budgets.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">When to Use Projects</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">When to Use Projects</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Home Renovations:</strong> Kitchen remodels, bathroom upgrades, landscaping</li>
                   <li><strong>Events:</strong> Weddings, birthday parties, holiday gatherings</li>
                   <li><strong>Travel:</strong> Vacation planning with flights, hotels, activities</li>
                   <li><strong>Large Purchases:</strong> New car, furniture, appliances</li>
                   <li><strong>Home Improvement:</strong> DIY projects, repairs, upgrades</li>
                 </ul>
-                <div className="mt-6 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-200 dark:border-cyan-800">
-                  <p className="text-sm text-cyan-800 dark:text-cyan-200">
+                <div className="mt-6 p-4 bg-cyan-900/20 rounded-xl border border-cyan-800">
+                  <p className="text-sm text-cyan-200">
                     <strong>Pro Tip:</strong> If something has a budget and multiple expenses spread over time, it's a good candidate for a project rather than just expense tracking.
                   </p>
                 </div>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -387,14 +387,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
                   <Target className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Creating Your First Project</h2>
+                <h2 className="text-2xl font-bold text-white">Creating Your First Project</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Setting up your first project is straightforward. Here's what you need to get started.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Step-by-Step Guide</h3>
-                <ol className="list-decimal list-inside space-y-3 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Step-by-Step Guide</h3>
+                <ol className="list-decimal list-inside space-y-3 text-gray-400">
                   <li>Navigate to <strong>Projects</strong> from the main navigation</li>
                   <li>Tap <strong>+ New Project</strong></li>
                   <li>Enter a descriptive project name (e.g., "Kitchen Renovation 2024")</li>
@@ -404,8 +404,8 @@ export default function ProjectsDocumentationPage() {
                   <li>Add any initial notes or description</li>
                   <li>Tap <strong>Create Project</strong></li>
                 </ol>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Essential Project Fields</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Essential Project Fields</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Project Name:</strong> Make it specific and searchable</li>
                   <li><strong>Budget:</strong> Your total planned spending</li>
                   <li><strong>Timeline:</strong> Start and end dates</li>
@@ -413,7 +413,7 @@ export default function ProjectsDocumentationPage() {
                   <li><strong>Status:</strong> Planning, In Progress, Completed, On Hold</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -423,28 +423,28 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project vs Budget Tracking</h2>
+                <h2 className="text-2xl font-bold text-white">Project vs Budget Tracking</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Understanding when to use Projects versus regular budget tracking helps you get the most out of Rowan.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Use Projects When:</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Use Projects When:</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>You have a specific, time-bound goal with a defined budget</li>
                   <li>Multiple expenses will contribute to one objective</li>
                   <li>You need to track budget vs actual spending in real-time</li>
                   <li>You're working with vendors or contractors</li>
                   <li>You want to archive completed work for future reference</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Use Regular Budgets When:</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Use Regular Budgets When:</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Tracking ongoing monthly expenses (groceries, utilities)</li>
                   <li>Managing recurring spending without a specific end goal</li>
                   <li>You want category-based spending limits</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -455,25 +455,25 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <Target className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Status Tracking</h2>
+                <h2 className="text-2xl font-bold text-white">Project Status Tracking</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Project statuses help you track progress and filter your project list effectively.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Available Statuses</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Available Statuses</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Planning:</strong> Project is being defined, budget not yet finalized</li>
                   <li><strong>In Progress:</strong> Active work is happening, expenses being tracked</li>
                   <li><strong>On Hold:</strong> Temporarily paused, budget frozen</li>
                   <li><strong>Completed:</strong> Project finished, archived for records</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">When to Change Status</h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">When to Change Status</h3>
+                <p className="text-gray-400">
                   Update status as your project progresses. This helps with filtering, reporting, and understanding which projects need attention. Completed projects are archived but still accessible for budget analysis.
                 </p>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -483,14 +483,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <FolderOpen className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Categories</h2>
+                <h2 className="text-2xl font-bold text-white">Project Categories</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Organize projects by category to make filtering and reporting easier.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Default Categories</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Default Categories</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-gray-400">
                   <div>• Home Improvement</div>
                   <div>• Renovation</div>
                   <div>• Travel & Vacation</div>
@@ -502,7 +502,7 @@ export default function ProjectsDocumentationPage() {
                   <div>• Other</div>
                 </div>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -512,27 +512,27 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Timeline Management</h2>
+                <h2 className="text-2xl font-bold text-white">Project Timeline Management</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Setting realistic timelines helps you plan expenses and track progress effectively.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Timeline Elements</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Timeline Elements</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Start Date:</strong> When the project begins (can be in the future for planning)</li>
                   <li><strong>Target End Date:</strong> Your goal completion date</li>
                   <li><strong>Actual End Date:</strong> When the project was actually completed</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Timeline Best Practices</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Timeline Best Practices</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Add buffer time for unexpected delays</li>
                   <li>Consider vendor lead times and scheduling</li>
                   <li>Account for decision-making time</li>
                   <li>Update timelines as reality changes</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -542,14 +542,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Description & Notes</h2>
+                <h2 className="text-2xl font-bold text-white">Project Description & Notes</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Good documentation helps you remember project details and share context with family members.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">What to Document</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What to Document</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Project goals and scope</li>
                   <li>Key decisions and reasoning</li>
                   <li>Vendor contact information</li>
@@ -557,7 +557,7 @@ export default function ProjectsDocumentationPage() {
                   <li>Lessons learned during the project</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -568,26 +568,26 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Setting Project Budgets</h2>
+                <h2 className="text-2xl font-bold text-white">Setting Project Budgets</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   A well-defined budget is the foundation of successful project management.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Budget Setting Tips</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Budget Setting Tips</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Research First:</strong> Get quotes and estimates before setting your budget</li>
                   <li><strong>Include Everything:</strong> Materials, labor, permits, taxes, delivery</li>
                   <li><strong>Add Contingency:</strong> 10-20% buffer for unexpected costs</li>
                   <li><strong>Be Realistic:</strong> Quality work costs money - don't underbudget</li>
                 </ul>
-                <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-                  <p className="text-sm text-green-800 dark:text-green-200">
+                <div className="mt-6 p-4 bg-green-900/20 rounded-xl border border-green-800">
+                  <p className="text-sm text-green-200">
                     <strong>Budget Formula:</strong> Estimated costs + 15% contingency = Project budget. This gives you breathing room without excessive padding.
                   </p>
                 </div>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -597,22 +597,22 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Expense Tracking</h2>
+                <h2 className="text-2xl font-bold text-white">Expense Tracking</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Track every expense against your project budget to maintain control over spending.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Adding Project Expenses</h3>
-                <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Adding Project Expenses</h3>
+                <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Open your project</li>
                   <li>Tap <strong>Add Expense</strong></li>
                   <li>Enter the expense details (amount, description, date)</li>
                   <li>Optionally attach a receipt image</li>
                   <li>Save - the expense is linked to your project</li>
                 </ol>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">What to Track</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What to Track</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>All purchases related to the project</li>
                   <li>Vendor payments and deposits</li>
                   <li>Permits and fees</li>
@@ -620,7 +620,7 @@ export default function ProjectsDocumentationPage() {
                   <li>Tools or equipment rental</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -630,27 +630,27 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Budget vs Actual Analysis</h2>
+                <h2 className="text-2xl font-bold text-white">Budget vs Actual Analysis</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Real-time budget vs actual tracking helps you stay on target and make informed decisions.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Key Metrics</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Key Metrics</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Budget:</strong> Your planned total spending</li>
                   <li><strong>Actual:</strong> What you've spent so far</li>
                   <li><strong>Remaining:</strong> Budget minus actual</li>
                   <li><strong>Percentage Used:</strong> How much of budget is consumed</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Warning Signs</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Warning Signs</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Spending faster than timeline progress</li>
                   <li>Approaching 80% budget before 80% complete</li>
                   <li>Multiple unexpected expenses</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -660,26 +660,26 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Cost Overrun Management</h2>
+                <h2 className="text-2xl font-bold text-white">Cost Overrun Management</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   When projects go over budget, you have options for how to handle it.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Options for Overruns</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Options for Overruns</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Adjust Budget:</strong> Increase the budget if you have funds available</li>
                   <li><strong>Reduce Scope:</strong> Cut back on non-essential items</li>
                   <li><strong>Pause Project:</strong> Put on hold until more funds are available</li>
                   <li><strong>Document & Continue:</strong> Accept the overrun and complete the project</li>
                 </ul>
-                <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                <div className="mt-6 p-4 bg-yellow-900/20 rounded-xl border border-yellow-800">
+                  <p className="text-sm text-yellow-200">
                     <strong>Learning Opportunity:</strong> Track why overruns happened. This data helps you budget more accurately for future projects.
                   </p>
                 </div>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -689,14 +689,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                   <FolderOpen className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Multi-Category Budgets</h2>
+                <h2 className="text-2xl font-bold text-white">Multi-Category Budgets</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Large projects benefit from breaking the budget into categories for better tracking.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Example: Kitchen Renovation</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Example: Kitchen Renovation</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Cabinets: $5,000</li>
                   <li>Countertops: $3,000</li>
                   <li>Appliances: $4,000</li>
@@ -706,7 +706,7 @@ export default function ProjectsDocumentationPage() {
                   <li><strong>Total: $21,000</strong></li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -717,14 +717,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Vendor Database</h2>
+                <h2 className="text-2xl font-bold text-white">Vendor Database</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Keep track of contractors, suppliers, and service providers you work with across projects.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Vendor Information to Track</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Vendor Information to Track</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Business name and contact person</li>
                   <li>Phone, email, website</li>
                   <li>Service type (contractor, supplier, etc.)</li>
@@ -732,7 +732,7 @@ export default function ProjectsDocumentationPage() {
                   <li>Payment terms and methods</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -742,21 +742,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Vendor Payment Tracking</h2>
+                <h2 className="text-2xl font-bold text-white">Vendor Payment Tracking</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Track payments to vendors to ensure you're staying on budget and meeting payment schedules.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Payment Best Practices</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Payment Best Practices</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Never pay 100% upfront - use milestone payments</li>
                   <li>Keep records of all payments with receipts</li>
                   <li>Document what each payment was for</li>
                   <li>Hold final payment until work is complete and inspected</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -766,21 +766,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Resource Allocation</h2>
+                <h2 className="text-2xl font-bold text-white">Resource Allocation</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Assign family members to project tasks for clear accountability.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Benefits of Assignment</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Benefits of Assignment</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Clear responsibility for each aspect</li>
                   <li>Better coordination on larger projects</li>
                   <li>Track who made purchases</li>
                   <li>Distribute workload fairly</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -790,14 +790,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                   <Target className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Vendor Performance</h2>
+                <h2 className="text-2xl font-bold text-white">Vendor Performance</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Track vendor performance to make better decisions on future projects.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">What to Evaluate</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What to Evaluate</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Quality of work</li>
                   <li>On-time delivery</li>
                   <li>Communication</li>
@@ -805,7 +805,7 @@ export default function ProjectsDocumentationPage() {
                   <li>Would you hire them again?</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -816,14 +816,14 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Dashboard</h2>
+                <h2 className="text-2xl font-bold text-white">Project Dashboard</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Your project dashboard provides an at-a-glance view of all active projects.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Dashboard Information</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Dashboard Information</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Active projects with status indicators</li>
                   <li>Budget utilization summary</li>
                   <li>Projects approaching deadline</li>
@@ -831,7 +831,7 @@ export default function ProjectsDocumentationPage() {
                   <li>Total portfolio value</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -841,21 +841,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Financial Reports</h2>
+                <h2 className="text-2xl font-bold text-white">Financial Reports</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Generate detailed reports on project spending and budget performance.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Available Reports</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Available Reports</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Individual project budget vs actual</li>
                   <li>Expense breakdown by category</li>
                   <li>Vendor payment summary</li>
                   <li>Cross-project spending analysis</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -865,20 +865,20 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Progress Tracking</h2>
+                <h2 className="text-2xl font-bold text-white">Progress Tracking</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Track project completion alongside budget consumption to ensure they stay aligned.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Progress Indicators</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Progress Indicators</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Timeline progress (% of time elapsed)</li>
                   <li>Budget consumption (% spent)</li>
                   <li>Ideally these should align - 50% time = ~50% budget</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -888,20 +888,20 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Budget Utilization</h2>
+                <h2 className="text-2xl font-bold text-white">Budget Utilization</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Understand how efficiently you're using your project budgets.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Utilization Insights</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Utilization Insights</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Under-utilized budgets may indicate over-estimation</li>
                   <li>Over-utilized budgets signal scope creep or underestimation</li>
                   <li>Historical data helps with future budgeting</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -911,20 +911,20 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">ROI Analysis</h2>
+                <h2 className="text-2xl font-bold text-white">ROI Analysis</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   For investment-type projects, track return on investment to understand value created.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">ROI Considerations</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">ROI Considerations</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Home Improvements:</strong> Estimated increase in home value</li>
                   <li><strong>Energy Efficiency:</strong> Monthly savings on utilities</li>
                   <li><strong>Quality of Life:</strong> Not all value is monetary</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -935,21 +935,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Team Project Management</h2>
+                <h2 className="text-2xl font-bold text-white">Team Project Management</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Work together on projects with your family members or partner.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Collaboration Features</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Collaboration Features</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>All space members can view project details</li>
                   <li>Any member can add expenses to projects</li>
                   <li>Real-time updates across all devices</li>
                   <li>Shared vendor database</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -959,21 +959,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Sharing</h2>
+                <h2 className="text-2xl font-bold text-white">Project Sharing</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Projects are automatically shared with all members of your space.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">What's Shared</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What's Shared</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Project details and budget</li>
                   <li>All expenses and receipts</li>
                   <li>Timeline and status</li>
                   <li>Notes and documentation</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -983,20 +983,20 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
                   <CheckSquare className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Approval Workflows</h2>
+                <h2 className="text-2xl font-bold text-white">Approval Workflows</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   For larger purchases, discuss with your partner before committing.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Informal Approval Process</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Informal Approval Process</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Use project notes to discuss major decisions</li>
                   <li>Set spending thresholds that require discussion</li>
                   <li>Check budget remaining before large purchases</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -1006,20 +1006,20 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
                   <Users className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Communication & Updates</h2>
+                <h2 className="text-2xl font-bold text-white">Communication & Updates</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Keep everyone informed about project progress.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Staying Connected</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Staying Connected</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Real-time updates show new expenses</li>
                   <li>Use project notes for important updates</li>
                   <li>Review project status together regularly</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -1030,21 +1030,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                   <FolderOpen className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Templates</h2>
+                <h2 className="text-2xl font-bold text-white">Project Templates</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Create templates for project types you do frequently to speed up setup.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Template Ideas</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Template Ideas</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Annual vacation planning</li>
                   <li>Birthday party organization</li>
                   <li>Seasonal home maintenance</li>
                   <li>Holiday gift budgeting</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -1054,21 +1054,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Receipt Scanning Integration</h2>
+                <h2 className="text-2xl font-bold text-white">Receipt Scanning Integration</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Use AI receipt scanning to quickly add project expenses with all details extracted automatically.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Integration Benefits</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Integration Benefits</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Scan receipts directly to projects</li>
                   <li>AI extracts merchant, amount, and date</li>
                   <li>Receipt images attached for records</li>
                   <li>Saves time on manual data entry</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -1078,21 +1078,21 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                   <FolderOpen className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Project Archives</h2>
+                <h2 className="text-2xl font-bold text-white">Project Archives</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Completed projects are archived but remain accessible for future reference.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Archive Benefits</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Archive Benefits</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Historical record of all spending</li>
                   <li>Reference for future similar projects</li>
                   <li>Vendor performance history</li>
                   <li>Budget accuracy analysis</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>
@@ -1102,20 +1102,20 @@ export default function ProjectsDocumentationPage() {
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                   <FileText className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Export & Reporting</h2>
+                <h2 className="text-2xl font-bold text-white">Export & Reporting</h2>
               </div>
-              <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+              <div className="prose prose-gray prose-invert max-w-none">
+                <p className="text-gray-400 leading-relaxed mb-4">
                   Export project data for external use in accounting software, spreadsheets, or tax preparation.
                 </p>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">Export Options</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Export Options</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>CSV:</strong> All expenses with project details</li>
                   <li><strong>PDF Summary:</strong> Formatted project report</li>
                   <li><strong>Receipt Package:</strong> All attached receipt images</li>
                 </ul>
               </div>
-              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-600 dark:text-cyan-400 hover:underline text-sm font-medium">
+              <a href="#" className="inline-flex items-center gap-2 mt-6 text-cyan-400 hover:underline text-sm font-medium">
                 ← Back to top
               </a>
             </section>

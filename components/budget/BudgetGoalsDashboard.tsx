@@ -92,9 +92,9 @@ export function BudgetGoalsDashboard({ className }: BudgetGoalsDashboardProps) {
 
   const getStatusColor = (status: 'on_track' | 'warning' | 'over_budget') => {
     switch (status) {
-      case 'on_track': return 'text-green-600 bg-green-50 dark:bg-green-950';
-      case 'warning': return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950';
-      case 'over_budget': return 'text-red-600 bg-red-50 dark:bg-red-950';
+      case 'on_track': return 'text-green-600 bg-green-950';
+      case 'warning': return 'text-yellow-600 bg-yellow-950';
+      case 'over_budget': return 'text-red-600 bg-red-950';
     }
   };
 

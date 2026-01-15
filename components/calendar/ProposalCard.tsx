@@ -56,10 +56,10 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
 
   const getStatusBadge = () => {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      countered: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+      pending: 'bg-yellow-100 bg-yellow-900/30 text-yellow-400',
+      approved: 'bg-green-100 bg-green-900/30 text-green-400',
+      rejected: 'bg-red-100 bg-red-900/30 text-red-400',
+      countered: 'bg-blue-100 bg-blue-900/30 text-blue-400'
     };
 
     const labels = {
@@ -77,19 +77,19 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-all">
+    <div className="bg-gray-800 rounded-xl border-2 border-gray-700 p-6 shadow-sm hover:shadow-md transition-all">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-white mb-2">
             {proposal.title}
           </h3>
           {proposal.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-gray-400 mb-3">
               {proposal.description}
             </p>
           )}
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-4 text-sm text-gray-400">
             <div className="flex items-center gap-1.5">
               <Users className="w-4 h-4" />
               <span>Proposed by {proposal.proposer?.raw_user_meta_data?.name || proposal.proposer?.email || 'Unknown'}</span>
@@ -105,7 +105,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
 
       {/* Time Slots */}
       <div className="space-y-3">
-        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+        <h4 className="text-sm font-semibold text-gray-300 mb-3">
           Proposed Times ({proposal.time_slots.length})
         </h4>
 
@@ -119,16 +119,16 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
           return (
             <div
               key={index}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+              className="border border-gray-700 rounded-lg overflow-hidden"
             >
               {/* Slot Header */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-800/50">
+              <div className="p-4 bg-gray-800/50">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    <div className="text-sm font-medium text-white mb-1">
                       {slot.label || format(startTime, 'EEEE, MMMM d, yyyy')}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="text-xs text-gray-400">
                       {format(startTime, 'h:mm a')}
                       {endTime && ` - ${format(endTime, 'h:mm a')}`}
                     </div>
@@ -137,24 +137,24 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                   {/* Vote Summary */}
                   <div className="flex items-center gap-2 text-xs">
                     {summary.preferred > 0 && (
-                      <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400" title="Preferred">
+                      <div className="flex items-center gap-1 text-purple-400" title="Preferred">
                         <Star className="w-3.5 h-3.5 fill-current" />
                         <span>{summary.preferred}</span>
                       </div>
                     )}
                     {summary.available > 0 && (
-                      <div className="flex items-center gap-1 text-green-600 dark:text-green-400" title="Available">
+                      <div className="flex items-center gap-1 text-green-400" title="Available">
                         <ThumbsUp className="w-3.5 h-3.5" />
                         <span>{summary.available}</span>
                       </div>
                     )}
                     {summary.unavailable > 0 && (
-                      <div className="flex items-center gap-1 text-red-600 dark:text-red-400" title="Unavailable">
+                      <div className="flex items-center gap-1 text-red-400" title="Unavailable">
                         <ThumbsDown className="w-3.5 h-3.5" />
                         <span>{summary.unavailable}</span>
                       </div>
                     )}
-                    <div className="text-gray-500 dark:text-gray-400" title="Total votes">
+                    <div className="text-gray-400" title="Total votes">
                       ({summary.total} {summary.total === 1 ? 'vote' : 'votes'})
                     </div>
                   </div>
@@ -168,8 +168,8 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                       disabled={voting}
                       className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all group relative ${
                         userVote?.vote === 'preferred'
-                          ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-2 border-purple-500'
-                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-purple-400 dark:hover:border-purple-500'
+                          ? 'bg-purple-900/30 text-purple-300 border-2 border-purple-500'
+                          : 'bg-gray-700 text-gray-300 border border-gray-600 hover:border-purple-500'
                       }`}
                       title="Mark as preferred time"
                     >
@@ -185,8 +185,8 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                       disabled={voting}
                       className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all group relative ${
                         userVote?.vote === 'available'
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-2 border-green-500'
-                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-green-400 dark:hover:border-green-500'
+                          ? 'bg-green-900/30 text-green-300 border-2 border-green-500'
+                          : 'bg-gray-700 text-gray-300 border border-gray-600 hover:border-green-500'
                       }`}
                       title="Mark as available"
                     >
@@ -202,8 +202,8 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                       disabled={voting}
                       className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all group relative ${
                         userVote?.vote === 'unavailable'
-                          ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-2 border-red-500'
-                          : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500'
+                          ? 'bg-red-900/30 text-red-300 border-2 border-red-500'
+                          : 'bg-gray-700 text-gray-300 border border-gray-600 hover:border-red-500'
                       }`}
                       title="Mark as unavailable"
                     >
@@ -216,7 +216,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
 
                     <button
                       onClick={() => setExpandedSlot(isExpanded ? null : index)}
-                      className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group relative"
+                      className="p-2 rounded-lg text-gray-400 hover:bg-gray-700 transition-colors group relative"
                       title="View votes"
                     >
                       <MessageSquare className="w-4 h-4" />
@@ -230,8 +230,8 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
 
               {/* Expanded Vote Details */}
               {isExpanded && (
-                <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                  <h5 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <div className="p-4 bg-gray-800 border-t border-gray-700">
+                  <h5 className="text-xs font-semibold text-gray-300 mb-3">
                     Vote Details
                   </h5>
                   <div className="space-y-2">
@@ -243,13 +243,13 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                           className="flex items-start justify-between text-xs"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900 dark:text-white">
+                            <span className="font-medium text-white">
                               {vote.user?.raw_user_meta_data?.name || vote.user?.email || 'Unknown User'}
                             </span>
                             <span className={`flex items-center gap-1 ${
-                              vote.vote === 'preferred' ? 'text-purple-600 dark:text-purple-400' :
-                              vote.vote === 'available' ? 'text-green-600 dark:text-green-400' :
-                              'text-red-600 dark:text-red-400'
+                              vote.vote === 'preferred' ? 'text-purple-400' :
+                              vote.vote === 'available' ? 'text-green-400' :
+                              'text-red-400'
                             }`}>
                               {vote.vote === 'preferred' && <Star className="w-3 h-3 fill-current" />}
                               {vote.vote === 'available' && <ThumbsUp className="w-3 h-3" />}
@@ -258,7 +258,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
                             </span>
                           </div>
                           {vote.comment && (
-                            <span className="text-gray-600 dark:text-gray-400 ml-2">
+                            <span className="text-gray-400 ml-2">
                               {vote.comment}
                             </span>
                           )}
@@ -274,7 +274,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
 
       {/* Actions for Proposer */}
       {isProposer && proposal.status === 'pending' && onApprove && onReject && (
-        <div className="flex items-center gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 mt-6 pt-6 border-t border-gray-700">
           <button
             onClick={onApprove}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-calendar text-white rounded-lg hover:opacity-90 transition-all font-medium text-sm group relative"
@@ -288,7 +288,7 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
           </button>
           <button
             onClick={onReject}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium text-sm group relative"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-red-700 text-red-400 rounded-lg hover:bg-red-900/20 transition-all font-medium text-sm group relative"
             title="Reject proposal"
           >
             <XCircle className="w-4 h-4" />

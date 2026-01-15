@@ -187,24 +187,24 @@ export const conflictDetectionService = {
     switch (severity) {
       case 'high':
         return {
-          border: 'border-red-500 dark:border-red-400',
-          bg: 'bg-red-50 dark:bg-red-900/20',
-          text: 'text-red-700 dark:text-red-300',
-          icon: 'text-red-600 dark:text-red-400',
+          border: 'border-red-400',
+          bg: 'bg-red-900/20',
+          text: 'text-red-300',
+          icon: 'text-red-400',
         };
       case 'medium':
         return {
-          border: 'border-orange-500 dark:border-orange-400',
-          bg: 'bg-orange-50 dark:bg-orange-900/20',
-          text: 'text-orange-700 dark:text-orange-300',
-          icon: 'text-orange-600 dark:text-orange-400',
+          border: 'border-orange-400',
+          bg: 'bg-orange-900/20',
+          text: 'text-orange-300',
+          icon: 'text-orange-400',
         };
       case 'low':
         return {
-          border: 'border-yellow-500 dark:border-yellow-400',
-          bg: 'bg-yellow-50 dark:bg-yellow-900/20',
-          text: 'text-yellow-700 dark:text-yellow-300',
-          icon: 'text-yellow-600 dark:text-yellow-400',
+          border: 'border-yellow-400',
+          bg: 'bg-yellow-900/20',
+          text: 'text-yellow-300',
+          icon: 'text-yellow-400',
         };
     }
   },

@@ -215,40 +215,40 @@ export default function DocumentationPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-blue-50/30 dark:from-gray-950 dark:via-purple-950/20 dark:to-blue-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 from-gray-950 to-blue-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
             <Link
               href="/settings"
-              className="inline-flex items-center gap-2 py-2 px-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
+              className="inline-flex items-center gap-2 py-2 px-3 text-gray-400 hover:text-white transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Settings
             </Link>
             <div className="text-center mb-8">
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
                 Documentation
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">
                 Choose a feature to learn about. Comprehensive guides for all Rowan features.
               </p>
             </div>
 
             {/* Search Bar */}
             <div className="relative max-w-xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="text"
                 placeholder="Search documentation... (e.g., 'expenses', 'billing', 'meal planning')"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-colors"
+                className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-700 bg-gray-800 text-white placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -267,18 +267,18 @@ export default function DocumentationPage() {
                   <Link
                     key={feature.id}
                     href={feature.href}
-                    className={`group relative p-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-2 border-gray-200/60 dark:border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105`}
+                    className={`group relative p-6 bg-gray-800/70 backdrop-blur-sm border-2 border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105`}
                   >
                     <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
                       <Icon className="w-7 h-7 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors">
                       {feature.name}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                    <p className="text-sm text-gray-400 leading-relaxed mb-4">
                       {feature.description}
                     </p>
-                    <div className="flex items-center text-sm font-semibold text-purple-600 dark:text-purple-400">
+                    <div className="flex items-center text-sm font-semibold text-purple-400">
                       Read guides
                       <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
                     </div>
@@ -288,18 +288,18 @@ export default function DocumentationPage() {
                 return (
                   <div
                     key={feature.id}
-                    className="relative p-6 bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl opacity-60"
+                    className="relative p-6 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl opacity-60"
                   >
                     <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
                       <Icon className="w-7 h-7 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-xl font-bold text-white mb-3">
                       {feature.name}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                    <p className="text-sm text-gray-400 leading-relaxed mb-4">
                       {feature.description}
                     </p>
-                    <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+                    <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400">
                       Coming Soon
                     </div>
                   </div>
@@ -311,12 +311,12 @@ export default function DocumentationPage() {
           {/* No Results Message */}
           {filteredFeatures.length === 0 && searchQuery && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
+              <p className="text-gray-400 text-lg">
                 No documentation found for &ldquo;{searchQuery}&rdquo;
               </p>
               <button
                 onClick={() => setSearchQuery('')}
-                className="mt-4 text-purple-600 dark:text-purple-400 hover:underline"
+                className="mt-4 text-purple-400 hover:underline"
               >
                 Clear search
               </button>

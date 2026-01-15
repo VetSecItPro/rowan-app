@@ -273,17 +273,17 @@ export default function DiscoverRecipesPage() {
   const getSourceBadgeColor = (source: string) => {
     switch (source) {
       case 'themealdb':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-blue-100 bg-blue-900/30 text-blue-300';
       case 'spoonacular':
-        return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300';
+        return 'bg-emerald-100 bg-emerald-900/30 text-emerald-300';
       case 'edamam':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-100 bg-green-900/30 text-green-300';
       case 'tasty':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-orange-100 bg-orange-900/30 text-orange-300';
       case 'apininjas':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
+        return 'bg-purple-100 bg-purple-900/30 text-purple-300';
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+        return 'bg-gray-100 bg-gray-800 text-gray-300';
     }
   };
 
@@ -305,7 +305,7 @@ export default function DiscoverRecipesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -352,14 +352,14 @@ export default function DiscoverRecipesPage() {
       </div>
 
       {/* Cuisine Filters */}
-      <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by cuisine:</span>
+            <span className="text-sm font-medium text-gray-300">Filter by cuisine:</span>
             {selectedCuisine && (
               <button
                 onClick={handleClearFilters}
-                className="text-sm px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="text-sm px-3 py-1 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors"
               >
                 ✕ Clear filter
               </button>
@@ -373,7 +373,7 @@ export default function DiscoverRecipesPage() {
                 className={`px-4 py-2.5 md:px-4 md:py-2 text-sm min-h-[44px] md:min-h-0 rounded-full font-medium transition-all ${
                   selectedCuisine === cuisine.value
                     ? 'bg-orange-500 text-white shadow-md scale-105'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600 hover:scale-105'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-105'
                 }`}
               >
                 <span className="mr-1">{cuisine.flag}</span>
@@ -390,7 +390,7 @@ export default function DiscoverRecipesPage() {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
-            <span className="ml-3 text-gray-600 dark:text-gray-400">Searching recipes...</span>
+            <span className="ml-3 text-gray-400">Searching recipes...</span>
           </div>
         )}
 
@@ -400,7 +400,7 @@ export default function DiscoverRecipesPage() {
             {recipes.map((recipe) => (
               <div
                 key={recipe.id}
-                className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                className="bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
               >
                 {/* Recipe Image - Clickable */}
                 {recipe.image_url && (
@@ -409,7 +409,7 @@ export default function DiscoverRecipesPage() {
                       setPreviewRecipe(recipe);
                       setIsPreviewOpen(true);
                     }}
-                    className="w-full h-48 overflow-hidden bg-gray-200 dark:bg-gray-700 cursor-pointer group"
+                    className="w-full h-48 overflow-hidden bg-gray-700 cursor-pointer group"
                   >
                     <img
                       src={recipe.image_url}
@@ -449,20 +449,20 @@ export default function DiscoverRecipesPage() {
                     }}
                     className="text-left w-full group"
                   >
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                    <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2 group-hover:text-orange-400 transition-colors">
                       {recipe.name}
                     </h3>
                   </button>
 
                   {/* Description */}
                   {recipe.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                       {recipe.description}
                     </p>
                   )}
 
                   {/* Meta Info */}
-                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
                     {recipe.prep_time && (
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
@@ -480,20 +480,20 @@ export default function DiscoverRecipesPage() {
                   {/* Ingredients Preview */}
                   {recipe.ingredients && recipe.ingredients.length > 0 && (
                     <div className="mb-4">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      <p className="text-xs text-gray-400 mb-1">
                         {recipe.ingredients.length} ingredients
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {recipe.ingredients.slice(0, 3).map((ing, idx) => (
                           <span
                             key={idx}
-                            className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+                            className="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded"
                           >
                             {ing.name}
                           </span>
                         ))}
                         {recipe.ingredients.length > 3 && (
-                          <span className="text-xs px-2 py-1 text-gray-500 dark:text-gray-400">
+                          <span className="text-xs px-2 py-1 text-gray-400">
                             +{recipe.ingredients.length - 3} more
                           </span>
                         )}
@@ -536,10 +536,10 @@ export default function DiscoverRecipesPage() {
         {!loading && recipes.length === 0 && (
           <div className="text-center py-12">
             <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
               {searchQuery ? "No recipes found" : "No recipes available"}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               {searchQuery
                 ? "Try searching for something else"
                 : "Unable to load recipes at the moment. Please try refreshing the page."

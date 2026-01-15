@@ -234,7 +234,7 @@ export function BottomSheet({
         ref={sheetRef}
         className={`
           absolute bottom-0 left-0 right-0
-          bg-white dark:bg-gray-900
+          bg-gray-900
           rounded-t-2xl
           shadow-2xl
           flex flex-col
@@ -269,9 +269,9 @@ export function BottomSheet({
             <div
               className={`
                 w-10 h-1 rounded-full
-                bg-gray-300 dark:bg-gray-600
+                bg-gray-600
                 transition-all duration-200
-                ${isDragging ? 'w-12 bg-gray-400 dark:bg-gray-500' : ''}
+                ${isDragging ? 'w-12 bg-gray-500' : ''}
               `}
             />
           </div>
@@ -284,13 +284,13 @@ export function BottomSheet({
               flex items-center justify-between
               px-4 pb-3
               ${!showHandle ? 'pt-4' : ''}
-              border-b border-gray-200 dark:border-gray-800
+              border-b border-gray-800
             `}
           >
             {title && (
               <h2
                 id="bottom-sheet-title"
-                className="text-lg font-semibold text-gray-900 dark:text-white"
+                className="text-lg font-semibold text-white"
               >
                 {title}
               </h2>
@@ -303,8 +303,8 @@ export function BottomSheet({
                   w-10 h-10 -mr-2
                   flex items-center justify-center
                   rounded-full
-                  text-gray-500 dark:text-gray-400
-                  hover:bg-gray-100 dark:hover:bg-gray-800
+                  text-gray-400
+                  hover:bg-gray-800
                   transition-colors
                   active:scale-95
                   touch-manipulation

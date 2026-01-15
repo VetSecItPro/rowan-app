@@ -30,8 +30,6 @@ import {
   Settings,
   type LucideIcon
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
-
 // Import content panels for tabbed management console
 import {
   UsersPanel,
@@ -109,11 +107,11 @@ const StatCard = memo(function StatCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{title}</p>
-          <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{value}</p>
+          <p className="text-xs font-medium text-gray-400">{title}</p>
+          <p className="text-xl font-bold text-white mt-0.5">{value}</p>
           {trend && trendValue && (
             <div className="flex items-center mt-1">
               <TrendingUp className={`w-3 h-3 mr-1 ${
@@ -145,8 +143,8 @@ const ActivityItem = memo(function ActivityItem({
   title,
   description,
   time,
-  iconBg = 'bg-blue-100 dark:bg-blue-900/30',
-  iconColor = 'text-blue-600 dark:text-blue-400'
+  iconBg = 'bg-blue-900/30',
+  iconColor = 'text-blue-400'
 }: {
   icon: LucideIcon;
   title: string;
@@ -156,13 +154,13 @@ const ActivityItem = memo(function ActivityItem({
   iconColor?: string;
 }) {
   return (
-    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700/50 transition-colors">
       <div className={`w-8 h-8 ${iconBg} rounded-full flex items-center justify-center flex-shrink-0`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{title}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{description}</p>
+        <p className="text-sm font-medium text-white truncate">{title}</p>
+        <p className="text-xs text-gray-400 truncate">{description}</p>
       </div>
       <div className="flex items-center gap-1 text-xs text-gray-400 flex-shrink-0">
         <Clock className="w-3 h-3" />
@@ -188,8 +186,8 @@ const TabButton = memo(function TabButton({
       onClick={onClick}
       className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
         isActive
-          ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm border border-gray-200 dark:border-gray-600'
-          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+          ? 'bg-gray-700 text-white shadow-sm border border-gray-600'
+          : 'text-gray-400 hover:bg-gray-700/50 hover:text-white'
       }`}
     >
       <Icon className={`w-3.5 h-3.5 ${isActive ? tab.color : ''}`} />
@@ -203,13 +201,13 @@ const StatsSkeleton = memo(function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {[...Array(6)].map((_, i) => (
-        <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
+        <div key={i} className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4 animate-pulse">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16" />
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12" />
+              <div className="h-3 bg-gray-700 rounded w-16" />
+              <div className="h-6 bg-gray-700 rounded w-12" />
             </div>
-            <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+            <div className="w-10 h-10 bg-gray-700 rounded-lg" />
           </div>
         </div>
       ))}
@@ -286,27 +284,27 @@ function AdminDashboardContent() {
       case 'user_signup':
         return {
           icon: UserPlus,
-          iconBg: 'bg-green-100 dark:bg-green-900/30',
-          iconColor: 'text-green-600 dark:text-green-400',
+          iconBg: 'bg-green-900/30',
+          iconColor: 'text-green-400',
         };
       case 'beta_granted':
         return {
           icon: Shield,
-          iconBg: 'bg-purple-100 dark:bg-purple-900/30',
-          iconColor: 'text-purple-600 dark:text-purple-400',
+          iconBg: 'bg-purple-900/30',
+          iconColor: 'text-purple-400',
         };
       case 'beta_feedback':
       case 'feedback':
         return {
           icon: MessageSquare,
-          iconBg: 'bg-pink-100 dark:bg-pink-900/30',
-          iconColor: 'text-pink-600 dark:text-pink-400',
+          iconBg: 'bg-pink-900/30',
+          iconColor: 'text-pink-400',
         };
       default:
         return {
           icon: Activity,
-          iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-          iconColor: 'text-blue-600 dark:text-blue-400',
+          iconBg: 'bg-blue-900/30',
+          iconColor: 'text-blue-400',
         };
     }
   };
@@ -336,33 +334,32 @@ function AdminDashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+      <div className="bg-gray-800 border-b border-gray-700 sticky top-0 z-10">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 px-2 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="flex items-center gap-2 px-2 py-1.5 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-700"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="text-sm hidden sm:inline">Back</span>
               </Link>
-              <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 hidden sm:block" />
+              <div className="w-px h-5 bg-gray-600 hidden sm:block" />
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Shield className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+                  <h1 className="text-lg font-bold text-white">
                     Operations Dashboard
                   </h1>
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               <button
                 onClick={() => refetch()}
                 disabled={isFetching}
@@ -435,15 +432,15 @@ function AdminDashboardContent() {
         )}
 
         {/* Row 2: System Status */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
               <Monitor className="w-4 h-4 text-emerald-500" />
               System Status
             </h3>
             <button
               onClick={() => setActiveTab('system')}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs text-blue-400 hover:underline"
             >
               View Details
             </button>
@@ -452,28 +449,28 @@ function AdminDashboardContent() {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Database</p>
+                <p className="text-sm font-medium text-white">Database</p>
                 <p className="text-xs text-gray-500">Operational</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">API</p>
+                <p className="text-sm font-medium text-white">API</p>
                 <p className="text-xs text-gray-500">Running</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Rate Limit</p>
+                <p className="text-sm font-medium text-white">Rate Limit</p>
                 <p className="text-xs text-gray-500">Active</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Beta</p>
+                <p className="text-sm font-medium text-white">Beta</p>
                 <p className="text-xs text-gray-500">{stats?.betaUsers ?? 0}/100</p>
               </div>
             </div>
@@ -481,9 +478,9 @@ function AdminDashboardContent() {
         </div>
 
         {/* Row 3: Recent Activity Bar */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
               <Activity className="w-4 h-4 text-blue-500" />
               Recent Activity
             </h3>
@@ -506,7 +503,7 @@ function AdminDashboardContent() {
                 );
               })
             ) : (
-              <div className="flex-1 flex items-center justify-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+              <div className="flex-1 flex items-center justify-center py-4 text-gray-400 text-sm">
                 <Activity className="w-4 h-4 mr-2 opacity-50" />
                 Activity will appear here as users interact with the platform
               </div>
@@ -515,16 +512,16 @@ function AdminDashboardContent() {
         </div>
 
         {/* Row 4: Management Console (Tabbed Content Area) - Fills remaining space */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex-1 flex flex-col">
+        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden flex-1 flex flex-col">
           {/* Console Header */}
-          <div className="bg-indigo-600 dark:bg-indigo-700 px-4 py-3">
+          <div className="bg-indigo-700 px-4 py-3">
             <h2 className="text-sm font-semibold text-white flex items-center gap-2">
               <Layers className="w-4 h-4" />
               Management Console
             </h2>
           </div>
           {/* Tab Navigation - Centered */}
-          <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-2 py-2">
+          <div className="border-b border-gray-700 bg-gray-800/50 px-2 py-2">
             <div className="flex items-center justify-center gap-2">
               <div className="flex items-center justify-center gap-1 overflow-x-auto scrollbar-hide pb-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {TABS.map((tab) => (
@@ -553,7 +550,7 @@ function AdminDashboardContent() {
 export default function AdminDashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>

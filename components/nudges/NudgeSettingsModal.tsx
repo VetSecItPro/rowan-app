@@ -121,9 +121,9 @@ export function NudgeSettingsModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full sm:max-w-lg transform overflow-hidden sm:rounded-2xl bg-white dark:bg-gray-800 text-left align-middle shadow-xl transition-all h-full sm:h-auto flex flex-col">
+              <Dialog.Panel className="w-full sm:max-w-lg transform overflow-hidden sm:rounded-2xl bg-gray-800 text-left align-middle shadow-xl transition-all h-full sm:h-auto flex flex-col">
                 {/* Header */}
-                <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
                       <Bell className="w-5 h-5 text-white" />
@@ -131,18 +131,18 @@ export function NudgeSettingsModal({
                     <div>
                       <Dialog.Title
                         as="h3"
-                        className="text-lg font-bold leading-6 text-gray-900 dark:text-white"
+                        className="text-lg font-bold leading-6 text-white"
                       >
                         Nudge Settings
                       </Dialog.Title>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-gray-400">
                         Customize your goal reminders and notifications
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={onClose}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="text-gray-400 hover:text-gray-200"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -150,7 +150,7 @@ export function NudgeSettingsModal({
 
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
                   {/* Global Toggle */}
-                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <div className="bg-gray-700 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {settings.nudges_enabled ? (
@@ -159,10 +159,10 @@ export function NudgeSettingsModal({
                           <VolumeX className="w-5 h-5 text-gray-400" />
                         )}
                         <div>
-                          <h4 className="font-medium text-gray-900 dark:text-white">
+                          <h4 className="font-medium text-white">
                             Smart Nudges
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-400">
                             Enable intelligent goal reminders
                           </p>
                         </div>
@@ -171,7 +171,7 @@ export function NudgeSettingsModal({
                         onClick={() => handleToggle('nudges_enabled', !settings.nudges_enabled)}
                         className={cn(
                           'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                          settings.nudges_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                          settings.nudges_enabled ? 'bg-blue-600' : 'bg-gray-600'
                         )}
                       >
                         <span
@@ -187,15 +187,15 @@ export function NudgeSettingsModal({
                   {/* Nudge Types */}
                   {settings.nudges_enabled && (
                     <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900 dark:text-white">Nudge Types</h4>
+                      <h4 className="font-medium text-white">Nudge Types</h4>
 
                       {/* Daily Nudges */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <label className="text-sm font-medium text-gray-900 dark:text-white">
+                          <label className="text-sm font-medium text-white">
                             Daily Check-ins
                           </label>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             Daily reminders to review your goals
                           </p>
                         </div>
@@ -203,7 +203,7 @@ export function NudgeSettingsModal({
                           onClick={() => handleToggle('daily_nudges_enabled', !settings.daily_nudges_enabled)}
                           className={cn(
                             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                            settings.daily_nudges_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.daily_nudges_enabled ? 'bg-blue-600' : 'bg-gray-600'
                           )}
                         >
                           <span
@@ -218,10 +218,10 @@ export function NudgeSettingsModal({
                       {/* Weekly Summary */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <label className="text-sm font-medium text-gray-900 dark:text-white">
+                          <label className="text-sm font-medium text-white">
                             Weekly Summaries
                           </label>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             Weekly progress reports and insights
                           </p>
                         </div>
@@ -229,7 +229,7 @@ export function NudgeSettingsModal({
                           onClick={() => handleToggle('weekly_summary_enabled', !settings.weekly_summary_enabled)}
                           className={cn(
                             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                            settings.weekly_summary_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.weekly_summary_enabled ? 'bg-blue-600' : 'bg-gray-600'
                           )}
                         >
                           <span
@@ -244,10 +244,10 @@ export function NudgeSettingsModal({
                       {/* Milestone Reminders */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <label className="text-sm font-medium text-gray-900 dark:text-white">
+                          <label className="text-sm font-medium text-white">
                             Milestone Reminders
                           </label>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             Celebrate achievements and milestones
                           </p>
                         </div>
@@ -255,7 +255,7 @@ export function NudgeSettingsModal({
                           onClick={() => handleToggle('milestone_reminders_enabled', !settings.milestone_reminders_enabled)}
                           className={cn(
                             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                            settings.milestone_reminders_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.milestone_reminders_enabled ? 'bg-blue-600' : 'bg-gray-600'
                           )}
                         >
                           <span
@@ -270,10 +270,10 @@ export function NudgeSettingsModal({
                       {/* Deadline Alerts */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <label className="text-sm font-medium text-gray-900 dark:text-white">
+                          <label className="text-sm font-medium text-white">
                             Deadline Alerts
                           </label>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             Warnings for approaching deadlines
                           </p>
                         </div>
@@ -281,7 +281,7 @@ export function NudgeSettingsModal({
                           onClick={() => handleToggle('deadline_alerts_enabled', !settings.deadline_alerts_enabled)}
                           className={cn(
                             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                            settings.deadline_alerts_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.deadline_alerts_enabled ? 'bg-blue-600' : 'bg-gray-600'
                           )}
                         >
                           <span
@@ -296,10 +296,10 @@ export function NudgeSettingsModal({
                       {/* Motivation Quotes */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <label className="text-sm font-medium text-gray-900 dark:text-white">
+                          <label className="text-sm font-medium text-white">
                             Motivation Boosts
                           </label>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             Inspirational messages and encouragement
                           </p>
                         </div>
@@ -307,7 +307,7 @@ export function NudgeSettingsModal({
                           onClick={() => handleToggle('motivation_quotes_enabled', !settings.motivation_quotes_enabled)}
                           className={cn(
                             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                            settings.motivation_quotes_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.motivation_quotes_enabled ? 'bg-blue-600' : 'bg-gray-600'
                           )}
                         >
                           <span
@@ -324,33 +324,33 @@ export function NudgeSettingsModal({
                   {/* Timing Settings */}
                   {settings.nudges_enabled && (
                     <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900 dark:text-white flex items-center space-x-2">
+                      <h4 className="font-medium text-white flex items-center space-x-2">
                         <Clock className="w-4 h-4" />
                         <span>Timing</span>
                       </h4>
 
                       {/* Preferred Time */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        <label className="block text-sm font-medium text-white mb-2">
                           Preferred Nudge Time
                         </label>
                         <input
                           type="time"
                           value={settings.preferred_nudge_time}
                           onChange={(e) => handleChange('preferred_nudge_time', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white"
                         />
                       </div>
 
                       {/* Frequency */}
                       <div className="relative z-50">
-                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        <label className="block text-sm font-medium text-white mb-2">
                           Nudge Frequency (days)
                         </label>
                         <select
                           value={settings.nudge_frequency_days}
                           onChange={(e) => handleChange('nudge_frequency_days', parseInt(e.target.value))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white relative z-50"
+                          className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white relative z-50"
                           style={{ position: 'relative', zIndex: 9999 }}
                         >
                           <option value={1}>Every day</option>
@@ -362,13 +362,13 @@ export function NudgeSettingsModal({
 
                       {/* Max Daily Nudges */}
                       <div className="relative z-50">
-                        <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        <label className="block text-sm font-medium text-white mb-2">
                           Max Daily Nudges
                         </label>
                         <select
                           value={settings.max_daily_nudges}
                           onChange={(e) => handleChange('max_daily_nudges', parseInt(e.target.value))}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white relative z-50"
+                          className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white relative z-50"
                           style={{ position: 'relative', zIndex: 9999 }}
                         >
                           <option value={1}>1 nudge</option>
@@ -382,10 +382,10 @@ export function NudgeSettingsModal({
                       {/* Weekend Nudges */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <label className="text-sm font-medium text-gray-900 dark:text-white">
+                          <label className="text-sm font-medium text-white">
                             Weekend Nudges
                           </label>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <p className="text-xs text-gray-400">
                             Receive nudges on weekends
                           </p>
                         </div>
@@ -393,7 +393,7 @@ export function NudgeSettingsModal({
                           onClick={() => handleToggle('weekend_nudges_enabled', !settings.weekend_nudges_enabled)}
                           className={cn(
                             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                            settings.weekend_nudges_enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.weekend_nudges_enabled ? 'bg-blue-600' : 'bg-gray-600'
                           )}
                         >
                           <span
@@ -409,10 +409,10 @@ export function NudgeSettingsModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex-shrink-0 flex justify-end space-x-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex-shrink-0 flex justify-end space-x-3 p-4 sm:p-6 border-t border-gray-700">
                   <button
                     onClick={onClose}
-                    className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
                   >
                     Cancel
                   </button>

@@ -260,8 +260,8 @@ export function TrialBadge() {
         href="/pricing"
         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
           isUrgent
-            ? 'bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50'
-            : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50'
+            ? 'bg-amber-100 text-amber-800 bg-amber-900/30 hover:bg-amber-900/50'
+            : 'bg-emerald-100 text-emerald-800 bg-emerald-900/30 hover:bg-emerald-900/50'
         }`}
       >
         <Clock className="h-3 w-3" />
@@ -274,7 +274,7 @@ export function TrialBadge() {
     return (
       <Link
         href="/pricing"
-        className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+        className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 bg-gray-800 hover:bg-gray-700 transition-colors"
       >
         <Crown className="h-3 w-3" />
         <span>Upgrade</span>

@@ -99,31 +99,31 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
       >
         <div className="space-y-6">
           <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-400 mb-6">
               Help us set up the perfect workspace for your needs.
             </p>
           </div>
 
           {/* Personal Use Option */}
           <div
-            className="p-6 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-purple-300 dark:hover:border-purple-600 cursor-pointer transition-all group"
+            className="p-6 border-2 border-gray-700 rounded-lg hover:border-purple-600 cursor-pointer transition-all group"
             onClick={() => setIntent('personal')}
           >
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
+                <div className="w-12 h-12 bg-purple-900/30 rounded-lg flex items-center justify-center group-hover:bg-purple-800/50 transition-colors">
                   <span className="text-2xl">👤</span>
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   Just for me
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   Personal productivity and organization. Perfect for individual use.
                 </p>
                 <div className="mt-3">
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-purple-900/30 text-purple-300">
                     Instant setup
                   </span>
                 </div>
@@ -133,24 +133,24 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
 
           {/* Family/Shared Use Option */}
           <div
-            className="p-6 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-all group"
+            className="p-6 border-2 border-gray-700 rounded-lg hover:border-blue-600 cursor-pointer transition-all group"
             onClick={() => setIntent('family')}
           >
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                <div className="w-12 h-12 bg-blue-900/30 rounded-lg flex items-center justify-center group-hover:bg-blue-800/50 transition-colors">
                   <span className="text-2xl">👥</span>
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   With family/partner
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   Shared organization for households, families, or teams.
                 </p>
                 <div className="mt-3">
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-900/30 text-blue-300">
                     Collaboration features
                   </span>
                 </div>
@@ -159,7 +159,7 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
           </div>
 
           <div className="text-center pt-4">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-400">
               You can always invite others or create additional workspaces later.
             </p>
           </div>
@@ -179,12 +179,12 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
     >
       <div className="space-y-6">
         {error && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg">
             <div className="flex justify-between items-start">
-              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+              <p className="text-sm text-red-300">{error}</p>
               <button
                 onClick={clearError}
-                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                className="text-red-500 text-red-400 hover:text-red-300"
               >
                 ×
               </button>
@@ -195,25 +195,25 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
         <div className="text-center">
           {isPersonalFlow ? (
             <>
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">👤</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Personal Workspace
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-400 mb-6">
                 We'll create your personal workspace with all the features you need for individual productivity.
               </p>
             </>
           ) : (
             <>
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">👥</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Shared Workspace
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-400 mb-6">
                 Let's create a shared workspace where you can collaborate with family, partners, or teammates.
               </p>
             </>

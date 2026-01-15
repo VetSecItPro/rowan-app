@@ -199,7 +199,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
       <div className={`flex items-center gap-2 ${className}`}>
         <div className="flex gap-1">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="w-8 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div key={i} className="w-8 h-6 bg-gray-700 rounded animate-pulse" />
           ))}
         </div>
       </div>
@@ -219,8 +219,8 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
           title={getReactionTooltip(emoji)}
           className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all hover:scale-105 ${
             userReactions.has(emoji)
-              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? 'bg-blue-900/30 text-blue-300 border border-blue-700'
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
           }`}
         >
           <span>{emoji}</span>
@@ -232,7 +232,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
       <div className="relative">
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-gray-800 text-gray-400 hover:bg-gray-700 transition-all"
           title="Add reaction"
         >
           <Smile className="h-3 w-3" />
@@ -241,17 +241,17 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
 
         {/* Emoji picker */}
         {showEmojiPicker && (
-          <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-3 z-50 min-w-[240px]">
+          <div className="absolute bottom-full left-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-3 z-50 min-w-[240px]">
             {/* Popular emojis */}
             <div className="mb-3">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Popular</p>
+              <p className="text-xs font-medium text-gray-400 mb-2">Popular</p>
               <div className="grid grid-cols-6 gap-1">
                 {popularEmojis.map(emoji => (
                   <button
                     key={emoji}
                     onClick={() => handleReaction(emoji)}
-                    className={`w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center ${
-                      userReactions.has(emoji) ? 'bg-blue-100 dark:bg-blue-900/30' : ''
+                    className={`w-8 h-8 rounded hover:bg-gray-700 transition-colors flex items-center justify-center ${
+                      userReactions.has(emoji) ? 'bg-blue-900/30' : ''
                     }`}
                     title={emoji}
                   >
@@ -265,7 +265,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {Object.entries(emojiCategories).map(([category, emojis]) => (
                 <div key={category}>
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 capitalize">
+                  <p className="text-xs font-medium text-gray-400 mb-1 capitalize">
                     {category}
                   </p>
                   <div className="grid grid-cols-8 gap-1">
@@ -273,8 +273,8 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
                       <button
                         key={emoji}
                         onClick={() => handleReaction(emoji)}
-                        className={`w-6 h-6 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center text-sm ${
-                          userReactions.has(emoji) ? 'bg-blue-100 dark:bg-blue-900/30' : ''
+                        className={`w-6 h-6 rounded hover:bg-gray-700 transition-colors flex items-center justify-center text-sm ${
+                          userReactions.has(emoji) ? 'bg-blue-900/30' : ''
                         }`}
                         title={emoji}
                       >
@@ -287,10 +287,10 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
             </div>
 
             {/* Close button */}
-            <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <div className="mt-3 pt-2 border-t border-gray-700">
               <button
                 onClick={() => setShowEmojiPicker(false)}
-                className="w-full px-3 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                className="w-full px-3 py-1 text-xs text-gray-400 hover:text-gray-200 transition-colors"
               >
                 Close
               </button>

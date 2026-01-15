@@ -102,7 +102,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950">
+    <div className="min-h-screen bg-gradient-to-b from-white from-gray-900 to-gray-950">
       {/* Hero Section */}
       <div className="px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl">
@@ -120,16 +120,16 @@ export default function PricingPage() {
 
             {/* Trial Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-2">
-              <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              <Sparkles className="h-4 w-4 text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-300">
                 Start with a 14-day free trial - no credit card required
               </span>
             </div>
 
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
               The family command center that works
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
               Try Rowan Pro free for 14 days. Experience unlimited tasks, calendar, meal planning,
               and more. No commitment - upgrade only if you love it.
             </p>
@@ -142,8 +142,8 @@ export default function PricingPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mt-8 mx-auto max-w-md rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 text-center">
-              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+            <div className="mt-8 mx-auto max-w-md rounded-lg bg-red-900/20 border border-red-800 p-4 text-center">
+              <p className="text-sm text-red-300">{error}</p>
             </div>
           )}
 
@@ -228,46 +228,46 @@ export default function PricingPage() {
 
           {/* Trust Signals */}
           <div className="mt-16">
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <Clock className="h-4 w-4 text-emerald-400" />
                 <span>14-day free trial</span>
               </div>
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <Shield className="h-4 w-4 text-emerald-400" />
                 <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <Sparkles className="h-4 w-4 text-emerald-400" />
                 <span>Cancel anytime</span>
               </div>
             </div>
-            <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-500">
+            <p className="mt-4 text-center text-sm text-gray-500">
               30-day money-back guarantee on paid plans • Secure payment via Stripe
             </p>
           </div>
 
           {/* FAQ Section */}
           <div className="mt-24">
-            <h2 className="text-center text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-center text-3xl font-bold text-white">
               Frequently Asked Questions
             </h2>
             <div className="mx-auto mt-12 max-w-3xl space-y-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   Can I switch plans later?
                 </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-gray-400">
                   Yes! You can upgrade or downgrade your plan at any time. Changes take effect
                   immediately, and we'll prorate any charges or credits.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   What happens to my data if I cancel?
                 </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-gray-400">
                   Your data is safe! If you cancel, you'll still have access until the end of your
                   billing period. After that, you'll be downgraded to the free tier, and your data
                   remains accessible with free tier limits.
@@ -275,30 +275,30 @@ export default function PricingPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   Do you offer refunds?
                 </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-gray-400">
                   We offer a 30-day money-back guarantee. If you're not satisfied within the first
                   30 days, contact us for a full refund, no questions asked.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   How do I cancel my subscription?
                 </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-gray-400">
                   You can cancel anytime from your account settings. Your subscription will remain
                   active until the end of the current billing period.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-white">
                   What payment methods do you accept?
                 </h3>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-gray-400">
                   We accept all major credit cards (Visa, Mastercard, American Express, Discover)
                   through our secure payment processor, Stripe.
                 </p>

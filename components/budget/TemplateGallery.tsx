@@ -61,10 +61,10 @@ export function TemplateGallery({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Filter Controls */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
         <div className="flex items-center gap-2 mb-3">
-          <Filter className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <Filter className="w-4 h-4 text-gray-400" />
+          <h3 className="text-sm font-medium text-gray-300">
             Filter Templates
           </h3>
           {hasActiveFilters && (
@@ -73,7 +73,7 @@ export function TemplateGallery({
                 setHouseholdFilter('all');
                 setShowOnlyRecommended(false);
               }}
-              className="ml-auto text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 font-medium"
+              className="ml-auto text-xs text-amber-600 text-amber-400 hover:text-amber-300 font-medium"
             >
               Clear Filters
             </button>
@@ -85,7 +85,7 @@ export function TemplateGallery({
           <div>
             <label
               htmlFor="household-filter"
-              className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              className="block text-xs font-medium text-gray-400 mb-1"
             >
               Household Type
             </label>
@@ -93,7 +93,7 @@ export function TemplateGallery({
               id="household-filter"
               value={householdFilter}
               onChange={(e) => setHouseholdFilter(e.target.value as HouseholdType | 'all')}
-              className="w-full px-3 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               <option value="all">All Types</option>
               {Object.entries(householdLabels).map(([key, label]) => (
@@ -114,7 +114,7 @@ export function TemplateGallery({
                   onChange={(e) => setShowOnlyRecommended(e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-300">
                   Show only recommended for my income
                 </span>
               </label>
@@ -124,7 +124,7 @@ export function TemplateGallery({
       </div>
 
       {/* Results Summary */}
-      <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex items-center justify-between text-sm text-gray-400">
         <span>
           {filteredTemplates.length} {filteredTemplates.length === 1 ? 'template' : 'templates'}{' '}
           {hasActiveFilters ? 'found' : 'available'}
@@ -133,12 +133,12 @@ export function TemplateGallery({
 
       {/* Templates Grid */}
       {filteredTemplates.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="text-center py-12 bg-gray-900 rounded-lg border border-gray-700">
           <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-medium text-white mb-2">
             No Templates Found
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-gray-400 mb-4">
             {hasActiveFilters
               ? 'Try adjusting your filters to see more options.'
               : 'No budget templates are currently available.'}

@@ -87,7 +87,7 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
 
   if (loading) {
     return (
-      <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+      <div className="text-center py-4 text-gray-400 text-sm">
         Loading attachments...
       </div>
     );
@@ -154,11 +154,11 @@ function AttachmentItem({
   const fileSize = reminderAttachmentsService.formatFileSize(attachment.file_size);
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg group hover:shadow-md transition-shadow">
+    <div className="flex items-center gap-3 p-3 bg-gray-900 border border-gray-700 rounded-lg group hover:shadow-md transition-shadow">
       {/* Icon/Thumbnail */}
       <div className="flex-shrink-0">
         {isImage && attachment.type === 'file' && attachment.file_path ? (
-          <div className="relative w-12 h-12 rounded overflow-hidden bg-gray-200 dark:bg-gray-800">
+          <div className="relative w-12 h-12 rounded overflow-hidden bg-gray-800">
             <img
               src={reminderAttachmentsService.getFileUrl(attachment.file_path)}
               alt={attachment.display_name}
@@ -176,10 +176,10 @@ function AttachmentItem({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+        <p className="text-sm font-medium text-white truncate">
           {attachment.display_name}
         </p>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
           {attachment.type === 'file' && <span>{fileSize}</span>}
           {attachment.uploader && <span>• {attachment.uploader.name}</span>}
         </div>
@@ -191,13 +191,13 @@ function AttachmentItem({
         {(attachment.type === 'file' || attachment.type === 'url') && (
           <button
             onClick={onDownload}
-            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+            className="p-2 hover:bg-gray-700 rounded transition-colors"
             aria-label={attachment.type === 'url' ? 'Open link' : 'Download file'}
           >
             {attachment.type === 'url' ? (
-              <ExternalLink className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <ExternalLink className="w-4 h-4 text-gray-400" />
             ) : (
-              <Download className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <Download className="w-4 h-4 text-gray-400" />
             )}
           </button>
         )}
@@ -207,10 +207,10 @@ function AttachmentItem({
           <button
             onClick={onDelete}
             disabled={isDeleting}
-            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors disabled:opacity-50"
+            className="p-2 hover:bg-red-900/30 rounded transition-colors disabled:opacity-50"
             aria-label="Delete attachment"
           >
-            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <Trash2 className="w-4 h-4 text-red-400" />
           </button>
         )}
       </div>

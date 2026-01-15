@@ -105,17 +105,17 @@ export function SplitCalculator({
   const fixedAmountError = Math.abs(user1FixedAmount + user2FixedAmount - totalAmount) > 0.01;
 
   return (
-    <div className={`bg-gray-50 dark:bg-gray-900 rounded-lg p-6 space-y-4 ${className}`}>
+    <div className={`bg-gray-900 rounded-lg p-6 space-y-4 ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <Calculator className="w-5 h-5 text-amber-600" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Split Calculation</h3>
+        <h3 className="text-lg font-semibold text-white">Split Calculation</h3>
       </div>
 
       {/* Total Amount Display */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Total Amount</span>
+          <span className="text-sm text-gray-400">Total Amount</span>
           <span className="text-2xl font-bold text-amber-600">
             ${totalAmount.toLocaleString()}
           </span>
@@ -127,7 +127,7 @@ export function SplitCalculator({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 {user1Name} %
               </label>
               <input
@@ -141,11 +141,11 @@ export function SplitCalculator({
                   setUser1Percentage(val);
                   setUser2Percentage(100 - val);
                 }}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 {user2Name} %
               </label>
               <input
@@ -159,12 +159,12 @@ export function SplitCalculator({
                   setUser2Percentage(val);
                   setUser1Percentage(100 - val);
                 }}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
           {percentageError && (
-            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+            <div className="flex items-center gap-2 text-sm text-red-400">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>Percentages must sum to 100%</span>
             </div>
@@ -177,7 +177,7 @@ export function SplitCalculator({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 {user1Name} $
               </label>
               <input
@@ -190,11 +190,11 @@ export function SplitCalculator({
                   setUser1FixedAmount(val);
                   setUser2FixedAmount(totalAmount - val);
                 }}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 {user2Name} $
               </label>
               <input
@@ -207,12 +207,12 @@ export function SplitCalculator({
                   setUser2FixedAmount(val);
                   setUser1FixedAmount(totalAmount - val);
                 }}
-                className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
           </div>
           {fixedAmountError && (
-            <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+            <div className="flex items-center gap-2 text-sm text-red-400">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>Amounts must sum to ${totalAmount.toLocaleString()}</span>
             </div>
@@ -222,20 +222,20 @@ export function SplitCalculator({
 
       {/* Income Information for Income-Based */}
       {splitType === 'income-based' && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3">
           <div className="flex items-start gap-2 mb-2">
-            <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800 dark:text-blue-200">
+            <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-200">
               <strong>Income-based split:</strong> Proportional to each person's income
             </div>
           </div>
           {user1Income > 0 && user2Income > 0 ? (
-            <div className="text-xs text-blue-700 dark:text-blue-300 mt-2 space-y-1">
+            <div className="text-xs text-blue-300 mt-2 space-y-1">
               <div>{user1Name}: ${user1Income.toLocaleString()}/month</div>
               <div>{user2Name}: ${user2Income.toLocaleString()}/month</div>
             </div>
           ) : (
-            <div className="text-xs text-red-600 dark:text-red-400 mt-2">
+            <div className="text-xs text-red-400 mt-2">
               Income information not set. Update incomes to use this split type.
             </div>
           )}
@@ -245,36 +245,36 @@ export function SplitCalculator({
       {/* Results Display */}
       <div className="grid grid-cols-2 gap-3">
         {/* User 1 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <div className="flex items-center gap-2 mb-2">
             <User className="w-4 h-4 text-emerald-600" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user1Name}</span>
+            <span className="text-sm font-medium text-gray-300">{user1Name}</span>
           </div>
           <div className="text-2xl font-bold text-emerald-600 mb-1">
             ${result.user1Amount.toLocaleString()}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-400">
             {result.user1Percentage.toFixed(1)}% of total
           </div>
         </div>
 
         {/* User 2 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user2Name}</span>
+            <span className="text-sm font-medium text-gray-300">{user2Name}</span>
           </div>
           <div className="text-2xl font-bold text-blue-600 mb-1">
             ${result.user2Amount.toLocaleString()}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-400">
             {result.user2Percentage.toFixed(1)}% of total
           </div>
         </div>
       </div>
 
       {/* Visual Split Bar */}
-      <div className="relative h-8 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="relative h-8 bg-gray-700 rounded-full overflow-hidden">
         <div
           className="absolute left-0 top-0 h-full bg-emerald-500 transition-all flex items-center justify-center text-xs text-white font-medium"
           style={{ width: `${result.user1Percentage}%` }}

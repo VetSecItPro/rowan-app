@@ -75,16 +75,16 @@ function getStatusBadge(status?: string): { bg: string; text: string; label: str
   switch (status?.toLowerCase()) {
     case 'completed':
     case 'done':
-      return { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', label: 'Completed' };
+      return { bg: 'bg-green-900/30', text: 'text-green-300', label: 'Completed' };
     case 'in-progress':
     case 'in_progress':
-      return { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', label: 'In Progress' };
+      return { bg: 'bg-blue-900/30', text: 'text-blue-300', label: 'In Progress' };
     case 'pending':
-      return { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', label: 'Pending' };
+      return { bg: 'bg-yellow-900/30', text: 'text-yellow-300', label: 'Pending' };
     case 'overdue':
-      return { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', label: 'Overdue' };
+      return { bg: 'bg-red-900/30', text: 'text-red-300', label: 'Overdue' };
     default:
-      return { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300', label: status || 'Unknown' };
+      return { bg: 'bg-gray-800', text: 'text-gray-300', label: status || 'Unknown' };
   }
 }
 
@@ -98,7 +98,7 @@ function TaskDetails({ item }: { item: UnifiedCalendarItem }) {
       {task.priority && (
         <div className="flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Priority:</span>
+          <span className="text-sm text-gray-400">Priority:</span>
           <span className={`text-sm font-medium capitalize ${
             task.priority === 'urgent' ? 'text-red-600' :
             task.priority === 'high' ? 'text-orange-600' :
@@ -111,8 +111,8 @@ function TaskDetails({ item }: { item: UnifiedCalendarItem }) {
       {task.estimated_hours && (
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Estimated:</span>
-          <span className="text-sm font-medium text-gray-900 dark:text-white">
+          <span className="text-sm text-gray-400">Estimated:</span>
+          <span className="text-sm font-medium text-white">
             {task.estimated_hours} hours
           </span>
         </div>
@@ -131,18 +131,18 @@ function MealDetails({ item }: { item: UnifiedCalendarItem }) {
       {meal.meal_type && (
         <div className="flex items-center gap-2">
           <UtensilsCrossed className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Meal Type:</span>
-          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+          <span className="text-sm text-gray-400">Meal Type:</span>
+          <span className="text-sm font-medium text-white capitalize">
             {meal.meal_type}
           </span>
         </div>
       )}
       {meal.recipe && (
-        <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-          <p className="text-sm font-medium text-orange-800 dark:text-orange-200">Recipe</p>
-          <p className="text-sm text-orange-700 dark:text-orange-300">{meal.recipe.name}</p>
+        <div className="mt-3 p-3 bg-orange-900/20 rounded-lg">
+          <p className="text-sm font-medium text-orange-200">Recipe</p>
+          <p className="text-sm text-orange-300">{meal.recipe.name}</p>
           {meal.recipe.prep_time && (
-            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+            <p className="text-xs text-orange-400 mt-1">
               Prep: {meal.recipe.prep_time} min | Cook: {meal.recipe.cook_time || 0} min
             </p>
           )}
@@ -162,8 +162,8 @@ function ReminderDetails({ item }: { item: UnifiedCalendarItem }) {
       {reminder.category && (
         <div className="flex items-center gap-2">
           <Bell className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Category:</span>
-          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+          <span className="text-sm text-gray-400">Category:</span>
+          <span className="text-sm font-medium text-white capitalize">
             {reminder.category}
           </span>
         </div>
@@ -171,7 +171,7 @@ function ReminderDetails({ item }: { item: UnifiedCalendarItem }) {
       {reminder.recurrence_pattern && (
         <div className="flex items-center gap-2">
           <Circle className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-pink-600 dark:text-pink-400 font-medium">
+          <span className="text-sm text-pink-400 font-medium">
             Recurring: {reminder.recurrence_pattern}
           </span>
         </div>
@@ -190,10 +190,10 @@ function GoalDetails({ item }: { item: UnifiedCalendarItem }) {
       {goal.progress !== undefined && (
         <div className="space-y-1">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Progress</span>
-            <span className="font-medium text-gray-900 dark:text-white">{goal.progress}%</span>
+            <span className="text-gray-400">Progress</span>
+            <span className="font-medium text-white">{goal.progress}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-indigo-500 rounded-full transition-all"
               style={{ width: `${goal.progress}%` }}
@@ -204,8 +204,8 @@ function GoalDetails({ item }: { item: UnifiedCalendarItem }) {
       {goal.category && (
         <div className="flex items-center gap-2">
           <Target className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600 dark:text-gray-400">Category:</span>
-          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+          <span className="text-sm text-gray-400">Category:</span>
+          <span className="text-sm font-medium text-white capitalize">
             {goal.category}
           </span>
         </div>
@@ -234,11 +234,11 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 sm:rounded-t-2xl ${colors.bg}`}>
+        <div className={`flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-700 sm:rounded-t-2xl ${colors.bg}`}>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg ${colors.bg} ${colors.border} border-2 flex items-center justify-center`}>
@@ -248,14 +248,14 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
                   <span className={`text-xs font-semibold uppercase tracking-wide ${colors.text}`}>
                     {label}
                   </span>
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+                  <h2 className="text-lg font-bold text-white mt-0.5">
                     {item.title}
                   </h2>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -277,14 +277,14 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-900 dark:text-white">
+                <span className="text-sm text-white">
                   {formatDate(item.startTime)}
                 </span>
               </div>
               {!item.isAllDay && (
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-900 dark:text-white">
+                  <span className="text-sm text-white">
                     {formatTime(item.startTime)}
                     {item.endTime && ` - ${formatTime(item.endTime)}`}
                   </span>
@@ -294,8 +294,8 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
 
             {/* Description */}
             {item.description && (
-              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+              <div className="p-3 bg-gray-800 rounded-lg">
+                <p className="text-sm text-gray-300">
                   {item.description}
                 </p>
               </div>
@@ -305,7 +305,7 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
             {item.location && (
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-300">
                   {item.location}
                 </span>
               </div>
@@ -319,11 +319,11 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
           </div>
 
           {/* Footer */}
-          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-700 flex justify-end gap-3">
             <button
               onClick={onClose}
               disabled={isNavigating}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
             >
               Close
             </button>

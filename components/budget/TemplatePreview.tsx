@@ -37,17 +37,17 @@ export function TemplatePreview({
   const isUnderAllocated = totalPercentage < 100;
 
   return (
-    <div className={`bg-gray-50 dark:bg-gray-900 rounded-lg p-6 ${className}`}>
+    <div className={`bg-gray-900 rounded-lg p-6 ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp className="w-5 h-5 text-amber-600" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Budget Preview</h3>
+        <h3 className="text-lg font-semibold text-white">Budget Preview</h3>
       </div>
 
       {/* Total Budget Summary */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 mb-4">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Total Monthly Income</span>
+          <span className="text-sm text-gray-400">Total Monthly Income</span>
           <span className="text-2xl font-bold text-amber-600">
             ${monthlyIncome.toLocaleString()}
           </span>
@@ -56,12 +56,12 @@ export function TemplatePreview({
         {/* Allocation Status */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Total Allocated</span>
+            <span className="text-gray-400">Total Allocated</span>
             <span
               className={`font-medium ${
                 isOverAllocated
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-900 dark:text-white'
+                  ? 'text-red-400'
+                  : 'text-white'
               }`}
             >
               ${totalAllocated.toLocaleString()} ({totalPercentage}%)
@@ -69,14 +69,14 @@ export function TemplatePreview({
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Remaining</span>
+            <span className="text-gray-400">Remaining</span>
             <span
               className={`font-medium ${
                 remaining < 0
-                  ? 'text-red-600 dark:text-red-400'
+                  ? 'text-red-400'
                   : remaining > 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-gray-900 dark:text-white'
+                  ? 'text-green-400'
+                  : 'text-white'
               }`}
             >
               ${Math.abs(remaining).toLocaleString()}
@@ -87,7 +87,7 @@ export function TemplatePreview({
 
         {/* Progress Bar */}
         <div className="mt-3">
-          <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all ${
                 isOverAllocated ? 'bg-red-500' : 'bg-amber-500'
@@ -100,9 +100,9 @@ export function TemplatePreview({
 
       {/* Warnings */}
       {isOverAllocated && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 flex items-start gap-2">
-          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-red-800 dark:text-red-200">
+        <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4 flex items-start gap-2">
+          <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-red-200">
             <strong>Warning:</strong> This budget allocates more than 100% of your income. You'll
             need to adjust the categories.
           </div>
@@ -110,9 +110,9 @@ export function TemplatePreview({
       )}
 
       {isUnderAllocated && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4 flex items-start gap-2">
-          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800 dark:text-blue-200">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mb-4 flex items-start gap-2">
+          <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-200">
             You have ${remaining.toLocaleString()} ({100 - totalPercentage}%) unallocated. Consider
             allocating to savings or other categories.
           </div>
@@ -122,7 +122,7 @@ export function TemplatePreview({
       {/* Category Breakdown */}
       <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         {categoriesWithAmounts.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-gray-400">
             <Info className="w-10 h-10 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No categories defined for this template</p>
           </div>
@@ -130,7 +130,7 @@ export function TemplatePreview({
           categoriesWithAmounts.map((category) => (
             <div
               key={category.id}
-              className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+              className="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -139,18 +139,18 @@ export function TemplatePreview({
                       {category.icon}
                     </span>
                   )}
-                  <span className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                  <span className="font-medium text-white text-sm truncate">
                     {category.category_name}
                   </span>
                 </div>
-                <span className="font-bold text-gray-900 dark:text-white flex-shrink-0 ml-2">
+                <span className="font-bold text-white flex-shrink-0 ml-2">
                   ${category.calculated_amount.toLocaleString()}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 {category.description && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 mr-2">
+                  <span className="text-xs text-gray-400 truncate flex-1 mr-2">
                     {category.description}
                   </span>
                 )}
@@ -160,7 +160,7 @@ export function TemplatePreview({
               </div>
 
               {/* Visual percentage bar */}
-              <div className="mt-2 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="mt-2 h-1 bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-amber-500"
                   style={{ width: `${category.percentage}%` }}

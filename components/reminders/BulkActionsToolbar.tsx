@@ -134,22 +134,22 @@ export function BulkActionsToolbar({
   return (
     <>
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-in slide-in-from-bottom-4 pb-safe">
-        <div className="bg-white dark:bg-gray-800 border-2 border-blue-500 dark:border-blue-600 rounded-xl shadow-2xl p-4 flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+        <div className="bg-gray-800 border-2 border-blue-600 rounded-xl shadow-2xl p-4 flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
           {/* Selection Count */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-900/30 rounded-lg">
+            <span className="text-sm font-semibold text-blue-300">
               {selectedCount} selected
             </span>
           </div>
 
           {/* Divider */}
-          <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+          <div className="w-px h-8 bg-gray-600" />
 
           {/* Complete */}
           <button
             onClick={() => setShowCompleteConfirm(true)}
             disabled={isProcessing}
-            className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-1.5 bg-green-900/30 text-green-300 rounded-lg hover:bg-green-900/50 transition-colors disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span className="text-sm font-medium">Complete</span>
@@ -160,7 +160,7 @@ export function BulkActionsToolbar({
             <button
               onClick={() => setShowPriorityMenu(!showPriorityMenu)}
               disabled={isProcessing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-900/30 text-blue-300 rounded-lg hover:bg-blue-900/50 transition-colors disabled:opacity-50"
             >
               <Flag className="w-4 h-4" />
               <span className="text-sm font-medium">Priority</span>
@@ -173,12 +173,12 @@ export function BulkActionsToolbar({
                   className="fixed inset-0 z-10"
                   onClick={() => setShowPriorityMenu(false)}
                 />
-                <div className="absolute bottom-full mb-2 left-0 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+                <div className="absolute bottom-full mb-2 left-0 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                   {(['low', 'medium', 'high', 'urgent'] as const).map((priority) => (
                     <button
                       key={priority}
                       onClick={() => handleChangePriority(priority)}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize transition-colors"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize transition-colors"
                     >
                       {priority}
                     </button>
@@ -193,7 +193,7 @@ export function BulkActionsToolbar({
             <button
               onClick={() => setShowCategoryMenu(!showCategoryMenu)}
               disabled={isProcessing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-1.5 bg-purple-900/30 text-purple-300 rounded-lg hover:bg-purple-900/50 transition-colors disabled:opacity-50"
             >
               <Tag className="w-4 h-4" />
               <span className="text-sm font-medium">Category</span>
@@ -206,13 +206,13 @@ export function BulkActionsToolbar({
                   className="fixed inset-0 z-10"
                   onClick={() => setShowCategoryMenu(false)}
                 />
-                <div className="absolute bottom-full mb-2 left-0 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20">
+                <div className="absolute bottom-full mb-2 left-0 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                   {(['bills', 'health', 'work', 'personal', 'household'] as const).map(
                     (category) => (
                       <button
                         key={category}
                         onClick={() => handleChangeCategory(category)}
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize transition-colors"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg capitalize transition-colors"
                       >
                         {category}
                       </button>
@@ -227,23 +227,23 @@ export function BulkActionsToolbar({
           <div className="relative group">
             <button
               disabled={isProcessing}
-              className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded-lg hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-1.5 bg-amber-900/30 text-amber-300 rounded-lg hover:bg-amber-900/50 transition-colors disabled:opacity-50"
             >
               <Download className="w-4 h-4" />
               <span className="text-sm font-medium">Export</span>
               <ChevronDown className="w-3 h-3" />
             </button>
 
-            <div className="absolute bottom-full mb-2 left-0 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto z-20">
+            <div className="absolute bottom-full mb-2 left-0 w-32 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto z-20">
               <button
                 onClick={handleExportJSON}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 rounded-t-lg transition-colors"
               >
                 JSON
               </button>
               <button
                 onClick={handleExportCSV}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg transition-colors"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 rounded-b-lg transition-colors"
               >
                 CSV
               </button>
@@ -251,13 +251,13 @@ export function BulkActionsToolbar({
           </div>
 
           {/* Divider */}
-          <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+          <div className="w-px h-8 bg-gray-600" />
 
           {/* Delete */}
           <button
             onClick={() => setShowDeleteConfirm(true)}
             disabled={isProcessing}
-            className="flex items-center gap-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-1.5 bg-red-900/30 text-red-300 rounded-lg hover:bg-red-900/50 transition-colors disabled:opacity-50"
           >
             <Trash2 className="w-4 h-4" />
             <span className="text-sm font-medium">Delete</span>
@@ -267,9 +267,9 @@ export function BulkActionsToolbar({
           <button
             onClick={onClearSelection}
             disabled={isProcessing}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+            className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
           >
-            <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <X className="w-4 h-4 text-gray-400" />
           </button>
         </div>
       </div>
@@ -281,18 +281,18 @@ export function BulkActionsToolbar({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowCompleteConfirm(false)}
           />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
+            <h3 className="text-xl font-bold text-white mb-4">
               Complete {selectedCount} Reminder{selectedCount > 1 ? 's' : ''}?
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-400 mb-6">
               This will mark all selected reminders as completed.
             </p>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowCompleteConfirm(false)}
                 disabled={isProcessing}
-                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -315,18 +315,18 @@ export function BulkActionsToolbar({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowDeleteConfirm(false)}
           />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
+            <h3 className="text-xl font-bold text-white mb-4">
               Delete {selectedCount} Reminder{selectedCount > 1 ? 's' : ''}?
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-400 mb-6">
               This action cannot be undone. All selected reminders will be permanently deleted.
             </p>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isProcessing}
-                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

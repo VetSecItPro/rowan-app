@@ -351,7 +351,7 @@ export function OptimizedAudio({
   };
 
   return (
-    <div className={`flex items-center gap-3 p-3 bg-gray-100 dark:bg-gray-800 rounded-xl ${className}`}>
+    <div className={`flex items-center gap-3 p-3 bg-gray-800 rounded-xl ${className}`}>
       <button
         onClick={handlePlayPause}
         className="
@@ -371,10 +371,10 @@ export function OptimizedAudio({
       </button>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+        <p className="text-sm font-medium text-white truncate">
           {title}
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-400">
           {formatTime(currentTime)} / {duration ? formatTime(duration) : '--:--'}
         </p>
       </div>

@@ -631,18 +631,18 @@ export const reminderNotificationsService = {
    */
   getNotificationColor(type: NotificationType): string {
     const colorMap: Record<NotificationType, string> = {
-      due: 'text-blue-600 dark:text-blue-400',
-      overdue: 'text-red-600 dark:text-red-400',
-      assigned: 'text-green-600 dark:text-green-400',
-      unassigned: 'text-gray-600 dark:text-gray-400',
-      mentioned: 'text-purple-600 dark:text-purple-400',
-      commented: 'text-pink-600 dark:text-pink-400',
-      completed: 'text-green-600 dark:text-green-400',
-      snoozed: 'text-purple-600 dark:text-purple-400',
-      goal_checkin_due: 'text-indigo-600 dark:text-indigo-400',
-      goal_checkin_overdue: 'text-red-600 dark:text-red-400',
+      due: 'text-blue-400',
+      overdue: 'text-red-400',
+      assigned: 'text-green-400',
+      unassigned: 'text-gray-400',
+      mentioned: 'text-purple-400',
+      commented: 'text-pink-400',
+      completed: 'text-green-400',
+      snoozed: 'text-purple-400',
+      goal_checkin_due: 'text-indigo-400',
+      goal_checkin_overdue: 'text-red-400',
     };
 
-    return colorMap[type] || 'text-gray-600 dark:text-gray-400';
+    return colorMap[type] || 'text-gray-400';
   },
 };

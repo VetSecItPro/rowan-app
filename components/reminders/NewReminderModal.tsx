@@ -179,7 +179,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       />
 
       {/* Modal */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 bg-gradient-reminders flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
           <h2 className="text-lg sm:text-xl font-bold text-white">
@@ -208,7 +208,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="button"
               onClick={() => setShowTemplatePicker(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 border border-pink-200 dark:border-pink-800/50 rounded-xl text-pink-600 dark:text-pink-400 hover:from-pink-100 hover:to-purple-100 dark:hover:from-pink-900/30 dark:hover:to-purple-900/30 transition-all text-sm font-medium"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-pink-50 from-pink-900/20 to-purple-900/20 border border-pink-800/50 rounded-xl text-pink-400 hover:from-pink-100 hover:from-pink-900/30 hover:to-purple-900/30 transition-all text-sm font-medium"
             >
               <Sparkles className="w-4 h-4" />
               Start from a template
@@ -217,7 +217,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
           {/* Title with Emoji Picker */}
           <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Reminder Title *
             </label>
             <div className="relative">
@@ -228,12 +228,12 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                 id="field-1"
               onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}
                 placeholder="Enter reminder title..."
-                className="w-full px-4 pr-12 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-gray-900 dark:text-white"
+                className="w-full px-4 pr-12 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-white"
               />
               <button
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors z-10"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-700 rounded transition-colors z-10"
               >
                 <Smile className="w-5 h-5 text-gray-400" />
               </button>
@@ -245,8 +245,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     className="fixed inset-0 z-20"
                     onClick={() => setShowEmojiPicker(false)}
                   />
-                  <div className="absolute right-0 mt-2 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-30 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
-                    <h4 className="text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select an emoji</h4>
+                  <div className="absolute right-0 mt-2 p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-30 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+                    <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>
                     <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {['🔔', '⏰', '📅', '⚡', '💡', '📌', '✅', '🎯', '⭐', '💊', '🏃', '💰', '🏠', '📝', '📧', '☎️', '🎉', '🎂', '❤️', '🔥'].map((emoji) => (
                         <button
@@ -256,7 +256,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                             setFormData({ ...formData, emoji });
                             setShowEmojiPicker(false);
                           }}
-                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          className="w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-700 rounded-lg transition-colors"
                         >
                           {emoji}
                         </button>
@@ -270,7 +270,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
           {/* Description */}
           <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+            <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
               Description
             </label>
             <textarea
@@ -279,7 +279,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
               placeholder="Add a description..."
               rows={2}
-              className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-gray-900 dark:text-white resize-none overflow-y-auto max-h-24"
+              className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-white resize-none overflow-y-auto max-h-24"
             />
           </div>
 
@@ -287,7 +287,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           {editReminder && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Attachments
                 </label>
                 <AttachmentList
@@ -304,16 +304,16 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
           {/* Category Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
               Category
             </label>
             <div className="flex gap-1.5 overflow-x-auto pb-1">
               {[
-                { value: 'bills', label: 'Bills', icon: '💰', color: 'bg-green-500', hoverBg: 'hover:bg-green-100 dark:hover:bg-green-900/30' },
-                { value: 'health', label: 'Health', icon: '💊', color: 'bg-red-500', hoverBg: 'hover:bg-red-100 dark:hover:bg-red-900/30' },
-                { value: 'work', label: 'Work', icon: '💼', color: 'bg-blue-500', hoverBg: 'hover:bg-blue-100 dark:hover:bg-blue-900/30' },
-                { value: 'personal', label: 'Me', icon: '👤', color: 'bg-purple-500', hoverBg: 'hover:bg-purple-100 dark:hover:bg-purple-900/30' },
-                { value: 'household', label: 'Home', icon: '🏠', color: 'bg-amber-500', hoverBg: 'hover:bg-amber-100 dark:hover:bg-amber-900/30' },
+                { value: 'bills', label: 'Bills', icon: '💰', color: 'bg-green-500', hoverBg: 'hover:bg-green-900/30' },
+                { value: 'health', label: 'Health', icon: '💊', color: 'bg-red-500', hoverBg: 'hover:bg-red-900/30' },
+                { value: 'work', label: 'Work', icon: '💼', color: 'bg-blue-500', hoverBg: 'hover:bg-blue-900/30' },
+                { value: 'personal', label: 'Me', icon: '👤', color: 'bg-purple-500', hoverBg: 'hover:bg-purple-900/30' },
+                { value: 'household', label: 'Home', icon: '🏠', color: 'bg-amber-500', hoverBg: 'hover:bg-amber-900/30' },
               ].map((category) => (
                 <button
                   key={category.value}
@@ -322,7 +322,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-full transition-all font-medium text-xs ${
                     formData.category === category.value
                       ? `${category.color} text-white shadow-md`
-                      : `bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 ${category.hoverBg}`
+                      : `bg-gray-700 text-gray-300 ${category.hoverBg}`
                   }`}
                 >
                   <span>{category.icon}</span>
@@ -369,7 +369,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           <div className="grid grid-cols-2 gap-4">
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Priority
               </label>
               <Dropdown
@@ -382,7 +382,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
             {/* Repeat Pattern */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Repeat
               </label>
               <Dropdown
@@ -401,7 +401,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           {/* Conditional Weekly Days Selection */}
           {formData.repeat_pattern === 'weekly' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Select Days
               </label>
               <div className="flex flex-wrap gap-2">
@@ -419,7 +419,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                       selectedWeekdays.includes(index)
                         ? 'bg-pink-500 text-white shadow-md'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-pink-100 dark:hover:bg-pink-900/30'
+                        : 'bg-gray-700 text-gray-300 hover:bg-pink-900/30'
                     }`}
                   >
                     {day}
@@ -432,7 +432,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           {/* Conditional Monthly Days Selection */}
           {formData.repeat_pattern === 'monthly' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
                 Select Days of Month
               </label>
               <div className="grid grid-cols-7 gap-2">
@@ -450,7 +450,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                     className={`w-10 h-10 rounded-full text-sm font-medium transition-all ${
                       selectedMonthDays.includes(day)
                         ? 'bg-pink-500 text-white shadow-md'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-pink-100 dark:hover:bg-pink-900/30'
+                        : 'bg-gray-700 text-gray-300 hover:bg-pink-900/30'
                     }`}
                   >
                     {day}
@@ -461,11 +461,11 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-all font-medium"
+              className="px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-all font-medium"
             >
               Cancel
             </button>

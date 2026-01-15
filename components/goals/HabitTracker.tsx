@@ -147,10 +147,10 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-8 bg-gray-700 rounded w-1/3 mb-4"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+              <div key={i} className="h-32 bg-gray-700 rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -162,52 +162,52 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 bg-blue-900/30 rounded-lg flex items-center justify-center">
+              <Target className="w-5 h-5 text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalStats.total}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Habits</p>
+              <p className="text-2xl font-bold text-white">{totalStats.total}</p>
+              <p className="text-sm text-gray-400">Total Habits</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="w-10 h-10 bg-green-900/30 rounded-lg flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-white">
                 {totalStats.completed}/{totalStats.total}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Today's Progress</p>
+              <p className="text-sm text-gray-400">Today's Progress</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="w-10 h-10 bg-purple-900/30 rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalStats.rate}%</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Completion Rate</p>
+              <p className="text-2xl font-bold text-white">{totalStats.rate}%</p>
+              <p className="text-sm text-gray-400">Completion Rate</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-              <Flame className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+            <div className="w-10 h-10 bg-orange-900/30 rounded-lg flex items-center justify-center">
+              <Flame className="w-5 h-5 text-orange-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalStats.activeStreaks}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active Streaks</p>
+              <p className="text-2xl font-bold text-white">{totalStats.activeStreaks}</p>
+              <p className="text-sm text-gray-400">Active Streaks</p>
             </div>
           </div>
         </div>
@@ -216,15 +216,15 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
       {/* Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* View Mode Toggle */}
-        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+        <div className="flex items-center bg-gray-800 rounded-lg p-1">
           {(['today', 'week', 'month'] as ViewMode[]).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
                 viewMode === mode
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               {mode}
@@ -238,7 +238,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="all">All Categories</option>
             {HABIT_CATEGORIES.slice(0, -1).map((category) => (
@@ -262,7 +262,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
             return (
               <div
                 key={habit.template.id}
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all"
+                className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:shadow-lg transition-all"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -271,10 +271,10 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
                       {categoryInfo.icon}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-white">
                         {habit.template.title}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-400">
                         {categoryInfo.label}
                       </p>
                     </div>
@@ -284,7 +284,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
                     className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                       isCompleted
                         ? 'bg-green-500 text-white'
-                        : 'border-2 border-gray-300 dark:border-gray-600 hover:border-green-500'
+                        : 'border-2 border-gray-600 hover:border-green-500'
                     }`}
                   >
                     {isCompleted && <CheckCircle2 className="w-5 h-5" />}
@@ -293,7 +293,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
 
                 {/* Description */}
                 {habit.template.description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-sm text-gray-400 mb-4">
                     {habit.template.description}
                   </p>
                 )}
@@ -304,9 +304,9 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Flame className="w-4 h-4 text-orange-500" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Current Streak</span>
+                      <span className="text-sm text-gray-400">Current Streak</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-white">
                       {currentStreak} days
                     </span>
                   </div>
@@ -315,15 +315,15 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">30-day Rate</span>
+                      <span className="text-sm text-gray-400">30-day Rate</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <span className="text-sm font-semibold text-white">
                       {completionRate.toFixed(1)}%
                     </span>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
                       className="h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, completionRate)}%` }}
@@ -332,10 +332,10 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
                 </div>
 
                 {/* Target */}
-                <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <div className="mt-4 p-3 bg-gray-900 rounded-lg">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Target</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <span className="text-sm text-gray-400">Target</span>
+                    <span className="text-sm font-medium text-white">
                       {habit.template.target_value} {habit.template.target_unit}
                     </span>
                   </div>
@@ -348,27 +348,27 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
 
       {/* Week View */}
       {viewMode === 'week' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-white">
               Week of {format(startOfWeek(selectedDate, { weekStartsOn: 1 }), 'MMM d, yyyy')}
             </h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setSelectedDate(addDays(selectedDate, -7))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setSelectedDate(new Date())}
-                className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+                className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 rounded-md transition-colors"
               >
                 Today
               </button>
               <button
                 onClick={() => setSelectedDate(addDays(selectedDate, 7))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -379,14 +379,14 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
             <table className="w-full">
               <thead>
                 <tr>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-600 dark:text-gray-400">
+                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-400">
                     Habit
                   </th>
                   {getWeekDates().map((date) => (
-                    <th key={date.toISOString()} className="text-center py-2 px-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                    <th key={date.toISOString()} className="text-center py-2 px-2 text-sm font-medium text-gray-400">
                       <div>
                         <div className="text-xs">{format(date, 'EEE')}</div>
-                        <div className={`text-sm ${isToday(date) ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}`}>
+                        <div className={`text-sm ${isToday(date) ? 'text-indigo-400 font-bold' : ''}`}>
                           {format(date, 'd')}
                         </div>
                       </div>
@@ -396,20 +396,20 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               </thead>
               <tbody>
                 {filteredHabits.map((habit) => (
-                  <tr key={habit.template.id} className="border-t border-gray-200 dark:border-gray-700">
+                  <tr key={habit.template.id} className="border-t border-gray-700">
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-3">
                         <div className={`w-6 h-6 ${getCategoryInfo(habit.template.habit_category).color} rounded text-white text-xs flex items-center justify-center`}>
                           {getCategoryInfo(habit.template.habit_category).icon}
                         </div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        <span className="text-sm font-medium text-white">
                           {habit.template.title}
                         </span>
                       </div>
                     </td>
                     {getWeekDates().map((date) => (
                       <td key={date.toISOString()} className="text-center py-3 px-2">
-                        <div className="w-8 h-8 mx-auto rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <div className="w-8 h-8 mx-auto rounded-full bg-gray-700 flex items-center justify-center">
                           {/* Placeholder for week view completion status */}
                           <Circle className="w-4 h-4 text-gray-400" />
                         </div>
@@ -427,16 +427,16 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
       {filteredHabits.length === 0 && !loading && (
         <div className="text-center py-12">
           <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-medium text-white mb-2">
             No habits found
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-gray-400 mb-6">
             {selectedCategory === 'all'
               ? "Start building consistent habits to track your progress"
               : `No habits found in the ${getCategoryInfo(selectedCategory).label} category`
             }
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             Use the "New Habit" button above to get started.
           </p>
         </div>

@@ -63,13 +63,13 @@ export function RichTextToolbar({ textareaRef, onFormatApplied }: RichTextToolba
   ];
 
   return (
-    <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div className="flex items-center gap-1 px-2 py-1 bg-gray-800 border-b border-gray-700">
       {buttons.map((button) => (
         <button
           key={button.label}
           type="button"
           onClick={button.onClick}
-          className="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors active:scale-95"
+          className="p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors active:scale-95"
           title={button.label}
           aria-label={button.label}
         >
@@ -77,7 +77,7 @@ export function RichTextToolbar({ textareaRef, onFormatApplied }: RichTextToolba
         </button>
       ))}
       <div className="flex-1" />
-      <span className="text-xs text-gray-500 dark:text-gray-400">
+      <span className="text-xs text-gray-400">
         Markdown supported
       </span>
     </div>

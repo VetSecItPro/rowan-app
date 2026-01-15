@@ -103,7 +103,7 @@ export function IncomeInput({
       {label && (
         <label
           htmlFor="income-input"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          className="block text-sm font-medium text-gray-300 mb-2"
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -112,7 +112,7 @@ export function IncomeInput({
 
       {/* Input Field */}
       <div className="relative">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
           $
         </span>
         <input
@@ -125,12 +125,12 @@ export function IncomeInput({
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="5000"
-          className={`w-full pl-8 pr-12 py-3 bg-white dark:bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ${
+          className={`w-full pl-8 pr-12 py-3 bg-gray-900 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors ${
             showError
-              ? 'border-red-500 dark:border-red-500'
+              ? 'border-red-500'
               : showSuccess
-              ? 'border-green-500 dark:border-green-500'
-              : 'border-gray-300 dark:border-gray-600'
+              ? 'border-green-500'
+              : 'border-gray-600'
           }`}
           aria-invalid={showError ? 'true' : 'false'}
           aria-describedby={error ? 'income-error' : helpText ? 'income-help' : undefined}
@@ -150,7 +150,7 @@ export function IncomeInput({
 
       {/* Help Text */}
       {helpText && !showError && (
-        <p id="income-help" className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p id="income-help" className="text-xs text-gray-400 mt-1">
           {helpText}
         </p>
       )}
@@ -159,7 +159,7 @@ export function IncomeInput({
       {showError && (
         <p
           id="income-error"
-          className="text-sm text-red-600 dark:text-red-400 mt-1 flex items-center gap-1"
+          className="text-sm text-red-400 mt-1 flex items-center gap-1"
         >
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
@@ -168,7 +168,7 @@ export function IncomeInput({
 
       {/* Success Message (optional) */}
       {showSuccess && value > 0 && (
-        <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+        <p className="text-sm text-green-400 mt-1">
           ${value.toLocaleString()}/month
         </p>
       )}

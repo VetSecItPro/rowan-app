@@ -103,15 +103,15 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
   function getStatusColor(status: string) {
     switch (status) {
       case 'completed':
-        return 'border-l-green-500 bg-green-50 dark:bg-green-900/10';
+        return 'border-l-green-500 bg-green-900/10';
       case 'in_progress':
-        return 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/10';
+        return 'border-l-blue-500 bg-blue-900/10';
       case 'blocked':
-        return 'border-l-red-500 bg-red-50 dark:bg-red-900/10';
+        return 'border-l-red-500 bg-red-900/10';
       case 'on-hold':
-        return 'border-l-amber-500 bg-amber-50 dark:bg-amber-900/10';
+        return 'border-l-amber-500 bg-amber-900/10';
       default:
-        return 'border-l-gray-300 dark:border-l-gray-600 bg-gray-50 dark:bg-gray-800';
+        return 'border-l-gray-600 bg-gray-800';
     }
   }
 
@@ -164,7 +164,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow`}
+      className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-700 hover:shadow-md transition-shadow`}
     >
       {/* Drag Handle */}
       <button
@@ -194,19 +194,19 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       {/* Task Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <h3 className={`font-medium text-gray-900 dark:text-white truncate ${
+          <h3 className={`font-medium text-white truncate ${
             task.status === 'completed' ? 'line-through opacity-60' : ''
           }`}>
             {task.title}
           </h3>
           {isOverdue && (
-            <span className="px-2 py-0.5 text-xs bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded">
+            <span className="px-2 py-0.5 text-xs bg-red-900/20 text-red-300 rounded">
               Overdue
             </span>
           )}
         </div>
         {task.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+          <p className="text-sm text-gray-400 truncate">
             {task.description}
           </p>
         )}
@@ -229,7 +229,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
           }}
           className="p-1 rounded"
         >
-          <MoreVertical className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          <MoreVertical className="w-4 h-4 text-gray-400" />
         </button>
 
         {showMenu && (
@@ -238,7 +238,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
               className="fixed inset-0 z-10"
               onClick={() => setShowMenu(false)}
             />
-            <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20">
+            <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20">
               {onViewDetails && (
                 <button
                   onClick={(e) => {
@@ -399,10 +399,10 @@ export function DraggableTaskList({
       {/* Drag Overlay */}
       <DragOverlay>
         {activeTask ? (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-2xl opacity-90">
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-800 border border-gray-700 shadow-2xl opacity-90">
             <GripVertical className="w-4 h-4 text-gray-400" />
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-gray-900 dark:text-white truncate">
+              <h3 className="font-medium text-white truncate">
                 {activeTask.title}
               </h3>
             </div>

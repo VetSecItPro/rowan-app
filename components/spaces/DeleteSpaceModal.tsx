@@ -197,7 +197,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -226,17 +226,17 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
           {step === 'warning' && (
             <div className="space-y-6">
               {/* Warning */}
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+              <div className="bg-red-900/20 border border-red-800 rounded-xl p-4">
                 <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2">
+                    <h3 className="font-semibold text-red-100 mb-2">
                       Permanent Deletion Warning
                     </h3>
-                    <p className="text-red-800 dark:text-red-200 mb-3">
+                    <p className="text-red-200 mb-3">
                       This action will permanently delete "<strong>{space.name}</strong>" and all its data including:
                     </p>
-                    <ul className="text-red-800 dark:text-red-200 text-sm space-y-1 ml-4">
+                    <ul className="text-red-200 text-sm space-y-1 ml-4">
                       <li>• All tasks and to-do lists</li>
                       <li>• Calendar events and reminders</li>
                       <li>• Messages and conversations</li>
@@ -245,7 +245,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                       <li>• Goals and progress tracking</li>
                       <li>• All other space content</li>
                     </ul>
-                    <p className="text-red-800 dark:text-red-200 mt-3 font-medium">
+                    <p className="text-red-200 mt-3 font-medium">
                       This action cannot be undone.
                     </p>
                   </div>
@@ -253,14 +253,14 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
               </div>
 
               {/* Data Export Recommendation */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+              <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4">
                 <div className="flex items-start gap-3">
-                  <Download className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <Download className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                    <h3 className="font-semibold text-blue-100 mb-2">
                       Recommended: Export Your Data First
                     </h3>
-                    <p className="text-blue-800 dark:text-blue-200">
+                    <p className="text-blue-200">
                       Before deleting this space, we strongly recommend exporting all your data.
                       This allows you to keep a backup of your tasks, events, messages, and other content
                       for your records.
@@ -270,11 +270,11 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-3 pt-4 border-t border-gray-700">
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -293,20 +293,20 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
             <div className="space-y-6">
               {/* Export Summary */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-semibold text-white mb-4">
                   Export Space Data
                 </h3>
 
                 {loadingExportSummary ? (
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 text-center">
+                  <div className="bg-gray-700 rounded-xl p-6 text-center">
                     <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-3"></div>
-                    <p className="text-gray-600 dark:text-gray-400">Loading export summary...</p>
+                    <p className="text-gray-400">Loading export summary...</p>
                   </div>
                 ) : exportSummary ? (
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                  <div className="bg-gray-700 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-4">
-                      <Database className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <Database className="w-5 h-5 text-blue-400" />
+                      <span className="font-medium text-white">
                         Data Summary for "{space.name}"
                       </span>
                     </div>
@@ -326,13 +326,13 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                         { label: 'Goals', count: exportSummary.goals },
                         { label: 'Check-ins', count: exportSummary.daily_checkins },
                       ].map(({ label, count }) => (
-                        <div key={label} className="flex justify-between text-gray-700 dark:text-gray-300">
+                        <div key={label} className="flex justify-between text-gray-300">
                           <span>{label}:</span>
                           <span className="font-medium">{count}</span>
                         </div>
                       ))}
-                      <div className="col-span-2 border-t border-gray-300 dark:border-gray-600 pt-2 mt-2">
-                        <div className="flex justify-between font-semibold text-gray-900 dark:text-white">
+                      <div className="col-span-2 border-t border-gray-600 pt-2 mt-2">
+                        <div className="flex justify-between font-semibold text-white">
                           <span>Total Records:</span>
                           <span>{exportSummary.total}</span>
                         </div>
@@ -346,7 +346,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
               {exportSummary && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Export Format
                     </label>
                     <div className="flex gap-3">
@@ -359,7 +359,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                           onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                         />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">JSON (structured data)</span>
+                        <span className="ml-2 text-sm text-gray-300">JSON (structured data)</span>
                       </label>
                       <label className="flex items-center">
                         <input
@@ -370,7 +370,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                           onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                         />
-                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">CSV (spreadsheet format)</span>
+                        <span className="ml-2 text-sm text-gray-300">CSV (spreadsheet format)</span>
                       </label>
                     </div>
                   </div>
@@ -395,8 +395,8 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                   </button>
 
                   {hasExported && (
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3">
-                      <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
+                    <div className="bg-green-900/20 border border-green-800 rounded-xl p-3">
+                      <div className="flex items-center gap-2 text-green-200">
                         <CheckCircle className="w-5 h-5" />
                         <span className="font-medium">Data exported successfully!</span>
                       </div>
@@ -406,11 +406,11 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
               )}
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-3 pt-4 border-t border-gray-700">
                 <button
                   type="button"
                   onClick={goBack}
-                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
                 >
                   Back
                 </button>
@@ -428,23 +428,23 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
           {step === 'confirm' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-semibold text-white mb-4">
                   Final Confirmation
                 </h3>
 
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
-                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200 mb-2">
+                <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 mb-6">
+                  <div className="flex items-center gap-2 text-red-200 mb-2">
                     <AlertCircle className="w-5 h-5" />
                     <span className="font-semibold">This action is permanent and cannot be undone</span>
                   </div>
-                  <p className="text-red-700 dark:text-red-300 text-sm">
+                  <p className="text-red-300 text-sm">
                     All data in "{space.name}" will be permanently deleted from our servers.
                   </p>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Type the space name to confirm: <strong>{space.name}</strong>
                     </label>
                     <input
@@ -452,12 +452,12 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                       value={spaceNameConfirmation}
                       onChange={(e) => setSpaceNameConfirmation(e.target.value)}
                       placeholder={space.name}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Type <strong>DELETE_SPACE</strong> to confirm deletion:
                     </label>
                     <input
@@ -465,19 +465,19 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                       value={confirmationText}
                       onChange={(e) => setConfirmationText(e.target.value)}
                       placeholder="DELETE_SPACE"
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 dark:text-white"
+                      className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex gap-3 pt-4 border-t border-gray-700">
                 <button
                   type="button"
                   onClick={goBack}
                   disabled={isDeleting}
-                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
                 >
                   Back
                 </button>

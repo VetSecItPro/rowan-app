@@ -22,7 +22,7 @@ export function PresenceIndicator({
 
   const statusClasses = {
     online: 'bg-green-500 shadow-green-500/50',
-    offline: 'bg-gray-400 dark:bg-gray-600'
+    offline: 'bg-gray-600'
   };
 
   const labels = {
@@ -35,7 +35,7 @@ export function PresenceIndicator({
       <div className="relative">
         <div
           className={cn(
-            'rounded-full border-2 border-white dark:border-gray-800',
+            'rounded-full border-2 border-gray-800',
             sizeClasses[size],
             statusClasses[status],
             status === 'online' && 'shadow-sm animate-pulse'
@@ -53,7 +53,7 @@ export function PresenceIndicator({
       {showLabel && (
         <span className={cn(
           'text-sm font-medium',
-          status === 'online' ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'
+          status === 'online' ? 'text-green-400' : 'text-gray-400'
         )}>
           {labels[status]}
         </span>

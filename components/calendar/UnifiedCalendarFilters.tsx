@@ -51,7 +51,7 @@ const FilterButton = memo(function FilterButton({
           ${
             isActive
               ? `${colors.bg} ${colors.border} ${colors.text}`
-              : 'border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-500'
+              : 'border-gray-200 bg-gray-50 border-gray-700 text-gray-500'
           }
           hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2
           ${isActive ? 'focus:ring-purple-500' : 'focus:ring-gray-400'}
@@ -65,7 +65,7 @@ const FilterButton = memo(function FilterButton({
           <span
             className={`
               ml-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold
-              ${isActive ? 'bg-white/50 dark:bg-black/20' : 'bg-gray-200 dark:bg-gray-700'}
+              ${isActive ? 'bg-black/20' : 'bg-gray-700'}
             `}
           >
             {count}
@@ -146,7 +146,7 @@ export const UnifiedCalendarFilters = memo(function UnifiedCalendarFilters({
       />
 
       {/* Divider */}
-      <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />
+      <div className="mx-1 h-6 w-px bg-gray-700" />
 
       {/* All/None toggle with instant tooltip */}
       <div className="group relative">
@@ -158,8 +158,8 @@ export const UnifiedCalendarFilters = memo(function UnifiedCalendarFilters({
             transition-colors duration-200
             ${
               allEnabled
-                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-                : 'bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50'
+                ? 'bg-gray-100 text-gray-700 bg-gray-800 hover:bg-gray-700'
+                : 'bg-purple-100 text-purple-700 bg-purple-900/30 hover:bg-purple-900/50'
             }
           `}
           aria-label={allEnabled ? 'Hide all item types from calendar' : 'Show all item types on calendar'}

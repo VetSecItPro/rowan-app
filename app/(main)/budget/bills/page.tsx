@@ -150,17 +150,17 @@ export default function BillsManagementPage() {
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-amber-600 to-amber-600 bg-clip-text text-transparent mb-2">
               Bills Management
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-400 max-w-2xl mx-auto">
               Manage your recurring bills, track due dates, and never miss a payment
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-xl p-4">
+            <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <p className="text-red-800 dark:text-red-200">{error}</p>
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                <p className="text-red-200">{error}</p>
               </div>
             </div>
           )}
@@ -174,52 +174,52 @@ export default function BillsManagementPage() {
               iconGradient="bg-gradient-to-br from-amber-500 to-amber-600"
               gridClassName="grid stats-grid-mobile gap-6"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
                     <Calendar className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     {stats.total}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bills</h3>
+                <h3 className="text-sm font-medium text-gray-400">Total Bills</h3>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     {stats.scheduled}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Scheduled</h3>
+                <h3 className="text-sm font-medium text-gray-400">Scheduled</h3>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-red-500 to-red-600 shadow-lg">
                     <AlertCircle className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     {stats.overdue}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Overdue</h3>
+                <h3 className="text-sm font-medium text-gray-400">Overdue</h3>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                   <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg">
                     <DollarSign className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <span className="text-2xl font-bold text-white">
                     ${stats.totalAmountDue.toFixed(0)}
                   </span>
                 </div>
-                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">Amount Due</h3>
+                <h3 className="text-sm font-medium text-gray-400">Amount Due</h3>
               </div>
             </CollapsibleStatsGrid>
           )}
@@ -239,7 +239,7 @@ export default function BillsManagementPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-gray-600 dark:text-gray-400">Loading bills...</p>
+              <p className="text-gray-400">Loading bills...</p>
             </div>
           ) : (
             <BillsList

@@ -92,10 +92,10 @@ export default function SignUpPage() {
   // Don't render form if no authorization (redirect will happen)
   if (!hasValidAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Redirecting...</p>
+          <p className="text-gray-400">Redirecting...</p>
         </div>
       </div>
     );
@@ -289,7 +289,7 @@ export default function SignUpPage() {
     <div className="min-h-screen flex flex-col lg:flex-row transition-all duration-500">
       {/* Mobile Header - Green section with logo */}
       <div
-        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
       >
         <Link href="/" className="flex flex-col items-center group">
@@ -308,7 +308,7 @@ export default function SignUpPage() {
 
       {/* Desktop Left side - Branding */}
       <div
-        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-900 dark:via-teal-900 dark:to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
           }`}
       >
 
@@ -327,10 +327,10 @@ export default function SignUpPage() {
               Rowan
             </h1>
           </Link>
-          <p className="text-lg xl:text-xl text-emerald-100 dark:text-emerald-200 mb-8 text-center px-4">
+          <p className="text-lg xl:text-xl text-emerald-200 mb-8 text-center px-4">
             Collaborative life management for couples and families
           </p>
-          <div className="space-y-4 text-lg text-emerald-100 dark:text-emerald-200 max-w-md mx-auto">
+          <div className="space-y-4 text-lg text-emerald-200 max-w-md mx-auto">
             <p className="flex items-center gap-3">
               <span className="w-2 h-2 bg-emerald-300 rounded-full flex-shrink-0"></span>
               Shared calendars & task management
@@ -349,20 +349,20 @@ export default function SignUpPage() {
 
       {/* Right side - Sign up form */}
       <div
-        className="flex-1 lg:w-1/2 bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4 sm:p-8 overflow-y-auto"
+        className="flex-1 lg:w-1/2 bg-gray-950 flex items-center justify-center p-4 sm:p-8 overflow-y-auto"
       >
         <motion.div
-          className="w-full max-w-md py-10 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-800/50 my-8"
+          className="w-full max-w-md py-10 bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-800/50 my-8"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           {/* Header */}
           <motion.div className="mb-8" variants={itemVariants}>
-            <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
+            <h2 className="text-4xl font-extrabold text-white mb-2 tracking-tight">
               {accountCreated ? 'Welcome to Rowan!' : 'Create Account'}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-gray-400 text-lg">
               {accountCreated ? 'Redirecting you to login...' : 'Start your collaborative journey'}
             </p>
           </motion.div>
@@ -376,7 +376,7 @@ export default function SignUpPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mb-6 bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/50 text-red-600 dark:text-red-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
+                  className="mb-6 bg-red-900/10 border border-red-800/50 text-red-400 px-4 py-3 rounded-2xl text-sm leading-relaxed overflow-hidden"
                 >
                   {error}
                 </motion.div>
@@ -385,7 +385,7 @@ export default function SignUpPage() {
 
             {/* Name Field */}
             <motion.div variants={itemVariants}>
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Full Name <span className="text-red-500">*</span>
               </label>
               <div className="relative group">
@@ -396,7 +396,7 @@ export default function SignUpPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="Alex Johnson"
                   disabled={isLoading}
                   autoFocus
@@ -408,7 +408,7 @@ export default function SignUpPage() {
 
             {/* Email Field */}
             <motion.div variants={itemVariants}>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Email Address <span className="text-red-500">*</span>
               </label>
               <div className="relative group">
@@ -420,7 +420,7 @@ export default function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="alex@example.com"
                   disabled={isLoading}
                   autoComplete="email"
@@ -431,7 +431,7 @@ export default function SignUpPage() {
 
             {/* Password Field */}
             <motion.div variants={itemVariants}>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Password <span className="text-red-500">*</span>
               </label>
               <div className="relative group">
@@ -443,7 +443,7 @@ export default function SignUpPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={10}
-                  className="w-full pl-12 pr-14 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                  className="w-full pl-12 pr-14 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="••••••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
@@ -451,7 +451,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors p-2"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -477,30 +477,30 @@ export default function SignUpPage() {
                               : passwordStrength <= 4
                                 ? 'bg-blue-500'
                                 : 'bg-emerald-500'
-                          : 'bg-gray-200 dark:bg-gray-700'
+                          : 'bg-gray-700'
                           }`}
                       />
                     ))}
                   </div>
                   {/* Requirements Checklist */}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                    <div className={`flex items-center gap-1.5 ${passwordChecks.length ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.length ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {passwordChecks.length ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       <span>10+ characters</span>
                     </div>
-                    <div className={`flex items-center gap-1.5 ${passwordChecks.uppercase ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.uppercase ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {passwordChecks.uppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       <span>Uppercase (A-Z)</span>
                     </div>
-                    <div className={`flex items-center gap-1.5 ${passwordChecks.lowercase ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.lowercase ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {passwordChecks.lowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       <span>Lowercase (a-z)</span>
                     </div>
-                    <div className={`flex items-center gap-1.5 ${passwordChecks.number ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                    <div className={`flex items-center gap-1.5 ${passwordChecks.number ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {passwordChecks.number ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       <span>Number (0-9)</span>
                     </div>
-                    <div className={`flex items-center gap-1.5 col-span-2 ${passwordChecks.special ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+                    <div className={`flex items-center gap-1.5 col-span-2 ${passwordChecks.special ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {passwordChecks.special ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       <span>Special (!@#$%^&amp;*)</span>
                     </div>
@@ -508,7 +508,7 @@ export default function SignUpPage() {
                 </div>
               )}
               {password.length === 0 && (
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 ml-1">
+                <p className="mt-1 text-xs text-gray-400 ml-1">
                   10+ characters with uppercase, lowercase, number, and special character
                 </p>
               )}
@@ -516,7 +516,7 @@ export default function SignUpPage() {
 
             {/* Confirm Password Field */}
             <motion.div variants={itemVariants}>
-              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Confirm Password <span className="text-red-500">*</span>
               </label>
               <div className="relative group">
@@ -528,27 +528,27 @@ export default function SignUpPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={10}
-                  className="w-full pl-12 pr-24 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                  className="w-full pl-12 pr-24 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="••••••••••••"
                   disabled={isLoading}
                   autoComplete="new-password"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   {confirmPassword && password && confirmPassword === password && (
-                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" />
                       Match
                     </span>
                   )}
                   {confirmPassword && password && confirmPassword !== password && (
-                    <span className="text-xs font-semibold text-red-500 dark:text-red-400">
+                    <span className="text-xs font-semibold text-red-400">
                       No match
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2"
+                    className="text-gray-400 hover:text-gray-300 transition-colors p-2"
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
                     {showConfirmPassword ? (
@@ -563,7 +563,7 @@ export default function SignUpPage() {
 
             {/* Space Name */}
             <motion.div variants={itemVariants}>
-              <label htmlFor="spaceName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+              <label htmlFor="spaceName" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Space Name <span className="text-red-500">*</span>
               </label>
               <div className="relative group">
@@ -577,7 +577,7 @@ export default function SignUpPage() {
                     setSpaceTouched(true);
                   }}
                   required
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
                   placeholder="Samira's Space"
                   disabled={isLoading}
                 />
@@ -586,7 +586,7 @@ export default function SignUpPage() {
 
             {/* Color Theme Selector */}
             <motion.div variants={itemVariants}>
-              <label htmlFor="colorTheme" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+              <label htmlFor="colorTheme" className="block text-sm font-semibold text-gray-300 mb-2 ml-1">
                 Choose your color theme
               </label>
               <div className="relative">
@@ -594,7 +594,7 @@ export default function SignUpPage() {
                   type="button"
                   onClick={() => setShowColorDropdown(!showColorDropdown)}
                   disabled={isLoading}
-                  className="w-full px-4 py-4 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all duration-300 flex items-center justify-between shadow-sm"
+                  className="w-full px-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all duration-300 flex items-center justify-between shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-lg shadow-lg ${getColorClasses(colorTheme)}`} />
@@ -613,7 +613,7 @@ export default function SignUpPage() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl"
+                    className="absolute z-10 w-full mt-2 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl"
                   >
                     {colorThemes.map((theme) => (
                       <button
@@ -624,14 +624,14 @@ export default function SignUpPage() {
                           setShowColorDropdown(false);
                         }}
                         disabled={isLoading}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-700 transition-colors text-left"
                       >
                         <div className={`w-8 h-8 rounded-lg shadow-md flex-shrink-0 ${getColorClasses(theme.value)}`} />
-                        <span className="flex-1 font-semibold text-gray-900 dark:text-white text-sm">
+                        <span className="flex-1 font-semibold text-white text-sm">
                           {theme.label}
                         </span>
                         {colorTheme === theme.value && (
-                          <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                          <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                         )}
                       </button>
                     ))}
@@ -643,7 +643,7 @@ export default function SignUpPage() {
             {/* Email Opt-in */}
             <motion.div
               variants={itemVariants}
-              className="flex items-start gap-4 p-5 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/50 rounded-2xl"
+              className="flex items-start gap-4 p-5 bg-blue-900/10 border border-blue-800/50 rounded-2xl"
             >
               <input
                 type="checkbox"
@@ -653,12 +653,12 @@ export default function SignUpPage() {
                 disabled={isLoading}
                 className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded-lg focus:ring-blue-500/50 transition-all duration-200 mt-1 cursor-pointer"
               />
-              <label htmlFor="emailOptIn" className="text-sm text-blue-900 dark:text-blue-100 cursor-pointer">
+              <label htmlFor="emailOptIn" className="text-sm text-blue-100 cursor-pointer">
                 <span className="font-bold">Stay updated with Rowan</span>
-                <p className="text-blue-700 dark:text-blue-300 mt-1.5 leading-relaxed">
+                <p className="text-blue-300 mt-1.5 leading-relaxed">
                   Receive occasional updates about new features and tips. You can unsubscribe anytime.
                 </p>
-                <span className="block text-[11px] mt-2 text-blue-500 dark:text-blue-400 font-medium uppercase tracking-wider">
+                <span className="block text-[11px] mt-2 text-blue-400 font-medium uppercase tracking-wider">
                   From Rowan only • Never shared with third parties
                 </span>
               </label>
@@ -669,7 +669,7 @@ export default function SignUpPage() {
               variants={itemVariants}
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
             >
               {isLoading ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -684,11 +684,11 @@ export default function SignUpPage() {
 
           {/* Sign in link */}
           <motion.div className="mt-8 text-center" variants={itemVariants}>
-            <p className="text-gray-600 dark:text-gray-400 text-md font-medium">
+            <p className="text-gray-400 text-md font-medium">
               Already have an account?{' '}
               <Link
                 href="/login"
-                className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold transition-all duration-200 hover:underline"
+                className="text-emerald-400 hover:text-emerald-300 font-bold transition-all duration-200 hover:underline"
               >
                 Sign In
               </Link>

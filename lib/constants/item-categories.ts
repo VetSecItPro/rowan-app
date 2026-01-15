@@ -11,7 +11,7 @@ export const TASK_CATEGORIES = {
     label: 'Work & Career',
     color: 'bg-blue-500',
     textColor: 'text-blue-600',
-    lightBg: 'bg-blue-100 dark:bg-blue-900/30',
+    lightBg: 'bg-blue-900/30',
     description: 'Professional tasks, meetings, deadlines'
   },
 
@@ -21,7 +21,7 @@ export const TASK_CATEGORIES = {
     label: 'Personal Growth',
     color: 'bg-purple-500',
     textColor: 'text-purple-600',
-    lightBg: 'bg-purple-100 dark:bg-purple-900/30',
+    lightBg: 'bg-purple-900/30',
     description: 'Self-improvement, learning, hobbies'
   },
 
@@ -31,7 +31,7 @@ export const TASK_CATEGORIES = {
     label: 'Home & Family',
     color: 'bg-amber-500',
     textColor: 'text-amber-600',
-    lightBg: 'bg-amber-100 dark:bg-amber-900/30',
+    lightBg: 'bg-amber-900/30',
     description: 'Household tasks, family activities'
   },
 
@@ -41,7 +41,7 @@ export const TASK_CATEGORIES = {
     label: 'Shopping & Errands',
     color: 'bg-emerald-500',
     textColor: 'text-emerald-600',
-    lightBg: 'bg-emerald-100 dark:bg-emerald-900/30',
+    lightBg: 'bg-emerald-900/30',
     description: 'Grocery runs, appointments, errands'
   },
 
@@ -51,7 +51,7 @@ export const TASK_CATEGORIES = {
     label: 'Health & Wellness',
     color: 'bg-green-500',
     textColor: 'text-green-600',
-    lightBg: 'bg-green-100 dark:bg-green-900/30',
+    lightBg: 'bg-green-900/30',
     description: 'Exercise, medical appointments, wellness'
   },
 
@@ -61,7 +61,7 @@ export const TASK_CATEGORIES = {
     label: 'Finance & Budget',
     color: 'bg-yellow-500',
     textColor: 'text-yellow-600',
-    lightBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    lightBg: 'bg-yellow-900/30',
     description: 'Bills, budgeting, financial planning'
   },
 
@@ -71,7 +71,7 @@ export const TASK_CATEGORIES = {
     label: 'Education & Learning',
     color: 'bg-indigo-500',
     textColor: 'text-indigo-600',
-    lightBg: 'bg-indigo-100 dark:bg-indigo-900/30',
+    lightBg: 'bg-indigo-900/30',
     description: 'Courses, reading, skill development'
   },
 
@@ -81,7 +81,7 @@ export const TASK_CATEGORIES = {
     label: 'Family & Friends',
     color: 'bg-pink-500',
     textColor: 'text-pink-600',
-    lightBg: 'bg-pink-100 dark:bg-pink-900/30',
+    lightBg: 'bg-pink-900/30',
     description: 'Family time, social events, relationships'
   },
 
@@ -91,7 +91,7 @@ export const TASK_CATEGORIES = {
     label: 'Events & Social',
     color: 'bg-orange-500',
     textColor: 'text-orange-600',
-    lightBg: 'bg-orange-100 dark:bg-orange-900/30',
+    lightBg: 'bg-orange-900/30',
     description: 'Parties, gatherings, celebrations'
   },
 
@@ -101,7 +101,7 @@ export const TASK_CATEGORIES = {
     label: 'Kids & School',
     color: 'bg-cyan-500',
     textColor: 'text-cyan-600',
-    lightBg: 'bg-cyan-100 dark:bg-cyan-900/30',
+    lightBg: 'bg-cyan-900/30',
     description: 'School activities, kids events, childcare'
   },
 
@@ -111,7 +111,7 @@ export const TASK_CATEGORIES = {
     label: 'Travel & Vacation',
     color: 'bg-sky-500',
     textColor: 'text-sky-600',
-    lightBg: 'bg-sky-100 dark:bg-sky-900/30',
+    lightBg: 'bg-sky-900/30',
     description: 'Trip planning, vacations, adventures'
   },
 
@@ -121,7 +121,7 @@ export const TASK_CATEGORIES = {
     label: 'Other',
     color: 'bg-gray-500',
     textColor: 'text-gray-600',
-    lightBg: 'bg-gray-100 dark:bg-gray-900/30',
+    lightBg: 'bg-gray-900/30',
     description: 'Miscellaneous tasks and activities'
   },
 };
@@ -134,7 +134,7 @@ export const CHORE_CATEGORIES = {
     label: 'Kitchen & Cooking',
     color: 'bg-orange-500',
     textColor: 'text-orange-600',
-    lightBg: 'bg-orange-100 dark:bg-orange-900/30',
+    lightBg: 'bg-orange-900/30',
     description: 'Meal prep, cooking, kitchen cleanup'
   },
 
@@ -144,7 +144,7 @@ export const CHORE_CATEGORIES = {
     label: 'Cleaning & Tidying',
     color: 'bg-cyan-500',
     textColor: 'text-cyan-600',
-    lightBg: 'bg-cyan-100 dark:bg-cyan-900/30',
+    lightBg: 'bg-cyan-900/30',
     description: 'Deep cleaning, organizing, decluttering'
   },
 
@@ -154,7 +154,7 @@ export const CHORE_CATEGORIES = {
     label: 'Laundry & Clothing',
     color: 'bg-blue-500',
     textColor: 'text-blue-600',
-    lightBg: 'bg-blue-100 dark:bg-blue-900/30',
+    lightBg: 'bg-blue-900/30',
     description: 'Washing, drying, folding, ironing'
   },
 
@@ -164,7 +164,7 @@ export const CHORE_CATEGORIES = {
     label: 'Dishes & Cleanup',
     color: 'bg-teal-500',
     textColor: 'text-teal-600',
-    lightBg: 'bg-teal-100 dark:bg-teal-900/30',
+    lightBg: 'bg-teal-900/30',
     description: 'Washing dishes, loading dishwasher'
   },
 
@@ -174,7 +174,7 @@ export const CHORE_CATEGORIES = {
     label: 'Yard & Garden',
     color: 'bg-green-500',
     textColor: 'text-green-600',
-    lightBg: 'bg-green-100 dark:bg-green-900/30',
+    lightBg: 'bg-green-900/30',
     description: 'Gardening, lawn care, outdoor maintenance'
   },
 
@@ -184,7 +184,7 @@ export const CHORE_CATEGORIES = {
     label: 'Home Maintenance',
     color: 'bg-gray-500',
     textColor: 'text-gray-600',
-    lightBg: 'bg-gray-100 dark:bg-gray-900/30',
+    lightBg: 'bg-gray-900/30',
     description: 'Repairs, upkeep, home improvements'
   },
 
@@ -194,7 +194,7 @@ export const CHORE_CATEGORIES = {
     label: 'Pet Care',
     color: 'bg-amber-500',
     textColor: 'text-amber-600',
-    lightBg: 'bg-amber-100 dark:bg-amber-900/30',
+    lightBg: 'bg-amber-900/30',
     description: 'Feeding, grooming, vet visits, walks'
   },
 
@@ -204,7 +204,7 @@ export const CHORE_CATEGORIES = {
     label: 'Organization',
     color: 'bg-purple-500',
     textColor: 'text-purple-600',
-    lightBg: 'bg-purple-100 dark:bg-purple-900/30',
+    lightBg: 'bg-purple-900/30',
     description: 'Organizing spaces, decluttering, storage'
   },
 
@@ -214,7 +214,7 @@ export const CHORE_CATEGORIES = {
     label: 'Trash & Recycling',
     color: 'bg-emerald-500',
     textColor: 'text-emerald-600',
-    lightBg: 'bg-emerald-100 dark:bg-emerald-900/30',
+    lightBg: 'bg-emerald-900/30',
     description: 'Taking out trash, recycling, composting'
   },
 
@@ -224,7 +224,7 @@ export const CHORE_CATEGORIES = {
     label: 'Childcare',
     color: 'bg-pink-500',
     textColor: 'text-pink-600',
-    lightBg: 'bg-pink-100 dark:bg-pink-900/30',
+    lightBg: 'bg-pink-900/30',
     description: 'Kids activities, bedtime, school prep'
   },
 
@@ -234,7 +234,7 @@ export const CHORE_CATEGORIES = {
     label: 'Grocery & Shopping',
     color: 'bg-indigo-500',
     textColor: 'text-indigo-600',
-    lightBg: 'bg-indigo-100 dark:bg-indigo-900/30',
+    lightBg: 'bg-indigo-900/30',
     description: 'Grocery shopping, household supplies'
   },
 
@@ -244,7 +244,7 @@ export const CHORE_CATEGORIES = {
     label: 'Other Household',
     color: 'bg-slate-500',
     textColor: 'text-slate-600',
-    lightBg: 'bg-slate-100 dark:bg-slate-900/30',
+    lightBg: 'bg-slate-900/30',
     description: 'Other household tasks and chores'
   },
 };
@@ -256,7 +256,7 @@ export const PRIORITY_LEVELS = {
     emoji: '🔥',
     color: 'bg-red-500',
     textColor: 'text-red-600',
-    lightBg: 'bg-red-100 dark:bg-red-900/30',
+    lightBg: 'bg-red-900/30',
     description: 'Needs immediate attention'
   },
   high: {
@@ -264,7 +264,7 @@ export const PRIORITY_LEVELS = {
     emoji: '⚡',
     color: 'bg-orange-500',
     textColor: 'text-orange-600',
-    lightBg: 'bg-orange-100 dark:bg-orange-900/30',
+    lightBg: 'bg-orange-900/30',
     description: 'Important, do soon'
   },
   medium: {
@@ -272,7 +272,7 @@ export const PRIORITY_LEVELS = {
     emoji: '📌',
     color: 'bg-yellow-500',
     textColor: 'text-yellow-600',
-    lightBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    lightBg: 'bg-yellow-900/30',
     description: 'Normal priority'
   },
   low: {
@@ -280,7 +280,7 @@ export const PRIORITY_LEVELS = {
     emoji: '💤',
     color: 'bg-green-500',
     textColor: 'text-green-600',
-    lightBg: 'bg-green-100 dark:bg-green-900/30',
+    lightBg: 'bg-green-900/30',
     description: 'When you have time'
   },
 };
@@ -361,7 +361,7 @@ export const STATUS_TYPES = {
     emoji: '⏳',
     color: 'bg-gray-500',
     textColor: 'text-gray-600',
-    lightBg: 'bg-gray-100 dark:bg-gray-900/30',
+    lightBg: 'bg-gray-900/30',
     description: 'Not started yet'
   },
   in_progress: {
@@ -369,7 +369,7 @@ export const STATUS_TYPES = {
     emoji: '⚡',
     color: 'bg-blue-500',
     textColor: 'text-blue-600',
-    lightBg: 'bg-blue-100 dark:bg-blue-900/30',
+    lightBg: 'bg-blue-900/30',
     description: 'Currently working on'
   },
   completed: {
@@ -377,7 +377,7 @@ export const STATUS_TYPES = {
     emoji: '✅',
     color: 'bg-green-500',
     textColor: 'text-green-600',
-    lightBg: 'bg-green-100 dark:bg-green-900/30',
+    lightBg: 'bg-green-900/30',
     description: 'Finished successfully'
   },
   blocked: {
@@ -385,7 +385,7 @@ export const STATUS_TYPES = {
     emoji: '🚫',
     color: 'bg-red-500',
     textColor: 'text-red-600',
-    lightBg: 'bg-red-100 dark:bg-red-900/30',
+    lightBg: 'bg-red-900/30',
     description: 'Cannot proceed'
   },
   on_hold: {
@@ -393,7 +393,7 @@ export const STATUS_TYPES = {
     emoji: '⏸️',
     color: 'bg-amber-500',
     textColor: 'text-amber-600',
-    lightBg: 'bg-amber-100 dark:bg-amber-900/30',
+    lightBg: 'bg-amber-900/30',
     description: 'Temporarily paused'
   },
 };

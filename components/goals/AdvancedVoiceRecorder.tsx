@@ -378,23 +378,23 @@ export function AdvancedVoiceRecorder({
 
   const getCategoryColor = (category: VoiceNoteMetadata['category']) => {
     switch (category) {
-      case 'progress': return 'text-green-600 bg-green-100 dark:bg-green-900/20';
-      case 'challenges': return 'text-red-600 bg-red-100 dark:bg-red-900/20';
-      case 'reflections': return 'text-purple-600 bg-purple-100 dark:bg-purple-900/20';
-      case 'goals': return 'text-blue-600 bg-blue-100 dark:bg-blue-900/20';
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20';
+      case 'progress': return 'text-green-600 bg-green-900/20';
+      case 'challenges': return 'text-red-600 bg-red-900/20';
+      case 'reflections': return 'text-purple-600 bg-purple-900/20';
+      case 'goals': return 'text-blue-600 bg-blue-900/20';
+      default: return 'text-gray-600 bg-gray-900/20';
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 space-y-4">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 space-y-4">
       {/* Header with Goal Context */}
       {goalTitle && (
-        <div className="text-center pb-2 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="text-center pb-2 border-b border-gray-700">
+          <h3 className="text-lg font-semibold text-white">
             Voice Check-In
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             for "{goalTitle}"
           </p>
         </div>
@@ -404,12 +404,12 @@ export function AdvancedVoiceRecorder({
       {!selectedTemplate && !isRecording && !audioUrl && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <h4 className="text-sm font-medium text-gray-300">
               Choose a template (optional)
             </h4>
             <button
               onClick={() => setShowTemplates(!showTemplates)}
-              className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+              className="text-sm text-indigo-600 text-indigo-400"
             >
               {showTemplates ? 'Hide' : 'Show'} templates
             </button>
@@ -421,7 +421,7 @@ export function AdvancedVoiceRecorder({
                 <button
                   key={template.id}
                   onClick={() => handleTemplateSelect(template)}
-                  className="text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="text-left p-3 border border-gray-700 rounded-lg hover:bg-gray-700/50 transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getCategoryColor(template.category)}`}>
@@ -429,7 +429,7 @@ export function AdvancedVoiceRecorder({
                       {template.name}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     {template.prompt}
                   </p>
                 </button>
@@ -441,22 +441,22 @@ export function AdvancedVoiceRecorder({
 
       {/* Current Template Context */}
       {selectedTemplate && (
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+        <div className="bg-indigo-900/20 border border-indigo-800 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getCategoryColor(selectedTemplate.category)}`}>
               {getCategoryIcon(selectedTemplate.category)}
               {selectedTemplate.name}
             </span>
           </div>
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+          <p className="text-sm text-gray-300 mb-3">
             {selectedTemplate.prompt}
           </p>
           {selectedTemplate.questions.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+              <p className="text-xs font-medium text-gray-400">
                 Question {currentQuestionIndex + 1} of {selectedTemplate.questions.length}:
               </p>
-              <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
+              <p className="text-sm font-medium text-indigo-300">
                 {selectedTemplate.questions[currentQuestionIndex]}
               </p>
             </div>
@@ -475,13 +475,13 @@ export function AdvancedVoiceRecorder({
             <Mic className="w-8 h-8 text-white" />
           </button>
           <div className="text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-400">
               {selectedTemplate ? 'Answer the question above' : 'Tap to start recording'}
             </p>
             {selectedTemplate && (
               <button
                 onClick={() => setSelectedTemplate(null)}
-                className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-1"
+                className="text-xs text-gray-500 text-gray-400 hover:text-gray-200 mt-1"
               >
                 Cancel template
               </button>
@@ -496,21 +496,21 @@ export function AdvancedVoiceRecorder({
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-xl font-mono text-gray-900 dark:text-white">
+              <span className="text-xl font-mono text-white">
                 {formatDuration(recordingDuration)}
               </span>
             </div>
             <button
               onClick={handleStopRecording}
-              className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
+              className="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
               aria-label="Stop recording"
             >
-              <Square className="w-6 h-6 text-gray-900 dark:text-white" />
+              <Square className="w-6 h-6 text-white" />
             </button>
           </div>
 
           {/* Live recording visualization placeholder */}
-          <div className="h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+          <div className="h-12 bg-gray-700 rounded-lg flex items-center justify-center">
             <div className="flex items-center gap-1">
               {[...Array(20)].map((_, i) => (
                 <div
@@ -531,17 +531,17 @@ export function AdvancedVoiceRecorder({
       {audioUrl && !isRecording && (
         <div className="space-y-4">
           {/* Waveform */}
-          <div ref={waveformRef} className="w-full h-16 bg-gray-50 dark:bg-gray-900 rounded-lg" />
+          <div ref={waveformRef} className="w-full h-16 bg-gray-900 rounded-lg" />
 
           {/* Main Controls */}
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleSeek('backward')}
-                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
+                className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
                 aria-label="Skip backward 10 seconds"
               >
-                <SkipBack className="w-4 h-4 text-gray-900 dark:text-white" />
+                <SkipBack className="w-4 h-4 text-white" />
               </button>
 
               <button
@@ -558,14 +558,14 @@ export function AdvancedVoiceRecorder({
 
               <button
                 onClick={() => handleSeek('forward')}
-                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
+                className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all active:scale-95"
                 aria-label="Skip forward 10 seconds"
               >
-                <SkipForward className="w-4 h-4 text-gray-900 dark:text-white" />
+                <SkipForward className="w-4 h-4 text-white" />
               </button>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-gray-400">
               <span>{formatDuration(recordingDuration)}</span>
               {metadata.category !== 'general' && (
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getCategoryColor(metadata.category)}`}>
@@ -577,7 +577,7 @@ export function AdvancedVoiceRecorder({
           </div>
 
           {/* Advanced Controls */}
-          <div className="flex items-center justify-between gap-4 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between gap-4 pt-2 border-t border-gray-700">
             <div className="flex items-center gap-4">
               {/* Speed Control */}
               <div className="flex items-center gap-2">
@@ -585,7 +585,7 @@ export function AdvancedVoiceRecorder({
                 <select
                   value={playbackSpeed}
                   onChange={(e) => handleSpeedChange(Number(e.target.value))}
-                  className="text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+                  className="text-xs bg-gray-800 border border-gray-600 rounded px-2 py-1"
                 >
                   <option value={0.5}>0.5x</option>
                   <option value={0.75}>0.75x</option>
@@ -615,7 +615,7 @@ export function AdvancedVoiceRecorder({
             <button
               onClick={handleTranscribe}
               disabled={isTranscribing}
-              className="flex items-center gap-1 px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-1 text-xs bg-blue-900/20 text-blue-400 rounded-md hover:bg-blue-900/40 transition-colors disabled:opacity-50"
             >
               {isTranscribing ? (
                 <Loader2 className="w-3 h-3 animate-spin" />
@@ -628,9 +628,9 @@ export function AdvancedVoiceRecorder({
 
           {/* Transcription Result */}
           {metadata.transcription && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <h5 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Transcription:</h5>
-              <p className="text-sm text-blue-800 dark:text-blue-200">{metadata.transcription}</p>
+            <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3">
+              <h5 className="text-sm font-medium text-blue-100 mb-2">Transcription:</h5>
+              <p className="text-sm text-blue-200">{metadata.transcription}</p>
             </div>
           )}
 
@@ -639,7 +639,7 @@ export function AdvancedVoiceRecorder({
             <button
               onClick={handleDelete}
               disabled={sending}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-all active:scale-95 disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all active:scale-95 disabled:opacity-50"
               aria-label="Delete recording"
             >
               <Trash2 className="w-4 h-4" />
@@ -648,7 +648,7 @@ export function AdvancedVoiceRecorder({
             <button
               onClick={handleSend}
               disabled={sending}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-300 disabled:to-blue-400 dark:disabled:from-blue-800 dark:disabled:to-blue-900 text-white rounded-lg transition-all active:scale-95 shadow-lg"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-300 disabled:from-blue-800 disabled:to-blue-900 text-white rounded-lg transition-all active:scale-95 shadow-lg"
               aria-label="Send voice message"
             >
               {sending ? (
@@ -665,7 +665,7 @@ export function AdvancedVoiceRecorder({
       {/* Permission Error */}
       {permissionDenied && (
         <div className="text-center py-4">
-          <p className="text-sm text-red-600 dark:text-red-400">
+          <p className="text-sm text-red-400">
             Microphone permission denied. Please enable it in your browser settings to record voice notes.
           </p>
         </div>

@@ -139,9 +139,9 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Container with Glassmorphism */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] shadow-2xl flex flex-col overflow-hidden overscroll-contain">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] shadow-2xl flex flex-col overflow-hidden overscroll-contain">
         {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 backdrop-blur-md border-b border-indigo-200/50 dark:border-indigo-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sm:rounded-t-xl">
+        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 backdrop-blur-md border-b border-indigo-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sm:rounded-t-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <Target className="w-5 h-5 text-white" />
@@ -168,7 +168,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
           {/* Title */}
           <div>
-            <label htmlFor="habit-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="habit-title" className="block text-sm font-medium text-gray-300 mb-2">
               Habit Name *
             </label>
             <input
@@ -178,13 +178,13 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Drink 8 glasses of water"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="habit-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="habit-description" className="block text-sm font-medium text-gray-300 mb-2">
               Description (Optional)
             </label>
             <textarea
@@ -193,13 +193,13 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add notes or details about this habit..."
               rows={3}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white resize-none"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white resize-none"
             />
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="habit-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="habit-category" className="block text-sm font-medium text-gray-300 mb-2">
               Category
             </label>
             <Dropdown
@@ -212,7 +212,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
 
           {/* Frequency */}
           <div>
-            <label htmlFor="habit-frequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="habit-frequency" className="block text-sm font-medium text-gray-300 mb-2">
               Frequency *
             </label>
             <Dropdown
@@ -225,7 +225,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
 
           {/* Target Count */}
           <div>
-            <label htmlFor="habit-target" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="habit-target" className="block text-sm font-medium text-gray-300 mb-2">
               Daily Target
             </label>
             <div className="flex items-center gap-3">
@@ -236,20 +236,20 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
                 max="100"
                 value={formData.target_count || 1}
                 onChange={(e) => setFormData({ ...formData, target_count: parseInt(e.target.value) || 1 })}
-                className="w-20 px-3 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white text-center"
+                className="w-20 px-3 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white text-center"
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-gray-400">
                 times per {formData.frequency_type === 'daily' ? 'day' : formData.frequency_type === 'weekly' ? 'week' : 'month'}
               </span>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="px-6 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors font-medium"
             >
               Cancel
             </button>

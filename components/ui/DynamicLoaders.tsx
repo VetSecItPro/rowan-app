@@ -29,8 +29,8 @@ const LoadingFallback = ({
   return (
     <div className="flex items-center justify-center p-8">
       <div className="flex flex-col items-center gap-3">
-        <Loader2 className={`${sizes[size]} animate-spin text-blue-600 dark:text-blue-400`} />
-        <p className="text-sm text-gray-600 dark:text-gray-400">{text}</p>
+        <Loader2 className={`${sizes[size]} animate-spin text-blue-400`} />
+        <p className="text-sm text-gray-400">{text}</p>
       </div>
     </div>
   );
@@ -48,13 +48,13 @@ const ErrorFallback = ({
 }) => (
   <div className="flex items-center justify-center p-8">
     <div className="text-center">
-      <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
-        <span className="text-red-600 dark:text-red-400 text-xl">⚠️</span>
+      <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-900/20 flex items-center justify-center">
+        <span className="text-red-400 text-xl">⚠️</span>
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+      <h3 className="text-lg font-semibold text-white mb-2">
         Failed to load component
       </h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+      <p className="text-sm text-gray-400 mb-4">
         {error.message || 'Something went wrong while loading this component.'}
       </p>
       {retry && (

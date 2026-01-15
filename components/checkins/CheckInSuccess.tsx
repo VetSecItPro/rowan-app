@@ -53,13 +53,13 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-      <div className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-800 dark:via-purple-900/30 dark:to-pink-900/30 rounded-2xl max-w-md w-full p-8 shadow-2xl border border-pink-200 dark:border-pink-500/30 animate-celebration">
+      <div className="bg-gradient-to-br from-pink-50 via-purple-50 from-gray-800 to-pink-900/30 rounded-2xl max-w-md w-full p-8 shadow-2xl border border-pink-500/30 animate-celebration">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+          className="absolute top-4 right-4 p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
         >
-          <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          <X className="w-5 h-5 text-gray-400" />
         </button>
 
         {/* Success Icon with Animation */}
@@ -75,36 +75,36 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
         {/* Mood Display */}
         <div className="text-center mb-6">
           <div className="text-6xl mb-4 animate-celebration">{getMoodEmoji(mood)}</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-2xl font-bold text-white mb-2">
             Check-In Complete!
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg">
+          <p className="text-gray-300 text-lg">
             {message}
           </p>
         </div>
 
         {/* Streak Display */}
         {streak > 0 && (
-          <div className="bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30 rounded-xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-orange-100 from-orange-900/30 to-yellow-900/30 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-center gap-2">
               <Sparkles className="w-5 h-5 text-orange-500" />
-              <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+              <span className="text-lg font-bold text-orange-400">
                 {streak} Day Streak!
               </span>
               <Sparkles className="w-5 h-5 text-orange-500" />
             </div>
             {streak === 7 && (
-              <p className="text-center text-sm text-orange-600 dark:text-orange-400 mt-2">
+              <p className="text-center text-sm text-orange-400 mt-2">
                 🎉 One week milestone! Amazing!
               </p>
             )}
             {streak === 30 && (
-              <p className="text-center text-sm text-orange-600 dark:text-orange-400 mt-2">
+              <p className="text-center text-sm text-orange-400 mt-2">
                 🌟 One month strong! You're incredible!
               </p>
             )}
             {streak === 100 && (
-              <p className="text-center text-sm text-orange-600 dark:text-orange-400 mt-2">
+              <p className="text-center text-sm text-orange-400 mt-2">
                 🏆 100 days! You're a legend!
               </p>
             )}
@@ -112,14 +112,14 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
         )}
 
         {/* Tips */}
-        <div className="bg-white/50 dark:bg-gray-700/50 rounded-lg p-4 border border-pink-200/50 dark:border-pink-500/30">
+        <div className="bg-gray-700/50 rounded-lg p-4 border border-pink-500/30">
           <div className="flex items-start gap-3">
             <Heart className="w-5 h-5 text-pink-500 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+              <p className="text-sm font-medium text-white mb-1">
                 Pro Tip:
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">
+              <p className="text-xs text-gray-300">
                 Check your Journal view to see mood patterns and weekly insights!
               </p>
             </div>

@@ -33,8 +33,8 @@ export function CircularProgress({
   };
 
   const bgColorClasses = {
-    gray: 'stroke-gray-200 dark:stroke-gray-700',
-    emerald: 'stroke-emerald-100 dark:stroke-emerald-900',
+    gray: 'stroke-gray-700',
+    emerald: 'stroke-emerald-900',
   };
 
   return (
@@ -68,7 +68,7 @@ export function CircularProgress({
         />
       </svg>
       {showPercentage && (
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+        <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-gray-300">
           {Math.round(progress)}%
         </span>
       )}

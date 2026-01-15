@@ -231,12 +231,12 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        <div className="bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
           <div className="p-6 animate-pulse">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+            <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
             <div className="space-y-3">
-              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-20 bg-gray-700 rounded"></div>
+              <div className="h-20 bg-gray-700 rounded"></div>
             </div>
           </div>
         </div>
@@ -247,18 +247,18 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-700">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-white">
               Category & Tag Manager
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -270,8 +270,8 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
               onClick={() => setActiveTab('categories')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'categories'
-                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-purple-900/30 text-purple-400'
+                  : 'text-gray-400 hover:bg-gray-700'
               }`}
             >
               <FolderOpen className="w-4 h-4" />
@@ -281,8 +281,8 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
               onClick={() => setActiveTab('tags')}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                 activeTab === 'tags'
-                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-purple-900/30 text-purple-400'
+                  : 'text-gray-400 hover:bg-gray-700'
               }`}
             >
               <Tags className="w-4 h-4" />
@@ -299,7 +299,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
               {!isAddingCategory && (
                 <button
                   onClick={() => setIsAddingCategory(true)}
-                  className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-purple-400 dark:hover:border-purple-500 transition-colors flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400"
+                  className="w-full p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-purple-500 transition-colors flex items-center justify-center gap-2 text-gray-400"
                 >
                   <Plus className="w-5 h-5" />
                   Add Custom Category
@@ -308,8 +308,8 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
 
               {/* Category Form */}
               {isAddingCategory && (
-                <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
-                  <h3 className="font-medium text-gray-900 dark:text-white">
+                <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4 space-y-4">
+                  <h3 className="font-medium text-white">
                     {editingCategory ? 'Edit Category' : 'New Category'}
                   </h3>
 
@@ -318,20 +318,20 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                     placeholder="Category name"
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
                   />
 
                   <textarea
                     placeholder="Description (optional)"
                     value={categoryDescription}
                     onChange={(e) => setCategoryDescription(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white resize-none"
                     rows={2}
                   />
 
                   {/* Icon Selector */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Icon
                     </label>
                     <div className="grid grid-cols-10 gap-2">
@@ -343,8 +343,8 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                             onClick={() => setCategoryIcon(iconName)}
                             className={`p-2 rounded-lg transition-colors ${
                               categoryIcon === iconName
-                                ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600'
-                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                ? 'bg-purple-900/30 text-purple-600'
+                                : 'hover:bg-gray-700 text-gray-400'
                             }`}
                           >
                             <IconComponent className="w-5 h-5" />
@@ -356,7 +356,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
 
                   {/* Color Selector */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Color
                     </label>
                     <div className="grid grid-cols-8 gap-2">
@@ -381,7 +381,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                       placeholder="Monthly budget (optional)"
                       value={categoryBudget}
                       onChange={(e) => setCategoryBudget(e.target.value)}
-                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="flex-1 px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
                       step="0.01"
                       min="0"
                     />
@@ -398,7 +398,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                     </button>
                     <button
                       onClick={resetCategoryForm}
-                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors flex items-center gap-2"
+                      className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition-colors flex items-center gap-2"
                     >
                       <X className="w-5 h-5" />
                       Cancel
@@ -414,7 +414,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                   return (
                     <div
                       key={category.id}
-                      className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-purple-300 dark:hover:border-purple-700 transition-colors"
+                      className="flex items-center justify-between p-4 bg-gray-800 border border-gray-700 rounded-lg hover:border-purple-700 transition-colors"
                     >
                       <div className="flex items-center gap-3 flex-1">
                         <div
@@ -424,12 +424,12 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                           <IconComponent className="w-5 h-5" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white">{category.name}</h4>
+                          <h4 className="font-medium text-white">{category.name}</h4>
                           {category.description && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{category.description}</p>
+                            <p className="text-sm text-gray-400">{category.description}</p>
                           )}
                           {category.monthly_budget && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-400">
                               Budget: ${category.monthly_budget.toFixed(2)}/month
                             </p>
                           )}
@@ -438,13 +438,13 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEditCategory(category)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                          className="p-2 text-blue-600 hover:bg-blue-900/20 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => handleDeleteCategory(category.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          className="p-2 text-red-600 hover:bg-red-900/20 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -453,7 +453,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                   );
                 })}
                 {categories.length === 0 && !isAddingCategory && (
-                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="text-center py-8 text-gray-400">
                     <FolderOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No custom categories yet.</p>
                     <p className="text-sm mt-1">Create your first category above!</p>
@@ -469,7 +469,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
               {!isAddingTag && (
                 <button
                   onClick={() => setIsAddingTag(true)}
-                  className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-purple-400 dark:hover:border-purple-500 transition-colors flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400"
+                  className="w-full p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-purple-500 transition-colors flex items-center justify-center gap-2 text-gray-400"
                 >
                   <Plus className="w-5 h-5" />
                   Add Tag
@@ -478,8 +478,8 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
 
               {/* Tag Form */}
               {isAddingTag && (
-                <div className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
-                  <h3 className="font-medium text-gray-900 dark:text-white">
+                <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4 space-y-4">
+                  <h3 className="font-medium text-white">
                     {editingTag ? 'Edit Tag' : 'New Tag'}
                   </h3>
 
@@ -488,20 +488,20 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                     placeholder="Tag name"
                     value={tagName}
                     onChange={(e) => setTagName(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
                   />
 
                   <textarea
                     placeholder="Description (optional)"
                     value={tagDescription}
                     onChange={(e) => setTagDescription(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white resize-none"
                     rows={2}
                   />
 
                   {/* Color Selector */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Color
                     </label>
                     <div className="grid grid-cols-8 gap-2">
@@ -529,7 +529,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                     </button>
                     <button
                       onClick={resetTagForm}
-                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors flex items-center gap-2"
+                      className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition-colors flex items-center gap-2"
                     >
                       <X className="w-5 h-5" />
                       Cancel
@@ -543,25 +543,25 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                 {tags.map((tag) => (
                   <div
                     key={tag.id}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700 transition-colors group"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-700 hover:border-purple-700 transition-colors group"
                   >
                     <span
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: tag.color }}
                     />
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <span className="text-sm font-medium text-white">
                       {tag.name}
                     </span>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handleEditTag(tag)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                        className="p-1 text-blue-600 hover:bg-blue-900/20 rounded"
                       >
                         <Edit2 className="w-3 h-3" />
                       </button>
                       <button
                         onClick={() => handleDeleteTag(tag.id)}
-                        className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                        className="p-1 text-red-600 hover:bg-red-900/20 rounded"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -569,7 +569,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                   </div>
                 ))}
                 {tags.length === 0 && !isAddingTag && (
-                  <div className="w-full text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="w-full text-center py-8 text-gray-400">
                     <Tags className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No tags yet.</p>
                     <p className="text-sm mt-1">Create your first tag above!</p>

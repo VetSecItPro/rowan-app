@@ -131,14 +131,14 @@ const categories = [
 ];
 
 const colorClasses: Record<string, { bg: string; text: string; border: string }> = {
-  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20' },
-  purple: { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400', border: 'border-purple-500/20' },
-  blue: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20' },
-  green: { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', border: 'border-green-500/20' },
-  indigo: { bg: 'bg-indigo-500/10', text: 'text-indigo-600 dark:text-indigo-400', border: 'border-indigo-500/20' },
-  pink: { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400', border: 'border-pink-500/20' },
-  orange: { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', border: 'border-orange-500/20' },
-  amber: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-500/20' },
+  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+  purple: { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20' },
+  blue: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
+  green: { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/20' },
+  indigo: { bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/20' },
+  pink: { bg: 'bg-pink-500/10', text: 'text-pink-400', border: 'border-pink-500/20' },
+  orange: { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/20' },
+  amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20' },
 };
 
 export default function ArticlesPage() {
@@ -172,7 +172,7 @@ export default function ArticlesPage() {
   const featuredArticles = articles.filter(a => a.featured);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       <Header
         onBetaClick={() => setIsBetaModalOpen(true)}
         onLaunchClick={() => setIsLaunchModalOpen(true)}
@@ -182,7 +182,7 @@ export default function ArticlesPage() {
       <main>
         {/* Hero Section */}
         <section className="relative pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.1),transparent)] dark:bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.05),transparent)]" />
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.1),transparent)] bg-[radial-gradient(45%_45%_at_50%_0%,rgba(16,185,129,0.05),transparent)]" />
 
           <div className="max-w-7xl mx-auto text-center">
             <motion.div
@@ -190,16 +190,16 @@ export default function ArticlesPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/30 text-emerald-300 text-sm font-medium mb-6">
                 <FileText className="w-4 h-4" />
                 <span>Learn & Explore</span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">
                 Articles & <span className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent">Guides</span>
               </h1>
 
-              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light">
+              <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-light">
                 Discover tips, tutorials, and best practices for getting the most out of Rowan
                 for your family.
               </p>
@@ -218,7 +218,7 @@ export default function ArticlesPage() {
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-700 bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -231,7 +231,7 @@ export default function ArticlesPage() {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selectedCategory === category.name
                       ? 'bg-emerald-500 text-white shadow-md'
-                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                   }`}
                 >
                   {category.name}
@@ -250,7 +250,7 @@ export default function ArticlesPage() {
         {selectedCategory === 'All' && searchQuery === '' && (
           <section className="px-4 sm:px-6 lg:px-8 pb-12">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Featured</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">Featured</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {featuredArticles.map((article, index) => {
                   const colors = colorClasses[article.color] || colorClasses.emerald;
@@ -262,25 +262,25 @@ export default function ArticlesPage() {
                       transition={{ delay: index * 0.1, duration: 0.5 }}
                     >
                       <Link href={`/articles/${article.slug}`}>
-                        <div className={`group h-full p-6 rounded-2xl border ${colors.border} bg-white dark:bg-gray-800 hover:shadow-lg transition-all cursor-pointer`}>
+                        <div className={`group h-full p-6 rounded-2xl border ${colors.border} bg-gray-800 hover:shadow-lg transition-all cursor-pointer`}>
                           <div className={`w-12 h-12 rounded-xl ${colors.bg} flex items-center justify-center mb-4`}>
                             <article.icon className={`w-6 h-6 ${colors.text}`} />
                           </div>
                           <div className="flex items-center gap-2 mb-2">
                             <span className={`text-xs font-medium ${colors.text}`}>{article.category}</span>
                             <span className="text-xs text-gray-400">•</span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <span className="text-xs text-gray-400 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               {article.readTime}
                             </span>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
                             {article.title}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                          <p className="text-sm text-gray-400 line-clamp-2">
                             {article.description}
                           </p>
-                          <div className="mt-4 flex items-center text-emerald-600 dark:text-emerald-400 text-sm font-medium group-hover:gap-2 transition-all">
+                          <div className="mt-4 flex items-center text-emerald-400 text-sm font-medium group-hover:gap-2 transition-all">
                             Read more <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                           </div>
                         </div>
@@ -297,14 +297,14 @@ export default function ArticlesPage() {
         <section className="px-4 sm:px-6 lg:px-8 pb-20">
           <div className="max-w-7xl mx-auto">
             {selectedCategory === 'All' && searchQuery === '' && (
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">All Articles</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">All Articles</h2>
             )}
 
             {filteredArticles.length === 0 ? (
               <div className="text-center py-12">
-                <FileText className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No articles found</h3>
-                <p className="text-gray-500 dark:text-gray-400">
+                <FileText className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">No articles found</h3>
+                <p className="text-gray-400">
                   Try adjusting your search or filter to find what you're looking for.
                 </p>
               </div>
@@ -320,24 +320,24 @@ export default function ArticlesPage() {
                       transition={{ delay: index * 0.05, duration: 0.5 }}
                     >
                       <Link href={`/articles/${article.slug}`}>
-                        <div className="group h-full p-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-lg hover:border-emerald-500/30 transition-all cursor-pointer">
+                        <div className="group h-full p-6 rounded-2xl border border-gray-700 bg-gray-800 hover:shadow-lg hover:border-emerald-500/30 transition-all cursor-pointer">
                           <div className="flex items-start justify-between mb-4">
                             <div className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center`}>
                               <article.icon className={`w-5 h-5 ${colors.text}`} />
                             </div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <span className="text-xs text-gray-400 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               {article.readTime}
                             </span>
                           </div>
                           <span className={`text-xs font-medium ${colors.text} mb-2 block`}>{article.category}</span>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+                          <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2">
                             {article.title}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
+                          <p className="text-sm text-gray-400 line-clamp-2 mb-4">
                             {article.description}
                           </p>
-                          <div className="flex items-center text-emerald-600 dark:text-emerald-400 text-sm font-medium">
+                          <div className="flex items-center text-emerald-400 text-sm font-medium">
                             Read article <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                           </div>
                         </div>
@@ -351,12 +351,12 @@ export default function ArticlesPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 dark:from-emerald-500/5 dark:via-teal-500/5 dark:to-cyan-500/5">
+        <section className="py-16 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 from-emerald-500/5 to-cyan-500/5">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-white mb-4">
               Ready to organize your family life?
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
+            <p className="text-gray-400 mb-8 max-w-xl mx-auto">
               Join thousands of families already using Rowan to stay connected and organized.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -369,7 +369,7 @@ export default function ArticlesPage() {
               </button>
               <button
                 onClick={() => setIsLaunchModalOpen(true)}
-                className="px-8 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold transition-all shadow-md"
+                className="px-8 py-3 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold transition-all shadow-md"
               >
                 Notify Me on Launch
               </button>

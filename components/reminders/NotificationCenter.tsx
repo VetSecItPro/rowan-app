@@ -101,7 +101,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
       {/* Bell Icon Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors active:scale-95"
+        className="relative p-2 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors active:scale-95"
         aria-label="Notifications"
       >
         <Bell className="w-6 h-6" />
@@ -122,24 +122,24 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
           />
 
           {/* Panel with Glassmorphism */}
-          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
+          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between backdrop-blur-md">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between backdrop-blur-md">
+              <h3 className="text-lg font-semibold text-white">
                 Notifications
               </h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium active:opacity-80"
+                    className="text-sm text-pink-400 hover:text-pink-300 font-medium active:opacity-80"
                   >
                     Mark all read
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors active:scale-95"
+                  className="p-1 hover:bg-gray-700 rounded transition-colors active:scale-95"
                   aria-label="Close notifications"
                 >
                   <X className="w-5 h-5" />
@@ -150,21 +150,21 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
             {/* Notifications List */}
             <div className="overflow-y-auto flex-1">
               {loading ? (
-                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                <div className="p-8 text-center text-gray-400">
                   Loading notifications...
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">
+                  <Bell className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                  <p className="text-gray-400 font-medium mb-1">
                     No notifications
                   </p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                  <p className="text-sm text-gray-500">
                     We'll notify you when reminders are due
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                <div className="divide-y divide-gray-700">
                   {notifications.map((notification) => (
                     <NotificationItem
                       key={notification.id}
@@ -179,13 +179,13 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-gray-200/50 dark:border-gray-700/50 text-center backdrop-blur-md">
+              <div className="p-3 border-t border-gray-700/50 text-center backdrop-blur-md">
                 <button
                   onClick={() => {
                     setIsOpen(false);
                     router.push('/reminders');
                   }}
-                  className="text-sm text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium active:opacity-80"
+                  className="text-sm text-pink-400 hover:text-pink-300 font-medium active:opacity-80"
                 >
                   View all reminders →
                 </button>
@@ -215,15 +215,15 @@ function NotificationItem({ notification, onClick, onMarkAsRead }: NotificationI
 
   return (
     <div
-      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer ${
-        !notification.is_read ? 'bg-pink-50/50 dark:bg-pink-900/10' : ''
+      className={`p-4 hover:bg-gray-700/50 transition-colors cursor-pointer ${
+        !notification.is_read ? 'bg-pink-900/10' : ''
       }`}
       onClick={onClick}
     >
       <div className="flex items-start gap-3">
         {/* Icon */}
         <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-          !notification.is_read ? 'bg-pink-100 dark:bg-pink-900/30' : 'bg-gray-100 dark:bg-gray-700'
+          !notification.is_read ? 'bg-pink-900/30' : 'bg-gray-700'
         }`}>
           <span className="text-xl">{notification.reminder?.emoji || '🔔'}</span>
         </div>
@@ -232,12 +232,12 @@ function NotificationItem({ notification, onClick, onMarkAsRead }: NotificationI
         <div className="flex-1 min-w-0">
           <p className={`text-sm ${
             !notification.is_read
-              ? 'font-semibold text-gray-900 dark:text-white'
-              : 'text-gray-700 dark:text-gray-300'
+              ? 'font-semibold text-white'
+              : 'text-gray-300'
           }`}>
             {message}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             {formatRelativeTime(notification.created_at)}
           </p>
         </div>
@@ -249,10 +249,10 @@ function NotificationItem({ notification, onClick, onMarkAsRead }: NotificationI
               e.stopPropagation();
               onMarkAsRead();
             }}
-            className="flex-shrink-0 p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+            className="flex-shrink-0 p-1.5 hover:bg-gray-600 rounded-full transition-colors"
             aria-label="Mark as read"
           >
-            <Check className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <Check className="w-4 h-4 text-gray-400" />
           </button>
         )}
       </div>

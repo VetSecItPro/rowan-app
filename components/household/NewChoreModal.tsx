@@ -37,7 +37,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-xl shadow-2xl sm:max-w-lg overflow-hidden flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl shadow-2xl sm:max-w-lg overflow-hidden flex flex-col">
         <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-amber-500 to-amber-600 sm:rounded-t-xl">
           <h2 className="text-xl sm:text-2xl font-bold text-white">{editChore ? 'Edit Chore' : 'New Chore'}</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 transition-all"><X className="w-5 h-5 text-white" /></button>
@@ -45,16 +45,16 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
         <form onSubmit={(e) => { e.preventDefault(); onSave(formData); onClose(); }} className="flex-1 overflow-y-auto p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">Title *</label>
-            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white" />
+            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Description</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-gray-900 dark:text-white resize-none" />
+            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white resize-none" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="relative z-50">
               <label className="block text-sm font-medium mb-2">Frequency</label>
-              <select value={formData.frequency} onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg relative z-50" style={{ position: 'relative', zIndex: 9999 }}>
+              <select value={formData.frequency} onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })} className="w-full px-4 py-2 bg-gray-900 border rounded-lg relative z-50" style={{ position: 'relative', zIndex: 9999 }}>
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
@@ -63,11 +63,11 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Due Date</label>
-              <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border rounded-lg" />
+              <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="w-full px-4 py-2 bg-gray-900 border rounded-lg" />
             </div>
           </div>
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-full">Cancel</button>
+            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-700 rounded-full">Cancel</button>
             <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-full">{editChore ? 'Save' : 'Create'}</button>
           </div>
         </form>

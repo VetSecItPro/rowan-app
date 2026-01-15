@@ -108,16 +108,16 @@ const CalendarDayCell = memo(({
     <div
       className={`min-h-[120px] p-2 rounded-lg border-2 transition-all ${
         isCurrentMonth
-          ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
-          : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50'
+          ? 'border-gray-700 bg-gray-800'
+          : 'border-gray-800 bg-gray-900/50'
       } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
     >
       <div className={`text-sm font-medium mb-2 ${
         isCurrentMonth
           ? isToday
-            ? 'text-purple-600 dark:text-purple-400'
-            : 'text-gray-900 dark:text-white'
-          : 'text-gray-400 dark:text-gray-600'
+            ? 'text-purple-400'
+            : 'text-white'
+          : 'text-gray-600'
       }`}>
         {format(day, 'd')}
       </div>
@@ -128,12 +128,12 @@ const CalendarDayCell = memo(({
             <button
               key={meal.id}
               onClick={() => onMealClick(meal)}
-              className="w-full text-left px-2 py-1 rounded text-xs bg-orange-50 dark:bg-orange-900/20 border-l-2 border-orange-500 hover:opacity-80 transition-opacity"
+              className="w-full text-left px-2 py-1 rounded text-xs bg-orange-900/20 border-l-2 border-orange-500 hover:opacity-80 transition-opacity"
             >
-              <p className="font-medium text-orange-700 dark:text-orange-300 truncate">
+              <p className="font-medium text-orange-300 truncate">
                 {meal.recipe?.name || meal.name || 'Untitled'}
               </p>
-              <p className="text-gray-500 dark:text-gray-400 text-[10px] capitalize">
+              <p className="text-gray-400 text-[10px] capitalize">
                 {meal.meal_type}
               </p>
             </button>
@@ -143,7 +143,7 @@ const CalendarDayCell = memo(({
           <div className="flex justify-center mt-1">
             <button
               onClick={onAddClick}
-              className="px-2 py-1 text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-[10px] rounded transition-all"
+              className="px-2 py-1 text-gray-400 hover:text-orange-400 hover:bg-orange-900/20 text-[10px] rounded transition-all"
             >
               + Add Meal
             </button>
@@ -193,8 +193,8 @@ export default function MealsPage() {
   // Memoized user color mapping
   const getUserColor = useCallback((userId: string) => {
     const userColors: Record<string, { border: string; bg: string; text: string }> = {
-      'user-1': { border: 'border-l-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-600 dark:text-purple-400' },
-      'user-2': { border: 'border-l-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-600 dark:text-blue-400' },
+      'user-1': { border: 'border-l-purple-500', bg: 'bg-purple-900/20', text: 'text-purple-400' },
+      'user-2': { border: 'border-l-blue-500', bg: 'bg-blue-900/20', text: 'text-blue-400' },
     };
     return userColors[userId] || userColors['user-1'];
   }, []);
@@ -880,18 +880,18 @@ export default function MealsPage() {
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-meals flex items-center justify-center flex-shrink-0"><UtensilsCrossed className="w-5 h-5 sm:w-6 sm:h-6 text-white" /></div>
               <div>
                 <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-meals bg-clip-text text-transparent">Meal Planning</h1>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Plan your meals together</p>
+                <p className="text-sm sm:text-base text-gray-400">Plan your meals together</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Toggle */}
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto">
                 <button
                     onClick={handleSetCalendarView}
                     className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
                       viewMode === 'calendar'
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                        : 'text-gray-300 hover:bg-orange-500 hover:text-white'
                     }`}
                   >
                     <LayoutGrid className="w-4 h-4" />
@@ -902,7 +902,7 @@ export default function MealsPage() {
                     className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
                       viewMode === 'list'
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                        : 'text-gray-300 hover:bg-orange-500 hover:text-white'
                     }`}
                   >
                     <List className="w-4 h-4" />
@@ -913,7 +913,7 @@ export default function MealsPage() {
                     className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
                       viewMode === 'recipes'
                         ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white'
+                        : 'text-gray-300 hover:bg-orange-500 hover:text-white'
                     }`}
                   >
                     <BookOpen className="w-4 h-4" />
@@ -922,10 +922,10 @@ export default function MealsPage() {
               </div>
 
               {/* Meal Actions Toggle */}
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700 w-full sm:w-auto">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto">
                 <button
                   onClick={handleOpenRecipeModal}
-                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-700 dark:text-gray-300 hover:bg-orange-500 hover:text-white"
+                  className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-300 hover:bg-orange-500 hover:text-white"
                 >
                   <ChefHat className="w-4 h-4" />
                   <span className="text-sm">Recipe</span>
@@ -951,16 +951,16 @@ export default function MealsPage() {
             {/* This Week Card */}
             <button
               onClick={handleThisWeekClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
+                <h3 className="text-gray-400 font-medium">This Week</h3>
                 <div className="w-12 h-12 bg-gradient-meals rounded-xl flex items-center justify-center"><CalendarIcon className="w-6 h-6 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.thisWeek}</p>
                 {stats.thisWeek > 0 && (
-                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                  <div className="flex items-center gap-1 text-amber-400">
                     <CalendarIcon className="w-3 h-3" />
                     <span className="text-xs font-medium">Planned</span>
                   </div>
@@ -971,16 +971,16 @@ export default function MealsPage() {
             {/* Next Two Weeks Card */}
             <button
               onClick={handleNextTwoWeeksClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Next Two Weeks</h3>
+                <h3 className="text-gray-400 font-medium">Next Two Weeks</h3>
                 <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.nextWeek}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.nextWeek}</p>
                 {stats.nextWeek > 0 && (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <div className="flex items-center gap-1 text-green-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">Upcoming</span>
                   </div>
@@ -991,16 +991,16 @@ export default function MealsPage() {
             {/* Saved Recipes Card */}
             <button
               onClick={handleSavedRecipesClick}
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Saved Recipes</h3>
+                <h3 className="text-gray-400 font-medium">Saved Recipes</h3>
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"><BookOpen className="w-6 h-6 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.savedRecipes}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.savedRecipes}</p>
                 {stats.savedRecipes > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-blue-400">
                     <BookOpen className="w-3 h-3" />
                     <span className="text-xs font-medium">In library</span>
                   </div>
@@ -1011,16 +1011,16 @@ export default function MealsPage() {
             {/* Shopping Items Card */}
             <Link
               href="/shopping"
-              className="bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500 dark:hover:border-amber-400 transition-all duration-200 cursor-pointer block"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer block"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-600 dark:text-gray-400 font-medium">Shopping Items</h3>
+                <h3 className="text-gray-400 font-medium">Shopping Items</h3>
                 <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"><ShoppingBag className="w-6 h-6 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.shoppingItems}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.shoppingItems}</p>
                 {stats.shoppingItems > 0 && (
-                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                  <div className="flex items-center gap-1 text-purple-400">
                     <ShoppingBag className="w-3 h-3" />
                     <span className="text-xs font-medium">From recipes</span>
                   </div>
@@ -1030,7 +1030,7 @@ export default function MealsPage() {
           </CollapsibleStatsGrid>
 
           {/* Search Bar - No container box on mobile */}
-          <div className="sm:bg-gray-50 sm:dark:bg-gray-800 sm:border sm:border-gray-200 sm:dark:border-gray-700 sm:rounded-xl sm:p-4">
+          <div className="sm:bg-gray-50 sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4">
             <div className="apple-search-container meals-search">
               <Search className="apple-search-icon" />
               <input
@@ -1057,14 +1057,14 @@ export default function MealsPage() {
           </div>
 
           {/* Meals/Recipes Section */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
             {viewMode !== 'calendar' && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-lg sm:text-xl font-bold text-white">
                     {viewMode === 'recipes' ? `Saved Recipes (${filteredRecipes.length})` : `Planned Meals (${filteredMeals.length})`}
                   </h2>
-                  <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap">
+                  <span className="px-3 py-1 bg-orange-900/30 border border-orange-700 text-orange-300 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap">
                     {format(new Date(), 'MMM yyyy')}
                   </span>
                 </div>
@@ -1076,7 +1076,7 @@ export default function MealsPage() {
                     className={`hidden sm:flex px-4 py-2 rounded-full transition-colors items-center gap-2 text-sm font-medium whitespace-nowrap ${
                       showPastMeals
                         ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                     title={showPastMeals ? 'Hide past meals' : 'Show past meals'}
                   >
@@ -1101,7 +1101,7 @@ export default function MealsPage() {
                   <div>
                     {/* Toggle skeleton */}
                     <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
-                      <div className="h-12 w-full sm:w-[400px] bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse" />
+                      <div className="h-12 w-full sm:w-[400px] bg-gray-700 rounded-xl animate-pulse" />
                     </div>
                     {/* Mobile: Stacked card skeleton */}
                     <div className="sm:hidden">
@@ -1126,13 +1126,13 @@ export default function MealsPage() {
               /* Recipes View */
               filteredRecipes.length === 0 ? (
                 <div className="text-center py-12 max-w-lg mx-auto">
-                  <div className="bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/20 dark:to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <ChefHat className="w-12 h-12 text-orange-600 dark:text-orange-400" />
+                  <div className="bg-gradient-to-br from-orange-100 from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <ChefHat className="w-12 h-12 text-orange-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  <h3 className="text-2xl font-bold text-white mb-3">
                     {searchQuery ? 'No recipes found' : 'Your recipe collection awaits'}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-gray-400 mb-2">
                     {searchQuery
                       ? `No recipes match "${searchQuery}". Try adjusting your search or browse all recipes.`
                       : 'Save your favorite recipes to quickly plan meals and generate shopping lists.'
@@ -1140,7 +1140,7 @@ export default function MealsPage() {
                   </p>
                   {!searchQuery && (
                     <>
-                      <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                      <p className="text-sm text-gray-500 mb-6">
                         💡 Tip: You can add recipes manually or import them from a URL!
                       </p>
                       <button
@@ -1171,13 +1171,13 @@ export default function MealsPage() {
               <div className="w-full">
                 {/* Calendar View Mode Selector - Full Width on Mobile */}
                 <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
-                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl border border-orange-200 dark:border-orange-700">
+                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
                       className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'week'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
+                          : 'text-gray-300 hover:bg-orange-900/50'
                       }`}
                     >
                       <span className="hidden sm:inline">Current Week</span>
@@ -1188,7 +1188,7 @@ export default function MealsPage() {
                       className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === '2weeks'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
+                          : 'text-gray-300 hover:bg-orange-900/50'
                       }`}
                     >
                       <span className="hidden sm:inline">Two Weeks</span>
@@ -1199,7 +1199,7 @@ export default function MealsPage() {
                       className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'month'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
+                          : 'text-gray-300 hover:bg-orange-900/50'
                       }`}
                     >
                       Month
@@ -1238,18 +1238,18 @@ export default function MealsPage() {
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={handlePreviousMonth}
-                        className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                        <ChevronLeft className="w-5 h-5 text-gray-400" />
                       </button>
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                      <h3 className="text-lg sm:text-xl font-bold text-white">
                         {format(currentMonth, 'MMMM yyyy')}
                       </h3>
                       <button
                         onClick={handleNextMonth}
-                        className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        className="p-2.5 hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </button>
                     </div>
 
@@ -1263,7 +1263,7 @@ export default function MealsPage() {
                         }
                         return weeks.map((week, weekIndex) => (
                           <div key={weekIndex} className="space-y-2">
-                            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-1">
+                            <h4 className="text-xs font-semibold text-gray-400 px-1">
                               Week of {format(week[0], 'MMM d')}
                             </h4>
                             <div className="space-y-2">
@@ -1279,16 +1279,16 @@ export default function MealsPage() {
                                     key={day.toISOString()}
                                     className={`rounded-xl border-2 p-3 transition-all ${
                                       isToday
-                                        ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/10'
-                                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'
+                                        ? 'border-orange-500 bg-orange-900/10'
+                                        : 'border-gray-700 bg-gray-800'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between mb-2">
                                       <div className="flex items-center gap-2">
-                                        <span className={`text-sm font-medium ${isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                                        <span className={`text-sm font-medium ${isToday ? 'text-orange-400' : 'text-gray-400'}`}>
                                           {format(day, 'EEE')}
                                         </span>
-                                        <span className={`text-lg font-bold ${isToday ? 'text-orange-600 dark:text-orange-400' : 'text-gray-900 dark:text-white'}`}>
+                                        <span className={`text-lg font-bold ${isToday ? 'text-orange-400' : 'text-white'}`}>
                                           {format(day, 'd')}
                                         </span>
                                         {isToday && (
@@ -1309,12 +1309,12 @@ export default function MealsPage() {
                                           <button
                                             key={meal.id}
                                             onClick={() => handleMealClick(meal)}
-                                            className="w-full text-left px-3 py-2 rounded-lg text-sm bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500 hover:shadow-md transition-all"
+                                            className="w-full text-left px-3 py-2 rounded-lg text-sm bg-orange-900/20 border-l-4 border-orange-500 hover:shadow-md transition-all"
                                           >
-                                            <p className="font-medium text-gray-900 dark:text-white">
+                                            <p className="font-medium text-white">
                                               {meal.recipe?.name || meal.name || 'Untitled'}
                                             </p>
-                                            <p className="text-xs text-orange-600 dark:text-orange-400 capitalize">
+                                            <p className="text-xs text-orange-400 capitalize">
                                               {meal.meal_type}
                                             </p>
                                           </button>
@@ -1335,7 +1335,7 @@ export default function MealsPage() {
                       <div className="grid grid-cols-7 gap-2">
                         {/* Day headers */}
                         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                          <div key={day} className="text-center text-sm font-medium text-gray-600 dark:text-gray-400 py-2">
+                          <div key={day} className="text-center text-sm font-medium text-gray-400 py-2">
                             {day}
                           </div>
                         ))}
@@ -1365,13 +1365,13 @@ export default function MealsPage() {
               /* List View */
               filteredMeals.length === 0 ? (
                 <div className="text-center py-12 max-w-lg mx-auto">
-                  <div className="bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/20 dark:to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <UtensilsCrossed className="w-12 h-12 text-orange-600 dark:text-orange-400" />
+                  <div className="bg-gradient-to-br from-orange-100 from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <UtensilsCrossed className="w-12 h-12 text-orange-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  <h3 className="text-2xl font-bold text-white mb-3">
                     {searchQuery ? 'No meals found' : 'Your meal planning journey begins'}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-gray-400 mb-2">
                     {searchQuery
                       ? `No meals match "${searchQuery}". Try adjusting your search or browse all meals.`
                       : 'Plan your meals ahead of time to save time, reduce stress, and eat healthier.'
@@ -1379,7 +1379,7 @@ export default function MealsPage() {
                   </p>
                   {!searchQuery && (
                     <>
-                      <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                      <p className="text-sm text-gray-500 mb-6">
                         💡 Tip: Link meals to recipes for automatic ingredient tracking and shopping list generation!
                       </p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

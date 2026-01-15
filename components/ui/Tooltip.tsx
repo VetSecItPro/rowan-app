@@ -84,7 +84,7 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
   }, [isVisible, position, tooltipPosition, horizontalOffset]);
 
   const getTooltipStyles = () => {
-    const baseStyles = 'absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 dark:bg-gray-700 rounded shadow-lg whitespace-nowrap pointer-events-none';
+    const baseStyles = 'absolute z-50 px-2 py-1 text-xs text-white bg-gray-700 rounded shadow-lg whitespace-nowrap pointer-events-none';
 
     switch (tooltipPosition) {
       case 'top':
@@ -127,7 +127,7 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
           {content}
           {/* Tooltip arrow */}
           <div
-            className={`absolute w-2 h-2 bg-gray-900 dark:bg-gray-700 transform rotate-45 ${
+            className={`absolute w-2 h-2 bg-gray-700 transform rotate-45 ${
               tooltipPosition === 'top' ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' :
               tooltipPosition === 'bottom' ? 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2' :
               tooltipPosition === 'left' ? 'right-0 top-1/2 -translate-y-1/2 translate-x-1/2' :

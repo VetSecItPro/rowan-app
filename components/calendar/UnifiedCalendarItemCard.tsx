@@ -127,12 +127,12 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
         </div>
         <div className="flex items-center gap-1">
           {item.priority === 'urgent' && (
-            <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300">
+            <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium bg-red-900/30 text-red-300">
               Urgent
             </span>
           )}
           {item.priority === 'high' && (
-            <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
+            <span className="rounded-full bg-orange-100 px-1.5 py-0.5 text-xs font-medium bg-orange-900/30 text-orange-300">
               High
             </span>
           )}
@@ -145,7 +145,7 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
       </div>
 
       {/* Time row */}
-      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex items-center gap-2 text-sm text-gray-400">
         {item.isAllDay ? (
           <span>All day</span>
         ) : (
@@ -153,7 +153,7 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
         )}
         {item.location && (
           <>
-            <span className="text-gray-300 dark:text-gray-600">|</span>
+            <span className="text-gray-600">|</span>
             <span className="truncate">{item.location}</span>
           </>
         )}
@@ -161,14 +161,14 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
 
       {/* Description preview */}
       {item.description && (
-        <p className="line-clamp-2 text-sm text-gray-500 dark:text-gray-400">{item.description}</p>
+        <p className="line-clamp-2 text-sm text-gray-400">{item.description}</p>
       )}
 
       {/* Item-specific metadata */}
-      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-500">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
         {/* Meal type */}
         {item.itemType === 'meal' && item.category && (
-          <span className="rounded bg-gray-100 px-1.5 py-0.5 capitalize dark:bg-gray-800">
+          <span className="rounded bg-gray-100 px-1.5 py-0.5 capitalize bg-gray-800">
             {item.category}
           </span>
         )}
@@ -178,10 +178,10 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
           <span
             className={`rounded px-1.5 py-0.5 capitalize ${
               item.status === 'completed'
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                ? 'bg-green-100 bg-green-900/30 text-green-300'
                 : item.status === 'blocked'
-                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                : 'bg-gray-100 dark:bg-gray-800'
+                ? 'bg-red-100 bg-red-900/30 text-red-300'
+                : 'bg-gray-800'
             }`}
           >
             {item.status.replace('-', ' ')}
@@ -190,7 +190,7 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
 
         {/* Category */}
         {item.category && item.itemType !== 'meal' && (
-          <span className="rounded bg-gray-100 px-1.5 py-0.5 capitalize dark:bg-gray-800">
+          <span className="rounded bg-gray-100 px-1.5 py-0.5 capitalize bg-gray-800">
             {item.category}
           </span>
         )}

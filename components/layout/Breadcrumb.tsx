@@ -52,7 +52,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
         <li className={filteredItems.length > 1 ? 'hidden sm:flex flex-shrink-0' : 'flex flex-shrink-0'}>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-0.5 py-0 px-0 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all active:scale-95"
+            className="inline-flex items-center gap-0.5 py-0 px-0 text-sm text-gray-400 hover:text-white transition-all active:scale-95"
           >
             <LayoutDashboard className="w-4 h-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -74,7 +74,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="inline-flex items-center gap-0.5 py-0 px-0 ml-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95"
+                  className="inline-flex items-center gap-0.5 py-0 px-0 ml-1 text-sm text-gray-400 hover:text-white transition-all truncate max-w-[120px] sm:max-w-[200px] active:scale-95"
                   title={item.label}
                 >
                   <IconComponent className="w-4 h-4 flex-shrink-0" />
@@ -82,7 +82,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
                 </Link>
               ) : (
                 <span
-                  className="inline-flex items-center gap-0.5 text-sm text-gray-900 dark:text-white font-medium truncate max-w-[180px] sm:max-w-none py-0 px-0 ml-1"
+                  className="inline-flex items-center gap-0.5 text-sm text-white font-medium truncate max-w-[180px] sm:max-w-none py-0 px-0 ml-1"
                   title={item.label}
                 >
                   <IconComponent className="w-4 h-4 flex-shrink-0" />

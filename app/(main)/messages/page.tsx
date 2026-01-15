@@ -887,7 +887,7 @@ export default function MessagesPage() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-messages bg-clip-text text-transparent">
                 Messages
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm sm:text-base text-gray-400 mt-1">
                 Stay connected with your partner
               </p>
             </div>
@@ -909,17 +909,17 @@ export default function MessagesPage() {
             iconGradient="bg-gradient-messages"
             gridClassName="stats-grid-mobile gap-3 sm:gap-6"
           >
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Today</h3>
+                <h3 className="text-xs sm:text-sm text-gray-400 font-medium">Today</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
                   <MessageSquare className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.today}</p>
+                <p className="text-xl sm:text-3xl font-bold text-white">{stats.today}</p>
                 {stats.today > 0 && (
-                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                  <div className="flex items-center gap-1 text-green-400">
                     <MessageSquare className="w-3 h-3" />
                     <span className="text-xs font-medium">Active</span>
                   </div>
@@ -927,17 +927,17 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">This Week</h3>
+                <h3 className="text-xs sm:text-sm text-gray-400 font-medium">This Week</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gradient-messages rounded-xl flex items-center justify-center">
                   <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.thisWeek}</p>
+                <p className="text-xl sm:text-3xl font-bold text-white">{stats.thisWeek}</p>
                 {stats.thisWeek > 0 && (
-                  <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <div className="flex items-center gap-1 text-emerald-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">Recent</span>
                   </div>
@@ -945,17 +945,17 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Unread</h3>
+                <h3 className="text-xs sm:text-sm text-gray-400 font-medium">Unread</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                   <Mail className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.unread}</p>
+                <p className="text-xl sm:text-3xl font-bold text-white">{stats.unread}</p>
                 {stats.unread > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center gap-1 text-blue-400">
                     <Mail className="w-3 h-3" />
                     <span className="text-xs font-medium">New!</span>
                   </div>
@@ -963,17 +963,17 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <h3 className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">All Time</h3>
+                <h3 className="text-xs sm:text-sm text-gray-400 font-medium">All Time</h3>
                 <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
                   <MessageCircle className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                <p className="text-xl sm:text-3xl font-bold text-white">{stats.total}</p>
                 {stats.total > 0 && (
-                  <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                  <div className="flex items-center gap-1 text-purple-400">
                     <MessageCircle className="w-3 h-3" />
                     <span className="text-xs font-medium">Overall</span>
                   </div>
@@ -999,17 +999,17 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Interface - WhatsApp Style */}
-            <div className="flex-1 min-h-0 bg-[#efeae2] dark:bg-[#0b141a] md:rounded-3xl overflow-hidden flex flex-col md:border md:border-gray-200 dark:md:border-gray-700">
+            <div className="flex-1 min-h-0 bg-[#efeae2] bg-[#0b141a] md:rounded-3xl overflow-hidden flex flex-col md:border md:border-gray-700">
             {/* Chat Header - WhatsApp Style */}
-            <div className="px-3 py-2 bg-[#f0f2f5] dark:bg-[#202c33] border-b border-gray-200 dark:border-gray-700">
+            <div className="px-3 py-2 bg-[#f0f2f5] bg-[#202c33] border-b border-gray-700">
               <div className="flex items-center gap-3">
                 {/* Back/Menu Button */}
                 <button
                   onClick={() => setShowConversationSidebar(true)}
-                  className="md:hidden p-2 -ml-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  className="md:hidden p-2 -ml-1 hover:bg-gray-700 rounded-full transition-colors"
                   aria-label="Open conversations"
                 >
-                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
@@ -1029,17 +1029,17 @@ export default function MessagesPage() {
                       onKeyDown={handleTitleKeyDown}
                       onBlur={handleSaveConversationTitle}
                       autoFocus
-                      className="text-base font-semibold text-gray-900 dark:text-white bg-transparent border-b-2 border-emerald-500 outline-none w-full max-w-[200px]"
+                      className="text-base font-semibold text-white bg-transparent border-b-2 border-emerald-500 outline-none w-full max-w-[200px]"
                     />
                   ) : (
                     <h2
-                      className="text-base font-semibold text-gray-900 dark:text-white truncate cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                      className="text-base font-semibold text-white truncate cursor-pointer hover:text-emerald-400 transition-colors"
                       onClick={handleEditConversationTitle}
                     >
                       {conversationTitle}
                     </h2>
                   )}
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400">online</p>
+                  <p className="text-xs text-emerald-400">online</p>
                 </div>
 
                 {/* Header Actions */}
@@ -1048,46 +1048,46 @@ export default function MessagesPage() {
                     onClick={() => setShowMembersPanel(!showMembersPanel)}
                     className={`p-2 rounded-full transition-colors ${
                       showMembersPanel
-                        ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400'
+                        ? 'bg-emerald-900/50 text-emerald-400'
+                        : 'hover:bg-gray-700 text-gray-400'
                     }`}
                     title="View members"
                   >
                     <Users className="w-5 h-5" />
                   </button>
-                  <button className="hidden sm:flex p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">
-                    <Search className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  <button className="hidden sm:flex p-2 hover:bg-gray-700 rounded-full transition-colors">
+                    <Search className="w-5 h-5 text-gray-400" />
                   </button>
                 </div>
               </div>
 
               {/* Members Panel - Slides down */}
               {showMembersPanel && (
-                <div className="px-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700">
+                <div className="px-4 py-3 bg-gray-800/80 backdrop-blur-xl border-b border-gray-700">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Chat Members</h3>
+                    <h3 className="text-sm font-semibold text-gray-300">Chat Members</h3>
                     <button
                       onClick={() => setShowMembersPanel(false)}
-                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                      className="p-1 hover:bg-gray-700 rounded-full"
                     >
                       <X className="w-4 h-4 text-gray-500" />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {/* Current user */}
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-900/30 rounded-full">
                       <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
                         {user?.user_metadata?.name?.charAt(0)?.toUpperCase() || 'Y'}
                       </div>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">You</span>
+                      <span className="text-sm text-gray-300">You</span>
                     </div>
                     {/* Show other space members */}
                     {currentSpace && (
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700/50 rounded-full">
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-700/50 rounded-full">
                         <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
                           <Users className="w-3 h-3" />
                         </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Space members</span>
+                        <span className="text-sm text-gray-400">Space members</span>
                       </div>
                     )}
                   </div>
@@ -1097,7 +1097,7 @@ export default function MessagesPage() {
 
             {/* Mobile Thread Navigation Bar */}
             {conversations.length > 1 && (
-              <div className="md:hidden px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-[#f0f2f5] dark:bg-[#202c33]">
+              <div className="md:hidden px-2 py-1.5 border-b border-gray-700 bg-[#f0f2f5] bg-[#202c33]">
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
                   {/* New Thread Button - First */}
                   <button
@@ -1113,7 +1113,7 @@ export default function MessagesPage() {
                       className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                         conv.id === conversationId
                           ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md'
-                          : 'bg-white/60 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50'
+                          : 'bg-gray-700/60 text-gray-300 border border-gray-600/50'
                       }`}
                     >
                       <span className="truncate max-w-[100px] inline-block align-middle">
@@ -1138,7 +1138,7 @@ export default function MessagesPage() {
               }}
             >
               {/* Dark mode background override */}
-              <div className="hidden dark:block absolute inset-0 bg-[#0b141a]" style={{
+              <div className="hidden block absolute inset-0 bg-[#0b141a]" style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
               }} />
 
@@ -1156,22 +1156,22 @@ export default function MessagesPage() {
                 <div className="space-y-2 py-4">
                   {[...Array(5)].map((_, i) => (
                     <div key={i} className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-                      <div className={`max-w-[70%] ${i % 2 === 0 ? 'bg-white dark:bg-gray-700' : 'bg-emerald-500/60 dark:bg-emerald-600/60'} rounded-2xl px-3 py-2 animate-pulse`}>
-                        <div className={`h-4 rounded w-24 mb-2 ${i % 2 === 0 ? 'bg-gray-200 dark:bg-gray-600' : 'bg-emerald-400/50'}`} />
-                        <div className={`h-3 rounded w-16 ${i % 2 === 0 ? 'bg-gray-100 dark:bg-gray-600' : 'bg-emerald-400/30'}`} />
+                      <div className={`max-w-[70%] ${i % 2 === 0 ? 'bg-gray-700' : 'bg-emerald-600/60'} rounded-2xl px-3 py-2 animate-pulse`}>
+                        <div className={`h-4 rounded w-24 mb-2 ${i % 2 === 0 ? 'bg-gray-600' : 'bg-emerald-400/50'}`} />
+                        <div className={`h-3 rounded w-16 ${i % 2 === 0 ? 'bg-gray-600' : 'bg-emerald-400/30'}`} />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : filteredMessages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                  <div className="w-16 h-16 bg-emerald-500/20 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
-                    <MessageCircle className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
+                    <MessageCircle className="w-8 h-8 text-emerald-400" />
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">
+                  <p className="text-gray-300 font-medium mb-1">
                     {emptyStateMessage.primary}
                   </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  <p className="text-gray-400 text-sm">
                     {emptyStateMessage.secondary}
                   </p>
                 </div>
@@ -1186,7 +1186,7 @@ export default function MessagesPage() {
                         {/* Date Separator - WhatsApp Style */}
                         {showDateSeparator && (
                           <div className="flex items-center justify-center my-3">
-                            <span className="px-3 py-1 text-[11px] font-medium text-gray-600 dark:text-gray-300 bg-white/90 dark:bg-gray-700/90 rounded-lg shadow-sm">
+                            <span className="px-3 py-1 text-[11px] font-medium text-gray-300 bg-gray-700/90 rounded-lg shadow-sm">
                               {getDateLabel(new Date(message.created_at))}
                             </span>
                           </div>
@@ -1232,30 +1232,30 @@ export default function MessagesPage() {
             </div>
 
             {/* Message Input - WhatsApp Style */}
-            <div className="flex-shrink-0 px-2 py-2 bg-[#f0f2f5] dark:bg-[#202c33]">
+            <div className="flex-shrink-0 px-2 py-2 bg-[#f0f2f5] bg-[#202c33]">
               <div className="flex items-center gap-2">
                 {/* Message Input with Emoji Inside */}
-                <div className="flex-1 flex items-center bg-white dark:bg-[#2a3942] rounded-3xl shadow-sm relative">
+                <div className="flex-1 flex items-center bg-[#2a3942] rounded-3xl shadow-sm relative">
                   {/* Emoji Button - Inside Input */}
                   <div className="relative flex-shrink-0">
                     <button
                       type="button"
                       onClick={toggleEmojiPicker}
-                      className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full transition-colors ml-1"
+                      className="p-2.5 hover:bg-gray-700/50 rounded-full transition-colors ml-1"
                     >
-                      <Smile className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      <Smile className="w-5 h-5 text-gray-400" />
                     </button>
                     {/* Emoji Picker */}
                     {showEmojiPicker && (
                       <>
                         <div className="fixed inset-0 z-10" onClick={closeEmojiPicker} />
-                        <div className="absolute bottom-full mb-2 left-0 bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-3 grid grid-cols-6 gap-1 z-20 min-w-[240px] border border-gray-200 dark:border-gray-700">
+                        <div className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-2xl shadow-xl p-3 grid grid-cols-6 gap-1 z-20 min-w-[240px] border border-gray-700">
                           {EMOJIS.map((emoji, idx) => (
                             <button
                               key={idx}
                               type="button"
                               onClick={() => handleEmojiClick(emoji)}
-                              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-xl transition-colors"
+                              className="w-9 h-9 flex items-center justify-center hover:bg-gray-700 rounded-lg text-xl transition-colors"
                             >
                               {emoji}
                             </button>
@@ -1283,9 +1283,9 @@ export default function MessagesPage() {
                   <button
                     type="button"
                     onClick={handleFileClick}
-                    className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-full transition-colors mr-1 flex-shrink-0"
+                    className="p-2.5 hover:bg-gray-700/50 rounded-full transition-colors mr-1 flex-shrink-0"
                   >
-                    <Paperclip className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    <Paperclip className="w-5 h-5 text-gray-400" />
                   </button>
                 </div>
 
@@ -1324,7 +1324,7 @@ export default function MessagesPage() {
 
               {/* Voice Recorder */}
               {showVoiceRecorder && (
-                <div className="mt-2 p-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+                <div className="mt-2 p-3 bg-gray-800 rounded-2xl shadow-sm">
                   <VoiceRecorder
                     onSendVoice={handleSendVoice}
                     onCancel={() => setShowVoiceRecorder(false)}

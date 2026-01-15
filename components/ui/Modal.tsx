@@ -216,8 +216,8 @@ export function Modal({
         ref={modalRef}
         className={`
           ${fullScreenOnMobile ? 'absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto' : 'relative'}
-          bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl
-          border border-gray-200/50 dark:border-gray-700/50
+          bg-gray-800/90 backdrop-blur-xl
+          border border-gray-700/50
           ${fullScreenOnMobile ? 'w-auto' : 'w-full max-w-md'}
           ${fullScreenOnMobile ? 'sm:w-auto sm:rounded-xl' : 'rounded-xl'}
           ${fullScreenOnMobile ? `sm:${maxWidthClasses[maxWidth]}` : maxWidthClasses[maxWidth]}
@@ -238,11 +238,11 @@ export function Modal({
         onTouchEnd={handleTouchEnd}
       >
         {/* Header */}
-        <div className="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <div className="flex-shrink-0 bg-gray-800/80 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           {/* Swipe Indicator - Mobile Only */}
           {fullScreenOnMobile && (
             <div
-              className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full transition-all duration-200 sm:hidden"
+              className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-600 rounded-full transition-all duration-200 sm:hidden"
               style={{
                 opacity: isDragging ? 1 : 0.6,
                 width: isDragging ? '48px' : '40px',
@@ -255,7 +255,7 @@ export function Modal({
             />
           )}
 
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white pr-12">
+          <h2 className="text-lg sm:text-xl font-bold text-white pr-12">
             {title}
           </h2>
 
@@ -267,16 +267,16 @@ export function Modal({
               w-12 h-12 sm:w-10 sm:h-10
               flex items-center justify-center
               rounded-full
-              hover:bg-gray-100 dark:hover:bg-gray-700
+              hover:bg-gray-700
               transition-all
               focus:outline-none
-              focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-600
+              focus:ring-4 focus:ring-gray-600
               sm:focus:ring-2
               active:scale-95
             "
             aria-label="Close modal"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-400" />
+            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-400" />
           </button>
         </div>
 

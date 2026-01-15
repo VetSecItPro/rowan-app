@@ -25,7 +25,7 @@ const MealLoadingFallback = ({
         <Icon className="w-8 h-8 text-orange-500" />
         <Loader2 className="w-4 h-4 absolute -top-1 -right-1 animate-spin text-orange-600" />
       </div>
-      <p className="text-sm text-gray-600 dark:text-gray-400">{text}</p>
+      <p className="text-sm text-gray-400">{text}</p>
     </div>
   </div>
 );
@@ -35,10 +35,10 @@ const MealLoadingFallback = ({
  */
 const ModalSkeleton = ({ title }: { title: string }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6">
+    <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
-        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-32" />
+        <div className="w-6 h-6 rounded-full bg-gray-700 animate-pulse" />
+        <div className="h-6 bg-gray-700 rounded animate-pulse w-32" />
       </div>
       <MealLoadingFallback text={`Loading ${title}...`} />
     </div>
@@ -125,7 +125,7 @@ export const WeekCalendarView = dynamic(
   () => import('@/components/meals/WeekCalendarView').then(mod => ({ default: mod.WeekCalendarView })),
   {
     loading: () => (
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-800 rounded-lg p-6">
         <ProgressiveCalendarSkeleton type="week" />
       </div>
     ),
@@ -141,11 +141,11 @@ export const TwoWeekCalendarView = dynamic(
   () => import('@/components/meals/TwoWeekCalendarView').then(mod => ({ default: mod.TwoWeekCalendarView })),
   {
     loading: () => (
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+      <div className="bg-gray-800 rounded-lg p-6">
         <MealLoadingFallback text="Loading two-week view..." />
         <div className="grid grid-cols-7 gap-4 mt-4">
           {Array.from({ length: 14 }).map((_, i) => (
-            <div key={i} className="h-24 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" />
+            <div key={i} className="h-24 bg-gray-700 rounded-lg animate-pulse" />
           ))}
         </div>
       </div>
@@ -162,16 +162,16 @@ export const MealCard = dynamic(
   () => import('@/components/meals/MealCard').then(mod => ({ default: mod.MealCard })),
   {
     loading: () => (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 animate-pulse">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+          <div className="w-12 h-12 bg-gray-700 rounded-lg" />
           <div className="flex-1">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+            <div className="h-4 bg-gray-700 rounded w-3/4 mb-2" />
+            <div className="h-3 bg-gray-700 rounded w-1/2" />
           </div>
         </div>
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-1" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+        <div className="h-3 bg-gray-700 rounded w-full mb-1" />
+        <div className="h-3 bg-gray-700 rounded w-2/3" />
       </div>
     ),
     ssr: true, // Cards can be SSR'd
@@ -186,15 +186,15 @@ export const RecipeCard = dynamic(
   () => import('@/components/meals/RecipeCard').then(mod => ({ default: mod.RecipeCard })),
   {
     loading: () => (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse">
-        <div className="h-48 bg-gray-200 dark:bg-gray-700" />
+      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden animate-pulse">
+        <div className="h-48 bg-gray-700" />
         <div className="p-4">
-          <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-3" />
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2" />
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4" />
+          <div className="h-5 bg-gray-700 rounded w-3/4 mb-3" />
+          <div className="h-3 bg-gray-700 rounded w-full mb-2" />
+          <div className="h-3 bg-gray-700 rounded w-2/3 mb-4" />
           <div className="flex gap-2">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20" />
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+            <div className="h-8 bg-gray-700 rounded w-20" />
+            <div className="h-8 bg-gray-700 rounded w-20" />
           </div>
         </div>
       </div>

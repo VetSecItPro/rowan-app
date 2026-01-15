@@ -1,12 +1,12 @@
 export function Skeleton({ className = '' }: { className?: string }) {
   return (
-    <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`} />
+    <div className={`animate-pulse bg-gray-700 rounded ${className}`} />
   );
 }
 
 export function MealCardSkeleton() {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
       <div className="flex items-start gap-4">
         <Skeleton className="w-24 h-24 flex-shrink-0" />
         <div className="flex-1 space-y-3">
@@ -25,8 +25,8 @@ export function MealCardSkeleton() {
 
 export function CalendarDaySkeleton() {
   return (
-    <div className="min-h-[300px] rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3">
-      <div className="mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+    <div className="min-h-[300px] rounded-lg border-2 border-gray-700 bg-gray-800 p-3">
+      <div className="mb-3 pb-2 border-b border-gray-700">
         <Skeleton className="h-4 w-12 mb-1" />
         <Skeleton className="h-8 w-8" />
       </div>
@@ -42,9 +42,9 @@ export function CalendarDaySkeleton() {
 // Mobile-optimized day card skeleton that matches the vertical card layout
 export function MobileDayCardSkeleton() {
   return (
-    <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+    <div className="rounded-xl border-2 border-gray-700 bg-gray-800 p-4">
       {/* Day Header */}
-      <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-700">
         <div className="flex items-center gap-3">
           <div>
             <Skeleton className="h-4 w-16 mb-1" />
@@ -84,7 +84,7 @@ export function MobileCalendarSkeleton() {
 
 export function RecipeCardSkeleton() {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
       <Skeleton className="w-full h-48" />
       <div className="p-4 space-y-3">
         <Skeleton className="h-6 w-3/4" />
@@ -101,7 +101,7 @@ export function RecipeCardSkeleton() {
 
 export function GoalCardSkeleton() {
   return (
-    <div className="bg-white/10 dark:bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/20 dark:border-white/10 rounded-xl p-6">
+    <div className="bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/10 rounded-xl p-6">
       <div className="flex items-start gap-3 mb-4">
         <Skeleton className="min-w-[44px] min-h-[44px] rounded-lg flex-shrink-0" />
         <div className="flex-1 space-y-2">
@@ -131,7 +131,7 @@ export function GoalCardSkeleton() {
 
 export function MilestoneCardSkeleton() {
   return (
-    <div className="bg-white/10 dark:bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/20 dark:border-white/10 rounded-xl p-6">
+    <div className="bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/10 rounded-xl p-6">
       <div className="flex items-start gap-3 mb-4">
         <Skeleton className="min-w-[44px] min-h-[44px] rounded-lg flex-shrink-0" />
         <div className="flex-1 space-y-2">
@@ -158,7 +158,7 @@ export function MilestoneCardSkeleton() {
 
 export function StatsCardSkeleton() {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl" />
@@ -173,7 +173,7 @@ export function StatsCardSkeleton() {
 
 export function TaskCardSkeleton() {
   return (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 rounded-lg p-4 sm:p-4">
+    <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-lg p-4 sm:p-4">
       {/* Header */}
       <div className="flex items-start justify-between mb-3 gap-3">
         <div className="flex items-start gap-3 flex-1">

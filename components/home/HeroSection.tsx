@@ -62,10 +62,10 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 border border-blue-500/20 dark:border-blue-500/30"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 from-blue-500/20 to-cyan-500/20 border border-blue-500/30"
                         >
-                            <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            <Compass className="w-4 h-4 text-blue-400" />
+                            <span className="text-sm font-medium text-blue-400">
                                 Your Life Management Hub
                             </span>
                         </motion.div>
@@ -85,7 +85,7 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                                 className="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-2xl"
                                 priority
                             />
-                            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-extrabold tracking-tight bg-gradient-to-r from-blue-600 from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                                 Rowan
                             </h1>
                         </motion.div>
@@ -96,8 +96,8 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight"
                         >
-                            <span className="text-gray-900 dark:text-white">Your Life, </span>
-                            <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 dark:from-blue-400 dark:via-cyan-400 dark:to-teal-400 bg-clip-text text-transparent animate-gradient">
+                            <span className="text-white">Your Life, </span>
+                            <span className="bg-gradient-to-r from-blue-600 via-cyan-600 from-blue-400 to-teal-400 bg-clip-text text-transparent animate-gradient">
                                 Organized
                             </span>
                         </motion.h2>
@@ -106,7 +106,7 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.3 }}
-                            className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed font-serif italic"
+                            className="text-xl sm:text-2xl text-gray-300 leading-relaxed font-serif italic"
                         >
                             Rowan brings tasks, schedules, lists, meals, budgets, and goals into one elegant workspace, so your family stays aligned without constant reminders.
                         </motion.p>
@@ -125,7 +125,7 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             </MagneticButton>
 
                             <MagneticButton strength={15} onClick={onLaunchClick}>
-                                <div className="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
+                                <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
                                     Get Notified on Launch
                                 </div>
                             </MagneticButton>
@@ -143,10 +143,10 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             {benefits.map((benefit, index) => {
                                 // Map gradients to specific icon colors
                                 const iconColorMap: Record<string, string> = {
-                                    'from-blue-500 to-indigo-500': 'text-blue-600 dark:text-blue-400',
-                                    'from-green-500 to-emerald-500': 'text-green-600 dark:text-green-400',
-                                    'from-purple-500 to-violet-500': 'text-purple-600 dark:text-purple-400',
-                                    'from-orange-500 to-amber-500': 'text-orange-600 dark:text-orange-400'
+                                    'from-blue-500 to-indigo-500': 'text-blue-400',
+                                    'from-green-500 to-emerald-500': 'text-green-400',
+                                    'from-purple-500 to-violet-500': 'text-purple-400',
+                                    'from-orange-500 to-amber-500': 'text-orange-400'
                                 };
 
                                 return (
@@ -155,17 +155,17 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                                        className="relative group p-6 rounded-2xl bg-gradient-to-br from-white/80 to-white/40 dark:from-gray-800/80 dark:to-gray-900/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 hover:scale-105 transition-all duration-300 hover:shadow-xl"
+                                        className="relative group p-6 rounded-2xl bg-gradient-to-br from-white/80 from-gray-800/80 to-gray-900/40 backdrop-blur-xl border border-gray-700/50 hover:scale-105 transition-all duration-300 hover:shadow-xl"
                                     >
                                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} p-0.5 mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                            <div className="w-full h-full rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center">
+                                            <div className="w-full h-full rounded-xl bg-gray-900 flex items-center justify-center">
                                                 <benefit.icon className={`w-6 h-6 ${iconColorMap[benefit.gradient]}`} />
                                             </div>
                                         </div>
-                                        <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">
+                                        <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">
                                             {benefit.title}
                                         </h3>
-                                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-serif italic">
+                                        <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-serif italic">
                                             {benefit.description}
                                         </p>
                                     </motion.div>
@@ -180,8 +180,8 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             transition={{ duration: 0.6, delay: 1.1 }}
                             className="flex items-center justify-center gap-2 mt-6"
                         >
-                            <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                            <Shield className="w-5 h-5 text-blue-400" />
+                            <span className="text-sm font-semibold text-gray-300">
                                 Veteran-Owned Business
                             </span>
                         </motion.div>

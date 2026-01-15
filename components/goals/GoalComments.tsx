@@ -158,10 +158,10 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
           <div className="space-y-4">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex items-start space-x-3">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                <div className="w-8 h-8 bg-gray-700 rounded-full animate-pulse" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2" />
+                  <div className="h-4 bg-gray-700 rounded animate-pulse w-3/4" />
+                  <div className="h-3 bg-gray-700 rounded animate-pulse w-1/2" />
                 </div>
               </div>
             ))}
@@ -202,7 +202,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
               }}
             />
             <div className="flex justify-between items-center">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-400">
                 Tip: Use @username to mention someone
               </p>
               <Button
@@ -217,7 +217,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
         </div>
 
         {comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-gray-400">
             <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No comments yet</p>
             <p className="text-sm">Be the first to share your thoughts!</p>
@@ -236,13 +236,13 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                     </Avatar>
 
                     <div className="flex-1 min-w-0">
-                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg px-4 py-3">
+                      <div className="bg-gray-800 rounded-lg px-4 py-3">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium">
                               {comment.user?.full_name}
                             </p>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-400">
                               {formatDistanceToNow(new Date(comment.created_at))} ago
                               {comment.is_edited && ' (edited)'}
                             </span>
@@ -323,7 +323,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                                 onClick={() => handleReaction(comment.id, emoji)}
                                 className={cn(
                                   "h-7 px-2 text-xs gap-1",
-                                  count > 0 && "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                                  count > 0 && "bg-blue-900/20 text-blue-400"
                                 )}
                               >
                                 {emoji}

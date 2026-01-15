@@ -140,8 +140,8 @@ export function PullToRefresh({
       >
         <div
           className={`
-            w-10 h-10 rounded-full bg-white dark:bg-gray-800
-            shadow-lg border border-gray-200 dark:border-gray-700
+            w-10 h-10 rounded-full bg-gray-800
+            shadow-lg border border-gray-700
             flex items-center justify-center
             ${isRefreshing ? 'animate-pulse' : ''}
           `}
@@ -162,7 +162,7 @@ export function PullToRefresh({
         {/* Pull indicator text */}
         {!isRefreshing && pullDistance > 10 && (
           <div className="text-center mt-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+            <span className="text-xs text-gray-400 font-medium">
               {pullProgress >= 1 ? 'Release to refresh' : 'Pull to refresh'}
             </span>
           </div>

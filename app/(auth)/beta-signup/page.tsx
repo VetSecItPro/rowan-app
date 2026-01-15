@@ -20,11 +20,11 @@ export default function BetaSignupPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">Redirecting to beta signup...</p>
-        <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+        <p className="text-gray-400">Redirecting to beta signup...</p>
+        <p className="text-sm text-gray-500 mt-2">
           Request your beta invite code at our homepage
         </p>
       </div>

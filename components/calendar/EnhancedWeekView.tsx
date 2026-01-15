@@ -147,10 +147,10 @@ export function EnhancedWeekView({
   const firstEventWithLocation = weekDays.flatMap(day => getEventsForDay(day)).find(e => e.location);
 
   return (
-    <div className="relative bg-white dark:bg-gray-900 sm:rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto -mx-4 sm:mx-0">
+    <div className="relative bg-gray-900 sm:rounded-xl border border-gray-700 overflow-x-auto -mx-4 sm:mx-0">
       {/* Weather Badge Header */}
       {firstEventWithLocation && (
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="px-4 py-3 border-b border-gray-700 bg-gray-800/50">
           <WeatherBadge
             eventTime={firstEventWithLocation.start_time}
             location={firstEventWithLocation.location}
@@ -160,9 +160,9 @@ export function EnhancedWeekView({
       )}
 
       {/* Header with day names */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-30">
+      <div className="flex border-b border-gray-700 sticky top-0 bg-gray-900 z-30">
         {/* Time column spacer */}
-        <div className="w-12 sm:w-16 flex-shrink-0 border-r border-gray-200 dark:border-gray-700" />
+        <div className="w-12 sm:w-16 flex-shrink-0 border-r border-gray-700" />
 
         {/* Day headers */}
         {weekDays.map(day => {
@@ -170,23 +170,23 @@ export function EnhancedWeekView({
           return (
             <div
               key={day.toISOString()}
-              className={`flex-1 min-w-[44px] sm:min-w-0 p-1 sm:p-3 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
-                isTodayDate ? 'bg-purple-50 dark:bg-purple-900/20' : ''
+              className={`flex-1 min-w-[44px] sm:min-w-0 p-1 sm:p-3 text-center border-r border-gray-700 last:border-r-0 ${
+                isTodayDate ? 'bg-purple-900/20' : ''
               }`}
             >
               <div className={`text-xs sm:text-sm font-medium ${
-                isTodayDate ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400'
+                isTodayDate ? 'text-purple-400' : 'text-gray-400'
               }`}>
                 {format(day, 'EEE')}
               </div>
               <div className={`text-xl sm:text-2xl font-bold mt-1 ${
                 isTodayDate
-                  ? 'text-purple-600 dark:text-purple-400'
-                  : 'text-gray-900 dark:text-white'
+                  ? 'text-purple-400'
+                  : 'text-white'
               }`}>
                 {format(day, 'd')}
               </div>
-              <div className="text-xs sm:text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+              <div className="text-xs sm:text-[10px] text-gray-400 mt-0.5">
                 {getEventsForDay(day).length} events
               </div>
             </div>
@@ -197,14 +197,14 @@ export function EnhancedWeekView({
       {/* Time grid + Events container */}
       <div className="flex pt-2">
         {/* Time labels */}
-        <div className="w-12 sm:w-16 flex-shrink-0 border-r border-gray-200 dark:border-gray-700">
+        <div className="w-12 sm:w-16 flex-shrink-0 border-r border-gray-700">
           {HOURS.map(hour => (
             <div
               key={hour}
-              className="relative border-b border-gray-200 dark:border-gray-700"
+              className="relative border-b border-gray-700"
               style={{ height: `${HOUR_HEIGHT}px` }}
             >
-              <div className="absolute -top-2 left-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 px-0.5">
+              <div className="absolute -top-2 left-1 text-[10px] sm:text-xs font-medium text-gray-400 bg-gray-900 px-0.5">
                 {format(new Date().setHours(hour, 0), 'ha').toLowerCase()}
               </div>
             </div>
@@ -219,8 +219,8 @@ export function EnhancedWeekView({
           return (
             <div
               key={day.toISOString()}
-              className={`flex-1 min-w-[44px] sm:min-w-0 relative border-r border-gray-200 dark:border-gray-700 last:border-r-0 ${
-                isTodayDate ? 'bg-purple-50/30 dark:bg-purple-900/10' : ''
+              className={`flex-1 min-w-[44px] sm:min-w-0 relative border-r border-gray-700 last:border-r-0 ${
+                isTodayDate ? 'bg-purple-900/10' : ''
               }`}
               style={{ height: `${HOURS.length * HOUR_HEIGHT}px` }}
             >
@@ -228,7 +228,7 @@ export function EnhancedWeekView({
               {HOURS.map(hour => (
                 <div
                   key={hour}
-                  className="absolute w-full border-b border-gray-100 dark:border-gray-800"
+                  className="absolute w-full border-b border-gray-800"
                   style={{ top: `${(hour - 6) * HOUR_HEIGHT}px` }}
                 />
               ))}
@@ -258,9 +258,9 @@ export function EnhancedWeekView({
                 // Use purple shades for overlapping events (calendar brand color)
                 const isOverlapping = maxColumns > 1;
                 const purpleShades = [
-                  'bg-purple-100 dark:bg-purple-900/30 border-purple-500',
-                  'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-500',
-                  'bg-violet-100 dark:bg-violet-900/30 border-violet-500',
+                  'bg-purple-900/30 border-purple-500',
+                  'bg-indigo-900/30 border-indigo-500',
+                  'bg-violet-900/30 border-violet-500',
                 ];
                 const overlappingStyle = isOverlapping ? purpleShades[column % purpleShades.length] : '';
 
@@ -307,7 +307,7 @@ export function EnhancedWeekView({
                         {/* Event content */}
                         <div className="flex-1 min-w-0">
                           {/* Time */}
-                          <div className="flex items-center gap-0.5 text-[9px] text-gray-600 dark:text-gray-400 mb-0.5">
+                          <div className="flex items-center gap-0.5 text-[9px] text-gray-400 mb-0.5">
                             <Clock className="w-2.5 h-2.5 flex-shrink-0" />
                             <span className="truncate">{format(parseISO(event.start_time), 'h:mm a')}</span>
                           </div>
@@ -321,7 +321,7 @@ export function EnhancedWeekView({
                           {parseInt(style.height) > 50 && (
                             <div className="flex items-center gap-0.5 flex-wrap">
                               <span className={`text-[9px] px-1 py-0.5 rounded ${
-                                isOverlapping ? 'bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-100' : categoryColor.color
+                                isOverlapping ? 'bg-purple-800 text-purple-100' : categoryColor.color
                               } truncate`}>
                                 {category.icon} {category.label}
                               </span>
@@ -330,7 +330,7 @@ export function EnhancedWeekView({
 
                           {/* Location (if tall enough) */}
                           {event.location && parseInt(style.height) > 70 && (
-                            <div className="flex items-center gap-0.5 mt-0.5 text-[9px] text-gray-500 dark:text-gray-400 truncate">
+                            <div className="flex items-center gap-0.5 mt-0.5 text-[9px] text-gray-400 truncate">
                               <MapPin className="w-2.5 h-2.5 flex-shrink-0" />
                               <span className="truncate">{event.location}</span>
                             </div>
@@ -344,20 +344,20 @@ export function EnhancedWeekView({
                               e.stopPropagation();
                               onViewDetails(event);
                             }}
-                            className="p-0.5 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded transition-colors"
+                            className="p-0.5 hover:bg-gray-700/50 rounded transition-colors"
                             title="View Details"
                           >
-                            <Eye className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                            <Eye className="w-3 h-3 text-gray-400" />
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               onEditEvent(event);
                             }}
-                            className="p-0.5 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded transition-colors"
+                            className="p-0.5 hover:bg-gray-700/50 rounded transition-colors"
                             title="Edit Event"
                           >
-                            <Edit className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                            <Edit className="w-3 h-3 text-gray-400" />
                           </button>
                         </div>
                       </div>
@@ -373,7 +373,7 @@ export function EnhancedWeekView({
       {/* Drag indicator overlay */}
       {draggedEvent && (
         <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-          <div className="bg-purple-500/20 backdrop-blur-sm px-4 py-2 rounded-lg text-sm text-purple-900 dark:text-purple-100 font-medium">
+          <div className="bg-purple-500/20 backdrop-blur-sm px-4 py-2 rounded-lg text-sm text-purple-100 font-medium">
             Dragging: {draggedEvent.title}
           </div>
         </div>

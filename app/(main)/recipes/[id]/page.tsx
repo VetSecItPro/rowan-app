@@ -116,10 +116,10 @@ export default function RecipeDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="flex items-center gap-3">
           <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
-          <span className="text-gray-600 dark:text-gray-400">Loading recipe...</span>
+          <span className="text-gray-400">Loading recipe...</span>
         </div>
       </div>
     );
@@ -127,11 +127,11 @@ export default function RecipeDetailPage() {
 
   if (!recipe) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Recipe not found</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <h1 className="text-2xl font-bold text-white mb-2">Recipe not found</h1>
+          <p className="text-gray-400 mb-6">
             The recipe you're looking for doesn't exist or has been deleted.
           </p>
           <Link
@@ -149,7 +149,7 @@ export default function RecipeDetailPage() {
   const ingredients = parseIngredients();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -202,7 +202,7 @@ export default function RecipeDetailPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Recipe Image */}
         {recipe.image_url ? (
-          <div className="rounded-xl overflow-hidden shadow-lg mb-8 bg-gray-200 dark:bg-gray-700">
+          <div className="rounded-xl overflow-hidden shadow-lg mb-8 bg-gray-700">
             <img
               src={recipe.image_url}
               alt={recipe.name}
@@ -221,28 +221,28 @@ export default function RecipeDetailPage() {
         )}
 
         {/* Recipe Name */}
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        <h2 className="text-3xl font-bold text-white mb-4">
           {recipe.name}
         </h2>
 
         {/* Meta Info */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
           {recipe.prep_time && (
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-gray-400">
               <Clock className="w-5 h-5" />
               <span className="font-medium">Prep:</span>
               <span>{recipe.prep_time}m</span>
             </div>
           )}
           {recipe.cook_time && (
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-gray-400">
               <Clock className="w-5 h-5" />
               <span className="font-medium">Cook:</span>
               <span>{recipe.cook_time}m</span>
             </div>
           )}
           {recipe.servings && (
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-gray-400">
               <Users className="w-5 h-5" />
               <span className="font-medium">Servings:</span>
               <span>{recipe.servings}</span>
@@ -253,19 +253,19 @@ export default function RecipeDetailPage() {
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-8">
           {recipe.cuisine_type && (
-            <span className="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium">
+            <span className="px-3 py-1 bg-orange-900/30 text-orange-300 rounded-full text-sm font-medium">
               {recipe.cuisine_type}
             </span>
           )}
           {recipe.difficulty && (
-            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+            <span className="px-3 py-1 bg-blue-900/30 text-blue-300 rounded-full text-sm font-medium">
               {recipe.difficulty}
             </span>
           )}
           {recipe.tags && Array.isArray(recipe.tags) && recipe.tags.map((tag, idx) => (
             <span
               key={idx}
-              className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm"
+              className="px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-sm"
             >
               {tag}
             </span>
@@ -275,7 +275,7 @@ export default function RecipeDetailPage() {
         {/* Description */}
         {recipe.description && (
           <div className="mb-8">
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               {recipe.description}
             </p>
           </div>
@@ -284,15 +284,15 @@ export default function RecipeDetailPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Ingredients */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 className="text-xl font-semibold text-white mb-4">
               Ingredients
             </h3>
             <ul className="space-y-3">
               {ingredients.map((ingredient: any, idx: number) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">
+                  <span className="text-gray-300">
                     {ingredient.amount && ingredient.unit ? (
                       <>
                         <span className="font-medium">{ingredient.amount} {ingredient.unit}</span>{' '}
@@ -308,16 +308,16 @@ export default function RecipeDetailPage() {
           </div>
 
           {/* Instructions */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 className="text-xl font-semibold text-white mb-4">
               Instructions
             </h3>
             {recipe.instructions ? (
-              <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+              <div className="text-gray-300 whitespace-pre-line leading-relaxed">
                 {recipe.instructions}
               </div>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 italic">
+              <p className="text-gray-400 italic">
                 No instructions provided
               </p>
             )}

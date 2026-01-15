@@ -41,7 +41,7 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-emerald-600">
           <h2 className="text-lg sm:text-xl font-bold text-white">Save as Template</h2>
           <button
@@ -55,7 +55,7 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
 
         <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
           <div>
-            <label htmlFor="template-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="template-name" className="block text-sm font-medium text-gray-300 mb-2">
               Template Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -65,12 +65,12 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Weekly Groceries"
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-900 text-white"
             />
           </div>
 
           <div>
-            <label htmlFor="template-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="template-description" className="block text-sm font-medium text-gray-300 mb-2">
               Description (Optional)
             </label>
             <input
@@ -79,12 +79,12 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe this template..."
-              className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white"
+              className="w-full px-4 py-2.5 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-900 text-white"
             />
           </div>
 
-          <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
-            <p className="text-sm text-emerald-700 dark:text-emerald-300">
+          <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-4">
+            <p className="text-sm text-emerald-300">
               💡 <strong>Tip:</strong> This template will save all {list.items?.length || 0} items from your current list, making it easy to reuse for future shopping trips.
             </p>
           </div>
@@ -93,7 +93,7 @@ export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplat
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+              className="flex-1 px-4 py-2.5 border border-gray-600 text-gray-300 rounded-full hover:bg-gray-700 transition-colors font-medium"
             >
               Cancel
             </button>

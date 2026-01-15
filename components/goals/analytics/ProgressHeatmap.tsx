@@ -14,11 +14,11 @@ export default function ProgressHeatmap({ data }: ProgressHeatmapProps) {
 
   // Get intensity color based on count
   const getIntensityColor = (count: number) => {
-    if (count === 0) return 'bg-gray-100 dark:bg-gray-800';
-    if (count === 1) return 'bg-indigo-200 dark:bg-indigo-900';
-    if (count === 2) return 'bg-indigo-400 dark:bg-indigo-700';
-    if (count === 3) return 'bg-indigo-600 dark:bg-indigo-500';
-    return 'bg-indigo-700 dark:bg-indigo-400';
+    if (count === 0) return 'bg-gray-800';
+    if (count === 1) return 'bg-indigo-900';
+    if (count === 2) return 'bg-indigo-700';
+    if (count === 3) return 'bg-indigo-500';
+    return 'bg-indigo-400';
   };
 
   // Group data by week
@@ -70,12 +70,12 @@ export default function ProgressHeatmap({ data }: ProgressHeatmapProps) {
   const avgActivity = data.length > 0 ? (totalActivity / data.length).toFixed(1) : '0';
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-white">
           Activity Heatmap
         </h3>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-400">
           {totalActivity} activities in the last year (avg: {avgActivity}/day)
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function ProgressHeatmap({ data }: ProgressHeatmapProps) {
                 style={{ width: '14px', marginRight: '2px' }}
               >
                 {label && (
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                  <span className="text-xs text-gray-400">
                     {label}
                   </span>
                 )}
@@ -137,14 +137,14 @@ export default function ProgressHeatmap({ data }: ProgressHeatmapProps) {
         )}
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-4 text-xs text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 mt-4 text-xs text-gray-400">
           <span>Less</span>
           <div className="flex gap-1">
-            <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800" />
-            <div className="w-3 h-3 rounded-sm bg-indigo-200 dark:bg-indigo-900" />
-            <div className="w-3 h-3 rounded-sm bg-indigo-400 dark:bg-indigo-700" />
-            <div className="w-3 h-3 rounded-sm bg-indigo-600 dark:bg-indigo-500" />
-            <div className="w-3 h-3 rounded-sm bg-indigo-700 dark:bg-indigo-400" />
+            <div className="w-3 h-3 rounded-sm bg-gray-800" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-900" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-700" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-500" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-400" />
           </div>
           <span>More</span>
         </div>

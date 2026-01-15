@@ -186,8 +186,8 @@ export function SubscriptionSettings() {
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
-          <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="h-8 w-48 bg-gray-700 rounded mb-4" />
+          <div className="h-32 bg-gray-700 rounded" />
         </div>
       </div>
     );
@@ -199,8 +199,8 @@ export function SubscriptionSettings() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">Subscription</h2>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Manage your plan and view your current features</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Subscription</h2>
+        <p className="text-sm sm:text-base text-gray-400">Manage your plan and view your current features</p>
       </div>
 
       {/* Current Plan Card */}
@@ -209,10 +209,10 @@ export function SubscriptionSettings() {
         animate={{ opacity: 1, y: 0 }}
         className={`relative overflow-hidden rounded-2xl border p-6 shadow-lg ${
           effectiveTier === 'family'
-            ? 'bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-purple-200 dark:border-purple-800'
+            ? 'bg-gradient-to-br from-purple-50 from-purple-900/20 to-indigo-900/20 border-purple-800'
             : effectiveTier === 'pro'
-              ? 'bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-800'
-              : 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-gray-200 dark:border-gray-700'
+              ? 'bg-gradient-to-br from-emerald-50 from-emerald-900/20 to-teal-900/20 border-emerald-800'
+              : 'bg-gradient-to-br from-white from-gray-800 to-gray-900 border-gray-700'
         }`}
       >
         {/* Decorative gradient overlay */}
@@ -225,17 +225,17 @@ export function SubscriptionSettings() {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-xl font-bold text-white">
                   {currentTierDetails.name} Plan
                 </h3>
                 {isInTrial && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-900/30 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-900/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300 border border-amber-800">
                     <Clock className="h-3 w-3" />
                     Trial
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 {isInTrial
                   ? `You're enjoying Pro features during your free trial`
                   : tier === 'free'
@@ -259,21 +259,21 @@ export function SubscriptionSettings() {
 
         {/* Trial Status */}
         {isInTrial && (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800">
+          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-amber-50 from-amber-900/20 to-orange-900/20 border border-amber-800">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-              <span className="font-semibold text-amber-800 dark:text-amber-200">
+              <Clock className="h-5 w-5 text-amber-400" />
+              <span className="font-semibold text-amber-200">
                 {trialDaysRemaining} {trialDaysRemaining === 1 ? 'day' : 'days'} remaining in your trial
               </span>
             </div>
-            <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+            <p className="text-sm text-amber-300 mb-3">
               {trial?.trialEndsAt
                 ? `Your trial ends on ${new Date(trial.trialEndsAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`
                 : 'Your trial is active.'
               }
               {' '}Upgrade before it ends to keep all Pro features.
             </p>
-            <div className="h-2.5 rounded-full bg-amber-200 dark:bg-amber-800 overflow-hidden">
+            <div className="h-2.5 rounded-full bg-amber-800 overflow-hidden">
               <motion.div
                 className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
                 initial={{ width: 0 }}
@@ -281,45 +281,45 @@ export function SubscriptionSettings() {
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />
             </div>
-            <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+            <p className="mt-2 text-xs text-amber-400">
               {Math.round((trialDaysRemaining / 14) * 100)}% of trial remaining
             </p>
           </div>
         )}
 
         {hasTrialExpired && (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border border-red-200 dark:border-red-800">
+          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-red-50 from-red-900/20 to-rose-900/20 border border-red-800">
             <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <span className="font-semibold text-red-800 dark:text-red-200">
+              <AlertTriangle className="h-5 w-5 text-red-400" />
+              <span className="font-semibold text-red-200">
                 Your trial has ended
               </span>
             </div>
-            <p className="text-sm text-red-700 dark:text-red-300">
+            <p className="text-sm text-red-300">
               You've been moved to the Free plan with limited features. Upgrade now to regain access to all Pro features.
             </p>
           </div>
         )}
 
         {/* Current Plan Features */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 flex items-center gap-2">
+        <div className="border-t border-gray-700 pt-5">
+          <h4 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
             <Star className="h-4 w-4" />
             Your current features
           </h4>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {currentTierDetails.features.map((feature, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <li key={i} className="flex items-center gap-3 text-sm text-gray-400">
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
                   effectiveTier === 'family'
-                    ? 'bg-purple-100 dark:bg-purple-900/30'
+                    ? 'bg-purple-900/30'
                     : effectiveTier === 'pro'
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30'
-                      : 'bg-gray-100 dark:bg-gray-800'
+                      ? 'bg-emerald-900/30'
+                      : 'bg-gray-800'
                 }`}>
                   <Check className={`h-3 w-3 ${
-                    effectiveTier === 'family' ? 'text-purple-600 dark:text-purple-400' :
-                    effectiveTier === 'pro' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'
+                    effectiveTier === 'family' ? 'text-purple-400' :
+                    effectiveTier === 'pro' ? 'text-emerald-400' : 'text-gray-500'
                   }`} />
                 </div>
                 {feature}
@@ -335,17 +335,17 @@ export function SubscriptionSettings() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
+          className="bg-gray-800 rounded-2xl border border-gray-700 p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Receipt className="h-5 w-5 text-emerald-500" />
               Billing Summary
             </h3>
             <button
               onClick={handleManageBilling}
               disabled={isBillingLoading}
-              className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 transition-colors"
+              className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors"
             >
               {isBillingLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -361,9 +361,9 @@ export function SubscriptionSettings() {
           {isBillingInfoLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="animate-pulse p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
-                  <div className="h-4 w-20 bg-gray-200 dark:bg-gray-600 rounded mb-2" />
-                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-600 rounded" />
+                <div key={i} className="animate-pulse p-4 rounded-xl bg-gray-700/50">
+                  <div className="h-4 w-20 bg-gray-600 rounded mb-2" />
+                  <div className="h-6 w-32 bg-gray-600 rounded" />
                 </div>
               ))}
             </div>
@@ -371,12 +371,12 @@ export function SubscriptionSettings() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 {/* Next Billing Date */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 from-blue-900/20 to-indigo-900/20 border border-blue-800">
                   <div className="flex items-center gap-2 mb-2">
-                    <CalendarClock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">Next Billing</span>
+                    <CalendarClock className="h-4 w-4 text-blue-400" />
+                    <span className="text-xs font-medium text-blue-400">Next Billing</span>
                   </div>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  <p className="text-lg font-bold text-white">
                     {billingInfo.nextBillingDate
                       ? new Date(billingInfo.nextBillingDate).toLocaleDateString('en-US', {
                           month: 'short',
@@ -387,7 +387,7 @@ export function SubscriptionSettings() {
                     }
                   </p>
                   {billingInfo.cancelAtPeriodEnd && (
-                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-amber-400 mt-1 flex items-center gap-1">
                       <AlertTriangle className="h-3 w-3" />
                       Cancels after this period
                     </p>
@@ -395,45 +395,45 @@ export function SubscriptionSettings() {
                 </div>
 
                 {/* Amount Due */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-100 dark:border-emerald-800">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 from-emerald-900/20 to-teal-900/20 border border-emerald-800">
                   <div className="flex items-center gap-2 mb-2">
-                    <Receipt className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Amount</span>
+                    <Receipt className="h-4 w-4 text-emerald-400" />
+                    <span className="text-xs font-medium text-emerald-400">Amount</span>
                   </div>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  <p className="text-lg font-bold text-white">
                     {billingInfo.nextAmount !== undefined && billingInfo.nextAmount !== null
                       ? `$${billingInfo.nextAmount.toFixed(2)}`
                       : '—'
                     }
                     {billingInfo.currency && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">{billingInfo.currency}</span>
+                      <span className="text-xs text-gray-400 ml-1">{billingInfo.currency}</span>
                     )}
                   </p>
                 </div>
 
                 {/* Payment Method */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-100 dark:border-purple-800">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 from-purple-900/20 to-pink-900/20 border border-purple-800">
                   <div className="flex items-center gap-2 mb-2">
-                    <CreditCard className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">Payment Method</span>
+                    <CreditCard className="h-4 w-4 text-purple-400" />
+                    <span className="text-xs font-medium text-purple-400">Payment Method</span>
                   </div>
                   {billingInfo.paymentMethod ? (
                     <>
-                      <p className="text-lg font-bold text-gray-900 dark:text-white capitalize">
+                      <p className="text-lg font-bold text-white capitalize">
                         {billingInfo.paymentMethod.brand} •••• {billingInfo.paymentMethod.last4}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-400">
                         Expires {billingInfo.paymentMethod.expMonth}/{billingInfo.paymentMethod.expYear}
                       </p>
                     </>
                   ) : (
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">—</p>
+                    <p className="text-lg font-bold text-white">—</p>
                   )}
                 </div>
               </div>
 
               {/* Quick note */}
-              <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+              <p className="text-xs text-gray-400 flex items-center gap-2">
                 <Shield className="h-3 w-3 text-green-500" />
                 View full billing history and invoices in Stripe
               </p>
@@ -447,73 +447,73 @@ export function SubscriptionSettings() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
+        className="bg-gray-800 rounded-2xl border border-gray-700 p-6 shadow-sm"
       >
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
           <Zap className="h-5 w-5 text-amber-500" />
           Feature Limits
         </h3>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
-            <CheckSquare className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 from-blue-900/20 to-indigo-900/20 border border-blue-800">
+            <CheckSquare className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">
               {limits.maxActiveTasks === Infinity ? '∞' : limits.maxActiveTasks}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Active Tasks</p>
+            <p className="text-xs text-gray-400 mt-1">Active Tasks</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-100 dark:border-purple-800">
-            <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 from-purple-900/20 to-pink-900/20 border border-purple-800">
+            <Calendar className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">
               {limits.canCreateCalendar ? '∞' : '—'}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Calendar Events</p>
+            <p className="text-xs text-gray-400 mt-1">Calendar Events</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-100 dark:border-emerald-800">
-            <Users className="h-6 w-6 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-emerald-50 from-emerald-900/20 to-teal-900/20 border border-emerald-800">
+            <Users className="h-6 w-6 text-emerald-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">
               {limits.maxSpaces}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Spaces</p>
+            <p className="text-xs text-gray-400 mt-1">Spaces</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800">
-            <Users className="h-6 w-6 text-amber-600 dark:text-amber-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-amber-50 from-amber-900/20 to-orange-900/20 border border-amber-800">
+            <Users className="h-6 w-6 text-amber-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-white">
               {limits.maxUsers}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Users</p>
+            <p className="text-xs text-gray-400 mt-1">Users</p>
           </div>
         </div>
 
         {/* Additional limits row */}
         <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
-            <MessageSquare className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto mb-2" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
+            <MessageSquare className="h-5 w-5 text-green-400 mx-auto mb-2" />
+            <p className="text-lg font-bold text-white">
               {limits.dailyMessages === Infinity ? '∞' : limits.dailyMessages}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Messages/Day</p>
+            <p className="text-xs text-gray-400 mt-1">Messages/Day</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
-            <ShoppingCart className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
+            <ShoppingCart className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
+            <p className="text-lg font-bold text-white">
               {limits.maxShoppingLists === Infinity ? '∞' : limits.maxShoppingLists}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Shopping Lists</p>
+            <p className="text-xs text-gray-400 mt-1">Shopping Lists</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
-            <Camera className="h-5 w-5 text-pink-600 dark:text-pink-400 mx-auto mb-2" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
+            <Camera className="h-5 w-5 text-pink-400 mx-auto mb-2" />
+            <p className="text-lg font-bold text-white">
               {limits.canUploadPhotos ? (limits.storageGB ? `${limits.storageGB}GB` : '∞') : '—'}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Photo Storage</p>
+            <p className="text-xs text-gray-400 mt-1">Photo Storage</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600">
-            <Zap className="h-5 w-5 text-amber-600 dark:text-amber-400 mx-auto mb-2" />
-            <p className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-4 rounded-xl bg-gray-700/50 border border-gray-600">
+            <Zap className="h-5 w-5 text-amber-400 mx-auto mb-2" />
+            <p className="text-lg font-bold text-white">
               {limits.dailyQuickActions === Infinity ? '∞' : limits.dailyQuickActions}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Quick Actions/Day</p>
+            <p className="text-xs text-gray-400 mt-1">Quick Actions/Day</p>
           </div>
         </div>
       </motion.div>
@@ -523,9 +523,9 @@ export function SubscriptionSettings() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm"
+        className="bg-gray-800 rounded-2xl border border-gray-700 p-6 shadow-sm"
       >
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
           <Shield className="h-5 w-5 text-blue-500" />
           Billing & Management
         </h3>
@@ -533,15 +533,15 @@ export function SubscriptionSettings() {
         <div className="space-y-3">
           <Link
             href="/pricing"
-            className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all group"
+            className="flex items-center justify-between p-4 rounded-xl border border-gray-700 hover:bg-gray-700/50 hover:border-emerald-800 transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                <Crown className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="w-10 h-10 rounded-lg bg-emerald-900/30 flex items-center justify-center">
+                <Crown className="h-5 w-5 text-emerald-400" />
               </div>
               <div>
-                <span className="font-semibold text-gray-900 dark:text-white block">View Plans & Pricing</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Compare all available plans</span>
+                <span className="font-semibold text-white block">View Plans & Pricing</span>
+                <span className="text-xs text-gray-400">Compare all available plans</span>
               </div>
             </div>
             <span className="text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all">→</span>
@@ -550,29 +550,29 @@ export function SubscriptionSettings() {
           {(tier === 'pro' || tier === 'family') && (
             <div className="space-y-2">
               <button
-                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-blue-200 dark:hover:border-blue-800 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-700 hover:bg-gray-700/50 hover:border-blue-800 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleManageBilling}
                 disabled={isBillingLoading}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-900/30 flex items-center justify-center">
                     {isBillingLoading ? (
-                      <Loader2 className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-spin" />
+                      <Loader2 className="h-5 w-5 text-blue-400 animate-spin" />
                     ) : (
-                      <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <Shield className="h-5 w-5 text-blue-400" />
                     )}
                   </div>
                   <div className="text-left">
-                    <span className="font-semibold text-gray-900 dark:text-white block">
+                    <span className="font-semibold text-white block">
                       {isBillingLoading ? 'Opening Billing Portal...' : 'Manage Billing'}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Update payment method, view invoices</span>
+                    <span className="text-xs text-gray-400">Update payment method, view invoices</span>
                   </div>
                 </div>
                 <span className="text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all">→</span>
               </button>
               {billingError && (
-                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2 px-4">
+                <p className="text-sm text-red-400 flex items-center gap-2 px-4">
                   <AlertTriangle className="h-4 w-4" />
                   {billingError}
                 </p>
@@ -581,8 +581,8 @@ export function SubscriptionSettings() {
           )}
         </div>
 
-        <div className="mt-5 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
-          <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+        <div className="mt-5 p-4 rounded-xl bg-gray-700/50">
+          <p className="text-xs text-gray-400 flex items-center gap-2">
             <Shield className="h-4 w-4 text-green-500" />
             Secure payments processed by Stripe. Your payment information is never stored on our servers.
           </p>
@@ -594,15 +594,15 @@ export function SubscriptionSettings() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="text-center p-6 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl border border-gray-200 dark:border-gray-700"
+        className="text-center p-6 bg-gradient-to-br from-gray-50 from-gray-800/50 to-gray-900/50 rounded-2xl border border-gray-700"
       >
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Need help with your subscription?</h4>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+        <h4 className="text-sm font-semibold text-white mb-2">Need help with your subscription?</h4>
+        <p className="text-xs text-gray-400 mb-4">
           Contact our support team for assistance with billing, plan changes, or any subscription questions.
         </p>
         <Link
           href="/settings/support"
-          className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
         >
           Contact Support
           <span>→</span>

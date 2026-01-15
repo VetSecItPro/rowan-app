@@ -25,7 +25,7 @@ const features = [
     gradient: 'from-purple-500 to-purple-600',
     bgColor: 'bg-purple-500',
     textColor: 'text-purple-600',
-    darkBgColor: 'dark:bg-purple-900/30',
+    darkBgColor: 'bg-purple-900/30',
     shadowColor: 'shadow-purple-500/20',
     href: '/settings/audit-log',
     features: [
@@ -35,7 +35,7 @@ const features = [
       '2-year retention'
     ],
     badge: 'GDPR Article 15',
-    badgeColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+    badgeColor: 'bg-purple-100 bg-purple-900/30 text-purple-300'
   },
   {
     id: 'privacy-compliance',
@@ -45,7 +45,7 @@ const features = [
     gradient: 'from-orange-500 to-orange-600',
     bgColor: 'bg-orange-500',
     textColor: 'text-orange-600',
-    darkBgColor: 'dark:bg-orange-900/30',
+    darkBgColor: 'bg-orange-900/30',
     shadowColor: 'shadow-orange-500/20',
     href: '/settings/privacy-compliance',
     features: [
@@ -55,7 +55,7 @@ const features = [
       'Data sharing controls'
     ],
     badge: 'GDPR + CCPA',
-    badgeColor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+    badgeColor: 'bg-orange-100 bg-orange-900/30 text-orange-300'
   },
   {
     id: 'export-data',
@@ -65,7 +65,7 @@ const features = [
     gradient: 'from-blue-500 to-blue-600',
     bgColor: 'bg-blue-500',
     textColor: 'text-blue-600',
-    darkBgColor: 'dark:bg-blue-900/30',
+    darkBgColor: 'bg-blue-900/30',
     shadowColor: 'shadow-blue-500/20',
     href: '/settings/data-privacy/export',
     features: [
@@ -75,7 +75,7 @@ const features = [
       'Bulk export capabilities'
     ],
     badge: 'GDPR Article 20',
-    badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+    badgeColor: 'bg-blue-100 bg-blue-900/30 text-blue-300'
   },
   {
     id: 'bulk-operations',
@@ -85,7 +85,7 @@ const features = [
     gradient: 'from-green-500 to-green-600',
     bgColor: 'bg-green-500',
     textColor: 'text-green-600',
-    darkBgColor: 'dark:bg-green-900/30',
+    darkBgColor: 'bg-green-900/30',
     shadowColor: 'shadow-green-500/20',
     href: '/settings/data-privacy/bulk-operations',
     features: [
@@ -95,7 +95,7 @@ const features = [
       'Data cleanup tools'
     ],
     badge: 'Data Minimization',
-    badgeColor: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+    badgeColor: 'bg-green-100 bg-green-900/30 text-green-300'
   },
   {
     id: 'delete-account',
@@ -105,7 +105,7 @@ const features = [
     gradient: 'from-red-500 to-red-600',
     bgColor: 'bg-red-500',
     textColor: 'text-red-600',
-    darkBgColor: 'dark:bg-red-900/30',
+    darkBgColor: 'bg-red-900/30',
     shadowColor: 'shadow-red-500/20',
     href: '/settings',
     features: [
@@ -115,7 +115,7 @@ const features = [
       'Cancel anytime'
     ],
     badge: 'GDPR Article 17',
-    badgeColor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    badgeColor: 'bg-red-100 bg-red-900/30 text-red-300',
     warning: true
   },
 ];
@@ -125,19 +125,19 @@ const complianceInfo = [
     icon: CheckCircle,
     title: 'GDPR Compliant',
     description: 'Full compliance with EU General Data Protection Regulation',
-    color: 'text-green-600 dark:text-green-400'
+    color: 'text-green-400'
   },
   {
     icon: CheckCircle,
     title: 'CCPA Compliant',
     description: 'California Consumer Privacy Act rights implemented',
-    color: 'text-blue-600 dark:text-blue-400'
+    color: 'text-blue-400'
   },
   {
     icon: CheckCircle,
     title: 'Transparent',
     description: 'Complete audit trail of all data access and processing',
-    color: 'text-purple-600 dark:text-purple-400'
+    color: 'text-purple-400'
   }
 ];
 
@@ -149,11 +149,11 @@ export default function DataPrivacyPage() {
     ]}>
       <div className="space-y-8">
         {/* Header */}
-        <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+          <h1 className="text-3xl font-bold text-white mb-3">
             Data & Privacy Management
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-gray-400 mb-6">
             Your data is yours. Export it, delete it, or manage how it's used. We're committed to transparency and giving you full control.
           </p>
 
@@ -162,14 +162,14 @@ export default function DataPrivacyPage() {
             {complianceInfo.map((item) => (
               <div
                 key={item.title}
-                className="flex items-start gap-3 p-4 bg-white/50 dark:bg-gray-900/50 rounded-xl"
+                className="flex items-start gap-3 p-4 bg-gray-900/50 rounded-xl"
               >
                 <item.icon className={`w-5 h-5 ${item.color} flex-shrink-0 mt-0.5`} />
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                  <h3 className="font-semibold text-white text-sm">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     {item.description}
                   </p>
                 </div>
@@ -187,7 +187,7 @@ export default function DataPrivacyPage() {
               <Link
                 key={feature.id}
                 href={feature.href}
-                className="group relative bg-white/30 dark:bg-gray-800/30 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 rounded-2xl p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                className="group relative bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
               >
                 {/* Badge */}
                 <div className="absolute top-4 right-4">
@@ -202,10 +202,10 @@ export default function DataPrivacyPage() {
                 </div>
 
                 {/* Title & Description */}
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 pr-20">
+                <h3 className="text-xl font-bold text-white mb-2 pr-20">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-400 mb-4">
                   {feature.description}
                 </p>
 
@@ -214,7 +214,7 @@ export default function DataPrivacyPage() {
                   {feature.features.map((item, index) => (
                     <li
                       key={index}
-                      className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300"
+                      className="flex items-center gap-2 text-xs text-gray-300"
                     >
                       <div className={`w-1.5 h-1.5 rounded-full ${feature.bgColor}`} />
                       {item}
@@ -224,16 +224,16 @@ export default function DataPrivacyPage() {
 
                 {/* Warning for dangerous actions */}
                 {feature.warning && (
-                  <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
-                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-red-700 dark:text-red-300">
+                  <div className="flex items-start gap-2 p-3 bg-red-900/20 border border-red-800 rounded-lg mb-4">
+                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-300">
                       This action is permanent and cannot be undone
                     </p>
                   </div>
                 )}
 
                 {/* Arrow */}
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white group-hover:gap-3 transition-all">
+                <div className="flex items-center gap-2 text-sm font-medium text-white group-hover:gap-3 transition-all">
                   <span>{feature.warning ? 'Learn More' : 'Manage'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
@@ -243,17 +243,17 @@ export default function DataPrivacyPage() {
         </div>
 
         {/* Info Banner */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+        <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
+            <Shield className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              <h3 className="font-semibold text-blue-100 mb-2">
                 Your Privacy Rights
               </h3>
-              <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+              <p className="text-sm text-blue-200 mb-3">
                 Under GDPR and CCPA, you have the right to:
               </p>
-              <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
+              <ul className="space-y-1 text-sm text-blue-300">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-500 mt-1">•</span>
                   <span><strong>Know</strong> what data we collect and how it's used</span>

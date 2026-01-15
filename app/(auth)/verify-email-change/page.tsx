@@ -80,7 +80,7 @@ function VerifyEmailChangeContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950 p-4">
       <div
         className={`w-full max-w-md transition-all duration-700 ease-out ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -101,16 +101,16 @@ function VerifyEmailChangeContent() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-700/50">
+        <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-700/50">
           {isVerifying && (
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 text-white animate-spin" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Verifying Email Change
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-400">
                 Please wait while we update your email...
               </p>
             </div>
@@ -121,18 +121,18 @@ function VerifyEmailChangeContent() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Email Updated!
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-2">
+              <p className="text-gray-400 mb-2">
                 Your email has been successfully changed to:
               </p>
               {newEmail && (
-                <p className="font-semibold text-emerald-600 dark:text-emerald-400 mb-4">
+                <p className="font-semibold text-emerald-400 mb-4">
                   {newEmail}
                 </p>
               )}
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 Please sign in again with your new email address.
               </p>
               <Link
@@ -149,10 +149,10 @@ function VerifyEmailChangeContent() {
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                 <AlertCircle className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-xl font-bold text-white mb-2">
                 Verification Failed
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="text-gray-400 mb-4">
                 {verificationError}
               </p>
               <div className="space-y-3">
@@ -162,7 +162,7 @@ function VerifyEmailChangeContent() {
                 >
                   Go to Settings
                 </Link>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   You can request a new email change from your settings page.
                 </p>
               </div>
@@ -171,11 +171,11 @@ function VerifyEmailChangeContent() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
+        <p className="text-center text-sm text-gray-400 mt-8">
           Need help?{' '}
           <a
             href="mailto:support@rowan.app"
-            className="text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="text-emerald-400 hover:underline"
           >
             Contact support
           </a>
@@ -188,10 +188,10 @@ function VerifyEmailChangeContent() {
 export default function VerifyEmailChangePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950">
         <div className="animate-pulse">
-          <div className="w-16 h-16 rounded-full bg-emerald-200 dark:bg-emerald-800 mx-auto mb-4" />
-          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+          <div className="w-16 h-16 rounded-full bg-emerald-800 mx-auto mb-4" />
+          <div className="h-4 w-32 bg-gray-700 rounded mx-auto" />
         </div>
       </div>
     }>

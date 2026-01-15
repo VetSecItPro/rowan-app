@@ -172,42 +172,42 @@ export function ExpenseSplitModal({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-white dark:bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-semibold text-white">
                   Split Expense
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-400">
                   {expense.title} • ${expense.amount.toFixed(2)}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-8">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-200">{error}</p>
               </div>
             )}
 
             {/* Ownership Selection */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Who is this expense for?
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -230,28 +230,28 @@ export function ExpenseSplitModal({
                       }}
                       className={`p-4 rounded-lg border-2 text-left transition-all ${
                         ownership === option.value
-                          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'border-purple-500 bg-purple-900/20'
+                          : 'border-gray-700 hover:border-gray-600'
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <Icon className={`w-5 h-5 ${
                           ownership === option.value
-                            ? 'text-purple-600 dark:text-purple-400'
-                            : 'text-gray-500 dark:text-gray-400'
+                            ? 'text-purple-400'
+                            : 'text-gray-400'
                         }`} />
                         <span className={`font-medium ${
                           ownership === option.value
-                            ? 'text-purple-900 dark:text-purple-100'
-                            : 'text-gray-900 dark:text-white'
+                            ? 'text-purple-100'
+                            : 'text-white'
                         }`}>
                           {option.label}
                         </span>
                       </div>
                       <p className={`text-sm ${
                         ownership === option.value
-                          ? 'text-purple-700 dark:text-purple-300'
-                          : 'text-gray-600 dark:text-gray-400'
+                          ? 'text-purple-300'
+                          : 'text-gray-400'
                       }`}>
                         {option.desc}
                       </p>
@@ -265,10 +265,10 @@ export function ExpenseSplitModal({
             {ownership === 'shared' && (
               <>
                 {/* Enable/Disable Split */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white">Enable Splitting</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <h4 className="font-medium text-white">Enable Splitting</h4>
+                    <p className="text-sm text-gray-400">
                       Track who owes what for this expense
                     </p>
                   </div>
@@ -279,7 +279,7 @@ export function ExpenseSplitModal({
                       onChange={(e) => setIsSplit(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 peer-focus:ring-purple-800 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-purple-600"></div>
                   </label>
                 </div>
 
@@ -319,11 +319,11 @@ export function ExpenseSplitModal({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+              className="px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors font-medium"
             >
               Cancel
             </button>

@@ -98,15 +98,15 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
       <div className={`${className}`}>
         <div className="flex items-center gap-2 mb-3">
           <Activity className="w-4 h-4 text-gray-500" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Activity</h3>
+          <h3 className="text-sm font-semibold text-gray-300">Activity</h3>
         </div>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-start gap-3 animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div className="w-8 h-8 rounded-full bg-gray-700" />
               <div className="flex-1 space-y-1">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+                <div className="h-4 bg-gray-700 rounded w-3/4" />
+                <div className="h-3 bg-gray-700 rounded w-1/2" />
               </div>
             </div>
           ))}
@@ -120,9 +120,9 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
       <div className={`${className}`}>
         <div className="flex items-center gap-2 mb-3">
           <Activity className="w-4 h-4 text-gray-500" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Activity</h3>
+          <h3 className="text-sm font-semibold text-gray-300">Activity</h3>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">No activity yet</p>
+        <p className="text-sm text-gray-400">No activity yet</p>
       </div>
     );
   }
@@ -133,14 +133,14 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-gray-500" />
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <h3 className="text-sm font-semibold text-gray-300">
             Activity ({activities.length})
           </h3>
         </div>
         {!isExpanded && hasMore && (
           <button
             onClick={() => setIsExpanded(true)}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs text-blue-400 hover:underline"
           >
             View all
           </button>
@@ -153,7 +153,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
         <div className="space-y-4">
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700" />
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-700" />
 
             {/* Activities */}
             <div className="space-y-4">
@@ -168,7 +168,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
                   <div key={activity.id} className="relative flex items-start gap-4 pl-0">
                     {/* Icon Circle */}
                     <div
-                      className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center ${iconColor}`}
+                      className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-gray-800 border-2 border-gray-700 flex items-center justify-center ${iconColor}`}
                     >
                       <IconComponent className="w-4 h-4" />
                     </div>
@@ -193,18 +193,18 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
                                   {getInitials(activity.user.name)}
                                 </div>
                               )}
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              <span className="text-sm font-medium text-white">
                                 {activity.user.name}
                               </span>
                             </div>
                           )}
 
                           {/* Message */}
-                          <p className="text-sm text-gray-700 dark:text-gray-300">{message}</p>
+                          <p className="text-sm text-gray-300">{message}</p>
 
                           {/* Metadata */}
                           {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            <div className="mt-1 text-xs text-gray-400">
                               {activity.action === 'snoozed' && activity.metadata.snooze_until && (
                                 <span>
                                   Until {new Date(activity.metadata.snooze_until).toLocaleString()}
@@ -215,7 +215,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
                         </div>
 
                         {/* Timestamp */}
-                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <span className="text-xs text-gray-400 whitespace-nowrap">
                           {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
                         </span>
                       </div>
@@ -230,7 +230,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
           {hasMore && (
             <button
               onClick={() => setShowAll(!showAll)}
-              className="w-full py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors flex items-center justify-center gap-1"
+              className="w-full py-2 text-sm text-blue-400 hover:bg-blue-900/20 rounded-lg transition-colors flex items-center justify-center gap-1"
             >
               {showAll ? (
                 <>
@@ -249,7 +249,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
           {/* Collapse Button */}
           <button
             onClick={() => setIsExpanded(false)}
-            className="w-full py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="w-full py-2 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
           >
             Collapse Activity
           </button>
@@ -273,8 +273,8 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">{message}</p>
-                  <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-300 line-clamp-1">{message}</p>
+                  <span className="text-[10px] text-gray-400">
                     {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
                   </span>
                 </div>

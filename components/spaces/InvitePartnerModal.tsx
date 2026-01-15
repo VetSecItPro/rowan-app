@@ -113,7 +113,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
     >
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
       <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-50 dark:bg-gray-800 sm:rounded-2xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -143,7 +143,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
           <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
             {/* Email Input */}
             <div>
-              <label htmlFor="field-1" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Email Address *
               </label>
               <div className="relative">
@@ -155,24 +155,24 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   id="field-1"
               onChange={(e) =>  setEmail(e.target.value)}
                   placeholder="partner@example.com"
-                  className="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+                  className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
                   disabled={loading}
                 />
               </div>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-2 text-sm text-gray-400">
                 They&apos;ll receive an email with a link to join this space.
               </p>
             </div>
 
             {/* Role Selection */}
             <div className="relative z-50">
-              <label htmlFor="role-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="role-select" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Role *
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as 'member' | 'admin')}
-                className="w-full pl-4 pr-10 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white appearance-none relative z-50"
+                className="w-full pl-4 pr-10 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white appearance-none relative z-50"
                 disabled={loading}
                 id="role-select"
                 style={{
@@ -187,19 +187,19 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 <option value="member">Member</option>
                 <option value="admin">Admin</option>
               </select>
-              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <div className="mt-2 text-sm text-gray-400">
                 <p className="mb-1"><span className="font-medium">Member:</span> Can view and collaborate on all content</p>
                 <p><span className="font-medium">Admin:</span> Can invite/remove members and manage the workspace</p>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex gap-3 pt-4 border-t border-gray-700">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
+                className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -216,20 +216,20 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
           /* Success View with Invitation URL */
           <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+              <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="w-8 h-8 text-green-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-white">
                 Invitation Sent!
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-sm text-gray-400 mt-2">
                 An invitation has been sent to <span className="font-medium">{email}</span>
               </p>
             </div>
 
             {/* Invitation URL */}
             <div>
-              <label htmlFor="field-2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 cursor-pointer">
+              <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
                 Invitation Link
               </label>
               <div className="flex gap-2">
@@ -237,7 +237,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   type="text"
                   value={invitationUrl}
                   readOnly
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white text-sm"
+                  className="flex-1 px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl text-white text-sm"
                 id="field-2" />
                 <button
                   type="button"
@@ -252,7 +252,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                   )}
                 </button>
               </div>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-2 text-sm text-gray-400">
                 You can also share this link directly with them.
               </p>
             </div>

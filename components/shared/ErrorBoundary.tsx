@@ -117,18 +117,18 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Default error UI
       return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
           <div className="max-w-md w-full">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+            <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-900/30 flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-red-400" />
               </div>
 
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-xl font-bold text-white mb-2">
                 Something went wrong
               </h1>
 
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-sm text-gray-400 mb-6">
                 We encountered an unexpected error. Don't worry, your data is safe.
                 Try refreshing the page or go back to continue using Rowan.
               </p>
@@ -146,7 +146,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <div className="flex gap-3">
                   <button
                     onClick={this.handleGoBack}
-                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="flex-1 px-4 py-2 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Go Back
@@ -154,7 +154,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
                   <button
                     onClick={this.handleGoHome}
-                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="flex-1 px-4 py-2 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <Home className="w-4 h-4" />
                     Dashboard
@@ -164,7 +164,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 {this.props.showReportButton && (
                   <button
                     onClick={this.handleReportError}
-                    className="w-full px-4 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors border border-gray-300 dark:border-gray-600 rounded-xl hover:border-gray-400 dark:hover:border-gray-500"
+                    className="w-full px-4 py-2 text-xs text-gray-400 hover:text-gray-300 transition-colors border border-gray-600 rounded-xl hover:border-gray-500"
                   >
                     Report this error
                   </button>
@@ -174,10 +174,10 @@ export class ErrorBoundary extends Component<Props, State> {
               {/* Development error details */}
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <details className="mt-6 text-left">
-                  <summary className="text-xs text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">
+                  <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-300">
                     Error Details (Development)
                   </summary>
-                  <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs font-mono text-gray-800 dark:text-gray-200 overflow-auto max-h-32">
+                  <div className="mt-2 p-3 bg-gray-900 rounded-lg text-xs font-mono text-gray-200 overflow-auto max-h-32">
                     <div className="mb-2">
                       <strong>Error:</strong> {this.state.error.message}
                     </div>

@@ -99,8 +99,8 @@ export function SpaceMembersIndicator() {
 
             {/* Tooltip */}
             <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-50">
-              <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded-lg px-3 py-1.5 whitespace-nowrap">
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 dark:border-b-gray-100"></div>
+              <div className="bg-gray-100 text-gray-900 text-xs rounded-lg px-3 py-1.5 whitespace-nowrap">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-100"></div>
                 {member.users.name}
                 {isCurrentUser && ' (You)'}
               </div>

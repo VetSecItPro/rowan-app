@@ -109,14 +109,14 @@ const articlesData: Record<string, {
 };
 
 const colorClasses: Record<string, { bg: string; text: string; gradient: string }> = {
-  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-500 to-teal-500' },
-  purple: { bg: 'bg-purple-500/10', text: 'text-purple-600 dark:text-purple-400', gradient: 'from-purple-500 to-indigo-500' },
-  blue: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', gradient: 'from-blue-500 to-cyan-500' },
-  green: { bg: 'bg-green-500/10', text: 'text-green-600 dark:text-green-400', gradient: 'from-green-500 to-emerald-500' },
-  indigo: { bg: 'bg-indigo-500/10', text: 'text-indigo-600 dark:text-indigo-400', gradient: 'from-indigo-500 to-purple-500' },
-  pink: { bg: 'bg-pink-500/10', text: 'text-pink-600 dark:text-pink-400', gradient: 'from-pink-500 to-rose-500' },
-  orange: { bg: 'bg-orange-500/10', text: 'text-orange-600 dark:text-orange-400', gradient: 'from-orange-500 to-amber-500' },
-  amber: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', gradient: 'from-amber-500 to-yellow-500' },
+  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', gradient: 'from-emerald-500 to-teal-500' },
+  purple: { bg: 'bg-purple-500/10', text: 'text-purple-400', gradient: 'from-purple-500 to-indigo-500' },
+  blue: { bg: 'bg-blue-500/10', text: 'text-blue-400', gradient: 'from-blue-500 to-cyan-500' },
+  green: { bg: 'bg-green-500/10', text: 'text-green-400', gradient: 'from-green-500 to-emerald-500' },
+  indigo: { bg: 'bg-indigo-500/10', text: 'text-indigo-400', gradient: 'from-indigo-500 to-purple-500' },
+  pink: { bg: 'bg-pink-500/10', text: 'text-pink-400', gradient: 'from-pink-500 to-rose-500' },
+  orange: { bg: 'bg-orange-500/10', text: 'text-orange-400', gradient: 'from-orange-500 to-amber-500' },
+  amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', gradient: 'from-amber-500 to-yellow-500' },
 };
 
 export default function ArticlePage() {
@@ -145,7 +145,7 @@ export default function ArticlePage() {
   // 404 for unknown articles
   if (!article) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-900">
         <Header
           onBetaClick={() => setIsBetaModalOpen(true)}
           onLaunchClick={() => setIsLaunchModalOpen(true)}
@@ -153,9 +153,9 @@ export default function ArticlePage() {
         />
         <main className="pt-32 pb-20 px-4">
           <div className="max-w-2xl mx-auto text-center">
-            <FileText className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Article Not Found</h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
+            <FileText className="w-16 h-16 text-gray-600 mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-white mb-4">Article Not Found</h1>
+            <p className="text-gray-400 mb-8">
               The article you're looking for doesn't exist or has been moved.
             </p>
             <Link
@@ -176,7 +176,7 @@ export default function ArticlePage() {
   const Icon = article.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       <Header
         onBetaClick={() => setIsBetaModalOpen(true)}
         onLaunchClick={() => setIsLaunchModalOpen(true)}
@@ -192,7 +192,7 @@ export default function ArticlePage() {
             {/* Breadcrumb */}
             <Link
               href="/articles"
-              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors mb-8"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-colors mb-8"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Articles
@@ -209,17 +209,17 @@ export default function ArticlePage() {
                 </div>
                 <span className={`text-sm font-medium ${colors.text}`}>{article.category}</span>
                 <span className="text-gray-400">•</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <span className="text-sm text-gray-400 flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   {article.readTime}
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              <h1 className="text-3xl sm:text-5xl font-bold text-white mb-6">
                 {article.title}
               </h1>
 
-              <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-xl text-gray-400 leading-relaxed">
                 {article.description}
               </p>
 
@@ -235,7 +235,7 @@ export default function ArticlePage() {
                       });
                     }
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-700 text-gray-400 hover:bg-gray-800 transition-colors"
                 >
                   <Share2 className="w-4 h-4" />
                   Share
@@ -252,17 +252,17 @@ export default function ArticlePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 p-8 sm:p-12 text-center"
+              className="bg-gray-800 rounded-3xl border border-gray-700 p-8 sm:p-12 text-center"
             >
               <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${colors.gradient} mx-auto mb-6 flex items-center justify-center`}>
                 <BookOpen className="w-10 h-10 text-white" />
               </div>
 
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-white mb-4">
                 Full Article Coming Soon
               </h2>
 
-              <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+              <p className="text-gray-400 mb-8 max-w-md mx-auto">
                 We're working on creating comprehensive guides and tutorials to help you get the most out of Rowan.
                 Check back soon for the full article!
               </p>
@@ -277,7 +277,7 @@ export default function ArticlePage() {
                 </button>
                 <button
                   onClick={() => setIsLaunchModalOpen(true)}
-                  className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-full font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="px-6 py-3 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-600 transition-colors"
                 >
                   Get Notified
                 </button>
@@ -289,7 +289,7 @@ export default function ArticlePage() {
         {/* Related Articles */}
         <section className="px-4 sm:px-6 lg:px-8 pb-20">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">More Articles</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">More Articles</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(articlesData)
                 .filter(([key]) => key !== slug)
@@ -299,16 +299,16 @@ export default function ArticlePage() {
                   const ArtIcon = art.icon;
                   return (
                     <Link key={key} href={`/articles/${key}`}>
-                      <div className="group p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md hover:border-emerald-500/30 transition-all">
+                      <div className="group p-4 rounded-xl border border-gray-700 bg-gray-800 hover:shadow-md hover:border-emerald-500/30 transition-all">
                         <div className="flex items-start gap-3">
                           <div className={`w-8 h-8 rounded-lg ${artColors.bg} flex items-center justify-center flex-shrink-0`}>
                             <ArtIcon className={`w-4 h-4 ${artColors.text}`} />
                           </div>
                           <div>
-                            <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+                            <h3 className="font-medium text-white group-hover:text-emerald-400 transition-colors line-clamp-1">
                               {art.title}
                             </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                            <p className="text-sm text-gray-400 mt-1 line-clamp-1">
                               {art.description}
                             </p>
                           </div>

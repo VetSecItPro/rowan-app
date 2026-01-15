@@ -86,7 +86,7 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
         <Clock className="w-4 h-4 text-gray-500" />
-        <span className="text-sm text-gray-600 dark:text-gray-400">
+        <span className="text-sm text-gray-400">
           {totalTime > 0 ? `${Math.floor(totalTime / 60)}h ${totalTime % 60}m` : 'No time tracked'}
         </span>
       </div>

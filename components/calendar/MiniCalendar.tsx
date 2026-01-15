@@ -70,27 +70,27 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+    <div className="bg-gray-800 rounded-xl border border-gray-700 p-4 shadow-sm">
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={handlePrevMonth}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
           title="Previous month"
         >
-          <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          <ChevronLeft className="w-4 h-4 text-gray-400" />
         </button>
 
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-sm font-semibold text-white">
           {format(viewMonth, 'MMMM yyyy')}
         </h3>
 
         <button
           onClick={handleNextMonth}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
           title="Next month"
         >
-          <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          <ChevronRight className="w-4 h-4 text-gray-400" />
         </button>
       </div>
 
@@ -99,7 +99,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, index) => (
           <div
             key={index}
-            className="text-xs font-medium text-gray-500 dark:text-gray-400 text-center"
+            className="text-xs font-medium text-gray-400 text-center"
           >
             {day}
           </div>
@@ -122,9 +122,9 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
               disabled={!isCurrentMonth}
               className={`
                 relative aspect-square rounded-lg text-xs font-medium transition-colors
-                ${!isCurrentMonth ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : ''}
-                ${isCurrentMonth && !isSelected && !isTodayDate ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
-                ${isTodayDate && !isSelected ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-2 ring-purple-500' : ''}
+                ${!isCurrentMonth ? 'text-gray-600 cursor-not-allowed' : ''}
+                ${isCurrentMonth && !isSelected && !isTodayDate ? 'text-gray-300 hover:bg-gray-700' : ''}
+                ${isTodayDate && !isSelected ? 'bg-purple-900/30 text-purple-300 ring-2 ring-purple-500' : ''}
                 ${isSelected ? 'bg-purple-600 text-white' : ''}
               `}
               title={format(day, 'MMMM d, yyyy')}
@@ -143,7 +143,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
                           isSelected
                             ? 'bg-white'
                             : isTodayDate
-                            ? 'bg-purple-600 dark:bg-purple-400'
+                            ? 'bg-purple-400'
                             : 'bg-purple-500'
                         }`}
                       />
@@ -154,8 +154,8 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
                       isSelected
                         ? 'text-white'
                         : isTodayDate
-                        ? 'text-purple-700 dark:text-purple-300'
-                        : 'text-purple-600 dark:text-purple-400'
+                        ? 'text-purple-300'
+                        : 'text-purple-400'
                     }`}>
                       {eventCount}
                     </div>
@@ -177,20 +177,20 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
       </button>
 
       {/* Legend */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-          <div className="w-5 h-5 rounded bg-purple-100 dark:bg-purple-900/30 ring-2 ring-purple-500 flex items-center justify-center">
-            <span className="text-[10px] font-medium text-purple-700 dark:text-purple-300">1</span>
+      <div className="mt-4 pt-4 border-t border-gray-700 space-y-2">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="w-5 h-5 rounded bg-purple-900/30 ring-2 ring-purple-500 flex items-center justify-center">
+            <span className="text-[10px] font-medium text-purple-300">1</span>
           </div>
           <span>Today</span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
           <div className="w-5 h-5 rounded bg-purple-600 flex items-center justify-center">
             <span className="text-[10px] font-medium text-white">1</span>
           </div>
           <span>Selected</span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
           <div className="flex gap-0.5">
             <div className="w-1 h-1 rounded-full bg-purple-500" />
             <div className="w-1 h-1 rounded-full bg-purple-500" />
