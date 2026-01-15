@@ -8,6 +8,17 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { buildAppUrl } from '@/lib/utils/app-url';
+import { z } from 'zod';
+
+// Zod schemas for invitation operations
+const CancelInvitationSchema = z.object({
+  invitation_id: z.string().uuid(),
+}).strict();
+
+const ResendInvitationSchema = z.object({
+  invitation_id: z.string().uuid(),
+  space_id: z.string().uuid().optional(),
+}).strict();
 
 /**
  * GET /api/spaces/invitations?space_id=xxx
@@ -111,14 +122,16 @@ export async function DELETE(req: NextRequest) {
     setSentryUser(user);
 
     const body = await req.json();
-    const { invitation_id } = body;
+    const validationResult = CancelInvitationSchema.safeParse(body);
 
-    if (!invitation_id) {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'invitation_id is required' },
+        { error: 'Invalid input', details: validationResult.error.flatten() },
         { status: 400 }
       );
     }
+
+    const { invitation_id } = validationResult.data;
 
     const result = await cancelInvitation(invitation_id, user.id);
 
@@ -174,14 +187,16 @@ export async function PUT(req: NextRequest) {
     setSentryUser(user);
 
     const body = await req.json();
-    const { invitation_id, space_id } = body;
+    const validationResult = ResendInvitationSchema.safeParse(body);
 
-    if (!invitation_id) {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'invitation_id is required' },
+        { error: 'Invalid input', details: validationResult.error.flatten() },
         { status: 400 }
       );
     }
+
+    const { invitation_id, space_id } = validationResult.data;
 
     // Resend invitation (creates new token)
     const result = await resendInvitation(invitation_id, user.id);

@@ -417,7 +417,7 @@ export default function MessagesPage() {
     });
 
     // Create optimistic message
-    const tempId = `temp-${Date.now()}-${Math.random()}`;
+    const tempId = `temp-${crypto.randomUUID()}`;
     const optimisticMessage: Message = {
       id: tempId,
       space_id: currentSpace.id,

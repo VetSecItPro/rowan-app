@@ -74,7 +74,7 @@ function getSessionId(): string {
 
     if (!sessionId) {
       // Generate new session ID
-      sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+      sessionId = crypto.randomUUID();
       sessionStorage.setItem('rowan_session_id', sessionId);
     }
   }

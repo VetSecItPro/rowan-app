@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { geographicDetectionService } from '@/lib/services/geographic-detection-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { z } from 'zod';
+
+// Zod schema for manual location input
+const ManualLocationSchema = z.object({
+  city: z.string().min(1).max(200),
+  region: z.string().min(1).max(200),
+  country: z.string().min(1).max(100),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  timezone: z.string().max(100).optional(),
+}).strict();
 
 // Force dynamic rendering for this route since it uses request data
 export const dynamic = 'force-dynamic';
@@ -119,32 +130,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { city, region, country, latitude, longitude } = body;
+    const validationResult = ManualLocationSchema.safeParse(body);
 
-    // Validate required fields
-    if (!city || !region || !country) {
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'City, region, and country are required' },
+        { error: 'Invalid input', details: validationResult.error.flatten() },
         { status: 400 }
       );
     }
 
-    // Validate coordinates if provided
-    if (latitude !== undefined && longitude !== undefined) {
-      if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-        return NextResponse.json(
-          { error: 'Latitude and longitude must be numbers' },
-          { status: 400 }
-        );
-      }
-
-      if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-        return NextResponse.json(
-          { error: 'Invalid latitude or longitude values' },
-          { status: 400 }
-        );
-      }
-    }
+    const { city, region, country, latitude, longitude, timezone } = validationResult.data;
 
     const manualLocation = {
       success: true,
@@ -154,7 +149,7 @@ export async function POST(request: NextRequest) {
         country,
         latitude: latitude || 0,
         longitude: longitude || 0,
-        timezone: body.timezone || 'UTC',
+        timezone: timezone || 'UTC',
         formatted: `${city}, ${region}`,
         cityOnly: city,
         regionOnly: region,

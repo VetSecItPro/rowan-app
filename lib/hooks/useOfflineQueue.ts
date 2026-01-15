@@ -156,7 +156,7 @@ export function useOfflineQueue() {
     method: QueuedAction['method'],
     data: unknown
   ): string => {
-    const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const id = crypto.randomUUID();
 
     const action: QueuedAction = {
       id,

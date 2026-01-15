@@ -7,6 +7,17 @@ import { verifyResourceAccess } from '@/lib/services/authorization-service';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Zod schema for meal updates
+const UpdateMealSchema = z.object({
+  recipe_id: z.string().uuid().optional(),
+  name: z.string().max(200).optional(),
+  meal_type: z.enum(['breakfast', 'lunch', 'dinner', 'snack']).optional(),
+  scheduled_date: z.string().optional(),
+  notes: z.string().max(1000).optional(),
+  assigned_to: z.string().uuid().optional(),
+}).strict();
 
 /**
  * GET /api/meals/[id]
@@ -155,8 +166,18 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
-    // Parse request body
-    const updates = await req.json();
+    // Parse and validate request body
+    const body = await req.json();
+    const validationResult = UpdateMealSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validationResult.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const updates = validationResult.data;
 
     // Update meal using service
     const updatedMeal = await mealsService.updateMeal(params.id, updates);
