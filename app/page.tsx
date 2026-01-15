@@ -50,7 +50,7 @@ export default function HomePage() {
       <Header variant="landing" />
 
       {/* Main Content Components */}
-      <main>
+      <main className="relative">
         <HeroSection
           onBetaClick={() => setIsBetaModalOpen(true)}
           onLaunchClick={() => setIsLaunchModalOpen(true)}

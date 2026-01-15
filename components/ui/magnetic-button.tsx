@@ -3,11 +3,11 @@
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 
-interface MagneticButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface MagneticButtonProps {
     children: React.ReactNode;
     className?: string;
-    onClick?: () => void;
     strength?: number; // How strong the pull is (higher = moves more)
+    onClick?: () => void;
 }
 
 export function MagneticButton({
@@ -15,7 +15,6 @@ export function MagneticButton({
     className = "",
     strength = 30,
     onClick,
-    ...props
 }: MagneticButtonProps) {
     const ref = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -42,17 +41,12 @@ export function MagneticButton({
             ref={ref}
             onMouseMove={handleMouseMove}
             onMouseLeave={reset}
+            onClick={onClick}
             animate={{ x, y }}
             transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-            className="inline-block"
+            className={`inline-block cursor-pointer ${className}`}
         >
-            <button
-                className={className}
-                onClick={onClick}
-                {...props}
-            >
-                {children}
-            </button>
+            {children}
         </motion.div>
     );
 }
