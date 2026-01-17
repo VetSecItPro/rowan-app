@@ -245,7 +245,7 @@ export default function MilestoneCelebration({
               <p className="text-gray-400 mb-6">{milestoneDescription}</p>
 
               {/* Motivational Message */}
-              <div className="bg-gradient-to-br from-indigo-50 from-indigo-900/20 to-purple-900/20 rounded-xl p-4 border border-indigo-800">
+              <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 rounded-xl p-4 border border-indigo-800">
                 <p className="text-sm text-indigo-300 font-medium">
                   {percentageReached === 100
                     ? '🎊 Amazing! You have reached your goal! Time to celebrate!'

@@ -115,7 +115,7 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
   return (
     <div className="space-y-6">
       {/* Key Insights */}
-      <div className="bg-gradient-to-br from-indigo-50 from-indigo-900/20 to-purple-900/20 border-2 border-indigo-800 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-800 rounded-xl p-6">
         <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
           <Lightbulb className="w-6 h-6 text-indigo-400" />
           Key Insights & Recommendations
@@ -243,7 +243,7 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
           {forecast.slice(0, 6).map((pred) => (
             <div
               key={pred.category}
-              className="p-4 bg-gradient-to-br from-gray-50 from-gray-900/50 to-gray-800/50 rounded-lg border border-gray-700"
+              className="p-4 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-lg border border-gray-700"
             >
               <h4 className="font-semibold text-white mb-2">
                 {pred.category}

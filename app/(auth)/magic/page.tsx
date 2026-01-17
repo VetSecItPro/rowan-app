@@ -57,7 +57,7 @@ function MagicLinkHandler() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 from-purple-950 to-indigo-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-950 via-blue-950 to-indigo-950 p-4">
         <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
           <div className="w-16 h-16 bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
@@ -75,7 +75,7 @@ function MagicLinkHandler() {
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 from-purple-950 to-indigo-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-950 via-blue-950 to-indigo-950 p-4">
         <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
           <div className="w-16 h-16 bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-green-400" />
@@ -93,7 +93,7 @@ function MagicLinkHandler() {
 
   // Error state
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 from-purple-950 to-indigo-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-950 via-blue-950 to-indigo-950 p-4">
       <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
         <div className="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <AlertCircle className="w-8 h-8 text-red-400" />
@@ -128,7 +128,7 @@ export default function MagicLinkPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 from-purple-950 to-indigo-950">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-950 via-blue-950 to-indigo-950">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         </div>
       }

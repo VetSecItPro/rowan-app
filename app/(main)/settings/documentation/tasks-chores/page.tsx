@@ -1440,7 +1440,7 @@ export default function TasksChoresDocumentationPage() {
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3">How It Works</h3>
-              <div className="p-5 bg-gradient-to-r from-blue-50 from-blue-900/20 to-indigo-900/20 rounded-xl my-4">
+              <div className="p-5 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-xl my-4">
                 <p className="text-gray-300 mb-3"><strong>Example: "Take out trash" (Weekly)</strong></p>
                 <ul className="space-y-2 text-gray-300 text-sm">
                   <li>Week 1: Alex's turn</li>

@@ -139,7 +139,7 @@ function FeatureGateBlockedPage({
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
       {/* Icon */}
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 from-emerald-900/30 to-teal-900/30">
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-900/30 to-teal-900/30">
         <Lock className="h-10 w-10 text-emerald-400" />
       </div>
 

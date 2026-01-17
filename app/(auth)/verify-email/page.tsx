@@ -144,7 +144,7 @@ function VerifyEmailContent() {
   // If verifying a token, show verification UI
   if (token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-emerald-950 p-4">
         <div
           className={`w-full max-w-md transition-all duration-700 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -232,7 +232,7 @@ function VerifyEmailContent() {
 
   // Standard "waiting for verification" UI (no token)
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-emerald-950 p-4">
       <div
         className={`w-full max-w-md transition-all duration-700 ease-out ${
           mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -361,7 +361,7 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white from-gray-900 to-emerald-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-emerald-950">
         <div className="animate-pulse">
           <div className="w-16 h-16 rounded-full bg-emerald-800 mx-auto mb-4" />
           <div className="h-4 w-32 bg-gray-700 rounded mx-auto" />

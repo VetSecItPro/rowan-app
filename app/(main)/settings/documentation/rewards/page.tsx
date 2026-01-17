@@ -236,7 +236,7 @@ const guideSections: GuideSection[] = [
 
 export default function RewardsDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/30 from-gray-950 to-orange-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-amber-950/30 to-orange-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -277,7 +277,7 @@ export default function RewardsDocumentationPage() {
               </div>
 
               {/* Browse Rewards */}
-              <div className="p-6 bg-gradient-to-br from-amber-50 from-amber-900/30 to-orange-900/30 backdrop-blur-sm border-2 border-amber-700 rounded-2xl relative">
+              <div className="p-6 bg-gradient-to-br from-amber-900/30 to-orange-900/30 backdrop-blur-sm border-2 border-amber-700 rounded-2xl relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-3 py-1 text-xs font-bold bg-amber-500 text-white rounded-full">FUN</span>
                 </div>

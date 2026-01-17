@@ -256,9 +256,9 @@ export default function ImageUpload({
                   e.stopPropagation();
                   handleRemove();
                 }}
-                className="p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
               >
-                <X className="w-5 h-5 text-gray-900" />
+                <X className="w-5 h-5 text-gray-100" />
               </button>
             </div>
           </div>

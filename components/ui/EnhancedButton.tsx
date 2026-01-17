@@ -203,11 +203,11 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
           variant === 'primary' && currentFeature === 'dashboard',
 
         // Secondary variant
-        'bg-gray-100 hover:bg-gray-200 text-gray-900 border bg-gray-800 text-gray-100 border-gray-600':
+        'bg-gray-800 border text-gray-100 border-gray-600':
           variant === 'secondary',
 
         // Ghost variant
-        'hover:bg-gray-100 hover:bg-gray-800 text-gray-300':
+        'hover:bg-gray-800 text-gray-300':
           variant === 'ghost',
 
         // Outline variant

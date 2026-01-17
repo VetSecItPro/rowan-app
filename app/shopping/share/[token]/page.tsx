@@ -138,7 +138,7 @@ export default function PublicShoppingListPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white from-gray-900 to-emerald-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-950 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-emerald-400 animate-spin mx-auto mb-4" />
           <p className="text-gray-400">Loading shopping list...</p>
@@ -150,7 +150,7 @@ export default function PublicShoppingListPage() {
   // Error state
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white from-gray-900 to-emerald-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-lg p-8 text-center">
           <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-400" />
@@ -171,7 +171,7 @@ export default function PublicShoppingListPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white from-gray-900 to-emerald-950">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-950">
       <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 mb-6">

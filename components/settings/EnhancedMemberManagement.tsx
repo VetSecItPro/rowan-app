@@ -120,7 +120,7 @@ export function EnhancedMemberManagement({
   return (
     <div className="space-y-6">
       {/* Member Overview */}
-      <div className="bg-gradient-to-br from-purple-50 from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl p-4">
+      <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-lg font-semibold text-white flex items-center gap-2">
             <Users className="w-5 h-5" />

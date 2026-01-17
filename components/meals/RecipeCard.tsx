@@ -23,7 +23,7 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
         </div>
       )}
       {!recipe.image_url && (
-        <div className="w-full h-48 bg-gradient-to-br from-purple-100 from-purple-900/30 to-pink-900/30 flex items-center justify-center">
+        <div className="w-full h-48 bg-gradient-to-br from-purple-900/30 to-pink-900/30 flex items-center justify-center">
           <ChefHat className="w-16 h-16 text-purple-400" />
         </div>
       )}

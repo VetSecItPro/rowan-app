@@ -52,7 +52,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
     switch (status) {
       case 'safe':
         return {
-          gradient: 'from-green-50 from-green-900/20 to-emerald-800/20',
+          gradient: 'from-green-900/20 to-emerald-800/20',
           border: 'border-green-700',
           textColor: 'text-green-300',
           icon: CheckCircle,
@@ -62,7 +62,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
         };
       case 'warning':
         return {
-          gradient: 'from-yellow-50 from-yellow-900/20 to-orange-800/20',
+          gradient: 'from-yellow-900/20 to-orange-800/20',
           border: 'border-yellow-700',
           textColor: 'text-yellow-300',
           icon: AlertCircle,
@@ -72,7 +72,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
         };
       case 'danger':
         return {
-          gradient: 'from-orange-50 from-orange-900/20 to-red-800/20',
+          gradient: 'from-orange-900/20 to-red-800/20',
           border: 'border-orange-700',
           textColor: 'text-orange-300',
           icon: TrendingDown,
@@ -82,7 +82,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
         };
       case 'over':
         return {
-          gradient: 'from-red-50 from-red-900/30 to-red-800/30',
+          gradient: 'from-red-900/30 to-red-800/30',
           border: 'border-red-700',
           textColor: 'text-red-300',
           icon: TrendingDown,

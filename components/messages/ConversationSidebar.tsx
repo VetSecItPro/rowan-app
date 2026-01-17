@@ -191,7 +191,7 @@ export function ConversationSidebar({
       <div className="flex-1 overflow-y-auto">
         {filteredConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100/60 from-emerald-900/30 to-green-900/20 flex items-center justify-center mb-4 shadow-lg">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-900/30 to-green-900/20 flex items-center justify-center mb-4 shadow-lg">
               <MessageCircle className="w-10 h-10 text-emerald-500" />
             </div>
             <p className="text-gray-400 text-sm mb-3 font-medium">
@@ -348,7 +348,7 @@ function ConversationItem({
         }
       }}
       className={`group w-full px-4 py-3 flex items-start gap-3 transition-all duration-200 cursor-pointer ${isActive
-          ? 'bg-gradient-to-r from-emerald-100/60 via-green-50/50 from-emerald-900/30 to-teal-900/20 border-l-4 border-l-emerald-500 shadow-sm'
+          ? 'bg-gradient-to-r from-emerald-900/30 via-green-900/20 to-teal-900/20 border-l-4 border-l-emerald-500 shadow-sm'
           : 'hover:bg-gray-800/40 border-l-4 border-l-transparent hover:border-l-emerald-700'
         } border-b border-gray-700/20`}
     >

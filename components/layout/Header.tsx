@@ -243,7 +243,7 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
               {/* Dashboard button - desktop only */}
               <Link
                 href="/dashboard"
-                className="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded-full transition-all shadow-md hover:shadow-lg font-medium active:scale-95"
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -257,14 +257,14 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
                   {hasAdminAccess(user) ? (
                     <Link
                       href="/admin/dashboard"
-                      className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-indigo-900/30 border border-indigo-700 text-indigo-300 rounded-full text-[10px] sm:text-xs font-medium hover:bg-indigo-900/50 transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-900/30 border border-indigo-700 text-indigo-300 rounded-full text-xs font-medium hover:bg-indigo-900/50 transition-colors"
                     >
-                      <Shield className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                      <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span className="hidden sm:inline">Admin</span>
                     </Link>
                   ) : (
-                    <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 bg-amber-900/30 border border-amber-700 text-amber-300 rounded-full text-[10px] sm:text-xs font-medium">
-                      <TestTube className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-900/30 border border-amber-700 text-amber-300 rounded-full text-xs font-medium">
+                      <TestTube className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span>Beta</span>
                     </div>
                   )}
@@ -276,7 +276,7 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
                 <button
                   ref={buttonRef}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-[10px] font-medium transition-all hover:opacity-90 active:scale-95 ${COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-white text-xs font-medium transition-all hover:opacity-90 active:scale-95 ${COLOR_THEMES[user.color_theme as keyof typeof COLOR_THEMES] || 'bg-emerald-600'}`}
                 >
                   {user.avatar_url ? (
                     <Image

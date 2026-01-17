@@ -138,7 +138,7 @@ export function PartnerBalanceWidget({
         ) : (
           <div className="space-y-4">
             {/* Net Balance Display */}
-            <div className="text-center p-4 bg-gradient-to-r from-purple-50 from-purple-900/20 to-blue-900/20 rounded-lg border border-purple-800">
+            <div className="text-center p-4 bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-lg border border-purple-800">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <ArrowRightLeft className="w-5 h-5 text-purple-400" />
                 <span className="text-sm font-medium text-purple-100">

@@ -406,7 +406,7 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
   return (
     <div
       className={`p-4 hover:bg-gray-700/50 transition-colors cursor-pointer relative group ${
-        !notification.is_read ? 'bg-gradient-to-r from-pink-50/50 from-pink-900/10 to-purple-900/10' : ''
+        !notification.is_read ? 'bg-gradient-to-r from-pink-900/10 to-purple-900/10' : ''
       }`}
       onClick={onClick}
     >

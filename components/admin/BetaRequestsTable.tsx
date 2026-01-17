@@ -81,7 +81,7 @@ export function BetaRequestsTable({ betaRequests, isLoading, searchTerm }: BetaR
                     Invite Sent
                   </span>
                 ) : (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 bg-gray-700 text-gray-400">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400">
                     <AlertTriangle className="w-3 h-3 mr-1" />
                     No Invite
                   </span>

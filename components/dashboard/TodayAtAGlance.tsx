@@ -458,7 +458,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
       className={`bg-gray-800 rounded-xl shadow-sm border border-gray-700 overflow-hidden ${className}`}
     >
       {/* Header */}
-      <div className="px-4 sm:px-6 py-4 border-b border-teal-800/50 bg-gradient-to-r from-teal-100 via-cyan-100 from-teal-900/40 to-sky-900/40">
+      <div className="px-4 sm:px-6 py-4 border-b border-teal-800/50 bg-gradient-to-r from-teal-900/40 via-cyan-900/30 to-sky-900/40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-teal-900/30 flex items-center justify-center">

@@ -212,7 +212,7 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
             ? 'bg-red-100 bg-red-900/30 text-red-400'
             : item.status === 'on-hold'
             ? 'bg-purple-100 bg-purple-900/30 text-purple-400'
-            : 'bg-gray-100 bg-gray-700 text-gray-400'
+            : 'bg-gray-700 text-gray-400'
         }`}>
           {item.status === 'in-progress' ? 'Active' : item.status === 'on-hold' ? 'Hold' : item.status === 'completed' ? 'Done' : item.status === 'blocked' ? 'Blocked' : 'Pending'}
         </span>

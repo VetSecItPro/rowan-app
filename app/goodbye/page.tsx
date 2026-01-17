@@ -23,7 +23,7 @@ export default function GoodbyePage() {
   }, [signOut]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white from-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Main Card */}
         <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 text-center">

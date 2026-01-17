@@ -227,7 +227,7 @@ export default function RemindersDocumentationPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-pink-50 from-pink-900/20 to-purple-900/20 border border-pink-800 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-pink-900/20 to-purple-900/20 border border-pink-800 rounded-xl p-6">
             <div className="flex items-start gap-3">
               <Lightbulb className="w-6 h-6 text-pink-400 flex-shrink-0 mt-0.5" />
               <div>

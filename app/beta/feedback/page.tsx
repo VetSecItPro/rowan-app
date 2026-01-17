@@ -50,7 +50,7 @@ const CATEGORIES = {
   feature_request: { label: 'Feature Request', color: 'bg-blue-100 bg-blue-900 text-blue-300' },
   ui_ux: { label: 'UI/UX Feedback', color: 'bg-purple-100 bg-purple-900 text-purple-300' },
   performance: { label: 'Performance', color: 'bg-orange-100 bg-orange-900 text-orange-300' },
-  other: { label: 'Other', color: 'bg-gray-100 bg-gray-900 text-gray-300' }
+  other: { label: 'Other', color: 'bg-gray-900 text-gray-300' }
 };
 
 const SEVERITY_COLORS = {
@@ -64,7 +64,7 @@ const STATUS_COLORS = {
   open: 'bg-green-100 bg-green-900 text-green-300',
   in_progress: 'bg-blue-100 bg-blue-900 text-blue-300',
   resolved: 'bg-purple-100 bg-purple-900 text-purple-300',
-  closed: 'bg-gray-100 bg-gray-900 text-gray-300'
+  closed: 'bg-gray-900 text-gray-300'
 };
 
 export default function BetaFeedbackPage() {
@@ -150,7 +150,7 @@ export default function BetaFeedbackPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 from-gray-950 to-indigo-950/20">
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-blue-950/30 to-indigo-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -177,7 +177,7 @@ export default function BetaFeedbackPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'all'
                       ? 'bg-blue-100 bg-blue-900 text-blue-300'
-                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   All Feedback
@@ -187,7 +187,7 @@ export default function BetaFeedbackPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'bugs'
                       ? 'bg-red-100 bg-red-900 text-red-300'
-                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   Bugs
@@ -197,7 +197,7 @@ export default function BetaFeedbackPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'features'
                       ? 'bg-green-100 bg-green-900 text-green-300'
-                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   Features
@@ -207,7 +207,7 @@ export default function BetaFeedbackPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === 'my_feedback'
                       ? 'bg-purple-100 bg-purple-900 text-purple-300'
-                      : 'bg-gray-100 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                   }`}
                 >
                   My Feedback

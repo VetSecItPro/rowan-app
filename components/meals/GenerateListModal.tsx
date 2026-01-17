@@ -121,7 +121,7 @@ export function GenerateListModal({
       />
       <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-50 from-emerald-900/20 to-green-900/20 px-4 sm:px-6 py-4 border-b border-emerald-800">
+        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-900/20 to-green-900/20 px-4 sm:px-6 py-4 border-b border-emerald-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 flex items-center justify-center">

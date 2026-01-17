@@ -1183,7 +1183,7 @@ export default function SettingsPage() {
                                 key={space.id}
                                 className={`btn-touch p-4 rounded-xl border transition-all cursor-pointer active:scale-95 ${
                                   currentSpace?.id === space.id
-                                    ? 'bg-gradient-to-br from-purple-50 from-purple-900/20 to-blue-900/20 border-purple-800 shadow-lg hover:shadow-xl'
+                                    ? 'bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-800 shadow-lg hover:shadow-xl'
                                     : 'bg-gray-900/50 border-gray-700 hover:border-purple-800 hover:shadow-md hover:scale-105'
                                 }`}
                                 onClick={() => switchSpace(space)}
@@ -1213,7 +1213,7 @@ export default function SettingsPage() {
 
                       {/* Current Space Actions */}
                       {currentSpace && (
-                        <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl">
+                        <div className="mb-6 p-4 bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">

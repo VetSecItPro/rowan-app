@@ -209,10 +209,10 @@ export function SubscriptionSettings() {
         animate={{ opacity: 1, y: 0 }}
         className={`relative overflow-hidden rounded-2xl border p-6 shadow-lg ${
           effectiveTier === 'family'
-            ? 'bg-gradient-to-br from-purple-50 from-purple-900/20 to-indigo-900/20 border-purple-800'
+            ? 'bg-gradient-to-br from-purple-900/20 to-indigo-900/20 border-purple-800'
             : effectiveTier === 'pro'
-              ? 'bg-gradient-to-br from-emerald-50 from-emerald-900/20 to-teal-900/20 border-emerald-800'
-              : 'bg-gradient-to-br from-white from-gray-800 to-gray-900 border-gray-700'
+              ? 'bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-800'
+              : 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700'
         }`}
       >
         {/* Decorative gradient overlay */}
@@ -259,7 +259,7 @@ export function SubscriptionSettings() {
 
         {/* Trial Status */}
         {isInTrial && (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-amber-50 from-amber-900/20 to-orange-900/20 border border-amber-800">
+          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-amber-900/20 to-orange-900/20 border border-amber-800">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="h-5 w-5 text-amber-400" />
               <span className="font-semibold text-amber-200">
@@ -288,7 +288,7 @@ export function SubscriptionSettings() {
         )}
 
         {hasTrialExpired && (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-red-50 from-red-900/20 to-rose-900/20 border border-red-800">
+          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-red-900/20 to-rose-900/20 border border-red-800">
             <div className="flex items-center gap-2 mb-1">
               <AlertTriangle className="h-5 w-5 text-red-400" />
               <span className="font-semibold text-red-200">
@@ -371,7 +371,7 @@ export function SubscriptionSettings() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 {/* Next Billing Date */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 from-blue-900/20 to-indigo-900/20 border border-blue-800">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-900/20 to-indigo-900/20 border border-blue-800">
                   <div className="flex items-center gap-2 mb-2">
                     <CalendarClock className="h-4 w-4 text-blue-400" />
                     <span className="text-xs font-medium text-blue-400">Next Billing</span>
@@ -395,7 +395,7 @@ export function SubscriptionSettings() {
                 </div>
 
                 {/* Amount Due */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 from-emerald-900/20 to-teal-900/20 border border-emerald-800">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-800">
                   <div className="flex items-center gap-2 mb-2">
                     <Receipt className="h-4 w-4 text-emerald-400" />
                     <span className="text-xs font-medium text-emerald-400">Amount</span>
@@ -412,7 +412,7 @@ export function SubscriptionSettings() {
                 </div>
 
                 {/* Payment Method */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 from-purple-900/20 to-pink-900/20 border border-purple-800">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-800">
                   <div className="flex items-center gap-2 mb-2">
                     <CreditCard className="h-4 w-4 text-purple-400" />
                     <span className="text-xs font-medium text-purple-400">Payment Method</span>
@@ -455,28 +455,28 @@ export function SubscriptionSettings() {
         </h3>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-50 from-blue-900/20 to-indigo-900/20 border border-blue-800">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-900/20 to-indigo-900/20 border border-blue-800">
             <CheckSquare className="h-6 w-6 text-blue-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
               {limits.maxActiveTasks === Infinity ? '∞' : limits.maxActiveTasks}
             </p>
             <p className="text-xs text-gray-400 mt-1">Active Tasks</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-50 from-purple-900/20 to-pink-900/20 border border-purple-800">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-800">
             <Calendar className="h-6 w-6 text-purple-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
               {limits.canCreateCalendar ? '∞' : '—'}
             </p>
             <p className="text-xs text-gray-400 mt-1">Calendar Events</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-emerald-50 from-emerald-900/20 to-teal-900/20 border border-emerald-800">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border border-emerald-800">
             <Users className="h-6 w-6 text-emerald-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
               {limits.maxSpaces}
             </p>
             <p className="text-xs text-gray-400 mt-1">Spaces</p>
           </div>
-          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-amber-50 from-amber-900/20 to-orange-900/20 border border-amber-800">
+          <div className="text-center p-4 rounded-xl bg-gradient-to-br from-amber-900/20 to-orange-900/20 border border-amber-800">
             <Users className="h-6 w-6 text-amber-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">
               {limits.maxUsers}
@@ -594,7 +594,7 @@ export function SubscriptionSettings() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="text-center p-6 bg-gradient-to-br from-gray-50 from-gray-800/50 to-gray-900/50 rounded-2xl border border-gray-700"
+        className="text-center p-6 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl border border-gray-700"
       >
         <h4 className="text-sm font-semibold text-white mb-2">Need help with your subscription?</h4>
         <p className="text-xs text-gray-400 mb-4">
