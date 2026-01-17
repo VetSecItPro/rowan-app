@@ -240,7 +240,7 @@ export function EditSeriesModal({
                         actionInfo.destructive
                           ? 'text-red-600 focus:ring-red-500'
                           : 'text-purple-600 focus:ring-purple-500'
-                      } bg-gray-100 bg-gray-700 border-gray-600`}
+                      } bg-gray-700 border-gray-600`}
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">

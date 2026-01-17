@@ -47,12 +47,12 @@ export function PricingCard({
           : tier === 'family'
             ? 'border-gray-700 hover:shadow-indigo-500/30 hover:shadow-2xl'
             : 'border-gray-700 hover:shadow-gray-400/40 hover:shadow-2xl'
-      } ${isFree ? 'bg-gray-800' : 'bg-gradient-to-br from-white from-gray-800 to-gray-900'}`}
+      } ${isFree ? 'bg-gray-800' : 'bg-gradient-to-br from-gray-800 to-gray-900'}`}
     >
       {/* Popular Badge */}
       {popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="rounded-full bg-gradient-to-r from-emerald-600 from-emerald-500 to-teal-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
+          <span className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-1 text-xs font-semibold text-white shadow-md">
             Most Popular
           </span>
         </div>
@@ -95,10 +95,10 @@ export function PricingCard({
         disabled={loading || disabled}
         className={`mb-6 w-full rounded-lg px-6 py-3 text-base font-semibold transition-all flex items-center justify-center gap-2 ${
           popular
-            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 from-emerald-500 hover:from-emerald-600 hover:to-teal-600 shadow-md hover:shadow-lg'
+            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-md hover:shadow-lg'
             : isFree
-              ? 'bg-gray-200 text-gray-900 bg-gray-700 hover:bg-gray-600'
-              : 'bg-gray-900 text-white bg-gray-700 hover:bg-gray-600'
+              ? 'bg-gray-700 text-white hover:bg-gray-600'
+              : 'bg-gray-700 text-white hover:bg-gray-600'
         } ${(loading || disabled) ? 'opacity-60 cursor-not-allowed' : ''}`}
         aria-label={`${cta} for ${title} plan`}
       >

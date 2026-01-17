@@ -102,7 +102,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white from-gray-900 to-gray-950">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
       {/* Hero Section */}
       <div className="px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl">

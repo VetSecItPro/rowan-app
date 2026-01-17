@@ -220,7 +220,7 @@ const guideSections: GuideSection[] = [
 
 export default function ExpensesDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50/30 from-gray-950 to-orange-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-red-950/30 to-orange-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -245,7 +245,7 @@ export default function ExpensesDocumentationPage() {
           </div>
 
       {/* Quick Stats */}
-      <div className="mb-12 p-8 bg-gradient-to-br from-red-50 from-red-900/20 to-red-800/20 rounded-2xl border border-red-800">
+      <div className="mb-12 p-8 bg-gradient-to-br from-red-900/20 to-red-800/20 rounded-2xl border border-red-800">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mx-auto mb-3">
@@ -309,7 +309,7 @@ export default function ExpensesDocumentationPage() {
       </div>
 
       {/* AI Technology Spotlight */}
-      <div className="mb-12 p-6 bg-gradient-to-br from-purple-50 from-purple-900/20 to-purple-800/20 rounded-2xl border border-purple-800">
+      <div className="mb-12 p-6 bg-gradient-to-br from-purple-900/20 to-purple-800/20 rounded-2xl border border-purple-800">
         <div className="flex items-start gap-4 mb-4">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0">
             <Scan className="w-5 h-5 text-white" />
@@ -391,7 +391,7 @@ export default function ExpensesDocumentationPage() {
           </div>
 
           {/* Pro Tips */}
-          <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 from-blue-900/20 to-indigo-900/20 rounded-2xl border border-blue-800">
+          <div className="mt-12 p-6 bg-gradient-to-br from-blue-900/20 to-indigo-900/20 rounded-2xl border border-blue-800">
             <h3 className="text-lg font-semibold text-white mb-4">💡 Pro Tips</h3>
             <div className="space-y-3 text-sm text-gray-300">
               <div className="flex items-start gap-3">

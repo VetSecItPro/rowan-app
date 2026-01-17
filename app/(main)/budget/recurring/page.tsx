@@ -159,7 +159,7 @@ export default function RecurringExpensesPage() {
           )}
 
           {/* Info Banner */}
-          <div className="bg-gradient-to-r from-purple-50 from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl p-6">
+          <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-800 rounded-xl p-6">
             <div className="flex items-start gap-4">
               <Sparkles className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
               <div className="flex-1">

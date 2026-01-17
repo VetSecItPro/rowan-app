@@ -252,7 +252,7 @@ const guideSections: GuideSection[] = [
 
 export default function ProjectsDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-cyan-50/30 from-gray-950 to-blue-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-cyan-950/30 to-blue-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -326,7 +326,7 @@ export default function ProjectsDocumentationPage() {
           </div>
 
           {/* Pro Tips */}
-          <div className="mt-12 p-6 bg-gradient-to-br from-green-50 from-green-900/20 to-green-800/20 rounded-2xl border border-green-800">
+          <div className="mt-12 p-6 bg-gradient-to-br from-green-900/20 to-green-800/20 rounded-2xl border border-green-800">
             <h3 className="text-lg font-semibold text-white mb-4">💡 Pro Tips</h3>
             <div className="space-y-3 text-sm text-gray-300">
               <div className="flex items-start gap-3">

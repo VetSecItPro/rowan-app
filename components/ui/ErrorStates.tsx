@@ -66,7 +66,7 @@ export function AuthErrorState({
   message?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-50 via-white from-gray-900 to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         <ErrorIcon size="lg" className="mx-auto mb-6" />
         <div className="space-y-3">
@@ -90,7 +90,7 @@ export function AuthErrorState({
           {onSignOut && (
             <button
               onClick={onSignOut}
-              className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               Sign Out
             </button>
@@ -115,7 +115,7 @@ export function SpacesErrorState({
   error?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-orange-50 via-white from-gray-900 to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         <ErrorIcon size="lg" className="mx-auto mb-6" />
         <div className="space-y-3">
@@ -164,7 +164,7 @@ export function NoSpacesFoundState({
   userName?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 from-gray-900 to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-lg">
         {/* Welcome icon instead of error */}
         <div className="flex items-center justify-center rounded-full bg-indigo-900/20 h-16 w-16 mx-auto mb-6">
@@ -204,7 +204,7 @@ export function NoSpacesFoundState({
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               Refresh
             </button>
@@ -227,7 +227,7 @@ export function NetworkErrorState({
   message?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-50 via-white from-gray-900 to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         {/* Network icon */}
         <div className="flex items-center justify-center rounded-full bg-yellow-900/20 h-16 w-16 mx-auto mb-6">
@@ -288,7 +288,7 @@ export function PermissionDeniedState({
   resource?: string;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-red-50 via-white from-gray-900 to-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-center p-8 max-w-md">
         {/* Shield icon */}
         <div className="flex items-center justify-center rounded-full bg-red-900/20 h-16 w-16 mx-auto mb-6">
@@ -396,7 +396,7 @@ export function ModalErrorState({
         {onClose && (
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 text-sm rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-100 text-sm rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Close
           </button>
@@ -420,7 +420,7 @@ export function AppErrorState({
   isDevelopment?: boolean;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white from-gray-900 to-gray-800 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
       <div className="text-center p-8 max-w-lg">
         <ErrorIcon size="lg" className="mx-auto mb-6" />
 
@@ -452,7 +452,7 @@ export function AppErrorState({
           )}
           <button
             onClick={() => window.location.href = '/'}
-            className="px-4 py-2 bg-gray-100 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
           >
             Go to Dashboard
           </button>

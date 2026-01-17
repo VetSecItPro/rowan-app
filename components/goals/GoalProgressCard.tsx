@@ -54,7 +54,7 @@ export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProp
   return (
     <div
       onClick={onClick}
-      className={`bg-gradient-to-br from-gray-50 from-gray-800 to-gray-900 border-2 ${
+      className={`bg-gradient-to-br from-gray-800 to-gray-900 border-2 ${
         isComplete
           ? 'border-green-700'
           : 'border-gray-700'

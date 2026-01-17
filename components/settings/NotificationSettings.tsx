@@ -676,7 +676,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
         description="Your personalized morning assistant"
         icon={Calendar}
       >
-        <div className="p-4 bg-gradient-to-r from-purple-50 from-purple-900/20 to-indigo-900/20 border border-purple-800 rounded-xl mb-4">
+        <div className="p-4 bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border border-purple-800 rounded-xl mb-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
               <span className="text-lg">✨</span>

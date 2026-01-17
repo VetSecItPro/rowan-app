@@ -30,12 +30,12 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-gray-50 from-gray-900 to-gray-950">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto px-4 py-16">
         {/* Badge */}
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 from-blue-900/20 to-indigo-900/20 border border-blue-800 rounded-full">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-800 rounded-full">
             <Sparkles className="w-4 h-4 text-blue-400" />
             <span className="text-sm font-semibold text-blue-100">
               Beta Tester Upgrade

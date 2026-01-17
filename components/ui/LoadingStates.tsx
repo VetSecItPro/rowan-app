@@ -4,7 +4,7 @@ import React from 'react';
 
 export function AuthLoadingState() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
         <p className="text-gray-400">Loading authentication...</p>
@@ -21,7 +21,7 @@ export function AuthLoadingState() {
  */
 export function DashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
       {/* Header Skeleton */}
       <header className="bg-[#0a0a0f]/80 backdrop-blur-lg border-b border-gray-800/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,7 +119,7 @@ export function DashboardSkeleton() {
 
 export function SpacesLoadingState() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-gray-50 from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto mb-4"></div>
         <p className="text-gray-400">Loading your spaces...</p>

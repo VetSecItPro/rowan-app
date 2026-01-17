@@ -351,7 +351,7 @@ export default function ArticlesPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 from-emerald-500/5 to-cyan-500/5">
+        <section className="py-16 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold text-white mb-4">
               Ready to organize your family life?

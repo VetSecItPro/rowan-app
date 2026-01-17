@@ -201,7 +201,7 @@ const guideSections: GuideSection[] = [
 
 export default function MealPlanningDocumentation() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Header */}
       <div className="mb-8">
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -1549,7 +1549,7 @@ export default function MealPlanningDocumentation() {
         </div>
 
         {/* Quick Reference Card */}
-        <div className="mt-12 p-6 bg-gradient-to-r from-purple-50 from-purple-900/20 to-indigo-900/20 border border-purple-800 rounded-xl">
+        <div className="mt-12 p-6 bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border border-purple-800 rounded-xl">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <Keyboard className="w-5 h-5 text-purple-400" />
             Quick Reference: Keyboard Shortcuts

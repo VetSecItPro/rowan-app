@@ -166,11 +166,11 @@ export default function Landing2Page() {
   const year = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen bg-white bg-gray-950 text-white font-[ui-sans-serif,system-ui,sans-serif]">
+    <div className="min-h-screen bg-gray-950 text-white font-[ui-sans-serif,system-ui,sans-serif]">
       {/* Background */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_15%_10%,rgba(59,130,246,0.16),transparent_45%),radial-gradient(900px_circle_at_80%_20%,rgba(34,211,238,0.14),transparent_45%),radial-gradient(900px_circle_at_50%_100%,rgba(99,102,241,0.10),transparent_40%)] opacity-90 bg-[radial-gradient(1200px_circle_at_15%_10%,rgba(59,130,246,0.14),transparent_45%),radial-gradient(900px_circle_at_80%_20%,rgba(34,211,238,0.12),transparent_45%),radial-gradient(900px_circle_at_50%_100%,rgba(99,102,241,0.10),transparent_40%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/65 via-white/75 from-gray-950/50 to-gray-950" />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/65 via-gray-950/75 to-gray-950" />
       </div>
 
       {/* Header */}
@@ -261,7 +261,7 @@ export default function Landing2Page() {
               {/* Product mock (placeholder until screenshots) */}
               <div className="relative">
                 <div className="relative overflow-hidden rounded-[2rem] border border-black/10 bg-white/60 p-2 shadow-2xl backdrop-blur bg-white/5">
-                  <div className="rounded-[1.65rem] border border-black/5 bg-gradient-to-b from-white to-gray-50 p-6 from-gray-950 to-gray-900">
+                  <div className="rounded-[1.65rem] border border-black/5 bg-gradient-to-b from-gray-950 p-6 to-gray-900">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
@@ -477,7 +477,7 @@ export default function Landing2Page() {
                   </div>
                   <div className="mt-5 text-lg font-semibold text-white">{feature.title}</div>
                   <p className="mt-2 text-sm leading-relaxed text-gray-300">{feature.description}</p>
-                  <div className="mt-6 h-1.5 w-full rounded-full bg-gradient-to-r from-black/5 from-white/10 to-white/0" />
+                  <div className="mt-6 h-1.5 w-full rounded-full bg-gradient-to-r from-white/10 to-white/0" />
                 </Link>
               ))}
             </div>

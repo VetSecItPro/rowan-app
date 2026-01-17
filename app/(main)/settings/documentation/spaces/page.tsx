@@ -230,7 +230,7 @@ const guideSections: GuideSection[] = [
 
 export default function SpacesDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-teal-50/30 from-gray-950 to-cyan-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-teal-950/30 to-cyan-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -344,7 +344,7 @@ export default function SpacesDocumentationPage() {
 
           {/* Quick Reference */}
           <div className="mt-16 max-w-4xl mx-auto">
-            <div className="p-8 bg-gradient-to-r from-teal-50 from-teal-900/30 to-cyan-900/30 backdrop-blur-sm border border-teal-800/60 rounded-2xl shadow-lg">
+            <div className="p-8 bg-gradient-to-r from-teal-900/30 to-cyan-900/30 backdrop-blur-sm border border-teal-800/60 rounded-2xl shadow-lg">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">Quick Reference</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

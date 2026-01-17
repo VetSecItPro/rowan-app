@@ -485,7 +485,7 @@ export default function RemindersPage(): React.JSX.Element {
           </CollapsibleStatsGrid>
 
           {/* Search & Filter Bar - No box on mobile, box on desktop for filters */}
-          <div className="sm:bg-gray-50 sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4 space-y-2 sm:space-y-3">
+          <div className="sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4 space-y-2 sm:space-y-3">
                 {/* Search and Sort Row */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   {/* Search */}

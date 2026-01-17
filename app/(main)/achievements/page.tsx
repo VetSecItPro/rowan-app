@@ -161,7 +161,7 @@ export default function AchievementsPage() {
                 gridClassName="grid stats-grid-mobile gap-4 sm:gap-6"
               >
                 {/* Achievement Level */}
-                <div className="bg-gradient-to-br from-purple-50 from-purple-900/20 to-purple-800/20 border border-purple-700 rounded-xl p-4 sm:p-6">
+                <div className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 border border-purple-700 rounded-xl p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-purple-400 font-medium text-sm">Achievement Level</h3>
                     <Award className="w-8 h-8 text-purple-400" />
@@ -180,7 +180,7 @@ export default function AchievementsPage() {
                 </div>
 
                 {/* Total Points */}
-                <div className="bg-gradient-to-br from-yellow-50 from-yellow-900/20 to-yellow-800/20 border border-yellow-700 rounded-xl p-4 sm:p-6">
+                <div className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 border border-yellow-700 rounded-xl p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-yellow-400 font-medium text-sm">Total Points</h3>
                     <Star className="w-8 h-8 text-yellow-400" />
@@ -191,7 +191,7 @@ export default function AchievementsPage() {
                 </div>
 
                 {/* Badges Earned */}
-                <div className="bg-gradient-to-br from-green-50 from-green-900/20 to-green-800/20 border border-green-700 rounded-xl p-4 sm:p-6">
+                <div className="bg-gradient-to-br from-green-900/20 to-green-800/20 border border-green-700 rounded-xl p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-green-400 font-medium text-sm">Badges Earned</h3>
                     <Trophy className="w-8 h-8 text-green-400" />
@@ -207,7 +207,7 @@ export default function AchievementsPage() {
                 </div>
 
                 {/* Progress */}
-                <div className="bg-gradient-to-br from-blue-50 from-blue-900/20 to-blue-800/20 border border-blue-700 rounded-xl p-4 sm:p-6">
+                <div className="bg-gradient-to-br from-blue-900/20 to-blue-800/20 border border-blue-700 rounded-xl p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-blue-400 font-medium text-sm">In Progress</h3>
                     <TrendingUp className="w-8 h-8 text-blue-400" />
@@ -220,7 +220,7 @@ export default function AchievementsPage() {
             )}
 
             {/* Category Tabs */}
-            <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-gray-100 from-gray-800 to-gray-700 rounded-xl border border-gray-600">
+            <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl border border-gray-600">
               <button
                 onClick={() => setSelectedCategory('recent')}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all font-medium flex-1 sm:flex-initial ${

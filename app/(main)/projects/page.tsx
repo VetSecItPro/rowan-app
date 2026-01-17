@@ -509,7 +509,7 @@ export default function ProjectsPage() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <div className="grid grid-cols-5 sm:flex sm:items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-100 from-amber-900/30 to-amber-900/30 rounded-xl border border-amber-700 w-full sm:w-auto">
+              <div className="grid grid-cols-5 sm:flex sm:items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-amber-900/30 to-amber-900/30 rounded-xl border border-amber-700 w-full sm:w-auto">
                 {(['projects', 'budgets', 'bills', 'expenses', 'receipts'] as TabType[]).map((tab) => (
                   <button
                     key={tab}
@@ -873,7 +873,7 @@ export default function ProjectsPage() {
                   {/* Budget Stats Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {/* Monthly Budget */}
-                    <div className="bg-gradient-to-br from-amber-50 from-amber-900/20 to-amber-800/20 border border-amber-700 rounded-lg p-4">
+                    <div className="bg-gradient-to-br from-amber-900/20 to-amber-800/20 border border-amber-700 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <DollarSign className="w-5 h-5 text-amber-400" />
                         <p className="text-sm font-medium text-amber-100">Monthly Budget</p>
@@ -884,7 +884,7 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Spent This Month */}
-                    <div className="bg-gradient-to-br from-orange-50 from-orange-900/20 to-orange-800/20 border border-orange-700 rounded-lg p-4">
+                    <div className="bg-gradient-to-br from-orange-900/20 to-orange-800/20 border border-orange-700 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Receipt className="w-5 h-5 text-orange-400" />
                         <p className="text-sm font-medium text-orange-100">Spent</p>
@@ -895,7 +895,7 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Remaining */}
-                    <div className={`bg-gradient-to-br ${budgetStats.remaining >= 0 ? 'from-green-50 from-green-900/20 to-green-800/20 border-green-700' : 'from-red-50 from-red-900/20 to-red-800/20 border-red-700'} border rounded-lg p-4`}>
+                    <div className={`bg-gradient-to-br ${budgetStats.remaining >= 0 ? 'from-green-900/20 to-green-800/20 border-green-700' : 'from-red-900/20 to-red-800/20 border-red-700'} border rounded-lg p-4`}>
                       <div className="flex items-center gap-2 mb-2">
                         <Wallet className={`w-5 h-5 ${budgetStats.remaining >= 0 ? 'text-green-400' : 'text-red-400'}`} />
                         <p className={`text-sm font-medium ${budgetStats.remaining >= 0 ? 'text-green-100' : 'text-red-100'}`}>

@@ -43,7 +43,7 @@ const NavItemComponent = memo(function NavItemComponent({
           isExpanded ? 'gap-3 px-2.5' : 'justify-center px-2'
         } ${
           isActive
-            ? 'bg-gradient-to-r from-blue-50/80 from-blue-900/20 to-indigo-900/10 shadow-sm border border-blue-800/30'
+            ? 'bg-gradient-to-r from-blue-900/20 to-indigo-900/10 shadow-sm border border-blue-800/30'
             : 'hover:bg-gray-800/50 hover:shadow-sm border border-transparent'
         }`}
       >
@@ -274,7 +274,7 @@ export function Sidebar() {
       ref={sidebarRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`hidden md:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-white/90 via-white/80 from-gray-900/90 to-gray-950/90 backdrop-blur-xl border-r border-gray-700/30 transition-all duration-300 ease-out shadow-xl shadow-black/20 ${
+      className={`hidden md:flex flex-col h-screen sticky top-0 bg-gradient-to-b from-gray-900/90 to-gray-950/90 backdrop-blur-xl border-r border-gray-700/30 transition-all duration-300 ease-out shadow-xl shadow-black/20 ${
         effectivelyExpanded ? 'w-64' : 'w-[72px]'
       } ${isHoverExpanded ? 'z-50' : ''}`}
     >
@@ -305,7 +305,7 @@ export function Sidebar() {
       {/* Navigation Items */}
       <nav className="flex-1 py-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-thumb-gray-700">
         {/* Features Section with subtle background */}
-        <div className={`mb-3 rounded-xl bg-gradient-to-b from-gray-50/40 from-gray-800/20 to-transparent ${effectivelyExpanded ? 'mx-2 p-2' : 'mx-1 p-1'}`}>
+        <div className={`mb-3 rounded-xl bg-gradient-to-b from-gray-800/20 to-transparent ${effectivelyExpanded ? 'mx-2 p-2' : 'mx-1 p-1'}`}>
           <ul className="space-y-1.5">
             {NAVIGATION_ITEMS.map((item, index) => (
               <NavItemComponent

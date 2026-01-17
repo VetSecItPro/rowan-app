@@ -228,7 +228,7 @@ const guideSections: GuideSection[] = [
 
 export default function SubscriptionsDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 from-gray-950 to-teal-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-emerald-950/30 to-teal-950/20">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">
@@ -270,7 +270,7 @@ export default function SubscriptionsDocumentationPage() {
               </div>
 
               {/* Pro Plan */}
-              <div className="p-6 bg-gradient-to-br from-emerald-50 from-emerald-900/30 to-teal-900/30 backdrop-blur-sm border-2 border-emerald-700 rounded-2xl relative">
+              <div className="p-6 bg-gradient-to-br from-emerald-900/30 to-teal-900/30 backdrop-blur-sm border-2 border-emerald-700 rounded-2xl relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-3 py-1 text-xs font-bold bg-emerald-500 text-white rounded-full">POPULAR</span>
                 </div>
@@ -448,7 +448,7 @@ export default function SubscriptionsDocumentationPage() {
 
           {/* Quick Reference */}
           <div className="mt-12 max-w-4xl mx-auto">
-            <div className="p-8 bg-gradient-to-r from-emerald-50 from-emerald-900/30 to-teal-900/30 backdrop-blur-sm border border-emerald-800/60 rounded-2xl shadow-lg">
+            <div className="p-8 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 backdrop-blur-sm border border-emerald-800/60 rounded-2xl shadow-lg">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">Quick Reference</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

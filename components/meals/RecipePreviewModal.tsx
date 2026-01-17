@@ -33,7 +33,7 @@ export function RecipePreviewModal({
       case 'apininjas':
         return 'bg-purple-100 bg-purple-900/30 text-purple-300';
       default:
-        return 'bg-gray-100 bg-gray-800 text-gray-300';
+        return 'bg-gray-800 text-gray-300';
     }
   };
 

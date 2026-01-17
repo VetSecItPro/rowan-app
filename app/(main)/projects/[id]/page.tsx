@@ -119,7 +119,7 @@ export default function ProjectDetailPage() {
     planning: { label: 'Planning', color: 'bg-blue-100 bg-blue-900/30 text-blue-400' },
     'in-progress': { label: 'In Progress', color: 'bg-yellow-100 bg-yellow-900/30 text-yellow-400' },
     completed: { label: 'Completed', color: 'bg-green-100 bg-green-900/30 text-green-400' },
-    'on-hold': { label: 'On Hold', color: 'bg-gray-100 bg-gray-900/30 text-gray-400' },
+    'on-hold': { label: 'On Hold', color: 'bg-gray-900/30 text-gray-400' },
     cancelled: { label: 'Cancelled', color: 'bg-red-100 bg-red-900/30 text-red-400' },
   };
 

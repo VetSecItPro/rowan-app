@@ -79,7 +79,7 @@ export function ProjectDashboard({
       {/* Project Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Financial Summary */}
-        <div className="bg-gradient-to-br from-green-50 from-green-900/20 to-emerald-900/20 border border-green-800 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border border-green-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 rounded-lg bg-gradient-to-br from-green-500 to-green-600 shadow-lg">
               <DollarSign className="w-6 h-6 text-white" />
@@ -103,7 +103,7 @@ export function ProjectDashboard({
         </div>
 
         {/* Payment Status */}
-        <div className="bg-gradient-to-br from-blue-50 from-blue-900/20 to-cyan-900/20 border border-blue-800 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border border-blue-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg">
               <CheckCircle className="w-6 h-6 text-white" />
@@ -129,8 +129,8 @@ export function ProjectDashboard({
         {/* Timeline Status */}
         <div className={`bg-gradient-to-br ${
           isOverdue
-            ? 'from-red-50 from-red-900/20 to-orange-900/20 border-red-800'
-            : 'from-purple-50 from-purple-900/20 to-indigo-900/20 border-purple-800'
+            ? 'from-red-900/20 to-orange-900/20 border-red-800'
+            : 'from-purple-900/20 to-indigo-900/20 border-purple-800'
         } border rounded-xl p-6`}>
           <div className="flex items-center justify-between mb-4">
             <div className={`p-3 rounded-lg bg-gradient-to-br ${
@@ -173,7 +173,7 @@ export function ProjectDashboard({
         </div>
 
         {/* Items Status */}
-        <div className="bg-gradient-to-br from-amber-50 from-amber-900/20 to-yellow-900/20 border border-amber-800 rounded-xl p-6">
+        <div className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border border-amber-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg">
               <BarChart3 className="w-6 h-6 text-white" />
@@ -255,7 +255,7 @@ export function ProjectDashboard({
       </div>
 
       {/* Project Details */}
-      <div className="bg-gradient-to-r from-amber-50 from-amber-900/20 to-orange-900/20 border border-amber-800 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-amber-900/20 to-orange-900/20 border border-amber-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-amber-100">
             Project Details

@@ -208,7 +208,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             <button
               type="button"
               onClick={() => setShowTemplatePicker(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-pink-50 from-pink-900/20 to-purple-900/20 border border-pink-800/50 rounded-xl text-pink-400 hover:from-pink-100 hover:from-pink-900/30 hover:to-purple-900/30 transition-all text-sm font-medium"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-pink-900/20 to-purple-900/20 border border-pink-800/50 rounded-xl text-pink-400 hover:from-pink-900/30 hover:to-purple-900/30 transition-all text-sm font-medium"
             >
               <Sparkles className="w-4 h-4" />
               Start from a template
