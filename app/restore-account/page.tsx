@@ -99,7 +99,7 @@ export default function RestoreAccountPage() {
 
   if (authLoading || checkingStatus) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
           <p className="text-gray-400">Checking account status...</p>
@@ -114,7 +114,7 @@ export default function RestoreAccountPage() {
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br from-blue-50 via-white from-gray-900 to-gray-800 flex items-center justify-center p-4 transition-all duration-700 ${
+      className={`min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4 transition-all duration-700 ${
         mounted ? 'opacity-100' : 'opacity-0'
       }`}
     >

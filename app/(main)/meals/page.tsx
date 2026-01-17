@@ -885,7 +885,7 @@ export default function MealsPage() {
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* View Toggle */}
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto">
                 <button
                     onClick={handleSetCalendarView}
                     className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium min-w-[90px] sm:min-w-[110px] ${
@@ -922,7 +922,7 @@ export default function MealsPage() {
               </div>
 
               {/* Meal Actions Toggle */}
-              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto">
+              <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto">
                 <button
                   onClick={handleOpenRecipeModal}
                   className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium min-w-[90px] sm:min-w-[110px] text-gray-300 hover:bg-orange-500 hover:text-white"
@@ -1030,7 +1030,7 @@ export default function MealsPage() {
           </CollapsibleStatsGrid>
 
           {/* Search Bar - No container box on mobile */}
-          <div className="sm:bg-gray-50 sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4">
+          <div className="sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4">
             <div className="apple-search-container meals-search">
               <Search className="apple-search-icon" />
               <input
@@ -1126,7 +1126,7 @@ export default function MealsPage() {
               /* Recipes View */
               filteredRecipes.length === 0 ? (
                 <div className="text-center py-12 max-w-lg mx-auto">
-                  <div className="bg-gradient-to-br from-orange-100 from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
                     <ChefHat className="w-12 h-12 text-orange-400" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-3">
@@ -1171,7 +1171,7 @@ export default function MealsPage() {
               <div className="w-full">
                 {/* Calendar View Mode Selector - Full Width on Mobile */}
                 <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
-                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700">
+                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
                       className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
@@ -1365,7 +1365,7 @@ export default function MealsPage() {
               /* List View */
               filteredMeals.length === 0 ? (
                 <div className="text-center py-12 max-w-lg mx-auto">
-                  <div className="bg-gradient-to-br from-orange-100 from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
                     <UtensilsCrossed className="w-12 h-12 text-orange-400" />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-3">

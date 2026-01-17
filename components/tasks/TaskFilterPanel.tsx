@@ -103,11 +103,11 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   const activeCount = getActiveFilterCount();
 
   const statusOptions = [
-    { value: 'not-started', label: 'Not Started', color: 'bg-gray-100 text-gray-700' },
-    { value: 'in-progress', label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
-    { value: 'completed', label: 'Completed', color: 'bg-green-100 text-green-700' },
-    { value: 'blocked', label: 'Blocked', color: 'bg-red-100 text-red-700' },
-    { value: 'on-hold', label: 'On Hold', color: 'bg-amber-100 text-amber-700' },
+    { value: 'not-started', label: 'Not Started', color: 'bg-gray-700 text-gray-300' },
+    { value: 'in-progress', label: 'In Progress', color: 'bg-blue-900/30 text-blue-300' },
+    { value: 'completed', label: 'Completed', color: 'bg-green-900/30 text-green-300' },
+    { value: 'blocked', label: 'Blocked', color: 'bg-red-900/30 text-red-300' },
+    { value: 'on-hold', label: 'On Hold', color: 'bg-amber-900/30 text-amber-300' },
   ];
 
   const priorityOptions = [
@@ -140,7 +140,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 e.stopPropagation();
                 clearFilters();
               }}
-              className="btn-touch px-3 py-1 text-xs text-gray-600 text-gray-400 hover:text-white transition-colors"
+              className="btn-touch px-3 py-1 text-xs text-gray-400 hover:text-white transition-colors"
             >
               Clear all
             </button>

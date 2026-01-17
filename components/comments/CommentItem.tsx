@@ -145,7 +145,7 @@ export default function CommentItem({
             <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-100 hover:bg-gray-700 hover:text-gray-300 transition-all active:scale-95 hover:shadow-md"
+                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-all active:scale-95 hover:shadow-md"
                 title="Edit"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function CommentItem({
               </button>
               <button
                 onClick={() => onPin(comment.id)}
-                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-100 hover:bg-gray-700 hover:text-gray-300 transition-all active:scale-95 hover:shadow-md"
+                className="btn-touch rounded p-1 text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-all active:scale-95 hover:shadow-md"
                 title={comment.is_pinned ? 'Unpin' : 'Pin'}
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">

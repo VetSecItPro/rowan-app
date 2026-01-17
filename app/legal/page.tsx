@@ -57,7 +57,7 @@ export default function LegalPage() {
         </div>
       </header>
 
-      <div className="bg-gradient-to-b from-white via-gray-50/50 from-black to-gray-800/20">
+      <div className="bg-gradient-to-b from-black to-gray-800/20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Link
             href="/"

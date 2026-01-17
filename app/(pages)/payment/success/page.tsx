@@ -39,7 +39,7 @@ export default function PaymentSuccessPage() {
   const periodLabel = period === 'annual' ? 'annual' : 'monthly';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 from-gray-900 to-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

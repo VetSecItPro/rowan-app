@@ -698,7 +698,7 @@ export default function GoalsPage() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* Simplified Navigation - Core tabs only */}
-              <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-100 from-indigo-900/30 to-indigo-800/30 rounded-xl border border-indigo-700 sm:min-w-[380px]">
+              <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-900/30 to-indigo-800/30 rounded-xl border border-indigo-700 sm:min-w-[380px]">
                 <Tooltip content="View and manage your goals" position="bottom">
                   <button
                     onClick={() => handleViewModeChange('goals')}

@@ -37,7 +37,7 @@ const StatusBadge = memo(function StatusBadge({ subscribed }: { subscribed: bool
       Subscribed
     </span>
   ) : (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 bg-gray-700 text-gray-400">
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-400">
       <XCircle className="w-3 h-3 mr-1" />
       Unsubscribed
     </span>
@@ -49,7 +49,7 @@ const SourceBadge = memo(function SourceBadge({ source }: { source: string }) {
     homepage: 'bg-blue-100 bg-blue-900/30 text-blue-400',
     beta: 'bg-purple-100 bg-purple-900/30 text-purple-400',
     referral: 'bg-green-100 bg-green-900/30 text-green-400',
-    direct: 'bg-gray-100 bg-gray-700 text-gray-400',
+    direct: 'bg-gray-700 text-gray-400',
   };
 
   return (

@@ -258,7 +258,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
 
       {/* Bulk Action Bar */}
       {selectionMode && selectedMealIds.size > 0 && (
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-100 from-red-900/30 to-red-900/40 border border-red-700 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-900/30 to-red-900/40 border border-red-700 rounded-lg">
           <span className="text-sm font-medium text-white">
             {selectedMealIds.size} meal{selectedMealIds.size > 1 ? 's' : ''} selected
           </span>

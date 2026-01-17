@@ -114,7 +114,7 @@ export function CountdownWidget({
   // Empty state - compact
   if (countdowns.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-4 from-gray-900 to-gray-800">
+      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-900 p-4 to-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-400">
             <Timer className="h-4 w-4" />

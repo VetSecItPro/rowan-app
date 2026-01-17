@@ -86,7 +86,7 @@ function AcceptInvitationContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full">
           <div className="animate-pulse space-y-6">
             <div className="w-16 h-16 bg-purple-700 rounded-full mx-auto" />
@@ -103,7 +103,7 @@ function AcceptInvitationContent() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-12 h-12 text-green-400" />
@@ -128,7 +128,7 @@ function AcceptInvitationContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <X className="w-12 h-12 text-red-400" />
@@ -157,7 +157,7 @@ function AcceptInvitationContent() {
 export default function AcceptInvitationPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <Loader2 className="w-16 h-16 text-purple-400 animate-spin mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">

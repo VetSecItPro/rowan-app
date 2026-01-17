@@ -34,7 +34,7 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
   const getStatusConfig = () => {
     if (isPaid) {
       return {
-        bg: 'from-green-50 from-green-900/20 to-emerald-800/20',
+        bg: 'from-green-900/20 to-emerald-800/20',
         border: 'border-green-700',
         statusBadge: 'bg-green-900/30 text-green-300 border-green-700',
         icon: Check,
@@ -45,7 +45,7 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
 
     if (isOverdue) {
       return {
-        bg: 'from-red-50 from-red-900/30 to-red-800/30',
+        bg: 'from-red-900/30 to-red-800/30',
         border: 'border-red-700',
         statusBadge: 'bg-red-900/30 text-red-300 border-red-700',
         icon: AlertCircle,
@@ -56,7 +56,7 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
 
     if (daysUntilDue <= 7) {
       return {
-        bg: 'from-yellow-50 from-yellow-900/20 to-orange-800/20',
+        bg: 'from-yellow-900/20 to-orange-800/20',
         border: 'border-yellow-700',
         statusBadge: 'bg-yellow-900/30 text-yellow-300 border-yellow-700',
         icon: Clock,
@@ -66,7 +66,7 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
     }
 
     return {
-      bg: 'from-blue-50 from-blue-900/20 to-indigo-800/20',
+      bg: 'from-blue-900/20 to-indigo-800/20',
       border: 'border-blue-700',
       statusBadge: 'bg-blue-900/30 text-blue-300 border-blue-700',
       icon: Calendar,

@@ -183,7 +183,7 @@ export default function CommentForm({
               className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
                 index === selectedMentionIndex
                   ? 'bg-blue-50 bg-blue-900/20 text-blue-400'
-                  : 'text-gray-700 text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-300 hover:bg-gray-700'
               }`}
             >
               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-medium bg-blue-900 text-blue-300">

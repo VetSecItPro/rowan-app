@@ -158,8 +158,8 @@ export const UnifiedCalendarFilters = memo(function UnifiedCalendarFilters({
             transition-colors duration-200
             ${
               allEnabled
-                ? 'bg-gray-100 text-gray-700 bg-gray-800 hover:bg-gray-700'
-                : 'bg-purple-100 text-purple-700 bg-purple-900/30 hover:bg-purple-900/50'
+                ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                : 'bg-purple-900/30 text-purple-300 hover:bg-purple-900/50'
             }
           `}
           aria-label={allEnabled ? 'Hide all item types from calendar' : 'Show all item types on calendar'}

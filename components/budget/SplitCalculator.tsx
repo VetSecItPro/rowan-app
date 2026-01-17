@@ -225,7 +225,7 @@ export function SplitCalculator({
 
       {/* Income-Based Fairness Indicator */}
       {splitType === 'income-based' && partnership?.user1_income && partnership?.user2_income && (
-        <div className="bg-gradient-to-r from-green-50 from-green-900/20 to-blue-900/20 border border-green-800 rounded-lg p-4">
+        <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-800 rounded-lg p-4">
           <h4 className="font-medium text-green-100 mb-2">
             💡 Fair Split Calculation
           </h4>

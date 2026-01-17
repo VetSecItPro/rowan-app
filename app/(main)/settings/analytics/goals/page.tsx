@@ -282,7 +282,7 @@ export default function GoalsAnalyticsPage() {
 
             {/* Activity Summary */}
             {analytics && (
-              <div className="bg-gradient-to-r from-indigo-50 from-indigo-900/20 to-purple-900/20 border border-indigo-800 rounded-xl p-6">
+              <div className="bg-gradient-to-r from-indigo-900/20 to-purple-900/20 border border-indigo-800 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Activity className="w-6 h-6 text-indigo-400" />
                   <h3 className="text-lg font-semibold text-indigo-100">

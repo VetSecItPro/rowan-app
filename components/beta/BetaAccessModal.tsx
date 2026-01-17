@@ -343,7 +343,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
               {/* Request via Email */}
               <button
                 onClick={() => setViewMode('email')}
-                className="w-full p-4 bg-gradient-to-r from-blue-50 from-blue-900/20 to-cyan-900/20 border border-blue-700 rounded-xl hover:border-blue-500 transition-all group text-left"
+                className="w-full p-4 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 border border-blue-700 rounded-xl hover:border-blue-500 transition-all group text-left"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">

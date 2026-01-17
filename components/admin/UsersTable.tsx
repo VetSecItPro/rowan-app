@@ -92,7 +92,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
         );
       case 'inactive':
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 bg-gray-900/20 text-gray-400">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-900/20 text-gray-400">
             Inactive
           </span>
         );

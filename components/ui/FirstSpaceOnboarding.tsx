@@ -10,7 +10,7 @@ interface FirstSpaceOnboardingProps {
 
 export function FirstSpaceOnboarding({ userName, onSpaceCreated, onSkip }: FirstSpaceOnboardingProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 from-gray-900 to-gray-800">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="max-w-md mx-auto text-center p-8">
         <h1 className="text-2xl font-bold text-white mb-4">
           Welcome to Rowan

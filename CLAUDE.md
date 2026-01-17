@@ -67,13 +67,37 @@ pkill -f "next" 2>/dev/null; rm -rf ".next 2" "node_modules 2" ".next 3" "node_m
 ## MCP Configuration
 
 ### Supabase MCP
-> **CRITICAL**: Project `mhqpjprmpvigmwcghpzx` - NEVER use any other project ref.
+> **CRITICAL - VERIFY BEFORE ANY DB OPERATIONS**: Always run `mcp__supabase__get_project_url` first to confirm you're connected to the correct project!
 
-**Project URL**: `https://mhqpjprmpvigmwcghpzx.supabase.co`
+| Property | Value |
+|----------|-------|
+| **Project Ref** | `mhqpjprmpvigmwcghpzx` |
+| **Project URL** | `https://mhqpjprmpvigmwcghpzx.supabase.co` |
+| **Dashboard** | https://supabase.com/dashboard/project/mhqpjprmpvigmwcghpzx |
+
+**NEVER use any other project ref. If `get_project_url` returns a different URL, STOP and reconfigure.**
 
 **Tables**: `spaces`, `space_members`, `users`, `tasks`, `events`, `reminders`, `messages`, `shopping_lists`, `shopping_items`, `recipes`, `meal_plans`, `meals`, `budgets`, `budget_categories`, `expenses`, `bills`, `chores`, `goals`, `daily_checkins`
 
-**If wrong tables appear**: Run `claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=mhqpjprmpvigmwcghpzx" --transport http --scope project`, then restart Claude Code.
+### Isolated Tables (DO NOT USE IN ROWAN)
+
+> **WARNING**: The following tables exist in this Supabase project but are **NOT part of Rowan**. Do not query, join, or reference these tables when working on Rowan features.
+
+| Table | Purpose | Access |
+|-------|---------|--------|
+| `sm_content` | Social media content tracking | Claude social media skills ONLY |
+
+**Rules for `sm_content`:**
+- ❌ NEVER create foreign keys to/from this table
+- ❌ NEVER join with Rowan tables in queries
+- ❌ NEVER reference in Rowan components or services
+- ❌ NEVER include in Rowan migrations or schema changes
+- ✅ Completely ignore when working on Rowan features
+
+**If wrong project connected**: Run this command, then restart Claude Code:
+```bash
+claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.supabase.com/mcp?project_ref=mhqpjprmpvigmwcghpzx" --transport http --scope project
+```
 
 ### Vercel MCP
 **Team**: VetSecItPro (`team_HFUTBVxI8jKYi334LvgVsVNh`) | **Project**: rowan-app (`prj_JDUhvutaUVWf0QXkBEe8axFVlWvE`)

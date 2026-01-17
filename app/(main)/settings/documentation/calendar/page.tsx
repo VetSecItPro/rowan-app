@@ -713,7 +713,7 @@ export default function CalendarDocumentationPage() {
 
               <div className="grid gap-6 mb-6">
                 {/* Day View */}
-                <div className="p-6 bg-gradient-to-r from-blue-50 from-blue-900/20 to-blue-800/20 rounded-xl border border-blue-700">
+                <div className="p-6 bg-gradient-to-r from-blue-900/20 to-blue-800/20 rounded-xl border border-blue-700">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0">
                       <CalendarDays className="w-6 h-6 text-white" />
@@ -727,7 +727,7 @@ export default function CalendarDocumentationPage() {
                 </div>
 
                 {/* Week View */}
-                <div className="p-6 bg-gradient-to-r from-green-50 from-green-900/20 to-green-800/20 rounded-xl border border-green-700">
+                <div className="p-6 bg-gradient-to-r from-green-900/20 to-green-800/20 rounded-xl border border-green-700">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-green-500 flex items-center justify-center flex-shrink-0">
                       <CalendarRange className="w-6 h-6 text-white" />
@@ -741,7 +741,7 @@ export default function CalendarDocumentationPage() {
                 </div>
 
                 {/* Month View */}
-                <div className="p-6 bg-gradient-to-r from-purple-50 from-purple-900/20 to-purple-800/20 rounded-xl border border-purple-700">
+                <div className="p-6 bg-gradient-to-r from-purple-900/20 to-purple-800/20 rounded-xl border border-purple-700">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-purple-500 flex items-center justify-center flex-shrink-0">
                       <Calendar className="w-6 h-6 text-white" />
@@ -755,7 +755,7 @@ export default function CalendarDocumentationPage() {
                 </div>
 
                 {/* Agenda View */}
-                <div className="p-6 bg-gradient-to-r from-amber-50 from-amber-900/20 to-amber-800/20 rounded-xl border border-amber-700">
+                <div className="p-6 bg-gradient-to-r from-amber-900/20 to-amber-800/20 rounded-xl border border-amber-700">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-amber-500 flex items-center justify-center flex-shrink-0">
                       <CalendarClock className="w-6 h-6 text-white" />
@@ -769,7 +769,7 @@ export default function CalendarDocumentationPage() {
                 </div>
 
                 {/* Timeline View */}
-                <div className="p-6 bg-gradient-to-r from-indigo-50 from-indigo-900/20 to-indigo-800/20 rounded-xl border border-indigo-700">
+                <div className="p-6 bg-gradient-to-r from-indigo-900/20 to-indigo-800/20 rounded-xl border border-indigo-700">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-indigo-500 flex items-center justify-center flex-shrink-0">
                       <LayoutGrid className="w-6 h-6 text-white" />
@@ -783,7 +783,7 @@ export default function CalendarDocumentationPage() {
                 </div>
 
                 {/* Proposal View */}
-                <div className="p-6 bg-gradient-to-r from-pink-50 from-pink-900/20 to-pink-800/20 rounded-xl border border-pink-700">
+                <div className="p-6 bg-gradient-to-r from-pink-900/20 to-pink-800/20 rounded-xl border border-pink-700">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-pink-500 flex items-center justify-center flex-shrink-0">
                       <Sparkles className="w-6 h-6 text-white" />
@@ -2318,7 +2318,7 @@ export default function CalendarDocumentationPage() {
               </p>
 
               <div className="grid gap-4 mb-6">
-                <div className="p-4 bg-gradient-to-r from-purple-50 from-purple-900/20 to-purple-800/20 rounded-xl border border-purple-700">
+                <div className="p-4 bg-gradient-to-r from-purple-900/20 to-purple-800/20 rounded-xl border border-purple-700">
                   <h3 className="text-lg font-semibold text-white mb-4">Navigation Shortcuts</h3>
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div className="flex items-center gap-3">
@@ -2340,7 +2340,7 @@ export default function CalendarDocumentationPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-blue-50 from-blue-900/20 to-blue-800/20 rounded-xl border border-blue-700">
+                <div className="p-4 bg-gradient-to-r from-blue-900/20 to-blue-800/20 rounded-xl border border-blue-700">
                   <h3 className="text-lg font-semibold text-white mb-4">View Mode Shortcuts</h3>
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div className="flex items-center gap-3">
@@ -2370,7 +2370,7 @@ export default function CalendarDocumentationPage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-gradient-to-r from-green-50 from-green-900/20 to-green-800/20 rounded-xl border border-green-700">
+                <div className="p-4 bg-gradient-to-r from-green-900/20 to-green-800/20 rounded-xl border border-green-700">
                   <h3 className="text-lg font-semibold text-white mb-4">Action Shortcuts</h3>
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div className="flex items-center gap-3">

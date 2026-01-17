@@ -51,7 +51,7 @@ export default function BadgesWidget({ userId, spaceId }: BadgesWidgetProps) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-amber-50 from-amber-900/20 to-yellow-900/20 border border-amber-800 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+    <div className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 border border-amber-800 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <h3 className="text-gray-300 font-medium text-xs sm:text-sm flex items-center gap-2">
           <Trophy className="w-4 h-4 text-amber-600" />

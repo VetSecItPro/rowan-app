@@ -57,7 +57,7 @@ export function WeeklyInsights({ checkIns }: WeeklyInsightsProps) {
 
   if (totalCheckIns === 0) {
     return (
-      <div className="bg-gradient-to-br from-purple-50/50 via-pink-50/50 from-purple-900/10 to-blue-900/10 rounded-xl p-6 border border-purple-500/20">
+      <div className="bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-blue-900/30 rounded-xl p-6 border border-purple-500/20">
         <div className="text-center py-8">
           <Heart className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-sm text-gray-400">No check-ins this week yet</p>
@@ -68,7 +68,7 @@ export function WeeklyInsights({ checkIns }: WeeklyInsightsProps) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-purple-50/50 via-pink-50/50 from-purple-900/10 to-blue-900/10 rounded-xl p-6 border border-purple-500/20 space-y-6">
+    <div className="bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-blue-900/30 rounded-xl p-6 border border-purple-500/20 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

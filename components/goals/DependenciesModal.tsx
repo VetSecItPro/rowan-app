@@ -363,7 +363,7 @@ export function DependenciesModal({
                       type="checkbox"
                       checked={autoUnlock}
                       onChange={(e) => setAutoUnlock(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500"
+                      className="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500"
                     />
                     <span className="text-sm text-gray-300">
                       Automatically unlock when dependency is satisfied

@@ -231,7 +231,7 @@ export default function LoginPage() {
   // Show loading state when processing auth callback (magic link, OAuth)
   if (isProcessingCallback) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 from-emerald-950 to-cyan-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-950 via-teal-950 to-cyan-950">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-white">Signing you in...</h2>

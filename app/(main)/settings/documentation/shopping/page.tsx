@@ -189,7 +189,7 @@ const guideSections: GuideSection[] = [
 
 export default function ShoppingDocumentation() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 from-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Header */}
       <div className="mb-8">
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -885,7 +885,7 @@ export default function ShoppingDocumentation() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
                 {/* Produce */}
-                <div className="p-5 bg-gradient-to-br from-emerald-50 from-emerald-900/30 to-green-900/30 rounded-xl border-2 border-emerald-800">
+                <div className="p-5 bg-gradient-to-br from-emerald-900/30 to-green-900/30 rounded-xl border-2 border-emerald-800">
                   <div className="text-4xl mb-3">🥬</div>
                   <h4 className="font-bold text-xl text-white mb-2">Produce</h4>
                   <p className="text-sm text-gray-400 mb-3">Fresh fruits, vegetables, and herbs</p>
@@ -897,7 +897,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Dairy */}
-                <div className="p-5 bg-gradient-to-br from-blue-50 from-blue-900/30 to-cyan-900/30 rounded-xl border-2 border-blue-800">
+                <div className="p-5 bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-xl border-2 border-blue-800">
                   <div className="text-4xl mb-3">🥛</div>
                   <h4 className="font-bold text-xl text-white mb-2">Dairy</h4>
                   <p className="text-sm text-gray-400 mb-3">Milk products and eggs</p>
@@ -909,7 +909,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Meat & Seafood */}
-                <div className="p-5 bg-gradient-to-br from-red-50 from-red-900/30 to-orange-900/30 rounded-xl border-2 border-red-800">
+                <div className="p-5 bg-gradient-to-br from-red-900/30 to-orange-900/30 rounded-xl border-2 border-red-800">
                   <div className="text-4xl mb-3">🥩</div>
                   <h4 className="font-bold text-xl text-white mb-2">Meat & Seafood</h4>
                   <p className="text-sm text-gray-400 mb-3">Fresh and frozen proteins</p>
@@ -922,7 +922,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Bakery */}
-                <div className="p-5 bg-gradient-to-br from-amber-50 from-amber-900/30 to-yellow-900/30 rounded-xl border-2 border-amber-800">
+                <div className="p-5 bg-gradient-to-br from-amber-900/30 to-yellow-900/30 rounded-xl border-2 border-amber-800">
                   <div className="text-4xl mb-3">🍞</div>
                   <h4 className="font-bold text-xl text-white mb-2">Bakery</h4>
                   <p className="text-sm text-gray-400 mb-3">Bread and baked goods</p>
@@ -933,7 +933,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Pantry */}
-                <div className="p-5 bg-gradient-to-br from-purple-50 from-purple-900/30 to-pink-900/30 rounded-xl border-2 border-purple-800">
+                <div className="p-5 bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl border-2 border-purple-800">
                   <div className="text-4xl mb-3">🥫</div>
                   <h4 className="font-bold text-xl text-white mb-2">Pantry</h4>
                   <p className="text-sm text-gray-400 mb-3">Shelf-stable essentials</p>
@@ -946,7 +946,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Frozen */}
-                <div className="p-5 bg-gradient-to-br from-cyan-50 from-cyan-900/30 to-blue-900/30 rounded-xl border-2 border-cyan-800">
+                <div className="p-5 bg-gradient-to-br from-cyan-900/30 to-blue-900/30 rounded-xl border-2 border-cyan-800">
                   <div className="text-4xl mb-3">🧊</div>
                   <h4 className="font-bold text-xl text-white mb-2">Frozen</h4>
                   <p className="text-sm text-gray-400 mb-3">Frozen foods and treats</p>
@@ -958,7 +958,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Beverages */}
-                <div className="p-5 bg-gradient-to-br from-indigo-50 from-indigo-900/30 to-purple-900/30 rounded-xl border-2 border-indigo-800">
+                <div className="p-5 bg-gradient-to-br from-indigo-900/30 to-purple-900/30 rounded-xl border-2 border-indigo-800">
                   <div className="text-4xl mb-3">🥤</div>
                   <h4 className="font-bold text-xl text-white mb-2">Beverages</h4>
                   <p className="text-sm text-gray-400 mb-3">Drinks and beverage supplies</p>
@@ -970,7 +970,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Snacks */}
-                <div className="p-5 bg-gradient-to-br from-pink-50 from-pink-900/30 to-rose-900/30 rounded-xl border-2 border-pink-800">
+                <div className="p-5 bg-gradient-to-br from-pink-900/30 to-rose-900/30 rounded-xl border-2 border-pink-800">
                   <div className="text-4xl mb-3">🍿</div>
                   <h4 className="font-bold text-xl text-white mb-2">Snacks</h4>
                   <p className="text-sm text-gray-400 mb-3">Snack foods and treats</p>
@@ -981,7 +981,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Personal Care */}
-                <div className="p-5 bg-gradient-to-br from-teal-50 from-teal-900/30 to-emerald-900/30 rounded-xl border-2 border-teal-800">
+                <div className="p-5 bg-gradient-to-br from-teal-900/30 to-emerald-900/30 rounded-xl border-2 border-teal-800">
                   <div className="text-4xl mb-3">🧴</div>
                   <h4 className="font-bold text-xl text-white mb-2">Personal Care</h4>
                   <p className="text-sm text-gray-400 mb-3">Health and hygiene products</p>
@@ -993,7 +993,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Household */}
-                <div className="p-5 bg-gradient-to-br from-gray-100 from-gray-800 to-slate-800 rounded-xl border-2 border-gray-700">
+                <div className="p-5 bg-gradient-to-br from-gray-800 to-slate-800 rounded-xl border-2 border-gray-700">
                   <div className="text-4xl mb-3">🧹</div>
                   <h4 className="font-bold text-xl text-white mb-2">Household</h4>
                   <p className="text-sm text-gray-400 mb-3">Cleaning and household supplies</p>
@@ -1005,7 +1005,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Other */}
-                <div className="p-5 bg-gradient-to-br from-stone-100 from-stone-800 to-zinc-800 rounded-xl border-2 border-stone-700">
+                <div className="p-5 bg-gradient-to-br from-stone-800 to-zinc-800 rounded-xl border-2 border-stone-700">
                   <div className="text-4xl mb-3">📦</div>
                   <h4 className="font-bold text-xl text-white mb-2">Other</h4>
                   <p className="text-sm text-gray-400 mb-3">Miscellaneous items</p>
@@ -1129,7 +1129,7 @@ export default function ShoppingDocumentation() {
 
               <div className="space-y-6">
                 {/* Weekly Groceries Template */}
-                <div className="bg-gradient-to-r from-emerald-50 from-emerald-900/20 to-teal-900/20 rounded-xl p-6 border-2 border-emerald-800">
+                <div className="bg-gradient-to-r from-emerald-900/20 to-teal-900/20 rounded-xl p-6 border-2 border-emerald-800">
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">🛒</div>
                     <div className="flex-1">
@@ -1153,7 +1153,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Monthly Bulk Run Template */}
-                <div className="bg-gradient-to-r from-blue-50 from-blue-900/20 to-cyan-900/20 rounded-xl p-6 border-2 border-blue-800">
+                <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl p-6 border-2 border-blue-800">
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">📦</div>
                     <div className="flex-1">
@@ -1177,7 +1177,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Party Supplies Template */}
-                <div className="bg-gradient-to-r from-purple-50 from-purple-900/20 to-pink-900/20 rounded-xl p-6 border-2 border-purple-800">
+                <div className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-xl p-6 border-2 border-purple-800">
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">🎉</div>
                     <div className="flex-1">
@@ -1201,7 +1201,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Holiday Baking Template */}
-                <div className="bg-gradient-to-r from-amber-50 from-amber-900/20 to-orange-900/20 rounded-xl p-6 border-2 border-amber-800">
+                <div className="bg-gradient-to-r from-amber-900/20 to-orange-900/20 rounded-xl p-6 border-2 border-amber-800">
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">🎄</div>
                     <div className="flex-1">
@@ -1225,7 +1225,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Breakfast Restock Template */}
-                <div className="bg-gradient-to-r from-yellow-50 from-yellow-900/20 to-amber-900/20 rounded-xl p-6 border-2 border-yellow-800">
+                <div className="bg-gradient-to-r from-yellow-900/20 to-amber-900/20 rounded-xl p-6 border-2 border-yellow-800">
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">☕</div>
                     <div className="flex-1">
@@ -1249,7 +1249,7 @@ export default function ShoppingDocumentation() {
                 </div>
 
                 {/* Meal Prep Sunday Template */}
-                <div className="bg-gradient-to-r from-green-50 from-green-900/20 to-teal-900/20 rounded-xl p-6 border-2 border-green-800">
+                <div className="bg-gradient-to-r from-green-900/20 to-teal-900/20 rounded-xl p-6 border-2 border-green-800">
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">🥗</div>
                     <div className="flex-1">
@@ -1588,7 +1588,7 @@ export default function ShoppingDocumentation() {
                   <div className="absolute -left-4 top-0 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                     1
                   </div>
-                  <div className="bg-gradient-to-r from-orange-50 from-orange-900/20 to-red-900/20 rounded-lg p-5 border-2 border-orange-800">
+                  <div className="bg-gradient-to-r from-orange-900/20 to-red-900/20 rounded-lg p-5 border-2 border-orange-800">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="text-3xl">🍳</div>
                       <h4 className="text-lg font-bold text-white">Find & Save Recipes (Meal Planning)</h4>
@@ -1612,7 +1612,7 @@ export default function ShoppingDocumentation() {
                   <div className="absolute -left-4 top-0 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                     2
                   </div>
-                  <div className="bg-gradient-to-r from-purple-50 from-purple-900/20 to-pink-900/20 rounded-lg p-5 border-2 border-purple-800">
+                  <div className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 rounded-lg p-5 border-2 border-purple-800">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="text-3xl">📅</div>
                       <h4 className="text-lg font-bold text-white">Plan Your Week (Meal Planning)</h4>
@@ -1637,7 +1637,7 @@ export default function ShoppingDocumentation() {
                   <div className="absolute -left-4 top-0 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                     3
                   </div>
-                  <div className="bg-gradient-to-r from-emerald-50 from-emerald-900/20 to-teal-900/20 rounded-lg p-5 border-2 border-emerald-800">
+                  <div className="bg-gradient-to-r from-emerald-900/20 to-teal-900/20 rounded-lg p-5 border-2 border-emerald-800">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="text-3xl">🛒</div>
                       <h4 className="text-lg font-bold text-white">Generate Shopping List (Meal Planning → Shopping)</h4>
@@ -1663,7 +1663,7 @@ export default function ShoppingDocumentation() {
                   <div className="absolute -left-4 top-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                     4
                   </div>
-                  <div className="bg-gradient-to-r from-blue-50 from-blue-900/20 to-cyan-900/20 rounded-lg p-5 border-2 border-blue-800">
+                  <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-lg p-5 border-2 border-blue-800">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="text-3xl">📆</div>
                       <h4 className="text-lg font-bold text-white">Schedule Shopping Trip (Shopping → Calendar)</h4>
@@ -1689,7 +1689,7 @@ export default function ShoppingDocumentation() {
                   <div className="absolute -left-4 top-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                     5
                   </div>
-                  <div className="bg-gradient-to-r from-indigo-50 from-indigo-900/20 to-purple-900/20 rounded-lg p-5 border-2 border-indigo-800">
+                  <div className="bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-lg p-5 border-2 border-indigo-800">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="text-3xl">✅</div>
                       <h4 className="text-lg font-bold text-white">Create Task (Shopping → Tasks)</h4>
@@ -1715,7 +1715,7 @@ export default function ShoppingDocumentation() {
                   <div className="absolute -left-4 top-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
                     6
                   </div>
-                  <div className="bg-gradient-to-r from-green-50 from-green-900/20 to-emerald-900/20 rounded-lg p-5 border-2 border-green-800">
+                  <div className="bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-lg p-5 border-2 border-green-800">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="text-3xl">🎯</div>
                       <h4 className="text-lg font-bold text-white">Complete Everything</h4>
@@ -1796,7 +1796,7 @@ export default function ShoppingDocumentation() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-50 from-purple-900/20 to-pink-900/20 border-2 border-purple-800 rounded-xl p-6">
+              <div className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border-2 border-purple-800 rounded-xl p-6">
                 <h4 className="font-semibold text-purple-100 mb-3 text-lg">✨ Why Integration Matters</h4>
                 <p className="text-purple-300 text-sm mb-4">
                   By connecting Shopping Lists with Meal Planning, Calendar, and Tasks, you create a complete household management system:

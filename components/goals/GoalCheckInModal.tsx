@@ -298,7 +298,7 @@ export function GoalCheckInModal({
             )}
 
             {voiceNoteBlob && !showVoiceRecorder && (
-              <div className="p-4 bg-gradient-to-r from-blue-50 from-blue-900/20 to-indigo-900/20 rounded-xl border border-blue-800">
+              <div className="p-4 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-xl border border-blue-800">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">

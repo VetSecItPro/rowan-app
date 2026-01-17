@@ -1,6 +1,6 @@
 export default function MagicLinkLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 from-purple-950 to-indigo-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-950 via-blue-950 to-indigo-950 p-4">
       <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
         {/* Loading spinner */}
         <div className="w-16 h-16 bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">

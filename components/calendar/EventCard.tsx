@@ -78,7 +78,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
   };
 
   return (
-    <div className="bg-gray-800 sm:bg-white/60 sm:bg-gray-800/60 sm:backdrop-blur-md border border-gray-700 sm:border-gray-200/50 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-gray-800 sm:bg-gray-800/60 sm:backdrop-blur-md border border-gray-700 sm:border-gray-200/50 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">

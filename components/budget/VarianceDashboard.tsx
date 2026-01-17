@@ -171,7 +171,7 @@ export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
 
         {/* Projected End of Month */}
         {projectedVariance && (
-          <div className="bg-gradient-to-br from-indigo-50 from-indigo-900/20 to-purple-900/20 border-2 border-indigo-800 rounded-xl p-6">
+          <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <Target className="w-5 h-5" />

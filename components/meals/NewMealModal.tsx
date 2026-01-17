@@ -279,7 +279,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                         onOpenRecipeDiscover();
                       }
                     }}
-                    className="btn-touch w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-50 from-orange-900/20 to-red-900/20 border-y border-orange-700 hover:from-orange-100 hover:from-orange-900/30 hover:to-red-900/30 transition-all group"
+                    className="btn-touch w-full px-4 py-3 flex items-center justify-between bg-gradient-to-r from-orange-900/20 to-red-900/20 border-y border-orange-700 hover:from-orange-900/30 hover:to-red-900/30 transition-all group"
                   >
                     <div className="flex items-center gap-2">
                       <ChefHat className="w-4 h-4 text-orange-400" />

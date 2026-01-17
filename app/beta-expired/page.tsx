@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function BetaExpiredPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-gray-50 from-gray-900 to-gray-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-950 p-4">
       <div className="max-w-md w-full">
         {/* Card */}
         <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 p-8">

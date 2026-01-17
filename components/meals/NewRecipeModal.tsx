@@ -340,7 +340,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
           {/* Toggle Buttons - In Content Area */}
           {!editRecipe && (
             <div className="px-4 sm:px-6 pt-4 pb-0 flex-shrink-0">
-              <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-100 from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto sm:inline-flex">
+              <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto sm:inline-flex">
                 <button
                   onClick={() => setActiveTab('manual')}
                   className={`flex-1 sm:flex-none px-2 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-colors font-medium text-xs sm:text-sm ${

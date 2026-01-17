@@ -32,7 +32,7 @@ export default function TermsPage() {
         </div>
       </header>
 
-      <div className="bg-gradient-to-b from-white via-purple-50/30 from-black to-purple-900/30">
+      <div className="bg-gradient-to-b from-black via-purple-900/30 to-purple-900/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
             href="/"
