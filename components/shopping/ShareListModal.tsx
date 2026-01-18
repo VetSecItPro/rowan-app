@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Share2, Copy, Check, Eye, EyeOff, Globe, Lock } from 'lucide-react';
+import { Share2, Copy, Check, Globe, Lock } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
+import { Modal } from '@/components/ui/Modal';
 import { copyToClipboard } from '@/lib/utils/share';
 import { logger } from '@/lib/logger';
 
@@ -85,25 +86,29 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
     }
   };
 
-  if (!isOpen || !list) return null;
+  if (!list) return null;
+
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-4 sm:px-6 py-2.5 text-gray-300 bg-gray-800 border border-gray-600 rounded-full hover:bg-gray-700 transition-colors text-sm sm:text-base"
+      >
+        Close
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-t-lg">
-          <h2 className="text-lg font-semibold text-white">
-            Share Shopping List
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-all"
-            aria-label="Close sharing modal"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-        </div>
-
-        <div className="p-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Share Shopping List"
+      maxWidth="md"
+      headerGradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
           <div className="mb-6">
             <h3 className="font-medium text-white mb-2">
               {list.title}
@@ -227,17 +232,7 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="flex gap-2 p-6 pt-0">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 text-gray-300 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
-            Close
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

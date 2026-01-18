@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, CheckCircle, XCircle, Clock, UserCheck, MessageSquare } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
 import { taskApprovalsService } from '@/lib/services/task-approvals-service';
+import { Modal } from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -159,27 +160,19 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     }
   }
 
-  if (!isOpen) return null;
-
   const pendingApprovals = approvals.filter(a => a.status === 'pending');
   const completedApprovals = approvals.filter(a => a.status !== 'pending');
   const myPendingApprovals = pendingApprovals.filter(a => a.approver_id === currentUserId);
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <div className="flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-white" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Approval Workflow</h2>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Approval Workflow"
+      maxWidth="3xl"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+    >
+      <div className="space-y-6">
           {loading ? (
             <div className="text-center py-8 text-gray-500">Loading approvals...</div>
           ) : (
@@ -342,8 +335,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
               )}
             </>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

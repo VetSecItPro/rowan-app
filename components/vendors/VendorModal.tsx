@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Star, Shield, Building2, Phone, Mail, MapPin, ExternalLink, User } from 'lucide-react';
+import { Star, Shield, Building2, Phone, Mail, MapPin, ExternalLink, User } from 'lucide-react';
 import type { Vendor, CreateVendorInput } from '@/lib/services/project-tracking-service';
-import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 // Vendor data without space_id and created_by (added by parent component)
 type VendorFormData = Omit<CreateVendorInput, 'space_id' | 'created_by'>;
@@ -143,26 +143,37 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="vendor-form"
+        disabled={saving}
+        className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full hover:from-amber-600 hover:to-orange-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {editVendor ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
+        {saving ? 'Saving...' : editVendor ? 'Update Vendor' : 'Add Vendor'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl w-full sm:max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-700 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">
-            {editVendor ? 'Edit Vendor' : 'Add New Vendor'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editVendor ? 'Edit Vendor' : 'Add New Vendor'}
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-amber-500 to-orange-500"
+      footer={footerContent}
+    >
+      <form id="vendor-form" onSubmit={handleSubmit} className="space-y-6">
           {/* General Error */}
           {errors.general && (
             <div className="bg-red-900/20 border border-red-800 rounded-lg p-4">
@@ -384,27 +395,8 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
             />
           </div>
 
-          {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
-            <SecondaryButton
-              type="button"
-              onClick={onClose}
-              feature="projects"
-            >
-              Cancel
-            </SecondaryButton>
-            <CTAButton
-              type="submit"
-              disabled={saving}
-              feature="projects"
-              icon={editVendor ? <User className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
-            >
-              {saving ? 'Saving...' : editVendor ? 'Update Vendor' : 'Add Vendor'}
-            </CTAButton>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }
 

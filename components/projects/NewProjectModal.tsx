@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, CheckCircle2, Circle, GripVertical, Target } from 'lucide-react';
+import { Plus, Trash2, CheckCircle2, Circle, Target } from 'lucide-react';
 import type { Project } from '@/lib/services/project-tracking-service';
 import type { CreateProjectInput } from '@/lib/services/projects-service';
 import { projectMilestonesService, type ProjectMilestone } from '@/lib/services/project-milestones-service';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface MilestoneItem {
   id?: string;
@@ -181,234 +182,228 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
     ? Math.round((completedCount / activeMilestones.length) * 100)
     : 0;
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-project-form"
+        disabled={loading}
+        className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full transition-all shadow-lg shadow-amber-500/25 font-medium disabled:opacity-50"
+      >
+        {loading ? 'Saving...' : editProject ? 'Save Project' : 'Create Project'}
+      </button>
+    </div>
+  );
 
   return (
-    <div onClick={onClose} className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      <div onClick={(e) => e.stopPropagation()} className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold">
-              {editProject ? 'Edit Project' : 'Create New Project'}
-            </h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all">
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editProject ? 'Edit Project' : 'Create New Project'}
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-amber-500 to-amber-600"
+      footer={footerContent}
+    >
+      <form id="new-project-form" onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
+            Project Name *
+          </label>
+          <input
+            type="text"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
+            Description
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            rows={2}
+            className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
+          />
+        </div>
+
+        <div className="relative z-50">
+          <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
+            Status
+          </label>
+          <select
+            value={formData.status}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planning' | 'in_progress' | 'completed' | 'on_hold' })}
+            className="w-full pl-1 pr-1 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white relative z-50"
+            style={{ position: 'relative', zIndex: 9999 }}
+          >
+            <option value="planning">Planning</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="on_hold">On Hold</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
+              Start Date
+            </label>
+            <input
+              type="date"
+              value={formData.start_date}
+              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
+              Target Date
+            </label>
+            <input
+              type="date"
+              value={formData.target_date}
+              onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
+            />
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
-              Project Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
+            Budget Amount
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={formData.budget_amount || ''}
+            onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
+            className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
+            placeholder="$0.00"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={2}
-              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
-            />
-          </div>
-
-          <div className="relative z-50">
-            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
-              Status
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planning' | 'in_progress' | 'completed' | 'on_hold' })}
-              className="w-full pl-1 pr-1 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white relative z-50"
-              style={{ position: 'relative', zIndex: 9999 }}
-            >
-              <option value="planning">Planning</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="on_hold">On Hold</option>
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={formData.start_date}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
-              />
+        {/* Steps Section */}
+        <div className="border-t border-gray-700 pt-4 mt-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-amber-500" />
+              <h3 className="text-sm font-semibold text-white">
+                Steps
+              </h3>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
-                Target Date
-              </label>
-              <input
-                type="date"
-                value={formData.target_date}
-                onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1 cursor-pointer">
-              Budget Amount
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.budget_amount || ''}
-              onChange={(e) => setFormData({ ...formData, budget_amount: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white"
-              placeholder="$0.00"
-            />
-          </div>
-
-          {/* Steps Section */}
-          <div className="border-t border-gray-700 pt-4 mt-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-amber-500" />
-                <h3 className="text-sm font-semibold text-white">
-                  Steps
-                </h3>
-              </div>
-              {activeMilestones.length > 0 && (
-                <span className="text-xs font-medium text-amber-400">
-                  {completedCount}/{activeMilestones.length} completed ({progressPercentage}%)
-                </span>
-              )}
-            </div>
-
-            {/* Progress bar */}
             {activeMilestones.length > 0 && (
-              <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
-                <div
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${progressPercentage}%` }}
-                />
-              </div>
+              <span className="text-xs font-medium text-amber-400">
+                {completedCount}/{activeMilestones.length} completed ({progressPercentage}%)
+              </span>
             )}
+          </div>
 
-            {/* Milestones list */}
-            {loadingMilestones ? (
-              <div className="animate-pulse space-y-2">
-                {[1, 2].map(i => (
-                  <div key={i} className="h-10 bg-gray-700 rounded-lg" />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-2 mb-3">
-                {activeMilestones.map((milestone, index) => {
-                  const actualIndex = milestones.findIndex(m => m === milestone);
-                  return (
-                    <div
-                      key={milestone.id || index}
-                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+          {/* Progress bar */}
+          {activeMilestones.length > 0 && (
+            <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
+              <div
+                className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          )}
+
+          {/* Milestones list */}
+          {loadingMilestones ? (
+            <div className="animate-pulse space-y-2">
+              {[1, 2].map(i => (
+                <div key={i} className="h-10 bg-gray-700 rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2 mb-3">
+              {activeMilestones.map((milestone, index) => {
+                const actualIndex = milestones.findIndex(m => m === milestone);
+                return (
+                  <div
+                    key={milestone.id || index}
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                      milestone.is_completed
+                        ? 'bg-green-900/20 border-green-800'
+                        : 'bg-gray-900 border-gray-700'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleToggleMilestone(actualIndex)}
+                      className="flex-shrink-0"
+                    >
+                      {milestone.is_completed ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-gray-400 hover:text-amber-500 transition-colors" />
+                      )}
+                    </button>
+                    <span
+                      className={`flex-1 text-sm ${
                         milestone.is_completed
-                          ? 'bg-green-900/20 border-green-800'
-                          : 'bg-gray-900 border-gray-700'
+                          ? 'text-gray-400 line-through'
+                          : 'text-white'
                       }`}
                     >
-                      <button
-                        type="button"
-                        onClick={() => handleToggleMilestone(actualIndex)}
-                        className="flex-shrink-0"
-                      >
-                        {milestone.is_completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-gray-400 hover:text-amber-500 transition-colors" />
-                        )}
-                      </button>
-                      <span
-                        className={`flex-1 text-sm ${
-                          milestone.is_completed
-                            ? 'text-gray-400 line-through'
-                            : 'text-white'
-                        }`}
-                      >
-                        {milestone.title}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteMilestone(actualIndex)}
-                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Add new milestone */}
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={newMilestoneTitle}
-                onChange={(e) => setNewMilestoneTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddMilestone();
-                  }
-                }}
-                placeholder="Add a step..."
-                className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900 text-white placeholder:text-gray-400"
-              />
-              <button
-                type="button"
-                onClick={handleAddMilestone}
-                disabled={!newMilestoneTitle.trim()}
-                className="p-2 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:bg-gray-700 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
-              >
-                <Plus className="w-5 h-5" />
-              </button>
+                      {milestone.title}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteMilestone(actualIndex)}
+                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
+          )}
 
-            {activeMilestones.length === 0 && (
-              <p className="text-xs text-gray-400 mt-2">
-                Break your project into steps to track progress
-              </p>
-            )}
-          </div>
-
-          <div className="flex gap-3 pt-4 border-t border-gray-700">
+          {/* Add new milestone */}
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={newMilestoneTitle}
+              onChange={(e) => setNewMilestoneTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddMilestone();
+                }
+              }}
+              placeholder="Add a step..."
+              className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900 text-white placeholder:text-gray-400"
+            />
             <button
               type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+              onClick={handleAddMilestone}
+              disabled={!newMilestoneTitle.trim()}
+              className="p-2 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-700 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-full transition-all shadow-lg shadow-amber-500/25 font-medium disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : editProject ? 'Save Project' : 'Create Project'}
+              <Plus className="w-5 h-5" />
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+
+          {activeMilestones.length === 0 && (
+            <p className="text-xs text-gray-400 mt-2">
+              Break your project into steps to track progress
+            </p>
+          )}
+        </div>
+      </form>
+    </Modal>
   );
 }

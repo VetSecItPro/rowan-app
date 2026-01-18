@@ -319,7 +319,7 @@ export default function DiscoverRecipesPage() {
 
           {/* Search Bar */}
           <div className="max-w-2xl">
-            <div className={`apple-search-container group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+            <div className={`apple-search-container recipes-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
               <input
                 type="search"

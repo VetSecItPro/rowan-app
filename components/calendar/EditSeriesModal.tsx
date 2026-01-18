@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Calendar, Edit3, Trash2, Copy, AlertTriangle } from 'lucide-react';
+import { Edit3, Trash2, AlertTriangle } from 'lucide-react';
 import { CalendarEvent, CreateEventInput, calendarService } from '@/lib/services/calendar-service';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface EditSeriesModalProps {
@@ -27,8 +28,6 @@ export function EditSeriesModal({
   const [selectedAction, setSelectedAction] = useState<EditAction>('this');
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>('');
-
-  if (!isOpen) return null;
 
   const isRecurringOccurrence = calendarService.isRecurringOccurrence(event);
   const seriesId = isRecurringOccurrence ? (event as any).series_id : event.id;
@@ -173,32 +172,42 @@ export function EditSeriesModal({
     ? ['delete-this', 'delete-future', 'delete-all']
     : ['this', 'future', 'all'];
 
-  return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-          <div className="flex items-center gap-3">
-            <Calendar className="w-6 h-6 text-purple-600" />
-            <div>
-              <h2 className="text-xl font-semibold text-white">
-                {isDeleteAction ? 'Delete Recurring Event' : 'Edit Recurring Event'}
-              </h2>
-              <p className="text-sm text-gray-400">
-                "{event.title}" is part of a recurring series
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-700 rounded-xl transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        disabled={isProcessing}
+        className="px-4 sm:px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-full transition-colors disabled:opacity-50 text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleConfirm}
+        disabled={isProcessing}
+        className={`px-4 sm:px-6 py-2.5 rounded-full font-medium transition-colors disabled:opacity-50 text-sm sm:text-base ${
+          isDeleteAction
+            ? 'bg-red-600 hover:bg-red-700 text-white'
+            : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
+        }`}
+      >
+        {isProcessing ? 'Processing...' : (isDeleteAction ? 'Delete' : 'Continue')}
+      </button>
+    </div>
+  );
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isDeleteAction ? 'Delete Recurring Event' : 'Edit Recurring Event'}
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-purple-500 to-purple-600"
+      footer={footerContent}
+    >
+      <div className="space-y-4">
+        <p className="text-sm text-gray-400">
+          "{event.title}" is part of a recurring series
+        </p>
           {isDeleteAction && (
             <div className="flex items-center gap-3 p-4 bg-red-900/20 border border-red-800 rounded-xl">
               <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
@@ -272,30 +281,7 @@ export function EditSeriesModal({
               <p className="text-sm text-red-200">{error}</p>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-gray-700">
-          <button
-            onClick={onClose}
-            disabled={isProcessing}
-            className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-xl transition-colors disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={isProcessing}
-            className={`px-6 py-2 rounded-xl font-medium transition-colors disabled:opacity-50 ${
-              isDeleteAction
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
-            }`}
-          >
-            {isProcessing ? 'Processing...' : (isDeleteAction ? 'Delete' : 'Continue')}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

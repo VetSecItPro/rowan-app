@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
       // Beta program capacity check
       (async (): Promise<HealthMetric> => {
         try {
-          const { data, error } = await supabaseAdmin
+          const { count, error } = await supabaseAdmin
             .from('beta_access_requests')
             .select('*', { count: 'exact', head: true })
             .eq('access_granted', true)
@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
 
           if (error) throw error;
 
-          const activeBetaUsers = Number(data) || 0;
+          const activeBetaUsers = count ?? 0;
           const capacity = 100; // Beta program capacity is 100 users
           const usage = Math.round((activeBetaUsers / capacity) * 100);
 
@@ -174,20 +174,20 @@ export async function GET(req: NextRequest) {
         }
       })(),
 
-      // Memory usage against Vercel function limit (1024MB default)
+      // Memory usage - show heap used (actual app memory)
       (async (): Promise<HealthMetric> => {
         try {
           const memoryUsage = process.memoryUsage();
           const heapUsedMB = Math.round(memoryUsage.heapUsed / 1024 / 1024);
-          const rssMB = Math.round(memoryUsage.rss / 1024 / 1024); // Total memory allocated
-          const VERCEL_MEMORY_LIMIT_MB = 1024; // Vercel serverless function limit
-          const usage = Math.round((rssMB / VERCEL_MEMORY_LIMIT_MB) * 100);
+          const heapTotalMB = Math.round(memoryUsage.heapTotal / 1024 / 1024);
+          const usage = Math.round((heapUsedMB / heapTotalMB) * 100);
+          const isDev = process.env.NODE_ENV === 'development';
 
           return {
             name: 'Memory Usage',
-            status: usage < 50 ? 'healthy' : usage < 80 ? 'warning' : 'critical',
+            status: usage < 70 ? 'healthy' : usage < 85 ? 'warning' : 'critical',
             value: `${usage}%`,
-            description: `${rssMB}MB / ${VERCEL_MEMORY_LIMIT_MB}MB function limit`,
+            description: `${heapUsedMB}MB / ${heapTotalMB}MB heap${isDev ? ' (dev server)' : ''}`,
             lastChecked: now,
           };
         } catch (error) {

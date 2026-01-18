@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Users, Calculator, DollarSign, Percent, TrendingUp, AlertCircle, Check } from 'lucide-react';
+import { Users, DollarSign, AlertCircle, Check } from 'lucide-react';
 import { SplitTypeSelector } from './SplitTypeSelector';
 import { SplitCalculator } from './SplitCalculator';
 import { SettlementTracker } from './SettlementTracker';
@@ -15,6 +15,7 @@ import {
   type PartnershipBalance,
 } from '@/lib/services/expense-splitting-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { Modal } from '@/components/ui/Modal';
 
 interface ExpenseSplitModalProps {
   isOpen: boolean;
@@ -168,35 +169,46 @@ export function ExpenseSplitModal({
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSave}
+        disabled={loading}
+        className="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {loading ? (
+          <>
+            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            Saving...
+          </>
+        ) : (
+          <>
+            <Check className="w-4 h-4" />
+            Save Split Settings
+          </>
+        )}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-white">
-                  Split Expense
-                </h2>
-                <p className="text-sm text-gray-400">
-                  {expense.title} • ${expense.amount.toFixed(2)}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 text-gray-400" />
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Split Expense"
+      subtitle={`${expense.title} • $${expense.amount.toFixed(2)}`}
+      maxWidth="4xl"
+      headerGradient="bg-gradient-to-r from-purple-500 to-purple-600"
+      footer={footerContent}
+    >
+      <div className="space-y-8">
             {/* Error Message */}
             {error && (
               <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 flex items-start gap-3">
@@ -309,43 +321,14 @@ export function ExpenseSplitModal({
               </>
             )}
 
-            {/* Settlement Tracker (if already split) */}
-            {expense.is_split && (
-              <SettlementTracker
-                expenseId={expense.id}
-                spaceId={currentSpace?.id || ''}
-              />
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  Save Split Settings
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        {/* Settlement Tracker (if already split) */}
+        {expense.is_split && (
+          <SettlementTracker
+            expenseId={expense.id}
+            spaceId={currentSpace?.id || ''}
+          />
+        )}
       </div>
+    </Modal>
   );
 }

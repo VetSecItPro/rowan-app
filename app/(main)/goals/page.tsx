@@ -754,9 +754,9 @@ export default function GoalsPage() {
               </div>
               <button
                 onClick={handleNewButtonClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2 sm:min-w-[150px]"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base font-medium"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>New {viewMode === 'goals' ? 'Goal' : viewMode === 'milestones' ? 'Milestone' : viewMode === 'habits' ? 'Habit' : 'Goal'}</span>
               </button>
             </div>
@@ -865,9 +865,10 @@ export default function GoalsPage() {
             )}
           </CollapsibleStatsGrid>
 
-          {/* Search Bar */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
-            <div className={`apple-search-container goals-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+          {/* Goals/Milestones List */}
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
+            {/* Search Bar - inside container */}
+            <div className={`apple-search-container goals-search group mb-4 ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
               <input
                 type="search"
@@ -891,14 +892,10 @@ export default function GoalsPage() {
                 </button>
               )}
             </div>
-          </div>
-
-          {/* Goals/Milestones List */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
             {/* Header with Month Badge and Status Filter - Hide for habits since it has custom header */}
             {viewMode !== 'habits' && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h2 className="text-lg sm:text-xl font-bold text-white">
                   {viewMode === 'goals' ? `All Goals (${filteredGoals.length})` :
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
@@ -907,6 +904,15 @@ export default function GoalsPage() {
                 <span className="px-3 py-1 bg-indigo-900/30 border border-indigo-700 text-indigo-300 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
+                {viewMode === 'goals' && (
+                  <button
+                    onClick={handleNewButtonClick}
+                    className="px-3 py-1 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all text-xs font-medium flex items-center gap-1 sm:hidden"
+                  >
+                    <Plus className="w-3 h-3" />
+                    New
+                  </button>
+                )}
               </div>
 
               {/* Filter Controls Container - Only show for goals view */}

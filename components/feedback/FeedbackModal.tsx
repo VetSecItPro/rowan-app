@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X, Upload, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Upload, AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { FeedbackType } from '@/lib/types';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -39,7 +39,6 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const { user } = useAuth();
   const { currentSpace } = useSpaces();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const modalContentRef = useRef<HTMLDivElement>(null);
 
   const [feedbackType, setFeedbackType] = useState<FeedbackType | ''>('');
   const [featureName, setFeatureName] = useState('');
@@ -49,22 +48,11 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [mounted, setMounted] = useState(false);
 
-  // Mount state for portal
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
-  // Auto-populate page URL and scroll to top
+  // Auto-populate page URL when opened
   useEffect(() => {
     if (isOpen && typeof window !== 'undefined') {
       setPageUrl(window.location.href);
-      // Scroll modal content to top when opened
-      if (modalContentRef.current) {
-        modalContentRef.current.scrollTop = 0;
-      }
     }
   }, [isOpen]);
 
@@ -185,33 +173,45 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     }
   };
 
-  if (!isOpen || !mounted) return null;
-
-  const modalContent = (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-sm overflow-hidden">
-      <div
-        ref={modalContentRef}
-        className="w-full max-h-[100dvh] sm:h-auto sm:max-h-[80vh] sm:max-w-2xl bg-gray-900 rounded-xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden my-auto"
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={isSubmitting}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-blue-600">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">Send Feedback</h2>
-            <p className="text-sm text-blue-100 mt-1">Help us improve Rowan by sharing your thoughts</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="feedback-form"
+        disabled={isSubmitting || description.trim().length < 10}
+        className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          'Submit Feedback'
+        )}
+      </button>
+    </div>
+  );
 
-        {/* Form Container - layout wrapper */}
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Send Feedback"
+      subtitle="Help us improve Rowan by sharing your thoughts"
+      maxWidth="2xl"
+      headerGradient="bg-blue-600"
+      footer={footerContent}
+    >
+      <form id="feedback-form" onSubmit={handleSubmit} className="space-y-4">
             {/* Error Message */}
             {error && (
               <div className="flex items-start gap-3 p-4 bg-red-900/20 border border-red-800 rounded-lg">
@@ -343,37 +343,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 className="hidden"
               />
             </div>
-          </div>
-
-          {/* Footer - Sticky Actions */}
-          <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-800 bg-gray-800/50 mt-auto">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="px-6 py-2 rounded-full border border-gray-700 text-gray-300 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || description.trim().length < 10}
-              className="px-6 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                'Submit Feedback'
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
-
-  return createPortal(modalContent, document.body);
 }

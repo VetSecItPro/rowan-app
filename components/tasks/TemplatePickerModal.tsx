@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-import { X, Star, Zap } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { taskTemplatesService, TaskTemplate } from '@/lib/services/task-templates-service';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface TemplatePickerModalProps {
@@ -41,24 +42,16 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
     );
   }, [templates, debouncedSearch]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-white" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Task Templates</h2>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
-          <input
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Task Templates"
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+    >
+      <div className="space-y-4">
+        <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -98,8 +91,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
               ))}
             </div>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

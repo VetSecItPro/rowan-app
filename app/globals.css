@@ -3436,312 +3436,231 @@ select:focus,
   }
 }
 
-/* Reminders Feature - Pink Brand Color Search Input */
+/* ====================================
+   UNIFIED MINIMAL SEARCH INPUTS
+   All features use underline-only style with brand colors
+   ==================================== */
+
+/* Base minimal search style - applied to all feature searches */
+.apple-search-container.tasks-search .apple-search-input,
+.apple-search-container.reminders-search .apple-search-input,
+.apple-search-container.shopping-search .apple-search-input,
+.apple-search-container.meals-search .apple-search-input,
+.apple-search-container.goals-search .apple-search-input,
+.apple-search-container.projects-search .apple-search-input,
+.apple-search-container.messages-search .apple-search-input,
+.apple-search-container.calendar-search .apple-search-input,
+.apple-search-container.recipes-search .apple-search-input {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding-left: 36px;
+  padding-right: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.dark .apple-search-container.tasks-search .apple-search-input,
+.dark .apple-search-container.reminders-search .apple-search-input,
+.dark .apple-search-container.shopping-search .apple-search-input,
+.dark .apple-search-container.meals-search .apple-search-input,
+.dark .apple-search-container.goals-search .apple-search-input,
+.dark .apple-search-container.projects-search .apple-search-input,
+.dark .apple-search-container.messages-search .apple-search-input,
+.dark .apple-search-container.calendar-search .apple-search-input,
+.dark .apple-search-container.recipes-search .apple-search-input {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Tasks Feature - Blue Brand Color */
+.apple-search-container.tasks-search .apple-search-input {
+  border-bottom: 1px solid rgba(59, 130, 246, 0.4);
+}
+.apple-search-container.tasks-search .apple-search-input:hover {
+  border-bottom-color: rgba(59, 130, 246, 0.6);
+}
+.apple-search-container.tasks-search .apple-search-input:focus {
+  border-bottom-color: rgba(59, 130, 246, 0.9);
+  outline: none;
+}
+.apple-search-container.tasks-search .apple-search-icon {
+  color: rgba(59, 130, 246, 0.6);
+}
+.apple-search-container.tasks-search .apple-search-clear:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+.apple-search-container.tasks-search .apple-search-input::placeholder {
+  color: rgba(59, 130, 246, 0.5);
+}
+
+/* Reminders Feature - Pink Brand Color */
 .apple-search-container.reminders-search .apple-search-input {
-  border-color: rgba(236, 72, 153, 0.3); /* pink-500 */
+  border-bottom: 1px solid rgba(236, 72, 153, 0.4);
 }
-
 .apple-search-container.reminders-search .apple-search-input:hover {
-  border-color: rgba(236, 72, 153, 0.5); /* pink-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(236, 72, 153, 0.1);
+  border-bottom-color: rgba(236, 72, 153, 0.6);
 }
-
 .apple-search-container.reminders-search .apple-search-input:focus {
-  border-color: rgba(236, 72, 153, 0.6); /* pink-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1), 0 4px 16px -4px rgba(236, 72, 153, 0.2);
+  border-bottom-color: rgba(236, 72, 153, 0.9);
+  outline: none;
 }
-
-.apple-search-container.reminders-search.apple-search-typing .apple-search-input {
-  border-color: rgba(236, 72, 153, 0.3); /* pink-500 */
-  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.08), 0 2px 12px -2px rgba(236, 72, 153, 0.15);
-}
-
 .apple-search-container.reminders-search .apple-search-icon {
-  color: rgba(236, 72, 153, 0.6); /* pink-500 */
+  color: rgba(236, 72, 153, 0.6);
 }
-
-.apple-search-container.reminders-search .apple-search-input:focus + .apple-search-icon,
-.apple-search-container.reminders-search .apple-search-input:focus ~ .apple-search-icon {
-  color: rgba(236, 72, 153, 0.9); /* pink-500 */
-}
-
 .apple-search-container.reminders-search .apple-search-clear:hover {
-  background: rgba(236, 72, 153, 0.2); /* pink-500 */
+  background: rgba(236, 72, 153, 0.2);
 }
-
 .apple-search-container.reminders-search .apple-search-input::placeholder {
-  color: rgba(236, 72, 153, 0.4); /* pink-500 */
+  color: rgba(236, 72, 153, 0.5);
 }
 
-.apple-search-container.reminders-search .apple-search-input:focus::placeholder {
-  color: rgba(236, 72, 153, 0.3); /* pink-500 */
-}
-
-.dark .apple-search-container.reminders-search .apple-search-input {
-  border-color: rgba(236, 72, 153, 0.2); /* pink-500 */
-}
-
-.dark .apple-search-container.reminders-search .apple-search-input:hover {
-  border-color: rgba(236, 72, 153, 0.3); /* pink-500 */
-}
-
-.dark .apple-search-container.reminders-search .apple-search-input:focus {
-  border-color: rgba(236, 72, 153, 0.5); /* pink-500 */
-}
-
-.dark .apple-search-container.reminders-search .apple-search-input::placeholder {
-  color: rgba(236, 72, 153, 0.5); /* pink-500 */
-}
-
-.dark .apple-search-container.reminders-search .apple-search-input:focus::placeholder {
-  color: rgba(236, 72, 153, 0.4); /* pink-500 */
-}
-
-/* Shopping Feature - Emerald Brand Color Search Input */
+/* Shopping Feature - Emerald Brand Color */
 .apple-search-container.shopping-search .apple-search-input {
-  border-color: rgba(16, 185, 129, 0.3); /* emerald-500 */
+  border-bottom: 1px solid rgba(16, 185, 129, 0.4);
 }
 .apple-search-container.shopping-search .apple-search-input:hover {
-  border-color: rgba(16, 185, 129, 0.5); /* emerald-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(16, 185, 129, 0.15);
+  border-bottom-color: rgba(16, 185, 129, 0.6);
 }
 .apple-search-container.shopping-search .apple-search-input:focus {
-  border-color: rgba(16, 185, 129, 0.6); /* emerald-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15), 0 4px 16px -4px rgba(16, 185, 129, 0.25);
-}
-.apple-search-container.shopping-search.apple-search-typing .apple-search-input {
-  border-color: rgba(16, 185, 129, 0.3); /* emerald-500 */
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.08), 0 2px 12px -2px rgba(16, 185, 129, 0.15);
+  border-bottom-color: rgba(16, 185, 129, 0.9);
+  outline: none;
 }
 .apple-search-container.shopping-search .apple-search-icon {
-  color: rgba(16, 185, 129, 0.6); /* emerald-500 */
-}
-.apple-search-container.shopping-search .apple-search-input:focus + .apple-search-icon,
-.apple-search-container.shopping-search .apple-search-input:focus ~ .apple-search-icon {
-  color: rgba(16, 185, 129, 0.9); /* emerald-500 */
+  color: rgba(16, 185, 129, 0.6);
 }
 .apple-search-container.shopping-search .apple-search-clear:hover {
-  background: rgba(16, 185, 129, 0.2); /* emerald-500 */
+  background: rgba(16, 185, 129, 0.2);
 }
 .apple-search-container.shopping-search .apple-search-input::placeholder {
-  color: rgba(16, 185, 129, 0.4); /* emerald-500 */
-}
-.apple-search-container.shopping-search .apple-search-input:focus::placeholder {
-  color: rgba(16, 185, 129, 0.3); /* emerald-500 */
-}
-.dark .apple-search-container.shopping-search .apple-search-input {
-  border-color: rgba(16, 185, 129, 0.2); /* emerald-500 */
-}
-.dark .apple-search-container.shopping-search .apple-search-input:hover {
-  border-color: rgba(16, 185, 129, 0.3); /* emerald-500 */
-}
-.dark .apple-search-container.shopping-search .apple-search-input:focus {
-  border-color: rgba(16, 185, 129, 0.5); /* emerald-500 */
-}
-.dark .apple-search-container.shopping-search .apple-search-input::placeholder {
-  color: rgba(16, 185, 129, 0.5); /* emerald-500 */
-}
-.dark .apple-search-container.shopping-search .apple-search-input:focus::placeholder {
-  color: rgba(16, 185, 129, 0.4); /* emerald-500 */
+  color: rgba(16, 185, 129, 0.5);
 }
 
-/* Tasks Feature - Blue Brand Color Search Input */
-.apple-search-container.tasks-search .apple-search-input {
-  border-color: rgba(59, 130, 246, 0.3); /* blue-500 */
-}
-
-.apple-search-container.tasks-search .apple-search-input:hover {
-  border-color: rgba(59, 130, 246, 0.5); /* blue-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(59, 130, 246, 0.1);
-}
-
-.apple-search-container.tasks-search .apple-search-input:focus {
-  border-color: rgba(59, 130, 246, 0.8); /* blue-500 - more prominent focus */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 4px 20px -4px rgba(59, 130, 246, 0.3);
-  outline: none;
-}
-
-.apple-search-container.tasks-search.apple-search-typing .apple-search-input {
-  border-color: rgba(59, 130, 246, 0.3); /* blue-500 */
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08), 0 2px 12px -2px rgba(59, 130, 246, 0.15);
-}
-
-.apple-search-container.tasks-search .apple-search-icon {
-  color: rgba(59, 130, 246, 0.6); /* blue-500 */
-}
-
-.apple-search-container.tasks-search .apple-search-input:focus + .apple-search-icon,
-.apple-search-container.tasks-search .apple-search-input:focus ~ .apple-search-icon {
-  color: rgba(59, 130, 246, 0.9); /* blue-500 */
-}
-
-.apple-search-container.tasks-search .apple-search-clear:hover {
-  background: rgba(59, 130, 246, 0.2); /* blue-500 */
-}
-
-.apple-search-container.tasks-search .apple-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.7); /* white with opacity */
-}
-
-.apple-search-container.tasks-search .apple-search-input:focus::placeholder {
-  color: rgba(255, 255, 255, 0.5); /* white with lower opacity when focused */
-}
-
-.dark .apple-search-container.tasks-search .apple-search-input {
-  border-color: rgba(59, 130, 246, 0.2); /* blue-500 */
-}
-
-.dark .apple-search-container.tasks-search .apple-search-input:hover {
-  border-color: rgba(59, 130, 246, 0.3); /* blue-500 */
-}
-
-.dark .apple-search-container.tasks-search .apple-search-input:focus {
-  border-color: rgba(59, 130, 246, 0.7); /* blue-500 - more prominent in dark mode */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 4px 20px -4px rgba(59, 130, 246, 0.25);
-  outline: none;
-}
-
-.dark .apple-search-container.tasks-search .apple-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6); /* white with opacity for dark mode */
-}
-
-.dark .apple-search-container.tasks-search .apple-search-input:focus::placeholder {
-  color: rgba(255, 255, 255, 0.4); /* white with lower opacity when focused in dark mode */
-}
-
-/* Goals Feature - Indigo Brand Color Search Input */
-.apple-search-container.goals-search .apple-search-input {
-  border-color: rgba(99, 102, 241, 0.3); /* indigo-500 */
-}
-
-.apple-search-container.goals-search .apple-search-input:hover {
-  border-color: rgba(99, 102, 241, 0.5); /* indigo-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(99, 102, 241, 0.1);
-}
-
-.apple-search-container.goals-search .apple-search-input:focus {
-  border-color: rgba(99, 102, 241, 0.6); /* indigo-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 16px -4px rgba(99, 102, 241, 0.2);
-}
-
-.apple-search-container.goals-search .apple-search-icon {
-  color: rgba(99, 102, 241, 0.6); /* indigo-500 */
-}
-
-.apple-search-container.goals-search .apple-search-clear:hover {
-  background: rgba(99, 102, 241, 0.2); /* indigo-500 */
-}
-
-.apple-search-container.goals-search .apple-search-input::placeholder {
-  color: rgba(99, 102, 241, 0.4); /* indigo-500 */
-}
-
-/* Projects Feature - Amber Brand Color Search Input */
-.apple-search-container.projects-search .apple-search-input {
-  border-color: rgba(245, 158, 11, 0.3); /* amber-500 */
-}
-
-.apple-search-container.projects-search .apple-search-input:hover {
-  border-color: rgba(245, 158, 11, 0.5); /* amber-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(245, 158, 11, 0.1);
-}
-
-.apple-search-container.projects-search .apple-search-input:focus {
-  border-color: rgba(245, 158, 11, 0.6); /* amber-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1), 0 4px 16px -4px rgba(245, 158, 11, 0.2);
-}
-
-.apple-search-container.projects-search .apple-search-icon {
-  color: rgba(245, 158, 11, 0.6); /* amber-500 */
-}
-
-.apple-search-container.projects-search .apple-search-clear:hover {
-  background: rgba(245, 158, 11, 0.2); /* amber-500 */
-}
-
-.apple-search-container.projects-search .apple-search-input::placeholder {
-  color: rgba(245, 158, 11, 0.4); /* amber-500 */
-}
-
-/* Meals Feature - Orange Brand Color Search Input */
+/* Meals Feature - Orange Brand Color */
 .apple-search-container.meals-search .apple-search-input {
-  border-color: rgba(249, 115, 22, 0.3); /* orange-500 */
+  border-bottom: 1px solid rgba(249, 115, 22, 0.4);
 }
-
 .apple-search-container.meals-search .apple-search-input:hover {
-  border-color: rgba(249, 115, 22, 0.5); /* orange-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(249, 115, 22, 0.1);
+  border-bottom-color: rgba(249, 115, 22, 0.6);
 }
-
 .apple-search-container.meals-search .apple-search-input:focus {
-  border-color: rgba(249, 115, 22, 0.6); /* orange-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1), 0 4px 16px -4px rgba(249, 115, 22, 0.2);
+  border-bottom-color: rgba(249, 115, 22, 0.9);
+  outline: none;
 }
-
 .apple-search-container.meals-search .apple-search-icon {
-  color: rgba(249, 115, 22, 0.6); /* orange-500 */
+  color: rgba(249, 115, 22, 0.6);
 }
-
 .apple-search-container.meals-search .apple-search-clear:hover {
-  background: rgba(249, 115, 22, 0.2); /* orange-500 */
+  background: rgba(249, 115, 22, 0.2);
 }
-
 .apple-search-container.meals-search .apple-search-input::placeholder {
-  color: rgba(249, 115, 22, 0.4); /* orange-500 */
+  color: rgba(249, 115, 22, 0.5);
 }
 
-/* Messages Feature - Green Brand Color Search Input */
+/* Goals Feature - Indigo Brand Color */
+.apple-search-container.goals-search .apple-search-input {
+  border-bottom: 1px solid rgba(99, 102, 241, 0.4);
+}
+.apple-search-container.goals-search .apple-search-input:hover {
+  border-bottom-color: rgba(99, 102, 241, 0.6);
+}
+.apple-search-container.goals-search .apple-search-input:focus {
+  border-bottom-color: rgba(99, 102, 241, 0.9);
+  outline: none;
+}
+.apple-search-container.goals-search .apple-search-icon {
+  color: rgba(99, 102, 241, 0.6);
+}
+.apple-search-container.goals-search .apple-search-clear:hover {
+  background: rgba(99, 102, 241, 0.2);
+}
+.apple-search-container.goals-search .apple-search-input::placeholder {
+  color: rgba(99, 102, 241, 0.5);
+}
+
+/* Projects Feature - Amber Brand Color */
+.apple-search-container.projects-search .apple-search-input {
+  border-bottom: 1px solid rgba(245, 158, 11, 0.4);
+}
+.apple-search-container.projects-search .apple-search-input:hover {
+  border-bottom-color: rgba(245, 158, 11, 0.6);
+}
+.apple-search-container.projects-search .apple-search-input:focus {
+  border-bottom-color: rgba(245, 158, 11, 0.9);
+  outline: none;
+}
+.apple-search-container.projects-search .apple-search-icon {
+  color: rgba(245, 158, 11, 0.6);
+}
+.apple-search-container.projects-search .apple-search-clear:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+.apple-search-container.projects-search .apple-search-input::placeholder {
+  color: rgba(245, 158, 11, 0.5);
+}
+
+/* Messages Feature - Green Brand Color */
 .apple-search-container.messages-search .apple-search-input {
-  border-color: rgba(34, 197, 94, 0.3); /* green-500 */
+  border-bottom: 1px solid rgba(34, 197, 94, 0.4);
 }
-
 .apple-search-container.messages-search .apple-search-input:hover {
-  border-color: rgba(34, 197, 94, 0.5); /* green-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(34, 197, 94, 0.1);
+  border-bottom-color: rgba(34, 197, 94, 0.6);
 }
-
 .apple-search-container.messages-search .apple-search-input:focus {
-  border-color: rgba(34, 197, 94, 0.6); /* green-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1), 0 4px 16px -4px rgba(34, 197, 94, 0.2);
+  border-bottom-color: rgba(34, 197, 94, 0.9);
+  outline: none;
 }
-
 .apple-search-container.messages-search .apple-search-icon {
-  color: rgba(34, 197, 94, 0.6); /* green-500 */
+  color: rgba(34, 197, 94, 0.6);
 }
-
 .apple-search-container.messages-search .apple-search-clear:hover {
-  background: rgba(34, 197, 94, 0.2); /* green-500 */
+  background: rgba(34, 197, 94, 0.2);
 }
-
 .apple-search-container.messages-search .apple-search-input::placeholder {
-  color: rgba(34, 197, 94, 0.4); /* green-500 */
+  color: rgba(34, 197, 94, 0.5);
 }
 
-/* Calendar Feature - Purple Brand Color Search Input */
+/* Calendar Feature - Purple Brand Color */
 .apple-search-container.calendar-search .apple-search-input {
-  border-color: rgba(168, 85, 247, 0.3); /* purple-500 */
+  border-bottom: 1px solid rgba(168, 85, 247, 0.4);
 }
-
 .apple-search-container.calendar-search .apple-search-input:hover {
-  border-color: rgba(168, 85, 247, 0.5); /* purple-500 with higher opacity */
-  box-shadow: 0 2px 12px -2px rgba(168, 85, 247, 0.1);
+  border-bottom-color: rgba(168, 85, 247, 0.6);
 }
-
 .apple-search-container.calendar-search .apple-search-input:focus {
-  border-color: rgba(168, 85, 247, 0.6); /* purple-500 - more visible focus */
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1), 0 4px 16px -4px rgba(168, 85, 247, 0.2);
+  border-bottom-color: rgba(168, 85, 247, 0.9);
+  outline: none;
 }
-
 .apple-search-container.calendar-search .apple-search-icon {
-  color: rgba(168, 85, 247, 0.6); /* purple-500 */
+  color: rgba(168, 85, 247, 0.6);
 }
-
 .apple-search-container.calendar-search .apple-search-clear:hover {
-  background: rgba(168, 85, 247, 0.2); /* purple-500 */
+  background: rgba(168, 85, 247, 0.2);
+}
+.apple-search-container.calendar-search .apple-search-input::placeholder {
+  color: rgba(168, 85, 247, 0.5);
 }
 
-.apple-search-container.calendar-search .apple-search-input::placeholder {
-  color: rgba(168, 85, 247, 0.4); /* purple-500 */
+/* Recipes Feature - Orange Brand Color */
+.apple-search-container.recipes-search .apple-search-input {
+  border-bottom: 1px solid rgba(249, 115, 22, 0.4);
+}
+.apple-search-container.recipes-search .apple-search-input:hover {
+  border-bottom-color: rgba(249, 115, 22, 0.6);
+}
+.apple-search-container.recipes-search .apple-search-input:focus {
+  border-bottom-color: rgba(249, 115, 22, 0.9);
+  outline: none;
+}
+.apple-search-container.recipes-search .apple-search-icon {
+  color: rgba(249, 115, 22, 0.6);
+}
+.apple-search-container.recipes-search .apple-search-clear:hover {
+  background: rgba(249, 115, 22, 0.2);
+}
+.apple-search-container.recipes-search .apple-search-input::placeholder {
+  color: rgba(249, 115, 22, 0.5);
 }
 
 /* ====================================

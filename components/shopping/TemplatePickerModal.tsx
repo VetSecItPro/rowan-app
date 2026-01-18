@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, FileText, ShoppingCart, Plus, Loader2, GripVertical } from 'lucide-react';
+import { FileText, ShoppingCart, Plus, Loader2, GripVertical } from 'lucide-react';
 import { shoppingService, type TemplateItemInput } from '@/lib/services/shopping-service';
+import { Modal } from '@/components/ui/Modal';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { logger } from '@/lib/logger';
 import { CreateCustomTemplateModal } from './CreateCustomTemplateModal';
@@ -90,24 +91,28 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
     loadTemplates();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-4 sm:px-6 py-2.5 border border-gray-600 text-gray-300 rounded-full hover:bg-gray-700 transition-colors font-medium text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gray-800 sm:bg-gradient-to-r sm:from-emerald-500 sm:to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-700 sm:border-emerald-600">
-          <h2 className="text-lg sm:text-xl font-bold text-white sm:text-white">Choose a Template</h2>
-          <button
-            onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-700 sm:hover:bg-emerald-600 transition-all active:scale-95"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-gray-400 sm:text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-4">
+    <>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Choose a Template"
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+      footer={footerContent}
+    >
+      <div className="space-y-4">
           {/* Templates Section */}
           {loading ? (
             <div className="text-center py-12">
@@ -857,25 +862,16 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
               </div>
             </div>
           )}
-        </div>
-
-        <div className="p-4 border-t border-gray-700">
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-2.5 border border-gray-600 text-gray-300 rounded-full hover:bg-gray-700 transition-colors font-medium"
-          >
-            Cancel
-          </button>
-        </div>
       </div>
+    </Modal>
 
-      {/* Custom Template Creation Modal */}
-      <CreateCustomTemplateModal
-        isOpen={showCustomTemplateModal}
-        onClose={() => setShowCustomTemplateModal(false)}
-        onSave={handleCustomTemplateCreated}
-        spaceId={spaceId}
-      />
-    </div>
+    {/* Custom Template Creation Modal */}
+    <CreateCustomTemplateModal
+      isOpen={showCustomTemplateModal}
+      onClose={() => setShowCustomTemplateModal(false)}
+      onSave={handleCustomTemplateCreated}
+      spaceId={spaceId}
+    />
+    </>
   );
 }

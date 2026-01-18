@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
-import { X, Link2, AlertCircle, Search, Trash2 } from 'lucide-react';
+import { AlertCircle, Search, Trash2 } from 'lucide-react';
 import { taskDependenciesService } from '@/lib/services/task-dependencies-service';
 import { createClient } from '@/lib/supabase/client';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface TaskDependency {
@@ -122,27 +123,19 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
     }
   }
 
-  if (!isOpen) return null;
-
   const blocksDependencies = dependencies.filter(d => d.dependency_type === 'blocks');
   const relatedDependencies = dependencies.filter(d => d.dependency_type === 'relates_to');
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <div className="flex items-center gap-2">
-            <Link2 className="w-5 h-5 text-white" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Task Dependencies</h2>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
-          {loading ? (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Task Dependencies"
+      maxWidth="3xl"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+    >
+      <div className="space-y-6">
+        {loading ? (
             <div className="text-center py-8 text-gray-500">Loading dependencies...</div>
           ) : (
             <>
@@ -293,8 +286,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
               )}
             </>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Lock, AlertTriangle, Shield } from 'lucide-react';
+import { AlertTriangle, Shield } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { Modal } from '@/components/ui/Modal';
 
 interface PasswordConfirmModalProps {
   isOpen: boolean;
@@ -74,80 +74,65 @@ export function PasswordConfirmModal({
     onClose();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={handleClose}
+        disabled={isVerifying}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="password-confirm-form"
+        disabled={isVerifying || !password.trim()}
+        className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        <Shield className="w-4 h-4" />
+        {isVerifying ? 'Verifying...' : confirmButtonText}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden border border-gray-700 flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-              <Lock className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-xl font-semibold text-white">{title}</h2>
-          </div>
-          <button
-            onClick={handleClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-800 flex items-center justify-center transition-colors"
-            disabled={isVerifying}
-          >
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={title}
+      maxWidth="md"
+      headerGradient="bg-orange-500"
+      footer={footerContent}
+    >
+      <form id="password-confirm-form" onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex items-start gap-3 p-4 bg-orange-900/20 border border-orange-800 rounded-lg">
+          <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-orange-200">
+            {description}
+          </p>
         </div>
 
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
-          <div className="flex items-start gap-3 p-4 bg-orange-900/20 border border-orange-800 rounded-xl">
-            <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-orange-200">
-              {description}
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-              Current Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white placeholder-gray-500"
-              placeholder="Enter your password"
-              disabled={isVerifying}
-              autoFocus
-            />
-            {error && (
-              <p className="mt-2 text-sm text-red-400">{error}</p>
-            )}
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            <SecondaryButton
-              type="button"
-              onClick={handleClose}
-              disabled={isVerifying}
-              feature="dashboard"
-              className="flex-1"
-            >
-              Cancel
-            </SecondaryButton>
-            <CTAButton
-              type="submit"
-              disabled={isVerifying || !password.trim()}
-              feature="dashboard"
-              icon={<Shield className="w-4 h-4" />}
-              className="flex-1"
-            >
-              {isVerifying ? 'Verifying...' : confirmButtonText}
-            </CTAButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+            Current Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white placeholder-gray-500"
+            placeholder="Enter your password"
+            disabled={isVerifying}
+            autoFocus
+          />
+          {error && (
+            <p className="mt-2 text-sm text-red-400">{error}</p>
+          )}
+        </div>
+      </form>
+    </Modal>
   );
 }

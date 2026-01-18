@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, Target, ChevronDown } from 'lucide-react';
+import { Smile, Target } from 'lucide-react';
 import { CreateGoalInput, Goal, GoalTemplate } from '@/lib/services/goals-service';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { Modal } from '@/components/ui/Modal';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -168,31 +169,35 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
     onClose();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-goal-form"
+        className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-full transition-all shadow-lg shadow-indigo-500/25 font-medium"
+      >
+        {editGoal ? 'Update Goal' : 'Create Goal'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-[600px] sm:rounded-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold">
-              {editGoal ? 'Edit Goal' : selectedTemplate ? `Create Goal from Template` : 'Create New Goal'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        <div className="flex-1 overflow-y-auto overscroll-contain relative">
-          <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editGoal ? 'Edit Goal' : selectedTemplate ? 'Create Goal from Template' : 'Create New Goal'}
+      maxWidth="xl"
+      headerGradient="bg-gradient-to-r from-indigo-500 to-indigo-600"
+      footer={footerContent}
+    >
+      <form id="new-goal-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
@@ -357,25 +362,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
               </p>
             </div>
           )}
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-indigo-500/25 font-medium"
-            >
-              {editGoal ? 'Update Goal' : 'Create Goal'}
-            </button>
-          </div>
-          </form>
-        </div>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

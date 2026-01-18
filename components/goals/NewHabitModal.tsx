@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Target, Calendar, Zap, ChevronDown, Plus } from 'lucide-react';
+import { Target, Plus } from 'lucide-react';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { Modal } from '@/components/ui/Modal';
 
 interface Habit {
   id: string;
@@ -128,44 +129,49 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
     onClose();
   };
 
-  if (!isOpen) return null;
-
   const selectedCategory = categoryOptions.find(opt => opt.value === formData.category);
   const selectedFrequency = frequencyOptions.find(opt => opt.value === formData.frequency_type);
 
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-habit-form"
+        className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-full transition-all shadow-lg shadow-indigo-500/25 font-medium flex items-center justify-center gap-2"
+      >
+        {editHabit ? (
+          <>
+            <Target className="w-4 h-4" />
+            Update Habit
+          </>
+        ) : (
+          <>
+            <Plus className="w-4 h-4" />
+            Create Habit
+          </>
+        )}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-
-      {/* Modal Container with Glassmorphism */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] shadow-2xl flex flex-col overflow-hidden overscroll-contain">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 backdrop-blur-md border-b border-indigo-700/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sm:rounded-t-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Target className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">
-                {editHabit ? 'Edit Habit' : 'Create New Habit'}
-              </h2>
-              <p className="text-indigo-100 text-sm">Build consistent healthy habits</p>
-            </div>
-          </div>
-
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all focus:outline-none focus:ring-4 focus:ring-white/20 sm:focus:ring-2 active:scale-95"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editHabit ? 'Edit Habit' : 'Create New Habit'}
+      subtitle="Build consistent healthy habits"
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-indigo-500 to-indigo-600"
+      footer={footerContent}
+    >
+      <form id="new-habit-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
             <label htmlFor="habit-title" className="block text-sm font-medium text-gray-300 mb-2">
@@ -244,34 +250,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl transition-all shadow-lg shadow-indigo-500/25 font-medium flex items-center gap-2"
-            >
-              {editHabit ? (
-                <>
-                  <Target className="w-4 h-4" />
-                  Update Habit
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4" />
-                  Create Habit
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

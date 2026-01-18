@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, AlertCircle, DollarSign, ChevronDown } from 'lucide-react';
+import { AlertCircle, DollarSign, ChevronDown } from 'lucide-react';
 import type { Bill, CreateBillInput, BillFrequency } from '@/lib/services/bills-service';
 import { logger } from '@/lib/logger';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/lib/validations/bills';
 import type { ZodError } from 'zod';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
+import { Modal } from '@/components/ui/Modal';
 
 interface NewBillModalProps {
   isOpen: boolean;
@@ -68,8 +69,6 @@ export function NewBillModal({
       setNotes('');
     }
   }, [editBill, isOpen]);
-
-  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,29 +131,39 @@ export function NewBillModal({
     { value: 'annual', label: 'Annual' },
   ];
 
-  return (
-    <>
-      <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[59] animate-fade-in"
+  const footerContent = (
+    <div className="flex items-center justify-end gap-3">
+      <SecondaryButton
+        type="button"
         onClick={onClose}
-      />
+        feature="projects"
+        className="!rounded-full"
+      >
+        Cancel
+      </SecondaryButton>
+      <CTAButton
+        type="submit"
+        form="new-bill-form"
+        disabled={isSaving}
+        feature="projects"
+        icon={<DollarSign className="w-4 h-4" />}
+        className="!rounded-full"
+      >
+        {isSaving ? 'Saving...' : editBill ? 'Update Bill' : 'Create Bill'}
+      </CTAButton>
+    </div>
+  );
 
-      <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-        <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl sm:max-w-4xl sm:max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
-          <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-amber-500 to-amber-600 sm:rounded-t-2xl">
-            <h2 className="text-xl font-semibold text-white">
-              {editBill ? 'Edit Bill' : 'New Bill'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editBill ? 'Edit Bill' : 'New Bill'}
+      maxWidth="4xl"
+      headerGradient="bg-gradient-to-r from-amber-500 to-amber-600"
+      footer={footerContent}
+    >
+      <form id="new-bill-form" onSubmit={handleSubmit} className="space-y-6">
             {/* General Error Banner */}
             {generalError && (
               <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 flex items-start gap-3">
@@ -368,28 +377,7 @@ export function NewBillModal({
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4">
-              <SecondaryButton
-                type="button"
-                onClick={onClose}
-                feature="projects"
-                className="!rounded-full"
-              >
-                Cancel
-              </SecondaryButton>
-              <CTAButton
-                type="submit"
-                disabled={isSaving}
-                feature="projects"
-                icon={<DollarSign className="w-4 h-4" />}
-                className="!rounded-full"
-              >
-                {isSaving ? 'Saving...' : editBill ? 'Update Bill' : 'Create Bill'}
-              </CTAButton>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
+      </form>
+    </Modal>
   );
 }

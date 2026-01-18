@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { X, Upload, Camera, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, Camera, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import { receiptsService } from '@/lib/services/receipts-service';
 import { ocrService } from '@/lib/services/ocr-service';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface ReceiptUploadModalProps {
   isOpen: boolean;
@@ -36,8 +37,6 @@ export function ReceiptUploadModal({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-
-  if (!isOpen) return null;
 
   const handleFileSelect = async (selectedFile: File) => {
     setError(null);
@@ -116,30 +115,46 @@ export function ReceiptUploadModal({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl sm:max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-            <div>
-              <h2 className="text-2xl font-bold text-white">
-                Upload Receipt
-              </h2>
-              <p className="text-gray-400 text-sm mt-1">
-                Take a photo or upload an image to extract details automatically
-              </p>
-            </div>
-            <button
-              onClick={handleClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 text-gray-400" />
-            </button>
-          </div>
+  const footerContent = file ? (
+    <div className="flex items-center justify-end gap-3">
+      <button
+        type="button"
+        onClick={handleClose}
+        className="px-6 py-2.5 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors font-medium"
+        disabled={isUploading}
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={isUploading || isProcessing}
+        className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+      >
+        {isUploading ? (
+          <>
+            <Loader className="w-4 h-4 animate-spin" />
+            Uploading...
+          </>
+        ) : (
+          'Save Receipt'
+        )}
+      </button>
+    </div>
+  ) : undefined;
 
-          <div className="flex-1 overflow-y-auto p-6">
-            {!file ? (
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Upload Receipt"
+      subtitle="Take a photo or upload an image to extract details automatically"
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-amber-500 to-amber-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
+        {!file ? (
               <div className="space-y-4">
                 {/* Upload Area */}
                 <div
@@ -322,37 +337,7 @@ export function ReceiptUploadModal({
                 </button>
               </div>
             )}
-          </div>
-
-          {/* Footer */}
-          {file && (
-            <div className="flex-shrink-0 flex items-center justify-end gap-3 p-4 sm:p-6 border-t border-gray-700">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors font-medium"
-                disabled={isUploading}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isUploading || isProcessing}
-                className="px-6 py-2.5 shimmer-projects text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader className="w-4 h-4 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  'Save Receipt'
-                )}
-              </button>
-            </div>
-          )}
-        </div>
       </div>
+    </Modal>
   );
 }

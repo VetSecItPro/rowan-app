@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip } from 'lucide-react';
+import { Smile, Image as ImageIcon, Paperclip, X } from 'lucide-react';
 import { CreateMessageInput, Message } from '@/lib/services/messages-service';
+import { Modal } from '@/components/ui/Modal';
 
 interface NewMessageModalProps {
   isOpen: boolean;
@@ -170,34 +171,93 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <h2 className="text-lg sm:text-xl font-bold text-white">
-            {editMessage ? 'Edit Message' : 'New Message'}
-          </h2>
+  const footerContent = (
+    <div className="flex items-center justify-between gap-3">
+      {/* Left side buttons */}
+      <div className="flex items-center gap-2">
+        {/* Emoji Picker Button */}
+        <div className="relative">
           <button
-            onClick={onClose}
-            className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
-            aria-label="Close modal"
+            type="button"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            title="Add emoji"
+            className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
           >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
+            <Smile className="w-5 h-5 text-gray-400" />
           </button>
+
+          {/* Emoji Picker Popup */}
+          {showEmojiPicker && (
+            <div className="absolute bottom-full mb-2 left-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-10 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
+              <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>
+              <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
+                {EMOJIS.map((emoji, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleEmojiClick(emoji)}
+                    className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-700 rounded-lg transition-colors active-press"
+                    title="Click to add emoji"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
+        {/* Image Attachment Button */}
+        <button
+          type="button"
+          onClick={() => imageInputRef.current?.click()}
+          title="Attach image"
+          className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
+        >
+          <ImageIcon className="w-5 h-5 text-gray-400" />
+        </button>
+
+        {/* File Attachment Button */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          title="Attach file"
+          className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
+        >
+          <Paperclip className="w-5 h-5 text-gray-400" />
+        </button>
+      </div>
+
+      {/* Right side buttons */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-6 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          form="new-message-form"
+          className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full hover:opacity-90 transition-all shadow-lg"
+        >
+          {editMessage ? 'Save Changes' : 'Send Message'}
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editMessage ? 'Edit Message' : 'New Message'}
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-green-500 to-emerald-600"
+      footer={footerContent}
+    >
+      <form id="new-message-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Message Content */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
@@ -265,81 +325,6 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between gap-3">
-            {/* Left side buttons */}
-            <div className="flex items-center gap-2">
-              {/* Emoji Picker Button */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  title="Add emoji"
-                  className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
-                >
-                  <Smile className="w-5 h-5 text-gray-400" />
-                </button>
-
-                {/* Emoji Picker Popup */}
-                {showEmojiPicker && (
-                  <div className="absolute bottom-full mb-2 left-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-10 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
-                    <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>
-                    <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
-                      {EMOJIS.map((emoji, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => handleEmojiClick(emoji)}
-                          className="btn-touch w-12 h-12 sm:w-10 sm:h-10 text-2xl flex items-center justify-center hover:bg-gray-700 rounded-lg transition-colors active-press"
-                          title="Click to add emoji"
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Image Attachment Button */}
-              <button
-                type="button"
-                onClick={() => imageInputRef.current?.click()}
-                title="Attach image"
-                className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
-              >
-                <ImageIcon className="w-5 h-5 text-gray-400" />
-              </button>
-
-              {/* File Attachment Button */}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                title="Attach file"
-                className="p-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors"
-              >
-                <Paperclip className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-
-            {/* Right side buttons */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
-              >
-                {editMessage ? 'Save Changes' : 'Send Message'}
-              </button>
-            </div>
-          </div>
-
           {/* Hidden File Inputs */}
           <input
             ref={imageInputRef}
@@ -357,8 +342,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
             onChange={handleFileSelect}
             className="hidden"
           />
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

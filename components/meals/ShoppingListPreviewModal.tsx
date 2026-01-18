@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, ShoppingCart, Calendar, Check, Minus, Plus, ListTodo } from 'lucide-react';
+import { ShoppingCart, Calendar, Check, Plus, ListTodo } from 'lucide-react';
 import { simplifyIngredients, SimplifiedIngredient } from '@/lib/utils/ingredient-simplifier';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { tasksService } from '@/lib/services/tasks-service';
 import { useAuth } from '@/lib/contexts/auth-context';
+import { Modal } from '@/components/ui/Modal';
 import { toast } from 'sonner';
 
 interface ShoppingListPreviewModalProps {
@@ -132,34 +133,47 @@ export function ShoppingListPreviewModal({
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        disabled={isSubmitting}
+        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors font-medium disabled:opacity-50 text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={isSubmitting || selectedCount === 0}
+        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
+        {isSubmitting ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <span className="hidden sm:inline">Creating...</span>
+          </>
+        ) : (
+          <>
+            <Plus className="w-4 h-4" />
+            <span>Add ({selectedCount})</span>
+          </>
+        )}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[80] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header - Emerald/Shopping theme */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-600 to-green-600 px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-white" />
-              <h2 className="text-lg sm:text-xl font-bold text-white">Add to Shopping List</h2>
-            </div>
-            <button
-              onClick={onClose}
-              aria-label="Close modal"
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-white/20 rounded-full transition-all active:scale-95"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-            </button>
-          </div>
-          <p className="text-emerald-100 text-sm mt-1">
-            From: {recipeName}
-          </p>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-hidden p-4 sm:p-6 flex flex-col">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Add to Shopping List - ${recipeName}`}
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-emerald-600 to-green-600"
+      footer={footerContent}
+    >
+      <div className="space-y-4">
           {/* List Name */}
           <div className="flex-shrink-0 mb-4">
             <label htmlFor="listName" className="block text-sm font-medium mb-2 text-gray-300">
@@ -268,48 +282,15 @@ export function ShoppingListPreviewModal({
                 </button>
               ))}
 
-              {simplifiedItems.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
-                  <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>No ingredients to add</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="flex-shrink-0 bg-gray-800 border-t border-gray-700 p-4 sm:p-6">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors font-medium disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={isSubmitting || selectedCount === 0}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4" />
-                  Add {selectedCount} Item{selectedCount !== 1 ? 's' : ''}
-                </>
-              )}
-            </button>
+            {simplifiedItems.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>No ingredients to add</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

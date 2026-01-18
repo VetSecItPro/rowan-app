@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { X, ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check } from 'lucide-react';
+import { Modal } from '@/components/ui/Modal';
 
 interface IngredientReviewModalProps {
   isOpen: boolean;
@@ -44,112 +45,100 @@ export function IngredientReviewModal({
     setSelectedIngredients(new Set());
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center justify-end gap-3">
+      <button
+        onClick={onClose}
+        className="px-4 sm:px-6 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleConfirm}
+        disabled={selectedIngredients.size === 0}
+        className="px-4 sm:px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm sm:text-base"
+      >
+        <ShoppingCart className="w-4 h-4" />
+        <span className="hidden sm:inline">Add {selectedIngredients.size} to List</span>
+        <span className="sm:hidden">Add ({selectedIngredients.size})</span>
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between px-4 sm:px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 sm:rounded-t-xl">
-          <div className="flex items-center gap-3">
-            <ShoppingCart className="w-6 h-6 text-white" />
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">Review Ingredients</h2>
-              <p className="text-sm text-emerald-100">{recipeName}</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-emerald-700 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Review Ingredients - ${recipeName}`}
+      maxWidth="md"
+      headerGradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+      footer={footerContent}
+    >
+      {/* Instructions */}
+      <div className="-mx-4 sm:-mx-6 -mt-4 sm:-mt-5 p-4 bg-emerald-900/20 border-b border-emerald-800">
+        <p className="text-sm text-gray-300">
+          Uncheck ingredients you already have. Only checked items will be added to your shopping list.
+        </p>
+      </div>
 
-        {/* Instructions */}
-        <div className="p-4 bg-emerald-900/20 border-b border-emerald-800">
-          <p className="text-sm text-gray-300">
-            Uncheck ingredients you already have. Only checked items will be added to your shopping list.
-          </p>
-        </div>
-
-        {/* Bulk Actions */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-gray-700">
-          <span className="text-sm font-medium text-gray-300">
-            {selectedIngredients.size} of {ingredients.length} selected
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={selectAll}
-              className="text-sm text-emerald-400 hover:underline"
-            >
-              Select All
-            </button>
-            <span className="text-gray-400">|</span>
-            <button
-              onClick={deselectAll}
-              className="text-sm text-gray-400 hover:underline"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-
-        {/* Ingredient List */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="space-y-2">
-            {ingredients.map((ingredient, index) => {
-              const isSelected = selectedIngredients.has(ingredient);
-              return (
-                <button
-                  key={index}
-                  onClick={() => toggleIngredient(ingredient)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
-                    isSelected
-                      ? 'bg-emerald-900/30 border-2 border-emerald-500'
-                      : 'bg-gray-900 border-2 border-gray-700'
-                  }`}
-                >
-                  <div
-                    className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
-                      isSelected
-                        ? 'bg-emerald-500 border-emerald-500'
-                        : 'border-gray-600'
-                    }`}
-                  >
-                    {isSelected && <Check className="w-3 h-3 text-white" />}
-                  </div>
-                  <span
-                    className={`text-left ${
-                      isSelected
-                        ? 'text-white font-medium'
-                        : 'text-gray-400'
-                    }`}
-                  >
-                    {ingredient}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
+      {/* Bulk Actions */}
+      <div className="flex items-center justify-between -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 border-b border-gray-700">
+        <span className="text-sm font-medium text-gray-300">
+          {selectedIngredients.size} of {ingredients.length} selected
+        </span>
+        <div className="flex gap-2">
           <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            onClick={selectAll}
+            className="text-sm text-emerald-400 hover:underline"
           >
-            Cancel
+            Select All
           </button>
+          <span className="text-gray-400">|</span>
           <button
-            onClick={handleConfirm}
-            disabled={selectedIngredients.size === 0}
-            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            onClick={deselectAll}
+            className="text-sm text-gray-400 hover:underline"
           >
-            <ShoppingCart className="w-4 h-4" />
-            Add {selectedIngredients.size} to Shopping List
+            Clear
           </button>
         </div>
       </div>
-    </div>
+
+      {/* Ingredient List */}
+      <div className="pt-4 space-y-2">
+        {ingredients.map((ingredient, index) => {
+          const isSelected = selectedIngredients.has(ingredient);
+          return (
+            <button
+              key={index}
+              onClick={() => toggleIngredient(ingredient)}
+              className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
+                isSelected
+                  ? 'bg-emerald-900/30 border-2 border-emerald-500'
+                  : 'bg-gray-900 border-2 border-gray-700'
+              }`}
+            >
+              <div
+                className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
+                  isSelected
+                    ? 'bg-emerald-500 border-emerald-500'
+                    : 'border-gray-600'
+                }`}
+              >
+                {isSelected && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <span
+                className={`text-left ${
+                  isSelected
+                    ? 'text-white font-medium'
+                    : 'text-gray-400'
+                }`}
+              >
+                {ingredient}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </Modal>
   );
 }

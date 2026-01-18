@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Shield, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface CCPAOptOutModalProps {
   isOpen: boolean;
@@ -95,33 +96,28 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
     onClose();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <button
+      type="button"
+      onClick={handleClose}
+      className="w-full px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      disabled={isSaving}
+    >
+      Close
+    </button>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden border border-gray-700 flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-white">CCPA Privacy Rights</h2>
-              <p className="text-sm text-gray-400">California Consumer Privacy Act</p>
-            </div>
-          </div>
-          <button
-            onClick={handleClose}
-            className="w-8 h-8 rounded-lg hover:bg-gray-800 flex items-center justify-center transition-colors"
-            disabled={isSaving}
-          >
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="CCPA Privacy Rights"
+      subtitle="California Consumer Privacy Act"
+      maxWidth="2xl"
+      headerGradient="bg-blue-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -284,7 +280,6 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

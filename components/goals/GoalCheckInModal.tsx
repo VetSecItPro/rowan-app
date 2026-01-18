@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { X, Camera, Plus, Trash2, Target } from 'lucide-react';
+import { Camera, Plus, Trash2, Target, X } from 'lucide-react';
 import { CreateCheckInInput } from '@/lib/services/goals-service';
 import { AdvancedVoiceRecorder } from './AdvancedVoiceRecorder';
 import { voiceTranscriptionService } from '@/lib/services/voice-transcription-service';
 import { PremiumButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 // Mood emoji options
 const MOOD_OPTIONS = [
@@ -140,31 +141,42 @@ export function GoalCheckInModal({
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <SecondaryButton
+        type="button"
+        onClick={onClose}
+        feature="goals"
+        className="flex-1 rounded-full"
+      >
+        Cancel
+      </SecondaryButton>
+      <PremiumButton
+        type="submit"
+        form="goal-checkin-form"
+        disabled={isSubmitting}
+        feature="goals"
+        className="flex-1 rounded-full"
+        loading={isSubmitting}
+        icon={<Target className="w-4 h-4" />}
+      >
+        {isSubmitting ? 'Saving...' : 'Save Check-In'}
+      </PremiumButton>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold">Goal Check-In</h2>
-              <p className="text-sm text-indigo-100 mt-1 truncate">{goalTitle}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Goal Check-In"
+        subtitle={goalTitle}
+        maxWidth="2xl"
+        headerGradient="bg-gradient-to-r from-indigo-500 to-indigo-600"
+        footer={footerContent}
+      >
+        <form id="goal-checkin-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Progress Slider */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
@@ -410,29 +422,8 @@ export function GoalCheckInModal({
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-700">
-            <SecondaryButton
-              type="button"
-              onClick={onClose}
-              feature="goals"
-              className="flex-1"
-            >
-              Cancel
-            </SecondaryButton>
-            <PremiumButton
-              type="submit"
-              disabled={isSubmitting}
-              feature="goals"
-              className="flex-1"
-              loading={isSubmitting}
-              icon={<Target className="w-4 h-4" />}
-            >
-              {isSubmitting ? 'Saving...' : 'Save Check-In'}
-            </PremiumButton>
-          </div>
         </form>
-      </div>
+      </Modal>
 
       <style jsx>{`
         .slider::-webkit-slider-thumb {
@@ -455,6 +446,6 @@ export function GoalCheckInModal({
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
       `}</style>
-    </div>
+    </>
   );
 }

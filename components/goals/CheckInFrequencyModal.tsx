@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Bell, Settings, Repeat } from 'lucide-react';
+import { Calendar, Clock, Bell, Settings, Repeat } from 'lucide-react';
 import { goalsService } from '@/lib/services/goals-service';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface CheckInFrequencySettings {
   frequency: 'daily' | 'weekly' | 'biweekly' | 'monthly';
@@ -186,36 +187,35 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
     });
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-4 py-3 text-gray-300 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:opacity-90 transition-all font-medium disabled:opacity-50"
+      >
+        {saving ? 'Saving...' : hasExistingSettings ? 'Update Settings' : 'Save Settings'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <Settings className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-lg sm:text-xl font-bold">Check-In Frequency</h2>
-                <p className="text-sm text-indigo-100 mt-1">{goalTitle}</p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Check-In Frequency"
+      subtitle={goalTitle}
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-indigo-600 to-purple-600"
+      footer={footerContent}
+    >
+      <div>
           {loading ? (
             <div className="space-y-6">
               {[...Array(4)].map((_, i) => (
@@ -415,25 +415,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
               </div>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-900 border-t border-gray-700 px-4 sm:px-6 py-4 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-3 text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors font-medium"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-all font-medium disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : hasExistingSettings ? 'Update Settings' : 'Save Settings'}
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

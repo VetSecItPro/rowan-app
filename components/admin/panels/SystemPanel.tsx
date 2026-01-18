@@ -1,16 +1,14 @@
 'use client';
 
 import { useState, memo } from 'react';
-import { HeartPulse, MessageSquare, Download } from 'lucide-react';
+import { HeartPulse, Download } from 'lucide-react';
 import { HealthPanel } from './HealthPanel';
-import { BetaFeedbackPanel } from './BetaFeedbackPanel';
 import { ExportPanel } from './ExportPanel';
 
-type SubTab = 'health' | 'feedback' | 'export';
+type SubTab = 'health' | 'export';
 
 const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'health', label: 'Health', icon: HeartPulse },
-  { id: 'feedback', label: 'Feedback', icon: MessageSquare },
   { id: 'export', label: 'Export', icon: Download },
 ];
 
@@ -44,7 +42,6 @@ export const SystemPanel = memo(function SystemPanel() {
       {/* Sub-tab Content */}
       <div className="flex-1 overflow-auto">
         {activeSubTab === 'health' && <HealthPanel />}
-        {activeSubTab === 'feedback' && <BetaFeedbackPanel />}
         {activeSubTab === 'export' && <ExportPanel />}
       </div>
     </div>

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Download, FileJson, FileSpreadsheet, FileText, Check, AlertCircle } from 'lucide-react';
+import { Download, FileJson, FileSpreadsheet, FileText, Check, AlertCircle } from 'lucide-react';
 import { logDataExport } from '@/lib/services/audit-log-service';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface ExportDataModalProps {
   isOpen: boolean;
@@ -109,30 +110,45 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-6 py-3 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition-colors"
+        disabled={isExporting}
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleExport}
+        className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        disabled={isExporting}
+      >
+        {isExporting ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Exporting...
+          </>
+        ) : (
+          <>
+            <Download className="w-4 h-4" />
+            Export Data
+          </>
+        )}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden border border-gray-700 flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-              <Download className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-xl font-semibold text-white">Export Your Data</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-800 flex items-center justify-center transition-colors rounded-lg"
-            disabled={isExporting}
-          >
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Export Your Data"
+      maxWidth="2xl"
+      headerGradient="bg-blue-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
           {/* Format Selection */}
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Select Format</h3>
@@ -279,36 +295,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
               <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-700">
-            <button
-              onClick={onClose}
-              className="flex-1 px-6 py-3 text-gray-300 bg-gray-800 hover:bg-gray-700 rounded-xl font-medium transition-colors"
-              disabled={isExporting}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleExport}
-              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              disabled={isExporting}
-            >
-              {isExporting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  Export Data
-                </>
-              )}
-            </button>
-          </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

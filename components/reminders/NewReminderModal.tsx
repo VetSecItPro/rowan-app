@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, Sparkles } from 'lucide-react';
+import { Smile, Sparkles } from 'lucide-react';
 import { CreateReminderInput, Reminder } from '@/lib/services/reminders-service';
 import { UserPicker } from './UserPicker';
 import { TemplatePicker } from './TemplatePicker';
@@ -9,6 +9,7 @@ import { AttachmentUploader } from './AttachmentUploader';
 import { AttachmentList } from './AttachmentList';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
 import { Dropdown } from '@/components/ui/Dropdown';
+import { Modal } from '@/components/ui/Modal';
 
 // Helper functions for dropdown options
 const getPriorityOptions = () => [
@@ -168,41 +169,52 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
     onClose();
   };
 
-  if (!isOpen) return null;
+  const getTitle = () => {
+    if (editReminder) return 'Edit Reminder';
+    if (showTemplatePicker) return 'Choose Template';
+    return 'New Reminder';
+  };
+
+  const footerContent = !showTemplatePicker ? (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-reminder-form"
+        disabled={!!dateError}
+        className={`flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-full transition-all font-medium ${
+          dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-pink-600 hover:to-pink-700'
+        }`}
+      >
+        {editReminder ? 'Save Changes' : 'Create Reminder'}
+      </button>
+    </div>
+  ) : null;
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-reminders flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <h2 className="text-lg sm:text-xl font-bold text-white">
-            {editReminder ? 'Edit Reminder' : showTemplatePicker ? 'Choose Template' : 'New Reminder'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors backdrop-blur-sm"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        {/* Template Picker or Form */}
-        {showTemplatePicker ? (
-          <TemplatePicker
-            spaceId={spaceId}
-            onSelectTemplate={handleSelectTemplate}
-            onClose={() => setShowTemplatePicker(false)}
-          />
-        ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={getTitle()}
+      maxWidth="2xl"
+      headerGradient="bg-gradient-reminders"
+      footer={footerContent}
+    >
+      {/* Template Picker or Form */}
+      {showTemplatePicker ? (
+        <TemplatePicker
+          spaceId={spaceId}
+          onSelectTemplate={handleSelectTemplate}
+          onClose={() => setShowTemplatePicker(false)}
+        />
+      ) : (
+        <form id="new-reminder-form" onSubmit={handleSubmit} className="space-y-5">
           {/* Quick Start with Template */}
           {!editReminder && (
             <button
@@ -460,28 +472,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-all font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!dateError}
-              className={`px-6 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-full transition-all shadow-lg shadow-pink-500/25 font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-pink-600 hover:to-pink-700 hover:shadow-xl hover:shadow-pink-500/30'
-              }`}
-            >
-              {editReminder ? 'Save Changes' : 'Create Reminder'}
-            </button>
-          </div>
         </form>
-        )}
-      </div>
-    </div>
+      )}
+    </Modal>
   );
 }

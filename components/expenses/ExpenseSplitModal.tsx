@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { X, Save, AlertCircle, Check } from 'lucide-react';
+import { Save, AlertCircle, Check } from 'lucide-react';
 import { SplitTypeSelector } from './SplitTypeSelector';
 import { SplitCalculator, type SplitResult } from './SplitCalculator';
 import type { SplitType } from '@/lib/validations/expense-splitting';
 import { safeValidateUpdateSplitExpense } from '@/lib/validations/expense-splitting';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface ExpenseSplitModalProps {
   isOpen: boolean;
@@ -116,38 +117,47 @@ export function ExpenseSplitModal({
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = !success ? (
+    <div className="flex gap-3">
+      <button
+        onClick={onClose}
+        disabled={saving}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSave}
+        disabled={saving || !splitResult}
+        className="flex-1 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {saving ? (
+          <>
+            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            Saving...
+          </>
+        ) : (
+          <>
+            <Save className="w-4 h-4" />
+            Save Split
+          </>
+        )}
+      </button>
+    </div>
+  ) : null;
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl shadow-2xl w-full sm:max-w-4xl sm:max-h-[90vh] overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gray-800 border-b border-gray-700 px-6 py-3 sm:py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  Split Expense
-                </h2>
-                <p className="text-sm text-gray-400 mt-1">
-                  {expenseName}
-                </p>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-lg text-gray-500 hover:bg-gray-700 transition-colors"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Success Message */}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Split Expense"
+      subtitle={expenseName}
+      maxWidth="4xl"
+      headerGradient="bg-emerald-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
+        {/* Success Message */}
             {success && (
               <div className="bg-green-900/20 border-2 border-green-600 rounded-lg p-4 flex items-center gap-3">
                 <Check className="w-6 h-6 text-green-400 flex-shrink-0" />
@@ -217,38 +227,7 @@ export function ExpenseSplitModal({
                 </div>
               </>
             )}
-          </div>
-
-          {/* Footer */}
-          {!success && (
-            <div className="flex-shrink-0 bg-gray-900 border-t border-gray-700 px-6 py-4 flex items-center justify-end gap-3">
-              <button
-                onClick={onClose}
-                disabled={saving}
-                className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving || !splitResult}
-                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all hover:shadow-lg"
-              >
-                {saving ? (
-                  <>
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    Save Split
-                  </>
-                )}
-              </button>
-            </div>
-          )}
       </div>
-    </div>
+    </Modal>
   );
 }
