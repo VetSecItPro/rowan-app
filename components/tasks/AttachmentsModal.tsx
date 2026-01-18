@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Paperclip, Upload, Download, Trash2, FileText, Image as ImageIcon } from 'lucide-react';
+import { Upload, Download, Trash2, FileText, Image as ImageIcon } from 'lucide-react';
 import { taskAttachmentsService, TaskAttachment } from '@/lib/services/task-attachments-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface AttachmentsModalProps {
@@ -111,24 +112,17 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <div className="flex items-center gap-2">
-            <Paperclip className="w-5 h-5 text-white" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Attachments</h2>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
-          {loading ? (
+    <>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Attachments"
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+    >
+      <div className="space-y-4">
+        {loading ? (
             <div className="text-center py-8 text-gray-500">Loading attachments...</div>
           ) : (
             <>
@@ -196,19 +190,19 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
               )}
             </>
           )}
-        </div>
       </div>
+    </Modal>
 
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, attachmentId: null })}
-        onConfirm={handleDeleteConfirm}
-        title="Delete Attachment"
-        message="Are you sure you want to delete this attachment? This action cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        variant="danger"
-      />
-    </div>
+    <ConfirmDialog
+      isOpen={confirmDialog.isOpen}
+      onClose={() => setConfirmDialog({ isOpen: false, attachmentId: null })}
+      onConfirm={handleDeleteConfirm}
+      title="Delete Attachment"
+      message="Are you sure you want to delete this attachment? This action cannot be undone."
+      confirmLabel="Delete"
+      cancelLabel="Cancel"
+      variant="danger"
+    />
+    </>
   );
 }

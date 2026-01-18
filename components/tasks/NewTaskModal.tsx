@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown, Repeat, Loader2 } from 'lucide-react';
+import { Smile, ChevronDown, Repeat, Loader2 } from 'lucide-react';
 import { CreateTaskInput, Task } from '@/lib/types';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 // 20 family-friendly universal emojis
@@ -196,55 +197,64 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     onClose();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-task-form"
+        disabled={!!dateError}
+        className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full transition-colors font-medium text-sm sm:text-base ${
+          dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-600 hover:to-blue-700'
+        }`}
+      >
+        {editTask ? 'Update Task' : 'Create Task'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-
-        {/* Loading Overlay for Space Creation */}
-        {spaceCreationLoading && (
-          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
-              <p className="text-sm text-gray-400">Setting up your space...</p>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editTask ? 'Edit Task' : 'Create New Task'}
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+      footer={footerContent}
+    >
+      {/* Loading Overlay for Space Creation */}
+      {spaceCreationLoading && (
+        <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
+            <p className="text-sm text-gray-400">Setting up your space...</p>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Error Message */}
-        {spaceError && !spaceCreationLoading && (
-          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
-            <div className="text-center max-w-sm mx-4">
-              <p className="text-red-400 mb-4">{spaceError}</p>
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold">
-              {editTask ? 'Edit Task' : 'Create New Task'}
-            </h2>
+      {/* Error Message */}
+      {spaceError && !spaceCreationLoading && (
+        <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+          <div className="text-center max-w-sm mx-4">
+            <p className="text-red-400 mb-4">{spaceError}</p>
             <button
               onClick={onClose}
-              className="p-1 -mr-1 hover:bg-white/20 rounded-full transition-colors"
-              aria-label="Close modal"
+              className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
             >
-              <X className="w-5 h-5" />
+              Close
             </button>
           </div>
         </div>
+      )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
+      {/* Form */}
+      <form id="new-task-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
@@ -526,27 +536,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
             )}
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!dateError}
-              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg transition-colors font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-600 hover:to-blue-700'
-              }`}
-            >
-              {editTask ? 'Update Task' : 'Create Task'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

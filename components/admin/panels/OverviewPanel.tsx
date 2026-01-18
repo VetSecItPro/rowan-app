@@ -2,12 +2,11 @@
 
 import { memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   Users,
   TrendingUp,
   Eye,
-  UserCheck,
-  DollarSign,
   Activity,
   AlertCircle,
   CheckCircle,
@@ -161,13 +160,15 @@ const QuickStat = memo(function QuickStat({
 });
 
 export const OverviewPanel = memo(function OverviewPanel() {
-  // Fetch dashboard stats
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  // Fetch dashboard stats - shares cache with main dashboard page
+  // Returns just the stats object to match the dashboard page's queryFn
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/dashboard/stats?t=${Date.now()}`);
+      const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}&refresh=true`);
       if (!response.ok) throw new Error('Failed to fetch stats');
-      return response.json();
+      const data = await response.json();
+      return data.stats; // Return just stats object, same as dashboard page
     },
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
@@ -177,7 +178,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
     queryKey: ['admin-analytics', '30d'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/analytics?range=30d');
+      const response = await adminFetch('/api/admin/analytics?range=30d');
       if (!response.ok) throw new Error('Failed to fetch analytics');
       const result = await response.json();
       return result.analytics;
@@ -197,7 +198,8 @@ export const OverviewPanel = memo(function OverviewPanel() {
     );
   }
 
-  const stats = statsData || {};
+  // Use stats directly (already extracted in queryFn), provide defaults
+  const safeStats = stats || {};
   const analytics: AnalyticsData = analyticsData || {
     summary: { totalPageViews: 0, uniqueVisitors: 0, activeBetaUsers: 0, growthRate: 0 },
     trafficMetrics: { totalPageViews: 0, uniqueSessions: 0 },
@@ -215,7 +217,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Total Users"
-            value={stats.totalUsers || 0}
+            value={safeStats.totalUsers || 0}
             trend={analytics.summary?.growthRate}
             trendLabel="vs last period"
             icon={Users}
@@ -246,10 +248,10 @@ export const OverviewPanel = memo(function OverviewPanel() {
       <div>
         <h3 className="text-sm font-semibold text-gray-300 mb-3">Growth & Acquisition</h3>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-          <QuickStat label="Beta Requests" value={stats.betaRequests || 0} />
-          <QuickStat label="Codes Sent" value={stats.codesSent || 0} />
-          <QuickStat label="Signups" value={stats.totalUsers || 0} />
-          <QuickStat label="Launch Signups" value={stats.launchSignups || 0} />
+          <QuickStat label="Beta Requests" value={safeStats.betaRequests || 0} />
+          <QuickStat label="Codes Sent" value={safeStats.codesSent || 0} />
+          <QuickStat label="Signups" value={safeStats.totalUsers || 0} />
+          <QuickStat label="Launch Signups" value={safeStats.launchSignups || 0} />
           <QuickStat label="Invite Success" value={`${analytics.betaMetrics?.approvalRate || 0}%`} />
           <QuickStat label="Unique Visitors" value={analytics.trafficMetrics?.uniqueSessions || 0} />
         </div>
@@ -263,7 +265,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
             <p className="text-purple-100 text-sm mt-1">Limited to 100 users</p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold">{stats.totalUsers || 0}/100</p>
+            <p className="text-3xl font-bold">{safeStats.betaUsers || 0}/100</p>
             <p className="text-purple-100 text-sm">slots filled</p>
           </div>
         </div>
@@ -271,36 +273,9 @@ export const OverviewPanel = memo(function OverviewPanel() {
           <div className="w-full bg-purple-400/30 rounded-full h-2">
             <div
               className="h-2 rounded-full bg-white transition-all duration-500"
-              style={{ width: `${Math.min((stats.totalUsers || 0), 100)}%` }}
+              style={{ width: `${Math.min((safeStats.betaUsers || 0), 100)}%` }}
             />
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions / What to Look At */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-300 mb-3">Quick Navigation</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
-            <TrendingUp className="w-5 h-5 text-green-500 mb-2" />
-            <p className="text-sm font-medium text-white">Growth</p>
-            <p className="text-xs text-gray-500">View acquisition funnel</p>
-          </button>
-          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
-            <Activity className="w-5 h-5 text-cyan-500 mb-2" />
-            <p className="text-sm font-medium text-white">Engagement</p>
-            <p className="text-xs text-gray-500">See user activity</p>
-          </button>
-          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
-            <UserCheck className="w-5 h-5 text-purple-500 mb-2" />
-            <p className="text-sm font-medium text-white">Retention</p>
-            <p className="text-xs text-gray-500">Check cohort data</p>
-          </button>
-          <button className="p-4 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-left">
-            <DollarSign className="w-5 h-5 text-orange-500 mb-2" />
-            <p className="text-sm font-medium text-white">Revenue</p>
-            <p className="text-xs text-gray-500">View MRR trends</p>
-          </button>
         </div>
       </div>
 

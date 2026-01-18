@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Check, FileText } from 'lucide-react';
+import { Plus, Trash2, Check, FileText } from 'lucide-react';
 import { CreateListInput, ShoppingList, shoppingService } from '@/lib/services/shopping-service';
+import { Modal } from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { Dropdown } from '@/components/ui/Dropdown';
@@ -140,21 +141,38 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     return options;
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <SecondaryButton
+        type="button"
+        onClick={onClose}
+        feature="shopping"
+        className="rounded-full px-4 sm:px-6"
+      >
+        Cancel
+      </SecondaryButton>
+      <CTAButton
+        type="submit"
+        form="new-shopping-list-form"
+        feature="shopping"
+        icon={editList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+        className="rounded-full px-4 sm:px-6"
+      >
+        {editList ? 'Save Changes' : 'Create Shopping List'}
+      </CTAButton>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-4xl lg:max-w-5xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-between px-4 sm:px-6 py-5 border-b border-emerald-600">
-          <h2 className="text-xl sm:text-2xl font-bold text-white">
-            {editList ? 'Edit Shopping List' : 'New Shopping List'}
-          </h2>
-          <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editList ? 'Edit Shopping List' : 'New Shopping List'}
+      maxWidth="4xl"
+      headerGradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+      footer={footerContent}
+    >
+      <form id="new-shopping-list-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Use Template Option - only show when creating new list */}
           {!editList && onUseTemplate && (
             <button
@@ -310,27 +328,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
             )}
           </div>
 
-          {/* Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-700">
-            <SecondaryButton
-              type="button"
-              onClick={onClose}
-              feature="shopping"
-              className="rounded-full px-6"
-            >
-              Cancel
-            </SecondaryButton>
-            <CTAButton
-              type="submit"
-              feature="shopping"
-              icon={editList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              className="rounded-full px-6"
-            >
-              {editList ? 'Save Changes' : 'Create Shopping List'}
-            </CTAButton>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

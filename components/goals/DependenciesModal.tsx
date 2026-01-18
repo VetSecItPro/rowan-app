@@ -3,23 +3,19 @@
 import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import {
-  X,
   Plus,
   Link,
   GitBranch,
-  ArrowRight,
   CheckCircle2,
   Clock,
   Shield,
   AlertTriangle,
   Trash2,
-  Settings,
-  Target,
   Zap,
   Ban,
-  Users,
-  Info
+  X
 } from 'lucide-react';
+import { Modal } from '@/components/ui/Modal';
 import {
   goalDependenciesService,
   type GoalDependency,
@@ -201,34 +197,28 @@ export function DependenciesModal({
   const getDependencyTypeConfig = (type: DependencyType) =>
     DEPENDENCY_TYPES.find(t => t.type === type) || DEPENDENCY_TYPES[0];
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Close
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/50 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-4xl w-full sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-700 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                <GitBranch className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold">Goal Dependencies</h2>
-                <p className="text-sm text-indigo-100 mt-1">{goal.title}</p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Goal Dependencies"
+      subtitle={goal.title}
+      maxWidth="4xl"
+      headerGradient="bg-gradient-to-r from-indigo-500 to-purple-600"
+      footer={footerContent}
+    >
+      <div>
           {/* Error Message */}
           {error && (
             <div className="mb-6 bg-red-900/20 border border-red-800 rounded-lg p-4">
@@ -500,8 +490,7 @@ export function DependenciesModal({
               </div>
             )}
           </div>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

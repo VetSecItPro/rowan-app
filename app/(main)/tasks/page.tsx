@@ -48,7 +48,6 @@ export default function TasksPage() {
   // Basic state
   const [loading, setLoading] = useState(true);
   const [choreLoading, setChoreLoading] = useState(false);
-  const [mobileStatsCollapsed, setMobileStatsCollapsed] = useState(true); // Collapsed by default on mobile
 
   // Individual item loading states
   const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, {
@@ -704,28 +703,10 @@ export default function TasksPage() {
           </div>
 
 
-          {/* Stats Dashboard - Collapsible on mobile */}
-          <div className="space-y-2 sm:space-y-3">
-            {/* Mobile toggle button - compact pill style */}
-            <button
-              onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
-              className="sm:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-800 border border-gray-700 rounded-full active:scale-[0.98] transition-all"
-              aria-expanded={!mobileStatsCollapsed}
-              aria-label={mobileStatsCollapsed ? 'Expand Stats Overview' : 'Collapse Stats Overview'}
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-tasks rounded-full flex items-center justify-center">
-                  <CheckSquare className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-xs font-medium text-gray-300">
-                  {stats.pending} pending • {stats.inProgress} active • {stats.completed} done
-                </span>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${mobileStatsCollapsed ? '' : 'rotate-180'}`} />
-            </button>
-
-            {/* Stats cards - hidden on mobile when collapsed, always visible on desktop */}
-            <div className={`stats-grid-mobile gap-4 sm:gap-6 ${mobileStatsCollapsed ? 'hidden sm:grid' : 'grid'}`}>
+          {/* Stats Dashboard - Hidden on mobile */}
+          <div className="hidden sm:block">
+            {/* Stats cards - only visible on desktop */}
+            <div className="stats-grid-mobile gap-4 sm:gap-6 grid">
               {/* Pending */}
               <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, memo } from 'react';
-import { X, Smile, Image as ImageIcon, Paperclip, Calendar, ChevronDown, ShoppingCart, Trash2, Timer } from 'lucide-react';
+import { Smile, Image as ImageIcon, Paperclip, Calendar, ShoppingCart, Trash2, Timer, X } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
@@ -9,6 +9,7 @@ import { shoppingIntegrationService } from '@/lib/services/shopping-integration-
 import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC, toUTC } from '@/lib/utils/timezone-utils';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface NewEventModalProps {
@@ -344,33 +345,55 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
     return options;
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+      {editEvent && onDelete && (
+        <button
+          type="button"
+          onClick={() => {
+            if (window.confirm(`Are you sure you want to delete "${editEvent.title}"? This event will be moved to trash.`)) {
+              onDelete(editEvent.id);
+              onClose();
+            }
+          }}
+          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 bg-red-900/30 text-red-300 rounded-full hover:bg-red-900/50 transition-colors font-medium text-sm sm:text-base sm:order-first"
+        >
+          <Trash2 className="w-4 h-4" />
+          Delete
+        </button>
+      )}
+      <div className="flex gap-2 sm:gap-3 sm:ml-auto">
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          form="new-event-form"
+          disabled={!!dateError || uploading}
+          className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-purple-600 text-white rounded-full transition-colors font-medium text-sm sm:text-base ${
+            dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
+          }`}
+        >
+          {uploading ? 'Saving...' : editEvent ? 'Update' : 'Create Event'}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center sm:p-4 pt-0 sm:pt-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-[600px] sm:max-w-[90vw] sm:max-h-[85vh] sm:rounded-2xl overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6" />
-              <h2 className="text-lg sm:text-xl font-bold">
-                {editEvent ? 'Edit Event' : 'Create New Event'}
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/20 transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editEvent ? 'Edit Event' : 'Create New Event'}
+      maxWidth="xl"
+      headerGradient="bg-gradient-to-r from-purple-500 to-purple-600"
+      footer={footerContent}
+    >
+      <form id="new-event-form" onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           {/* Title */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
@@ -799,45 +822,6 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-700">
-            {/* Delete button - only shown when editing, full width on mobile */}
-            {editEvent && onDelete && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.confirm(`Are you sure you want to delete "${editEvent.title}"? This event will be moved to trash.`)) {
-                    onDelete(editEvent.id);
-                    onClose();
-                  }
-                }}
-                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-900/30 text-red-300 rounded-full hover:bg-red-900/50 transition-colors font-medium"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </button>
-            )}
-            {/* Cancel and Create/Update buttons - always on one line */}
-            <div className="flex gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-3 sm:px-6 py-2.5 sm:py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={!!dateError || uploading}
-                className={`flex-1 px-3 sm:px-6 py-2.5 sm:py-3 bg-purple-600 text-white rounded-full transition-colors font-medium text-sm sm:text-base ${
-                  dateError || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-purple-700'
-                }`}
-              >
-                {uploading ? 'Saving...' : editEvent ? 'Update' : 'Create Event'}
-              </button>
-            </div>
-          </div>
-
           {/* Hidden File Inputs */}
           <input
             ref={imageInputRef}
@@ -855,8 +839,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             onChange={handleFileSelect}
             className="hidden"
           />
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 });

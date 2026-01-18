@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Clock, Calendar, Users, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Clock, Calendar, Users, CheckCircle2 } from 'lucide-react';
 import { format, addDays, parseISO } from 'date-fns';
 import { smartSchedulingService, TimeSlot, DURATION_PRESETS } from '@/lib/services/smart-scheduling-service';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface FindTimeModalProps {
@@ -73,32 +74,38 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
     return 'Fair';
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        className="px-4 sm:px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleConfirm}
+        disabled={!selectedSlot}
+        className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-full font-medium transition-all text-sm sm:text-base ${
+          selectedSlot
+            ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-lg'
+            : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+        }`}
+      >
+        Create Event
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-6 h-6" />
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold">Find Optimal Time</h2>
-              <p className="text-purple-100 text-xs sm:text-sm mt-1">AI-powered scheduling assistant</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
-            title="Close (Esc)"
-          >
-            <X className="w-5 h-5 sm:w-4 sm:h-4" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Find Optimal Time"
+      maxWidth="3xl"
+      headerGradient="bg-gradient-to-r from-purple-500 to-purple-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
           {/* Duration Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
@@ -246,29 +253,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
               </p>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="border-t border-gray-700 p-6 flex items-center justify-between gap-4">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 border-2 border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-all font-medium"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={!selectedSlot}
-            className={`px-6 py-3 rounded-lg font-medium transition-all ${
-              selectedSlot
-                ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-lg'
-                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Create Event with Selected Time
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

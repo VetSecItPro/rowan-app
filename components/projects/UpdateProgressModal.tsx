@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { Chore } from '@/lib/types';
+import { Modal } from '@/components/ui/Modal';
 
 interface UpdateProgressModalProps {
   isOpen: boolean;
@@ -35,108 +36,96 @@ export function UpdateProgressModal({
     }
   };
 
-  if (!isOpen || !chore) return null;
+  if (!chore) return null;
+
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-all font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="update-progress-form"
+        className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-full hover:opacity-90 transition-all shadow-lg font-medium"
+      >
+        Update Progress
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col border border-gray-700">
-        <div className="flex-shrink-0 bg-gray-800 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-700 sm:rounded-t-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-projects rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">
-                Update Progress
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all active:scale-95 text-gray-400"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Update Progress"
+      subtitle={chore.title}
+      maxWidth="md"
+      headerGradient="bg-gradient-to-r from-orange-500 to-amber-600"
+      footer={footerContent}
+    >
+      <form id="update-progress-form" onSubmit={handleSubmit} className="space-y-6">
+        {chore.description && (
+          <p className="text-sm text-gray-400">{chore.description}</p>
+        )}
+
+        <div>
+          <label htmlFor="completion-range" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
+            Completion Percentage: {completion}%
+          </label>
+          <input
+            id="completion-range"
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value={completion}
+            onChange={(e) => setCompletion(Number(e.target.value))}
+            className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-amber-500"
+          />
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <span>0%</span>
+            <span>25%</span>
+            <span>50%</span>
+            <span>75%</span>
+            <span>100%</span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
-          <div>
-            <h3 className="font-semibold text-white mb-2">{chore.title}</h3>
-            {chore.description && (
-              <p className="text-sm text-gray-400">{chore.description}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
-              Completion Percentage: {completion}%
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              value={completion}
-              onChange={(e) => setCompletion(Number(e.target.value))}
-              className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-purple-600"
-            />
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
-              <span>0%</span>
-              <span>25%</span>
-              <span>50%</span>
-              <span>75%</span>
-              <span>100%</span>
-            </div>
-          </div>
-
-          {/* Progress preview */}
-          <div className="bg-gray-900 rounded-lg p-4">
-            <p className="text-xs text-gray-400 mb-2">Preview</p>
-            <div className="h-3 bg-gray-600 rounded-full overflow-hidden">
-              <div
-                className={`h-full transition-all ${
-                  completion < 30
-                    ? 'bg-gradient-to-r from-red-400 to-red-500'
-                    : completion < 70
-                    ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                    : 'bg-gradient-to-r from-green-400 to-green-500'
-                }`}
-                style={{ width: `${completion}%` }}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="field-2" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
-              Notes / Remarks (Optional)
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any notes about progress, challenges, or updates..."
-              rows={4}
-              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white resize-none"
+        {/* Progress preview */}
+        <div className="bg-gray-900 rounded-lg p-4">
+          <p className="text-xs text-gray-400 mb-2">Preview</p>
+          <div className="h-3 bg-gray-600 rounded-full overflow-hidden">
+            <div
+              className={`h-full transition-all ${
+                completion < 30
+                  ? 'bg-gradient-to-r from-red-400 to-red-500'
+                  : completion < 70
+                  ? 'bg-gradient-to-r from-amber-400 to-orange-500'
+                  : 'bg-gradient-to-r from-green-400 to-green-500'
+              }`}
+              style={{ width: `${completion}%` }}
             />
           </div>
+        </div>
 
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-all font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-3 shimmer-projects text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium"
-            >
-              Update Progress
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div>
+          <label htmlFor="progress-notes" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
+            Notes / Remarks (Optional)
+          </label>
+          <textarea
+            id="progress-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Add any notes about progress, challenges, or updates..."
+            rows={4}
+            className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white resize-none"
+          />
+        </div>
+      </form>
+    </Modal>
   );
 }

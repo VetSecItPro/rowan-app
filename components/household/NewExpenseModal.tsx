@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
 import { CreateExpenseInput } from '@/lib/services/budgets-service';
 import { Expense } from '@/lib/types';
+import { Modal } from '@/components/ui/Modal';
 
 interface NewExpenseModalProps {
   isOpen: boolean;
@@ -32,40 +32,83 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     }
   }, [editExpense, spaceId]);
 
-  if (!isOpen) return null;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
+
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-expense-form"
+        className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full hover:from-amber-600 hover:to-amber-700 transition-colors font-medium"
+      >
+        {editExpense ? 'Save' : 'Create'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl shadow-2xl sm:max-w-lg overflow-hidden flex flex-col">
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-amber-500 to-amber-600 sm:rounded-t-xl">
-          <h2 className="text-xl sm:text-2xl font-bold text-white">{editExpense ? 'Edit Expense' : 'New Expense'}</h2>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-white/20 transition-all"><X className="w-5 h-5 text-white" /></button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editExpense ? 'Edit Expense' : 'New Expense'}
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-amber-500 to-amber-600"
+      footer={footerContent}
+    >
+      <form id="new-expense-form" onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Title *</label>
+          <input
+            type="text"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
+          />
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); onClose(); }} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Title *</label>
-            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Amount *</label>
-              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
-              <input type="text" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white" />
-            </div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Amount *</label>
+            <input
+              type="number"
+              required
+              step="0.01"
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Due Date</label>
-            <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white" />
+            <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <input
+              type="text"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
+            />
           </div>
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="flex-1 px-6 py-2 bg-gray-700 rounded-full">Cancel</button>
-            <button type="submit" className="flex-1 px-6 py-2 shimmer-bg text-white rounded-full">{editExpense ? 'Save' : 'Create'}</button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Due Date</label>
+          <input
+            type="date"
+            value={formData.due_date}
+            onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+            className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
+          />
+        </div>
+      </form>
+    </Modal>
   );
 }
