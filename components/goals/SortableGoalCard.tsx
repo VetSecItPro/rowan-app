@@ -23,10 +23,10 @@ interface SortableGoalCardProps {
 }
 
 const priorityConfig = {
-  p1: { label: 'P1', color: 'bg-red-500 text-white', textColor: 'text-red-400' },
-  p2: { label: 'P2', color: 'bg-orange-500 text-white', textColor: 'text-orange-400' },
-  p3: { label: 'P3', color: 'bg-yellow-500 text-white', textColor: 'text-yellow-400' },
-  p4: { label: 'P4', color: 'bg-blue-500 text-white', textColor: 'text-blue-400' },
+  p1: { label: 'P1', color: 'bg-red-500/20 text-red-400 border border-red-500/30', textColor: 'text-red-400' },
+  p2: { label: 'P2', color: 'bg-orange-500/20 text-orange-400 border border-orange-500/30', textColor: 'text-orange-400' },
+  p3: { label: 'P3', color: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30', textColor: 'text-yellow-400' },
+  p4: { label: 'P4', color: 'bg-blue-500/20 text-blue-400 border border-blue-500/30', textColor: 'text-blue-400' },
   none: { label: '', color: '', textColor: '' },
 };
 
@@ -98,19 +98,19 @@ export function SortableGoalCard({
       </div>
 
       {/* Priority and Pin Badges - top right */}
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1.5 sm:gap-2 z-10">
         {/* Pin Badge */}
         {onTogglePin && (
           <button
             onClick={handlePinClick}
-            className={`p-2 flex items-center justify-center rounded-lg transition-colors ${
+            className={`p-1.5 sm:p-2 flex items-center justify-center rounded-full transition-all ${
               goal.is_pinned
-                ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
+                : 'bg-gray-700/50 text-gray-500 hover:text-gray-300 hover:bg-gray-600/50'
             }`}
             title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
           >
-            <Pin className={`w-5 h-5 ${goal.is_pinned ? 'fill-current' : ''}`} />
+            <Pin className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${goal.is_pinned ? 'fill-current' : ''}`} />
           </button>
         )}
 
@@ -118,14 +118,14 @@ export function SortableGoalCard({
         {onPriorityChange && (
           <button
             onClick={handlePriorityClick}
-            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors ${
+            className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-full font-medium text-[10px] sm:text-xs transition-all ${
               priorityInfo.color
                 ? priorityInfo.color
-                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                : 'bg-gray-700/50 text-gray-500 hover:text-gray-300 hover:bg-gray-600/50'
             }`}
             title="Click to change priority"
           >
-            {priorityInfo.label || 'Set Priority'}
+            {priorityInfo.label || 'Priority'}
           </button>
         )}
 

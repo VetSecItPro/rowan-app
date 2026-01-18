@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ChevronDown, Smile } from 'lucide-react';
+import { Smile } from 'lucide-react';
 import { CreateExpenseInput, Expense } from '@/lib/services/budgets-service';
 import { CategorySelector } from '@/components/categories/CategorySelector';
+import { Modal } from '@/components/ui/Modal';
 
 // Expense-appropriate emojis
 const EMOJIS = ['💰', '💵', '💳', '💸', '🏦', '🛒', '🍽️', '☕', '⚡', '🏠', '🚗', '⛽', '💊', '🏥', '🎬', '🎮', '📚', '✈️', '🏨', '👕'];
@@ -63,22 +64,39 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     setShowEmojiPicker(false);
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-expense-form"
+        disabled={!!dateError}
+        className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full transition-all shadow-lg shadow-amber-500/25 font-medium ${
+          dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-amber-600 hover:to-amber-700'
+        }`}
+      >
+        {editExpense ? 'Save Expense' : 'Create Expense'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-lg sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header with amber gradient */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold">{editExpense ? 'Edit Expense' : 'Create New Expense'}</h2>
-            <button onClick={onClose} aria-label="Close modal" className="p-2 flex items-center justify-center hover:bg-white/20 rounded-full transition-all">
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        </div>
-        <form onSubmit={(e) => {
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={editExpense ? 'Edit Expense' : 'Create New Expense'}
+        maxWidth="lg"
+        headerGradient="bg-gradient-to-r from-amber-500 to-amber-600"
+        footer={footerContent}
+      >
+        <form id="new-expense-form" onSubmit={(e) => {
           e.preventDefault();
 
           // Validate due date is not in the past
@@ -210,26 +228,8 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
               </p>
             )}
           </div>
-          <div className="flex gap-3 pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!dateError}
-              className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl transition-all shadow-lg shadow-amber-500/25 font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-amber-600 hover:to-amber-700'
-              }`}
-            >
-              {editExpense ? 'Save Expense' : 'Create Expense'}
-            </button>
-          </div>
         </form>
-      </div>
+      </Modal>
       {/* Emoji Picker Portal */}
       {showEmojiPicker && emojiButtonRect && typeof document !== 'undefined' && createPortal(
         <div
@@ -256,6 +256,6 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
         </div>,
         document.body
       )}
-    </div>
+    </>
   );
 }

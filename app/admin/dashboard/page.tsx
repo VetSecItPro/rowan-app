@@ -239,14 +239,15 @@ function AdminDashboardContent() {
   const { data: stats, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
-      const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}`);
+      // Always bypass server-side Redis cache to get fresh data
+      const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}&refresh=true`);
       if (!response.ok) throw new Error('Failed to fetch stats');
       const data = await response.json();
       return data.stats as DashboardStats;
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
+    staleTime: 60 * 1000, // Reduce to 1 minute for fresher data
+    gcTime: 5 * 60 * 1000,
+    refetchInterval: 60 * 1000, // Refresh every minute
   });
 
   // Fetch recent activity data
@@ -439,7 +440,11 @@ function AdminDashboardContent() {
               System Status
             </h3>
             <button
-              onClick={() => setActiveTab('system')}
+              onClick={() => {
+                setActiveTab('system');
+                // Scroll to Management Console section
+                document.getElementById('management-console')?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="text-xs text-blue-400 hover:underline"
             >
               View Details
@@ -512,7 +517,7 @@ function AdminDashboardContent() {
         </div>
 
         {/* Row 4: Management Console (Tabbed Content Area) - Fills remaining space */}
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden flex-1 flex flex-col">
+        <div id="management-console" className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 overflow-hidden flex-1 flex flex-col">
           {/* Console Header */}
           <div className="bg-indigo-700 px-4 py-3">
             <h2 className="text-sm font-semibold text-white flex items-center gap-2">

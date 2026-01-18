@@ -1036,7 +1036,7 @@ export default function MealsPage() {
               <input
                 ref={searchInputRef}
                 type="search"
-                placeholder={viewMode === 'recipes' ? 'Search recipes... (Press / to type)' : 'Search meals... (Press / to type)'}
+                placeholder={viewMode === 'recipes' ? 'Search recipes...' : 'Search meals...'}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className={`apple-search-input w-full ${isSearchTyping ? 'typing' : ''}`}
@@ -1169,12 +1169,12 @@ export default function MealsPage() {
             ) : viewMode === 'calendar' ? (
               /* Calendar View */
               <div className="w-full">
-                {/* Calendar View Mode Selector - Full Width on Mobile */}
-                <div className="flex items-center justify-center mb-6 px-2 sm:px-0">
-                  <div className="flex items-center w-full sm:w-auto sm:inline-flex gap-1 p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700">
+                {/* Calendar View Mode Selector - Pill-shaped on Mobile */}
+                <div className="flex items-center justify-center mb-3 sm:mb-6 px-2 sm:px-0">
+                  <div className="flex items-center w-auto inline-flex gap-0.5 sm:gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-full sm:rounded-xl border border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
-                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'week'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-300 hover:bg-orange-900/50'
@@ -1185,7 +1185,7 @@ export default function MealsPage() {
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('2weeks')}
-                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === '2weeks'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-300 hover:bg-orange-900/50'
@@ -1196,7 +1196,7 @@ export default function MealsPage() {
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('month')}
-                      className={`flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
                         calendarViewMode === 'month'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-300 hover:bg-orange-900/50'

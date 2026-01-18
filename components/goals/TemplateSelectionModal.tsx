@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-import { X, Search, TrendingUp, ChevronRight } from 'lucide-react';
+import { Search, TrendingUp, ChevronRight } from 'lucide-react';
 import { GoalTemplate } from '@/lib/services/goals-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { logger } from '@/lib/logger';
+import { Modal } from '@/components/ui/Modal';
 
 interface TemplateSelectionModalProps {
   isOpen: boolean;
@@ -190,30 +191,39 @@ export function TemplateSelectionModal({
     return category.charAt(0).toUpperCase() + category.slice(1);
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:justify-between">
+      <button
+        onClick={onClose}
+        title="Close without selecting a template"
+        className="flex-1 sm:flex-none px-6 py-3 bg-gray-700 text-gray-300 rounded-full font-medium hover:bg-gray-600 transition-colors"
+      >
+        Cancel
+      </button>
+      {onCreateFromScratch && (
+        <button
+          onClick={onCreateFromScratch}
+          title="Start with a blank goal instead of using a template"
+          className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-full font-medium transition-all shadow-lg shadow-indigo-500/25"
+        >
+          Create from Scratch
+        </button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70">
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto sm:max-w-6xl sm:max-h-[90vh] bg-gray-900 border border-gray-700 sm:rounded-xl shadow-xl overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 bg-gradient-to-r from-indigo-500 to-indigo-600 sm:rounded-t-xl">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Choose a Goal Template</h2>
-            <p className="text-sm text-indigo-100 mt-1">
-              Start with a pre-built template or create from scratch
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="p-6 pb-4">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Choose a Goal Template"
+      subtitle="Start with a pre-built template or create from scratch"
+      maxWidth="6xl"
+      headerGradient="bg-gradient-to-r from-indigo-500 to-indigo-600"
+      footer={footerContent}
+    >
+      {/* Search Bar */}
+      <div className="mb-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -226,8 +236,8 @@ export function TemplateSelectionModal({
           </div>
         </div>
 
-        {/* Category Tabs */}
-        <div className="px-6 pb-4">
+      {/* Category Tabs */}
+      <div className="mb-4">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setSelectedCategory(null)}
@@ -257,8 +267,8 @@ export function TemplateSelectionModal({
           </div>
         </div>
 
-        {/* Template Grid */}
-        <div className="flex-1 overflow-y-auto p-6 pt-2">
+      {/* Template Grid */}
+      <div className="pt-2">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
@@ -322,30 +332,7 @@ export function TemplateSelectionModal({
               ))}
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 sm:p-6 border-t border-gray-700 bg-gray-800">
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:justify-between">
-            <button
-              onClick={onClose}
-              title="Close without selecting a template"
-              className="flex-1 sm:flex-none px-6 py-3 bg-gray-700 text-gray-300 rounded-xl font-medium hover:bg-gray-600 transition-colors"
-            >
-              Cancel
-            </button>
-            {onCreateFromScratch && (
-              <button
-                onClick={onCreateFromScratch}
-                title="Start with a blank goal instead of using a template"
-                className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/25"
-              >
-                Create from Scratch
-              </button>
-            )}
-          </div>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

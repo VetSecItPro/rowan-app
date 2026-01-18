@@ -140,7 +140,6 @@ export default function CalendarPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
   const [isBulkManagerOpen, setIsBulkManagerOpen] = useState(false);
-  const [mobileStatsCollapsed, setMobileStatsCollapsed] = useState(true); // Collapsed by default on mobile
   const [viewModeLoaded, setViewModeLoaded] = useState(false); // Track if view mode has been loaded from localStorage
 
   // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
@@ -954,28 +953,10 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Stats Dashboard - Collapsible on mobile */}
-          <div className="space-y-2 sm:space-y-0">
-            {/* Mobile toggle button - compact pill style */}
-            <button
-              onClick={() => setMobileStatsCollapsed(!mobileStatsCollapsed)}
-              className="sm:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-800 border border-gray-700 rounded-full active:scale-[0.98] transition-all"
-              aria-expanded={!mobileStatsCollapsed}
-              aria-label={mobileStatsCollapsed ? 'Expand Stats Overview' : 'Collapse Stats Overview'}
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-calendar rounded-full flex items-center justify-center">
-                  <CalendarIcon className="w-3 h-3 text-white" />
-                </div>
-                <span className="text-xs font-medium text-gray-300">
-                  {stats.today} today • {stats.thisWeek} this week • {stats.total} total
-                </span>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${mobileStatsCollapsed ? '' : 'rotate-180'}`} />
-            </button>
-
-            {/* Stats cards - hidden on mobile when collapsed, always visible on desktop */}
-            <div className={`stats-grid-mobile gap-4 sm:gap-6 ${mobileStatsCollapsed ? 'hidden sm:grid' : 'grid'}`}>
+          {/* Stats Dashboard - Hidden on mobile */}
+          <div className="hidden sm:block">
+            {/* Stats cards - only visible on desktop */}
+            <div className="stats-grid-mobile gap-4 sm:gap-6 grid">
             <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Today</h3>
@@ -1051,48 +1032,37 @@ export default function CalendarPage() {
           </div>
 
           {/* Search Bar */}
-          <div className="relative">
-            <div className="relative">
-              {/* Search Icon - Only show when not typing */}
-              {!searchQuery && (
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              )}
-
-              {/* Search Input */}
-              <input
-                ref={searchInputRef}
-                type="text"
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="none"
-                spellCheck="false"
-                placeholder="Search Events (Press / to focus)"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearchTyping(true);
-                  setTimeout(() => setIsSearchTyping(false), 300);
+          <div className={`apple-search-container calendar-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
+            <Search className="apple-search-icon" />
+            <input
+              ref={searchInputRef}
+              type="search"
+              inputMode="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck="false"
+              placeholder="Search events..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsSearchTyping(true);
+                setTimeout(() => setIsSearchTyping(false), 300);
+              }}
+              className="apple-search-input"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  searchInputRef.current?.focus();
                 }}
-                className={`w-full px-4 py-3 bg-gray-800 border-2 rounded-lg focus:outline-none transition-colors ${
-                  !searchQuery ? 'pl-12' : 'pr-12'
-                } border-purple-400 focus:border-purple-300 text-white placeholder-gray-400`}
-                title="Search events (Press / to focus)"
-              />
-
-              {/* Clear Button - Only show when typing */}
-              {searchQuery && (
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    searchInputRef.current?.focus();
-                  }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-300 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
-            </div>
+                className="apple-search-clear"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {/* Events Section */}

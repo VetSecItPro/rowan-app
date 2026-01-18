@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, DollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
+import { Modal } from '@/components/ui/Modal';
 
 interface NewBudgetModalProps {
   isOpen: boolean;
@@ -35,73 +36,58 @@ export function NewBudgetModal({
     }
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-all font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-budget-form"
+        className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-full hover:opacity-90 transition-all shadow-lg font-medium"
+      >
+        {currentBudget ? 'Update Budget' : 'Set Budget'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col border border-gray-700">
-        <div className="flex-shrink-0 bg-gray-800 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-700 sm:rounded-t-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-projects rounded-xl flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">
-                {currentBudget ? 'Update Budget' : 'Set Monthly Budget'}
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 flex items-center justify-center hover:opacity-75 transition-opacity text-gray-400"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={currentBudget ? 'Update Budget' : 'Set Monthly Budget'}
+      maxWidth="md"
+      headerGradient="bg-gradient-to-r from-orange-500 to-amber-600"
+      footer={footerContent}
+    >
+      <form id="new-budget-form" onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="budget-amount" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
+            Monthly Budget Amount
+          </label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={amount}
+              id="budget-amount"
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="5000.00"
+              className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white text-lg"
+              required
+            />
           </div>
+          <p className="mt-2 text-sm text-gray-400">
+            Set your total monthly budget for household expenses
+          </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto space-y-6">
-          <div>
-            <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
-              Monthly Budget Amount
-            </label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={amount}
-                id="field-1"
-              onChange={(e) =>  setAmount(e.target.value)}
-                placeholder="5000.00"
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white text-lg"
-                required
-              />
-            </div>
-            <p className="mt-2 text-sm text-gray-400">
-              Set your total monthly budget for household expenses
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-all font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg font-medium"
-            >
-              {currentBudget ? 'Update Budget' : 'Set Budget'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

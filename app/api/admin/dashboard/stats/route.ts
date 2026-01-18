@@ -40,6 +40,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const forceRefresh = searchParams.get('refresh') === 'true';
 
+    // Log cache status
+    logger.info('[Dashboard Stats] Request received', {
+      component: 'api-route',
+      data: { forceRefresh, timestamp: Date.now() }
+    });
+
     // Fetch stats with caching (1 minute TTL)
     const stats = await withCache(
       ADMIN_CACHE_KEYS.dashboardStats,
@@ -95,20 +101,34 @@ export async function GET(req: NextRequest) {
         ]);
 
         // Extract counts from results (handle errors gracefully)
-        const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.count || 0) : 0;
-        const launchSignups = launchSignupsResult.status === 'fulfilled' ? (launchSignupsResult.value.count || 0) : 0;
-        const betaRequestsToday = betaRequestsTodayResult.status === 'fulfilled' ? (betaRequestsTodayResult.value.count || 0) : 0;
-        const signupsToday = signupsTodayResult.status === 'fulfilled' ? (signupsTodayResult.value.count || 0) : 0;
+        // Debug: Log the actual results to understand what's being returned
+        if (betaUsersResult.status === 'fulfilled') {
+          logger.info('[Dashboard Stats] Beta users query result:', {
+            component: 'api-route',
+            data: {
+              count: betaUsersResult.value.count,
+              error: betaUsersResult.value.error,
+              hasData: betaUsersResult.value.data !== null
+            }
+          });
+        }
+
+        const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.count ?? 0) : 0;
+        const launchSignups = launchSignupsResult.status === 'fulfilled' ? (launchSignupsResult.value.count ?? 0) : 0;
+        const betaRequestsToday = betaRequestsTodayResult.status === 'fulfilled' ? (betaRequestsTodayResult.value.count ?? 0) : 0;
+        const signupsToday = signupsTodayResult.status === 'fulfilled' ? (signupsTodayResult.value.count ?? 0) : 0;
 
         // Log any errors for debugging
         [betaUsersResult, launchSignupsResult, betaRequestsTodayResult, signupsTodayResult]
           .forEach((result, index) => {
             if (result.status === 'rejected') {
-              logger.error('Dashboard stat query ${index} failed:', undefined, { component: 'api-route', action: 'api_request', details: result.reason });
+              logger.error(`Dashboard stat query ${index} failed:`, undefined, { component: 'api-route', action: 'api_request', details: result.reason });
+            } else if (result.value.error) {
+              logger.error(`Dashboard stat query ${index} Supabase error:`, undefined, { component: 'api-route', action: 'api_request', details: result.value.error });
             }
           });
 
-        return {
+        const result = {
           totalUsers,
           activeUsers,
           betaUsers,
@@ -117,11 +137,27 @@ export async function GET(req: NextRequest) {
           signupsToday,
           lastUpdated: new Date().toISOString(),
         };
+
+        logger.info('[Dashboard Stats] Computed stats:', {
+          component: 'api-route',
+          data: result
+        });
+
+        return result;
       },
       { ttl: ADMIN_CACHE_TTL.dashboardStats, skipCache: forceRefresh }
     );
 
-    // Log admin dashboard access
+    // Log what we're returning (whether from cache or fresh)
+    logger.info('[Dashboard Stats] Returning response:', {
+      component: 'api-route',
+      data: {
+        betaUsers: stats.betaUsers,
+        totalUsers: stats.totalUsers,
+        activeUsers: stats.activeUsers,
+        fromCache: !forceRefresh
+      }
+    });
 
     return NextResponse.json({
       success: true,

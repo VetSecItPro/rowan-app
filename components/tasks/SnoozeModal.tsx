@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Clock, Calendar, History } from 'lucide-react';
+import { Clock, History } from 'lucide-react';
 import { taskSnoozeService } from '@/lib/services/task-snooze-service';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface SnoozeModalProps {
@@ -101,23 +102,15 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
     { label: 'Next Week', date: getQuickSnoozeDate(7 * 24) },
   ];
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-white" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Snooze Task</h2>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Snooze Task"
+      maxWidth="md"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+    >
+      <div className="space-y-6">
           {/* Quick Options */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-300 mb-3">
@@ -198,37 +191,36 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
             {showHistory ? 'Hide' : 'Show'} Snooze History
           </button>
 
-          {/* Snooze History */}
-          {showHistory && (
-            <div className="mt-4 p-4 bg-gray-900 rounded-lg max-h-48 overflow-y-auto">
-              {history.length === 0 ? (
-                <p className="text-xs text-gray-500 text-center">No snooze history</p>
-              ) : (
-                <div className="space-y-2">
-                  {history.map((item) => (
-                    <div key={item.id} className="text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-300">
-                          Snoozed until {new Date(item.snoozed_until).toLocaleString()}
-                        </span>
-                        <span className="px-2 py-0.5 rounded bg-amber-900/20 text-amber-300">
-                          Snoozed
-                        </span>
-                      </div>
-                      {item.reason && (
-                        <p className="text-gray-500 mt-1">Reason: {item.reason}</p>
-                      )}
-                      <p className="text-gray-400 mt-1">
-                        Set on {new Date(item.created_at).toLocaleDateString()}
-                      </p>
+        {/* Snooze History */}
+        {showHistory && (
+          <div className="mt-4 p-4 bg-gray-900 rounded-lg max-h-48 overflow-y-auto">
+            {history.length === 0 ? (
+              <p className="text-xs text-gray-500 text-center">No snooze history</p>
+            ) : (
+              <div className="space-y-2">
+                {history.map((item) => (
+                  <div key={item.id} className="text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-300">
+                        Snoozed until {new Date(item.snoozed_until).toLocaleString()}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-amber-900/20 text-amber-300">
+                        Snoozed
+                      </span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                    {item.reason && (
+                      <p className="text-gray-500 mt-1">Reason: {item.reason}</p>
+                    )}
+                    <p className="text-gray-400 mt-1">
+                      Set on {new Date(item.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 }

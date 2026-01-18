@@ -46,7 +46,7 @@ export function Breadcrumb({ items = [] }: BreadcrumbProps) {
   const filteredItems = items.filter(item => item.label !== 'Dashboard');
 
   return (
-    <nav className="px-4 sm:px-8 py-2">
+    <nav className="hidden sm:block px-4 sm:px-8 py-2">
       <ol className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto scrollbar-hide">
         {/* Dashboard Link - Always show as root */}
         <li className={filteredItems.length > 1 ? 'hidden sm:flex flex-shrink-0' : 'flex flex-shrink-0'}>

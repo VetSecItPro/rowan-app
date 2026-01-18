@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle, X } from 'lucide-react';
 import { eventProposalsService, EventProposal, ProposalVote, CreateProposalInput } from '@/lib/services/event-proposals-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { Modal } from '@/components/ui/Modal';
 import { formatDistance, format } from 'date-fns';
 import { logger } from '@/lib/logger';
 
@@ -168,40 +169,57 @@ export function EventProposalModal({
     }
   };
 
-  if (!isOpen) return null;
+  const createModeFooter = (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="px-4 sm:px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="event-proposal-form"
+        disabled={loading}
+        className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+      >
+        <Send className="w-4 h-4" />
+        {loading ? 'Creating...' : 'Send Proposal'}
+      </button>
+    </div>
+  );
+
+  const voteModeFooter = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-4 sm:px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base"
+      >
+        Close
+      </button>
+    </div>
+  );
+
+  const subtitle = mode === 'vote' && proposal
+    ? `Created by ${proposal.proposer?.raw_user_meta_data?.name || proposal.proposer?.email} • ${formatDistance(new Date(proposal.created_at), new Date(), { addSuffix: true })}`
+    : undefined;
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-3xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6" />
-              <h2 className="text-lg sm:text-xl font-bold">
-                {mode === 'create' ? 'Propose Event Times' : 'Vote on Proposal'}
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          {mode === 'vote' && proposal && (
-            <p className="mt-2 text-purple-100 text-sm">
-              Created by {proposal.proposer?.raw_user_meta_data?.name || proposal.proposer?.email} • {formatDistance(new Date(proposal.created_at), new Date(), { addSuffix: true })}
-            </p>
-          )}
-        </div>
-
-        {/* Content */}
+    <>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={mode === 'create' ? 'Propose Event Times' : 'Vote on Proposal'}
+      maxWidth="3xl"
+      headerGradient="bg-gradient-to-r from-purple-500 to-purple-600"
+      footer={mode === 'create' ? createModeFooter : voteModeFooter}
+      subtitle={subtitle}
+    >
+      <div className="space-y-6">
         {mode === 'create' ? (
           /* CREATE MODE */
-          <form onSubmit={handleCreateProposal} className="p-6 space-y-6">
+          <form id="event-proposal-form" onSubmit={handleCreateProposal} className="space-y-6">
             {/* Info Box */}
             <div className="bg-blue-900/20 border border-blue-700 rounded-xl p-4 flex gap-3">
               <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
@@ -319,30 +337,11 @@ export function EventProposalModal({
                 </button>
               )}
             </div>
-
-            {/* Actions */}
-            <div className="flex gap-3 pt-4 border-t border-gray-700">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-6 py-2.5 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                {loading ? 'Creating...' : 'Send Proposal'}
-              </button>
-            </div>
           </form>
         ) : (
           /* VOTE MODE */
           proposal && (
-            <div className="p-6 space-y-6">
+            <>
               {/* Event Details */}
               <div className="bg-gray-900 rounded-xl p-5 border border-gray-700">
                 <h3 className="text-xl font-bold text-white mb-2">
@@ -467,36 +466,27 @@ export function EventProposalModal({
                   );
                 })}
               </div>
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-700">
-                <button
-                  onClick={onClose}
-                  className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+            </>
           )
         )}
       </div>
+    </Modal>
 
-      {/* Approve Proposal Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={showApproveConfirm}
-        onClose={() => {
-          setShowApproveConfirm(false);
-          setSlotToApprove(null);
-        }}
-        onConfirm={confirmApproveProposal}
-        title="Create Event"
-        message="Create this event? This will finalize the time and notify all participants."
-        confirmLabel="Create Event"
-        cancelLabel="Cancel"
-        variant="warning"
-        confirmLoading={loading}
-      />
-    </div>
+    {/* Approve Proposal Confirm Dialog */}
+    <ConfirmDialog
+      isOpen={showApproveConfirm}
+      onClose={() => {
+        setShowApproveConfirm(false);
+        setSlotToApprove(null);
+      }}
+      onConfirm={confirmApproveProposal}
+      title="Create Event"
+      message="Create this event? This will finalize the time and notify all participants."
+      confirmLabel="Create Event"
+      cancelLabel="Cancel"
+      variant="warning"
+      confirmLoading={loading}
+    />
+    </>
   );
 }

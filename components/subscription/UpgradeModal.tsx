@@ -7,9 +7,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { X, Crown, Check, Clock, Sparkles, Zap, Lock } from 'lucide-react';
+import { Crown, Check, Clock, Sparkles, Zap, Lock } from 'lucide-react';
 import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Modal } from '@/components/ui/Modal';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -113,108 +113,94 @@ export function UpgradeModal({
   // Determine which tier is needed for this feature
   const requiresFamily = feature === 'ai' || feature === 'integrations';
 
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Maybe Later
+      </button>
+      <Link
+        href="/pricing"
+        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-full hover:from-emerald-700 hover:to-teal-700 transition-colors font-medium"
+        onClick={onClose}
+      >
+        <Crown className="h-4 w-4" />
+        <span>View Plans</span>
+      </Link>
+    </div>
+  );
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm">
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto w-full sm:max-w-lg sm:rounded-2xl bg-gray-900 shadow-2xl overflow-hidden flex flex-col"
-          >
-            {/* Header with gradient */}
-            <div className="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-6 sm:py-8 text-center text-white relative">
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 rounded-full p-1.5 text-white/80 hover:bg-white/20 hover:text-white transition-colors z-10"
-                aria-label="Close"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
-                {featureInfo?.icon || <Crown className="h-8 w-8" />}
-              </div>
-              <h2 className="text-2xl font-bold">{title}</h2>
-              <p className="mt-2 text-white/80">{description}</p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      subtitle={description}
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-emerald-500 to-teal-500"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
+        {/* Feature Icon */}
+        <div className="text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+            {featureInfo?.icon || <Crown className="h-8 w-8" />}
+          </div>
 
-              {/* Trial status badge */}
-              {isInTrial && (
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-sm">
-                  <Clock className="h-4 w-4" />
-                  <span>{trialDaysRemaining} days left in trial</span>
-                </div>
-              )}
-
-              {hasTrialExpired && (
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-sm">
-                  <Clock className="h-4 w-4" />
-                  <span>Your trial has ended</span>
-                </div>
-              )}
+          {/* Trial status badge */}
+          {isInTrial && (
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 text-amber-400 px-3 py-1 text-sm">
+              <Clock className="h-4 w-4" />
+              <span>{trialDaysRemaining} days left in trial</span>
             </div>
+          )}
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-6">
-              {/* Trial message */}
-              {isInTrial && (
-                <div className="mb-6 rounded-lg bg-amber-900/20 p-4 border border-amber-800">
-                  <p className="text-sm text-amber-200">
-                    <strong>You're on a free trial!</strong> You currently have access to this feature.
-                    Upgrade before your trial ends to keep using it.
-                  </p>
-                </div>
-              )}
-
-              {/* Features list */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-white">
-                  {requiresFamily ? 'Family Plan includes:' : 'Pro Plan includes:'}
-                </h3>
-
-                <ul className="space-y-2">
-                  {(requiresFamily ? [...PRO_FEATURES, ...FAMILY_EXTRAS] : PRO_FEATURES).map((feat, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 flex-shrink-0 text-emerald-500" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Pricing hint */}
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-400">
-                  {requiresFamily
-                    ? 'Starting at $17.99/month'
-                    : 'Starting at $11.99/month'}
-                </p>
-              </div>
+          {hasTrialExpired && (
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 text-red-400 px-3 py-1 text-sm">
+              <Clock className="h-4 w-4" />
+              <span>Your trial has ended</span>
             </div>
-
-            {/* Actions */}
-            <div className="border-t border-gray-700 px-6 py-4 flex gap-3">
-              <button
-                onClick={onClose}
-                className="flex-1 rounded-lg border border-gray-600 px-4 py-2.5 text-sm font-medium text-gray-300 hover:bg-gray-800 transition-colors"
-              >
-                Maybe Later
-              </button>
-              <Link
-                href="/pricing"
-                className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-sm font-medium text-white hover:from-emerald-700 hover:to-teal-700 transition-colors"
-                onClick={onClose}
-              >
-                <Crown className="h-4 w-4" />
-                <span>View Plans</span>
-              </Link>
-            </div>
-          </motion.div>
+          )}
         </div>
-      )}
-    </AnimatePresence>
+
+        {/* Trial message */}
+        {isInTrial && (
+          <div className="rounded-lg bg-amber-900/20 p-4 border border-amber-800">
+            <p className="text-sm text-amber-200">
+              <strong>You're on a free trial!</strong> You currently have access to this feature.
+              Upgrade before your trial ends to keep using it.
+            </p>
+          </div>
+        )}
+
+        {/* Features list */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-white">
+            {requiresFamily ? 'Family Plan includes:' : 'Pro Plan includes:'}
+          </h3>
+
+          <ul className="space-y-2">
+            {(requiresFamily ? [...PRO_FEATURES, ...FAMILY_EXTRAS] : PRO_FEATURES).map((feat, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                <Check className="h-4 w-4 flex-shrink-0 text-emerald-500" />
+                <span>{feat}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Pricing hint */}
+        <div className="text-center">
+          <p className="text-sm text-gray-400">
+            {requiresFamily
+              ? 'Starting at $17.99/month'
+              : 'Starting at $11.99/month'}
+          </p>
+        </div>
+      </div>
+    </Modal>
   );
 }
 

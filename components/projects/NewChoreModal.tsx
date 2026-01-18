@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Smile, ChevronDown, Home } from 'lucide-react';
+import { Smile, ChevronDown, Home } from 'lucide-react';
 import { CreateChoreInput } from '@/lib/services/chores-service';
 import { Chore } from '@/lib/types';
+import { Modal } from '@/components/ui/Modal';
 
 // 20 family-friendly universal emojis
 const EMOJIS = ['😊', '😂', '❤️', '👍', '🎉', '🙏', '👏', '🤝', '💪', '🌟', '✨', '🎈', '🌸', '🌈', '☀️', '🍕', '☕', '📅', '✅', '🏠'];
@@ -108,38 +109,38 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
     onClose();
   };
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-chore-form"
+        disabled={!!dateError}
+        className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full transition-all shadow-lg font-medium ${
+          dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+        }`}
+      >
+        {editChore ? 'Update Chore' : 'Create Chore'}
+      </button>
+    </div>
+  );
 
   return (
-    <div
-      className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={editChore ? 'Edit Chore' : 'New Chore'}
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-amber-500 to-amber-600"
+      footer={footerContent}
     >
-      <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-2xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Home className="w-6 h-6" />
-              <h2 className="text-lg sm:text-xl font-bold">
-                {editChore ? 'Edit Chore' : 'New Chore'}
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-6">
+      <form id="new-chore-form" onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
             <label htmlFor="field-1" className="block text-sm font-medium text-gray-300 mb-2 cursor-pointer">
@@ -392,27 +393,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-xl hover:bg-gray-600 transition-colors font-medium"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!dateError}
-              className={`flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl transition-all shadow-lg font-medium ${
-                dateError ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
-              }`}
-            >
-              {editChore ? 'Update Chore' : 'Create Chore'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }

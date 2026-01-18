@@ -1,7 +1,9 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import { X, Clock, Users, ChefHat, ExternalLink, Plus, Calendar } from 'lucide-react';
 import { ExternalRecipe } from '@/lib/services/external-recipes-service';
+import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 interface RecipePreviewModalProps {
   isOpen: boolean;
@@ -18,7 +20,66 @@ export function RecipePreviewModal({
   onPlanMeal,
   onAddToLibrary
 }: RecipePreviewModalProps) {
-  if (!isOpen || !recipe) return null;
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  // Swipe to dismiss state
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchCurrent, setTouchCurrent] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const dismissThreshold = 120;
+  const transform = touchStart !== null && touchCurrent !== null
+    ? Math.max(0, touchCurrent - touchStart)
+    : 0;
+  const dragProgress = Math.min(transform / dismissThreshold, 1);
+  const shouldDismiss = transform > dismissThreshold;
+
+  useScrollLock(isOpen);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsAnimating(true);
+        });
+      });
+    } else {
+      setIsAnimating(false);
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!headerRef.current?.contains(e.target as Node)) return;
+    const touch = e.touches[0];
+    setTouchStart(touch.clientY);
+    setTouchCurrent(touch.clientY);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || touchStart === null) return;
+    const touch = e.touches[0];
+    if (touch.clientY >= touchStart) {
+      setTouchCurrent(touch.clientY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    if (shouldDismiss) {
+      onClose();
+    }
+    setTouchStart(null);
+    setTouchCurrent(null);
+    setIsDragging(false);
+  };
+
+  if (!isVisible || !recipe) return null;
 
   const getSourceBadgeColor = (source: string) => {
     switch (source) {
@@ -55,16 +116,67 @@ export function RecipePreviewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
+    <div
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className={`
+          absolute inset-0 bg-black/70 backdrop-blur-sm
+          transition-opacity duration-300
+          ${isAnimating ? 'opacity-100' : 'opacity-0'}
+        `}
         onClick={onClose}
       />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-4xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
+
+      {/* Modal Container */}
+      <div
+        className={`
+          relative w-full
+          bg-gray-800
+          border-t border-x sm:border border-gray-700/50
+          rounded-t-2xl sm:rounded-xl
+          max-h-[92vh] sm:max-h-[90vh]
+          overflow-hidden
+          overscroll-contain
+          shadow-2xl
+          flex flex-col
+          transition-all duration-300 ease-out
+          sm:max-w-4xl
+          ${isAnimating
+            ? 'translate-y-0 sm:translate-y-0 sm:scale-100 opacity-100'
+            : 'translate-y-full sm:translate-y-4 sm:scale-95 opacity-0'
+          }
+          ${isDragging ? '!transition-none' : ''}
+        `}
+        style={{
+          transform: isDragging ? `translateY(${transform}px)` : undefined,
+          opacity: isDragging ? Math.max(0.5, 1 - dragProgress * 0.5) : undefined,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header with Image */}
-        <div className="relative">
+        <div ref={headerRef} className="relative cursor-grab active:cursor-grabbing sm:cursor-default">
+          {/* Swipe Indicator - Mobile Only */}
+          <div
+            className={`
+              absolute top-2 left-1/2 -translate-x-1/2 z-20
+              h-1 rounded-full
+              transition-all duration-200
+              sm:hidden
+              ${shouldDismiss ? 'bg-green-500' : isDragging ? 'bg-white' : 'bg-white/60'}
+            `}
+            style={{
+              width: isDragging ? '48px' : '36px',
+              opacity: isDragging ? 1 : 0.8,
+            }}
+          />
+
           {recipe.image_url && (
-            <div className="h-64 overflow-hidden bg-gray-700">
+            <div className="h-48 sm:h-64 overflow-hidden bg-gray-700 rounded-t-2xl sm:rounded-t-xl">
               <img
                 src={recipe.image_url}
                 alt={recipe.name}
@@ -205,7 +317,7 @@ export function RecipePreviewModal({
         </div>
 
         {/* Footer Actions - Mobile Optimized */}
-        <div className="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-4 sm:p-6">
+        <div className="flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/90 backdrop-blur-md pb-safe-4 sm:pb-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={onClose}
@@ -221,8 +333,7 @@ export function RecipePreviewModal({
               className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add to Library</span>
-              <span className="sm:hidden">Add to Library</span>
+              <span>Add</span>
             </button>
             <button
               onClick={() => {
@@ -232,8 +343,7 @@ export function RecipePreviewModal({
               className="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full transition-all flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base font-medium"
             >
               <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Plan Meal</span>
-              <span className="sm:hidden">Plan</span>
+              <span>Plan</span>
             </button>
           </div>
         </div>

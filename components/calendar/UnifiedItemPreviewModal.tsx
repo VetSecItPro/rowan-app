@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, ExternalLink, Clock, MapPin, User, Calendar, CheckCircle2, Circle, AlertCircle, UtensilsCrossed, Bell, Target, Loader2 } from 'lucide-react';
+import { ExternalLink, Clock, MapPin, Calendar, CheckCircle2, Circle, AlertCircle, UtensilsCrossed, Bell, Target, Loader2 } from 'lucide-react';
 import type { UnifiedCalendarItem } from '@/lib/types/unified-calendar-item';
 import { UNIFIED_ITEM_COLORS, UNIFIED_ITEM_LABELS } from '@/lib/types/unified-calendar-item';
 import type { Task } from '@/lib/types';
 import type { Meal } from '@/lib/services/meals-service';
 import type { Reminder } from '@/lib/services/reminders-service';
 import type { Goal } from '@/lib/services/goals-service';
+import { Modal } from '@/components/ui/Modal';
 
 interface UnifiedItemPreviewModalProps {
   item: UnifiedCalendarItem;
@@ -222,8 +223,6 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
   const Icon = getItemIcon(item.itemType);
   const statusBadge = getStatusBadge(item.status);
 
-  if (!isOpen) return null;
-
   const handleEditClick = () => {
     setIsNavigating(true);
     const route = getEditRoute(item);
@@ -231,39 +230,65 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
     // Don't call onClose() - let navigation complete first
   };
 
-  return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 sm:rounded-2xl shadow-2xl sm:max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
-        onClick={(e) => e.stopPropagation()}
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        disabled={isNavigating}
+        className="px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 rounded-full transition-colors disabled:opacity-50"
       >
-        {/* Header */}
-        <div className={`flex-shrink-0 px-6 py-3 sm:py-4 border-b border-gray-700 sm:rounded-t-2xl ${colors.bg}`}>
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg ${colors.bg} ${colors.border} border-2 flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${colors.text}`} />
-                </div>
-                <div>
-                  <span className={`text-xs font-semibold uppercase tracking-wide ${colors.text}`}>
-                    {label}
-                  </span>
-                  <h2 className="text-lg font-bold text-white mt-0.5">
-                    {item.title}
-                  </h2>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-          </div>
+        Close
+      </button>
+      <button
+        onClick={handleEditClick}
+        disabled={isNavigating}
+        className={`px-4 py-2 text-sm font-medium text-white rounded-full transition-colors flex items-center gap-2 disabled:opacity-70 ${
+          item.itemType === 'task' ? 'bg-blue-600 hover:bg-blue-700' :
+          item.itemType === 'meal' ? 'bg-orange-600 hover:bg-orange-700' :
+          item.itemType === 'reminder' ? 'bg-pink-600 hover:bg-pink-700' :
+          item.itemType === 'goal' ? 'bg-indigo-600 hover:bg-indigo-700' :
+          'bg-purple-600 hover:bg-purple-700'
+        }`}
+      >
+        {isNavigating ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Loading...
+          </>
+        ) : (
+          <>
+            <ExternalLink className="w-4 h-4" />
+            Edit in {label}s
+          </>
+        )}
+      </button>
+    </div>
+  );
 
-          {/* Content */}
-          <div className="px-6 py-4 space-y-4">
+  const headerGradient = item.itemType === 'task' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
+    item.itemType === 'meal' ? 'bg-gradient-meals' :
+    item.itemType === 'reminder' ? 'bg-gradient-to-r from-pink-500 to-pink-600' :
+    item.itemType === 'goal' ? 'bg-gradient-to-r from-indigo-500 to-indigo-600' :
+    'bg-gradient-to-r from-purple-500 to-purple-600';
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={item.title}
+      maxWidth="md"
+      headerGradient={headerGradient}
+      footer={footerContent}
+    >
+      <div className="space-y-4">
+        {/* Type & Status Row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${colors.bg}`}>
+            <Icon className={`w-3.5 h-3.5 ${colors.text}`} />
+            <span className={`text-xs font-semibold ${colors.text}`}>
+              {label}
+            </span>
+          </div>
             {/* Status Badge */}
             {item.status && (
               <div className="flex items-center gap-2">
@@ -273,85 +298,52 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
               </div>
             )}
 
-            {/* Date & Time */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-white">
-                  {formatDate(item.startTime)}
-                </span>
-              </div>
-              {!item.isAllDay && (
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-white">
-                    {formatTime(item.startTime)}
-                    {item.endTime && ` - ${formatTime(item.endTime)}`}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Description */}
-            {item.description && (
-              <div className="p-3 bg-gray-800 rounded-lg">
-                <p className="text-sm text-gray-300">
-                  {item.description}
-                </p>
-              </div>
-            )}
-
-            {/* Location */}
-            {item.location && (
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-300">
-                  {item.location}
-                </span>
-              </div>
-            )}
-
-            {/* Type-specific details */}
-            {item.itemType === 'task' && <TaskDetails item={item} />}
-            {item.itemType === 'meal' && <MealDetails item={item} />}
-            {item.itemType === 'reminder' && <ReminderDetails item={item} />}
-            {item.itemType === 'goal' && <GoalDetails item={item} />}
-          </div>
-
-          {/* Footer */}
-          <div className="flex-shrink-0 px-6 py-4 border-t border-gray-700 flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              disabled={isNavigating}
-              className="px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 rounded-lg transition-colors disabled:opacity-50"
-            >
-              Close
-            </button>
-            <button
-              onClick={handleEditClick}
-              disabled={isNavigating}
-              className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70 ${
-                item.itemType === 'task' ? 'bg-blue-600 hover:bg-blue-700' :
-                item.itemType === 'meal' ? 'bg-orange-600 hover:bg-orange-700' :
-                item.itemType === 'reminder' ? 'bg-pink-600 hover:bg-pink-700' :
-                item.itemType === 'goal' ? 'bg-indigo-600 hover:bg-indigo-700' :
-                'bg-purple-600 hover:bg-purple-700'
-              }`}
-            >
-              {isNavigating ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                <>
-                  <ExternalLink className="w-4 h-4" />
-                  Edit in {label}s
-                </>
-              )}
-            </button>
-          </div>
         </div>
+
+        {/* Date & Time */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-white">
+              {formatDate(item.startTime)}
+            </span>
+          </div>
+          {!item.isAllDay && (
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-gray-500" />
+              <span className="text-sm text-white">
+                {formatTime(item.startTime)}
+                {item.endTime && ` - ${formatTime(item.endTime)}`}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        {item.description && (
+          <div className="p-3 bg-gray-800 rounded-lg">
+            <p className="text-sm text-gray-300">
+              {item.description}
+            </p>
+          </div>
+        )}
+
+        {/* Location */}
+        {item.location && (
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-gray-300">
+              {item.location}
+            </span>
+          </div>
+        )}
+
+        {/* Type-specific details */}
+        {item.itemType === 'task' && <TaskDetails item={item} />}
+        {item.itemType === 'meal' && <MealDetails item={item} />}
+        {item.itemType === 'reminder' && <ReminderDetails item={item} />}
+        {item.itemType === 'goal' && <GoalDetails item={item} />}
       </div>
+    </Modal>
   );
 }

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Download, FileText, CheckSquare } from 'lucide-react';
+import { Download, FileText, CheckSquare } from 'lucide-react';
 import { taskExportService } from '@/lib/services/task-export-service';
 import { TaskFilters } from './TaskFilterPanel';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface ExportModalProps {
@@ -75,23 +76,36 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
     }
   }
 
-  if (!isOpen) return null;
+  const footerContent = (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={onClose}
+        disabled={loading}
+        className="px-4 sm:px-6 py-2.5 text-gray-300 hover:bg-gray-700 rounded-full transition-colors text-sm sm:text-base"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleExport}
+        disabled={loading || selectedColumns.length === 0}
+        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base"
+      >
+        <Download className="w-4 h-4" />
+        {loading ? 'Exporting...' : 'Export CSV'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden overscroll-contain shadow-2xl flex flex-col">
-        <div className="flex-shrink-0 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-xl">
-          <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-white" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">Export Tasks</h2>
-          </div>
-          <button onClick={onClose} className="w-12 h-12 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-all active:scale-95">
-            <X className="w-5 h-5 sm:w-4 sm:h-4 text-white" />
-          </button>
-        </div>
-
-        <div className="flex-1 px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Export Tasks"
+      maxWidth="2xl"
+      headerGradient="bg-gradient-to-r from-blue-500 to-blue-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
           {/* Export Format */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-300 mb-3">
@@ -160,7 +174,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
           )}
 
           {/* Export Preview Info */}
-          <div className="mb-6 p-3 bg-gray-900 rounded-lg">
+          <div className="p-3 bg-gray-900 rounded-lg">
             <h4 className="text-xs font-medium text-gray-300 mb-2">
               What will be exported:
             </h4>
@@ -171,27 +185,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
               <li>• Date formats: YYYY-MM-DD HH:MM:SS</li>
             </ul>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 sm:gap-2">
-            <button
-              onClick={handleExport}
-              disabled={loading || selectedColumns.length === 0}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-            >
-              <Download className="w-5 h-5" />
-              {loading ? 'Exporting...' : 'Export to CSV'}
-            </button>
-            <button
-              onClick={onClose}
-              disabled={loading}
-              className="px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

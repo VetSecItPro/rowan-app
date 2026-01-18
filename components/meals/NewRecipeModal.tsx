@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Plus, Trash2, Sparkles, FileText, Info, Image as ImageIcon, Loader2, Search, Globe } from 'lucide-react';
+import { Plus, Trash2, Sparkles, FileText, Info, Image as ImageIcon, Loader2, Search, Globe, X } from 'lucide-react';
 import { CreateRecipeInput, Recipe } from '@/lib/services/meals-service';
 import ImageUpload from '@/components/shared/ImageUpload';
 import { searchExternalRecipes, searchByCuisine, getRandomRecipes, SUPPORTED_CUISINES, ExternalRecipe } from '@/lib/services/external-recipes-service';
 import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
+import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
 interface NewRecipeModalProps {
@@ -317,26 +318,37 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
     }
   };
 
-  if (!isOpen) return null;
+  // Footer content for manual tab
+  const manualFooterContent = (
+    <div className="flex items-center justify-end gap-3">
+      <button
+        type="button"
+        onClick={onClose}
+        className="px-6 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="new-recipe-form"
+        className="px-6 py-2 bg-gradient-meals hover:opacity-90 text-white rounded-full transition-all font-medium shadow-md hover:shadow-lg"
+      >
+        {editRecipe ? 'Save' : 'Create'}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-[70] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:w-auto sm:rounded-xl sm:max-w-2xl sm:max-h-[90vh] overflow-hidden sm:overflow-y-auto overscroll-contain shadow-2xl flex flex-col">
-        {/* Header */}
-        <div className="bg-gradient-meals px-4 sm:px-6 py-4 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg sm:text-xl font-bold text-white">
-              {editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
-            </h2>
-            <button onClick={onClose} aria-label="Close modal" className="w-12 h-12 sm:w-auto sm:h-auto flex items-center justify-center hover:bg-white/20 sm:hover:bg-transparent rounded-full sm:rounded-none transition-all active:scale-95 sm:active:scale-100 sm:opacity-80 sm:hover:opacity-100">
-              <X className="w-5 h-5 sm:w-5 sm:h-5 text-white" />
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={editRecipe ? 'Edit Recipe' : 'Create New Recipe'}
+        maxWidth="2xl"
+        headerGradient="bg-gradient-meals"
+        footer={activeTab === 'manual' ? manualFooterContent : undefined}
+      >
+        <div className="flex flex-col -mx-4 sm:-mx-6 -mt-4 sm:-mt-5">
           {/* Toggle Buttons - In Content Area */}
           {!editRecipe && (
             <div className="px-4 sm:px-6 pt-4 pb-0 flex-shrink-0">
@@ -642,7 +654,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
           {/* Manual Entry Tab */}
           {activeTab === 'manual' && (
-            <form onSubmit={handleSubmit} className={`p-6 space-y-4 h-full ${!editRecipe ? 'pt-4' : ''}`}>
+            <form id="new-recipe-form" onSubmit={handleSubmit} className={`px-4 sm:px-6 py-4 space-y-4 ${!editRecipe ? 'pt-4' : ''}`}>
               <div>
                 <label htmlFor="field-3" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Recipe Name *</label>
                 <input
@@ -851,22 +863,10 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                 )}
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-6 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="px-6 py-2 bg-gradient-meals hover:opacity-90 text-white rounded-full transition-all font-medium shadow-md hover:shadow-lg">
-                  {editRecipe ? 'Save' : 'Create'}
-                </button>
-              </div>
             </form>
           )}
         </div>
-      </div>
+      </Modal>
 
       {/* Recipe Preview Modal */}
       <RecipePreviewModal
@@ -882,6 +882,6 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
         }}
         onAddToLibrary={handleAddToLibrary}
       />
-    </div>
+    </>
   );
 }

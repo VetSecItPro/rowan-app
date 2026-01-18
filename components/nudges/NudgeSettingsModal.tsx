@@ -1,8 +1,7 @@
 'use client';
 
-import { Fragment, useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { X, Bell, Clock, Calendar, Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Clock, Volume2, VolumeX } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import {
   smartNudgesService,
@@ -12,6 +11,7 @@ import {
 import { useAuth } from '@/lib/contexts/auth-context';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Modal } from '@/components/ui/Modal';
 
 interface NudgeSettingsModalProps {
   isOpen: boolean;
@@ -95,60 +95,35 @@ export function NudgeSettingsModal({
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const footerContent = (
+    <div className="flex gap-3">
+      <button
+        onClick={onClose}
+        className="flex-1 px-6 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-colors font-medium"
+      >
+        Cancel
+      </button>
+      <button
+        onClick={handleSave}
+        disabled={loading}
+        className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? 'Saving...' : 'Save Settings'}
+      </button>
+    </div>
+  );
+
   return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-[60]" onClose={onClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
-        </Transition.Child>
-
-        <div className="fixed inset-0 sm:flex sm:items-center sm:justify-center sm:p-4">
-          <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto sm:flex sm:min-h-full sm:items-center sm:justify-center text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Dialog.Panel className="w-full sm:max-w-lg transform overflow-hidden sm:rounded-2xl bg-gray-800 text-left align-middle shadow-xl transition-all h-full sm:h-auto flex flex-col">
-                {/* Header */}
-                <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                      <Bell className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <Dialog.Title
-                        as="h3"
-                        className="text-lg font-bold leading-6 text-white"
-                      >
-                        Nudge Settings
-                      </Dialog.Title>
-                      <p className="text-sm text-gray-400">
-                        Customize your goal reminders and notifications
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="text-gray-400 hover:text-gray-200"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Nudge Settings"
+      subtitle="Customize your goal reminders and notifications"
+      maxWidth="lg"
+      headerGradient="bg-gradient-to-r from-blue-500 to-purple-600"
+      footer={footerContent}
+    >
+      <div className="space-y-6">
                   {/* Global Toggle */}
                   <div className="bg-gray-700 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
@@ -406,29 +381,7 @@ export function NudgeSettingsModal({
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* Footer */}
-                <div className="flex-shrink-0 flex justify-end space-x-3 p-4 sm:p-6 border-t border-gray-700">
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={loading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {loading ? 'Saving...' : 'Save Settings'}
-                  </button>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </div>
-      </Dialog>
-    </Transition>
+      </div>
+    </Modal>
   );
 }
