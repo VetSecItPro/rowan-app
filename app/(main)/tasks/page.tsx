@@ -5,16 +5,15 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
-import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, Filter, Download, Repeat, FileText, Zap, TrendingUp, TrendingDown, Minus, ChevronDown, X } from 'lucide-react';
+import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
-import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { tasksService } from '@/lib/services/tasks-service';
 import { taskTemplatesService } from '@/lib/services/task-templates-service';
-import { choresService, CreateChoreInput } from '@/lib/services/chores-service';
+import { choresService, CreateChoreInput, type UpdateChoreInput } from '@/lib/services/chores-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { Task, Chore } from '@/lib/types';
 import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
@@ -34,12 +33,16 @@ import {
 } from '@/lib/utils/lazy-components';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { PointsDisplay } from '@/components/rewards';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { pointsService } from '@/lib/services/rewards';
 import { logger } from '@/lib/logger';
 
-type TaskType = 'task' | 'chore';
-type TaskOrChore = (Task & { type: 'task' }) | (Chore & { type: 'chore' });
+type LinkedShoppingListMap = Awaited<ReturnType<typeof shoppingIntegrationService.getShoppingListsForTasks>>;
+type TaskOrChore = Task & {
+  type: 'task' | 'chore';
+  frequency?: Chore['frequency'];
+  notes?: Chore['notes'];
+  sort_order: number;
+};
 
 export default function TasksPage() {
   const { currentSpace, user } = useAuthWithSpaces();
@@ -49,33 +52,27 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true);
   const [choreLoading, setChoreLoading] = useState(false);
 
-  // Individual item loading states
-  const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, {
-    updating?: boolean;
-    deleting?: boolean;
-    statusChanging?: boolean;
-  }>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce search for 300ms
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   // Removed activeTab state - now showing all items together
-  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
+  const [linkedShoppingLists, setLinkedShoppingLists] = useState<LinkedShoppingListMap>({});
 
   // Unified modal state (replacing separate task/chore modals)
   const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);
   const [modalDefaultType, setModalDefaultType] = useState<'task' | 'chore'>('task');
-  const [editingItem, setEditingItem] = useState<(Task & {type: 'task'}) | (Chore & {type: 'chore'}) | null>(null);
+  const [editingItem, setEditingItem] = useState<TaskOrChore | null>(null);
 
   // Unified details modal state
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<(Task & {type: 'task'}) | (Chore & {type: 'chore'}) | null>(null);
+  const [selectedItem, setSelectedItem] = useState<TaskOrChore | null>(null);
 
   // Advanced features state
-  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<TaskFilters>({});
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
-  const [enableDragDrop, setEnableDragDrop] = useState(true);
+  const showFilters = false;
+  const enableDragDrop = true;
 
   // Remaining modal states for features not yet unified
   const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
@@ -93,9 +90,9 @@ export default function TasksPage() {
       assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
       // Exclude frequency and other chore-specific filters
     },
-    onTaskAdded: (task) => {}, // Silently handle - real-time updates shown via UI
-    onTaskUpdated: (task) => {}, // Silently handle - real-time updates shown via UI
-    onTaskDeleted: (taskId) => {}, // Silently handle - real-time updates shown via UI
+    onTaskAdded: () => {}, // Silently handle - real-time updates shown via UI
+    onTaskUpdated: () => {}, // Silently handle - real-time updates shown via UI
+    onTaskDeleted: () => {}, // Silently handle - real-time updates shown via UI
   });
 
   // Real-time chores with enhanced filters
@@ -108,9 +105,9 @@ export default function TasksPage() {
       assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
       search: filters.search, // Add search filter at hook level
     },
-    onChoreAdded: (chore) => {}, // Silently handle - real-time updates shown via UI
-    onChoreUpdated: (chore) => {}, // Silently handle - real-time updates shown via UI
-    onChoreDeleted: (choreId) => {}, // Silently handle - real-time updates shown via UI
+    onChoreAdded: () => {}, // Silently handle - real-time updates shown via UI
+    onChoreUpdated: () => {}, // Silently handle - real-time updates shown via UI
+    onChoreDeleted: () => {}, // Silently handle - real-time updates shown via UI
   });
 
   // Always use realtime data
@@ -119,14 +116,18 @@ export default function TasksPage() {
 
   // Combine tasks and chores for unified display
   const allItems = useMemo((): TaskOrChore[] => {
-    const tasksWithType = tasks.map(t => ({ ...t, type: 'task' as const }));
+    const tasksWithType = tasks.map((task, index) => ({
+      ...task,
+      type: 'task' as const,
+      sort_order: task.sort_order ?? 1000 + index,
+    }));
     // Add missing fields for chores to match TaskCard expectations
-    const choresWithType = chores.map((c, index) => ({
-      ...c,
+    const choresWithType = chores.map((chore, index) => ({
+      ...chore,
       type: 'chore' as const,
       priority: 'medium' as const, // Default priority for chores
       category: 'household' as const, // Default category for chores
-      sort_order: c.sort_order ?? (1000 + index) // Default sort order for chores
+      sort_order: chore.sort_order ?? (2000 + index + tasks.length) // Default sort order for chores
     }));
     return [...tasksWithType, ...choresWithType];
   }, [tasks, chores]);
@@ -256,7 +257,7 @@ export default function TasksPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentSpace, user]);
+  }, [currentSpace, realtimeTasks, user]);
 
   // Load tasks when currentSpace.id changes
   useEffect(() => {
@@ -293,14 +294,14 @@ export default function TasksPage() {
             space_id: taskData.space_id,
             assigned_to: taskData.assigned_to || undefined,
             description: taskData.description || undefined,
-            category: (taskData as any).category || undefined,
+            category: taskData.category || undefined,
             due_date: taskData.due_date || undefined,
-            tags: (taskData as any).tags,
-            estimated_hours: (taskData as any).estimated_hours,
+            tags: taskData.tags,
+            estimated_hours: taskData.estimated_hours,
             priority: taskData.priority || 'medium',
-            calendar_sync: (taskData as any).calendar_sync || false,
-            quick_note: (taskData as any).quick_note,
-            created_by: (taskData as any).created_by || user?.id || '',
+            calendar_sync: taskData.calendar_sync ?? false,
+            quick_note: taskData.quick_note,
+            created_by: taskData.created_by ?? user?.id ?? '',
             sort_order: Date.now(), // Use timestamp for unique sort order
           };
 
@@ -364,20 +365,6 @@ export default function TasksPage() {
     } catch (error) {
       logger.error('Failed to save item', error, { component: 'page', action: 'save_item', itemType: modalDefaultType });
 
-      // Enhanced error handling with user-friendly messages
-      let errorMessage = `Failed to ${editingItem ? 'update' : 'create'} ${modalDefaultType}. Please try again.`;
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Check your connection and try again.';
-        } else if (error.message.includes('validation') || error.message.includes('required')) {
-          errorMessage = 'Please check that all required fields are filled correctly.';
-        } else if (error.message.includes('permission') || error.message.includes('access')) {
-          errorMessage = 'You do not have permission to perform this action.';
-        } else if (error.message.includes('duplicate') || error.message.includes('already exists')) {
-          errorMessage = `A ${modalDefaultType} with this name already exists.`;
-        }
-      }
-
       // TODO: Replace with actual toast notification system (user-facing error shown via UI)
 
       // Additional recovery actions
@@ -391,15 +378,9 @@ export default function TasksPage() {
         refreshTasks();
       }
     }
-  }, [editingItem, modalDefaultType, setTasks, setChores, user, currentSpace, refreshChores, refreshTasks, setChoreLoading]);
+  }, [editingItem, modalDefaultType, refreshChores, refreshTasks, setChoreLoading, setChores, setTasks, user]);
 
   const handleStatusChange = useCallback(async (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => {
-    // Set loading state for this specific item
-    setItemLoadingStates(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId], statusChanging: true }
-    }));
-
     try {
       if (type === 'chore') {
         // Optimistic update for chores - update UI immediately
@@ -408,7 +389,7 @@ export default function TasksPage() {
             chore.id === itemId
               ? {
                   ...chore,
-                  status: status as any,
+                  status,
                   completed_at: status === 'completed' ? new Date().toISOString() : chore.completed_at,
                   updated_at: new Date().toISOString()
                 }
@@ -427,7 +408,7 @@ export default function TasksPage() {
             }
           } else {
             // For other status changes, use regular update
-            const updateData: any = { status };
+            const updateData: UpdateChoreInput = { status };
             if (status === 'completed') {
               updateData.completed_at = new Date().toISOString();
             }
@@ -449,7 +430,7 @@ export default function TasksPage() {
             t.id === itemId
               ? {
                   ...t,
-                  status: status as any,
+                  status,
                   updated_at: new Date().toISOString()
                 }
               : t
@@ -480,16 +461,6 @@ export default function TasksPage() {
     } catch (error) {
       logger.error('Failed to update item status', error, { component: 'page', action: 'update_status', itemId });
 
-      // Show user-friendly error message based on error type
-      let errorMessage = 'Failed to update status. Please try again.';
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Check your connection and try again.';
-        } else if (error.message.includes('permission') || error.message.includes('access')) {
-          errorMessage = 'You do not have permission to update this item.';
-        }
-      }
-
       // TODO: Replace with actual toast notification system (user-facing error shown via UI)
 
       // Additional recovery for chores
@@ -497,22 +468,10 @@ export default function TasksPage() {
         // Force refresh chores on error to ensure consistency
         refreshChores();
       }
-    } finally {
-      // Clear loading state for this item
-      setItemLoadingStates(prev => ({
-        ...prev,
-        [itemId]: { ...prev[itemId], statusChanging: false }
-      }));
     }
-  }, [currentSpace, setTasks, setChores, refreshTasks, refreshChores, user, spaceId, tasks]);
+  }, [refreshChores, refreshTasks, setChores, setTasks, spaceId, tasks, user]);
 
   const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
-    // Set loading state for this specific item
-    setItemLoadingStates(prev => ({
-      ...prev,
-      [itemId]: { ...prev[itemId], deleting: true }
-    }));
-
     try {
       if (type === 'chore') {
         setChoreLoading(true);
@@ -527,18 +486,6 @@ export default function TasksPage() {
     } catch (error) {
       logger.error(`Failed to delete ${type || 'task'}`, error, { component: 'page', action: 'delete_item', itemId, type });
 
-      // Show user-friendly error message
-      let errorMessage = `Failed to delete ${type || 'task'}. Please try again.`;
-      if (error instanceof Error) {
-        if (error.message.includes('network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Check your connection and try again.';
-        } else if (error.message.includes('permission') || error.message.includes('access')) {
-          errorMessage = `You do not have permission to delete this ${type || 'task'}.`;
-        } else if (error.message.includes('foreign key') || error.message.includes('constraint')) {
-          errorMessage = `Cannot delete ${type || 'task'} because it has dependencies. Please remove related items first.`;
-        }
-      }
-
       // TODO: Replace with actual toast notification system (user-facing error shown via UI)
 
       if (type === 'chore') {
@@ -549,22 +496,16 @@ export default function TasksPage() {
         // Reload tasks to restore on error
         refreshTasks();
       }
-    } finally {
-      // Clear loading state for this item
-      setItemLoadingStates(prev => ({
-        ...prev,
-        [itemId]: { ...prev[itemId], deleting: false }
-      }));
     }
-  }, [setTasks, setChores, currentSpace, refreshTasks, refreshChores]);
+  }, [refreshChores, refreshTasks, setChoreLoading, setTasks]);
 
   const handleEditItem = useCallback((item: TaskOrChore) => {
-    setEditingItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
+    setEditingItem({ ...item, type: item.type });
     setIsUnifiedModalOpen(true);
   }, []);
 
   const handleViewDetails = useCallback((item: TaskOrChore) => {
-    setSelectedItem({...item, type: item.type} as (Task & {type: 'task'}) | (Chore & {type: 'chore'}));
+    setSelectedItem({ ...item, type: item.type });
     setIsDetailsModalOpen(true);
   }, []);
 
@@ -611,19 +552,6 @@ export default function TasksPage() {
   const handleOpenModal = useCallback((type: 'task' | 'chore') => {
     setModalDefaultType(type);
     setIsUnifiedModalOpen(true);
-  }, []);
-
-
-  // Advanced feature handlers
-  const handleQuickAction = useCallback((action: string) => {
-    switch (action) {
-      case 'repeat':
-        // Recurring functionality is now integrated into UnifiedItemModal
-        handleOpenModal('task');
-        break;
-      default:
-        break;
-    }
   }, []);
 
   const handleBulkActionComplete = useCallback(() => {
@@ -854,7 +782,7 @@ export default function TasksPage() {
                   />
                 </div>
 
-                {loading || realtimeLoading || choreLoading ? (
+                {loading || realtimeLoading || choreRealtimeLoading || choreLoading ? (
                   <div className="space-y-4">
                     {[...Array(6)].map((_, i) => (
                       <TaskCardSkeleton key={i} />
@@ -885,11 +813,11 @@ export default function TasksPage() {
                     <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scrollbar">
                       <LazyDraggableItemList
                         spaceId={currentSpace.id}
-                        initialItems={paginatedItems as any}
+                        initialItems={paginatedItems}
                         onStatusChange={handleStatusChange}
-                        onEdit={handleEditItem as any}
+                        onEdit={handleEditItem}
                         onDelete={handleDeleteItem}
-                        onViewDetails={handleViewDetails as any}
+                        onViewDetails={handleViewDetails}
                       />
                     </div>
 
@@ -925,15 +853,15 @@ export default function TasksPage() {
                       {paginatedItems.map((item) => (
                         <TaskCard
                           key={item.id}
-                        task={item as any}
-                        onStatusChange={handleStatusChange as any}
-                        onEdit={handleEditItem as any}
-                        onDelete={handleDeleteItem}
-                        onViewDetails={handleViewDetails as any}
-                        onSaveAsTemplate={handleSaveAsTemplate}
-                        linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
-                      />
-                    ))}
+                          task={item}
+                          onStatusChange={handleStatusChange}
+                          onEdit={handleEditItem}
+                          onDelete={handleDeleteItem}
+                          onViewDetails={handleViewDetails}
+                          onSaveAsTemplate={handleSaveAsTemplate}
+                          linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
+                        />
+                      ))}
                     </div>
 
                     {/* Pagination Controls */}
@@ -990,7 +918,7 @@ export default function TasksPage() {
                 isOpen={isDetailsModalOpen}
                 onClose={handleCloseDetailsModal}
                 item={selectedItem}
-                onEdit={handleEditItem as any}
+                onEdit={handleEditItem}
                 onDelete={handleDeleteItem}
                 onSave={handleSaveItem}
                 spaceId={currentSpace.id}

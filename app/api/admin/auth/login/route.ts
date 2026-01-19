@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
@@ -90,7 +89,7 @@ export async function POST(req: NextRequest) {
       if (updateError) {
         // Error logged to Sentry via outer catch block if critical
       }
-    } catch (error) {
+    } catch {
       // Fail silently if column doesn't exist (optional feature)
     }
 
@@ -125,9 +124,8 @@ export async function POST(req: NextRequest) {
     // Increment daily analytics for admin logins
     const today = new Date().toISOString().split('T')[0];
     try {
-      const { error: analyticsError } = await supabaseAdmin
-        .rpc('increment_admin_logins', { target_date: today });
-    } catch (error) {
+      await supabaseAdmin.rpc('increment_admin_logins', { target_date: today });
+    } catch {
       // Fail silently if function doesn't exist
     }
 

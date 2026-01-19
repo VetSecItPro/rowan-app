@@ -19,6 +19,19 @@ const QueryParamsSchema = z.object({
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+type NotificationRecord = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  source?: string | null;
+  referrer?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  subscribed?: boolean;
+  created_at?: string | null;
+  unsubscribed_at?: string | null;
+};
+
 /**
  * GET /api/admin/notifications
  * Get all launch notifications for admin management
@@ -59,7 +72,7 @@ export async function GET(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -107,18 +120,21 @@ export async function GET(req: NextRequest) {
     }
 
     // Transform the data
-    const transformedNotifications = (notifications || []).map((notification: any) => ({
-      id: notification.id,
-      name: notification.name,
-      email: notification.email,
-      source: notification.source || 'homepage',
-      referrer: notification.referrer,
-      ip_address: notification.ip_address,
-      user_agent: notification.user_agent,
-      subscribed: notification.subscribed,
-      created_at: notification.created_at,
-      unsubscribed_at: notification.unsubscribed_at,
-    }));
+    const transformedNotifications = (notifications || []).map((notification) => {
+      const record = notification as NotificationRecord;
+      return {
+        id: record.id,
+        name: record.name,
+        email: record.email,
+        source: record.source || 'homepage',
+        referrer: record.referrer,
+        ip_address: record.ip_address,
+        user_agent: record.user_agent,
+        subscribed: record.subscribed,
+        created_at: record.created_at,
+        unsubscribed_at: record.unsubscribed_at,
+      };
+    });
 
     // Log admin access
 

@@ -10,6 +10,35 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+type BetaRequestRecord = {
+  user_id: string;
+  email: string | null;
+  created_at: string;
+  approved_at?: string | null;
+};
+
+type AuthUserRecord = {
+  id: string;
+  email?: string | null;
+  created_at: string;
+  last_sign_in_at?: string | null;
+};
+
+type BetaUser = {
+  id: string;
+  email: string | null;
+  created_at: string;
+  last_sign_in_at?: string | null;
+  beta_joined_at: string;
+  days_since_join: number;
+  days_since_last_login: number;
+  activity_score: number;
+  sessions_count: number;
+  beta_feedback_count: number;
+  is_active: boolean;
+  engagement_level: 'high' | 'medium' | 'low';
+};
+
 /**
  * GET /api/admin/beta/users
  * Get active beta users with activity metrics
@@ -69,11 +98,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Get user details from auth.users for each beta user
-    const betaUsers: any[] = [];
+    const betaUsers: BetaUser[] = [];
 
     if (betaRequests && betaRequests.length > 0) {
-      const userIds = betaRequests.map((request: any) => request.user_id);
-
       // Get auth users data
       const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers({
         page: 1,
@@ -85,8 +112,9 @@ export async function GET(req: NextRequest) {
       }
 
       // Filter and enhance beta users
-      betaRequests.forEach((betaRequest: any) => {
-        const authUser = authUsers.users.find((user: any) => user.id === betaRequest.user_id);
+      betaRequests.forEach((betaRequest) => {
+        const requestRecord = betaRequest as BetaRequestRecord;
+        const authUser = authUsers.users.find((user) => user.id === requestRecord.user_id) as AuthUserRecord | undefined;
 
         if (authUser) {
           // Calculate activity metrics (mock data for now)
@@ -105,10 +133,10 @@ export async function GET(req: NextRequest) {
 
           betaUsers.push({
             id: authUser.id,
-            email: authUser.email || betaRequest.email,
+            email: authUser.email || requestRecord.email,
             created_at: authUser.created_at,
             last_sign_in_at: authUser.last_sign_in_at,
-            beta_joined_at: betaRequest.approved_at || betaRequest.created_at,
+            beta_joined_at: requestRecord.approved_at || requestRecord.created_at,
             days_since_join: daysSinceJoin,
             days_since_last_login: daysSinceLastLogin,
             activity_score: Math.min(10, activityScore),

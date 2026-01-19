@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { getCategoryForItem } from '@/lib/constants/shopping-categories';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimeChannel, RealtimePostgresChangesPayload, SupabaseClient } from '@supabase/supabase-js';
 
 export interface ShoppingItem {
   id: string;
@@ -64,6 +64,7 @@ export interface CreateItemInput {
   quantity?: number;
   unit?: string;
   category?: string;
+  assigned_to?: string;
 }
 
 // For templates - items without list_id
@@ -96,9 +97,11 @@ interface ShoppingItemFromDB {
   list: { space_id: string };
 }
 
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 export const shoppingService = {
-  async getLists(spaceId: string): Promise<ShoppingList[]> {
-    const supabase = createClient();
+  async getLists(spaceId: string, supabaseClient?: SupabaseClient): Promise<ShoppingList[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('shopping_lists')
       .select('*, items:shopping_items(*, assignee:users!shopping_items_assigned_to_fkey(id, name, email, avatar_url))')
@@ -109,8 +112,8 @@ export const shoppingService = {
     return data || [];
   },
 
-  async getListById(id: string): Promise<ShoppingList | null> {
-    const supabase = createClient();
+  async getListById(id: string, supabaseClient?: SupabaseClient): Promise<ShoppingList | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('shopping_lists')
       .select('*, items:shopping_items(*, assignee:users!shopping_items_assigned_to_fkey(id, name, email, avatar_url))')
@@ -121,8 +124,8 @@ export const shoppingService = {
     return data;
   },
 
-  async createList(input: CreateListWithItemsInput): Promise<ShoppingList> {
-    const supabase = createClient();
+  async createList(input: CreateListWithItemsInput, supabaseClient?: SupabaseClient): Promise<ShoppingList> {
+    const supabase = getSupabaseClient(supabaseClient);
     // Remove items field if it exists (items are created separately)
     const { items, ...listData } = input;
 
@@ -139,8 +142,8 @@ export const shoppingService = {
     return data;
   },
 
-  async updateList(id: string, updates: UpdateListInput): Promise<ShoppingList> {
-    const supabase = createClient();
+  async updateList(id: string, updates: UpdateListInput, supabaseClient?: SupabaseClient): Promise<ShoppingList> {
+    const supabase = getSupabaseClient(supabaseClient);
     // Remove items field if it exists (items are managed separately)
     const { items, ...updateData } = updates;
     const finalUpdates: Record<string, unknown> = { ...updateData };
@@ -164,8 +167,8 @@ export const shoppingService = {
     return data;
   },
 
-  async deleteList(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteList(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
       .from('shopping_lists')
       .delete()

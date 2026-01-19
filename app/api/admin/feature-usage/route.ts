@@ -15,6 +15,7 @@ import { cookies } from 'next/headers';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -66,6 +67,10 @@ const FEATURE_DISPLAY_NAMES: Record<string, string> = {
   checkin: 'Check-In',
   settings: 'Settings',
 };
+
+const AggregateRequestSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+}).strict();
 
 export async function GET(req: NextRequest) {
   try {
@@ -376,7 +381,7 @@ export async function POST(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -385,7 +390,8 @@ export async function POST(req: NextRequest) {
 
     // Get optional date parameter
     const body = await req.json().catch(() => ({}));
-    const targetDate = body.date || new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const parsedBody = AggregateRequestSchema.parse(body);
+    const targetDate = parsedBody.date || new Date(Date.now() - 24 * 60 * 60 * 1000)
       .toISOString()
       .split('T')[0];
 
@@ -410,6 +416,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     Sentry.captureException(error);
     logger.error('[API] /api/admin/feature-usage POST error:', error, { component: 'api-route', action: 'api_request' });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: error.issues },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to aggregate data' },
       { status: 500 }

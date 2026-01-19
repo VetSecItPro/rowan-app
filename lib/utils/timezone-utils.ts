@@ -23,6 +23,7 @@ export function getUserTimezone(): string {
  * @returns UTC ISO string for database storage
  */
 export function toUTC(localDate: Date | string, timezone?: string): string {
+  void timezone;
   const date = typeof localDate === 'string' ? parseISO(localDate) : localDate;
   return date.toISOString();
 }
@@ -36,6 +37,7 @@ export function toUTC(localDate: Date | string, timezone?: string): string {
  * @returns Date object in user's local timezone
  */
 export function fromUTC(utcISOString: string, timezone?: string): Date {
+  void timezone;
   return parseISO(utcISOString);
 }
 
@@ -52,6 +54,7 @@ export function formatInLocalTimezone(
   formatString: string = 'PPp',
   timezone?: string
 ): string {
+  void timezone;
   const date = parseISO(utcISOString);
   return format(date, formatString);
 }
@@ -67,6 +70,7 @@ export function formatInLocalTimezone(
 export function toDateTimeLocalValue(utcISOString: string, timezone?: string): string {
   if (!utcISOString) return '';
 
+  void timezone;
   const localDate = fromUTC(utcISOString, timezone);
   // Format as YYYY-MM-DDTHH:mm (datetime-local format)
   return format(localDate, "yyyy-MM-dd'T'HH:mm");

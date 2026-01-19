@@ -1,22 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
-  useEffect(() => {
-    // Delay the auth check to avoid hydration issues
-    const timer = setTimeout(() => {
-      checkAuth();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/dashboard/stats', {
         method: 'GET',
@@ -30,13 +21,22 @@ export default function AdminPage() {
         // User is not authenticated, redirect to login (don't log this as error)
         router.replace('/admin/login');
       }
-    } catch (error) {
+    } catch {
       // Network or other error, redirect to login silently
       router.replace('/admin/login');
     } finally {
       setIsChecking(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    // Delay the auth check to avoid hydration issues
+    const timer = setTimeout(() => {
+      checkAuth();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [checkAuth]);
 
   // Only show loading if we're still checking
   if (isChecking) {

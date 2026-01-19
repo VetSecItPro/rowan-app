@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Decrypt and validate admin session
-    let sessionData: any;
+    let sessionData: unknown;
     try {
       sessionData = await decryptSessionData(adminSession.value);
 
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
             description: `Supabase connection response time`,
             lastChecked: now,
           };
-        } catch (error) {
+        } catch {
           return {
             name: 'Database Connection',
             status: 'critical',
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
             description: `${activeBetaUsers}/${capacity} beta slots used`,
             lastChecked: now,
           };
-        } catch (error) {
+        } catch {
           return {
             name: 'Beta Program Capacity',
             status: 'critical',
@@ -163,7 +163,7 @@ export async function GET(req: NextRequest) {
             description: `Redis rate limiting response time: ${testTime}ms`,
             lastChecked: now,
           };
-        } catch (error) {
+        } catch {
           return {
             name: 'Rate Limiting',
             status: 'critical',
@@ -190,7 +190,7 @@ export async function GET(req: NextRequest) {
             description: `${heapUsedMB}MB / ${heapTotalMB}MB heap${isDev ? ' (dev server)' : ''}`,
             lastChecked: now,
           };
-        } catch (error) {
+        } catch {
           return {
             name: 'Memory Usage',
             status: 'warning',
@@ -216,7 +216,7 @@ export async function GET(req: NextRequest) {
             description: 'Average API endpoint response time',
             lastChecked: now,
           };
-        } catch (error) {
+        } catch {
           return {
             name: 'API Response Time',
             status: 'critical',
@@ -241,7 +241,7 @@ export async function GET(req: NextRequest) {
             description: 'Application error rate over last hour',
             lastChecked: now,
           };
-        } catch (error) {
+        } catch {
           return {
             name: 'Error Rate',
             status: 'warning',

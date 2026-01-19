@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 /**
@@ -26,6 +27,8 @@ import { logger } from '@/lib/logger';
  * Users can export their data at any time from Settings → Privacy & Security
  */
 
+type ExportRecord = Record<string, unknown>;
+
 export interface UserDataExport {
   export_info: {
     export_date: string;
@@ -33,23 +36,23 @@ export interface UserDataExport {
     format: 'JSON';
     version: '1.0';
   };
-  profile: any;
-  partnerships: any[];
-  expenses: any[];
-  budgets: any[];
-  bills: any[];
-  goals: any[];
-  goal_contributions: any[];
-  projects: any[];
-  tasks: any[];
-  calendar_events: any[];
-  reminders: any[];
-  messages: any[];
-  shopping_lists: any[];
-  shopping_items: any[];
-  meals: any[];
-  recipes: any[];
-  households: any[];
+  profile: ExportRecord | null;
+  partnerships: ExportRecord[];
+  expenses: ExportRecord[];
+  budgets: ExportRecord[];
+  bills: ExportRecord[];
+  goals: ExportRecord[];
+  goal_contributions: ExportRecord[];
+  projects: ExportRecord[];
+  tasks: ExportRecord[];
+  calendar_events: ExportRecord[];
+  reminders: ExportRecord[];
+  messages: ExportRecord[];
+  shopping_lists: ExportRecord[];
+  shopping_items: ExportRecord[];
+  meals: ExportRecord[];
+  recipes: ExportRecord[];
+  households: ExportRecord[];
 }
 
 export interface ExportResult {
@@ -58,12 +61,14 @@ export interface ExportResult {
   error?: string;
 }
 
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 /**
  * Export all user data in GDPR-compliant format
  */
-export async function exportAllUserData(userId: string): Promise<ExportResult> {
+export async function exportAllUserData(userId: string, supabaseClient?: SupabaseClient): Promise<ExportResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     // Initialize export structure
     const exportData: UserDataExport = {
@@ -229,7 +234,7 @@ export async function exportAllUserData(userId: string): Promise<ExportResult> {
 /**
  * Helper: Escape CSV field values
  */
-function escapeCsvField(value: any): string {
+function escapeCsvField(value: unknown): string {
   if (value === null || value === undefined) return '';
 
   const stringValue = String(value);
@@ -245,7 +250,7 @@ function escapeCsvField(value: any): string {
 /**
  * Helper: Convert JSON array to CSV string
  */
-function jsonToCsv(data: any[], includeHeaders: boolean = true): string {
+function jsonToCsv(data: ExportRecord[], includeHeaders: boolean = true): string {
   if (!data || data.length === 0) {
     return '';
   }
@@ -269,7 +274,7 @@ function jsonToCsv(data: any[], includeHeaders: boolean = true): string {
   // Create data rows
   data.forEach(item => {
     const row = keys.map(key => {
-      const value = item[key];
+      const value = item[key as keyof ExportRecord];
 
       // Handle nested objects/arrays by converting to JSON string
       if (typeof value === 'object' && value !== null) {
@@ -288,8 +293,8 @@ function jsonToCsv(data: any[], includeHeaders: boolean = true): string {
 /**
  * Export expenses to CSV format
  */
-export async function exportExpensesToCsv(userId: string): Promise<string> {
-  const { data } = await exportAllUserData(userId);
+export async function exportExpensesToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
+  const { data } = await exportAllUserData(userId, supabaseClient);
 
   if (!data || !data.expenses) {
     return '';
@@ -301,8 +306,8 @@ export async function exportExpensesToCsv(userId: string): Promise<string> {
 /**
  * Export tasks to CSV format
  */
-export async function exportTasksToCsv(userId: string): Promise<string> {
-  const { data } = await exportAllUserData(userId);
+export async function exportTasksToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
+  const { data } = await exportAllUserData(userId, supabaseClient);
 
   if (!data || !data.tasks) {
     return '';
@@ -314,8 +319,8 @@ export async function exportTasksToCsv(userId: string): Promise<string> {
 /**
  * Export calendar events to CSV format
  */
-export async function exportEventsToCsv(userId: string): Promise<string> {
-  const { data } = await exportAllUserData(userId);
+export async function exportEventsToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
+  const { data } = await exportAllUserData(userId, supabaseClient);
 
   if (!data || !data.calendar_events) {
     return '';
@@ -327,8 +332,8 @@ export async function exportEventsToCsv(userId: string): Promise<string> {
 /**
  * Export shopping lists to CSV format
  */
-export async function exportShoppingListsToCsv(userId: string): Promise<string> {
-  const { data } = await exportAllUserData(userId);
+export async function exportShoppingListsToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
+  const { data } = await exportAllUserData(userId, supabaseClient);
 
   if (!data || !data.shopping_lists) {
     return '';
@@ -340,8 +345,8 @@ export async function exportShoppingListsToCsv(userId: string): Promise<string> 
 /**
  * Export messages to CSV format
  */
-export async function exportMessagesToCsv(userId: string): Promise<string> {
-  const { data } = await exportAllUserData(userId);
+export async function exportMessagesToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
+  const { data } = await exportAllUserData(userId, supabaseClient);
 
   if (!data || !data.messages) {
     return '';
@@ -354,8 +359,8 @@ export async function exportMessagesToCsv(userId: string): Promise<string> {
  * Export ALL data to multiple CSV files (returns a ZIP-ready structure)
  * Returns object with filename -> CSV content mapping
  */
-export async function exportAllDataToCsv(userId: string): Promise<Record<string, string>> {
-  const { data } = await exportAllUserData(userId);
+export async function exportAllDataToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<Record<string, string>> {
+  const { data } = await exportAllUserData(userId, supabaseClient);
 
   if (!data) {
     return {};
@@ -364,7 +369,8 @@ export async function exportAllDataToCsv(userId: string): Promise<Record<string,
   const csvFiles: Record<string, string> = {};
 
   // Export each data type to separate CSV file
-  const dataTypes = [
+  type ExportArrayKey = keyof Omit<UserDataExport, 'export_info' | 'profile'>;
+  const dataTypes: Array<{ key: ExportArrayKey; filename: string }> = [
     { key: 'expenses', filename: 'expenses.csv' },
     { key: 'budgets', filename: 'budgets.csv' },
     { key: 'bills', filename: 'bills.csv' },
@@ -381,7 +387,7 @@ export async function exportAllDataToCsv(userId: string): Promise<Record<string,
   ];
 
   dataTypes.forEach(({ key, filename }) => {
-    const dataArray = (data as any)[key];
+    const dataArray = data[key];
     if (dataArray && Array.isArray(dataArray) && dataArray.length > 0) {
       csvFiles[filename] = jsonToCsv(dataArray);
     }
@@ -415,47 +421,9 @@ export interface PdfExportOptions {
 }
 
 /**
- * Format data for PDF table display
- */
-function formatDataForPdfTable(data: any[]): any[] {
-  if (!data || data.length === 0) return [];
-
-  return data.map(item => {
-    const formatted: any = {};
-    Object.keys(item).forEach(key => {
-      // Skip internal fields and null values
-      if (key === 'id' || key === 'user_id' || key === 'partnership_id' || item[key] === null) {
-        return;
-      }
-
-      // Format dates
-      if (key.includes('date') || key.includes('_at') || key === 'created' || key === 'updated') {
-        formatted[key] = item[key] ? new Date(item[key]).toLocaleDateString() : '';
-        return;
-      }
-
-      // Format booleans
-      if (typeof item[key] === 'boolean') {
-        formatted[key] = item[key] ? 'Yes' : 'No';
-        return;
-      }
-
-      // Format objects/arrays as JSON strings
-      if (typeof item[key] === 'object') {
-        formatted[key] = JSON.stringify(item[key]);
-        return;
-      }
-
-      formatted[key] = item[key];
-    });
-    return formatted;
-  });
-}
-
-/**
  * Get data subset based on data type selection
  */
-export function getDataSubset(data: UserDataExport, dataType: string): { title: string; data: any[] } {
+export function getDataSubset(data: UserDataExport, dataType: string): { title: string; data: ExportRecord[] } {
   const dataMap: Record<string, { title: string; key: keyof UserDataExport }> = {
     'expenses': { title: 'Expenses', key: 'expenses' },
     'tasks': { title: 'Tasks & Chores', key: 'tasks' },
@@ -474,6 +442,6 @@ export function getDataSubset(data: UserDataExport, dataType: string): { title: 
 
   return {
     title: mapping.title,
-    data: data[mapping.key] as any[] || []
+    data: data[mapping.key] || []
   };
 }

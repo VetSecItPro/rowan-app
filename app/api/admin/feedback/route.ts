@@ -90,10 +90,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in admin feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: error.message || 'Internal server error' },
+      { success: false, error: message },
       { status: 500 }
     );
   }

@@ -6,7 +6,6 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { z } from 'zod';
-import { logger } from '@/lib/logger';
 
 // Query parameter validation schema
 const QueryParamsSchema = z.object({
@@ -18,6 +17,23 @@ const QueryParamsSchema = z.object({
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
+
+type BetaRequestRecord = {
+  id: string;
+  email: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  access_granted?: boolean;
+  user_id?: string | null;
+  created_at?: string | null;
+  approved_at?: string | null;
+  notes?: string | null;
+};
+
+type BetaStatsRecord = {
+  access_granted?: boolean;
+  user_id?: string | null;
+};
 
 /**
  * GET /api/admin/beta-requests
@@ -105,22 +121,23 @@ export async function GET(req: NextRequest) {
 
         // Transform the data to include additional information
         // SECURITY: password_attempt intentionally excluded to prevent credential exposure
-        const requests = (betaRequests || []).map((request: any) => {
-          const nameInfo = emailToName.get((request.email || '').toLowerCase());
+        const requests = (betaRequests || []).map((request) => {
+          const requestRecord = request as BetaRequestRecord;
+          const nameInfo = emailToName.get((requestRecord.email || '').toLowerCase());
           return {
-            id: request.id,
-            email: request.email,
+            id: requestRecord.id,
+            email: requestRecord.email,
             first_name: nameInfo?.first_name || null,
             last_name: nameInfo?.last_name || null,
             invite_code: nameInfo?.code || null,
             // password_attempt removed for security - credentials should never be exposed
-            ip_address: request.ip_address,
-            user_agent: request.user_agent,
-            access_granted: request.access_granted,
-            user_id: request.user_id,
-            created_at: request.created_at,
-            approved_at: request.approved_at,
-            notes: request.notes,
+            ip_address: requestRecord.ip_address,
+            user_agent: requestRecord.user_agent,
+            access_granted: requestRecord.access_granted,
+            user_id: requestRecord.user_id,
+            created_at: requestRecord.created_at,
+            approved_at: requestRecord.approved_at,
+            notes: requestRecord.notes,
           };
         });
 
@@ -133,7 +150,7 @@ export async function GET(req: NextRequest) {
           `)
           .not('email', 'is', null);
 
-        let summary = {
+        const summary = {
           total: 0,
           approved: 0,
           pending: 0,
@@ -142,9 +159,9 @@ export async function GET(req: NextRequest) {
 
         if (!statsError && stats) {
           summary.total = stats.length;
-          summary.approved = stats.filter((s: any) => s.access_granted).length;
-          summary.pending = stats.filter((s: any) => !s.access_granted).length;
-          summary.with_accounts = stats.filter((s: any) => s.user_id !== null).length;
+          summary.approved = stats.filter((entry) => (entry as BetaStatsRecord).access_granted).length;
+          summary.pending = stats.filter((entry) => !(entry as BetaStatsRecord).access_granted).length;
+          summary.with_accounts = stats.filter((entry) => (entry as BetaStatsRecord).user_id !== null).length;
         }
 
         return { requests, summary, count: count || 0 };

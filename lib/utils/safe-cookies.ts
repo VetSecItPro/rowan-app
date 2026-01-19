@@ -1,12 +1,28 @@
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 
+type CookieStore = Awaited<ReturnType<typeof cookies>>;
+type CookieOptions = Parameters<CookieStore['set']>[2];
+
 // Mock cookie store for build time
-const mockCookieStore = {
-  get: (name: string) => undefined,
-  set: (name: string, value: string, options?: any) => {},
-  delete: (name: string, options?: any) => {},
-  has: (name: string) => false,
+const mockCookieStore: CookieStore = {
+  get: (name: string) => {
+    void name;
+    return undefined;
+  },
+  set: (name: string, value: string, options?: CookieOptions) => {
+    void name;
+    void value;
+    void options;
+  },
+  delete: (name: string, options?: CookieOptions) => {
+    void name;
+    void options;
+  },
+  has: (name: string) => {
+    void name;
+    return false;
+  },
   getAll: () => [],
   toString: () => '',
 };
@@ -19,10 +35,10 @@ const mockCookieStore = {
  * const cookieStore = await safeCookiesAsync();
  * const session = cookieStore.get('session');
  */
-export async function safeCookiesAsync() {
+export async function safeCookiesAsync(): Promise<CookieStore> {
   try {
     return await cookies();
-  } catch (error) {
+  } catch {
     // During build time, provide a mock cookie store
     logger.warn('Cookies not available during build time, using mock store', { component: 'lib-safe-cookies' });
     return mockCookieStore;
@@ -41,13 +57,15 @@ export async function safeCookiesAsync() {
  * only works inside React components, NOT in API routes.
  * For API routes, use safeCookiesAsync() instead.
  */
-export function safeCookies() {
+export function safeCookies(): CookieStore {
   try {
-    // Try to use it synchronously for component contexts
-    // This will fail in API routes and trigger the catch
-    const React = require('react');
-    return React.use(cookies());
-  } catch (error) {
+    const store = cookies();
+    if (typeof (store as Promise<CookieStore>).then === 'function') {
+      logger.warn('Sync cookies access unavailable, returning mock store', { component: 'lib-safe-cookies' });
+      return mockCookieStore;
+    }
+    return store as CookieStore;
+  } catch {
     // During build time or API routes, provide a mock cookie store
     logger.warn('Cookies not available during build time, using mock store', { component: 'lib-safe-cookies' });
     return mockCookieStore;
@@ -61,7 +79,7 @@ export async function safeCookieGetAsync(name: string) {
   try {
     const cookieStore = await cookies();
     return cookieStore.get(name);
-  } catch (error) {
+  } catch {
     // During build time, return undefined
     return undefined;
   }
@@ -71,24 +89,18 @@ export async function safeCookieGetAsync(name: string) {
  * Safe cookie getter (DEPRECATED - use safeCookieGetAsync for API routes)
  */
 export function safeCookieGet(name: string) {
-  try {
-    const React = require('react');
-    const cookieStore = React.use(cookies());
-    return cookieStore.get(name);
-  } catch (error) {
-    // During build time, return undefined
-    return undefined;
-  }
+  const cookieStore = safeCookies();
+  return cookieStore.get(name);
 }
 
 /**
  * Async safe cookie setter for API routes
  */
-export async function safeCookieSetAsync(name: string, value: string, options?: any) {
+export async function safeCookieSetAsync(name: string, value: string, options?: CookieOptions) {
   try {
     const cookieStore = await cookies();
     cookieStore.set(name, value, options);
-  } catch (error) {
+  } catch {
     // During build time, do nothing
     logger.warn(`Cookie set ignored during build time: ${name}`, { component: 'lib-safe-cookies' });
   }
@@ -97,12 +109,11 @@ export async function safeCookieSetAsync(name: string, value: string, options?: 
 /**
  * Safe cookie setter (DEPRECATED - use safeCookieSetAsync for API routes)
  */
-export function safeCookieSet(name: string, value: string, options?: any) {
+export function safeCookieSet(name: string, value: string, options?: CookieOptions) {
   try {
-    const React = require('react');
-    const cookieStore = React.use(cookies());
+    const cookieStore = safeCookies();
     cookieStore.set(name, value, options);
-  } catch (error) {
+  } catch {
     // During build time, do nothing
     logger.warn(`Cookie set ignored during build time: ${name}`, { component: 'lib-safe-cookies' });
   }

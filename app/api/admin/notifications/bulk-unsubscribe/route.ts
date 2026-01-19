@@ -6,6 +6,11 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const BulkUnsubscribeSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(1000),
+}).strict();
 
 /**
  * POST /api/admin/notifications/bulk-unsubscribe
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -56,23 +61,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request body
     const body = await req.json();
-    const { ids } = body;
-
-    // Validate input
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return NextResponse.json(
-        { error: 'IDs array is required and must not be empty' },
-        { status: 400 }
-      );
-    }
-
-    // Limit bulk operations to prevent abuse
-    if (ids.length > 1000) {
-      return NextResponse.json(
-        { error: 'Maximum 1000 records can be processed at once' },
-        { status: 400 }
-      );
-    }
+    const { ids } = BulkUnsubscribeSchema.parse(body);
 
     // Get current timestamp for unsubscribed_at
     const unsubscribedAt = new Date().toISOString();
@@ -123,6 +112,12 @@ export async function POST(req: NextRequest) {
       },
     });
     logger.error('[API] /api/admin/notifications/bulk-unsubscribe POST error:', error, { component: 'api-route', action: 'api_request' });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: error.issues },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to process bulk unsubscribe' },
       { status: 500 }

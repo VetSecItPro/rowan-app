@@ -59,7 +59,7 @@ export async function PATCH(
     if (body.admin_notes !== undefined) update.admin_notes = body.admin_notes;
 
     // Update feedback
-    const result = await feedbackService.updateFeedback(id, update);
+    const result = await feedbackService.updateFeedback(id, update, supabaseAdmin);
 
     if (!result.success) {
       return NextResponse.json(
@@ -69,10 +69,11 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true, data: result.data });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in admin feedback update API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: error.message || 'Internal server error' },
+      { success: false, error: message },
       { status: 500 }
     );
   }
@@ -120,7 +121,7 @@ export async function DELETE(
     const { id } = await params;
 
     // Delete feedback
-    const result = await feedbackService.deleteFeedback(id);
+    const result = await feedbackService.deleteFeedback(id, supabaseAdmin);
 
     if (!result.success) {
       return NextResponse.json(
@@ -130,10 +131,11 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in admin feedback delete API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: error.message || 'Internal server error' },
+      { success: false, error: message },
       { status: 500 }
     );
   }

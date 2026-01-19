@@ -58,7 +58,7 @@ export async function PATCH(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }

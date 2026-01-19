@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -20,9 +20,7 @@ import {
   Shield,
   Lock,
   Cookie,
-  MapPin,
   Mail,
-  BarChart3,
   Share2,
   AlertCircle,
   FileText,
@@ -41,16 +39,7 @@ export default function PrivacyCompliancePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
-    loadData();
-  }, [user]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -74,7 +63,16 @@ export default function PrivacyCompliancePage() {
     }
 
     setLoading(false);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    loadData();
+  }, [user, router, loadData]);
 
   const handlePreferenceChange = async (key: keyof PrivacyPreferences, value: boolean) => {
     if (!user || !preferences) return;
@@ -123,7 +121,7 @@ export default function PrivacyCompliancePage() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-white mb-2">Privacy & Compliance Settings</h1>
               <p className="text-gray-400">
-                Manage your privacy preferences and view your data processing agreements. Your privacy is important to us, and we're committed to GDPR and CCPA compliance.
+                Manage your privacy preferences and view your data processing agreements. Your privacy is important to us, and we&apos;re committed to GDPR and CCPA compliance.
               </p>
             </div>
           </div>
@@ -153,7 +151,7 @@ export default function PrivacyCompliancePage() {
                 <div className="flex items-start gap-2">
                   <Info className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-orange-200">
-                    <p className="font-medium mb-1">What does "Do Not Sell" mean?</p>
+                    <p className="font-medium mb-1">What does &quot;Do Not Sell&quot; mean?</p>
                     <p className="text-xs">
                       When enabled, we will not share your personal information with third parties for monetary or other valuable consideration. This does not affect data sharing necessary for service functionality.
                     </p>
@@ -311,39 +309,11 @@ export default function PrivacyCompliancePage() {
                   </div>
                   <Toggle
                     id="allow-third-party-analytics"
-                    checked={preferences?.allow_third_party_analytics || false}
-                    onChange={(checked) => handlePreferenceChange('allow_third_party_analytics', checked)}
+                    checked={preferences?.third_party_analytics_enabled || false}
+                    onChange={(checked) => handlePreferenceChange('third_party_analytics_enabled', checked)}
                     disabled={saving}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Location Tracking */}
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-white mb-1">Location Services</h2>
-                  <p className="text-sm text-gray-400">
-                    Control whether we can access your location data.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                <div>
-                  <p className="font-medium text-white">Location Tracking</p>
-                  <p className="text-xs text-gray-400 mt-1">Enable location-based features and services</p>
-                </div>
-                <Toggle
-                  id="location-tracking-enabled"
-                  checked={preferences?.location_tracking_enabled || false}
-                  onChange={(checked) => handlePreferenceChange('location_tracking_enabled', checked)}
-                  disabled={saving}
-                />
               </div>
             </div>
 
