@@ -18,6 +18,25 @@ interface UseTaskRealtimeOptions {
   onTaskDeleted?: (taskId: string) => void;
 }
 
+type SubtaskRecord = {
+  id: string;
+  title: string;
+  completed: boolean;
+  sort_order: number | null;
+  parent_task_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type CommentRecord = {
+  id: string;
+  content: string;
+  user_id: string;
+  task_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
 // Optimized filter function
 function taskPassesFilters(task: Task, filters?: UseTaskRealtimeOptions['filters']): boolean {
   if (!filters) return true;
@@ -30,7 +49,7 @@ function taskPassesFilters(task: Task, filters?: UseTaskRealtimeOptions['filters
 }
 
 // Debounce helper for state updates
-function debounce<T extends (...args: any[]) => void>(func: T, delay: number): T {
+function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): T {
   let timeoutId: NodeJS.Timeout;
   return ((...args: Parameters<T>) => {
     clearTimeout(timeoutId);
@@ -139,8 +158,6 @@ export function useTaskRealtime({
     }
 
     const supabase = createClient();
-    let channel: RealtimeChannel;
-    let accessCheckInterval: NodeJS.Timeout;
 
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
@@ -226,75 +243,72 @@ export function useTaskRealtime({
       }
     }
 
-    function setupRealtimeSubscription() {
-      channel = supabase
-        .channel(`tasks:${spaceId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'tasks',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Task>) => {
-            const newTask = payload.new as Task;
+    const channel = supabase
+      .channel(`tasks:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'tasks',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Task>) => {
+          const newTask = payload.new as Task;
 
-            if (taskFilter(newTask)) {
-              // Add to batch queue instead of immediate state update
-              updateQueueRef.current.inserts.push(newTask);
-              debouncedBatchUpdate();
-              onTaskAdded?.(newTask);
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'tasks',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Task>) => {
-            const updatedTask = payload.new as Task;
-
-            if (taskFilter(updatedTask)) {
-              // Add to batch queue for updates
-              updateQueueRef.current.updates.push(updatedTask);
-              debouncedBatchUpdate();
-              onTaskUpdated?.(updatedTask);
-            } else {
-              // Task no longer passes filters, add to deletes queue
-              updateQueueRef.current.deletes.push(updatedTask.id);
-              debouncedBatchUpdate();
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'tasks',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Task>) => {
-            const deletedTaskId = (payload.old as Task).id;
-            // Add to batch queue for deletes
-            updateQueueRef.current.deletes.push(deletedTaskId);
+          if (taskFilter(newTask)) {
+            // Add to batch queue instead of immediate state update
+            updateQueueRef.current.inserts.push(newTask);
             debouncedBatchUpdate();
-            onTaskDeleted?.(deletedTaskId);
+            onTaskAdded?.(newTask);
           }
-        )
-        .subscribe();
-    }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Task>) => {
+          const updatedTask = payload.new as Task;
+
+          if (taskFilter(updatedTask)) {
+            // Add to batch queue for updates
+            updateQueueRef.current.updates.push(updatedTask);
+            debouncedBatchUpdate();
+            onTaskUpdated?.(updatedTask);
+          } else {
+            // Task no longer passes filters, add to deletes queue
+            updateQueueRef.current.deletes.push(updatedTask.id);
+            debouncedBatchUpdate();
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'tasks',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Task>) => {
+          const deletedTaskId = (payload.old as Task).id;
+          // Add to batch queue for deletes
+          updateQueueRef.current.deletes.push(deletedTaskId);
+          debouncedBatchUpdate();
+          onTaskDeleted?.(deletedTaskId);
+        }
+      )
+      .subscribe();
 
     loadTasks();
-    setupRealtimeSubscription();
 
     // Periodic access verification (every 15 minutes)
-    accessCheckInterval = setInterval(async () => {
+    const accessCheckInterval = setInterval(async () => {
       const hasAccess = await verifyAccess();
 
       if (!hasAccess) {
@@ -338,12 +352,11 @@ export function useTaskRealtime({
 
 // Separate hook for subtask real-time updates
 export function useSubtaskRealtime(taskId: string) {
-  const [subtasks, setSubtasks] = useState<any[]>([]);
+  const [subtasks, setSubtasks] = useState<SubtaskRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    let channel: RealtimeChannel;
 
     async function loadSubtasks() {
       try {
@@ -370,7 +383,7 @@ export function useSubtaskRealtime(taskId: string) {
       }
     }
 
-    channel = supabase
+    const channel = supabase
       .channel(`subtasks:${taskId}`)
       .on(
         'postgres_changes',
@@ -398,12 +411,11 @@ export function useSubtaskRealtime(taskId: string) {
 
 // Hook for task comments real-time updates
 export function useCommentsRealtime(taskId: string) {
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<CommentRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    let channel: RealtimeChannel;
 
     async function loadComments() {
       try {
@@ -429,7 +441,7 @@ export function useCommentsRealtime(taskId: string) {
       }
     }
 
-    channel = supabase
+    const channel = supabase
       .channel(`comments:${taskId}`)
       .on(
         'postgres_changes',

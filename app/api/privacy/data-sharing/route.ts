@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 async function applyDataSharingChanges(
   userId: string,
   allowSharing: boolean,
-  currentPrefs: any
+  currentPrefs: Record<string, unknown>
 ) {
   try {
     // 1. Update analytics providers

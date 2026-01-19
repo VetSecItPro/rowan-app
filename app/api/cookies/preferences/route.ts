@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { logger } from '@/lib/logger';
+import type { CookiePreferences } from '@/lib/utils/cookies';
 
 // Validation schema for cookie preferences
 const CookiePreferencesSchema = z.object({
@@ -188,7 +189,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Apply cookie preferences to external services
-async function applyCookiePreferences(userId: string, preferences: any) {
+async function applyCookiePreferences(userId: string, preferences: CookiePreferences) {
   try {
     // 1. Update Google Analytics consent
     if (process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID) {

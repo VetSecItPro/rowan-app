@@ -11,13 +11,15 @@ import type {
   TaskQueryOptions,
   PaginatedResponse,
 } from '@/lib/types';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimeChannel, RealtimePostgresChangesPayload, SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Security: Default maximum limit for list queries to prevent unbounded data retrieval
  * This protects against DoS attacks and ensures predictable API response sizes
  */
 const DEFAULT_MAX_LIMIT = 500;
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 /**
  * Tasks Service
@@ -58,8 +60,8 @@ export const tasksService = {
    * });
    * ```
    */
-  async getTasks(spaceId: string, options?: TaskQueryOptions): Promise<Task[]> {
-    const supabase = createClient();
+  async getTasks(spaceId: string, options?: TaskQueryOptions, supabaseClient?: SupabaseClient): Promise<Task[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     try {
       let query = supabase
         .from('tasks')
@@ -244,8 +246,8 @@ export const tasksService = {
    * }
    * ```
    */
-  async getTaskById(id: string): Promise<Task | null> {
-    const supabase = createClient();
+  async getTaskById(id: string, supabaseClient?: SupabaseClient): Promise<Task | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -286,8 +288,8 @@ export const tasksService = {
    * });
    * ```
    */
-  async createTask(data: CreateTaskInput): Promise<Task> {
-    const supabase = createClient();
+  async createTask(data: CreateTaskInput, supabaseClient?: SupabaseClient): Promise<Task> {
+    const supabase = getSupabaseClient(supabaseClient);
     try {
       const { data: task, error } = await supabase
         .from('tasks')
@@ -392,8 +394,8 @@ export const tasksService = {
    * });
    * ```
    */
-  async updateTask(id: string, updates: UpdateTaskInput): Promise<Task> {
-    const supabase = createClient();
+  async updateTask(id: string, updates: UpdateTaskInput, supabaseClient?: SupabaseClient): Promise<Task> {
+    const supabase = getSupabaseClient(supabaseClient);
     try {
       // If marking as completed, set completed_at timestamp
       const finalUpdates: any = { ...updates };
@@ -475,8 +477,8 @@ export const tasksService = {
    * await tasksService.deleteTask('task-id');
    * ```
    */
-  async deleteTask(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteTask(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
     try {
       const { error } = await supabase
         .from('tasks')

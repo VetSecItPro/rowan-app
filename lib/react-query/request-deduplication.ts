@@ -7,12 +7,23 @@
 
 import { queryClient, QUERY_KEYS, intelligentInvalidation } from './query-client';
 
+type BatchRequest = {
+  id: string;
+  resolve: (value: unknown) => void;
+  reject: (error: unknown) => void;
+};
+
+type BatchQueue = {
+  requests: BatchRequest[];
+  timeout: NodeJS.Timeout;
+};
+
 /**
  * Request throttling for user-triggered actions
  * Prevents excessive API calls from rapid user interactions
  */
 class RequestThrottler {
-  private pendingRequests = new Map<string, Promise<any>>();
+  private pendingRequests = new Map<string, Promise<unknown>>();
   private throttledActions = new Map<string, number>();
   private readonly THROTTLE_DELAY = 300; // 300ms throttle
 
@@ -67,6 +78,10 @@ class RequestThrottler {
     this.pendingRequests.clear();
     this.throttledActions.clear();
   }
+
+  getPendingCount(): number {
+    return this.pendingRequests.size;
+  }
 }
 
 /**
@@ -74,10 +89,7 @@ class RequestThrottler {
  * Groups related requests to reduce server load
  */
 class RequestBatcher {
-  private batchQueues = new Map<string, {
-    requests: Array<{id: string, resolve: (value: any) => void, reject: (error: any) => void}>;
-    timeout: NodeJS.Timeout;
-  }>();
+  private batchQueues = new Map<string, BatchQueue>();
 
   private readonly BATCH_DELAY = 50; // 50ms batch window
   private readonly MAX_BATCH_SIZE = 10;
@@ -90,7 +102,7 @@ class RequestBatcher {
     requestId: string,
     batchExecutor: (ids: string[]) => Promise<Record<string, T>>
   ): Promise<T> {
-    return new Promise((resolve, reject) => {
+    return new Promise<T>((resolve, reject) => {
       let batch = this.batchQueues.get(batchKey);
 
       if (!batch) {
@@ -101,7 +113,7 @@ class RequestBatcher {
         this.batchQueues.set(batchKey, batch);
       }
 
-      batch.requests.push({ id: requestId, resolve, reject });
+      batch.requests.push({ id: requestId, resolve: resolve as (value: unknown) => void, reject });
 
       // Execute immediately if batch is full
       if (batch.requests.length >= this.MAX_BATCH_SIZE) {
@@ -128,7 +140,7 @@ class RequestBatcher {
       // Resolve individual promises with their results
       requests.forEach(({ id, resolve, reject }) => {
         if (id in results) {
-          resolve(results[id]);
+          resolve(results[id] as T);
         } else {
           reject(new Error(`No result for request ${id}`));
         }
@@ -137,6 +149,14 @@ class RequestBatcher {
       // Reject all promises in the batch
       requests.forEach(({ reject }) => reject(error));
     }
+  }
+
+  clearAll(): void {
+    this.batchQueues.clear();
+  }
+
+  getBatchCount(): number {
+    return this.batchQueues.size;
   }
 }
 
@@ -153,7 +173,7 @@ export const deduplicatedRequests = {
   /**
    * Throttled space switching to prevent rapid switching
    */
-  async switchSpace(userId: string, spaceId: string, switchFn: () => Promise<any>) {
+  async switchSpace(userId: string, spaceId: string, switchFn: () => Promise<unknown>) {
     const key = `switch-space-${userId}-${spaceId}`;
     return requestThrottler.throttle(key, switchFn);
   },
@@ -161,7 +181,7 @@ export const deduplicatedRequests = {
   /**
    * Throttled profile updates to prevent rapid saves
    */
-  async updateProfile(userId: string, updateFn: () => Promise<any>) {
+  async updateProfile(userId: string, updateFn: () => Promise<unknown>) {
     const key = `update-profile-${userId}`;
     return requestThrottler.throttle(key, updateFn);
   },
@@ -169,8 +189,8 @@ export const deduplicatedRequests = {
   /**
    * Batched space member fetching
    */
-  async getSpaceMembers(spaceIds: string[]): Promise<Record<string, any[]>> {
-    const results: Record<string, any[]> = {};
+  async getSpaceMembers(spaceIds: string[]): Promise<Record<string, unknown[]>> {
+    const results: Record<string, unknown[]> = {};
 
     // Use Promise.all for concurrent requests, but with intelligent deduplication
     const uniqueSpaceIds = [...new Set(spaceIds)];
@@ -180,7 +200,7 @@ export const deduplicatedRequests = {
       // Check if data is already cached and fresh
       const cached = queryClient.getQueryData(QUERY_KEYS.spaces.members(spaceId));
       if (cached) {
-        return { spaceId, members: cached };
+        return { spaceId, members: cached as unknown[] };
       }
 
       // Otherwise, fetch with deduplication
@@ -195,7 +215,7 @@ export const deduplicatedRequests = {
         return data;
       });
 
-      return { spaceId, members };
+      return { spaceId, members: members as unknown[] };
     });
 
     const resolved = await Promise.all(promises);
@@ -259,14 +279,14 @@ export const deduplicationDevtools = {
    * Get current throttled requests count
    */
   getThrottledCount(): number {
-    return (requestThrottler as any).pendingRequests.size;
+    return requestThrottler.getPendingCount();
   },
 
   /**
    * Get current batched requests count
    */
   getBatchedCount(): number {
-    return (requestBatcher as any).batchQueues.size;
+    return requestBatcher.getBatchCount();
   },
 
   /**
@@ -274,7 +294,7 @@ export const deduplicationDevtools = {
    */
   clearAll(): void {
     requestThrottler.clearAll();
-    (requestBatcher as any).batchQueues.clear();
+    requestBatcher.clearAll();
   }
 };
 

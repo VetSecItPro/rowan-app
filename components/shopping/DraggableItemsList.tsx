@@ -23,6 +23,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Check, GripVertical } from 'lucide-react';
 import { ShoppingItem } from '@/lib/services/shopping-service';
 import { getCategoryIcon, getCategoryLabel } from '@/lib/constants/shopping-categories';
+import type { ShoppingCategory } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
 
 interface SortableItemProps {
@@ -115,7 +116,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
       </Tooltip>
 
       {/* Category Icon */}
-      <span className="text-base flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
+      <span className="text-base flex-shrink-0">{getCategoryIcon((item.category || 'other') as ShoppingCategory)}</span>
 
       {/* Item Details */}
       <div className="flex-1 min-w-0">
@@ -215,9 +216,9 @@ export function DraggableItemsList({ items, onReorder, onToggleItem }: Draggable
           <div key={category} className="space-y-2">
             {/* Category Header */}
             <div className="flex items-center gap-2 px-2">
-              <span className="text-lg">{getCategoryIcon(category as any)}</span>
+              <span className="text-lg">{getCategoryIcon(category as ShoppingCategory)}</span>
               <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                {getCategoryLabel(category as any)}
+                {getCategoryLabel(category as ShoppingCategory)}
               </h4>
               <span className="text-xs text-gray-400">({categoryItems.length})</span>
             </div>

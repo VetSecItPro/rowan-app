@@ -21,12 +21,15 @@ import {
 import { FeedbackSubmission, FeedbackType, FeedbackStatus } from '@/lib/types';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 export default function MyFeedbackPage() {
   const [feedback, setFeedback] = useState<FeedbackSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackSubmission | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const safeSelectedPageUrl = selectedFeedback?.page_url ? sanitizeUrl(selectedFeedback.page_url) : '';
 
   useEffect(() => {
     loadFeedback();
@@ -52,7 +55,7 @@ export default function MyFeedbackPage() {
     if (!confirm('Are you sure you want to delete this feedback?')) return;
 
     try {
-      const response = await fetch(`/api/feedback/${id}`, {
+      const response = await csrfFetch(`/api/feedback/${id}`, {
         method: 'DELETE',
       });
 
@@ -303,17 +306,17 @@ export default function MyFeedbackPage() {
               </div>
 
               {/* Page URL */}
-              {selectedFeedback.page_url && (
+              {safeSelectedPageUrl && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-400 mb-1">Page URL</h3>
                   <a
-                    href={selectedFeedback.page_url}
+                    href={safeSelectedPageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline flex items-center gap-2"
                   >
                     <Globe className="w-4 h-4" />
-                    {selectedFeedback.page_url}
+                    {safeSelectedPageUrl}
                   </a>
                 </div>
               )}

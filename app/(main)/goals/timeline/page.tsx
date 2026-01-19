@@ -3,23 +3,17 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Clock,
   Target,
   CheckCircle2,
   TrendingUp,
-  Users,
-  Calendar,
   MessageSquare,
-  Camera,
   Milestone as MilestoneIcon,
-  Flag,
   Play,
   Pause,
-  X,
-  Filter,
   Search,
   AlertCircle,
   Medal,
@@ -102,13 +96,7 @@ export default function GoalsTimelinePage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
   // Load timeline data
-  useEffect(() => {
-    if (spaceId && user) {
-      loadTimelineData();
-    }
-  }, [spaceId, user]);
-
-  const loadTimelineData = async () => {
+  const loadTimelineData = useCallback(async () => {
     if (!spaceId || !user) return;
 
     try {
@@ -203,7 +191,13 @@ export default function GoalsTimelinePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId, user]);
+
+  useEffect(() => {
+    if (spaceId && user) {
+      loadTimelineData();
+    }
+  }, [spaceId, user, loadTimelineData]);
 
   const groupEventsByDate = (events: TimelineEvent[]): TimelineGroup[] => {
     const groups: Record<string, TimelineEvent[]> = {};

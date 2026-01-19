@@ -150,8 +150,23 @@ async function validateDownloadToken(token: string): Promise<string | null> {
   }
 }
 
+type DownloadExportData = {
+  exportMetadata: {
+    userId: string;
+    exportDate: string;
+    gdprCompliance: string;
+  };
+  profile?: Record<string, unknown> | null;
+  privacyPreferences?: Record<string, unknown> | null;
+  privacyHistory?: Array<Record<string, unknown>>;
+};
+
+type ExportRequestRecord = {
+  user_id: string;
+};
+
 // Generate mock file response (in production this would fetch from storage)
-async function generateMockFileResponse(exportRequest: any, fileName: string) {
+async function generateMockFileResponse(exportRequest: ExportRequestRecord, fileName: string) {
   try {
     const supabase = await createClient();
 
@@ -205,7 +220,7 @@ async function generateMockFileResponse(exportRequest: any, fileName: string) {
 }
 
 // Simplified data gathering for download (reusing logic from generate-export)
-async function gatherUserDataForDownload(userId: string) {
+async function gatherUserDataForDownload(userId: string): Promise<DownloadExportData> {
   const supabase = await createClient();
 
   // Get essential user data
@@ -241,7 +256,7 @@ async function gatherUserDataForDownload(userId: string) {
 }
 
 // Generate CSV content
-function generateCSVContent(userData: any): string {
+function generateCSVContent(userData: DownloadExportData): string {
   let csvContent = 'Rowan Data Export\n';
   csvContent += `Export Date: ${new Date().toISOString()}\n`;
   csvContent += `User ID: ${userData.exportMetadata.userId}\n`;
@@ -269,7 +284,7 @@ function generateCSVContent(userData: any): string {
 }
 
 // Generate PDF content (simplified text format)
-function generatePDFContent(userData: any): string {
+function generatePDFContent(userData: DownloadExportData): string {
   let pdfContent = 'ROWAN DATA EXPORT\n';
   pdfContent += '==================\n\n';
   pdfContent += `Export Date: ${new Date().toISOString()}\n`;

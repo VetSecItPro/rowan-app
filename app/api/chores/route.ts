@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     if (search) options.search = search;
 
     // Get chores from service
-    const chores = await choresService.getChores(spaceId, options);
+    const chores = await choresService.getChores(spaceId, options, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
       due_date: validatedData.due_date ?? undefined,
       notes: validatedData.notes ?? undefined,
       sort_order: validatedData.sort_order ?? undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

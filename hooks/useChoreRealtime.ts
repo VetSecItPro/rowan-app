@@ -19,6 +19,13 @@ interface UseChoreRealtimeOptions {
   onChoreDeleted?: (choreId: string) => void;
 }
 
+type ChoreCompletion = {
+  id: string;
+  chore_id: string;
+  completed_at?: string;
+  [key: string]: unknown;
+};
+
 // Optimized filter function
 function chorePassesFilters(chore: Chore, filters?: UseChoreRealtimeOptions['filters']): boolean {
   if (!filters) return true;
@@ -146,8 +153,6 @@ export function useChoreRealtime({
     }
 
     const supabase = createClient();
-    let channel: RealtimeChannel;
-    let accessCheckInterval: NodeJS.Timeout;
 
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
@@ -227,75 +232,72 @@ export function useChoreRealtime({
       }
     }
 
-    function setupRealtimeSubscription() {
-      channel = supabase
-        .channel(`chores:${spaceId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'chores',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Chore>) => {
-            const newChore = payload.new as Chore;
+    const channel = supabase
+      .channel(`chores:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chores',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Chore>) => {
+          const newChore = payload.new as Chore;
 
-            if (choreFilter(newChore)) {
-              // Add to batch queue instead of immediate state update
-              updateQueueRef.current.inserts.push(newChore);
-              debouncedBatchUpdate();
-              onChoreAdded?.(newChore);
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'chores',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Chore>) => {
-            const updatedChore = payload.new as Chore;
-
-            if (choreFilter(updatedChore)) {
-              // Add to batch queue for updates
-              updateQueueRef.current.updates.push(updatedChore);
-              debouncedBatchUpdate();
-              onChoreUpdated?.(updatedChore);
-            } else {
-              // Chore no longer passes filters, add to deletes queue
-              updateQueueRef.current.deletes.push(updatedChore.id);
-              debouncedBatchUpdate();
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'chores',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Chore>) => {
-            const deletedChoreId = (payload.old as Chore).id;
-            // Add to batch queue for deletes
-            updateQueueRef.current.deletes.push(deletedChoreId);
+          if (choreFilter(newChore)) {
+            // Add to batch queue instead of immediate state update
+            updateQueueRef.current.inserts.push(newChore);
             debouncedBatchUpdate();
-            onChoreDeleted?.(deletedChoreId);
+            onChoreAdded?.(newChore);
           }
-        )
-        .subscribe();
-    }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'chores',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Chore>) => {
+          const updatedChore = payload.new as Chore;
+
+          if (choreFilter(updatedChore)) {
+            // Add to batch queue for updates
+            updateQueueRef.current.updates.push(updatedChore);
+            debouncedBatchUpdate();
+            onChoreUpdated?.(updatedChore);
+          } else {
+            // Chore no longer passes filters, add to deletes queue
+            updateQueueRef.current.deletes.push(updatedChore.id);
+            debouncedBatchUpdate();
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'chores',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Chore>) => {
+          const deletedChoreId = (payload.old as Chore).id;
+          // Add to batch queue for deletes
+          updateQueueRef.current.deletes.push(deletedChoreId);
+          debouncedBatchUpdate();
+          onChoreDeleted?.(deletedChoreId);
+        }
+      )
+      .subscribe();
 
     loadChores();
-    setupRealtimeSubscription();
 
     // Periodic access verification (every 15 minutes)
-    accessCheckInterval = setInterval(async () => {
+    const accessCheckInterval = setInterval(async () => {
       const hasAccess = await verifyAccess();
 
       if (!hasAccess) {
@@ -339,12 +341,11 @@ export function useChoreRealtime({
 
 // Hook for chore completion history real-time updates
 export function useChoreCompletionRealtime(choreId: string) {
-  const [completions, setCompletions] = useState<any[]>([]);
+  const [completions, setCompletions] = useState<ChoreCompletion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    let channel: RealtimeChannel;
 
     async function loadCompletions() {
       try {
@@ -363,7 +364,7 @@ export function useChoreCompletionRealtime(choreId: string) {
       }
     }
 
-    channel = supabase
+    const channel = supabase
       .channel(`chore_completions:${choreId}`)
       .on(
         'postgres_changes',

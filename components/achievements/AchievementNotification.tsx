@@ -19,16 +19,11 @@ export function AchievementNotification({
   onClose,
   duration = 5000
 }: AchievementNotificationProps) {
-  const [isShowing, setIsShowing] = useState(false);
-
   useEffect(() => {
     if (isVisible) {
-      setIsShowing(true);
-
       // Auto-close after duration
       const timer = setTimeout(() => {
-        setIsShowing(false);
-        setTimeout(onClose, 300); // Wait for exit animation
+        onClose();
       }, duration);
 
       return () => clearTimeout(timer);
@@ -71,7 +66,7 @@ export function AchievementNotification({
   return (
     <Transition
       appear
-      show={isShowing}
+      show={isVisible}
       as={Fragment}
       enter="transform transition duration-300 ease-out"
       enterFrom="translate-y-full opacity-0 scale-95"
@@ -93,10 +88,7 @@ export function AchievementNotification({
           <div className="relative z-10">
             {/* Close button */}
             <button
-              onClick={() => {
-                setIsShowing(false);
-                setTimeout(onClose, 300);
-              }}
+              onClick={onClose}
               className="absolute top-0 right-0 -mt-1 -mr-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
             >
               <X className="w-3 h-3 text-gray-500" />

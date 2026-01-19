@@ -3,10 +3,8 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { useDebounce } from '@/lib/hooks/useDebounce';
-import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Image as ImageIcon, Paperclip, TrendingUp, X, CalendarClock, Users, Info } from 'lucide-react';
-import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Paperclip, TrendingUp, X, Users } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -28,7 +26,6 @@ import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType, Conversation, CreateConversationInput } from '@/lib/services/messages-service';
 import { mentionsService } from '@/lib/services/mentions-service';
-import { getUserProgress } from '@/lib/services/user-progress-service';
 import { format, isSameDay, isToday, isYesterday } from 'date-fns';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { toast } from 'sonner';
@@ -58,12 +55,6 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [searchResults, setSearchResults] = useState<Message[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -85,8 +76,6 @@ export default function MessagesPage() {
   const [forwardingMessage, setForwardingMessage] = useState<Message | null>(null);
   const [editingConversationTitle, setEditingConversationTitle] = useState(false);
   const [conversationTitleInput, setConversationTitleInput] = useState('');
-  const [showSchedulePicker, setShowSchedulePicker] = useState(false);
-  const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
   const [showMembersPanel, setShowMembersPanel] = useState(false);
 
   const [stats, setStats] = useState({
@@ -96,16 +85,7 @@ export default function MessagesPage() {
     total: 0,
   });
 
-  // Use search results if searching, otherwise show current conversation messages
-  const filteredMessages = useMemo(() => {
-    if (debouncedSearchQuery && searchResults.length > 0) {
-      return searchResults;
-    }
-    if (debouncedSearchQuery && !isSearching && searchResults.length === 0) {
-      return []; // Show empty state when search has no results
-    }
-    return messages;
-  }, [messages, debouncedSearchQuery, searchResults, isSearching]);
+  const filteredMessages = messages;
 
   // Memoize date label computation
   const getDateLabel = useCallback((date: Date): string => {
@@ -156,10 +136,9 @@ export default function MessagesPage() {
 
       setConversationId(defaultConversation.id);
 
-      const [messagesData, statsData, userProgressResult, pinnedData, conversationsData] = await Promise.all([
+      const [messagesData, statsData, pinnedData, conversationsData] = await Promise.all([
         messagesService.getMessages(defaultConversation.id),
         messagesService.getMessageStats(currentSpace.id),
-        getUserProgress(user.id),
         messagesService.getPinnedMessages(defaultConversation.id),
         messagesService.getConversationsList(currentSpace.id, user.id),
       ]);
@@ -285,7 +264,7 @@ export default function MessagesPage() {
           )
         );
 
-        await messagesService.updateMessage(editingMessage.id, messageData);
+        await messagesService.updateMessage(editingMessage.id, messageData, { userId: user?.id });
       } else {
         await messagesService.createMessage(messageData);
       }
@@ -303,7 +282,7 @@ export default function MessagesPage() {
         );
       }
     }
-  }, [editingMessage]);
+  }, [editingMessage, user?.id]);
 
   // Memoize handleDeleteMessage callback - now tracks if it's own message for delete options
   const handleDeleteMessage = useCallback(async (messageId: string) => {
@@ -331,7 +310,7 @@ export default function MessagesPage() {
     }
 
     try {
-      await messagesService.deleteMessage(messageId, user?.id, mode);
+      await messagesService.deleteMessage(messageId, mode, { userId: user?.id });
     } catch (error) {
       logger.error('Failed to delete message:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to delete message');
@@ -493,54 +472,11 @@ export default function MessagesPage() {
     }
   }, [messageInput, isSending, conversationId, currentSpace, user, scrollToBottom]);
 
-  // Wrapper for form submission
-  const handleSendMessage = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    handleSubmitMessage();
-  }, [handleSubmitMessage]);
-
   // Memoize handleEmojiClick callback
   const handleEmojiClick = useCallback((emoji: string) => {
     setMessageInput(prev => prev + emoji);
     setShowEmojiPicker(false);
   }, []);
-
-  // Memoize handleSearchChange callback with debounced backend search
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    setIsSearchTyping(true);
-    setTimeout(() => setIsSearchTyping(false), 300);
-
-    // Clear previous timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    // Clear search results if query is empty
-    if (!query.trim()) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
-
-    // Debounce search - wait 500ms after user stops typing
-    setIsSearching(true);
-    searchTimeoutRef.current = setTimeout(async () => {
-      if (!currentSpace) return;
-
-      try {
-        const results = await messagesService.searchMessages(currentSpace.id, query);
-        setSearchResults(results);
-      } catch (error) {
-        logger.error('Search failed:', error, { component: 'page', action: 'service_call' });
-        toast.error('Search failed. Please try again.');
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 500);
-  }, [currentSpace]);
 
   // Memoize handleMessageInputChange callback with typing indicator
   const handleMessageInputChange = useCallback((value: string) => {
@@ -579,37 +515,23 @@ export default function MessagesPage() {
     setShowEmojiPicker(false);
   }, []);
 
-  // Memoize handleImageClick callback
-  const handleImageClick = useCallback(() => {
-    imageInputRef.current?.click();
-  }, []);
-
   // Memoize handleFileClick callback
   const handleFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
 
   // Memoize handleImageChange callback
-  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = useCallback(() => {
   }, []);
 
   // Memoize handleFileChange callback
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback(() => {
   }, []);
 
-  // Memoize empty state message
-  const emptyStateMessage = useMemo(() => {
-    if (debouncedSearchQuery) {
-      return {
-        primary: 'No messages found',
-        secondary: 'Try a different search'
-      };
-    }
-    return {
-      primary: 'No messages yet',
-      secondary: 'Start the conversation below!'
-    };
-  }, [debouncedSearchQuery]);
+  const emptyStateMessage = {
+    primary: 'No messages yet',
+    secondary: 'Start the conversation below!',
+  };
 
 
   // Handle opening thread view
@@ -780,10 +702,11 @@ export default function MessagesPage() {
       toast.error('Failed to create conversation');
       throw error;
     }
-  }, [currentSpace, handleSelectConversation]);
+  }, [currentSpace, handleSelectConversation, user?.id]);
 
   // Handle sending voice message
   const handleSendVoice = useCallback(async (audioBlob: Blob, duration: number) => {
+    void duration;
     if (!currentSpace || !user || !conversationId) {
       toast.error('Unable to send voice message');
       return;

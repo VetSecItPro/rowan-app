@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Toggle } from '@/components/ui/Toggle';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   Shield,
   Database,
@@ -91,7 +92,7 @@ export function PrivacyDataManager() {
       // Optimistically update UI
       setPreferences(prev => prev ? { ...prev, [key]: value } : null);
 
-      const response = await fetch('/api/privacy/preferences', {
+      const response = await csrfFetch('/api/privacy/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [key]: value }),
@@ -107,7 +108,7 @@ export function PrivacyDataManager() {
         setSuccess('Privacy preference updated successfully');
         setTimeout(() => setSuccess(null), 3000);
       }
-    } catch (error) {
+    } catch {
       // Revert on error
       setPreferences(prev => prev ? { ...prev, [key]: !value } : null);
       setError('Failed to update preference');
@@ -121,7 +122,7 @@ export function PrivacyDataManager() {
       setSaving('export');
       setError(null);
 
-      const response = await fetch('/api/privacy/data-export', {
+      const response = await csrfFetch('/api/privacy/data-export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ format: 'json' }),
@@ -135,7 +136,7 @@ export function PrivacyDataManager() {
       } else {
         setError(result.error || 'Failed to request data export');
       }
-    } catch (error) {
+    } catch {
       setError('Failed to request data export');
     } finally {
       setSaving(null);
@@ -151,7 +152,7 @@ export function PrivacyDataManager() {
       setSaving('deletion');
       setError(null);
 
-      const response = await fetch('/api/privacy/account-deletion', {
+      const response = await csrfFetch('/api/privacy/account-deletion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: 'User requested deletion' }),
@@ -165,7 +166,7 @@ export function PrivacyDataManager() {
       } else {
         setError(result.error || 'Failed to request account deletion');
       }
-    } catch (error) {
+    } catch {
       setError('Failed to request account deletion');
     } finally {
       setSaving(null);
@@ -177,7 +178,7 @@ export function PrivacyDataManager() {
       setSaving('cancel-deletion');
       setError(null);
 
-      const response = await fetch('/api/privacy/account-deletion', {
+      const response = await csrfFetch('/api/privacy/account-deletion', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: 'User cancelled deletion' }),
@@ -191,7 +192,7 @@ export function PrivacyDataManager() {
       } else {
         setError(result.error || 'Failed to cancel account deletion');
       }
-    } catch (error) {
+    } catch {
       setError('Failed to cancel account deletion');
     } finally {
       setSaving(null);
@@ -317,7 +318,7 @@ export function PrivacyDataManager() {
               </div>
             </div>
             <div className="text-xs text-blue-300 bg-blue-900/30 p-3 rounded-lg mb-4">
-              Includes your profile, tasks, messages, calendar events, and all personal data. You'll receive an email when your export is ready.
+              Includes your profile, tasks, messages, calendar events, and all personal data. You&apos;ll receive an email when your export is ready.
             </div>
             {exportStatus?.hasActiveRequest ? (
               <div className="text-xs text-blue-300 mb-4">
@@ -348,7 +349,7 @@ export function PrivacyDataManager() {
               </div>
             </div>
             <div className="text-xs text-red-300 bg-red-900/30 p-3 rounded-lg mb-4">
-              <strong>Important:</strong> Account deletion has a 30-day grace period. You'll receive email reminders and can cancel anytime before the final deletion.
+              <strong>Important:</strong> Account deletion has a 30-day grace period. You&apos;ll receive email reminders and can cancel anytime before the final deletion.
             </div>
             {deletionStatus?.hasActiveRequest ? (
               <div className="mb-4">

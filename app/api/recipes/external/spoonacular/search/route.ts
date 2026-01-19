@@ -12,6 +12,37 @@ import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
+type SpoonacularIngredient = {
+  name?: string;
+  original?: string;
+  amount?: number;
+  unit?: string;
+};
+
+type SpoonacularStep = {
+  number?: number;
+  step?: string;
+};
+
+type SpoonacularInstruction = {
+  steps?: SpoonacularStep[];
+};
+
+type SpoonacularRecipe = {
+  id: number | string;
+  extendedIngredients?: SpoonacularIngredient[];
+  analyzedInstructions?: SpoonacularInstruction[];
+  title?: string;
+  summary?: string;
+  image?: string;
+  preparationMinutes?: number;
+  cookingMinutes?: number;
+  servings?: number;
+  cuisines?: string[];
+  sourceUrl?: string;
+  spoonacularSourceUrl?: string;
+};
+
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting with automatic fallback
@@ -73,9 +104,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const recipes = searchData.results.map((recipe: any) => {
+    const results = (searchData.results ?? []) as SpoonacularRecipe[];
+    const recipes = results.map((recipe) => {
       // Parse and sanitize ingredients (external data could contain XSS payloads)
-      const ingredients = recipe.extendedIngredients?.map((ing: any) => ({
+      const ingredients = recipe.extendedIngredients?.map((ing) => ({
         name: sanitizePlainText(ing.name || ing.original),
         amount: ing.amount ? ing.amount.toString() : undefined,
         unit: sanitizePlainText(ing.unit) || undefined,
@@ -84,8 +116,8 @@ export async function GET(request: NextRequest) {
       // Parse and sanitize instructions
       let instructions = '';
       if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) {
-        instructions = recipe.analyzedInstructions[0].steps
-          .map((step: any) => `${step.number}. ${sanitizePlainText(step.step)}`)
+        instructions = (recipe.analyzedInstructions[0].steps ?? [])
+          .map((step) => `${step.number}. ${sanitizePlainText(step.step)}`)
           .join('\n\n');
       }
 

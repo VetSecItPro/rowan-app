@@ -204,7 +204,9 @@ async function gatherUserData(userId: string) {
     .eq('user_id', userId);
 
   // Get user's tasks across all spaces
-  const spaceIds = spaceMembers?.map((sm: any) => sm.space_id) || [];
+  const spaceIds = (spaceMembers || [])
+    .map((sm: SpaceMemberRecord) => sm.space_id)
+    .filter((spaceId): spaceId is string => Boolean(spaceId));
   const { data: tasks } = spaceIds.length > 0 ? await supabase
     .from('tasks')
     .select('*')
@@ -239,7 +241,7 @@ async function gatherUserData(userId: string) {
     .in('space_id', spaceIds)
     .eq('created_by', userId) : { data: [] };
 
-  const userData = {
+  const userData: ExportBundle = {
     exportMetadata: {
       userId,
       exportDate: new Date().toISOString(),
@@ -267,7 +269,35 @@ async function gatherUserData(userId: string) {
 }
 
 // Generate JSON export
-async function generateJSONExport(userData: any): Promise<Buffer> {
+type ExportRecord = Record<string, unknown>;
+
+type ExportBundle = {
+  exportMetadata: {
+    userId: string;
+    exportDate: string;
+    gdprCompliance: string;
+    retention: string;
+  };
+  profile?: ExportRecord | null;
+  privacyPreferences?: ExportRecord | null;
+  privacyHistory?: ExportRecord[];
+  emailNotifications?: ExportRecord[];
+  deletionRequests?: ExportRecord[];
+  exportRequests?: ExportRecord[];
+  spaces: {
+    memberships: ExportRecord[];
+    tasks: ExportRecord[];
+    calendarEvents: ExportRecord[];
+    reminders: ExportRecord[];
+    messages: ExportRecord[];
+    goals: ExportRecord[];
+  };
+};
+
+type SpaceMemberRecord = { space_id?: string | null };
+
+// Generate JSON export
+async function generateJSONExport(userData: ExportBundle): Promise<Buffer> {
   const exportData = {
     ...userData,
     _format: 'json',
@@ -279,7 +309,7 @@ async function generateJSONExport(userData: any): Promise<Buffer> {
 }
 
 // Generate CSV export
-async function generateCSVExport(userData: any): Promise<Buffer> {
+async function generateCSVExport(userData: ExportBundle): Promise<Buffer> {
   let csvContent = 'Rowan Data Export\n';
   csvContent += `Export Date: ${new Date().toISOString()}\n`;
   csvContent += `User ID: ${userData.exportMetadata.userId}\n`;
@@ -309,7 +339,7 @@ async function generateCSVExport(userData: any): Promise<Buffer> {
   if (userData.spaces.tasks?.length > 0) {
     csvContent += 'TASKS\n';
     csvContent += 'Title,Description,Status,Due Date,Created At\n';
-    userData.spaces.tasks.forEach((task: any) => {
+    userData.spaces.tasks.forEach((task: ExportRecord) => {
       csvContent += `"${task.title || ''}","${task.description || ''}","${task.status || ''}","${task.due_date || ''}","${task.created_at || ''}"\n`;
     });
     csvContent += '\n';
@@ -319,7 +349,7 @@ async function generateCSVExport(userData: any): Promise<Buffer> {
   if (userData.spaces.calendarEvents?.length > 0) {
     csvContent += 'CALENDAR EVENTS\n';
     csvContent += 'Title,Description,Start Date,End Date,Created At\n';
-    userData.spaces.calendarEvents.forEach((event: any) => {
+    userData.spaces.calendarEvents.forEach((event: ExportRecord) => {
       csvContent += `"${event.title || ''}","${event.description || ''}","${event.start_date || ''}","${event.end_date || ''}","${event.created_at || ''}"\n`;
     });
     csvContent += '\n';
@@ -329,7 +359,7 @@ async function generateCSVExport(userData: any): Promise<Buffer> {
   if (userData.privacyHistory?.length > 0) {
     csvContent += 'PRIVACY SETTINGS HISTORY\n';
     csvContent += 'Preference,Old Value,New Value,Changed At\n';
-    userData.privacyHistory.forEach((change: any) => {
+    userData.privacyHistory.forEach((change: ExportRecord) => {
       csvContent += `"${change.preference_key || ''}","${change.old_value || ''}","${change.new_value || ''}","${change.changed_at || ''}"\n`;
     });
   }
@@ -338,7 +368,7 @@ async function generateCSVExport(userData: any): Promise<Buffer> {
 }
 
 // Generate PDF export (simplified version - in production you'd use a library like Puppeteer or jsPDF)
-async function generatePDFExport(userData: any): Promise<Buffer> {
+async function generatePDFExport(userData: ExportBundle): Promise<Buffer> {
   // This is a simplified PDF-like text format
   // In a real implementation, you'd use a proper PDF library
   let pdfContent = 'ROWAN DATA EXPORT\n';

@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient } from '@/lib/react-query/query-client';
 import {
@@ -14,6 +14,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
 import type { Space } from '@/lib/types';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 /**
  * NEW AUTHENTICATION CONTEXT - REACT QUERY VERSION
@@ -41,7 +42,7 @@ interface AuthContextType {
   error: string | null;
 
   // Authentication methods
-  signUp: (email: string, password: string, profile: any, betaCode?: string, inviteToken?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, profile: SignUpProfile, betaCode?: string, inviteToken?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -56,6 +57,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+type SignUpProfile = Record<string, unknown>;
+
 /**
  * Inner AuthProvider that uses React Query hooks
  * This component has access to the QueryClient context
@@ -63,7 +66,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 function InnerAuthProvider({ children }: { children: ReactNode }) {
   const authQuery = useAuthQuery();
   const signOutMutation = useSignOut();
-  const updateProfileMutation = useUpdateProfile();
   const handleAuthStateChange = useAuthStateChange();
 
   // Set up real-time auth state change listener
@@ -80,9 +82,9 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   }, [handleAuthStateChange]);
 
   // Authentication methods
-  const signUp = async (email: string, password: string, profile: any, betaCode?: string, inviteToken?: string) => {
+  const signUp = async (email: string, password: string, profile: SignUpProfile, betaCode?: string, inviteToken?: string) => {
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await csrfFetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -134,7 +136,7 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   // Backward compatibility stubs (will be removed once SpacesContext is fully implemented)
   const spaces: (Space & { role: string })[] = [];
   const currentSpace: (Space & { role: string }) | null = null;
-  const switchSpace = (_space: Space & { role: string }) => {
+  const switchSpace = () => {
     // No-op for backward compatibility
   };
   const refreshSpaces = async () => {

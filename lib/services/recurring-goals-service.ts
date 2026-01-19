@@ -34,7 +34,7 @@ export interface RecurrencePattern {
   interval?: number; // For daily: every N days
   days_of_week?: number[]; // For weekly: 0=Sunday, 6=Saturday
   day_of_month?: number; // For monthly: day of month
-  custom_rules?: any; // For custom patterns
+  custom_rules?: Record<string, unknown>; // For custom patterns
 }
 
 export interface RecurringGoalInstance {
@@ -54,7 +54,7 @@ export interface RecurringGoalInstance {
   updated_at: string;
   // Populated relations
   template?: RecurringGoalTemplate;
-  goal?: any; // Reference to actual goal if created
+  goal?: Record<string, unknown>; // Reference to actual goal if created
 }
 
 export interface HabitEntry {
@@ -112,7 +112,7 @@ const RecurrencePatternSchema = z.object({
   interval: z.number().optional(),
   days_of_week: z.array(z.number().min(0).max(6)).optional(),
   day_of_month: z.number().min(1).max(31).optional(),
-  custom_rules: z.any().optional(),
+  custom_rules: z.record(z.unknown()).optional(),
 });
 
 const CreateRecurringGoalTemplateSchema = z.object({
@@ -440,7 +440,13 @@ export const recurringGoalsService = {
   }): Promise<RecurringGoalInstance> {
     const supabase = createClient();
 
-    const updateData: any = {
+    const updateData: {
+      status?: RecurringGoalInstance['status'];
+      current_value?: number;
+      completion_percentage?: number;
+      updated_at: string;
+      completed_at?: string | null;
+    } = {
       ...updates,
       updated_at: new Date().toISOString(),
     };
@@ -573,7 +579,10 @@ export const recurringGoalsService = {
     // Validate updates
     const validated = UpdateHabitEntrySchema.parse(updates);
 
-    const updateData: any = {
+    const updateData: UpdateHabitEntryInput & {
+      updated_at: string;
+      completed_at?: string | null;
+    } = {
       ...validated,
       updated_at: new Date().toISOString(),
     };

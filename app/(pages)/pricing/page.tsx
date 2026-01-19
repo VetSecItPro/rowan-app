@@ -11,10 +11,11 @@ import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
 import Image from 'next/image';
-import { Sparkles, Clock, Shield, Loader2 } from 'lucide-react';
+import { Sparkles, Clock, Shield } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 // Initialize Stripe.js
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -61,7 +62,7 @@ export default function PricingPage() {
 
     try {
       // Create checkout session
-      const response = await fetch('/api/stripe/create-checkout-session', {
+      const response = await csrfFetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tier, period }),
@@ -259,7 +260,7 @@ export default function PricingPage() {
                 </h3>
                 <p className="mt-2 text-gray-400">
                   Yes! You can upgrade or downgrade your plan at any time. Changes take effect
-                  immediately, and we'll prorate any charges or credits.
+                  immediately, and we&apos;ll prorate any charges or credits.
                 </p>
               </div>
 
@@ -268,8 +269,8 @@ export default function PricingPage() {
                   What happens to my data if I cancel?
                 </h3>
                 <p className="mt-2 text-gray-400">
-                  Your data is safe! If you cancel, you'll still have access until the end of your
-                  billing period. After that, you'll be downgraded to the free tier, and your data
+                  Your data is safe! If you cancel, you&apos;ll still have access until the end of your
+                  billing period. After that, you&apos;ll be downgraded to the free tier, and your data
                   remains accessible with free tier limits.
                 </p>
               </div>
@@ -279,7 +280,7 @@ export default function PricingPage() {
                   Do you offer refunds?
                 </h3>
                 <p className="mt-2 text-gray-400">
-                  We offer a 30-day money-back guarantee. If you're not satisfied within the first
+                  We offer a 30-day money-back guarantee. If you&apos;re not satisfied within the first
                   30 days, contact us for a full refund, no questions asked.
                 </p>
               </div>

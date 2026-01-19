@@ -9,6 +9,7 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { buildAppUrl } from '@/lib/utils/app-url';
 import { z } from 'zod';
+import type { SpaceInvitation } from '@/lib/types';
 
 // Zod schemas for invitation operations
 const CancelInvitationSchema = z.object({
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Add invitation URLs to each invitation
-    const invitationsWithUrls = result.data.map((inv: any) => ({
+    const invitationsWithUrls = result.data.map((inv: SpaceInvitation) => ({
       ...inv,
       invitation_url: buildAppUrl('/invitations/accept', { token: inv.token }),
     }));

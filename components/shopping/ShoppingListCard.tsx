@@ -1,13 +1,13 @@
 'use client';
 
-import { ShoppingCart, MoreVertical, Check, Plus } from 'lucide-react';
+import { MoreVertical, Check } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useMemo } from 'react';
 import { getCategoryIcon, getCategoryLabel } from '@/lib/constants/shopping-categories';
+import type { ShoppingCategory } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { CircularProgress } from '@/components/ui/CircularProgress';
-import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useAuth } from '@/lib/contexts/auth-context';
 
 interface ShoppingListCardProps {
@@ -26,7 +26,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
 
   const totalItems = list.items?.length || 0;
   const checkedItems = list.items?.filter(item => item.checked).length || 0;
@@ -52,7 +52,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
         acc[key] = grouped[key].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
         return acc;
       }, {} as Record<string, typeof list.items>);
-  }, [list.items]);
+  }, [list]);
 
   // Handlers for editable quantity input
   const handleQuantityChange = (itemId: string, value: string) => {
@@ -62,7 +62,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
     }
   };
 
-  const handleQuantityBlur = (itemId: string, currentQuantity: number) => {
+  const handleQuantityBlur = (itemId: string) => {
     const editedValue = editingQuantities[itemId];
     if (editedValue !== undefined) {
       const numValue = parseInt(editedValue, 10);
@@ -78,7 +78,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
     }
   };
 
-  const handleQuantityKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, itemId: string) => {
+  const handleQuantityKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.currentTarget.blur(); // Trigger blur to save
     }
@@ -144,9 +144,9 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
               {Object.entries(itemsByCategory).slice(0, isExpanded ? undefined : 2).map(([category, items]) => (
                 <div key={category} className="space-y-1.5">
                   <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="text-base sm:text-lg">{getCategoryIcon(category as any)}</span>
+                    <span className="text-base sm:text-lg">{getCategoryIcon(category as ShoppingCategory)}</span>
                     <span className="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wide">
-                      {getCategoryLabel(category as any)}
+                      {getCategoryLabel(category as ShoppingCategory)}
                     </span>
                   </div>
                   {items?.slice(0, isExpanded ? undefined : 3).map((item) => (
@@ -187,8 +187,8 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                             inputMode="numeric"
                             value={editingQuantities[item.id] ?? item.quantity}
                             onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                            onBlur={() => handleQuantityBlur(item.id, item.quantity)}
-                            onKeyPress={(e) => handleQuantityKeyPress(e, item.id)}
+                            onBlur={() => handleQuantityBlur(item.id)}
+                            onKeyPress={(e) => handleQuantityKeyPress(e)}
                             className="w-[22px] h-[18px] sm:w-7 sm:h-5 text-[8px] sm:text-xs font-medium text-gray-300 text-center bg-gray-800 border border-gray-600/50 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             aria-label="Edit quantity"
                           />

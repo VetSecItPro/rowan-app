@@ -6,7 +6,6 @@ import {
   Users,
   Plus,
   Search,
-  Filter,
   Star,
   Building2,
   Phone,
@@ -26,7 +25,6 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import {
   getVendors,
-  getPreferredVendors,
   createVendor,
   updateVendor,
   deleteVendor,

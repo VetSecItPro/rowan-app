@@ -183,7 +183,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               <p className="text-2xl font-bold text-white">
                 {totalStats.completed}/{totalStats.total}
               </p>
-              <p className="text-sm text-gray-400">Today's Progress</p>
+              <p className="text-sm text-gray-400">Today&apos;s Progress</p>
             </div>
           </div>
         </div>

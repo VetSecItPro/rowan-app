@@ -6,16 +6,6 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { tasksService } from '@/lib/services/tasks-service';
-import { calendarService } from '@/lib/services/calendar-service';
-import { remindersService } from '@/lib/services/reminders-service';
-import { messagesService } from '@/lib/services/messages-service';
-import { shoppingService } from '@/lib/services/shopping-service';
-import { mealsService } from '@/lib/services/meals-service';
-import { choresService } from '@/lib/services/chores-service';
-import { projectsService } from '@/lib/services/budgets-service';
-import { projectsOnlyService } from '@/lib/services/projects-service';
-import { goalsService } from '@/lib/services/goals-service';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
 import { reactionsService, type CheckInReaction } from '@/lib/services/reactions-service';
 import { WeeklyInsights } from '@/components/checkins/WeeklyInsights';
@@ -25,7 +15,7 @@ import { createClient } from '@/lib/supabase/client';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
-import { useDashboardStats, type EnhancedDashboardStats } from '@/lib/hooks/useDashboardStats';
+import { useDashboardStats } from '@/lib/hooks/useDashboardStats';
 import {
   CheckSquare,
   Calendar,
@@ -39,22 +29,15 @@ import {
   TrendingDown,
   Clock,
   AlertCircle,
-  Hand,
   Sparkles,
   Activity,
   Heart,
-  ArrowRight,
-  Plus,
-  Filter,
   ChevronRight,
   Zap,
-  Users,
-  DollarSign,
   List,
   ChevronLeft,
   Trophy
 } from 'lucide-react';
-import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
@@ -62,31 +45,14 @@ import { CompactTimeAwareWelcome } from '@/components/ui/TimeAwareWelcomeBox';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
 import { CountdownWidget } from '@/components/calendar/CountdownWidget';
 import { PointsDisplay, LeaderboardWidget } from '@/components/rewards';
-import { CTAButton } from '@/components/ui/EnhancedButton';
 import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
-import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
+import { format } from 'date-fns';
 import { formatDate, formatTimestamp, getCurrentDateString } from '@/lib/utils/date-utils';
 import { usePrefetchAllData } from '@/lib/hooks/usePrefetchData';
 
-
-// Animation variants for scroll animations
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
 
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.95 },
@@ -182,7 +148,7 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 export default function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, spaces, currentSpace, loading: authLoading, switchSpace, refreshSpaces } = useAuthWithSpaces();
+  const { user, currentSpace, loading: authLoading, refreshSpaces } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -208,7 +174,6 @@ export default function DashboardPage() {
   const [checkInGratitude, setCheckInGratitude] = useState('');
   const [recentCheckIns, setRecentCheckIns] = useState<DailyCheckIn[]>([]);
   const [checkInStats, setCheckInStats] = useState<CheckInStats | null>(null);
-  const [todayCheckIn, setTodayCheckIn] = useState<DailyCheckIn | null>(null);
   const [checkInSaving, setCheckInSaving] = useState(false);
   const [checkInExpanded, setCheckInExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<'checkin' | 'journal'>('checkin');
@@ -247,7 +212,6 @@ export default function DashboardPage() {
 
         // Load today's check-in if exists
         const today = await checkInsService.getTodayCheckIn(currentSpace.id, user.id);
-        setTodayCheckIn(today);
 
         // Load reactions for all check-ins
         const reactionsMap: Record<string, CheckInReaction[]> = {};
@@ -312,7 +276,7 @@ export default function DashboardPage() {
 
     setCheckInSaving(true);
     try {
-      const checkIn = await checkInsService.createCheckIn(user.id, {
+      await checkInsService.createCheckIn(user.id, {
         space_id: currentSpace.id,
         mood: selectedMood,
         note: checkInNote || undefined,
@@ -320,8 +284,6 @@ export default function DashboardPage() {
         challenges: checkInChallenges || undefined,
         gratitude: checkInGratitude || undefined,
       });
-
-      setTodayCheckIn(checkIn);
 
       // Store mood for success modal before clearing
       setLastCheckInMood(selectedMood);
@@ -665,7 +627,7 @@ export default function DashboardPage() {
                               {stats.messages.lastMessage.sender}:
                             </p>
                             <p className="text-sm text-white truncate">
-                              "{stats.messages.lastMessage.content}"
+                              &quot;{stats.messages.lastMessage.content}&quot;
                             </p>
                             <p className="text-xs text-gray-400 mt-1">
                               {formatTimestamp(stats.messages.lastMessage.created_at, 'h:mm a')}
@@ -722,7 +684,7 @@ export default function DashboardPage() {
                           <div className="p-3 bg-teal-900/20 rounded-lg mb-3">
                             <p className="text-xs text-teal-300 font-medium mb-1">Urgent:</p>
                             <p className="text-sm text-white font-medium truncate">
-                              {stats.shopping.uncheckedItems} items for "{stats.shopping.urgentList}"
+                              {stats.shopping.uncheckedItems} items for &quot;{stats.shopping.urgentList}&quot;
                             </p>
                           </div>
                         )}
@@ -1114,7 +1076,7 @@ export default function DashboardPage() {
                               ) : userEmoji ? (
                                 <div className="flex items-center gap-2 px-3 py-2 bg-gray-700/60 backdrop-blur-md rounded-full border border-gray-600/50">
                                   <span className="text-xl">💭</span>
-                                  <span className="text-xs font-medium text-gray-400">Partner hasn't checked in yet</span>
+                                  <span className="text-xs font-medium text-gray-400">Partner hasn&apos;t checked in yet</span>
                                 </div>
                               ) : null}
                             </>
@@ -1350,13 +1312,13 @@ export default function DashboardPage() {
                             <div>
                               <label className="text-sm font-medium text-gray-300 mb-1.5 block flex items-center gap-1.5">
                                 <Heart className="w-3.5 h-3.5 text-blue-500" />
-                                What's been challenging? (Optional)
+                                What&apos;s been challenging? (Optional)
                               </label>
                               <p className="text-xs text-blue-400 mb-2 italic">
-                                It's okay to not be okay. You're not alone.
+                                It&apos;s okay to not be okay. You&apos;re not alone.
                               </p>
                               <textarea
-                                placeholder="Share what's on your mind..."
+                                placeholder="Share what&apos;s on your mind..."
                                 value={checkInChallenges}
                                 onChange={(e) => setCheckInChallenges(e.target.value)}
                                 maxLength={150}
@@ -1466,7 +1428,7 @@ export default function DashboardPage() {
                           {/* Calendar Grid */}
                           <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                             {/* Day Headers */}
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, idx) => (
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                               <div key={day} className="text-center text-xs font-semibold text-gray-400 py-1 sm:py-2">
                                 <span className="hidden sm:inline">{day}</span>
                                 <span className="sm:hidden">{day.charAt(0)}</span>
@@ -1669,7 +1631,7 @@ export default function DashboardPage() {
           <CreateSpaceModal
             isOpen={showCreateSpaceModal}
             onClose={() => setShowCreateSpaceModal(false)}
-            onSpaceCreated={(spaceId, spaceName) => {
+            onSpaceCreated={() => {
               refreshSpaces();
               setShowCreateSpaceModal(false);
             }}

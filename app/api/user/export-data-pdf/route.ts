@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { exportAllUserData, getDataSubset } from '@/lib/services/data-export-service';
+import type { UserDataExport } from '@/lib/services/data-export-service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     const dataType = searchParams.get('type') || 'all';
 
     // Export all user data
-    const exportResult = await exportAllUserData(user.id);
+    const exportResult = await exportAllUserData(user.id, supabase);
 
     if (!exportResult.success || !exportResult.data) {
       return NextResponse.json({ error: exportResult.error || 'Export failed' }, { status: 500 });
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
     let yPosition = 50;
 
     // Determine what data to include
-    const dataTypes: Array<{ key: keyof typeof exportResult.data; title: string }> = [];
+    const dataTypes: Array<{ key: keyof UserDataExport; title: string }> = [];
 
     if (dataType === 'all') {
       dataTypes.push(
@@ -102,13 +103,13 @@ export async function GET(request: NextRequest) {
       // Get specific data type
       const subset = getDataSubset(exportResult.data, dataType);
       if (subset.data.length > 0) {
-        dataTypes.push({ key: dataType as any, title: subset.title });
+        dataTypes.push({ key: dataType as keyof UserDataExport, title: subset.title });
       }
     }
 
     // Generate tables for each data type
     for (const type of dataTypes) {
-      const data = exportResult.data[type.key] as any[];
+      const data = exportResult.data[type.key] as Record<string, unknown>[];
 
       if (!data || !Array.isArray(data) || data.length === 0) {
         continue;

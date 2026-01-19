@@ -5,9 +5,7 @@ import {
   Database,
   Shield,
   Download,
-  FileText,
   Trash2,
-  Archive,
   Lock,
   Eye,
   ArrowRight,
@@ -154,7 +152,7 @@ export default function DataPrivacyPage() {
             Data & Privacy Management
           </h1>
           <p className="text-gray-400 mb-6">
-            Your data is yours. Export it, delete it, or manage how it's used. We're committed to transparency and giving you full control.
+            Your data is yours. Export it, delete it, or manage how it&apos;s used. We&apos;re committed to transparency and giving you full control.
           </p>
 
           {/* Compliance Badges */}
@@ -256,7 +254,7 @@ export default function DataPrivacyPage() {
               <ul className="space-y-1 text-sm text-blue-300">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-500 mt-1">•</span>
-                  <span><strong>Know</strong> what data we collect and how it's used</span>
+                  <span><strong>Know</strong> what data we collect and how it&apos;s used</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-500 mt-1">•</span>

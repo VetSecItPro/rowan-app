@@ -24,6 +24,25 @@ export interface DateRange {
   end: Date;
 }
 
+type MilestoneRecord = {
+  target_date?: string | null;
+  completed?: boolean | null;
+};
+
+type GoalRecord = {
+  status?: string | null;
+  created_at?: string | null;
+  completed_at?: string | null;
+  category?: string | null;
+  goal_milestones?: MilestoneRecord[] | null;
+};
+
+type CheckInRecord = {
+  created_at?: string | null;
+  check_in_date?: string | null;
+  progress_percentage?: number | null;
+};
+
 // =====================================================
 // MAIN ANALYTICS FUNCTION
 // =====================================================
@@ -79,8 +98,8 @@ export async function getGoalAnalytics(
 // =====================================================
 
 function calculateAnalytics(
-  goals: any[],
-  checkIns: any[],
+  goals: GoalRecord[],
+  checkIns: CheckInRecord[],
   startDate: Date,
   endDate: Date
 ): GoalAnalytics {
@@ -126,7 +145,7 @@ function calculateAnalytics(
   };
 }
 
-function calculateAverageTimeToComplete(completedGoals: any[]): number {
+function calculateAverageTimeToComplete(completedGoals: GoalRecord[]): number {
   if (completedGoals.length === 0) return 0;
 
   const totalDays = completedGoals.reduce((sum, goal) => {
@@ -142,7 +161,7 @@ function calculateAverageTimeToComplete(completedGoals: any[]): number {
   return Math.round(totalDays / completedGoals.length);
 }
 
-function calculateSuccessByCategory(goals: any[]): Record<string, { completed: number; total: number; rate: number }> {
+function calculateSuccessByCategory(goals: GoalRecord[]): Record<string, { completed: number; total: number; rate: number }> {
   const categoryStats: Record<string, { completed: number; total: number }> = {};
 
   goals.forEach(goal => {
@@ -167,7 +186,7 @@ function calculateSuccessByCategory(goals: any[]): Record<string, { completed: n
   return result;
 }
 
-function calculateActivityHeatmap(checkIns: any[], startDate: Date, endDate: Date): Array<{ date: string; count: number }> {
+function calculateActivityHeatmap(checkIns: CheckInRecord[], startDate: Date, endDate: Date): Array<{ date: string; count: number }> {
   const dailyActivity: Record<string, number> = {};
 
   // Initialize all dates with 0
@@ -180,6 +199,7 @@ function calculateActivityHeatmap(checkIns: any[], startDate: Date, endDate: Dat
 
   // Count check-ins per day
   checkIns.forEach(checkIn => {
+    if (!checkIn.created_at) return;
     const dateStr = format(new Date(checkIn.created_at), 'yyyy-MM-dd');
     if (dailyActivity[dateStr] !== undefined) {
       dailyActivity[dateStr]++;
@@ -189,7 +209,7 @@ function calculateActivityHeatmap(checkIns: any[], startDate: Date, endDate: Dat
   return Object.entries(dailyActivity).map(([date, count]) => ({ date, count }));
 }
 
-function calculateMilestonesByWeek(goals: any[], startDate: Date, endDate: Date): Array<{ week: string; completed: number; total: number }> {
+function calculateMilestonesByWeek(goals: GoalRecord[], startDate: Date, endDate: Date): Array<{ week: string; completed: number; total: number }> {
   const weeks = eachWeekOfInterval({ start: startDate, end: endDate });
 
   return weeks.map(weekStart => {
@@ -201,7 +221,7 @@ function calculateMilestonesByWeek(goals: any[], startDate: Date, endDate: Date)
 
     goals.forEach(goal => {
       if (goal.goal_milestones) {
-        goal.goal_milestones.forEach((milestone: any) => {
+        goal.goal_milestones.forEach((milestone: MilestoneRecord) => {
           const milestoneDate = milestone.target_date ? new Date(milestone.target_date) : null;
           if (milestoneDate && milestoneDate >= weekStart && milestoneDate <= weekEnd) {
             total++;
@@ -217,17 +237,23 @@ function calculateMilestonesByWeek(goals: any[], startDate: Date, endDate: Date)
   });
 }
 
-function calculateStreaks(checkIns: any[]): { currentStreak: number; longestStreak: number } {
+function calculateStreaks(checkIns: CheckInRecord[]): { currentStreak: number; longestStreak: number } {
   if (checkIns.length === 0) return { currentStreak: 0, longestStreak: 0 };
 
   // Sort check-ins by date
-  const sortedCheckIns = [...checkIns].sort((a, b) =>
-    new Date(a.check_in_date).getTime() - new Date(b.check_in_date).getTime()
-  );
+  const sortedCheckIns = [...checkIns].sort((a, b) => {
+    const aDate = a.check_in_date || a.created_at;
+    const bDate = b.check_in_date || b.created_at;
+    if (!aDate || !bDate) return 0;
+    return new Date(aDate).getTime() - new Date(bDate).getTime();
+  });
 
   // Group by date (multiple check-ins per day count as one)
   const uniqueDates = Array.from(new Set(
-    sortedCheckIns.map(c => format(new Date(c.check_in_date), 'yyyy-MM-dd'))
+    sortedCheckIns
+      .map(c => c.check_in_date || c.created_at)
+      .filter((dateStr): dateStr is string => Boolean(dateStr))
+      .map(dateStr => format(new Date(dateStr), 'yyyy-MM-dd'))
   )).sort();
 
   if (uniqueDates.length === 0) return { currentStreak: 0, longestStreak: 0 };
@@ -265,11 +291,12 @@ function calculateStreaks(checkIns: any[]): { currentStreak: number; longestStre
   return { currentStreak, longestStreak };
 }
 
-function calculateProgressTrend(checkIns: any[], startDate: Date, endDate: Date): Array<{ date: string; progress: number; completed: number }> {
+function calculateProgressTrend(checkIns: CheckInRecord[], startDate: Date, endDate: Date): Array<{ date: string; progress: number; completed: number }> {
   const weeklyProgress: Record<string, { totalProgress: number; count: number; completed: number }> = {};
 
   // Group check-ins by week
   checkIns.forEach(checkIn => {
+    if (!checkIn.created_at) return;
     const weekStart = startOfWeek(new Date(checkIn.created_at));
     const weekStr = format(weekStart, 'MMM dd');
 
@@ -291,7 +318,7 @@ function calculateProgressTrend(checkIns: any[], startDate: Date, endDate: Date)
   })).sort((a, b) => a.date.localeCompare(b.date));
 }
 
-function calculateCategoryBreakdown(goals: any[]): Array<{ category: string; value: number; color: string }> {
+function calculateCategoryBreakdown(goals: GoalRecord[]): Array<{ category: string; value: number; color: string }> {
   const categoryCount: Record<string, number> = {};
 
   goals.forEach(goal => {
@@ -313,7 +340,7 @@ function calculateCategoryBreakdown(goals: any[]): Array<{ category: string; val
     .sort((a, b) => b.value - a.value);
 }
 
-function calculateTimeToCompleteByCategory(completedGoals: any[]): Array<{ category: string; avgDays: number }> {
+function calculateTimeToCompleteByCategory(completedGoals: GoalRecord[]): Array<{ category: string; avgDays: number }> {
   const categoryTimes: Record<string, number[]> = {};
 
   completedGoals.forEach(goal => {

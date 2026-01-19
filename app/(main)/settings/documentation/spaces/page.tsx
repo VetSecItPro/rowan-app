@@ -1,8 +1,10 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
 
 import {
+  type LucideIcon,
   ArrowLeft,
   Users,
   Play,
@@ -10,7 +12,6 @@ import {
   UserPlus,
   Shield,
   Eye,
-  Globe,
   Mail,
   CheckCircle,
   XCircle,
@@ -19,7 +20,6 @@ import {
   Building,
   Lock,
   Zap,
-  MessageSquare,
   TrendingUp,
   AlertTriangle,
   RefreshCw,
@@ -29,7 +29,7 @@ import {
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

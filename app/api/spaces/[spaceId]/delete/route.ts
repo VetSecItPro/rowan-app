@@ -121,7 +121,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
     }
 
     // Delete the space using service layer
-    const result = await deleteSpace(spaceId, user.id);
+    const result = await deleteSpace(spaceId, user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(

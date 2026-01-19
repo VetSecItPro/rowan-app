@@ -1,6 +1,7 @@
 /**
  * Date utility functions
  */
+import { format } from 'date-fns';
 
 /**
  * Parse a DATE string (YYYY-MM-DD) from the database without timezone conversion
@@ -27,6 +28,5 @@ export function parseDateString(dateString: string): Date {
  * @returns Formatted date string
  */
 export function formatDateString(dateString: string, formatStr: string = 'MMM d, yyyy'): string {
-  const { format } = require('date-fns');
   return format(parseDateString(dateString), formatStr);
 }

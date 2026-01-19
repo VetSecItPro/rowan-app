@@ -12,9 +12,10 @@ import { logger } from '@/lib/logger';
 // Validation schema
 const trackDismissalSchema = z.object({
   notification_id: z.string().optional(),
+  notificationId: z.string().optional(),
   tag: z.string().optional(),
   action: z.enum(['dismissed', 'clicked', 'closed']).default('dismissed'),
-  timestamp: z.string().optional(),
+  timestamp: z.union([z.string(), z.number()]).optional(),
   user_id: z.string().uuid().optional(),
 });
 
@@ -46,27 +47,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { notification_id, tag, action, timestamp, user_id } = parseResult.data;
+    const {
+      notification_id,
+      notificationId,
+      tag,
+      action,
+      timestamp,
+      user_id,
+    } = parseResult.data;
+    const normalizedNotificationId = notification_id || notificationId;
+    const trackedAt = typeof timestamp === 'number'
+      ? new Date(timestamp).toISOString()
+      : timestamp;
 
     // Try to get session (may not always be available from SW)
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
+    const effectiveUserId = user?.id;
 
-    const effectiveUserId = user_id || user?.id;
+    if (!effectiveUserId) {
+      return NextResponse.json({
+        success: true,
+        tracked: false,
+      });
+    }
 
-    // Log the dismissal/interaction to notification_log
+    // Log the dismissal/interaction to notification_interactions
     const { error: logError } = await supabase
-      .from('notification_log')
+      .from('notification_interactions')
       .insert({
         user_id: effectiveUserId,
-        notification_type: 'push',
-        channel: 'push',
-        status: action === 'clicked' ? 'clicked' : 'dismissed',
+        notification_id: normalizedNotificationId || null,
+        action,
         metadata: {
-          notification_id,
+          notification_id: normalizedNotificationId,
           tag,
           action,
-          tracked_at: timestamp || new Date().toISOString(),
+          tracked_at: trackedAt || new Date().toISOString(),
         },
       });
 
@@ -76,14 +93,14 @@ export async function POST(req: NextRequest) {
     }
 
     // If we have a notification_id, try to mark it as read if clicked
-    if (notification_id && action === 'clicked') {
+    if (normalizedNotificationId && action === 'clicked') {
       await supabase
         .from('in_app_notifications')
         .update({
           is_read: true,
           read_at: new Date().toISOString(),
         })
-        .eq('id', notification_id);
+        .eq('id', normalizedNotificationId);
     }
 
     return NextResponse.json({

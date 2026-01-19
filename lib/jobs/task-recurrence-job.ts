@@ -5,12 +5,12 @@
  * Should be called by a cron job or Vercel Cron.
  */
 
-import { createClient } from '@/lib/supabase/client';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
 import { logger } from '@/lib/logger';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function generateRecurringTasks() {
-  const supabase = createClient();
+  const supabase = supabaseAdmin;
 
   try {
     // Get all active recurring templates
@@ -52,15 +52,38 @@ export async function generateRecurringTasks() {
 
       if (nextDate && nextDate <= today) {
         // Check if task already exists for this date
-        const { data: existing } = await supabase
+        const { data: existing, error: existingError } = await supabase
           .from('tasks')
           .select('id')
           .eq('parent_recurrence_id', template.id)
           .eq('due_date', nextDate)
           .single();
 
+        if (existingError && existingError.code !== 'PGRST116') {
+          throw existingError;
+        }
+
         if (!existing) {
-          await taskRecurrenceService.generateNextOccurrence(template.id, nextDate);
+          const { error: insertError } = await supabase
+            .from('tasks')
+            .insert({
+              space_id: template.space_id,
+              title: template.title,
+              description: template.description,
+              category: template.category,
+              priority: template.priority,
+              status: 'pending',
+              due_date: nextDate,
+              assigned_to: template.assigned_to,
+              created_by: template.created_by,
+              is_recurring: true,
+              parent_recurrence_id: template.id,
+              is_recurrence_template: false,
+            })
+            .select()
+            .single();
+
+          if (insertError) throw insertError;
           generated++;
         }
       }

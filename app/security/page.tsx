@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable react/no-unescaped-entities */
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Shield, Lock, Eye, Database, AlertTriangle, CheckCircle } from 'lucide-react';

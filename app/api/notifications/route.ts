@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import {
-  inAppNotificationsService,
+  InAppNotificationsService,
   type NotificationFilters,
   type CreateNotificationInput
 } from '@/lib/services/in-app-notifications-service';
@@ -84,6 +84,7 @@ export async function GET(req: NextRequest) {
     }
 
     setSentryUser(user);
+    const notificationsService = new InAppNotificationsService(supabase);
 
     // Parse query parameters
     const { searchParams } = new URL(req.url);
@@ -107,13 +108,13 @@ export async function GET(req: NextRequest) {
     };
 
     // Get notifications
-    const notifications = await inAppNotificationsService.getUserNotifications(
+    const notifications = await notificationsService.getUserNotifications(
       user.id,
       filters
     );
 
     // Get unread count
-    const unreadCount = await inAppNotificationsService.getUnreadCount(user.id);
+    const unreadCount = await notificationsService.getUnreadCount(user.id);
 
     return NextResponse.json({
       success: true,
@@ -175,8 +176,15 @@ export async function POST(req: NextRequest) {
 
     const input: CreateNotificationInput = parseResult.data;
 
+    if (input.user_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Not authorized to create notifications for other users' },
+        { status: 403 }
+      );
+    }
+
     // Create notification
-    const success = await inAppNotificationsService.createNotification(input);
+    const success = await notificationsService.createNotification(input);
 
     if (!success) {
       return NextResponse.json(
@@ -246,7 +254,7 @@ export async function PATCH(req: NextRequest) {
 
     if (mark_all) {
       // Mark all as read
-      const success = await inAppNotificationsService.markAllAsRead(user.id);
+      const success = await notificationsService.markAllAsRead(user.id);
       if (!success) {
         return NextResponse.json(
           { error: 'Failed to mark all notifications as read' },
@@ -262,7 +270,7 @@ export async function PATCH(req: NextRequest) {
     if (notification_ids && notification_ids.length > 0) {
       // Mark specific notifications as read
       const results = await Promise.all(
-        notification_ids.map(id => inAppNotificationsService.markAsRead(id))
+        notification_ids.map(id => notificationsService.markAsRead(id))
       );
       const successCount = results.filter(Boolean).length;
 
@@ -318,6 +326,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     setSentryUser(user);
+    const notificationsService = new InAppNotificationsService(supabase);
 
     // Parse query parameters
     const { searchParams } = new URL(req.url);
@@ -326,7 +335,7 @@ export async function DELETE(req: NextRequest) {
 
     if (deleteAllRead) {
       // Delete all read notifications
-      const success = await inAppNotificationsService.deleteAllRead(user.id);
+      const success = await notificationsService.deleteAllRead(user.id);
       if (!success) {
         return NextResponse.json(
           { error: 'Failed to delete read notifications' },
@@ -341,7 +350,7 @@ export async function DELETE(req: NextRequest) {
 
     if (notificationId) {
       // Delete specific notification
-      const success = await inAppNotificationsService.deleteNotification(notificationId);
+      const success = await notificationsService.deleteNotification(notificationId);
       if (!success) {
         return NextResponse.json(
           { error: 'Failed to delete notification' },

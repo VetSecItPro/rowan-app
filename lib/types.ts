@@ -162,7 +162,7 @@ export interface Space {
   updated_at: string;
   user_id?: string;
   created_by?: string;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
   is_personal?: boolean;
   auto_created?: boolean;
 }
@@ -245,7 +245,7 @@ export interface Task {
   parent_recurrence_id?: string;
   is_recurrence_template?: boolean;
   recurrence_exceptions?: string[];
-  recurrence_metadata?: Record<string, any>;
+  recurrence_metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   completed_at?: string;
@@ -575,7 +575,7 @@ export interface ActivityLog {
   action: string;
   resource_type?: string;
   resource_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
 }
 
@@ -813,7 +813,7 @@ export interface FeedbackSubmission {
   page_url: string | null;
   description: string;
   screenshot_url: string | null;
-  browser_info: Record<string, any> | null;
+  browser_info: Record<string, unknown> | null;
   status: FeedbackStatus;
   admin_notes: string | null;
   created_at: string;
@@ -834,7 +834,7 @@ export interface CreateFeedbackInput {
   page_url?: string;
   description: string;
   screenshot?: File;
-  browser_info?: Record<string, any>;
+  browser_info?: Record<string, unknown>;
 }
 
 export interface UpdateFeedbackInput {

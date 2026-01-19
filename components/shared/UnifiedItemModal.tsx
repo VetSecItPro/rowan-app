@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, memo } from 'react';
-import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2, Trophy } from 'lucide-react';
+import { X, Repeat, Calendar, Tag, Star, Users, CheckSquare, Home, Loader2, Trophy } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
@@ -15,12 +15,31 @@ import {
   PRIORITY_LEVELS,
   FAMILY_ROLES,
   RECURRING_PATTERNS,
-  STATUS_TYPES,
-  EMOJIS
+  STATUS_TYPES
 } from '@/lib/constants/item-categories';
 
 type ItemType = 'task' | 'chore';
 type ModalMode = 'create' | 'quickEdit';
+type SectionId = 'basic' | 'details' | 'family' | 'schedule';
+
+const SECTION_IDS: SectionId[] = ['basic', 'details', 'family', 'schedule'];
+
+type FormDataState = {
+  space_id: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  status: string;
+  due_date: string;
+  assigned_to: string;
+  estimated_hours: string;
+  tags: string;
+  frequency: string;
+  point_value: number;
+};
+
+type EditItemData = Partial<Task & Chore> & { type?: ItemType };
 
 interface UnifiedItemModalProps {
   isOpen: boolean;
@@ -43,16 +62,16 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
   defaultType = 'task',
   mode = 'create'
 }: UnifiedItemModalProps) {
-  const { currentSpace, createSpace, hasZeroSpaces } = useAuthWithSpaces();
+  const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
 
   // Space management state
   const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
-  const [spaceCreationLoading, setSpaceCreationLoading] = useState(false);
+  const [spaceCreationLoading] = useState(false);
   const [spaceError, setSpaceError] = useState<string>('');
 
   // Core state
   const [itemType, setItemType] = useState<ItemType>(defaultType);
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState<FormDataState>({
     space_id: actualSpaceId || '',
     title: '',
     description: '',
@@ -68,12 +87,8 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
   });
 
   // UI state
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
-  const [activeSection, setActiveSection] = useState<string>('basic');
-
-  // Section navigation
-  const sections = ['basic', 'details', 'family', 'schedule'];
+  const [activeSection, setActiveSection] = useState<SectionId>('basic');
 
   // Enhanced features state
   const [isRecurring, setIsRecurring] = useState(false);
@@ -83,26 +98,26 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     days_of_week: [] as number[],
     end_date: '',
   });
-  const [intervalTouched, setIntervalTouched] = useState(false);
   const [calendarSync, setCalendarSync] = useState(false);
   const [familyAssignment, setFamilyAssignment] = useState('unassigned');
   const [quickNote, setQuickNote] = useState('');
 
   // Set up space ID when modal opens
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (isOpen) {
       if (spaceId) {
         // Use provided spaceId
         setActualSpaceId(spaceId);
-        setFormData((prev: any) => ({ ...prev, space_id: spaceId }));
+        setFormData((prev) => ({ ...prev, space_id: spaceId }));
       } else if (currentSpace && !editItem) {
         // Use current space from context
         setActualSpaceId(currentSpace.id);
-        setFormData((prev: any) => ({ ...prev, space_id: currentSpace.id }));
+        setFormData((prev) => ({ ...prev, space_id: currentSpace.id }));
       } else if (editItem) {
         // For edit mode, keep existing space_id from the item
         setActualSpaceId(editItem.space_id);
-        setFormData((prev: any) => ({ ...prev, space_id: editItem.space_id }));
+        setFormData((prev) => ({ ...prev, space_id: editItem.space_id }));
       } else if (hasZeroSpaces) {
         // Zero spaces scenario - this should be handled by AppWithOnboarding
         // but if we get here, show a friendly error
@@ -112,22 +127,24 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
   }, [isOpen, spaceId, currentSpace, editItem, hasZeroSpaces]);
 
   // Initialize form data
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (editItem) {
-      setItemType(editItem.type || 'task');
+      const editItemData = editItem as EditItemData;
+      setItemType(editItemData.type || 'task');
       setFormData({
         space_id: actualSpaceId || '',
-        title: editItem.title || '',
-        description: editItem.description || '',
-        category: (editItem as any).category || '',
-        priority: (editItem as any).priority || 'medium',
-        status: editItem.status || 'pending',
-        due_date: editItem.due_date || '',
-        assigned_to: editItem.assigned_to || '',
-        estimated_hours: (editItem as any).estimated_hours || '',
-        tags: (editItem as any).tags || '',
-        frequency: (editItem as any).frequency || 'once',
-        point_value: (editItem as any).point_value || 10,
+        title: editItemData.title || '',
+        description: editItemData.description || '',
+        category: editItemData.category || '',
+        priority: editItemData.priority || 'medium',
+        status: editItemData.status || 'pending',
+        due_date: editItemData.due_date || '',
+        assigned_to: editItemData.assigned_to || '',
+        estimated_hours: editItemData.estimated_hours || '',
+        tags: editItemData.tags || '',
+        frequency: editItemData.frequency || 'once',
+        point_value: editItemData.point_value || 10,
       });
     } else {
       // Reset for new items and set to defaultType
@@ -148,7 +165,6 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
       });
     }
     setActiveSection('basic');
-    setIntervalTouched(false); // Reset interval touched state for new modal instances
   }, [editItem, actualSpaceId, isOpen, defaultType]);
 
   // Tab navigation using keyboard
@@ -170,35 +186,38 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
         if (!isFormControl) {
           event.preventDefault();
 
-          const currentIndex = sections.indexOf(activeSection);
+          const currentIndex = SECTION_IDS.indexOf(activeSection);
           let nextIndex;
 
           if (event.shiftKey) {
             // Shift+Tab: go to previous section
-            nextIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
+            nextIndex = currentIndex > 0 ? currentIndex - 1 : SECTION_IDS.length - 1;
           } else {
             // Tab: go to next section
-            nextIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
+            nextIndex = currentIndex < SECTION_IDS.length - 1 ? currentIndex + 1 : 0;
           }
 
-          setActiveSection(sections[nextIndex]);
+          setActiveSection(SECTION_IDS[nextIndex]);
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, activeSection, sections]);
+  }, [isOpen, activeSection]);
 
   // Form handlers
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof FormDataState, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: field === 'point_value' ? Number(value) || 0 : value,
+    }));
     if (field === 'due_date') setDateError('');
   };
 
   const handleTypeSwitch = (type: ItemType) => {
     setItemType(type);
-    setFormData((prev: any) => ({ ...prev, category: '' })); // Reset category when switching
+    setFormData((prev) => ({ ...prev, category: '' })); // Reset category when switching
   };
 
   // Validation helper for recurring interval
@@ -543,7 +562,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                     </label>
                     <Dropdown
                       value={formData.category}
-                      onChange={(value) => handleInputChange('category', value)}
+                      onChange={(value) => handleInputChange('category', value || '')}
                       options={getCategoryOptions()}
                       placeholder="Select a category"
                     />
@@ -556,7 +575,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                     </label>
                     <Dropdown
                       value={formData.priority}
-                      onChange={(value) => handleInputChange('priority', value)}
+                      onChange={(value) => handleInputChange('priority', value || '')}
                       options={getPriorityOptions()}
                       placeholder="Select priority..."
                     />
@@ -576,7 +595,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                     </label>
                     <Dropdown
                       value={formData.status}
-                      onChange={(value) => handleInputChange('status', value)}
+                      onChange={(value) => handleInputChange('status', value || '')}
                       options={getStatusOptions()}
                       placeholder="Select status..."
                     />
@@ -708,7 +727,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                   <div>
                     <DateTimePicker
                       value={formData.due_date}
-                      onChange={(value) => handleInputChange('due_date', value)}
+                      onChange={(value) => handleInputChange('due_date', value || '')}
                       label="Due Date"
                       placeholder="Click to select date and time..."
                     />

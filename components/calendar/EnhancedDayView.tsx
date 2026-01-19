@@ -12,7 +12,7 @@ interface EnhancedDayViewProps {
   onEventStatusClick: (e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => void;
   onViewDetails: (event: CalendarEvent) => void;
   onEditEvent: (event: CalendarEvent) => void;
-  getCategoryColor: (category: string) => any;
+  getCategoryColor: (category: string) => { border: string; bg: string };
 }
 
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (6-23)

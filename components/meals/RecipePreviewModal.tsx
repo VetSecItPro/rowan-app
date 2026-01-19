@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Clock, Users, ChefHat, ExternalLink, Plus, Calendar } from 'lucide-react';
 import { ExternalRecipe } from '@/lib/services/external-recipes-service';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 interface RecipePreviewModalProps {
   isOpen: boolean;
@@ -80,6 +81,9 @@ export function RecipePreviewModal({
   };
 
   if (!isVisible || !recipe) return null;
+
+  const safeImageUrl = recipe.image_url ? sanitizeUrl(recipe.image_url) : '';
+  const safeSourceUrl = recipe.source_url ? sanitizeUrl(recipe.source_url) : '';
 
   const getSourceBadgeColor = (source: string) => {
     switch (source) {
@@ -175,10 +179,10 @@ export function RecipePreviewModal({
             }}
           />
 
-          {recipe.image_url && (
+          {safeImageUrl && (
             <div className="h-48 sm:h-64 overflow-hidden bg-gray-700 rounded-t-2xl sm:rounded-t-xl">
               <img
-                src={recipe.image_url}
+                src={safeImageUrl}
                 alt={recipe.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -213,9 +217,9 @@ export function RecipePreviewModal({
               <h2 className="text-2xl font-bold text-white">
                 {recipe.name}
               </h2>
-              {recipe.source_url && (
+              {safeSourceUrl && (
                 <a
-                  href={recipe.source_url}
+                  href={safeSourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 text-gray-400 hover:text-orange-500 transition-colors"

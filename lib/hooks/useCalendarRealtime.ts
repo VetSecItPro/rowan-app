@@ -25,7 +25,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
 
   // Handle postgres changes
   const handleEventChange = useCallback((
-    payload: RealtimePostgresChangesPayload<any>
+    payload: RealtimePostgresChangesPayload<Record<string, unknown>>
   ) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
 
@@ -107,7 +107,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         const presenceMap: Record<string, PresenceUser> = {};
 
         Object.keys(state).forEach(key => {
-          const presences = state[key] as any;
+          const presences = state[key] as PresenceUser[];
           if (presences.length > 0) {
             presenceMap[key] = presences[0];
           }
@@ -116,7 +116,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         setPresence(presenceMap);
       })
       // Listen to broadcast messages (editing notifications)
-      .on('broadcast', { event: 'event_editing' }, (payload: any) => {
+      .on('broadcast', { event: 'event_editing' }, (payload: { payload: { user_id?: string; event_id?: string | null; timestamp?: number } }) => {
         // Handle editing notifications
         logger.info('User editing:', { component: 'lib-useCalendarRealtime', data: payload.payload });
       })

@@ -1,5 +1,14 @@
 import { createClient } from '@/lib/supabase/client';
 
+type LinkedListRow = {
+  task_id?: string;
+  list?: {
+    id?: string;
+    title?: string;
+    items?: Array<unknown>;
+  };
+};
+
 export const shoppingIntegrationService = {
   // Calendar Integration
   async linkToCalendar(listId: string, eventId: string, reminderMinutes?: number) {
@@ -50,7 +59,8 @@ export const shoppingIntegrationService = {
     if (error) throw error;
 
     // Transform the data to include items_count
-    return (data || []).map((item: any) => ({
+    const rows = (data ?? []) as LinkedListRow[];
+    return rows.map((item) => ({
       id: item.list?.id,
       title: item.list?.title,
       items_count: item.list?.items?.length || 0,
@@ -106,7 +116,8 @@ export const shoppingIntegrationService = {
     if (error) throw error;
 
     // Transform the data to include items_count
-    return (data || []).map((item: any) => ({
+    const rows = (data ?? []) as LinkedListRow[];
+    return rows.map((item) => ({
       id: item.list?.id,
       title: item.list?.title,
       items_count: item.list?.items?.length || 0,
@@ -135,7 +146,8 @@ export const shoppingIntegrationService = {
     // Group by task_id and take first linked list for each task
     const result: Record<string, { id: string; title: string; items_count: number } | undefined> = {};
 
-    (data || []).forEach((item: any) => {
+    const rows = (data ?? []) as LinkedListRow[];
+    rows.forEach((item) => {
       // Only set if we haven't seen this task yet (take first list)
       if (item.task_id && !result[item.task_id] && item.list) {
         result[item.task_id] = {

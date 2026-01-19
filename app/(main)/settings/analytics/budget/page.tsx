@@ -2,7 +2,7 @@
 
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { Home, DollarSign, TrendingDown, PieChart, FileText, Plus, Download } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useParams } from 'next/navigation';
 import { ReportsPage } from '@/components/reports/ReportsPage';
@@ -21,13 +21,7 @@ export default function BudgetAnalyticsPage() {
   const [recentReports, setRecentReports] = useState<GeneratedReport[]>([]);
   const [loadingReports, setLoadingReports] = useState(false);
 
-  useEffect(() => {
-    if (spaceId && viewMode === 'analytics') {
-      loadRecentReports();
-    }
-  }, [spaceId, viewMode]);
-
-  const loadRecentReports = async () => {
+  const loadRecentReports = useCallback(async () => {
     if (!spaceId) return;
 
     try {
@@ -39,7 +33,13 @@ export default function BudgetAnalyticsPage() {
     } finally {
       setLoadingReports(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    if (spaceId && viewMode === 'analytics') {
+      loadRecentReports();
+    }
+  }, [loadRecentReports, spaceId, viewMode]);
 
   const stats = [
     {

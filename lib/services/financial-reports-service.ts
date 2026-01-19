@@ -45,7 +45,7 @@ export interface GeneratedReport {
   date_range_start: string;
   date_range_end: string;
   data: ReportData;
-  charts_config: any;
+  charts_config: Record<string, unknown>;
   summary_stats: ReportMetrics;
   pdf_url?: string;
   pdf_size?: number;
@@ -109,7 +109,7 @@ export interface ReportMetrics {
   max_expense: number;
   categories_count: number;
   vendors_count: number;
-  [key: string]: any;
+  [key: string]: number | string | boolean | null | undefined;
 }
 
 export interface ReportSchedule {
@@ -119,7 +119,7 @@ export interface ReportSchedule {
   name: string;
   description?: string;
   schedule_type: 'daily' | 'weekly' | 'monthly' | 'quarterly';
-  schedule_config: any;
+  schedule_config: Record<string, unknown>;
   email_recipients: string[];
   email_subject_template?: string;
   email_body_template?: string;
@@ -171,7 +171,7 @@ export interface CreateScheduleInput {
   name: string;
   description?: string;
   schedule_type: ReportSchedule['schedule_type'];
-  schedule_config: any;
+  schedule_config: Record<string, unknown>;
   email_recipients?: string[];
   email_subject_template?: string;
   email_body_template?: string;
@@ -336,8 +336,8 @@ class FinancialReportsService {
   }
 
   // Generate charts configuration based on data and config
-  private async generateChartsConfig(data: ReportData, config: ReportConfig): Promise<any> {
-    const charts: any = {};
+  private async generateChartsConfig(data: ReportData, config: ReportConfig): Promise<Record<string, unknown>> {
+    const charts: Record<string, unknown> = {};
 
     for (const chartType of config.charts) {
       switch (chartType) {

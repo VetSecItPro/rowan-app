@@ -12,6 +12,13 @@ import { createClient } from '@/lib/supabase/client';
 import type { Space } from '@/lib/types';
 
 type SpaceWithRole = Space & { role?: string };
+type SpaceMemberWithSpace = { role: string; spaces: Space | null };
+type SpaceMemberRow = Omit<SpaceMember, 'user_profile'> & { user_profiles?: SpaceMember['user_profile'] };
+type SpaceChangePayload = {
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+  new: Record<string, unknown> | null;
+  old: Record<string, unknown> | null;
+};
 
 /**
  * Space member interface
@@ -79,9 +86,10 @@ export function useUserSpaces(userId: string | undefined) {
       if (error) throw error;
 
       // Transform data to include role in space object
-      return data
-        .filter((item: any) => item.spaces) // Filter out any null spaces
-        .map((item: any) => ({
+      const rows = (data ?? []) as SpaceMemberWithSpace[];
+      return rows
+        .filter((item) => item.spaces) // Filter out any null spaces
+        .map((item) => ({
           ...item.spaces,
           role: item.role,
         })) as SpaceWithRole[];
@@ -191,7 +199,8 @@ export function useSpaceMembers(spaceId: string | undefined) {
 
       if (error) throw error;
 
-      return data.map((member: any) => ({
+      const members = (data ?? []) as SpaceMemberRow[];
+      return members.map((member) => ({
         ...member,
         user_profile: member.user_profiles,
       })) as SpaceMember[];
@@ -542,26 +551,30 @@ export function useJoinSpace() {
 export function useSpacesStateChange() {
   const queryClient = useQueryClient();
 
-  const handleSpacesChange = (payload: any) => {
+  const handleSpacesChange = (payload: SpaceChangePayload) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
+    const newSpaceId = typeof newRecord?.space_id === 'string' ? newRecord.space_id : null;
+    const newUserId = typeof newRecord?.user_id === 'string' ? newRecord.user_id : null;
+    const oldSpaceId = typeof oldRecord?.space_id === 'string' ? oldRecord.space_id : null;
+    const oldUserId = typeof oldRecord?.user_id === 'string' ? oldRecord.user_id : null;
 
     switch (eventType) {
       case 'INSERT':
         // Invalidate spaces list for affected users
-        if (newRecord.user_id) {
+        if (newUserId) {
           queryClient.invalidateQueries({
-            queryKey: QUERY_KEYS.spaces.all(newRecord.user_id),
+            queryKey: QUERY_KEYS.spaces.all(newUserId),
           });
         }
         break;
 
       case 'UPDATE':
         // Update space in cache
-        if (newRecord.space_id) {
+        if (newSpaceId) {
           queryClient.invalidateQueries({
             queryKey: ['spaces'],
             predicate: (query) =>
-              query.queryKey.includes(newRecord.space_id) ||
+              query.queryKey.includes(newSpaceId) ||
               query.queryKey.includes('all'),
           });
         }
@@ -569,9 +582,9 @@ export function useSpacesStateChange() {
 
       case 'DELETE':
         // Remove space from cache
-        if (oldRecord.space_id && oldRecord.user_id) {
+        if (oldSpaceId && oldUserId) {
           queryClient.invalidateQueries({
-            queryKey: QUERY_KEYS.spaces.all(oldRecord.user_id),
+            queryKey: QUERY_KEYS.spaces.all(oldUserId),
           });
         }
         break;

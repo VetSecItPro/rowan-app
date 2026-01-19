@@ -7,6 +7,7 @@ import { formatDateString } from '@/lib/utils/date';
 import { showSuccess } from '@/lib/utils/toast';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface GenerateListModalProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ export function GenerateListModal({
     setError(null);
 
     try {
-      const response = await fetch('/api/shopping/generate-from-meals', {
+      const response = await csrfFetch('/api/shopping/generate-from-meals', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

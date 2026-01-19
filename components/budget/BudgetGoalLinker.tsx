@@ -421,7 +421,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
             <Info className="h-4 w-4" />
             <AlertDescription>
               Your goal will automatically track progress based on your spending in the selected category.
-              Progress updates happen daily and you'll receive notifications when milestones are reached.
+              Progress updates happen daily and you&apos;ll receive notifications when milestones are reached.
             </AlertDescription>
           </Alert>
 

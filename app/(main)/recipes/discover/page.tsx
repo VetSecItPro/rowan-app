@@ -16,6 +16,7 @@ import {
 import { mealsService } from '@/lib/services/meals-service';
 import { useDebouncedCallback } from 'use-debounce';
 import { showSuccess, showError, showInfo } from '@/lib/utils/toast';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 export default function DiscoverRecipesPage() {
   const { currentSpace, spacesLoading, authLoading, hasZeroSpaces } = useAuthWithSpaces();
@@ -129,6 +130,9 @@ export default function DiscoverRecipesPage() {
     }
 
     try {
+      const safeImageUrl = planningRecipe.image_url ? sanitizeUrl(planningRecipe.image_url) : '';
+      const safeSourceUrl = planningRecipe.source_url ? sanitizeUrl(planningRecipe.source_url) : '';
+
       // First, save recipe to library
       const recipeData = {
         space_id: spaceId,
@@ -139,9 +143,9 @@ export default function DiscoverRecipesPage() {
         servings: planningRecipe.servings,
         difficulty: planningRecipe.difficulty || undefined,
         cuisine_type: planningRecipe.cuisine || undefined,
-        image_url: planningRecipe.image_url || undefined,
+        image_url: safeImageUrl || undefined,
         instructions: planningRecipe.instructions || undefined,
-        source_url: planningRecipe.source_url || undefined,
+        source_url: safeSourceUrl || undefined,
         ingredients: planningRecipe.ingredients.map(ing => ({
           name: ing.name,
           amount: ing.amount || '',
@@ -162,7 +166,7 @@ export default function DiscoverRecipesPage() {
         notes: '',
       };
 
-      const meal = await mealsService.createMeal(mealData);
+      await mealsService.createMeal(mealData);
 
       // Create shopping list if requested
       if (createShoppingList && planningRecipe.ingredients.length > 0) {
@@ -208,9 +212,10 @@ export default function DiscoverRecipesPage() {
       // Close modal and reset
       setIsQuickPlanOpen(false);
       setPlanningRecipe(null);
-    } catch (error: any) {
+    } catch (error) {
       logger.error('Failed to plan meal:', error, { component: 'page', action: 'execution' });
-      showError(`Failed to plan meal: ${error?.message || 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      showError(`Failed to plan meal: ${errorMessage}`);
     }
   }, [notifySpaceIssue, planningRecipe, spaceId]);
 
@@ -223,6 +228,9 @@ export default function DiscoverRecipesPage() {
     setAddingRecipeIds(prev => new Set(prev).add(externalRecipe.id));
 
     try {
+      const safeImageUrl = externalRecipe.image_url ? sanitizeUrl(externalRecipe.image_url) : '';
+      const safeSourceUrl = externalRecipe.source_url ? sanitizeUrl(externalRecipe.source_url) : '';
+
       // Prepare recipe data
       const recipeData = {
         space_id: spaceId,
@@ -233,9 +241,9 @@ export default function DiscoverRecipesPage() {
         servings: externalRecipe.servings,
         difficulty: externalRecipe.difficulty || undefined,
         cuisine_type: externalRecipe.cuisine || undefined,
-        image_url: externalRecipe.image_url || undefined,
+        image_url: safeImageUrl || undefined,
         instructions: externalRecipe.instructions || undefined,
-        source_url: externalRecipe.source_url || undefined,
+        source_url: safeSourceUrl || undefined,
         ingredients: externalRecipe.ingredients.map(ing => ({
           name: ing.name,
           amount: ing.amount || '',
@@ -254,13 +262,16 @@ export default function DiscoverRecipesPage() {
         label: 'View Library',
         onClick: () => window.location.href = '/recipes'
       });
-    } catch (error: any) {
-      logger.error('Failed to add recipe - Full error:', error, { component: 'page', action: 'execution' });
-      logger.error('Error message:', undefined, { component: 'page', action: 'execution', details: error?.message });
-      logger.error('Error details:', undefined, { component: 'page', action: 'execution', details: error?.details || error?.hint });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorDetails = (error && typeof error === 'object' && 'details' in error) ? (error as { details?: string }).details : undefined;
+      const errorHint = (error && typeof error === 'object' && 'hint' in error) ? (error as { hint?: string }).hint : undefined;
 
-      const errorMsg = error?.message || 'Unknown error occurred';
-      showError(`Failed to add recipe: ${errorMsg}`);
+      logger.error('Failed to add recipe - Full error:', error, { component: 'page', action: 'execution' });
+      logger.error('Error message:', undefined, { component: 'page', action: 'execution', details: errorMessage });
+      logger.error('Error details:', undefined, { component: 'page', action: 'execution', details: errorDetails || errorHint });
+
+      showError(`Failed to add recipe: ${errorMessage}`);
     } finally {
       setAddingRecipeIds(prev => {
         const next = new Set(prev);
@@ -397,30 +408,35 @@ export default function DiscoverRecipesPage() {
         {/* Results Grid */}
         {!loading && recipes.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipes.map((recipe) => (
-              <div
-                key={recipe.id}
-                className="bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                {/* Recipe Image - Clickable */}
-                {recipe.image_url && (
-                  <button
-                    onClick={() => {
-                      setPreviewRecipe(recipe);
-                      setIsPreviewOpen(true);
-                    }}
-                    className="w-full h-48 overflow-hidden bg-gray-700 cursor-pointer group"
-                  >
-                    <img
-                      src={recipe.image_url}
-                      alt={recipe.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+            {recipes.map((recipe) => {
+              const safeImageUrl = recipe.image_url ? sanitizeUrl(recipe.image_url) : '';
+              const safeSourceUrl = recipe.source_url ? sanitizeUrl(recipe.source_url) : '';
+
+              return (
+                <div
+                  key={recipe.id}
+                  className="bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  {/* Recipe Image - Clickable */}
+                  {safeImageUrl && (
+                    <button
+                      onClick={() => {
+                        setPreviewRecipe(recipe);
+                        setIsPreviewOpen(true);
                       }}
-                    />
-                  </button>
-                )}
+                      className="w-full h-48 overflow-hidden bg-gray-700 cursor-pointer group"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element -- external recipe images can be from any domain */}
+                      <img
+                        src={safeImageUrl}
+                        alt={recipe.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </button>
+                  )}
 
                 <div className="p-5">
                   {/* Source Badge */}
@@ -428,9 +444,9 @@ export default function DiscoverRecipesPage() {
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${getSourceBadgeColor(recipe.source)}`}>
                       {getSourceLabel(recipe.source)}
                     </span>
-                    {recipe.source_url && (
+                    {safeSourceUrl && (
                       <a
-                        href={recipe.source_url}
+                        href={safeSourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-400 hover:text-orange-500 transition-colors"
@@ -527,8 +543,9 @@ export default function DiscoverRecipesPage() {
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
 

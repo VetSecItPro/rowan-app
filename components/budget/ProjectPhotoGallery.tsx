@@ -29,6 +29,8 @@ interface ProjectPhotoGalleryProps {
   onRefresh: () => void;
 }
 
+type SortBy = 'date' | 'type' | 'order';
+
 export function ProjectPhotoGallery({
   projectId,
   photos,
@@ -38,7 +40,7 @@ export function ProjectPhotoGallery({
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterType, setFilterType] = useState<PhotoType | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'type' | 'order'>('date');
+  const [sortBy, setSortBy] = useState<SortBy>('date');
 
   // Filter and sort photos
   const filteredPhotos = photos.filter(photo =>
@@ -146,7 +148,7 @@ export function ProjectPhotoGallery({
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
             className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm"
           >
             <option value="date">Sort by Date</option>

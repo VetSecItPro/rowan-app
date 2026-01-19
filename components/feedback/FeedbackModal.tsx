@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { Upload, AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { FeedbackType } from '@/lib/types';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
 
 interface FeedbackModalProps {
@@ -145,7 +147,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       if (screenshot) formData.append('screenshot', screenshot);
       formData.append('browser_info', JSON.stringify(getBrowserInfo()));
 
-      const response = await fetch('/api/feedback', {
+      const response = await csrfFetch('/api/feedback', {
         method: 'POST',
         body: formData,
       });
@@ -162,9 +164,10 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
       });
 
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to submit feedback. Please try again.';
       logger.error('Error submitting feedback:', err, { component: 'FeedbackModal', action: 'component_action' });
-      setError(err.message || 'Failed to submit feedback. Please try again.');
+      setError(message);
       toast.error('Failed to submit feedback', {
         description: 'Please try again later.',
       });
@@ -318,12 +321,13 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 </button>
               ) : (
                 <div className="relative border-2 border-gray-700 rounded-lg p-4">
-                  <img
+                  <Image
                     src={previewUrl!}
                     alt="Screenshot preview"
-                    loading="lazy"
-                    decoding="async"
+                    width={1200}
+                    height={675}
                     className="w-full h-auto rounded-lg"
+                    unoptimized
                   />
                   <button
                     type="button"

@@ -91,7 +91,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     }
 
     // Prepare update data
-    const updateData: any = {
+    const updateData: { is_public: boolean; updated_at: string; shared_at?: string | null } = {
       is_public: isPublic,
       updated_at: new Date().toISOString(),
     };

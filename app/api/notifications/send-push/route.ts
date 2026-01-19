@@ -51,6 +51,17 @@ const sendBulkPushSchema = z.object({
   payload: pushPayloadSchema,
 });
 
+function withTracking(payload: z.infer<typeof pushPayloadSchema>) {
+  const data = payload.data ? { ...payload.data } : {};
+  if (data.trackDismissal === undefined) {
+    data.trackDismissal = true;
+  }
+  return {
+    ...payload,
+    data,
+  };
+}
+
 /**
  * POST /api/notifications/send-push
  * Send push notification to a user or multiple users
@@ -103,23 +114,31 @@ export async function POST(req: NextRequest) {
       if (targetUserId === callerId) return true;
 
       // Check if caller and target share at least one space
-      const { data: sharedSpaces, error } = await supabase
-        .from('space_members')
-        .select('space_id')
-        .eq('user_id', callerId)
-        .in('space_id',
-          supabase
-            .from('space_members')
-            .select('space_id')
-            .eq('user_id', targetUserId)
-        );
+      const [callerSpacesResult, targetSpacesResult] = await Promise.all([
+        supabase
+          .from('space_members')
+          .select('space_id')
+          .eq('user_id', callerId),
+        supabase
+          .from('space_members')
+          .select('space_id')
+          .eq('user_id', targetUserId),
+      ]);
 
-      if (error) {
-        logger.error('Error checking space membership:', error, { component: 'api-route', action: 'api_request' });
+      if (callerSpacesResult.error || targetSpacesResult.error) {
+        logger.error('Error checking space membership:', {
+          component: 'api-route',
+          action: 'api_request',
+          callerError: callerSpacesResult.error,
+          targetError: targetSpacesResult.error,
+        });
         return false;
       }
 
-      return sharedSpaces && sharedSpaces.length > 0;
+      const callerSpaces = callerSpacesResult.data || [];
+      const targetSpaces = targetSpacesResult.data || [];
+      const targetSpaceIds = new Set(targetSpaces.map((space) => space.space_id));
+      return callerSpaces.some((space) => targetSpaceIds.has(space.space_id));
     }
 
     if (isBulk) {
@@ -133,6 +152,7 @@ export async function POST(req: NextRequest) {
       }
 
       const { userIds, payload } = parseResult.data;
+      const payloadWithTracking = withTracking(payload);
       const results = { success: 0, failed: 0, errors: [] as string[], unauthorized: 0 };
 
       for (const userId of userIds) {
@@ -144,7 +164,7 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const sendResult = await sendPushToUser(supabase, userId, payload);
+        const sendResult = await sendPushToUser(supabase, userId, payloadWithTracking);
         if (sendResult.success) {
           results.success += sendResult.sent;
           results.failed += sendResult.failed;
@@ -171,6 +191,7 @@ export async function POST(req: NextRequest) {
       }
 
       const { userId, payload } = parseResult.data;
+      const payloadWithTracking = withTracking(payload);
 
       // SECURITY: Verify caller can notify target user
       const authorized = await canNotifyUser(userId);
@@ -181,7 +202,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const result = await sendPushToUser(supabase, userId, payload);
+      const result = await sendPushToUser(supabase, userId, payloadWithTracking);
 
       if (!result.success) {
         return NextResponse.json(

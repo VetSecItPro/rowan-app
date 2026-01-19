@@ -1,12 +1,13 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
 
 import {
+  type LucideIcon,
   ArrowLeft,
   CheckSquare,
   Play,
-  Plus,
   Clock,
   Users,
   Grid3x3,
@@ -16,11 +17,7 @@ import {
   Home,
   ListChecks,
   Calendar,
-  Bell,
-  Tag,
   GripVertical,
-  Repeat,
-  FileText,
   Zap,
   Target,
   TrendingUp,
@@ -28,7 +25,7 @@ import {
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

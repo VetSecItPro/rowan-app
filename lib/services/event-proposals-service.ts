@@ -25,7 +25,7 @@ export interface EventProposal {
   proposer?: {
     id: string;
     email: string;
-    raw_user_meta_data?: any;
+    raw_user_meta_data?: Record<string, unknown>;
   };
   votes?: ProposalVote[];
 }
@@ -43,7 +43,7 @@ export interface ProposalVote {
   user?: {
     id: string;
     email: string;
-    raw_user_meta_data?: any;
+    raw_user_meta_data?: Record<string, unknown>;
   };
 }
 
@@ -194,7 +194,12 @@ export const eventProposalsService = {
   }>> {
     const votes = await this.getVotes(proposalId);
 
-    const summary: Record<number, any> = {};
+    const summary: Record<number, {
+      available: number;
+      unavailable: number;
+      preferred: number;
+      total: number;
+    }> = {};
 
     votes.forEach(vote => {
       if (!summary[vote.time_slot_index]) {

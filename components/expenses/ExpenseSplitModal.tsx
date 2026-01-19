@@ -38,17 +38,26 @@ interface ExpenseSplitModalProps {
   }) => Promise<void>;
 }
 
+type SplitUpdatePayload = {
+  split_type: SplitType;
+  split_percentage_user1?: number;
+  split_percentage_user2?: number;
+  split_amount_user1?: number;
+  split_amount_user2?: number;
+  is_split: boolean;
+};
+
 export function ExpenseSplitModal({
   isOpen,
   onClose,
-  expenseId,
+  expenseId: _expenseId,
   expenseName,
   totalAmount,
   currentSplitType = 'equal',
-  currentSplitData,
-  user1Id,
+  currentSplitData: _currentSplitData,
+  user1Id: _user1Id,
   user1Name,
-  user2Id,
+  user2Id: _user2Id,
   user2Name,
   user1Income,
   user2Income,
@@ -71,7 +80,7 @@ export function ExpenseSplitModal({
     }
 
     // Build split data based on type
-    const splitData: any = {
+    const splitData: SplitUpdatePayload = {
       split_type: splitType,
       is_split: true,
     };
@@ -221,7 +230,7 @@ export function ExpenseSplitModal({
                     <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                     <div className="text-sm text-blue-200">
                       <strong>Note:</strong> Saving this split will automatically calculate who owes what
-                      and update your partner balance. The split will appear on both partners' dashboards.
+                      and update your partner balance. The split will appear on both partners&apos; dashboards.
                     </div>
                   </div>
                 </div>

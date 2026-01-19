@@ -59,8 +59,8 @@ interface DailyDigestEmailProps {
 const DailyDigestEmail = ({
   recipientName = 'Partner',
   date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
-  spaceName = 'Your Space',
-  spaceId = '',
+  spaceName: _spaceName = 'Your Space',
+  spaceId: _spaceId = '',
   events = [],
   tasksDue = [],
   overdueTasks = [],
@@ -104,7 +104,7 @@ const DailyDigestEmail = ({
     <Html>
       <Head />
       <Preview>
-        {greeting}, {recipientName}! Here's your daily briefing for {date}
+        {greeting}, {recipientName}! Here&apos;s your daily briefing for {date}
       </Preview>
       <Body style={main}>
         <Container style={container}>
@@ -177,7 +177,7 @@ const DailyDigestEmail = ({
                   <Section style={sectionContainer}>
                     <div style={sectionHeader}>
                       <span style={sectionIcon}>📅</span>
-                      <span style={sectionTitle}>Today's Events ({events.length})</span>
+                      <span style={sectionTitle}>Today&apos;s Events ({events.length})</span>
                     </div>
                     <div style={listCard}>
                       {events.slice(0, 5).map((event) => (
@@ -233,7 +233,7 @@ const DailyDigestEmail = ({
                   <Section style={sectionContainer}>
                     <div style={sectionHeader}>
                       <span style={sectionIcon}>🍽️</span>
-                      <span style={sectionTitle}>Today's Meals</span>
+                      <span style={sectionTitle}>Today&apos;s Meals</span>
                     </div>
                     <div style={listCard}>
                       {meals.map((meal) => (
@@ -306,7 +306,7 @@ const DailyDigestEmail = ({
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              You're receiving this daily digest because you have it enabled in your notification settings.
+              You&apos;re receiving this daily digest because you have it enabled in your notification settings.
             </Text>
             <Text style={footerText}>
               <Link href="https://rowanapp.com/settings?tab=notifications" style={link}>

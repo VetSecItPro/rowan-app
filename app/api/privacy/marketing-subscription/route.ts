@@ -5,10 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
-import { Resend } from 'resend';
 import { getAppUrl } from '@/lib/utils/app-url';
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Validation schemas
 const MarketingSubscriptionUpdateSchema = z.object({
@@ -19,10 +16,12 @@ const MarketingSubscriptionUpdateSchema = z.object({
   promotionalOffers: z.boolean().optional(),
 });
 
-const UnsubscribeTokenSchema = z.object({
-  token: z.string().min(32),
-  type: z.enum(['email', 'all']).optional().default('email'),
-});
+type MarketingPreferences = z.infer<typeof MarketingSubscriptionUpdateSchema>;
+
+type PreferenceUpdates = {
+  updated_at: string;
+  marketing_emails_enabled?: boolean;
+};
 
 // POST - Update marketing subscription preferences
 export async function POST(request: NextRequest) {
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
     const validatedData = MarketingSubscriptionUpdateSchema.parse(body);
 
     // Get current preferences, create default if none exist
-    let { data: currentPrefs, error: prefsError } = await supabase
+    const { data: currentPrefs, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('*')
       .eq('user_id', userId)
@@ -91,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build update object
-    const updates: any = {
+    const updates: PreferenceUpdates = {
       updated_at: new Date().toISOString(),
     };
 
@@ -113,7 +112,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Apply marketing preferences to external services
-    await applyMarketingPreferences(userId, validatedData, currentPrefs);
+    await applyMarketingPreferences(userId, validatedData);
 
     // Log the preference change
     await logMarketingPreferenceChange(userId, validatedData);
@@ -164,11 +163,12 @@ export async function GET(request: NextRequest) {
     const userId = user.id;
 
     // Get marketing preferences, create default if none exist
-    let { data: preferences, error: prefsError } = await supabase
+    const { data: preferencesData, error: prefsError } = await supabase
       .from('user_privacy_preferences')
       .select('marketing_emails_enabled')
       .eq('user_id', userId)
       .maybeSingle();
+    let preferences = preferencesData;
 
     // Create default preferences if user doesn't have any
     if (!preferences && !prefsError) {
@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Apply marketing preferences to external services
-async function applyMarketingPreferences(userId: string, preferences: any, currentPrefs: any) {
+async function applyMarketingPreferences(userId: string, preferences: MarketingPreferences) {
   try {
     // 1. Update Resend audience management
     if (typeof preferences.emailMarketing !== 'undefined') {
@@ -302,15 +302,6 @@ async function updateResendAudience(userId: string, enableMarketing: boolean) {
   }
 }
 
-// Update SMS subscription (Twilio or similar)
-// Note: Phone column doesn't exist in users table yet - placeholder for future SMS functionality
-async function updateSMSSubscription(userId: string, enableSMS: boolean) {
-  // TODO: Add phone column to users table or create separate phone_numbers table
-  // Then implement actual SMS subscription logic here
-  void userId;
-  void enableSMS;
-}
-
 // Update email service provider (if using multiple)
 // This would integrate with other email providers like Mailchimp, Sendgrid, etc.
 async function updateEmailServiceProvider(userId: string, enableEmail: boolean) {
@@ -323,7 +314,7 @@ async function updateEmailServiceProvider(userId: string, enableEmail: boolean) 
 }
 
 // Log marketing preference changes for audit trail
-async function logMarketingPreferenceChange(userId: string, preferences: any) {
+async function logMarketingPreferenceChange(userId: string, preferences: MarketingPreferences) {
   try {
     const supabase = await createClient();
 
@@ -408,7 +399,7 @@ async function handleTokenUnsubscribe(token: string, type: string) {
     }
 
     // Update preferences based on type
-    const updates: any = { updated_at: new Date().toISOString() };
+    const updates: PreferenceUpdates = { updated_at: new Date().toISOString() };
 
     switch (type) {
       case 'email':
@@ -437,11 +428,11 @@ async function handleTokenUnsubscribe(token: string, type: string) {
       });
 
     // Apply to external services
-    const preferences = {
+    const preferences: MarketingPreferences = {
       emailMarketing: type === 'email' || type === 'all' ? false : undefined,
     };
 
-    await applyMarketingPreferences(tokenRecord.user_id, preferences, {});
+    await applyMarketingPreferences(tokenRecord.user_id, preferences);
 
     return NextResponse.json({
       success: true,

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get task
-    const task = await tasksService.getTaskById(params.id);
+    const task = await tasksService.getTaskById(params.id, supabase);
 
     if (!task) {
       return NextResponse.json(
@@ -117,7 +117,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing task first
-    const existingTask = await tasksService.getTaskById(params.id);
+    const existingTask = await tasksService.getTaskById(params.id, supabase);
 
     if (!existingTask) {
       return NextResponse.json(
@@ -165,7 +165,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       category: validatedUpdates.category ?? undefined,
       assigned_to: validatedUpdates.assigned_to ?? undefined,
       due_date: validatedUpdates.due_date ?? undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,
@@ -222,7 +222,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing task first
-    const existingTask = await tasksService.getTaskById(params.id);
+    const existingTask = await tasksService.getTaskById(params.id, supabase);
 
     if (!existingTask) {
       return NextResponse.json(
@@ -242,7 +242,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete task using service
-    await tasksService.deleteTask(params.id);
+    await tasksService.deleteTask(params.id, supabase);
 
     return NextResponse.json({
       success: true,

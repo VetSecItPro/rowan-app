@@ -1,12 +1,13 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
 
-import { ArrowLeft, UtensilsCrossed, BookOpen, Play, Eye, Plus, ChefHat, Globe, Sparkles, ShoppingBag, CheckSquare, Keyboard, Clock, Lightbulb, Search, Calendar, List as ListIcon, LayoutGrid } from 'lucide-react';
+import { type LucideIcon, ArrowLeft, UtensilsCrossed, BookOpen, Play, Eye, Plus, ChefHat, Globe, Sparkles, ShoppingBag, Keyboard, Clock, Lightbulb, LayoutGrid } from 'lucide-react';
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

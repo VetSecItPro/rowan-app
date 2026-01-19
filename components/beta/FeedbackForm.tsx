@@ -3,22 +3,25 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   Bug,
   Lightbulb,
   Palette,
   Zap,
   MoreHorizontal,
-  AlertTriangle,
   Flag,
-  ExternalLink,
-  MonitorSpeaker
+  ExternalLink
 } from 'lucide-react';
 
 interface FeedbackFormProps {
   onSubmit?: () => void;
   onCancel?: () => void;
 }
+
+type FeedbackCategory = 'bug' | 'feature_request' | 'ui_ux' | 'performance' | 'other';
+type FeedbackSeverity = 'critical' | 'high' | 'medium' | 'low';
+type FeedbackPriority = 'must_have' | 'should_have' | 'could_have' | 'wont_have';
 
 const CATEGORIES = [
   { value: 'bug', label: 'Bug Report', icon: Bug, color: 'text-red-600 bg-red-50 border-red-200' },
@@ -49,9 +52,9 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '' as any,
-    severity: '' as any,
-    priority: 'should_have' as any,
+    category: '' as FeedbackCategory | '',
+    severity: '' as FeedbackSeverity | '',
+    priority: 'should_have' as FeedbackPriority,
     page_url: typeof window !== 'undefined' ? window.location.href : ''
   });
 
@@ -78,7 +81,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
         url: window.location.href
       };
 
-      const response = await fetch('/api/beta/feedback', {
+      const response = await csrfFetch('/api/beta/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +191,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
                 name="severity"
                 value={severity.value}
                 checked={formData.severity === severity.value}
-                onChange={(e) => setFormData({ ...formData, severity: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, severity: e.target.value as FeedbackSeverity })}
                 className="mt-1"
                 required
               />
@@ -213,7 +216,7 @@ export function FeedbackForm({ onSubmit, onCancel }: FeedbackFormProps) {
         <select
           id="priority"
           value={formData.priority}
-          onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+          onChange={(e) => setFormData({ ...formData, priority: e.target.value as FeedbackPriority })}
           className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {PRIORITIES.map((priority) => (

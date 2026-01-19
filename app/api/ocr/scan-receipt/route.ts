@@ -150,10 +150,18 @@ Extract the data now:`;
     }
 
     // Parse the JSON response
-    let parsedData: any;
+    type ParsedReceipt = {
+      merchant_name?: string;
+      total_amount?: string | number;
+      receipt_date?: string;
+      category?: string;
+      confidence?: number;
+    };
+
+    let parsedData: ParsedReceipt;
     try {
-      parsedData = JSON.parse(jsonText);
-    } catch (parseError) {
+      parsedData = JSON.parse(jsonText) as ParsedReceipt;
+    } catch {
       logger.warn('Failed to parse Gemini OCR response', { component: 'api/ocr/scan-receipt', action: 'parse_failed' });
       // Fallback to regex-based extraction if JSON parsing fails
       return NextResponse.json(
@@ -182,11 +190,12 @@ Extract the data now:`;
     }
 
     return NextResponse.json(ocrResult);
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : undefined;
     logger.error('OCR API error', error, { component: 'api/ocr/scan-receipt', action: 'ocr' });
 
     // Check if it's a Gemini API error
-    if (error?.message?.includes('API key')) {
+    if (message?.includes('API key')) {
       return NextResponse.json(
         { error: 'OCR service is not configured. Please contact support.' },
         { status: 500 }
@@ -196,7 +205,7 @@ Extract the data now:`;
     return NextResponse.json(
       {
         error: 'Failed to process receipt. Please try again.',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        details: process.env.NODE_ENV === 'development' ? message : undefined,
       },
       { status: 500 }
     );

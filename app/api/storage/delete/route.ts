@@ -94,8 +94,16 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    type StorageObjectRow = {
+      id: string;
+      name: string;
+      bucket_id: string;
+      metadata?: { space_id?: string } | null;
+    };
+    const fileRows = (files ?? []) as StorageObjectRow[];
+
     // Verify all files belong to the specified space
-    const invalidFiles = files.filter((file: any) => {
+    const invalidFiles = fileRows.filter((file) => {
       const metadata = file.metadata || {};
       return metadata.space_id !== spaceId;
     });
@@ -108,7 +116,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete files from storage
-    const deletePromises = files.map((file: any) => {
+    const deletePromises = fileRows.map((file) => {
       return supabase.storage.from(file.bucket_id).remove([file.name]);
     });
 

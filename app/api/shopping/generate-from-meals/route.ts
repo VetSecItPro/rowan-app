@@ -10,7 +10,7 @@ import {
   generateShoppingList,
   categorizeIngredient,
 } from '@/lib/services/ingredient-parser';
-import { notificationService } from '@/lib/services/notification-service';
+import { sendShoppingListEmail } from '@/lib/services/email-service';
 
 /**
  * Request schema for generating shopping list
@@ -20,6 +20,16 @@ const GenerateShoppingListSchema = z.object({
   listName: z.string().min(1).max(200).optional(),
   spaceId: z.string().uuid(),
 });
+
+type MealRecipe = {
+  id: string;
+  name: string;
+  ingredients: unknown;
+};
+
+type MealWithRecipe = {
+  recipes?: MealRecipe | null;
+};
 
 /**
  * POST /api/shopping/generate-from-meals
@@ -105,9 +115,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract recipes from meals
-    const recipes = meals
-      .filter((meal: any) => meal.recipes)
-      .map((meal: any) => ({
+    const recipes = (meals as MealWithRecipe[])
+      .filter((meal): meal is MealWithRecipe & { recipes: MealRecipe } => Boolean(meal.recipes))
+      .map((meal) => ({
         id: meal.recipes.id,
         name: meal.recipes.name,
         ingredients: meal.recipes.ingredients,
@@ -188,18 +198,34 @@ export async function POST(req: NextRequest) {
         .eq('id', user.id)
         .single();
 
-      if (userData?.email) {
-        await notificationService.sendShoppingListEmail(
-          {
-            id: user.id,
-            email: userData.email,
-            name: userData.name,
-          },
-          finalListName,
-          shoppingList.id,
-          aggregatedIngredients.length,
-          space?.name || 'Your Space'
-        );
+      const { data: prefs } = await supabase
+        .from('notification_preferences')
+        .select('email_enabled, email_shopping_lists')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const shouldSendEmail = !prefs || (prefs.email_enabled && prefs.email_shopping_lists);
+
+      if (userData?.email && shouldSendEmail) {
+        await sendShoppingListEmail({
+          recipientEmail: userData.email,
+          recipientName: userData.name || 'there',
+          senderName: userData.name || userData.email.split('@')[0],
+          listName: finalListName,
+          listDescription: undefined,
+          items: aggregatedIngredients.map((ingredient) => ({
+            id: ingredient.name,
+            name: ingredient.name,
+            quantity: ingredient.amount ? String(Math.round(ingredient.amount)) : undefined,
+            checked: false,
+          })),
+          totalItems: aggregatedIngredients.length,
+          completedItems: 0,
+          actionType: 'updated',
+          spaceId,
+          listId: shoppingList.id,
+          spaceName: space?.name || 'Your Space',
+        });
       }
     } catch (emailError) {
       // Log error but don't fail the request

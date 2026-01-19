@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get projects from service
-    const projects = await projectsOnlyService.getProjects(spaceId);
+    const projects = await projectsOnlyService.getProjects(spaceId, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
       start_date,
       target_date,
       budget_amount,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

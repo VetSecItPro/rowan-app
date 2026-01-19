@@ -71,6 +71,7 @@ export default function PrivacyCompliancePage() {
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [user, router, loadData]);
 

@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
@@ -255,8 +256,44 @@ async function generateDataExport(
 }
 
 // Collect all user data from various tables
-async function collectUserData(supabase: any, userId: string, includeData: any = {}) {
-  const data: any = {
+type ExportRecord = Record<string, unknown>;
+
+type ExportData = {
+  exportedAt: string;
+  userId: string;
+  gdprCompliance: {
+    article: string;
+    description: string;
+  };
+  profile?: ExportRecord | null;
+  tasks?: ExportRecord[];
+  messages?: ExportRecord[];
+  expenses?: ExportRecord[];
+  calendar?: ExportRecord[];
+  spaces?: ExportRecord[];
+  reminders?: ExportRecord[];
+  goals?: ExportRecord[];
+  shopping?: ExportRecord[];
+  meals?: ExportRecord[];
+  privacyPreferences?: ExportRecord | null;
+  privacyAuditTrail?: ExportRecord[];
+};
+
+type IncludeDataOptions = Partial<{
+  profile: boolean;
+  tasks: boolean;
+  messages: boolean;
+  expenses: boolean;
+  calendar: boolean;
+  spaces: boolean;
+  reminders: boolean;
+  goals: boolean;
+  shopping: boolean;
+  meals: boolean;
+}>;
+
+async function collectUserData(supabase: SupabaseClient, userId: string, includeData: IncludeDataOptions = {}): Promise<ExportData> {
+  const data: ExportData = {
     exportedAt: new Date().toISOString(),
     userId,
     gdprCompliance: {
@@ -318,7 +355,8 @@ async function collectUserData(supabase: any, userId: string, includeData: any =
         .from('space_members')
         .select('spaces(*)')
         .eq('user_id', userId);
-      data.spaces = spaces?.map((sm: any) => sm.spaces) || [];
+      const spaceMembers = (spaces || []) as Array<{ spaces?: ExportRecord | null }>;
+      data.spaces = spaceMembers.map((sm) => sm.spaces || {}).filter((space) => Object.keys(space).length > 0);
     }
 
     // Reminders
@@ -380,7 +418,7 @@ async function collectUserData(supabase: any, userId: string, includeData: any =
 }
 
 // Generate export file in requested format
-async function generateExportFile(data: any, format: 'json' | 'csv' | 'pdf'): Promise<Buffer> {
+async function generateExportFile(data: ExportData, format: 'json' | 'csv' | 'pdf'): Promise<Buffer> {
   switch (format) {
     case 'json':
       return Buffer.from(JSON.stringify(data, null, 2), 'utf-8');
@@ -400,7 +438,7 @@ async function generateExportFile(data: any, format: 'json' | 'csv' | 'pdf'): Pr
       if (data.tasks && data.tasks.length > 0) {
         csvContent += 'TASKS\n';
         csvContent += Object.keys(data.tasks[0]).join(',') + '\n';
-        data.tasks.forEach((task: any) => {
+        data.tasks.forEach((task: ExportRecord) => {
           csvContent += Object.values(task).join(',') + '\n';
         });
         csvContent += '\n';

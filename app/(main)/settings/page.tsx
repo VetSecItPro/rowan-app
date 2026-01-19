@@ -3,9 +3,10 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
@@ -13,9 +14,9 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { DeleteSpaceModal } from '@/components/spaces/DeleteSpaceModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 // Dynamic imports for optimized bundle splitting
 import {
-  PasswordConfirmModal,
   AccountDeletionModal,
   ExportDataModal,
   TwoFactorAuth,
@@ -26,7 +27,6 @@ import { NotificationSettings } from '@/components/settings/NotificationSettings
 import { ChangePasswordForm } from '@/components/settings/ChangePasswordForm';
 import { SubscriptionSettings } from '@/components/settings/SubscriptionSettings';
 import { CalendarConnections } from '@/components/calendar/CalendarConnections';
-import { Toggle } from '@/components/ui/Toggle';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { useNumericLimit } from '@/lib/hooks/useFeatureGate';
 import { createClient } from '@/lib/supabase/client';
@@ -35,7 +35,6 @@ import {
   User,
   Shield,
   Bell,
-  Lock,
   Users,
   Database,
   Save,
@@ -45,7 +44,6 @@ import {
   Trash2,
   LogOut,
   Key,
-  Smartphone,
   X,
   UserPlus,
   Crown,
@@ -56,8 +54,6 @@ import {
   Monitor,
   BarChart3,
   ArrowRight,
-  CheckCircle2,
-  TrendingUp,
   Calendar,
   CheckSquare,
   ShoppingCart,
@@ -69,7 +65,6 @@ import {
   ShoppingBag,
   Home,
   Heart,
-  AlertCircle,
   Loader2,
   Edit,
   Receipt,
@@ -82,7 +77,6 @@ import {
 
 type SettingsTab = 'profile' | 'subscription' | 'security' | 'notifications' | 'privacy-data' | 'data-management' | 'integrations' | 'documentation' | 'analytics';
 type UserRole = 'Admin' | 'Member' | 'Viewer';
-type ExportStatus = 'idle' | 'pending' | 'processing' | 'ready';
 
 
 interface SpaceMember {
@@ -372,8 +366,6 @@ export default function SettingsPage() {
 
   // Modal states
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [showManageMembersModal, setShowManageMembersModal] = useState(false);
-  const [showLeaveSpaceModal, setShowLeaveSpaceModal] = useState(false);
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showDeleteSpaceModal, setShowDeleteSpaceModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -397,17 +389,11 @@ export default function SettingsPage() {
   const [resendingInvitationId, setResendingInvitationId] = useState<string | null>(null);
   const [cancellingInvitationId, setCancellingInvitationId] = useState<string | null>(null);
 
-  // Create space state
-  const [newSpaceName, setNewSpaceName] = useState('');
-  const [isCreatingSpace, setIsCreatingSpace] = useState(false);
-
   // Rename space state
   const [isRenamingSpace, setIsRenamingSpace] = useState(false);
   const [newSpaceNameEdit, setNewSpaceNameEdit] = useState('');
   const [isSavingSpaceName, setIsSavingSpaceName] = useState(false);
 
-  // Export state
-  const [exportStatus, setExportStatus] = useState<ExportStatus>('idle');
 
   // Delete account state
   const [deletePassword, setDeletePassword] = useState('');
@@ -524,7 +510,7 @@ export default function SettingsPage() {
       }
 
       // Call profile update API
-      const response = await fetch('/api/user/profile', {
+      const response = await csrfFetch('/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -569,7 +555,6 @@ export default function SettingsPage() {
   };
 
   const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
-  const [isRemovingMember, setIsRemovingMember] = useState(false);
 
   const handleUpdateMemberRole = async (memberId: string, newRole: UserRole) => {
     if (!spaceId) return;
@@ -579,7 +564,7 @@ export default function SettingsPage() {
 
     try {
       setIsUpdatingRole(memberId);
-      const response = await fetch('/api/spaces/members', {
+      const response = await csrfFetch('/api/spaces/members', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -630,8 +615,7 @@ export default function SettingsPage() {
     if (!memberToRemove || !spaceId) return;
 
     try {
-      setIsRemovingMember(true);
-      const response = await fetch('/api/spaces/members', {
+      const response = await csrfFetch('/api/spaces/members', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -651,37 +635,9 @@ export default function SettingsPage() {
       logger.error('Error removing member:', error, { component: 'page', action: 'execution' });
       alert('Failed to remove member');
     } finally {
-      setIsRemovingMember(false);
       setShowRemoveMemberConfirm(false);
       setMemberToRemove(null);
     }
-  };
-
-  const handleLeaveSpace = async () => {
-    const adminCount = spaceMembers.filter(m => m.role === 'Admin').length;
-    const currentUserMember = spaceMembers.find(m => m.isCurrentUser);
-
-    if (currentUserMember?.role === 'Admin' && adminCount === 1) {
-      alert('You are the last admin. Please promote another member to admin before leaving.');
-      return;
-    }
-
-    setShowLeaveSpaceModal(false);
-  };
-
-  const handleCreateSpace = async () => {
-    if (!newSpaceName.trim()) {
-      alert('Please enter a space name');
-      return;
-    }
-
-    setIsCreatingSpace(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-
-    setNewSpaceName('');
-    setIsCreatingSpace(false);
-    setShowCreateSpaceModal(false);
   };
 
   const handleRenameSpace = async () => {
@@ -718,24 +674,6 @@ export default function SettingsPage() {
     } finally {
       setIsSavingSpaceName(false);
     }
-  };
-
-  const handleRequestExport = async () => {
-    setExportStatus('pending');
-    setShowExportModal(false);
-
-    // Simulate processing
-    setTimeout(() => {
-      setExportStatus('processing');
-    }, 2000);
-
-    setTimeout(() => {
-      setExportStatus('ready');
-    }, 5000);
-  };
-
-  const handleDownloadExport = () => {
-    setExportStatus('idle');
   };
 
   const handleDeleteAccount = async () => {
@@ -833,7 +771,7 @@ export default function SettingsPage() {
     if (activeTab === 'security') {
       fetchActiveSessions();
     }
-  }, [activeTab]);
+  }, [activeTab, fetchActiveSessions]);
 
   // Fetch space members and pending invitations when profile tab is active and space is selected
   // OPTIMIZATION: Fetch both in parallel for faster loading
@@ -841,9 +779,9 @@ export default function SettingsPage() {
     if (activeTab === 'profile' && spaceId) {
       Promise.all([fetchSpaceMembers(), fetchPendingInvitations()]);
     }
-  }, [activeTab, spaceId]);
+  }, [activeTab, spaceId, fetchSpaceMembers, fetchPendingInvitations]);
 
-  const fetchSpaceMembers = async () => {
+  const fetchSpaceMembers = useCallback(async () => {
     if (!spaceId) return;
 
     try {
@@ -861,9 +799,9 @@ export default function SettingsPage() {
     } finally {
       setIsLoadingMembers(false);
     }
-  };
+  }, [spaceId]);
 
-  const fetchPendingInvitations = async () => {
+  const fetchPendingInvitations = useCallback(async () => {
     if (!spaceId) return;
 
     try {
@@ -881,7 +819,7 @@ export default function SettingsPage() {
     } finally {
       setIsLoadingInvitations(false);
     }
-  };
+  }, [spaceId]);
 
   const handleCopyInvitationUrl = async (invitationId: string, url: string) => {
     try {
@@ -896,7 +834,7 @@ export default function SettingsPage() {
   const handleResendInvitation = async (invitationId: string) => {
     try {
       setResendingInvitationId(invitationId);
-      const response = await fetch('/api/spaces/invitations', {
+      const response = await csrfFetch('/api/spaces/invitations', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ invitation_id: invitationId, space_id: spaceId }),
@@ -927,7 +865,7 @@ export default function SettingsPage() {
 
     try {
       setCancellingInvitationId(invitationId);
-      const response = await fetch('/api/spaces/invitations', {
+      const response = await csrfFetch('/api/spaces/invitations', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ invitation_id: invitationId }),
@@ -947,7 +885,7 @@ export default function SettingsPage() {
     }
   };
 
-  const fetchActiveSessions = async () => {
+  const fetchActiveSessions = useCallback(async () => {
     try {
       setIsLoadingSessions(true);
       logger.info('Fetching active sessions...', { component: 'page' });
@@ -966,13 +904,13 @@ export default function SettingsPage() {
     } finally {
       setIsLoadingSessions(false);
     }
-  };
+  }, []);
 
   const handleRevokeSession = async () => {
     if (!sessionToRevoke) return;
 
     try {
-      const response = await fetch(`/api/user/sessions/${sessionToRevoke}`, {
+      const response = await csrfFetch(`/api/user/sessions/${sessionToRevoke}`, {
         method: 'DELETE',
       });
 
@@ -1096,10 +1034,13 @@ export default function SettingsPage() {
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                       <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
                         {profileImage ? (
-                          <img
+                          <Image
                             src={profileImage}
                             alt="Profile"
-                            className="w-full h-full rounded-full object-cover shadow-xl"
+                            fill
+                            sizes="(max-width: 640px) 80px, 96px"
+                            className="rounded-full object-cover shadow-xl"
+                            unoptimized
                           />
                         ) : (
                           <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl">
@@ -1582,7 +1523,7 @@ export default function SettingsPage() {
                         <div className="flex-1 w-full">
                           <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Reset Password</h3>
                           <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">
-                            We'll send you an email with a secure link to reset your password
+                            We&apos;ll send you an email with a secure link to reset your password
                           </p>
 
                           {resetEmailSent ? (
@@ -1595,7 +1536,7 @@ export default function SettingsPage() {
                                     Check your inbox at <span className="font-semibold">{user?.email}</span> for instructions to reset your password.
                                   </p>
                                   <p className="text-xs text-green-400 mt-2">
-                                    Didn't receive it? Check your spam folder or{' '}
+                                    Didn&apos;t receive it? Check your spam folder or{' '}
                                     <button
                                       onClick={() => {
                                         setResetEmailSent(false);
@@ -1874,7 +1815,7 @@ export default function SettingsPage() {
                                 a.click();
                                 window.URL.revokeObjectURL(url);
                                 document.body.removeChild(a);
-                              } catch (error) {
+                              } catch {
                                 alert('Failed to export data. Please try again.');
                               }
                             }}
@@ -2084,7 +2025,7 @@ export default function SettingsPage() {
       <CreateSpaceModal
         isOpen={showCreateSpaceModal}
         onClose={() => setShowCreateSpaceModal(false)}
-        onSpaceCreated={(spaceId, spaceName) => {
+        onSpaceCreated={() => {
           refreshSpaces();
           setShowCreateSpaceModal(false);
         }}
@@ -2267,7 +2208,7 @@ export default function SettingsPage() {
       <CreateSpaceModal
         isOpen={showCreateSpaceModal}
         onClose={() => setShowCreateSpaceModal(false)}
-        onSpaceCreated={(spaceId, spaceName) => {
+        onSpaceCreated={() => {
           refreshSpaces();
           setShowCreateSpaceModal(false);
         }}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
 
 interface CreateSpaceModalProps {
@@ -33,7 +34,7 @@ export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpac
     setLoading(true);
 
     try {
-      const response = await fetch('/api/spaces/create', {
+      const response = await csrfFetch('/api/spaces/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

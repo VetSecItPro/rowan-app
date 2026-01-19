@@ -78,7 +78,7 @@ export interface ActivityLog {
   user_id: string;
   user_email?: string;
   description: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
   is_system: boolean;
   created_at: string;
 }
@@ -104,7 +104,7 @@ export interface CreateActivityLogInput {
   entity_id: string;
   user_id: string;
   description?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   is_system?: boolean;
 }
 
@@ -126,6 +126,10 @@ export interface UnreadMention {
   comment_author_email: string;
   created_at: string;
 }
+
+type CommentRow = Comment & { users?: { email?: string | null } };
+type ReactionCountRow = { emoji: string; reaction_count: number; user_ids: string[] };
+type ActivityLogRow = ActivityLog & { users?: { email?: string | null } };
 
 // ==================== COMMENTS ====================
 
@@ -149,7 +153,8 @@ export async function getComments(
   if (error) throw error;
 
   // Organize into threaded structure
-  const comments = (data || []).map((c: any) => ({
+  const commentRows = (data || []) as CommentRow[];
+  const comments = commentRows.map((c) => ({
     ...c,
     user_email: c.users?.email,
     replies: [],
@@ -227,9 +232,10 @@ export async function getComment(commentId: string): Promise<CommentWithDetails 
 
   if (error) throw error;
 
+  const record = data as CommentRow;
   return {
-    ...data,
-    user_email: (data as any).users?.email,
+    ...record,
+    user_email: record.users?.email,
   };
 }
 
@@ -279,7 +285,7 @@ export async function createComment(input: CreateCommentInput): Promise<Comment>
 export async function updateComment(commentId: string, updates: UpdateCommentInput): Promise<Comment> {
   const supabase = createClient();
 
-  const updateData: any = { ...updates };
+  const updateData: UpdateCommentInput & { is_edited?: boolean; edited_at?: string } = { ...updates };
 
   if (updates.content) {
     updateData.is_edited = true;
@@ -478,7 +484,7 @@ export async function getCommentReactions(
 
   if (error) throw error;
 
-  return (data || []).map((r: any) => ({
+  return (data || []).map((r: ReactionCountRow) => ({
     emoji: r.emoji,
     count: r.reaction_count,
     user_ids: r.user_ids,
@@ -642,7 +648,7 @@ export async function getActivityFeed(
 
   if (error) throw error;
 
-  return (data || []).map((log: any) => ({
+  return (data || []).map((log: ActivityLogRow) => ({
     ...log,
     user_email: log.users?.email,
   }));

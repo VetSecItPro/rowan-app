@@ -91,6 +91,25 @@ export interface SettlementSummary {
   last_settlement: string | null;
 }
 
+type ExpenseRecord = Record<string, unknown>;
+
+type ExpenseSplitWithExpense = ExpenseSplit & {
+  expenses?: ExpenseRecord;
+};
+
+type ExpenseSplitWithUser = ExpenseSplit & {
+  users?: {
+    email?: string | null;
+  };
+};
+
+type ExpenseOwnershipRow = {
+  ownership?: OwnershipType;
+  amount: number | string;
+};
+
+type OwnershipStats = Record<string, { ownership: OwnershipType; total: number; count: number }>;
+
 // ==================== EXPENSE SPLITS ====================
 
 /**
@@ -114,7 +133,7 @@ export async function getExpenseSplits(expenseId: string): Promise<ExpenseSplit[
 export async function getUserOwedExpenses(
   userId: string,
   spaceId?: string
-): Promise<(ExpenseSplit & { expense?: any })[]> {
+): Promise<(ExpenseSplit & { expense?: ExpenseRecord })[]> {
   const supabase = createClient();
 
   let query = supabase
@@ -131,7 +150,8 @@ export async function getUserOwedExpenses(
   const { data, error } = await query;
 
   if (error) throw error;
-  return (data || []).map((item: any) => ({
+  const rows = (data ?? []) as ExpenseSplitWithExpense[];
+  return rows.map((item) => ({
     ...item,
     expense: item.expenses,
   }));
@@ -389,11 +409,12 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
     { email?: string; owed: number; owedToThem: number }
   > = {};
 
-  for (const split of splits || []) {
+  const splitRows = (splits ?? []) as ExpenseSplitWithUser[];
+  for (const split of splitRows) {
     const userId = split.user_id;
     if (!balanceMap[userId]) {
       balanceMap[userId] = {
-        email: (split as any).users?.email,
+        email: split.users?.email,
         owed: 0,
         owedToThem: 0,
       };
@@ -527,12 +548,12 @@ export async function getExpensesByOwnership(
   if (error) throw error;
 
   // Group by ownership
-  const stats = (data || []).reduce((acc: any, expense: any) => {
-    const ownership = expense.ownership || 'shared';
+  const stats = (data ?? []).reduce<OwnershipStats>((acc, expense: ExpenseOwnershipRow) => {
+    const ownership = (expense.ownership || 'shared') as OwnershipType;
     if (!acc[ownership]) {
       acc[ownership] = { ownership, total: 0, count: 0 };
     }
-    acc[ownership].total += parseFloat(expense.amount);
+    acc[ownership].total += Number(expense.amount);
     acc[ownership].count += 1;
     return acc;
   }, {});

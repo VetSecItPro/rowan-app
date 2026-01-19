@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { useDevice } from '@/lib/contexts/DeviceContext';
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, LayoutGrid, ChevronLeft, ChevronRight, ChevronDown, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -23,7 +23,7 @@ import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalen
 import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
 import { UnifiedItemPreviewModal } from '@/components/calendar/UnifiedItemPreviewModal';
 import { useUnifiedCalendar } from '@/lib/hooks/useUnifiedCalendar';
-import type { UnifiedCalendarItem, UnifiedCalendarFilters as FilterState } from '@/lib/types/unified-calendar-item';
+import type { UnifiedCalendarItem } from '@/lib/types/unified-calendar-item';
 
 // Import components directly to fix clickability issues
 import { NewEventModal } from '@/components/calendar/NewEventModal';
@@ -38,11 +38,12 @@ import { geolocationService } from '@/lib/services/geolocation-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
 import { useFeatureAccessSafe } from '@/lib/contexts/subscription-context';
-import { CalendarDaySkeleton } from '@/components/ui/Skeleton';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
+import type { EventTemplate } from '@/lib/services/calendar-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, subDays, addWeeks, subWeeks } from 'date-fns';
 
@@ -56,12 +57,6 @@ const CalendarConnectionSchema = z.object({
 });
 
 const CalendarConnectionsArraySchema = z.array(CalendarConnectionSchema);
-
-// ISO date string validation (basic format check)
-const ISODateStringSchema = z.string().refine(
-  (val) => !isNaN(Date.parse(val)),
-  { message: 'Invalid date string' }
-);
 
 /**
  * Safely parse and validate localStorage data
@@ -131,7 +126,13 @@ export default function CalendarPage() {
   const [isSearchTyping, setIsSearchTyping] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, any>>({});
+  type LinkedShoppingList = {
+    id?: string | null;
+    title?: string | null;
+    items_count: number;
+  };
+
+  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, LinkedShoppingList>>({});
   const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
@@ -206,12 +207,9 @@ export default function CalendarPage() {
 
   const {
     items: unifiedItems,
-    itemsByDate: unifiedItemsByDate,
     counts: unifiedCounts,
-    isLoading: unifiedLoading,
     filters: unifiedFilters,
     setFilters: setUnifiedFilters,
-    refresh: refreshUnifiedItems,
   } = useUnifiedCalendar({
     spaceId: currentSpace?.id || '',
     startDate: unifiedDateRange.start,
@@ -400,7 +398,7 @@ export default function CalendarPage() {
 
       // Load linked shopping lists for all events
       // For recurring event occurrences, use the series_id (master event ID) to lookup shopping lists
-      const linkedListsMap: Record<string, any> = {};
+      const linkedListsMap: Record<string, LinkedShoppingList> = {};
       const processedEventIds = new Set<string>();
 
       await Promise.all(
@@ -513,7 +511,7 @@ export default function CalendarPage() {
   }, []);
 
   // Stable callback for template selection
-  const handleSelectTemplate = useCallback(async (template: any) => {
+  const handleSelectTemplate = useCallback(async (template: EventTemplate) => {
     try {
       // Create event from template starting now (or could open modal to choose time)
       const startTime = new Date().toISOString();
@@ -642,7 +640,7 @@ export default function CalendarPage() {
       // Sync all connections in parallel for efficiency
       const syncPromises = calendarConnections.map(async (connection) => {
         try {
-          const response = await fetch('/api/calendar/sync', {
+          const response = await csrfFetch('/api/calendar/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1386,7 +1384,7 @@ export default function CalendarPage() {
                         display="medium"
                       />
                       <div className="mt-2 text-xs text-gray-400">
-                        {userLocation.split(',')[0]} • Today's weather
+                        {userLocation.split(',')[0]} • Today&apos;s weather
                       </div>
                     </>
                   ) : (

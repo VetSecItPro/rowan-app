@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get reminders from service
-    const reminders = await remindersService.getReminders(spaceId);
+    const reminders = await remindersService.getReminders(spaceId, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
       ...body,
       title: sanitizePlainText(title),
       description: description ? sanitizePlainText(description) : undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

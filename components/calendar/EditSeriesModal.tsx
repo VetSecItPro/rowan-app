@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Edit3, Trash2, AlertTriangle } from 'lucide-react';
-import { CalendarEvent, CreateEventInput, calendarService } from '@/lib/services/calendar-service';
+import { CalendarEvent, calendarService } from '@/lib/services/calendar-service';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 
@@ -29,8 +29,7 @@ export function EditSeriesModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>('');
 
-  const isRecurringOccurrence = calendarService.isRecurringOccurrence(event);
-  const seriesId = isRecurringOccurrence ? (event as any).series_id : event.id;
+  const seriesId = calendarService.isRecurringOccurrence(event) ? event.series_id : event.id;
   const isDeleteAction = selectedAction.startsWith('delete-');
 
   const handleConfirm = async () => {
@@ -206,7 +205,7 @@ export function EditSeriesModal({
     >
       <div className="space-y-4">
         <p className="text-sm text-gray-400">
-          "{event.title}" is part of a recurring series
+          &quot;{event.title}&quot; is part of a recurring series
         </p>
           {isDeleteAction && (
             <div className="flex items-center gap-3 p-4 bg-red-900/20 border border-red-800 rounded-xl">

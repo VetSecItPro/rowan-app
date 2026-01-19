@@ -12,6 +12,50 @@ import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
+type TastyTag = {
+  type?: string;
+  display_name?: string;
+};
+
+type TastyMeasurement = {
+  quantity?: string;
+  unit?: {
+    name?: string;
+  };
+};
+
+type TastyComponent = {
+  ingredient?: {
+    name?: string;
+  };
+  raw_text?: string;
+  measurements?: TastyMeasurement[];
+};
+
+type TastySection = {
+  components?: TastyComponent[];
+};
+
+type TastyInstruction = {
+  display_text?: string;
+};
+
+type TastyRecipe = {
+  id: number | string;
+  name?: string;
+  description?: string;
+  thumbnail_url?: string;
+  original_video_url?: string;
+  prep_time_minutes?: number;
+  cook_time_minutes?: number;
+  num_servings?: number;
+  tags?: TastyTag[];
+  canonical_id?: string;
+  slug?: string;
+  sections?: TastySection[];
+  instructions?: TastyInstruction[];
+};
+
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting with automatic fallback
@@ -70,16 +114,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const recipes = data.results.map((recipe: any) => {
+    const results = (data.results ?? []) as TastyRecipe[];
+    const recipes = results.map((recipe) => {
       // Parse and sanitize ingredients (external data could contain XSS payloads)
-      const ingredients = recipe.sections?.[0]?.components?.map((comp: any) => ({
+      const ingredients = recipe.sections?.[0]?.components?.map((comp) => ({
         name: sanitizePlainText(comp.ingredient?.name || comp.raw_text),
         amount: comp.measurements?.[0]?.quantity || undefined,
         unit: sanitizePlainText(comp.measurements?.[0]?.unit?.name) || undefined,
       })) || [];
 
       // Parse and sanitize instructions
-      const instructions = recipe.instructions?.map((inst: any, idx: number) =>
+      const instructions = recipe.instructions?.map((inst, idx: number) =>
         `${idx + 1}. ${sanitizePlainText(inst.display_text)}`
       ).join('\n\n') || '';
 
@@ -92,7 +137,7 @@ export async function GET(request: NextRequest) {
         prep_time: recipe.prep_time_minutes,
         cook_time: recipe.cook_time_minutes,
         servings: recipe.num_servings,
-        cuisine: sanitizePlainText(recipe.tags?.find((t: any) => t.type === 'cuisine')?.display_name),
+        cuisine: sanitizePlainText(recipe.tags?.find((t) => t.type === 'cuisine')?.display_name),
         ingredients,
         instructions,
         source_url: recipe.canonical_id ? `https://tasty.co/recipe/${encodeURIComponent(recipe.slug || '')}` : undefined,

@@ -9,6 +9,14 @@ import { PremiumButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
 import { Modal } from '@/components/ui/Modal';
 
+type VoiceNoteMetadata = {
+  transcription?: string;
+  confidence?: number;
+  keywords?: string[];
+  category?: string;
+  tags?: string[];
+};
+
 // Mood emoji options
 const MOOD_OPTIONS = [
   { value: 'great', emoji: '😊', label: 'Great', color: 'text-green-600' },
@@ -45,13 +53,13 @@ export function GoalCheckInModal({
 
   const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
   const [voiceNoteDuration, setVoiceNoteDuration] = useState(0);
-  const [voiceNoteMetadata, setVoiceNoteMetadata] = useState<any>(null);
+  const [voiceNoteMetadata, setVoiceNoteMetadata] = useState<VoiceNoteMetadata | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleVoiceNoteSent = async (audioBlob: Blob, duration: number, metadata?: any) => {
+  const handleVoiceNoteSent = async (audioBlob: Blob, duration: number, metadata?: VoiceNoteMetadata) => {
     setVoiceNoteBlob(audioBlob);
     setVoiceNoteDuration(duration);
     setVoiceNoteMetadata(metadata);
@@ -61,7 +69,7 @@ export function GoalCheckInModal({
     if (metadata && audioBlob) {
       try {
         const transcriptionResult = await voiceTranscriptionService.transcribeAudio(audioBlob);
-        setVoiceNoteMetadata((prev: any) => ({
+        setVoiceNoteMetadata((prev) => ({
           ...prev,
           transcription: transcriptionResult.transcription,
           confidence: transcriptionResult.confidence,

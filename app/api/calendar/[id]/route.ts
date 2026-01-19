@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get event
-    const event = await calendarService.getEventById(params.id);
+    const event = await calendarService.getEventById(params.id, supabase);
 
     if (!event) {
       return NextResponse.json(
@@ -118,7 +118,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing event first
-    const existingEvent = await calendarService.getEventById(params.id);
+    const existingEvent = await calendarService.getEventById(params.id, supabase);
 
     if (!existingEvent) {
       return NextResponse.json(
@@ -159,7 +159,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       title: title ? sanitizePlainText(title) : undefined,
       description: description ? sanitizePlainText(description) : undefined,
       location: location ? sanitizePlainText(location) : undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,
@@ -216,7 +216,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing event first
-    const existingEvent = await calendarService.getEventById(params.id);
+    const existingEvent = await calendarService.getEventById(params.id, supabase);
 
     if (!existingEvent) {
       return NextResponse.json(
@@ -236,7 +236,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete event using service
-    await calendarService.deleteEvent(params.id);
+    await calendarService.deleteEvent(params.id, false, supabase);
 
     return NextResponse.json({
       success: true,

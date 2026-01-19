@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars, no-console */
 // Temporary script to apply migration to Supabase
 const fs = require('fs');
 const path = require('path');

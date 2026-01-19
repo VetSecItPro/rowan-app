@@ -18,7 +18,6 @@ function UnsubscribeContent() {
   const { params, error: validationError } = useValidatedSearchParams(UnsubscribeParamsSchema);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<UnsubscribeResult | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [type, setType] = useState<string | null>(null);
 
   useEffect(() => {
@@ -32,7 +31,6 @@ function UnsubscribeContent() {
     const tokenParam = params?.token;
     const typeParam = params?.type || 'email';
 
-    setToken(tokenParam || null);
     setType(typeParam || null);
 
     if (tokenParam) {
@@ -147,7 +145,7 @@ function UnsubscribeContent() {
                   Successfully Unsubscribed
                 </h1>
                 <p className="text-white/90">
-                  You've been removed from {typeLabel.toLowerCase()}
+                  You&apos;ve been removed from {typeLabel.toLowerCase()}
                 </p>
               </div>
 
@@ -211,7 +209,7 @@ function UnsubscribeContent() {
                   Unsubscribe Failed
                 </h1>
                 <p className="text-white/90">
-                  We couldn't process your unsubscribe request
+                  We couldn&apos;t process your unsubscribe request
                 </p>
               </div>
 

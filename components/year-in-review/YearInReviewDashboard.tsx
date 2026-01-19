@@ -8,25 +8,16 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { logger } from '@/lib/logger';
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
   Area,
   AreaChart
 } from 'recharts';
 import {
   TrendingUp,
-  TrendingDown,
-  Calendar,
   Target,
   CheckCircle2,
   DollarSign,
@@ -35,16 +26,16 @@ import {
   Star,
   Trophy,
   Zap,
-  Users,
-  Clock,
   Download,
   Share2,
   Sparkles
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { YearInReviewData } from '@/lib/services/year-in-review-service';
 import { SpaceSelector } from '@/components/spaces/SpaceSelector';
 import { cn } from '@/lib/utils';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 // =====================================================
 // TYPES AND INTERFACES
@@ -64,7 +55,7 @@ export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year,
   const [data, setData] = useState<YearInReviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState(year || new Date().getFullYear());
+  const selectedYear = year ?? new Date().getFullYear();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Fetch year in review data
@@ -105,7 +96,7 @@ export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year,
     if (!currentSpace?.id || !data) return;
 
     try {
-      const response = await fetch('/api/year-in-review', {
+      const response = await csrfFetch('/api/year-in-review', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +176,7 @@ export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year,
               Getting ready to load your year in review...
             </p>
             <p className="text-sm text-muted-foreground">
-              Here's a preview of what your year in review will look like once you have some data.
+              Here&apos;s a preview of what your year in review will look like once you have some data.
             </p>
           </div>
         ) : (
@@ -281,7 +272,7 @@ export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year,
 // =====================================================
 
 interface OverviewCardProps {
-  icon: React.ComponentType<any>;
+  icon: LucideIcon;
   title: string;
   value: string | number;
   subtitle: string;
@@ -315,7 +306,7 @@ function OverviewCard({ icon: Icon, title, value, subtitle, color }: OverviewCar
 // =====================================================
 // EMPTY STATE COMPONENT
 // =====================================================
-function EmptyStateCard({ title, description, icon: Icon }: { title: string; description: string; icon: React.ComponentType<any> }) {
+function EmptyStateCard({ title, description, icon: Icon }: { title: string; description: string; icon: LucideIcon }) {
   return (
     <Card className="text-center py-12">
       <CardContent>

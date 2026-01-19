@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Heart, ThumbsUp, Smile, Users, Calendar, CheckCircle2, Target, Mic, Image as ImageIcon } from 'lucide-react';
+import { MessageCircle, Users, Calendar, CheckCircle2, Target, Mic } from 'lucide-react';
 import { GoalActivity, GoalComment, CreateCommentInput } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
@@ -13,6 +13,23 @@ interface ActivityFeedProps {
   goalId?: string; // If provided, filter activities for specific goal
   className?: string;
 }
+
+type ActivityData = Partial<{
+  goal_title: string;
+  progress_percentage: number;
+  mood: string;
+  has_voice_note: boolean;
+  has_notes: boolean;
+  need_help: boolean;
+}>;
+
+type AuthUser = {
+  email?: string | null;
+  full_name?: string | null;
+  user_metadata?: {
+    full_name?: string | null;
+  };
+};
 
 const activityIcons = {
   goal_created: Target,
@@ -55,7 +72,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   const [newComment, setNewComment] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const supabase = createClient();
 
@@ -146,12 +163,6 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     try {
       setIsSubmitting(true);
 
-      const commentInput: CreateCommentInput = {
-        goal_id: activityId, // This might need adjustment based on your schema
-        content,
-        content_type: 'text'
-      };
-
       // This would need to be implemented in your goals service
       // await goalsService.createComment(commentInput);
 
@@ -165,7 +176,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     }
   };
 
-  const handleReaction = async (commentId: string, emoji: string) => {
+  const handleReaction = async (_commentId: string, _emoji: string) => {
     hapticLight();
     try {
       // This would need to be implemented in your goals service
@@ -176,7 +187,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   };
 
   const getActivityDescription = (activity: GoalActivity) => {
-    const data = activity.activity_data as any;
+    const data = activity.activity_data as ActivityData;
 
     switch (activity.activity_type) {
       case 'goal_created':
@@ -202,7 +213,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   };
 
   const getActivityMetadata = (activity: GoalActivity) => {
-    const data = activity.activity_data as any;
+    const data = activity.activity_data as ActivityData;
     const metadata = [];
 
     if (data?.has_voice_note) {
@@ -224,9 +235,10 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     return metadata;
   };
 
-  const getUserInitials = (user: any) => {
-    if (user?.full_name) {
-      return user.full_name.split(' ').map((n: string) => n[0]).join('');
+  const getUserInitials = (user: AuthUser | null) => {
+    const fullName = user?.full_name || user?.user_metadata?.full_name;
+    if (fullName) {
+      return fullName.split(' ').map((n) => n[0]).join('');
     }
     return user?.email?.[0].toUpperCase() || '?';
   };

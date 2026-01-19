@@ -3,6 +3,7 @@
 import { Image as ImageIcon, Video, FileText, Download, X, Play, Pause, Volume2 } from 'lucide-react';
 import { FileUploadResult } from '@/lib/services/file-upload-service';
 import { useState, useRef } from 'react';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 interface AttachmentPreviewProps {
   attachment: FileUploadResult;
@@ -14,6 +15,12 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const safePublicUrl = sanitizeUrl(attachment.public_url);
+  const safeThumbnailUrl = attachment.thumbnail_url ? sanitizeUrl(attachment.thumbnail_url) : '';
+
+  if (!safePublicUrl) {
+    return null;
+  }
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
@@ -53,7 +60,7 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
     return (
       <div className="relative group">
         <img
-          src={attachment.thumbnail_url || attachment.public_url}
+          src={safeThumbnailUrl || safePublicUrl}
           alt={attachment.file_name}
           className={`rounded-lg object-cover ${
             compact ? 'w-20 h-20' : 'max-w-sm max-h-96 w-full'
@@ -70,7 +77,7 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
           </button>
         )}
         <a
-          href={attachment.public_url}
+          href={safePublicUrl}
           download={attachment.file_name}
           target="_blank"
           rel="noopener noreferrer"
@@ -88,7 +95,7 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
       <div className="relative group">
         <video
           ref={videoRef}
-          src={attachment.public_url}
+          src={safePublicUrl}
           className={`rounded-lg ${compact ? 'w-40 h-24' : 'max-w-lg w-full'}`}
           preload="metadata"
           onPlay={() => setIsPlaying(true)}
@@ -153,7 +160,7 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
         </div>
         <audio
           ref={audioRef}
-          src={attachment.public_url}
+          src={safePublicUrl}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onEnded={() => setIsPlaying(false)}
@@ -167,7 +174,7 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
   return (
     <div className="relative group">
       <a
-        href={attachment.public_url}
+        href={safePublicUrl}
         download={attachment.file_name}
         target="_blank"
         rel="noopener noreferrer"

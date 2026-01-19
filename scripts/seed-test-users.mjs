@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Script to create 5 test users with mock data for admin dashboard testing
  *

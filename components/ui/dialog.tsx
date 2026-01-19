@@ -6,12 +6,18 @@ interface DialogProps {
   children: React.ReactNode;
 }
 
+type DialogChildProps = {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onClick?: React.MouseEventHandler;
+};
+
 export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
   return (
     <div data-state={open ? 'open' : 'closed'}>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<any>, {
+          return React.cloneElement(child as React.ReactElement<DialogChildProps>, {
             open,
             onOpenChange,
           });
@@ -35,7 +41,7 @@ export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerPr
     };
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as React.ReactElement<any>, {
+      return React.cloneElement(children as React.ReactElement<DialogChildProps>, {
         onClick: handleClick,
       });
     }
@@ -115,7 +121,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
 
 DialogContent.displayName = 'DialogContent';
 
-interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
   ({ className = '', ...props }, ref) => (
@@ -129,7 +135,7 @@ export const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
 
 DialogHeader.displayName = 'DialogHeader';
 
-interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+type DialogFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
   ({ className = '', ...props }, ref) => (
@@ -143,7 +149,7 @@ export const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
 
 DialogFooter.displayName = 'DialogFooter';
 
-interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+type DialogTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
 export const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ className = '', ...props }, ref) => (
@@ -157,7 +163,7 @@ export const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps
 
 DialogTitle.displayName = 'DialogTitle';
 
-interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+type DialogDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 export const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
   ({ className = '', ...props }, ref) => (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, Calendar, Clock, X } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 /**
  * Enhanced Recurrence Pattern Component
@@ -38,12 +38,14 @@ const MONTHS = [
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const WEEKDAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+type EndType = 'never' | 'date' | 'count';
+
 export function EnhancedRecurrencePattern({
   value,
   onChange,
   enabled,
   onEnabledChange,
-  startDate
+  startDate: _startDate
 }: EnhancedRecurrencePatternProps) {
   const [pattern, setPattern] = useState<EnhancedRecurrencePattern>(
     value || {
@@ -53,22 +55,28 @@ export function EnhancedRecurrencePattern({
     }
   );
 
-  const [endType, setEndType] = useState<'never' | 'date' | 'count'>('never');
+  const [endType, setEndType] = useState<EndType>('never');
   const [endDate, setEndDate] = useState<string>('');
   const [endCount, setEndCount] = useState<number>(10);
 
   // Initialize end conditions from pattern
   useEffect(() => {
     if (value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPattern(value);
 
       if (value.end_date) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEndType('date');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEndDate(value.end_date);
       } else if (value.end_count) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEndType('count');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEndCount(value.end_count);
       } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setEndType('never');
       }
     }
@@ -168,7 +176,7 @@ export function EnhancedRecurrencePattern({
               <div className="relative flex-1">
                 <select
                   value={pattern.pattern}
-                  onChange={(e) => updatePattern({ pattern: e.target.value as any })}
+                  onChange={(e) => updatePattern({ pattern: e.target.value as EnhancedRecurrencePattern['pattern'] })}
                   className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white appearance-none pr-8"
                 >
                   <option value="daily">day(s)</option>
@@ -357,7 +365,7 @@ export function EnhancedRecurrencePattern({
                 name="endType"
                 value="never"
                 checked={endType === 'never'}
-                onChange={(e) => setEndType(e.target.value as any)}
+                onChange={(e) => setEndType(e.target.value as EndType)}
                 className="w-4 h-4 text-purple-600 focus:ring-purple-500"
               />
               <span className="text-sm text-gray-300">Never</span>
@@ -369,7 +377,7 @@ export function EnhancedRecurrencePattern({
                 name="endType"
                 value="date"
                 checked={endType === 'date'}
-                onChange={(e) => setEndType(e.target.value as any)}
+                onChange={(e) => setEndType(e.target.value as EndType)}
                 className="w-4 h-4 text-purple-600 focus:ring-purple-500"
               />
               <span className="text-sm text-gray-300">On date</span>
@@ -389,7 +397,7 @@ export function EnhancedRecurrencePattern({
                 name="endType"
                 value="count"
                 checked={endType === 'count'}
-                onChange={(e) => setEndType(e.target.value as any)}
+                onChange={(e) => setEndType(e.target.value as EndType)}
                 className="w-4 h-4 text-purple-600 focus:ring-purple-500"
               />
               <span className="text-sm text-gray-300">After</span>

@@ -177,6 +177,7 @@ const nextConfig = {
       "img-src 'self' data: https: blob:",
       "connect-src 'self' https: wss: data:",
       "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com",
+      "frame-ancestors 'self'",
       "worker-src 'self' blob:",
       "child-src 'self' blob:",
       "manifest-src 'self'",

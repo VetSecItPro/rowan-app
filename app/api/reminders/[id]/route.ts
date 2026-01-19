@@ -61,7 +61,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get reminder
-    const reminder = await remindersService.getReminderById(params.id);
+    const reminder = await remindersService.getReminderById(params.id, supabase);
 
     if (!reminder) {
       return NextResponse.json(
@@ -141,7 +141,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing reminder first
-    const existingReminder = await remindersService.getReminderById(params.id);
+    const existingReminder = await remindersService.getReminderById(params.id, supabase);
 
     if (!existingReminder) {
       return NextResponse.json(
@@ -188,7 +188,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     const updates = validationResult.data;
 
     // Update reminder using service
-    const updatedReminder = await remindersService.updateReminder(params.id, updates);
+    const updatedReminder = await remindersService.updateReminder(params.id, updates, supabase);
 
     return NextResponse.json({
       success: true,
@@ -237,7 +237,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing reminder first
-    const existingReminder = await remindersService.getReminderById(params.id);
+    const existingReminder = await remindersService.getReminderById(params.id, supabase);
 
     if (!existingReminder) {
       return NextResponse.json(
@@ -271,7 +271,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete reminder using service
-    await remindersService.deleteReminder(params.id);
+    await remindersService.deleteReminder(params.id, supabase);
 
     return NextResponse.json({
       success: true,

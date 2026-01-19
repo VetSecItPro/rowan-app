@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useState, useEffect } from 'react';
+import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { X, BarChart3, TrendingUp, Eye, MousePointer, CheckCircle } from 'lucide-react';
 import { smartNudgesService } from '@/lib/services/smart-nudges-service';
@@ -31,13 +31,7 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState(30); // days
 
-  useEffect(() => {
-    if (isOpen && user && currentSpace) {
-      loadAnalytics();
-    }
-  }, [isOpen, user, currentSpace, timeRange]);
-
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     if (!user || !currentSpace) return;
 
     try {
@@ -54,7 +48,13 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, currentSpace, timeRange]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadAnalytics();
+    }
+  }, [isOpen, loadAnalytics]);
 
   const getPercentageColor = (percentage: number) => {
     if (percentage >= 80) return 'text-green-400';
@@ -297,16 +297,16 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
                         ) : (
                           <>
                             {analytics.effectiveness_rate > 80 && (
-                              <p>🎉 Excellent! Your nudges are highly effective. You're taking action on most suggestions.</p>
+                              <p>🎉 Excellent! Your nudges are highly effective. You&apos;re taking action on most suggestions.</p>
                             )}
                             {analytics.effectiveness_rate < 30 && analytics.total_nudges > 5 && (
                               <p>💡 Consider adjusting your nudge settings to better match your preferences and schedule.</p>
                             )}
                             {analytics.read_rate > 90 && (
-                              <p>👀 Great engagement! You're reading almost all your nudges.</p>
+                              <p>👀 Great engagement! You&apos;re reading almost all your nudges.</p>
                             )}
                             {analytics.click_rate < analytics.read_rate / 2 && analytics.read_nudges > 5 && (
-                              <p>🎯 You're reading nudges but not clicking them often. Consider if the action buttons are helpful.</p>
+                              <p>🎯 You&apos;re reading nudges but not clicking them often. Consider if the action buttons are helpful.</p>
                             )}
                             {Object.keys(analytics.category_breakdown).length > 0 && (
                               <p>

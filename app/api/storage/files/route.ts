@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
       .from('objects')
       .select('id, name, metadata, created_at')
       .eq('bucket_id', 'space-files')
+      .eq('metadata->>space_id', spaceId)
       .order('created_at', { ascending: false });
 
     if (filesError) {
@@ -67,16 +68,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ files: [] }, { status: 200 });
     }
 
-    // Filter files by space_id from metadata
-    const spaceFiles = (files || [])
-      .filter((file: any) => {
+    type StorageObjectRow = {
+      id: string;
+      name: string;
+      metadata?: { space_id?: string; size?: string | number } | null;
+      created_at: string;
+    };
+    const fileRows = (files ?? []) as StorageObjectRow[];
+
+    // Defense-in-depth: filter files by space_id from metadata
+    const spaceFiles = fileRows
+      .filter((file) => {
         const metadata = file.metadata || {};
         return metadata.space_id === spaceId;
       })
-      .map((file: any) => ({
+      .map((file) => ({
         id: file.id,
         name: file.name,
-        size: parseInt(file.metadata?.size || '0', 10),
+        size: Number.parseInt(String(file.metadata?.size ?? '0'), 10),
         created_at: file.created_at,
         metadata: file.metadata,
       }));

@@ -76,7 +76,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       space,
       userId: user.id,
     });
-  }, [switchSpaceMutation, user?.id]);
+  }, [switchSpaceMutation, user]);
 
   const refreshSpaces = useCallback(async () => {
     spacesQuery.refetch();
@@ -105,7 +105,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         error: error instanceof Error ? error.message : 'Failed to create space',
       };
     }
-  }, [createSpaceMutation, user?.id]);
+  }, [createSpaceMutation, user]);
 
   const deleteSpace = useCallback(async (spaceId: string): Promise<{ success: boolean; error?: string }> => {
     if (!user?.id) {
@@ -125,7 +125,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         error: error instanceof Error ? error.message : 'Failed to delete space',
       };
     }
-  }, [deleteSpaceMutation, user?.id]);
+  }, [deleteSpaceMutation, user]);
 
   useEffect(() => {
     if (!user?.id) return;

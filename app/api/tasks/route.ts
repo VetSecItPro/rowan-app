@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     if (search) options.search = search;
 
     // Get tasks from service
-    const tasks = await tasksService.getTasks(spaceId, options);
+    const tasks = await tasksService.getTasks(spaceId, options, supabase);
 
     // Add cache headers for browser caching (30s with stale-while-revalidate)
     return withUserDataCache(
@@ -230,7 +230,7 @@ export async function POST(req: NextRequest) {
       tags: validatedData.tags ?? undefined,
       estimated_hours: validatedData.estimated_hours ?? undefined,
       calendar_sync: validatedData.calendar_sync ?? false,
-    });
+    }, supabase);
 
     // Track task creation usage
     await trackUsage(user.id, 'tasks_created');

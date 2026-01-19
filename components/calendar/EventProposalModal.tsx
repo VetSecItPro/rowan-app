@@ -22,6 +22,13 @@ interface TimeSlot {
   end_time: string;
 }
 
+type VoteSummary = Record<number, {
+  available: number;
+  unavailable: number;
+  preferred: number;
+  total: number;
+}>;
+
 export function EventProposalModal({
   isOpen,
   onClose,
@@ -46,7 +53,7 @@ export function EventProposalModal({
   // Vote mode state
   const [proposal, setProposal] = useState<EventProposal | null>(null);
   const [votes, setVotes] = useState<Record<number, 'available' | 'unavailable' | 'preferred'>>({});
-  const [voteSummary, setVoteSummary] = useState<any>(null);
+  const [voteSummary, setVoteSummary] = useState<VoteSummary | null>(null);
 
   useEffect(() => {
     if (existingProposal) {
@@ -371,7 +378,7 @@ export function EventProposalModal({
                   </div>
                   <div className="flex items-center gap-2">
                     <XCircle className="w-4 h-4 text-red-500" />
-                    <span><strong>Unavailable</strong> - You can't make this time</span>
+                    <span><strong>Unavailable</strong> - You can&apos;t make this time</span>
                   </div>
                 </div>
               </div>
@@ -379,7 +386,7 @@ export function EventProposalModal({
               {/* Time Slot Voting */}
               <div className="space-y-3">
                 {proposal.time_slots.map((slot, index) => {
-                  const slotSummary = voteSummary?.slots[index];
+                  const slotSummary = voteSummary?.[index];
                   const userVote = votes[index];
                   const isCreator = proposal.proposed_by === user?.id;
 

@@ -79,7 +79,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       `)
       .eq('space_id', spaceId);
 
-    setSpaceMembers((data || []) as any);
+    setSpaceMembers((data ?? []) as SpaceMember[]);
   }
 
   async function handleSave() {
@@ -95,9 +95,9 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       } else {
         await choreRotationService.createRotation(
           taskId,
-          formData.member_ids as any,
-          (formData as any).rotation_frequency || 'weekly',
-          'sequential',
+          formData.member_ids,
+          formData.interval_type,
+          formData.rotation_type,
           spaceId
         );
       }
@@ -291,7 +291,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
               />
               <select
                 value={formData.interval_type}
-                onChange={(e) => setFormData(prev => ({ ...prev, interval_type: e.target.value as any }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, interval_type: e.target.value as RotationConfig['interval_type'] }))}
                 className="pl-3 pr-10 py-2 border border-gray-600 rounded-lg bg-gray-900"
               >
                 <option value="daily">Day(s)</option>

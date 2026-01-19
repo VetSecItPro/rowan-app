@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get calendar events from service
-    const events = await calendarService.getEvents(spaceId);
+    const events = await calendarService.getEvents(spaceId, false, supabase);
 
     // Add cache headers for browser caching
     return withUserDataCache(
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       title: sanitizePlainText(title),
       description: description ? sanitizePlainText(description) : undefined,
       location: location ? sanitizePlainText(location) : undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

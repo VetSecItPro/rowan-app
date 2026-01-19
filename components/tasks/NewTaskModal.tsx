@@ -34,10 +34,12 @@ interface NewTaskModalProps {
   userId?: string;
 }
 
+type RecurrencePattern = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
+
 export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTaskModalProps) {
-  const { currentSpace, createSpace, hasZeroSpaces } = useAuthWithSpaces();
+  const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
   const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
-  const [spaceCreationLoading, setSpaceCreationLoading] = useState(false);
+  const [spaceCreationLoading] = useState(false);
   const [spaceError, setSpaceError] = useState<string>('');
 
   const [formData, setFormData] = useState<CreateTaskInput>({
@@ -58,12 +60,13 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
   const [dateError, setDateError] = useState<string>('');
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringData, setRecurringData] = useState({
-    pattern: 'weekly' as 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly',
+    pattern: 'weekly' as RecurrencePattern,
     interval: 1,
     daysOfWeek: [] as number[],
   });
 
   // Set up space ID when modal opens
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (isOpen) {
       if (spaceId) {
@@ -87,8 +90,14 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
   }, [isOpen, spaceId, currentSpace, editTask, hasZeroSpaces]);
 
   // Populate form when editing
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (editTask) {
+      const editTaskData = editTask as Partial<Task> & {
+        calendar_sync?: boolean;
+        quick_note?: string;
+        tags?: string;
+      };
       setFormData({
         space_id: actualSpaceId || '',
         title: editTask.title,
@@ -99,9 +108,9 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
         due_date: editTask.due_date || '',
         assigned_to: editTask.assigned_to || '',
         created_by: editTask.created_by || userId || '',
-        calendar_sync: (editTask as any).calendar_sync || false,
-        quick_note: (editTask as any).quick_note || '',
-        tags: (editTask as any).tags || '',
+        calendar_sync: editTaskData.calendar_sync || false,
+        quick_note: editTaskData.quick_note || '',
+        tags: editTaskData.tags || '',
       });
     } else {
       setFormData({
@@ -469,7 +478,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                         value={recurringData.pattern}
                         onChange={(e) => setRecurringData({
                           ...recurringData,
-                          pattern: e.target.value as any,
+                          pattern: e.target.value as RecurrencePattern,
                           daysOfWeek: [] // Reset days when pattern changes
                         })}
                         className="w-full pl-4 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white appearance-none"

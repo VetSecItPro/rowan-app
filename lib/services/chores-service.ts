@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { sanitizeSearchInput } from '@/lib/utils';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
@@ -46,6 +47,8 @@ export interface ChoreStats {
   partnerChores: number;
 }
 
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 /**
  * Chores Service
  *
@@ -65,8 +68,8 @@ export const choresService = {
    * @param options - Optional query options for filtering
    * @returns Promise<Chore[]> - Array of chores
    */
-  async getChores(spaceId: string, options?: ChoreQueryOptions): Promise<Chore[]> {
-    const supabase = createClient();
+  async getChores(spaceId: string, options?: ChoreQueryOptions, supabaseClient?: SupabaseClient): Promise<Chore[]> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     try {
       let query = supabase
@@ -151,8 +154,8 @@ export const choresService = {
    * @param data - Chore creation data
    * @returns Promise<Chore> - Created chore
    */
-  async createChore(data: CreateChoreInput): Promise<Chore> {
-    const supabase = createClient();
+  async createChore(data: CreateChoreInput, supabaseClient?: SupabaseClient): Promise<Chore> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     try {
       const { data: chore, error } = await supabase

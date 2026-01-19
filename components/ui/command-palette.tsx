@@ -46,7 +46,7 @@ interface CommandAction {
   id: string;
   title: string;
   description?: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   action: () => void;
   shortcut?: string[];
   category: 'navigation' | 'create' | 'actions' | 'settings' | 'recent';
@@ -369,6 +369,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   // Clear search when dialog closes
   useEffect(() => {
     if (!open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearch('');
     }
   }, [open]);
@@ -408,7 +409,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           </div>
           <Command.List className="max-h-[400px] overflow-y-auto overflow-x-hidden">
             <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
-              No results found for "{search}"
+              No results found for &quot;{search}&quot;
             </Command.Empty>
 
             {Object.entries(groupedActions).map(([category, actions]) => {

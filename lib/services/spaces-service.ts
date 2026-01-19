@@ -5,6 +5,8 @@ import type { Space, SpaceMember, CreateSpaceInput } from '@/lib/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 // =============================================
 // VALIDATION SCHEMAS
 // =============================================
@@ -96,10 +98,11 @@ export async function createSpace(
  * @returns Array of spaces with member role
  */
 export async function getUserSpaces(
-  userId: string
+  userId: string,
+  supabaseClient?: SupabaseClient
 ): Promise<{ success: true; data: (Space & { role: string })[] } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { data, error } = await supabase
       .from('space_members')
@@ -314,10 +317,11 @@ export async function updateSpace(
  */
 export async function deleteSpace(
   spaceId: string,
-  userId: string
+  userId: string,
+  supabaseClient?: SupabaseClient
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     // Check if user is owner
     const { data: membership, error: memberError } = await supabase

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { accountDeletionService } from '@/lib/services/account-deletion-service';
 import { send30DayWarningEmail, sendPermanentDeletionConfirmationEmail } from '@/lib/services/email-notification-service';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
     const now = new Date();
 
     // Step 1: Send 30-day warning emails (accounts at day 25)
@@ -171,7 +171,7 @@ export async function GET(request: Request) {
  * Permanently delete expired accounts
  */
 async function permanentlyDeleteExpiredAccounts() {
-  const supabase = await createClient();
+  const supabase = supabaseAdmin;
   const now = new Date();
 
   let deleted = 0;

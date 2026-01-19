@@ -6,10 +6,27 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 // Force dynamic rendering for this route since it uses request.url
 export const dynamic = 'force-dynamic';
 
+type GeocodeResult = {
+  name?: string;
+  latitude?: number;
+  longitude?: number;
+  country?: string;
+  country_code?: string;
+  admin1?: string;
+  admin2?: string;
+  admin3?: string;
+  admin4?: string;
+  timezone?: string;
+};
+
+type GeocodeResponse = {
+  results?: GeocodeResult[];
+};
+
 /**
  * Dynamic geocoding with universal fallback strategies
  */
-async function tryGeocodingWithFallbacks(location: string): Promise<any> {
+async function tryGeocodingWithFallbacks(location: string): Promise<GeocodeResult | null> {
   const searchStrategies = [
     // Strategy 1: Clean location string - remove common suffixes
     (() => {
@@ -132,7 +149,7 @@ async function tryGeocodingWithFallbacks(location: string): Promise<any> {
         continue;
       }
 
-      const data = await response.json();
+      const data = await response.json() as GeocodeResponse;
 
       if (data.results && data.results.length > 0) {
         // Try to find the most relevant result based on the original location context
@@ -158,7 +175,7 @@ async function tryGeocodingWithFallbacks(location: string): Promise<any> {
         // Check if the original location suggests a specific country
         for (const [countryCode, keywords] of Object.entries(countryPreferences)) {
           if (keywords.some(keyword => originalLocation.includes(keyword))) {
-            const countryResult = data.results.find((result: any) =>
+            const countryResult = data.results.find((result) =>
               result.country_code === countryCode ||
               keywords.some(keyword => result.country?.toLowerCase().includes(keyword))
             );
