@@ -56,7 +56,7 @@ export default function ProjectDetailPage() {
       ]);
 
       setProject(projectData);
-      setExpenses(expensesData);
+      setExpenses(expensesData as unknown as Expense[]);
       setPhotos(photosData);
     } catch (err) {
       logger.error('Error loading project:', err, { component: 'page', action: 'execution' });
