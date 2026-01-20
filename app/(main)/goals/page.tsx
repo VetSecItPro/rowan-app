@@ -339,7 +339,11 @@ export default function GoalsPage() {
       if (membersResult.data) {
         const members = (membersResult.data as SpaceMemberRow[])
           .map((member) => member.user)
-          .filter((member): member is SpaceMemberRow['user'] => member != null);
+          .filter((member): member is NonNullable<SpaceMemberRow['user']> => member != null)
+          .map(member => ({
+            ...member,
+            avatar_url: member.avatar_url ?? undefined
+          }));
         setSpaceMembers(members);
       }
 
