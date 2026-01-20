@@ -394,12 +394,6 @@ export default function ProjectTrackingPage() {
                             {expense.category}
                           </span>
                         )}
-                        {expense.vendor_id && (
-                          <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            Vendor linked
-                          </span>
-                        )}
                       </div>
                     </div>
                   ))}
