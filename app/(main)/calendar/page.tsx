@@ -127,9 +127,9 @@ export default function CalendarPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   type LinkedShoppingList = {
-    id?: string | null;
-    title?: string | null;
-    items_count: number;
+    id: string;
+    title: string;
+    items_count?: number;
   };
 
   const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, LinkedShoppingList>>({});
