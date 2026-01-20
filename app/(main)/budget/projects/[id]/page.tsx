@@ -10,7 +10,6 @@ import {
   Calendar,
   TrendingUp,
   TrendingDown,
-  Users,
   Camera,
   FileText
 } from 'lucide-react';
