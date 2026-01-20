@@ -24,7 +24,7 @@ type CostBreakdownItem = {
 type ProjectExpense = {
   id?: string;
   amount: number;
-  date: string;
+  date?: string;
   category?: string;
   description?: string;
   vendor?: string;
