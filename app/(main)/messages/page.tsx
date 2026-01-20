@@ -1000,7 +1000,7 @@ export default function MessagesPage() {
                     {/* Current user */}
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-900/30 rounded-full">
                       <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                        {user?.user_metadata?.name?.charAt(0)?.toUpperCase() || 'Y'}
+                        {user?.name?.charAt(0)?.toUpperCase() || 'Y'}
                       </div>
                       <span className="text-sm text-gray-300">You</span>
                     </div>
