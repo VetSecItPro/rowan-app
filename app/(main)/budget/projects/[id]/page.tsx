@@ -388,7 +388,7 @@ export default function ProjectTrackingPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <span>{format(parseISO(expense.date), 'MMM d, yyyy')}</span>
+                        {expense.date && <span>{format(parseISO(expense.date), 'MMM d, yyyy')}</span>}
                         {expense.category && (
                           <span className="px-2 py-1 bg-gray-700 rounded text-xs">
                             {expense.category}
