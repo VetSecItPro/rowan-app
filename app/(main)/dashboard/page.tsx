@@ -379,7 +379,7 @@ export default function DashboardPage() {
               {/* Compact Time-Aware Welcome Header */}
               <CompactTimeAwareWelcome
                 greetingText={greetingText}
-                userName={user?.name}
+                userName={user?.name ?? undefined}
                 currentDate={currentDate}
               />
 
