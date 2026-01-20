@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Heart, ThumbsUp, Smile, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MessageCircle, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -10,11 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-import { GoalComment, CreateCommentInput, goalsService } from '@/lib/services/goals-service';
+import { GoalComment, goalsService } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import type { User } from '@supabase/supabase-js';
 
 interface GoalCommentsProps {
   goalId: string;
@@ -30,22 +31,17 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
   const [editContent, setEditContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [reactionCounts, setReactionCounts] = useState<Record<string, Record<string, number>>>({});
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  useEffect(() => {
-    loadUser();
-    loadComments();
-  }, [goalId]);
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
-  };
+  }, [supabase]);
 
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     try {
       setLoading(true);
       const commentsData = await goalsService.getGoalComments(goalId);
@@ -66,7 +62,15 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [goalId]);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  useEffect(() => {
+    loadComments();
+  }, [loadComments]);
 
   const handleAddComment = async () => {
     const content = newComment.trim();
@@ -75,7 +79,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
     try {
       setIsSubmitting(true);
 
-      const comment = await goalsService.createComment({
+      await goalsService.createComment({
         goal_id: goalId,
         content,
         content_type: 'text'

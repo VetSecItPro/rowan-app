@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Calendar,
   CheckCircle,
@@ -43,16 +42,11 @@ export function ProjectDashboard({
   project,
   lineItems,
   costBreakdown,
-  expenses: _expenses,
-  onRefresh: _onRefresh,
 }: ProjectDashboardProps) {
-  const [showEditProject, setShowEditProject] = useState(false);
-
   // Calculate metrics
   const totalEstimated = lineItems.reduce((sum, item) => sum + item.estimated_cost, 0);
   const totalActual = lineItems.reduce((sum, item) => sum + item.actual_cost, 0);
   const totalPaid = lineItems.filter(item => item.is_paid).reduce((sum, item) => sum + item.actual_cost, 0);
-  const totalUnpaid = lineItems.filter(item => !item.is_paid).reduce((sum, item) => sum + item.estimated_cost, 0);
 
   const completedItems = lineItems.filter(item => item.is_paid).length;
   const pendingItems = lineItems.filter(item => !item.is_paid).length;

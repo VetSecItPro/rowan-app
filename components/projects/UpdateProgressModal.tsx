@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { TrendingUp } from 'lucide-react';
+import { useState } from 'react';
 import { Chore } from '@/lib/types';
 import { Modal } from '@/components/ui/Modal';
 
@@ -12,21 +11,20 @@ interface UpdateProgressModalProps {
   chore: Chore | null;
 }
 
-export function UpdateProgressModal({
+const buildInitialProgress = (chore: Chore | null) => ({
+  completion: chore?.completion_percentage || 0,
+  notes: chore?.notes || '',
+});
+
+function ProgressForm({
   isOpen,
   onClose,
   onSave,
   chore,
 }: UpdateProgressModalProps) {
-  const [completion, setCompletion] = useState<number>(0);
-  const [notes, setNotes] = useState<string>('');
-
-  useEffect(() => {
-    if (isOpen && chore) {
-      setCompletion(chore.completion_percentage || 0);
-      setNotes(chore.notes || '');
-    }
-  }, [isOpen, chore]);
+  const initial = buildInitialProgress(chore);
+  const [completion, setCompletion] = useState<number>(initial.completion);
+  const [notes, setNotes] = useState<string>(initial.notes);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,4 +126,10 @@ export function UpdateProgressModal({
       </form>
     </Modal>
   );
+}
+
+export function UpdateProgressModal(props: UpdateProgressModalProps) {
+  const { chore, isOpen } = props;
+  const formKey = `${chore?.id ?? 'none'}-${isOpen ? 'open' : 'closed'}`;
+  return <ProgressForm key={formKey} {...props} />;
 }

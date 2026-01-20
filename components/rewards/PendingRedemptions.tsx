@@ -4,6 +4,7 @@
 // Parent UI to approve, deny, or fulfill reward redemption requests
 
 import { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import {
   Clock,
@@ -152,8 +153,6 @@ export function PendingRedemptions({
   };
 
   // Pending items to show
-  const pendingItems = redemptions.filter((r) => r.status === 'pending');
-  const approvedItems = redemptions.filter((r) => r.status === 'approved');
   const displayItems = showAll ? redemptions : redemptions.slice(0, 5);
   const hasMore = redemptions.length > 5;
 
@@ -237,9 +236,11 @@ export function PendingRedemptions({
                   {/* User Avatar */}
                   <div className="flex-shrink-0">
                     {user?.avatar_url ? (
-                      <img
+                      <Image
                         src={user.avatar_url}
                         alt={user.name || 'User'}
+                        width={40}
+                        height={40}
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (

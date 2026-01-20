@@ -131,7 +131,7 @@ async function tryGeocodingWithFallbacks(location: string): Promise<GeocodeResul
     })(),
   ].filter(Boolean); // Remove null values
 
-  for (const [index, searchTerm] of searchStrategies.entries()) {
+  for (const searchTerm of searchStrategies) {
     if (!searchTerm) continue;
 
     try {
@@ -217,12 +217,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Get geocoding result (cache the basic coordinates, but get full details)
-    let fullResult: any = null;
+    let fullResult: GeocodeResult | null = null;
     const cachedCoords = await weatherCacheService.getOrFetchGeocode(
       location,
       async () => {
         fullResult = await tryGeocodingWithFallbacks(location);
         if (!fullResult) return null;
+        if (typeof fullResult.latitude !== 'number' || typeof fullResult.longitude !== 'number') {
+          return null;
+        }
 
         // Return coordinates for caching
         return {

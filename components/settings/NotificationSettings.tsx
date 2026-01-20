@@ -4,7 +4,6 @@ import { useState, useEffect, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import {
-  Bell,
   Mail,
   Smartphone,
   Clock,
@@ -14,11 +13,9 @@ import {
   CheckSquare,
   MessageCircle,
   AtSign,
-  Users,
   Loader2,
   Save,
   AlertCircle,
-  Info,
   BellRing,
   BellOff,
   Send,

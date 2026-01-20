@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Tags,
@@ -10,15 +10,12 @@ import {
   Trash2,
   Check,
   X,
-  Palette,
   DollarSign,
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import {
   type CustomCategory,
   type Tag,
-  type CreateCustomCategoryInput,
-  type CreateTagInput,
   getCustomCategories,
   getTags,
   createCustomCategory,
@@ -84,11 +81,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
   const [tagDescription, setTagDescription] = useState('');
   const [tagColor, setTagColor] = useState('#8b5cf6');
 
-  useEffect(() => {
-    loadData();
-  }, [spaceId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [categoriesData, tagsData] = await Promise.all([
@@ -102,7 +95,11 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Category handlers
   const handleSaveCategory = async () => {
@@ -224,7 +221,8 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
 
   // Get icon component
   const getIconComponent = (iconName: string) => {
-    const IconComponent = (Icons as any)[iconName] || Icons.FolderOpen;
+    const iconKey = iconName as keyof typeof Icons;
+    const IconComponent = Icons[iconKey] || Icons.FolderOpen;
     return IconComponent;
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import {
@@ -28,7 +28,6 @@ export default function CommentThread({
   commentableId,
   spaceId,
   maxDepth = 5,
-  showActivityLog = false,
 }: CommentThreadProps) {
   const { user } = useUser();
   const [comments, setComments] = useState<CommentWithDetails[]>([]);
@@ -37,7 +36,7 @@ export default function CommentThread({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load comments
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getComments(commentableType, commentableId);
@@ -49,11 +48,11 @@ export default function CommentThread({
     } finally {
       setLoading(false);
     }
-  };
+  }, [commentableType, commentableId]);
 
   useEffect(() => {
     loadComments();
-  }, [commentableType, commentableId]);
+  }, [loadComments]);
 
   // Real-time subscription
   useEffect(() => {
@@ -78,7 +77,7 @@ export default function CommentThread({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [commentableType, commentableId]);
+  }, [commentableType, commentableId, loadComments]);
 
   // Handle new comment submission
   const handleSubmit = async (content: string) => {

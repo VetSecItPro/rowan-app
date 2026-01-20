@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import {
   X, FileText, Paperclip, MessageSquare, CheckSquare, Home,
@@ -50,46 +50,29 @@ interface UnifiedDetailsModalProps {
   onUpdate?: () => void;
 }
 
-export function UnifiedDetailsModal({
+const buildInitialComments = (isOpen: boolean): CommentEntry[] => {
+  if (!isOpen) return [];
+  return [
+    { id: 1, user: 'Mom', content: 'Don\'t forget to check the expiration dates!', timestamp: new Date(Date.now() - 3600000), avatar: '👩' },
+    { id: 2, user: 'Dad', content: 'I can help with this on Saturday', timestamp: new Date(Date.now() - 1800000), avatar: '👨' }
+  ];
+};
+
+function DetailsModalContent({
   item,
   isOpen,
   onClose,
-  spaceId: _spaceId,
-  userId: _userId,
   onEdit,
-  onDelete: _onDelete,
   onSave,
   onUpdate
 }: UnifiedDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
-  const [comments, setComments] = useState<CommentEntry[]>([]);
+  const [comments, setComments] = useState<CommentEntry[]>(() => buildInitialComments(isOpen));
   const [newComment, setNewComment] = useState('');
   const [attachments, setAttachments] = useState<AttachmentEntry[]>([]);
-  const [editedStatus, setEditedStatus] = useState<string>('');
-  const [editedPriority, setEditedPriority] = useState<string>('');
+  const [editedStatus, setEditedStatus] = useState<string>(item?.status || 'pending');
+  const [editedPriority, setEditedPriority] = useState<string>((item as EditableItemData | null)?.priority || 'medium');
   const [hasChanges, setHasChanges] = useState(false);
-
-  // Initialize edited values when item changes
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (item) {
-      const itemData = item as EditableItemData;
-      setEditedStatus(item.status || 'pending');
-      setEditedPriority(itemData.priority || 'medium');
-      setHasChanges(false);
-    }
-  }, [item]);
-
-  // Load mock comments
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (isOpen) {
-      setComments([
-        { id: 1, user: 'Mom', content: 'Don\'t forget to check the expiration dates!', timestamp: new Date(Date.now() - 3600000), avatar: '👩' },
-        { id: 2, user: 'Dad', content: 'I can help with this on Saturday', timestamp: new Date(Date.now() - 1800000), avatar: '👨' }
-      ]);
-    }
-  }, [isOpen]);
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
@@ -471,4 +454,10 @@ export function UnifiedDetailsModal({
       </div>
     </div>
   );
+}
+
+export function UnifiedDetailsModal(props: UnifiedDetailsModalProps) {
+  const { item, isOpen } = props;
+  const modalKey = `${item?.id ?? 'none'}-${isOpen ? 'open' : 'closed'}`;
+  return <DetailsModalContent key={modalKey} {...props} />;
 }

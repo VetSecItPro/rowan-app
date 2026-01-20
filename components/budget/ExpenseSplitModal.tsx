@@ -118,7 +118,7 @@ export function ExpenseSplitModal({
         }
         break;
     }
-  }, [splitType, splitPercentageUser1, splitPercentageUser2, splitAmountUser1, expense.amount, isSplit, partnership]);
+  }, [splitType, splitPercentageUser1, splitPercentageUser2, splitAmountUser1, splitAmountUser2, expense.amount, isSplit, partnership]);
 
   // Handle percentage changes
   const handlePercentageChange = (user: 1 | 2, percentage: number) => {

@@ -3,13 +3,7 @@
 import { useState } from 'react';
 import {
   AlertTriangle,
-  TrendingUp,
-  TrendingDown,
   DollarSign,
-  BarChart3,
-  Calculator,
-  Target,
-  ArrowRight,
   Lightbulb,
   Edit3,
   X
@@ -35,9 +29,6 @@ export function BudgetVarianceCard({
   // Calculate detailed metrics
   const totalEstimated = lineItems.reduce((sum, item) => sum + item.estimated_cost, 0);
   const totalActual = lineItems.reduce((sum, item) => sum + item.actual_cost, 0);
-  const totalPaid = lineItems.filter(item => item.is_paid).reduce((sum, item) => sum + item.actual_cost, 0);
-  const totalUnpaid = lineItems.filter(item => !item.is_paid).reduce((sum, item) => sum + item.estimated_cost, 0);
-
   const variance = project.actual_cost - (project.estimated_budget || 0);
   const variancePercentage = project.estimated_budget ? (variance / project.estimated_budget) * 100 : 0;
   const isOverBudget = variance > 0;
@@ -60,7 +51,7 @@ export function BudgetVarianceCard({
   }, {} as Record<string, { estimated: number; actual: number; count: number }>);
 
   const overBudgetCategories = Object.entries(categoryBreakdown)
-    .filter(([_, data]) => data.actual > data.estimated)
+    .filter(([, data]) => data.actual > data.estimated)
     .map(([category, data]) => ({
       category,
       variance: data.actual - data.estimated,

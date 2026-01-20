@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
-import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -53,7 +52,6 @@ export async function POST(req: NextRequest) {
       tag,
       action,
       timestamp,
-      user_id,
     } = parseResult.data;
     const normalizedNotificationId = notification_id || notificationId;
     const trackedAt = typeof timestamp === 'number'

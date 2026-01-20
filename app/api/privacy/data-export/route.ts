@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET - Get export status
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 
@@ -481,7 +481,7 @@ async function uploadExportFile(
   const supabase = await createClient();
 
   try {
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('data-exports')
       .upload(fileName, fileBuffer, {
         contentType: format === 'json' ? 'application/json' : 'text/plain',

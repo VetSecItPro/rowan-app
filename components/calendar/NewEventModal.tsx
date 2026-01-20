@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef, memo } from 'react';
-import { Smile, Image as ImageIcon, Paperclip, Calendar, ShoppingCart, Trash2, Timer, X } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { Smile, Image as ImageIcon, Paperclip, ShoppingCart, Trash2, Timer, X } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC, toUTC } from '@/lib/utils/timezone-utils';
+import { toDateTimeLocalValue, fromDateTimeLocalValue, fromUTC } from '@/lib/utils/timezone-utils';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
 import { Modal } from '@/components/ui/Modal';
@@ -53,6 +53,11 @@ const ALLOWED_FILE_TYPES = [
 const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv', '.zip'];
 
 export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, spaceId }: NewEventModalProps) {
+  type RecurringFrequency = 'daily' | 'weekly' | 'monthly';
+  type EventCategory = NonNullable<CreateEventInput['category']>;
+  const isRecurringFrequency = (value: string): value is RecurringFrequency =>
+    value === 'daily' || value === 'weekly' || value === 'monthly';
+
   const [formData, setFormData] = useState<CreateEventInput>({
     space_id: spaceId,
     title: '',
@@ -67,7 +72,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachedImages, setAttachedImages] = useState<File[]>([]);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [recurringFrequency, setRecurringFrequency] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [recurringFrequency, setRecurringFrequency] = useState<RecurringFrequency>('weekly');
   const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState<number[]>([]);
   const [selectedDaysOfMonth, setSelectedDaysOfMonth] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
@@ -145,13 +150,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
   }, [editEvent, spaceId, isOpen]);
 
   // Load shopping lists on mount
-  useEffect(() => {
-    if (isOpen && spaceId) {
-      loadShoppingLists();
-    }
-  }, [isOpen, spaceId]);
-
-  const loadShoppingLists = async () => {
+  const loadShoppingLists = useCallback(async () => {
     try {
       const lists = await shoppingService.getLists(spaceId);
       // Only show active shopping lists
@@ -160,7 +159,13 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
     } catch (error) {
       logger.error('Failed to load shopping lists:', error, { component: 'NewEventModal', action: 'component_action' });
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    if (isOpen && spaceId) {
+      loadShoppingLists();
+    }
+  }, [isOpen, spaceId, loadShoppingLists]);
 
   const [uploading, setUploading] = useState(false);
 
@@ -633,7 +638,11 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 </label>
                 <Dropdown
                   value={recurringFrequency}
-                  onChange={(value) => setRecurringFrequency(value as any)}
+                  onChange={(value) => {
+                    if (typeof value === 'string' && isRecurringFrequency(value)) {
+                      setRecurringFrequency(value);
+                    }
+                  }}
                   options={getFrequencyOptions()}
                   placeholder="Select frequency..."
                 />
@@ -797,17 +806,17 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             </label>
             {/* Mobile: equal-width pills in one row | Desktop: grid */}
             <div className="flex gap-1 sm:grid sm:grid-cols-5 sm:gap-3">
-              {[
+              {([
                 { value: 'work', label: 'Work', icon: '💼', color: 'bg-blue-500' },
                 { value: 'personal', label: 'Pers.', icon: '👤', color: 'bg-purple-500' },
                 { value: 'family', label: 'Fam.', icon: '👨‍👩‍👧‍👦', color: 'bg-pink-500' },
                 { value: 'health', label: 'Health', icon: '💪', color: 'bg-green-500' },
                 { value: 'social', label: 'Social', icon: '🎉', color: 'bg-orange-500' },
-              ].map((category, index) => (
+              ] as Array<{ value: EventCategory; label: string; icon: string; color: string }>).map((category, index) => (
                 <button
                   key={category.value}
                   type="button"
-                  onClick={() => setFormData({ ...formData, category: category.value as any })}
+                  onClick={() => setFormData({ ...formData, category: category.value })}
                   className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-xl border-2 transition-colors sm:gap-2 sm:p-3 sm:rounded-lg ${
                     formData.category === category.value
                       ? `${category.color} border-transparent text-white`

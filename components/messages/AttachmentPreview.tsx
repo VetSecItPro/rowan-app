@@ -1,6 +1,7 @@
 'use client';
 
-import { Image as ImageIcon, Video, FileText, Download, X, Play, Pause, Volume2 } from 'lucide-react';
+import Image from 'next/image';
+import { FileText, Download, X, Play, Pause, Volume2 } from 'lucide-react';
 import { FileUploadResult } from '@/lib/services/file-upload-service';
 import { useState, useRef } from 'react';
 import { sanitizeUrl } from '@/lib/sanitize';
@@ -59,13 +60,15 @@ export function AttachmentPreview({ attachment, onDelete, compact = false }: Att
   if (attachment.file_type === 'image') {
     return (
       <div className="relative group">
-        <img
+        <Image
           src={safeThumbnailUrl || safePublicUrl}
           alt={attachment.file_name}
+          width={compact ? 80 : 640}
+          height={compact ? 80 : 384}
+          sizes={compact ? '80px' : '100vw'}
           className={`rounded-lg object-cover ${
             compact ? 'w-20 h-20' : 'max-w-sm max-h-96 w-full'
           }`}
-          loading="lazy"
         />
         {onDelete && (
           <button

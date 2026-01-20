@@ -46,17 +46,6 @@ export function CircularProgress({
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
 
-  // Color-coded progress colors (matching GoalCard system)
-  const getProgressColor = () => {
-    if (color) return color;
-    if (progress === 0) return 'rgb(156, 163, 175)'; // gray-400
-    if (progress <= 25) return 'rgb(96, 165, 250)'; // blue-400
-    if (progress <= 50) return 'rgb(59, 130, 246)'; // blue-500
-    if (progress <= 75) return 'rgb(34, 197, 94)'; // green-500
-    if (progress < 100) return 'rgb(34, 197, 94)'; // green-500
-    return 'rgb(22, 163, 74)'; // green-600
-  };
-
   // Get gradient ID based on progress
   const getGradientId = () => {
     if (color) return 'custom-gradient';
@@ -182,6 +171,7 @@ export function MultiRingProgress({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

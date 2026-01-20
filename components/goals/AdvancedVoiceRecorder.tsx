@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Mic,
@@ -134,21 +134,7 @@ export function AdvancedVoiceRecorder({
     return () => clearInterval(interval);
   }, [isRecording, audioBlob]);
 
-  // Initialize WaveSurfer when audio is ready
-  useEffect(() => {
-    if (audioUrl && waveformRef.current && !wavesurferRef.current) {
-      initializeWaveSurfer();
-    }
-
-    return () => {
-      if (wavesurferRef.current) {
-        wavesurferRef.current.destroy();
-        wavesurferRef.current = null;
-      }
-    };
-  }, [audioUrl]);
-
-  const initializeWaveSurfer = async () => {
+  const initializeWaveSurfer = useCallback(async () => {
     if (!waveformRef.current || !audioUrl) return;
 
     try {
@@ -186,7 +172,21 @@ export function AdvancedVoiceRecorder({
       logger.error('Failed to initialize WaveSurfer:', error, { component: 'AdvancedVoiceRecorder', action: 'component_action' });
       // Fallback to basic audio element
     }
-  };
+  }, [audioUrl]);
+
+  // Initialize WaveSurfer when audio is ready
+  useEffect(() => {
+    if (audioUrl && waveformRef.current && !wavesurferRef.current) {
+      initializeWaveSurfer();
+    }
+
+    return () => {
+      if (wavesurferRef.current) {
+        wavesurferRef.current.destroy();
+        wavesurferRef.current = null;
+      }
+    };
+  }, [audioUrl, initializeWaveSurfer]);
 
   const handleStartRecording = async () => {
     try {

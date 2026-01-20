@@ -127,7 +127,8 @@ export const shoppingService = {
   async createList(input: CreateListWithItemsInput, supabaseClient?: SupabaseClient): Promise<ShoppingList> {
     const supabase = getSupabaseClient(supabaseClient);
     // Remove items field if it exists (items are created separately)
-    const { items, ...listData } = input;
+    const listData = { ...input };
+    delete (listData as { items?: unknown }).items;
 
     const { data, error } = await supabase
       .from('shopping_lists')
@@ -145,7 +146,8 @@ export const shoppingService = {
   async updateList(id: string, updates: UpdateListInput, supabaseClient?: SupabaseClient): Promise<ShoppingList> {
     const supabase = getSupabaseClient(supabaseClient);
     // Remove items field if it exists (items are managed separately)
-    const { items, ...updateData } = updates;
+    const updateData = { ...updates };
+    delete (updateData as { items?: unknown }).items;
     const finalUpdates: Record<string, unknown> = { ...updateData };
 
     if (updateData.status === 'completed' && !finalUpdates.completed_at) {
@@ -212,7 +214,6 @@ export const shoppingService = {
   },
 
   async toggleItem(id: string, checked: boolean): Promise<ShoppingItem> {
-    const supabase = createClient();
     return this.updateItem(id, { checked } as Partial<CreateItemInput>);
   },
 
@@ -227,7 +228,6 @@ export const shoppingService = {
   },
 
   async getShoppingStats(spaceId: string): Promise<ShoppingStats> {
-    const supabase = createClient();
     const lists = await this.getLists(spaceId);
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);

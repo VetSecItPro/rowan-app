@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
 
 interface ClientProviderProps {
   children: React.ReactNode;
@@ -11,11 +11,7 @@ interface ClientProviderProps {
  * children only render after client-side hydration is complete
  */
 export function ClientProvider({ children }: ClientProviderProps) {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+  const hasMounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   // During SSR and initial hydration, render a minimal loading state
   if (!hasMounted) {
@@ -31,4 +27,27 @@ export function ClientProvider({ children }: ClientProviderProps) {
 
   // Once mounted, render the actual content
   return <>{children}</>;
+}
+
+let mounted = false;
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+const getSnapshot = () => mounted;
+const getServerSnapshot = () => false;
+
+if (typeof window !== 'undefined' && !mounted) {
+  const notify = () => {
+    mounted = true;
+    listeners.forEach((listener) => listener());
+  };
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(notify);
+  } else {
+    Promise.resolve().then(notify);
+  }
 }

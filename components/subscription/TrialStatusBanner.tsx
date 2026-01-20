@@ -5,7 +5,7 @@
  * Displays trial status on dashboard with countdown and upgrade CTA
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Clock, Gift, AlertTriangle, X, Crown, Zap } from 'lucide-react';
 import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
@@ -22,34 +22,33 @@ export function TrialStatusBanner({
   showDismiss = true,
   compact = false,
 }: TrialStatusBannerProps) {
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const dismissedTimestamp = localStorage.getItem('trial-banner-dismissed');
+    if (!dismissedTimestamp) return false;
+
+    const dismissedDate = new Date(parseInt(dismissedTimestamp, 10));
+    const now = new Date();
+    const daysSinceDismissed = Math.floor((now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (daysSinceDismissed < 3) {
+      return true;
+    }
+
+    localStorage.removeItem('trial-banner-dismissed');
+    return false;
+  });
   const subscription = useSubscriptionSafe();
 
   // Safe defaults when outside provider context
   const isLoading = subscription?.isLoading ?? true;
   const isInTrial = subscription?.isInTrial ?? false;
   const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
-  const isTrialExpiringSoon = subscription?.isTrialExpiringSoon ?? false;
   const hasTrialExpired = subscription?.hasTrialExpired ?? false;
   const tier = subscription?.tier ?? 'free';
-  const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isBetaTester = subscription?.isBetaTester ?? false;
-
-  // Check localStorage on mount for dismiss state (resets every 3 days)
-  useEffect(() => {
-    const dismissedTimestamp = localStorage.getItem('trial-banner-dismissed');
-    if (dismissedTimestamp) {
-      const dismissedDate = new Date(parseInt(dismissedTimestamp, 10));
-      const now = new Date();
-      const daysSinceDismissed = Math.floor((now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysSinceDismissed < 3) {
-        setIsDismissed(true);
-      } else {
-        // Clear old dismissal
-        localStorage.removeItem('trial-banner-dismissed');
-      }
-    }
-  }, []);
 
   const handleDismiss = () => {
     localStorage.setItem('trial-banner-dismissed', Date.now().toString());
@@ -189,7 +188,7 @@ export function TrialStatusBanner({
                 <p className="font-semibold text-white">Your trial has ended</p>
                 {!compact && (
                   <p className="text-sm text-gray-300">
-                    Upgrade to unlock all the features you've been using
+                    Upgrade to unlock all the features you&apos;ve been using
                   </p>
                 )}
               </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, ReactNode, useEffect, useCallback, useRef } from 'react';
 import {
   useSpaces as useSpacesQuery,
   useSwitchSpace,
@@ -28,7 +28,7 @@ const SpacesContext = createContext<SpacesContextType | null>(null);
 
 export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, session, loading: authLoading } = useAuth();
-  const [hasInitializedSpace, setHasInitializedSpace] = useState(false);
+  const hasInitializedSpace = useRef(false);
 
   const spacesQuery = useSpacesQuery(user?.id);
   const switchSpaceMutation = useSwitchSpace();
@@ -129,17 +129,17 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!user?.id) return;
-    if (hasInitializedSpace) return;
+    if (hasInitializedSpace.current) return;
     if (authLoading) return;
     if (spacesQuery.isLoading || spacesQuery.isRefetching) return;
 
     if (!spacesQuery.spaces?.length) {
-      setHasInitializedSpace(true);
+      hasInitializedSpace.current = true;
       return;
     }
 
     if (spacesQuery.currentSpace) {
-      setHasInitializedSpace(true);
+      hasInitializedSpace.current = true;
       return;
     }
 
@@ -147,10 +147,9 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     if (firstSpace && firstSpace.role) {
       switchSpace(firstSpace as Space & { role: string });
     }
-    setHasInitializedSpace(true);
+    hasInitializedSpace.current = true;
   }, [
     authLoading,
-    hasInitializedSpace,
     spacesQuery.currentSpace,
     spacesQuery.isRefetching,
     spacesQuery.isLoading,

@@ -17,7 +17,7 @@ import {
 } from 'recharts';
 
 interface BarChartData {
-  [key: string]: any;
+  [key: string]: number | string | null;
 }
 
 interface BarChartComponentProps {

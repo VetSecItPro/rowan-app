@@ -6,21 +6,13 @@ import {
   Target,
   CheckCircle2,
   Circle,
-  Calendar,
   Flame,
-  TrendingUp,
-  TrendingDown,
-  Plus,
-  Settings,
   BarChart3,
-  Clock,
-  Zap,
-  Award,
   ChevronLeft,
   ChevronRight,
   Filter
 } from 'lucide-react';
-import { format, addDays, startOfWeek, endOfWeek, isToday, isSameDay, parseISO } from 'date-fns';
+import { format, addDays, startOfWeek, isToday } from 'date-fns';
 import { recurringGoalsService, RecurringGoalTemplate, HabitEntry, HabitStreak } from '@/lib/services/recurring-goals-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { toast } from 'sonner';
@@ -80,7 +72,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
               completionRate,
             };
           } catch (error) {
-            logger.error('Error getting completion rate for habit ${habit.template.id}:', error, { component: 'HabitTracker', action: 'component_action' });
+            logger.error(`Error getting completion rate for habit ${habit.template.id}:`, error, { component: 'HabitTracker', action: 'component_action' });
             return habit;
           }
         })
@@ -437,7 +429,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
             }
           </p>
           <p className="text-sm text-gray-400">
-            Use the "New Habit" button above to get started.
+            Use the &quot;New Habit&quot; button above to get started.
           </p>
         </div>
       )}

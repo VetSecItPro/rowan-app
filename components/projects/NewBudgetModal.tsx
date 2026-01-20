@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { DollarSign } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 
@@ -19,20 +19,19 @@ export function NewBudgetModal({
   currentBudget,
   spaceId,
 }: NewBudgetModalProps) {
-  const [amount, setAmount] = useState<string>('');
+  const [amount, setAmount] = useState<string>(() => (currentBudget ? currentBudget.toString() : ''));
 
-  useEffect(() => {
-    if (isOpen) {
-      setAmount(currentBudget ? currentBudget.toString() : '');
-    }
-  }, [isOpen, currentBudget]);
+  const handleClose = () => {
+    setAmount(currentBudget ? currentBudget.toString() : '');
+    onClose();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const budgetAmount = parseFloat(amount);
     if (budgetAmount && budgetAmount > 0) {
       onSave(budgetAmount);
-      onClose();
+      handleClose();
     }
   };
 
@@ -40,7 +39,7 @@ export function NewBudgetModal({
     <div className="flex gap-3">
       <button
         type="button"
-        onClick={onClose}
+        onClick={handleClose}
         className="flex-1 px-4 py-3 bg-gray-700 text-gray-300 rounded-full hover:bg-gray-600 transition-all font-medium"
       >
         Cancel
@@ -58,7 +57,7 @@ export function NewBudgetModal({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={currentBudget ? 'Update Budget' : 'Set Monthly Budget'}
       maxWidth="md"
       headerGradient="bg-gradient-to-r from-orange-500 to-amber-600"

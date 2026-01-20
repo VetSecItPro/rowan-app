@@ -187,7 +187,7 @@ export const choresService = {
     const supabase = createClient();
     try {
       // Handle completed_at timestamp automatically
-      const finalUpdates: any = { ...updates };
+      const finalUpdates: UpdateChoreInput = { ...updates };
 
       // If marking as completed, set completed_at timestamp
       if (updates.status === 'completed' && !finalUpdates.completed_at) {
@@ -288,7 +288,6 @@ export const choresService = {
    * @returns Promise<void>
    */
   async bulkUpdateChoreOrder(updates: Array<{id: string; sort_order: number}>): Promise<void> {
-    const supabase = createClient();
     try {
       for (const update of updates) {
         await this.updateChoreOrder(update.id, update.sort_order);
@@ -433,8 +432,6 @@ export const choresService = {
     newStreak: number;
     transaction: PointTransaction;
   }> {
-    const supabase = createClient();
-
     // Get the chore first
     const chore = await this.getChoreById(choreId);
     if (!chore) {
@@ -452,7 +449,8 @@ export const choresService = {
     });
 
     // Get point value from chore (falls back to default if not set)
-    const basePoints = (chore as any).point_value || 10;
+    const choreWithPoints = chore as Chore & { point_value?: number };
+    const basePoints = choreWithPoints.point_value ?? 10;
 
     // Award points with streak tracking
     try {

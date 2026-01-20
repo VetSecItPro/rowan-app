@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server';
 import { eventMapper } from './event-mapper';
 import { logger } from '@/lib/logger';
 import type {
-  CalendarConnection,
   CalDAVEvent,
   CalDAVCalendar,
   ParsedICalEvent,
@@ -18,7 +17,6 @@ import type {
 // =============================================================================
 
 const APPLE_CALDAV_SERVER = 'https://caldav.icloud.com';
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
 
 // =============================================================================
 // CLIENT FACTORY
@@ -309,8 +307,6 @@ export async function updateEvent(
 ): Promise<CalDAVEvent> {
   const client = await getAuthenticatedClient(connectionId);
 
-  const calendars = await client.fetchCalendars();
-
   const iCalData = eventMapper.mapRowanToICalendar(event);
 
   await client.updateCalendarObject({
@@ -391,7 +387,7 @@ function parseICalendar(icalData: string): ParsedICalEvent | undefined {
     let currentLine = '';
 
     for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
+      const line = lines[i];
 
       // Handle line continuation (lines starting with space or tab)
       if (line.startsWith(' ') || line.startsWith('\t')) {

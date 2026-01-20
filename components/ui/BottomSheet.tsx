@@ -48,8 +48,7 @@ export function BottomSheet({
   showCloseButton = true,
   className = '',
 }: BottomSheetProps) {
-  const [mounted, setMounted] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const isClient = typeof window !== 'undefined';
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -59,21 +58,8 @@ export function BottomSheet({
   const lastY = useRef(0);
   const velocity = useRef(0);
 
-  // Mount check for portal
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
   // Lock scroll on the correct scroll container (main element)
   useScrollLock(isOpen);
-
-  // Handle open/close animation
-  useEffect(() => {
-    if (isOpen) {
-      setIsAnimating(true);
-    }
-  }, [isOpen]);
 
   // Handle escape key
   useEffect(() => {
@@ -195,18 +181,7 @@ export function BottomSheet({
     }
   };
 
-  // Handle animation end
-  const handleAnimationEnd = () => {
-    if (!isOpen) {
-      setIsAnimating(false);
-    }
-  };
-
-  // Don't render until mounted (for portal)
-  if (!mounted) return null;
-
-  // Don't render if closed and not animating
-  if (!isOpen && !isAnimating) return null;
+  if (!isClient) return null;
 
   const sheetContent = (
     <div
@@ -251,7 +226,6 @@ export function BottomSheet({
           // Add safe area padding at bottom
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
-        onAnimationEnd={handleAnimationEnd}
       >
         {/* Drag Handle Area */}
         {showHandle && (

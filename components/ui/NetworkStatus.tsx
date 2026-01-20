@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, CloudOff, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, CloudOff, RefreshCw, AlertCircle } from 'lucide-react';
 
 /**
  * Network Status Indicator
@@ -25,15 +25,16 @@ export function NetworkStatus({
   isSyncing = false,
   failedCount = 0,
 }: NetworkStatusProps) {
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(() => {
+    if (typeof navigator === 'undefined') {
+      return true;
+    }
+    return navigator.onLine;
+  });
   const [showBanner, setShowBanner] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
-  const [showSyncComplete, setShowSyncComplete] = useState(false);
 
   useEffect(() => {
-    // Check initial state
-    setIsOnline(navigator.onLine);
-
     const handleOnline = () => {
       setIsOnline(true);
       // Show "back online" message briefly if we were offline
@@ -59,17 +60,8 @@ export function NetworkStatus({
     };
   }, [wasOffline]);
 
-  // Show sync complete message when syncing finishes
-  useEffect(() => {
-    if (!isSyncing && pendingActions === 0 && wasOffline && isOnline) {
-      setShowSyncComplete(true);
-      const timer = setTimeout(() => setShowSyncComplete(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isSyncing, pendingActions, wasOffline, isOnline]);
-
   // Determine what to show
-  const shouldShowBanner = !isOnline || showBanner || (pendingActions > 0 && !isOnline) || showSyncComplete;
+  const shouldShowBanner = !isOnline || showBanner || (pendingActions > 0 && !isOnline);
 
   if (!shouldShowBanner && pendingActions === 0 && failedCount === 0) return null;
 
@@ -124,23 +116,6 @@ export function NetworkStatus({
       >
         <RefreshCw className="w-4 h-4 animate-spin" />
         <span>Syncing {pendingActions} action{pendingActions !== 1 ? 's' : ''}...</span>
-      </div>
-    );
-  }
-
-  // Sync complete
-  if (showSyncComplete) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-green-500 text-white transition-all duration-300 animate-slide-down"
-        style={{
-          paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
-        }}
-      >
-        <CheckCircle className="w-4 h-4" />
-        <span>All changes synced</span>
       </div>
     );
   }

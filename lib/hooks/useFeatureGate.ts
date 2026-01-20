@@ -5,7 +5,7 @@
  * Provides feature access checking with upgrade prompts
  */
 
-import { useCallback, useMemo, useState, useContext } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import type { FeatureLimits, SubscriptionTier } from '@/lib/types';
 
@@ -119,7 +119,10 @@ export function useFeatureGate(feature: GatedFeature): UseFeatureGateResult {
   const isLoading = subscription?.isLoading ?? true;
   const isInTrial = subscription?.isInTrial ?? false;
   const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
-  const showUpgradeModal = subscription?.showUpgradeModal ?? (() => {});
+  const showUpgradeModal = useMemo(
+    () => subscription?.showUpgradeModal ?? (() => {}),
+    [subscription]
+  );
 
   const limitKey = FEATURE_LIMIT_MAP[feature];
   const hasAccess = canAccess(limitKey);
@@ -204,7 +207,10 @@ export function useMultiFeatureGate(features: GatedFeature[]): {
   tier: SubscriptionTier;
 } {
   const subscription = useSubscriptionSafe();
-  const canAccess = subscription?.canAccess ?? (() => true);
+  const canAccess = useMemo(
+    () => subscription?.canAccess ?? (() => true),
+    [subscription]
+  );
   const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isLoading = subscription?.isLoading ?? true;
 
@@ -246,7 +252,10 @@ export function useNumericLimit(
   const limits = subscription?.limits ?? { maxActiveTasks: Infinity, maxShoppingLists: Infinity, maxShoppingItems: Infinity, maxUsers: Infinity, maxSpaces: Infinity };
   const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isLoading = subscription?.isLoading ?? true;
-  const showUpgradeModal = subscription?.showUpgradeModal ?? (() => {});
+  const showUpgradeModal = useMemo(
+    () => subscription?.showUpgradeModal ?? (() => {}),
+    [subscription]
+  );
 
   const limit = limits[limitKey] as number;
   const isUnlimited = limit === Infinity;

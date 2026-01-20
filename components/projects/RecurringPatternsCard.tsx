@@ -201,7 +201,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
               <div className="text-center py-8 text-gray-400">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No recurring patterns detected yet.</p>
-                <p className="text-sm mt-1">Click "Analyze Patterns" to scan your expense history.</p>
+                <p className="text-sm mt-1">Click &quot;Analyze Patterns&quot; to scan your expense history.</p>
               </div>
             ) : (
               patterns.map((pattern) => (

@@ -13,12 +13,10 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import {
-  getTodayUsageStats,
   getUsageWithLimits,
   canPerformAction,
   incrementUsage,
 } from '@/lib/services/usage-service';
-import type { UsageType } from '@/lib/types';
 
 // Validation schema for POST
 const UsageActionSchema = z.object({

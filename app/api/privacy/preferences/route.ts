@@ -24,7 +24,7 @@ const PrivacyPreferenceUpdateSchema = z.object({
 });
 
 // GET - Fetch user's privacy preferences
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

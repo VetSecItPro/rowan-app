@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to the space
     try {
       await verifySpaceAccess(user.id, space_id);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }

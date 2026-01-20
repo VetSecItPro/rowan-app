@@ -1,11 +1,10 @@
 'use client';
 
-import { Trophy, Calendar, Users, Target, Star, Award } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import {
   AchievementBadge,
   UserAchievement,
   AchievementProgress,
-  getBadgeRarityColor
 } from '@/lib/services/achievement-badges-service';
 import { cn } from '@/lib/utils';
 import { Modal } from '@/components/ui/Modal';
@@ -27,20 +26,6 @@ export function BadgeModal({
 }: BadgeModalProps) {
   const isEarned = !!userAchievement;
   const isLocked = badge.is_secret && !isEarned;
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'goals': return Target;
-      case 'milestones': return Award;
-      case 'streaks': return Star;
-      case 'social': return Users;
-      case 'special': return Trophy;
-      case 'seasonal': return Calendar;
-      default: return Award;
-    }
-  };
-
-  const CategoryIcon = getCategoryIcon(badge.category);
 
   const getRarityDisplayInfo = (rarity: string) => {
     const info = {

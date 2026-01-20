@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Smile, ChevronDown, Home } from 'lucide-react';
+import { useState } from 'react';
+import { Smile, ChevronDown } from 'lucide-react';
 import { CreateChoreInput } from '@/lib/services/chores-service';
 import { Chore } from '@/lib/types';
 import { Modal } from '@/components/ui/Modal';
@@ -32,8 +32,20 @@ interface NewChoreModalProps {
   userId: string;
 }
 
-export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, userId }: NewChoreModalProps) {
-  const [formData, setFormData] = useState<CreateChoreInput>({
+const buildInitialFormData = (editChore: Chore | null | undefined, spaceId: string, userId: string): CreateChoreInput => {
+  if (editChore) {
+    return {
+      space_id: spaceId,
+      title: editChore.title,
+      description: editChore.description || '',
+      frequency: editChore.frequency,
+      status: editChore.status,
+      due_date: editChore.due_date || '',
+      created_by: userId,
+    };
+  }
+
+  return {
     space_id: spaceId,
     title: '',
     description: '',
@@ -41,39 +53,25 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
     status: 'pending',
     due_date: '',
     created_by: userId,
+  };
+};
+
+function ChoreForm({
+  isOpen,
+  onClose,
+  onSave,
+  editChore,
+  spaceId,
+  userId
+}: NewChoreModalProps) {
+  const [formData, setFormData] = useState<CreateChoreInput>({
+    ...buildInitialFormData(editChore, spaceId, userId),
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [category, setCategory] = useState<string>('');
+  const [category, setCategory] = useState<string>(editChore?.category || '');
   const [selectedDaysOfWeek, setSelectedDaysOfWeek] = useState<number[]>([]);
   const [selectedDaysOfMonth, setSelectedDaysOfMonth] = useState<number[]>([]);
   const [dateError, setDateError] = useState<string>('');
-
-  useEffect(() => {
-    if (editChore) {
-      setFormData({
-        space_id: spaceId,
-        title: editChore.title,
-        description: editChore.description || '',
-        frequency: editChore.frequency,
-        status: editChore.status,
-        due_date: editChore.due_date || '',
-        created_by: userId,
-      });
-    } else {
-      setFormData({
-        space_id: spaceId,
-        title: '',
-        description: '',
-        frequency: 'weekly',
-        status: 'pending',
-        due_date: '',
-        created_by: userId,
-      });
-      setCategory('');
-    }
-    setShowEmojiPicker(false);
-    setDateError('');
-  }, [editChore, spaceId, isOpen]);
 
   const handleEmojiClick = (emoji: string) => {
     setFormData({ ...formData, title: formData.title + emoji });
@@ -152,7 +150,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 required
                 value={formData.title}
                 id="field-1"
-              onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Clean the kitchen"
                 className="w-full px-4 py-3 pr-12 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
               />
@@ -199,7 +197,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
             <textarea
               value={formData.description}
               id="field-2"
-              onChange={(e) =>  setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this chore..."
               rows={3}
               className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
@@ -217,7 +215,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 <select
                   value={category}
                   id="field-3"
-              onChange={(e) =>  setCategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
@@ -246,7 +244,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 <select
                   value={formData.frequency}
                   id="field-4"
-              onChange={(e) =>  setFormData({ ...formData, frequency: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, frequency: e.target.value as CreateChoreInput['frequency'] })}
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
@@ -339,7 +337,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 <select
                   value={formData.status}
                   id="field-7"
-              onChange={(e) =>  setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as CreateChoreInput['status'] })}
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
                   style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
                 >
@@ -362,7 +360,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
                 type="date"
                 value={formData.due_date}
                 id="field-8"
-              onChange={(e) =>  {
+              onChange={(e) => {
                   setFormData({ ...formData, due_date: e.target.value });
 
                   // Validate on change
@@ -396,4 +394,10 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
       </form>
     </Modal>
   );
+}
+
+export function NewChoreModal(props: NewChoreModalProps) {
+  const { editChore, isOpen, spaceId, userId } = props;
+  const formKey = `${editChore?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId}-${userId}`;
+  return <ChoreForm key={formKey} {...props} />;
 }

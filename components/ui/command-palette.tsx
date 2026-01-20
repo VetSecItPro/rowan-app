@@ -19,25 +19,15 @@ import {
   Settings,
   Home,
   User,
-  FileText,
   BarChart3,
   Lightbulb,
   Clock,
   Star,
-  Archive,
-  Trash2,
-  Filter,
   Download,
-  Upload,
-  Share,
-  Copy,
-  Edit,
-  Eye,
   ArrowRight,
   Sparkles,
   Command as CommandIcon
 } from 'lucide-react';
-import { useAuth } from '@/lib/contexts/auth-context';
 import { cn } from '@/lib/utils';
 
 // ==================== TYPES ====================
@@ -63,9 +53,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [search, setSearch] = useState('');
-  const [pages, setPages] = useState<string[]>([]);
   const router = useRouter();
-  const { currentSpace, user } = useAuth();
 
   // Navigation actions
   const navigationActions: CommandAction[] = [
@@ -339,12 +327,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     return groups;
   }, {} as Record<string, CommandAction[]>);
 
+  const handleOpenChange = useCallback((nextOpen: boolean) => {
+    onOpenChange(nextOpen);
+    if (!nextOpen) {
+      setSearch('');
+    }
+  }, [onOpenChange]);
+
   // Handle action execution
   const handleActionSelect = useCallback((action: CommandAction) => {
-    onOpenChange(false);
-    setSearch('');
+    handleOpenChange(false);
     action.action();
-  }, [onOpenChange]);
+  }, [handleOpenChange]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -352,27 +346,18 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       // Open command palette with Cmd+K or Ctrl+K
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        onOpenChange(!open);
+        handleOpenChange(!open);
       }
 
       // Close with Escape
       if (e.key === 'Escape') {
-        onOpenChange(false);
-        setSearch('');
+        handleOpenChange(false);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, onOpenChange]);
-
-  // Clear search when dialog closes
-  useEffect(() => {
-    if (!open) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSearch('');
-    }
-  }, [open]);
+  }, [handleOpenChange, open]);
 
   const categoryLabels = {
     navigation: 'Navigation',
@@ -391,7 +376,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="overflow-hidden p-0 shadow-lg max-w-2xl">
         <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
@@ -480,7 +465,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
   // Listen for trigger events
   useEffect(() => {
-    const handleTrigger = (event: CustomEvent) => {
+    const handleTrigger = () => {
       setOpen(true);
     };
 

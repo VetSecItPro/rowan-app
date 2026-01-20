@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { MessageCircle, Users, Calendar, CheckCircle2, Target, Mic } from 'lucide-react';
-import { GoalActivity, GoalComment, CreateCommentInput } from '@/lib/services/goals-service';
+import { GoalActivity, GoalComment } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
@@ -74,19 +75,14 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  useEffect(() => {
-    loadUser();
-    loadActivities();
-  }, [spaceId, goalId]);
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
-  };
+  }, [supabase]);
 
-  const loadActivities = async () => {
+  const loadActivities = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -123,7 +119,12 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     } finally {
       setLoading(false);
     }
-  };
+  }, [goalId, spaceId, supabase]);
+
+  useEffect(() => {
+    loadUser();
+    loadActivities();
+  }, [loadUser, loadActivities]);
 
   const loadComments = async (activityId: string) => {
     if (comments[activityId]) return; // Already loaded
@@ -176,8 +177,10 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     }
   };
 
-  const handleReaction = async (_commentId: string, _emoji: string) => {
+  const handleReaction = async (commentId: string, emoji: string) => {
     hapticLight();
+    void commentId;
+    void emoji;
     try {
       // This would need to be implemented in your goals service
       // await goalsService.toggleCommentReaction(commentId, emoji);
@@ -284,9 +287,11 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                     {/* Avatar */}
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-300">
                       {activity.user?.avatar_url ? (
-                        <img
+                        <Image
                           src={activity.user.avatar_url}
                           alt=""
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
@@ -331,9 +336,11 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                             <div key={comment.id} className="flex items-start space-x-2">
                               <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
                                 {comment.user?.avatar_url ? (
-                                  <img
+                                  <Image
                                     src={comment.user.avatar_url}
                                     alt=""
+                                    width={24}
+                                    height={24}
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
@@ -370,9 +377,11 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                           <div className="flex items-start space-x-2">
                             <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
                               {user?.avatar_url ? (
-                                <img
+                                <Image
                                   src={user.avatar_url}
                                   alt=""
+                                  width={24}
+                                  height={24}
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
                               ) : (

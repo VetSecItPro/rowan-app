@@ -52,27 +52,36 @@ interface UnifiedItemModalProps {
   mode?: ModalMode;
 }
 
-export const UnifiedItemModal = memo(function UnifiedItemModal({
-  isOpen,
-  onClose,
-  onSave,
-  editItem,
-  spaceId,
-  userId,
-  defaultType = 'task',
-  mode = 'create'
-}: UnifiedItemModalProps) {
-  const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
+interface UnifiedItemModalContentProps extends UnifiedItemModalProps {
+  currentSpaceId?: string;
+  hasZeroSpaces: boolean;
+}
 
-  // Space management state
-  const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
-  const [spaceCreationLoading] = useState(false);
-  const [spaceError, setSpaceError] = useState<string>('');
+const buildInitialFormData = (
+  editItem: UnifiedItemModalProps['editItem'],
+  defaultType: ItemType,
+  spaceId?: string
+): FormDataState => {
+  if (editItem) {
+    const editItemData = editItem as EditItemData;
+    return {
+      space_id: spaceId || '',
+      title: editItemData.title || '',
+      description: editItemData.description || '',
+      category: editItemData.category || '',
+      priority: editItemData.priority || 'medium',
+      status: editItemData.status || 'pending',
+      due_date: editItemData.due_date || '',
+      assigned_to: editItemData.assigned_to || '',
+      estimated_hours: editItemData.estimated_hours || '',
+      tags: editItemData.tags || '',
+      frequency: editItemData.frequency || 'once',
+      point_value: editItemData.point_value || 10,
+    };
+  }
 
-  // Core state
-  const [itemType, setItemType] = useState<ItemType>(defaultType);
-  const [formData, setFormData] = useState<FormDataState>({
-    space_id: actualSpaceId || '',
+  return {
+    space_id: spaceId || '',
     title: '',
     description: '',
     category: '',
@@ -82,8 +91,37 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     assigned_to: '',
     estimated_hours: '',
     tags: '',
-    frequency: 'once', // Add missing frequency field for chores
-    point_value: 10, // Default points for chores
+    frequency: 'once',
+    point_value: 10,
+  };
+};
+
+const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
+  isOpen,
+  onClose,
+  onSave,
+  editItem,
+  spaceId,
+  userId,
+  defaultType = 'task',
+  mode = 'create',
+  currentSpaceId,
+  hasZeroSpaces,
+}: UnifiedItemModalContentProps) {
+  const resolvedSpaceId = spaceId || editItem?.space_id || currentSpaceId;
+
+  // Space management state
+  const spaceCreationLoading = false;
+  const [spaceError, setSpaceError] = useState<string>(
+    hasZeroSpaces && isOpen && !resolvedSpaceId
+      ? 'Please create a workspace before adding items.'
+      : ''
+  );
+
+  // Core state
+  const [itemType, setItemType] = useState<ItemType>((editItem as EditItemData | null)?.type || defaultType);
+  const [formData, setFormData] = useState<FormDataState>({
+    ...buildInitialFormData(editItem, defaultType, resolvedSpaceId),
   });
 
   // UI state
@@ -101,71 +139,6 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
   const [calendarSync, setCalendarSync] = useState(false);
   const [familyAssignment, setFamilyAssignment] = useState('unassigned');
   const [quickNote, setQuickNote] = useState('');
-
-  // Set up space ID when modal opens
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (isOpen) {
-      if (spaceId) {
-        // Use provided spaceId
-        setActualSpaceId(spaceId);
-        setFormData((prev) => ({ ...prev, space_id: spaceId }));
-      } else if (currentSpace && !editItem) {
-        // Use current space from context
-        setActualSpaceId(currentSpace.id);
-        setFormData((prev) => ({ ...prev, space_id: currentSpace.id }));
-      } else if (editItem) {
-        // For edit mode, keep existing space_id from the item
-        setActualSpaceId(editItem.space_id);
-        setFormData((prev) => ({ ...prev, space_id: editItem.space_id }));
-      } else if (hasZeroSpaces) {
-        // Zero spaces scenario - this should be handled by AppWithOnboarding
-        // but if we get here, show a friendly error
-        setSpaceError('Please create a workspace before adding items.');
-      }
-    }
-  }, [isOpen, spaceId, currentSpace, editItem, hasZeroSpaces]);
-
-  // Initialize form data
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => {
-    if (editItem) {
-      const editItemData = editItem as EditItemData;
-      setItemType(editItemData.type || 'task');
-      setFormData({
-        space_id: actualSpaceId || '',
-        title: editItemData.title || '',
-        description: editItemData.description || '',
-        category: editItemData.category || '',
-        priority: editItemData.priority || 'medium',
-        status: editItemData.status || 'pending',
-        due_date: editItemData.due_date || '',
-        assigned_to: editItemData.assigned_to || '',
-        estimated_hours: editItemData.estimated_hours || '',
-        tags: editItemData.tags || '',
-        frequency: editItemData.frequency || 'once',
-        point_value: editItemData.point_value || 10,
-      });
-    } else {
-      // Reset for new items and set to defaultType
-      setItemType(defaultType);
-      setFormData({
-        space_id: actualSpaceId || '',
-        title: '',
-        description: '',
-        category: '',
-        priority: 'medium',
-        status: 'pending',
-        due_date: '',
-        assigned_to: '',
-        estimated_hours: '',
-        tags: '',
-        frequency: 'once',
-        point_value: 10,
-      });
-    }
-    setActiveSection('basic');
-  }, [editItem, actualSpaceId, isOpen, defaultType]);
 
   // Tab navigation using keyboard
   useEffect(() => {
@@ -264,7 +237,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     }
 
     // Ensure we have a space ID before proceeding
-    if (!actualSpaceId) {
+    if (!resolvedSpaceId) {
       setSpaceError('Space creation required');
       return;
     }
@@ -942,3 +915,19 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     </div>
   );
 });
+
+export function UnifiedItemModal(props: UnifiedItemModalProps) {
+  const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
+  const { editItem, isOpen, spaceId, defaultType = 'task' } = props;
+  const resolvedSpaceId = spaceId || editItem?.space_id || currentSpace?.id || 'none';
+  const modalKey = `${editItem?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${resolvedSpaceId}-${defaultType}`;
+
+  return (
+    <UnifiedItemModalContent
+      key={modalKey}
+      currentSpaceId={currentSpace?.id}
+      hasZeroSpaces={hasZeroSpaces}
+      {...props}
+    />
+  );
+}

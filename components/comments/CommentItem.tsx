@@ -42,7 +42,6 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [reactions, setReactions] = useState<ReactionSummary[]>([]);
-  const [loadingReactions, setLoadingReactions] = useState(false);
 
   const canReply = comment.thread_depth < maxDepth;
   const isOwner = currentUserId === comment.created_by;
@@ -50,13 +49,10 @@ export default function CommentItem({
   // Load reactions
   const loadReactions = async () => {
     try {
-      setLoadingReactions(true);
       const data = await getCommentReactions(comment.id);
       setReactions(data);
     } catch (err) {
       logger.error('Failed to load reactions:', err, { component: 'CommentItem', action: 'component_action' });
-    } finally {
-      setLoadingReactions(false);
     }
   };
 

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { subDays, subMonths, startOfWeek, endOfWeek, format, eachWeekOfInterval } from 'date-fns';
+import { subMonths, startOfWeek, endOfWeek, format, eachWeekOfInterval } from 'date-fns';
 import { logger } from '@/lib/logger';
 
 // =====================================================
@@ -123,7 +123,7 @@ function calculateAnalytics(
   const { currentStreak, longestStreak } = calculateStreaks(checkIns);
 
   // Progress trend
-  const progressTrend = calculateProgressTrend(checkIns, startDate, endDate);
+  const progressTrend = calculateProgressTrend(checkIns);
 
   // Category breakdown (pie chart data)
   const categoryBreakdown = calculateCategoryBreakdown(goals);
@@ -190,7 +190,7 @@ function calculateActivityHeatmap(checkIns: CheckInRecord[], startDate: Date, en
   const dailyActivity: Record<string, number> = {};
 
   // Initialize all dates with 0
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
     const dateStr = format(currentDate, 'yyyy-MM-dd');
     dailyActivity[dateStr] = 0;
@@ -291,7 +291,7 @@ function calculateStreaks(checkIns: CheckInRecord[]): { currentStreak: number; l
   return { currentStreak, longestStreak };
 }
 
-function calculateProgressTrend(checkIns: CheckInRecord[], startDate: Date, endDate: Date): Array<{ date: string; progress: number; completed: number }> {
+function calculateProgressTrend(checkIns: CheckInRecord[]): Array<{ date: string; progress: number; completed: number }> {
   const weeklyProgress: Record<string, { totalProgress: number; count: number; completed: number }> = {};
 
   // Group check-ins by week

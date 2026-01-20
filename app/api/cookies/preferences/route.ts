@@ -18,7 +18,7 @@ const CookiePreferencesSchema = z.object({
 });
 
 // GET - Get current cookie preferences for authenticated user
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 
@@ -222,7 +222,7 @@ async function applyCookiePreferences(userId: string, preferences: CookiePrefere
 }
 
 // DELETE - Reset cookie preferences to defaults
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   try {
     const supabase = await createClient();
 

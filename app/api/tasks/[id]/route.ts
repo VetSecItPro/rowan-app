@@ -55,7 +55,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     // Verify user has access to task's space
     try {
       await verifyResourceAccess(user.id, task);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this task' },
         { status: 403 }
@@ -129,7 +129,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     // Verify user has access to task's space
     try {
       await verifyResourceAccess(user.id, existingTask);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this task' },
         { status: 403 }
@@ -234,7 +234,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     // Verify user has access to task's space
     try {
       await verifyResourceAccess(user.id, existingTask);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this task' },
         { status: 403 }

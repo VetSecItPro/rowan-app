@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { Camera, Plus, Trash2, Target, X } from 'lucide-react';
 import { CreateCheckInInput } from '@/lib/services/goals-service';
 import { AdvancedVoiceRecorder } from './AdvancedVoiceRecorder';
@@ -188,7 +189,7 @@ export function GoalCheckInModal({
           {/* Progress Slider */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
-              How's your progress? ({formData.progress_percentage}%)
+              How&apos;s your progress? ({formData.progress_percentage}%)
             </label>
             <div className="space-y-4">
               <input
@@ -272,7 +273,7 @@ export function GoalCheckInModal({
                 Need help from your partner?
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                They'll be notified and can offer support
+                They&apos;ll be notified and can offer support
               </div>
             </div>
             <button
@@ -411,9 +412,11 @@ export function GoalCheckInModal({
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {formData.photos.map((photo, index) => (
                     <div key={index} className="relative group">
-                      <img
+                      <Image
                         src={URL.createObjectURL(photo)}
                         alt={`Progress photo ${index + 1}`}
+                        width={160}
+                        height={96}
                         className="w-full h-24 object-cover rounded-lg"
                       />
                       <button

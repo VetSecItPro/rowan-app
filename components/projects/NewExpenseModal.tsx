@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Smile } from 'lucide-react';
 import { CreateExpenseInput, Expense } from '@/lib/services/budgets-service';
@@ -10,21 +10,6 @@ import { Modal } from '@/components/ui/Modal';
 // Expense-appropriate emojis
 const EMOJIS = ['💰', '💵', '💳', '💸', '🏦', '🛒', '🍽️', '☕', '⚡', '🏠', '🚗', '⛽', '💊', '🏥', '🎬', '🎮', '📚', '✈️', '🏨', '👕'];
 
-// Expense categories with amber theme colors
-const EXPENSE_CATEGORIES = {
-  groceries: { emoji: '🛒', label: 'Groceries', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  utilities: { emoji: '⚡', label: 'Utilities', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  transportation: { emoji: '🚗', label: 'Transportation', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  healthcare: { emoji: '🏥', label: 'Healthcare', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  entertainment: { emoji: '🎬', label: 'Entertainment', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  dining: { emoji: '🍽️', label: 'Dining', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  shopping: { emoji: '🛍️', label: 'Shopping', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  housing: { emoji: '🏠', label: 'Housing', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  insurance: { emoji: '🛡️', label: 'Insurance', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  education: { emoji: '📚', label: 'Education', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
-  other: { emoji: '📌', label: 'Other', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-900/30' },
-};
-
 interface NewExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,8 +18,20 @@ interface NewExpenseModalProps {
   spaceId: string;
 }
 
-export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpenseModalProps) {
-  const [formData, setFormData] = useState<CreateExpenseInput>({
+const buildInitialFormData = (editExpense: Expense | null | undefined, spaceId: string): CreateExpenseInput => {
+  if (editExpense) {
+    return {
+      space_id: spaceId,
+      title: editExpense.title,
+      amount: editExpense.amount,
+      category: editExpense.category || '',
+      status: editExpense.status,
+      due_date: editExpense.due_date || '',
+      recurring: editExpense.recurring || false,
+    };
+  }
+
+  return {
     space_id: spaceId,
     title: '',
     amount: 0,
@@ -42,22 +39,17 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     status: 'pending',
     due_date: '',
     recurring: false,
+  };
+};
+
+function ExpenseForm({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpenseModalProps) {
+  const [formData, setFormData] = useState<CreateExpenseInput>({
+    ...buildInitialFormData(editExpense, spaceId),
   });
   const [dateError, setDateError] = useState<string>('');
-  const [customCategory, setCustomCategory] = useState<string>('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiButtonRect, setEmojiButtonRect] = useState<DOMRect | null>(null);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (editExpense) {
-      setFormData({ space_id: spaceId, title: editExpense.title, amount: editExpense.amount, category: editExpense.category || '', status: editExpense.status, due_date: editExpense.due_date || '', recurring: editExpense.recurring || false });
-    } else {
-      setFormData({ space_id: spaceId, title: '', amount: 0, category: '', status: 'pending', due_date: '', recurring: false });
-    }
-    setShowEmojiPicker(false);
-    setDateError('');
-  }, [editExpense, spaceId]);
 
   const handleEmojiClick = (emoji: string) => {
     setFormData({ ...formData, title: formData.title + emoji });
@@ -184,7 +176,6 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
                 value={formData.category}
                 onChange={(value) => {
                   setFormData({ ...formData, category: value });
-                  setCustomCategory(''); // Clear custom category when using selector
                 }}
                 domain="expense"
                 placeholder="Select category..."
@@ -258,4 +249,10 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
       )}
     </>
   );
+}
+
+export function NewExpenseModal(props: NewExpenseModalProps) {
+  const { editExpense, isOpen, spaceId } = props;
+  const formKey = `${editExpense?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId}`;
+  return <ExpenseForm key={formKey} {...props} />;
 }

@@ -4,7 +4,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
-import { ratelimit } from '@/lib/ratelimit';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
@@ -51,30 +50,25 @@ export async function POST(request: NextRequest) {
       // Generate export file based on format
       let fileBuffer: Buffer;
       let fileName: string;
-      let mimeType: string;
-
       switch (format) {
         case 'json':
           fileBuffer = await generateJSONExport(userData);
           fileName = `rowan-data-export-${userId}-${Date.now()}.json`;
-          mimeType = 'application/json';
           break;
         case 'csv':
           fileBuffer = await generateCSVExport(userData);
           fileName = `rowan-data-export-${userId}-${Date.now()}.csv`;
-          mimeType = 'text/csv';
           break;
         case 'pdf':
           fileBuffer = await generatePDFExport(userData);
           fileName = `rowan-data-export-${userId}-${Date.now()}.pdf`;
-          mimeType = 'application/pdf';
           break;
         default:
           throw new Error(`Unsupported export format: ${format}`);
       }
 
       // Upload file to storage (in a real implementation, you'd use S3, GCS, etc.)
-      const fileUrl = await uploadExportFile(fileName, fileBuffer, mimeType);
+      const fileUrl = await uploadExportFile(fileName, fileBuffer);
 
       // Update export request with completion status
       const expiresAt = new Date();
@@ -409,7 +403,7 @@ async function generatePDFExport(userData: ExportBundle): Promise<Buffer> {
 }
 
 // Upload export file to storage (mock implementation)
-async function uploadExportFile(fileName: string, fileBuffer: Buffer, mimeType: string): Promise<string> {
+async function uploadExportFile(fileName: string, fileBuffer: Buffer): Promise<string> {
   // In a real implementation, you would upload to S3, Google Cloud Storage, etc.
   // For now, we'll simulate a file URL
   const baseUrl = getAppUrl();

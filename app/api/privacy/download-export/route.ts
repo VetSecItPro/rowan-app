@@ -7,14 +7,7 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
-
-// Validation schema
-const DownloadRequestSchema = z.object({
-  file: z.string().min(1),
-  token: z.string().optional(), // For token-based access
-});
 
 // GET - Download export file
 export async function GET(request: NextRequest) {
@@ -168,8 +161,6 @@ type ExportRequestRecord = {
 // Generate mock file response (in production this would fetch from storage)
 async function generateMockFileResponse(exportRequest: ExportRequestRecord, fileName: string) {
   try {
-    const supabase = await createClient();
-
     // Get user data to generate the file
     const userData = await gatherUserDataForDownload(exportRequest.user_id);
 

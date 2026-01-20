@@ -5,12 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Shield,
   Users,
-  TrendingUp,
-  Activity,
-  Target,
-  UserCheck,
   RefreshCw,
-  Eye,
   Award,
   Search,
 } from 'lucide-react';
@@ -37,22 +32,12 @@ interface BetaUser {
 const StatCard = memo(function StatCard({
   title,
   value,
-  subtitle,
-  color = 'blue'
+  subtitle
 }: {
   title: string;
   value: string | number;
   subtitle?: string;
-  color?: 'blue' | 'green' | 'purple' | 'orange' | 'red';
 }) {
-  const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-900/30 text-blue-400',
-    green: 'bg-green-900/30 text-green-400',
-    purple: 'bg-purple-900/30 text-purple-400',
-    orange: 'bg-orange-900/30 text-orange-400',
-    red: 'bg-red-900/30 text-red-400',
-  };
-
   return (
     <div className="bg-gray-800 rounded-lg p-4">
       <p className="text-xs font-medium text-gray-400">{title}</p>
@@ -176,31 +161,26 @@ export const BetaProgramPanel = memo(function BetaProgramPanel() {
           title="Total Requests"
           value={stats.totalRequests}
           subtitle="All time"
-          color="blue"
         />
         <StatCard
           title="Conversion"
           value={`${stats.conversionRate}%`}
           subtitle="To active"
-          color="green"
         />
         <StatCard
           title="Active Users"
           value={`${stats.activeUsers}/${stats.capacity}`}
           subtitle={`${Math.round((stats.activeUsers / stats.capacity) * 100)}% capacity`}
-          color="purple"
         />
         <StatCard
           title="Avg Activity"
           value={stats.averageActivityScore.toFixed(1)}
           subtitle="Score"
-          color="orange"
         />
         <StatCard
           title="Success Rate"
           value={`${Math.round((stats.approvedRequests / Math.max(stats.totalRequests, 1)) * 100)}%`}
           subtitle="Invites sent"
-          color="red"
         />
       </div>
 

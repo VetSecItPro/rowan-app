@@ -76,6 +76,7 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
 
   // Mount check for portal
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     return () => setMounted(false);
   }, []);

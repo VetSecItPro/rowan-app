@@ -1,4 +1,4 @@
-import { format, subDays, startOfWeek, endOfWeek, eachDayOfInterval, isMonday, isFriday } from 'date-fns';
+import { subDays, startOfWeek, endOfWeek } from 'date-fns';
 import type { DailyCheckIn } from '@/lib/services/checkins-service';
 
 export interface MoodInsight {
@@ -275,7 +275,6 @@ export const moodInsightsService = {
     const checkInRate = (totalCheckIns / 30) * 100;
 
     const positiveCount = distribution.great + distribution.good;
-    const negativeCount = distribution.meh + distribution.rough;
     const positiveRatio = totalCheckIns > 0 ? (positiveCount / totalCheckIns) * 100 : 0;
 
     return {

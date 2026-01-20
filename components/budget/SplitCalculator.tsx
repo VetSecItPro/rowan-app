@@ -2,7 +2,6 @@
 
 import { Calculator, DollarSign, Percent, Users, TrendingUp } from 'lucide-react';
 import {
-  calculateIncomeBasedSplit,
   type SplitType,
   type PartnershipBalance,
 } from '@/lib/services/expense-splitting-service';

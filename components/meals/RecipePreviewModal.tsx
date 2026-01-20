@@ -39,6 +39,7 @@ export function RecipePreviewModal({
 
   useScrollLock(isOpen);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
@@ -53,6 +54,7 @@ export function RecipePreviewModal({
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!headerRef.current?.contains(e.target as Node)) return;

@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    const { space_id, title } = validatedData;
+    const { space_id } = validatedData;
 
     // Verify user has access to this space
     try {

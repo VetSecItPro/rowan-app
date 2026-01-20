@@ -609,7 +609,6 @@ export const goalsService = {
   },
 
   async getAllMilestones(spaceId: string): Promise<Milestone[]> {
-    const supabase = createClient();
     const goals = await this.getGoals(spaceId);
     const allMilestones: Milestone[] = [];
 
@@ -761,8 +760,6 @@ export const goalsService = {
       visibility?: 'private' | 'shared';
     }
   ): Promise<Goal> {
-    const supabase = createClient();
-
     // Get template with milestone templates
     const template = await this.getGoalTemplateById(templateId);
     if (!template) throw new Error('Template not found');
@@ -962,7 +959,7 @@ export const goalsService = {
       const fileName = `${checkInId}_${Date.now()}_${i}.${fileExt}`;
 
       // Upload to storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('goal-check-in-photos')
         .upload(fileName, photo);
 
@@ -1002,7 +999,8 @@ export const goalsService = {
     const supabase = createClient();
 
     // Remove photos from updates as they need to be handled separately
-    const { photos, ...checkInUpdates } = updates;
+    const checkInUpdates = { ...updates };
+    delete checkInUpdates.photos;
 
     const { data, error } = await supabase
       .from('goal_check_ins')

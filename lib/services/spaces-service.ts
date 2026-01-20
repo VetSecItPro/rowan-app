@@ -1,11 +1,29 @@
 import { createClient } from '@/lib/supabase/client';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
-import type { Space, SpaceMember, CreateSpaceInput } from '@/lib/types';
+import type { Space } from '@/lib/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
+type UserSpaceRow = {
+  role: string;
+  spaces: Pick<Space, 'id' | 'name' | 'created_at' | 'updated_at'> | null;
+};
+
+type SpaceMemberRow = {
+  space_id: string;
+  user_id: string;
+  role: string;
+  joined_at: string;
+  users: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  } | null;
+};
 
 // =============================================
 // VALIDATION SCHEMAS
@@ -124,10 +142,10 @@ export async function getUserSpaces(
     }
 
     // Transform the data to include role at the top level
-    const spaces = data.map((item: any) => ({
-      ...item.spaces,
-      role: item.role,
-    }));
+    const rows = (data || []) as UserSpaceRow[];
+    const spaces = rows
+      .map((item) => (item.spaces ? { ...item.spaces, role: item.role } : null))
+      .filter((item): item is Space & { role: string } => item !== null);
 
     return { success: true, data: spaces };
   } catch (error) {
@@ -201,7 +219,7 @@ export async function getSpace(
 export async function getSpaceMembers(
   spaceId: string,
   userId: string
-): Promise<{ success: true; data: any[] } | { success: false; error: string }> {
+): Promise<{ success: true; data: SpaceMemberRow[] } | { success: false; error: string }> {
   try {
     const supabase = createClient();
 
@@ -243,7 +261,8 @@ export async function getSpaceMembers(
       throw error;
     }
 
-    return { success: true, data };
+    const members = (data || []) as SpaceMemberRow[];
+    return { success: true, data: members };
   } catch (error) {
     logger.error('[spaces-service] getSpaceMembers error:', error, { component: 'lib-spaces-service', action: 'service_call' });
     return {

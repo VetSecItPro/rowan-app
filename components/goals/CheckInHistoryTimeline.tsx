@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Calendar, MessageSquare, Camera, Mic, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { GoalCheckIn, GoalCheckInPhoto, goalsService } from '@/lib/services/goals-service';
@@ -25,13 +26,7 @@ export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHisto
   const [loading, setLoading] = useState(true);
   const [expandedCheckIns, setExpandedCheckIns] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (isOpen && goalId) {
-      loadCheckInHistory();
-    }
-  }, [isOpen, goalId]);
-
-  const loadCheckInHistory = async () => {
+  const loadCheckInHistory = useCallback(async () => {
     try {
       setLoading(true);
       const history = await goalsService.getGoalCheckIns(goalId);
@@ -46,7 +41,7 @@ export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHisto
             photosMap[checkIn.id] = photos;
           }
         } catch (error) {
-          logger.error('Failed to load photos for check-in ${checkIn.id}:', error, { component: 'CheckInHistoryTimeline', action: 'component_action' });
+          logger.error(`Failed to load photos for check-in ${checkIn.id}:`, error, { component: 'CheckInHistoryTimeline', action: 'component_action' });
         }
       }
       setCheckInPhotos(photosMap);
@@ -55,7 +50,13 @@ export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHisto
     } finally {
       setLoading(false);
     }
-  };
+  }, [goalId]);
+
+  useEffect(() => {
+    if (isOpen && goalId) {
+      loadCheckInHistory();
+    }
+  }, [isOpen, goalId, loadCheckInHistory]);
 
   const toggleExpanded = (checkInId: string) => {
     const newExpanded = new Set(expandedCheckIns);
@@ -312,9 +313,11 @@ export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHisto
                                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                     {photos.map((photo, photoIndex) => (
                                       <div key={photo.id} className="relative group">
-                                        <img
+                                        <Image
                                           src={photo.photo_url}
                                           alt={photo.caption || `Progress photo ${photoIndex + 1}`}
+                                          width={160}
+                                          height={96}
                                           className="w-full h-24 object-cover rounded-lg"
                                         />
                                         {photo.caption && (

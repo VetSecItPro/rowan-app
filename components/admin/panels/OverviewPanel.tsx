@@ -162,7 +162,7 @@ const QuickStat = memo(function QuickStat({
 export const OverviewPanel = memo(function OverviewPanel() {
   // Fetch dashboard stats - shares cache with main dashboard page
   // Returns just the stats object to match the dashboard page's queryFn
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
       const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}&refresh=true`);

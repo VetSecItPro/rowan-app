@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle, X } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle, X } from 'lucide-react';
 import { eventProposalsService, EventProposal, ProposalVote, CreateProposalInput } from '@/lib/services/event-proposals-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -55,27 +55,16 @@ export function EventProposalModal({
   const [votes, setVotes] = useState<Record<number, 'available' | 'unavailable' | 'preferred'>>({});
   const [voteSummary, setVoteSummary] = useState<VoteSummary | null>(null);
 
-  useEffect(() => {
-    if (existingProposal) {
-      setMode('vote');
-      setProposal(existingProposal);
-      loadVoteSummary(existingProposal.id);
-      loadUserVotes(existingProposal.id);
-    } else {
-      setMode('create');
-    }
-  }, [existingProposal]);
-
-  const loadVoteSummary = async (proposalId: string) => {
+  const loadVoteSummary = useCallback(async (proposalId: string) => {
     try {
       const summary = await eventProposalsService.getVoteSummary(proposalId);
       setVoteSummary(summary);
     } catch (error) {
       logger.error('Failed to load vote summary:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
-  };
+  }, []);
 
-  const loadUserVotes = async (proposalId: string) => {
+  const loadUserVotes = useCallback(async (proposalId: string) => {
     try {
       const userVotes = await eventProposalsService.getVotes(proposalId);
       const voteMap: Record<number, 'available' | 'unavailable' | 'preferred'> = {};
@@ -88,7 +77,18 @@ export function EventProposalModal({
     } catch (error) {
       logger.error('Failed to load user votes:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (existingProposal) {
+      setMode('vote');
+      setProposal(existingProposal);
+      loadVoteSummary(existingProposal.id);
+      loadUserVotes(existingProposal.id);
+    } else {
+      setMode('create');
+    }
+  }, [existingProposal, loadUserVotes, loadVoteSummary]);
 
   const addTimeSlot = () => {
     if (timeSlots.length < 5) {

@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Chore } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
@@ -68,14 +68,8 @@ export function useChoreRealtime({
   }>({ inserts: [], updates: [], deletes: [] });
 
   // Memoized filters to prevent unnecessary re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.status?.join(','),
-    filters?.frequency?.join(','),
-    filters?.assignedTo
-  ]);
-
   // Memoized filter function to avoid recalculation
-  const choreFilter = useCallback((chore: Chore) => chorePassesFilters(chore, memoizedFilters), [memoizedFilters]);
+  const choreFilter = useCallback((chore: Chore) => chorePassesFilters(chore, filters), [filters]);
 
   // Debounced batch update function - use useRef to avoid recreation
   const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
@@ -322,7 +316,16 @@ export function useChoreRealtime({
       // Clear any pending batched updates
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId, memoizedFilters]); // Only depend on spaceId and memoized filters
+  }, [
+    spaceId,
+    filters,
+    choreFilter,
+    debouncedBatchUpdate,
+    onChoreAdded,
+    onChoreUpdated,
+    onChoreDeleted,
+    timeoutReached
+  ]);
 
   function refreshChores() {
     setLoading(true);

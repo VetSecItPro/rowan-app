@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
 
@@ -27,14 +27,9 @@ export function Dropdown({
   disabled = false
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Ensure component is mounted on client side
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const isHydrated = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   // Calculate dropdown position
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -171,7 +166,7 @@ export function Dropdown({
   };
 
   // Don't render dropdown portal on server side
-  if (!mounted) {
+  if (!isHydrated) {
     return (
       <button
         ref={triggerRef}
@@ -270,4 +265,27 @@ export function Dropdown({
       )}
     </>
   );
+}
+
+let hydrated = false;
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+const getSnapshot = () => hydrated;
+const getServerSnapshot = () => false;
+
+if (typeof window !== 'undefined' && !hydrated) {
+  const notify = () => {
+    hydrated = true;
+    listeners.forEach((listener) => listener());
+  };
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(notify);
+  } else {
+    Promise.resolve().then(notify);
+  }
 }

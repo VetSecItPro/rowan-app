@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Task } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
@@ -76,15 +76,8 @@ export function useTaskRealtime({
     deletes: string[];
   }>({ inserts: [], updates: [], deletes: [] });
 
-  // Memoized filters to prevent unnecessary re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.status?.join(','),
-    filters?.priority?.join(','),
-    filters?.assignedTo
-  ]);
-
   // Memoized filter function to avoid recalculation
-  const taskFilter = useCallback((task: Task) => taskPassesFilters(task, memoizedFilters), [memoizedFilters]);
+  const taskFilter = useCallback((task: Task) => taskPassesFilters(task, filters), [filters]);
 
   // Debounced batch update function - use useRef to avoid recreation
   const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
@@ -333,7 +326,16 @@ export function useTaskRealtime({
       // Clear any pending debounced updates
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId, memoizedFilters]); // Only depend on spaceId and memoized filters
+  }, [
+    spaceId,
+    filters,
+    taskFilter,
+    debouncedBatchUpdate,
+    onTaskAdded,
+    onTaskUpdated,
+    onTaskDeleted,
+    timeoutReached
+  ]);
 
   function refreshTasks() {
     setLoading(true);

@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, spaceId);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
           { status: 429 }
         );
       }
-    } catch (rateLimitError) {
+    } catch {
       // Fallback to in-memory rate limiting
       Sentry.captureMessage('Rate limiting degraded (using fallback)', {
         level: 'warning',
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, validatedData.space_id);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }

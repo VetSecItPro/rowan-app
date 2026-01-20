@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, pdf, Image } from '@react-pdf/renderer';
-import { GeneratedReport, ReportData } from './financial-reports-service';
+import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
+import { GeneratedReport, ReportData, ReportMetrics } from './financial-reports-service';
 import { format } from 'date-fns';
 
 // PDF Generation Service for Financial Reports
@@ -197,7 +197,7 @@ const SummarySection: React.FC<{ report: GeneratedReport }> = ({ report }) => (
 );
 
 // Key Metrics Section Component
-const KeyMetricsSection: React.FC<{ metrics: any }> = ({ metrics }) => (
+const KeyMetricsSection: React.FC<{ metrics: ReportMetrics }> = ({ metrics }) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>Key Metrics</Text>
     <View style={styles.twoColumn}>
@@ -340,7 +340,7 @@ const CategoryBreakdownSection: React.FC<{ data: ReportData }> = ({ data }) => {
 };
 
 // Budget vs Actual Section (if budget data available)
-const BudgetAnalysisSection: React.FC<{ data: ReportData; metrics: any }> = ({ data, metrics }) => {
+const BudgetAnalysisSection: React.FC<{ data: ReportData }> = ({ data }) => {
   if (!data.budgets || data.budgets.length === 0) return null;
 
   const categorySpending = data.expenses.reduce((acc, expense) => {
@@ -458,7 +458,7 @@ const FinancialReportPDF: React.FC<{ report: GeneratedReport }> = ({ report }) =
       <KeyMetricsSection metrics={report.summary_stats} />
 
       {/* Budget Analysis (if available) */}
-      <BudgetAnalysisSection data={report.data} metrics={report.summary_stats} />
+      <BudgetAnalysisSection data={report.data} />
 
       {/* Footer */}
       <Text style={styles.footer}>

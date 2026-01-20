@@ -56,7 +56,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     // Verify user has access to event's space
     try {
       await verifyResourceAccess(user.id, event);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this calendar event' },
         { status: 403 }
@@ -130,7 +130,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     // Verify user has access to event's space
     try {
       await verifyResourceAccess(user.id, existingEvent);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this calendar event' },
         { status: 403 }
@@ -228,7 +228,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     // Verify user has access to event's space
     try {
       await verifyResourceAccess(user.id, existingEvent);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this calendar event' },
         { status: 403 }

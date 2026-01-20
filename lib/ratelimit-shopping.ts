@@ -1,6 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import LRUCache from 'lru-cache';
+import { randomBytes } from 'crypto';
 import { logger } from '@/lib/logger';
 
 // Configure Redis for Upstash
@@ -62,7 +63,6 @@ export async function checkShoppingTokenRateLimit(ip: string): Promise<{ success
  * Uses crypto.randomBytes for maximum security
  */
 export function generateSecureShareToken(): string {
-  const { randomBytes } = require('crypto');
   // Generate 32 random bytes and encode as URL-safe base64
   return randomBytes(32).toString('base64url');
 }

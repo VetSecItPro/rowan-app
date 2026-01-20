@@ -57,28 +57,8 @@ export function Modal({
   const headerRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
-  // Animation state
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-
   // Lock scroll on the correct scroll container (main element)
   useScrollLock(isOpen);
-
-  // Handle open/close animation
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setIsAnimating(true);
-        });
-      });
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
 
   // Close on escape key
   useEffect(() => {
@@ -217,7 +197,7 @@ export function Modal({
     setHasTriggeredHaptic(false);
   };
 
-  if (!isVisible) return null;
+  if (!isOpen) return null;
 
   const maxWidthClasses = {
     sm: 'sm:max-w-sm',
@@ -243,7 +223,7 @@ export function Modal({
         className={`
           absolute inset-0 bg-black/70 backdrop-blur-sm
           transition-opacity duration-300
-          ${isAnimating ? 'opacity-100' : 'opacity-0'}
+          ${isOpen ? 'opacity-100' : 'opacity-0'}
         `}
         onClick={onClose}
         aria-label="Close modal"
@@ -267,7 +247,7 @@ export function Modal({
           flex flex-col
           transition-all duration-300 ease-out
           ${maxWidthClasses[maxWidth]}
-          ${isAnimating
+          ${isOpen
             ? 'translate-y-0 sm:translate-y-0 sm:scale-100 opacity-100'
             : 'translate-y-full sm:translate-y-4 sm:scale-95 opacity-0'
           }

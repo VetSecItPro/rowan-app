@@ -209,7 +209,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     // Verify user has access to list's space
     try {
       await verifyResourceAccess(user.id, list);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this shopping list' },
         { status: 403 }

@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
         margin: { top: 10, left: 14, right: 14 },
       });
 
-      // @ts-ignore - autoTable modifies the doc object
+      // @ts-expect-error - autoTable modifies the doc object
       yPosition = doc.lastAutoTable.finalY + 15;
     }
 

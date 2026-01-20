@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import type { RealtimeChannel, RealtimePostgresChangesPayload, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
@@ -21,7 +21,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [presence, setPresence] = useState<Record<string, PresenceUser>>({});
   const [isConnected, setIsConnected] = useState(false);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   // Handle postgres changes
   const handleEventChange = useCallback((
@@ -58,9 +58,9 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
 
   // Broadcast that user is editing an event
   const broadcastEditing = useCallback((eventId: string | null) => {
-    if (!channel) return;
+    if (!channelRef.current) return;
 
-    channel.send({
+    channelRef.current.send({
       type: 'broadcast',
       event: 'event_editing',
       payload: {
@@ -73,14 +73,14 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
 
   // Broadcast that user is viewing an event
   const broadcastViewing = useCallback((eventId: string | null) => {
-    if (!channel) return;
+    if (!channelRef.current) return;
 
-    channel.track({
+    channelRef.current.track({
       user_id: userId,
       online_at: new Date().toISOString(),
       viewing_event_id: eventId
     });
-  }, [channel, userId]);
+  }, [userId]);
 
   useEffect(() => {
     if (!spaceId || !userId) return;
@@ -134,12 +134,12 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         }
       });
 
-    setChannel(realtimeChannel);
+    channelRef.current = realtimeChannel;
 
     // Cleanup
     return () => {
       realtimeChannel.unsubscribe();
-      setChannel(null);
+      channelRef.current = null;
       setIsConnected(false);
     };
   }, [spaceId, userId, handleEventChange]);

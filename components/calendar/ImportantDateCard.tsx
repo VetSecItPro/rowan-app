@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Sparkles, Cake, Heart, Flame, RefreshCw, Calendar, Star } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import type { ImportantDateWithMeta } from '@/lib/types/important-dates';
 
 interface ImportantDateCardProps {
@@ -9,24 +9,12 @@ interface ImportantDateCardProps {
   onClick?: () => void;
 }
 
-// Map date types to icons
-const DATE_TYPE_ICONS = {
-  birthday: Cake,
-  anniversary: Heart,
-  memorial: Flame,
-  renewal: RefreshCw,
-  appointment: Calendar,
-  custom: Star,
-};
-
 /**
  * Compact card for displaying an important date
  * Similar to CountdownCard but with date-specific styling
  */
 export function ImportantDateCard({ date, onClick }: ImportantDateCardProps) {
   const { title, person_name, date_type, emoji, days_until, years, is_today } = date;
-
-  const Icon = DATE_TYPE_ICONS[date_type] || Star;
 
   // Generate gradient colors based on date type and urgency
   const gradientStyle = useMemo(() => {

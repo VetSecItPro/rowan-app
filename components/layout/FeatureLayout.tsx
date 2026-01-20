@@ -27,6 +27,9 @@ export function FeatureLayout({
   hideFooterOnMobile = true
 }: FeatureLayoutProps) {
   const pathname = usePathname();
+  type FeatureRoute = 'tasks' | 'calendar' | 'messages' | 'shopping' | 'meals' | 'reminders' | 'goals' | 'budget' | 'projects' | 'dashboard';
+  const featureRoutes: FeatureRoute[] = ['tasks', 'calendar', 'messages', 'shopping', 'meals', 'reminders', 'goals', 'budget', 'projects', 'dashboard'];
+  const isFeatureRoute = (value: string): value is FeatureRoute => featureRoutes.includes(value as FeatureRoute);
 
   // Auto-detect feature from pathname
   const currentFeature = useMemo(() => {
@@ -58,8 +61,8 @@ export function FeatureLayout({
       default:
         // Try to detect from breadcrumb if pathname detection fails
         const breadcrumbFeature = breadcrumbItems[0]?.label.toLowerCase();
-        if (breadcrumbFeature && ['tasks', 'calendar', 'messages', 'shopping', 'meals', 'reminders', 'goals', 'budget', 'projects'].includes(breadcrumbFeature)) {
-          return breadcrumbFeature as any;
+        if (breadcrumbFeature && isFeatureRoute(breadcrumbFeature)) {
+          return breadcrumbFeature;
         }
         return 'dashboard';
     }

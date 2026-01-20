@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { DashboardSkeleton, SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { SubscriptionProvider } from '@/lib/contexts/subscription-context';
-import { UpgradeModal } from '@/components/subscription';
 import { logger } from '@/lib/logger';
 
 interface AppWithOnboardingProps {

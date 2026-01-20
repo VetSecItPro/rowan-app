@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Smile, Plus } from 'lucide-react';
+import type { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
@@ -44,21 +45,16 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
   const [userReactions, setUserReactions] = useState<Set<string>>(new Set());
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  useEffect(() => {
-    loadUser();
-    loadReactions();
-  }, [checkInId]);
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
-  };
+  }, [supabase]);
 
-  const loadReactions = async () => {
+  const loadReactions = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -117,7 +113,15 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
     } finally {
       setLoading(false);
     }
-  };
+  }, [checkInId, supabase, user]);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  useEffect(() => {
+    loadReactions();
+  }, [loadReactions]);
 
   const handleReaction = async (emoji: string) => {
     if (!user) return;
