@@ -81,8 +81,8 @@ export default function VendorManagementPage() {
             const spendData = await getVendorSpendSummary(vendor.id);
             return {
               ...vendor,
-              totalSpent: spendData?.total_spent || 0,
-              projectCount: spendData?.project_count || 0
+              totalSpent: (spendData?.total_spent as number) || 0,
+              projectCount: (spendData?.project_count as number) || 0
             };
           } catch {
             return {
