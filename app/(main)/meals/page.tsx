@@ -1400,24 +1400,28 @@ export default function MealsPage() {
         </div>
       </div>
       {/* Modals */}
-      <NewMealModal
-        isOpen={isModalOpen}
-        onClose={handleCloseMealModal}
-        onSave={handleCreateMeal}
-        editMeal={editingMeal}
-        spaceId={spaceId}
-        recipes={recipes}
-        onOpenRecipeDiscover={handleOpenRecipeDiscover}
-      />
-      <NewRecipeModal
-        isOpen={isRecipeModalOpen}
-        onClose={handleCloseRecipeModal}
-        onSave={handleCreateRecipe}
-        editRecipe={editingRecipe}
-        spaceId={spaceId}
-        initialTab={recipeModalInitialTab}
-        onRecipeAdded={handleRecipeAddedFromDiscover}
-      />
+      {spaceId && (
+        <NewMealModal
+          isOpen={isModalOpen}
+          onClose={handleCloseMealModal}
+          onSave={handleCreateMeal}
+          editMeal={editingMeal}
+          spaceId={spaceId}
+          recipes={recipes}
+          onOpenRecipeDiscover={handleOpenRecipeDiscover}
+        />
+      )}
+      {spaceId && (
+        <NewRecipeModal
+          isOpen={isRecipeModalOpen}
+          onClose={handleCloseRecipeModal}
+          onSave={handleCreateRecipe}
+          editRecipe={editingRecipe}
+          spaceId={spaceId}
+          initialTab={recipeModalInitialTab}
+          onRecipeAdded={handleRecipeAddedFromDiscover}
+        />
+      )}
       {selectedRecipeForReview && (
         <IngredientReviewModal
           isOpen={isIngredientReviewOpen}
@@ -1431,13 +1435,15 @@ export default function MealsPage() {
           recipeName={selectedRecipeForReview.name}
         />
       )}
-      <GenerateListModal
-        isOpen={isGenerateListOpen}
-        onClose={() => setIsGenerateListOpen(false)}
-        meals={meals}
-        spaceId={spaceId}
-        onSuccess={() => loadMeals()}
-      />
+      {spaceId && (
+        <GenerateListModal
+          isOpen={isGenerateListOpen}
+          onClose={() => setIsGenerateListOpen(false)}
+          meals={meals}
+          spaceId={spaceId}
+          onSuccess={() => loadMeals()}
+        />
+      )}
       </PullToRefresh>
     </FeatureLayout>
     </FeatureGateWrapper>
