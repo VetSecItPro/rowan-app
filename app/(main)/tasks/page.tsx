@@ -297,10 +297,10 @@ export default function TasksPage() {
             category: taskData.category || undefined,
             due_date: taskData.due_date || undefined,
             tags: taskData.tags ?? undefined,
-            estimated_hours: taskData.estimated_hours,
+            estimated_hours: taskData.estimated_hours ?? undefined,
             priority: taskData.priority || 'medium',
             calendar_sync: taskData.calendar_sync ?? false,
-            quick_note: taskData.quick_note,
+            quick_note: taskData.quick_note ?? undefined,
             created_by: taskData.created_by ?? user?.id ?? '',
             sort_order: Date.now(), // Use timestamp for unique sort order
           };
