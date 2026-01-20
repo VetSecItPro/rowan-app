@@ -79,8 +79,8 @@ export default function ProjectTrackingPage() {
         setProject(projectData);
         setLineItems(lineItemsData);
         setPhotos(photosData);
-        setCostBreakdown(costBreakdownData as CostBreakdownItem[]);
-        setExpenses(expensesData as Expense[]);
+        setCostBreakdown(costBreakdownData as unknown as CostBreakdownItem[]);
+        setExpenses(expensesData as unknown as Expense[]);
       } catch (err) {
         logger.error('Failed to load project data:', err, { component: 'page', action: 'execution' });
         setError('Failed to load project information');
