@@ -11,7 +11,7 @@ import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
-import { User, Space } from '@/lib/types';
+import { Space } from '@/lib/types';
 import { isToday, isThisWeek, isPast, parseISO, startOfWeek } from 'date-fns';
 import { getCurrentDateString } from '@/lib/utils/date-utils';
 import type { RealtimeChannel } from '@supabase/supabase-js';
@@ -218,7 +218,7 @@ const initialStats: EnhancedDashboardStats = {
     },
 };
 
-export function useDashboardStats(user: User | null, currentSpace: Space | null, authLoading: boolean) {
+export function useDashboardStats(user: { id: string } | null, currentSpace: Space | null, authLoading: boolean) {
     const [stats, setStats] = useState<EnhancedDashboardStats>(initialStats);
     const [loading, setLoading] = useState(true);
 
