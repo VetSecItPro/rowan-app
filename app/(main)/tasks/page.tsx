@@ -296,7 +296,7 @@ export default function TasksPage() {
             description: taskData.description || undefined,
             category: taskData.category || undefined,
             due_date: taskData.due_date || undefined,
-            tags: taskData.tags,
+            tags: taskData.tags ?? undefined,
             estimated_hours: taskData.estimated_hours,
             priority: taskData.priority || 'medium',
             calendar_sync: taskData.calendar_sync ?? false,
