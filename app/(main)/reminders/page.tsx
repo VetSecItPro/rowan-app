@@ -189,9 +189,9 @@ export default function RemindersPage(): React.JSX.Element {
           // Add placeholder user data if not present
           user: user ? {
             id: user.id,
-            name: user.name,
+            name: user.name ?? undefined,
             email: user.email,
-            avatar_url: user.avatar_url
+            avatar_url: user.avatar_url ?? undefined
           } : undefined,
         };
 
