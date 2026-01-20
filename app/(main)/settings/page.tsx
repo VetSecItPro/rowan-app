@@ -766,13 +766,6 @@ export default function SettingsPage() {
   // }, []);
 
 
-  // Fetch active sessions when security tab is active
-  useEffect(() => {
-    if (activeTab === 'security') {
-      fetchActiveSessions();
-    }
-  }, [activeTab, fetchActiveSessions]);
-
   // Fetch space members and pending invitations when profile tab is active and space is selected
   // OPTIMIZATION: Fetch both in parallel for faster loading
   useEffect(() => {
@@ -905,6 +898,13 @@ export default function SettingsPage() {
       setIsLoadingSessions(false);
     }
   }, []);
+
+  // Fetch active sessions when security tab is active
+  useEffect(() => {
+    if (activeTab === 'security') {
+      fetchActiveSessions();
+    }
+  }, [activeTab, fetchActiveSessions]);
 
   const handleRevokeSession = async () => {
     if (!sessionToRevoke) return;
