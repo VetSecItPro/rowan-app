@@ -766,14 +766,6 @@ export default function SettingsPage() {
   // }, []);
 
 
-  // Fetch space members and pending invitations when profile tab is active and space is selected
-  // OPTIMIZATION: Fetch both in parallel for faster loading
-  useEffect(() => {
-    if (activeTab === 'profile' && spaceId) {
-      Promise.all([fetchSpaceMembers(), fetchPendingInvitations()]);
-    }
-  }, [activeTab, spaceId, fetchSpaceMembers, fetchPendingInvitations]);
-
   const fetchSpaceMembers = useCallback(async () => {
     if (!spaceId) return;
 
@@ -813,6 +805,14 @@ export default function SettingsPage() {
       setIsLoadingInvitations(false);
     }
   }, [spaceId]);
+
+  // Fetch space members and pending invitations when profile tab is active and space is selected
+  // OPTIMIZATION: Fetch both in parallel for faster loading
+  useEffect(() => {
+    if (activeTab === 'profile' && spaceId) {
+      Promise.all([fetchSpaceMembers(), fetchPendingInvitations()]);
+    }
+  }, [activeTab, spaceId, fetchSpaceMembers, fetchPendingInvitations]);
 
   const handleCopyInvitationUrl = async (invitationId: string, url: string) => {
     try {
