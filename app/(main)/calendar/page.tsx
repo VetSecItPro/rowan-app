@@ -419,9 +419,11 @@ export default function CalendarPage() {
             processedEventIds.add(lookupId);
 
             const linkedLists = await shoppingIntegrationService.getShoppingListsForEvent(lookupId);
-            if (linkedLists && linkedLists.length > 0) {
-              linkedListsMap[event.id] = linkedLists[0]; // For now, just take the first linked list
-              linkedListsMap[lookupId] = linkedLists[0]; // Also store under master ID for other occurrences
+            const validList = linkedLists?.find(list => list.id && list.title);
+            if (validList && validList.id && validList.title) {
+              const shoppingList: LinkedShoppingList = { id: validList.id, title: validList.title, items_count: validList.items_count };
+              linkedListsMap[event.id] = shoppingList;
+              linkedListsMap[lookupId] = shoppingList;
             }
           } catch (error) {
             logger.error('Failed to load shopping list for event ${event.id}:', error, { component: 'page', action: 'execution' });
