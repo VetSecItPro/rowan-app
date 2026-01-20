@@ -440,8 +440,8 @@ export default function SettingsPage() {
         return;
       }
 
-      // Check image dimensions
-      const img = new Image();
+      // Check image dimensions (use globalThis.Image to access native browser Image, not Next.js Image)
+      const img = new globalThis.Image();
       const objectUrl = URL.createObjectURL(file);
 
       img.onload = () => {
