@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimeChannel, RealtimePostgresChangesPayload, SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 // Expense Types
@@ -71,10 +71,12 @@ export interface CreateBudgetInput {
   monthly_budget: number;
 }
 
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 export const projectsService = {
   // Expenses
-  async getExpenses(spaceId: string): Promise<Expense[]> {
-    const supabase = createClient();
+  async getExpenses(spaceId: string, supabaseClient?: SupabaseClient): Promise<Expense[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -85,8 +87,8 @@ export const projectsService = {
     return data || [];
   },
 
-  async getExpenseById(id: string): Promise<Expense | null> {
-    const supabase = createClient();
+  async getExpenseById(id: string, supabaseClient?: SupabaseClient): Promise<Expense | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
@@ -97,8 +99,8 @@ export const projectsService = {
     return data;
   },
 
-  async createExpense(input: CreateExpenseInput): Promise<Expense> {
-    const supabase = createClient();
+  async createExpense(input: CreateExpenseInput, supabaseClient?: SupabaseClient): Promise<Expense> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('expenses')
       .insert([{
@@ -113,8 +115,8 @@ export const projectsService = {
     return data;
   },
 
-  async updateExpense(id: string, updates: Partial<CreateExpenseInput>): Promise<Expense> {
-    const supabase = createClient();
+  async updateExpense(id: string, updates: Partial<CreateExpenseInput>, supabaseClient?: SupabaseClient): Promise<Expense> {
+    const supabase = getSupabaseClient(supabaseClient);
     const finalUpdates: any = { ...updates };
 
     if (updates.status === 'paid' && !finalUpdates.paid_at) {
@@ -136,8 +138,8 @@ export const projectsService = {
     return data;
   },
 
-  async deleteExpense(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteExpense(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
       .from('expenses')
       .delete()
@@ -147,14 +149,14 @@ export const projectsService = {
   },
 
   // Budget
-  async getBudget(spaceId: string): Promise<Budget | null> {
+  async getBudget(spaceId: string, supabaseClient?: SupabaseClient): Promise<Budget | null> {
     // Return null if spaceId is invalid
     if (!spaceId || spaceId === 'undefined' || spaceId === 'null') {
       return null;
     }
 
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
       const { data, error } = await supabase
         .from('budgets')
         .select('*')
@@ -172,10 +174,10 @@ export const projectsService = {
     }
   },
 
-  async setBudget(input: CreateBudgetInput, userId: string): Promise<Budget> {
-    const supabase = createClient();
+  async setBudget(input: CreateBudgetInput, userId: string, supabaseClient?: SupabaseClient): Promise<Budget> {
+    const supabase = getSupabaseClient(supabaseClient);
     // Check if budget exists
-    const existing = await this.getBudget(input.space_id);
+    const existing = await this.getBudget(input.space_id, supabase);
 
     if (existing) {
       // Update existing budget
@@ -207,11 +209,12 @@ export const projectsService = {
     }
   },
 
-  async getBudgetStats(spaceId: string): Promise<BudgetStats> {
+  async getBudgetStats(spaceId: string, supabaseClient?: SupabaseClient): Promise<BudgetStats> {
     try {
+      const supabase = getSupabaseClient(supabaseClient);
       const [budget, expenses] = await Promise.all([
-        this.getBudget(spaceId),
-        this.getExpenses(spaceId),
+        this.getBudget(spaceId, supabase),
+        this.getExpenses(spaceId, supabase),
       ]);
 
       const now = new Date();

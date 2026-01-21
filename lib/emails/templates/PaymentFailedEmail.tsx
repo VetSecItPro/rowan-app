@@ -37,7 +37,7 @@ const PaymentFailedEmail = ({
     <Html>
       <Head />
       <Preview>
-        Action needed: Your Rowan payment couldn't be processed
+        Action needed: Your Rowan payment couldn&apos;t be processed
       </Preview>
       <Body style={main}>
         <Container style={container}>
@@ -87,7 +87,7 @@ const PaymentFailedEmail = ({
             </Section>
 
             <Text style={text}>
-              Don't worry - your Rowan {tierName} features are still active. To keep your subscription running smoothly, please update your payment method.
+              Don&apos;t worry - your Rowan {tierName} features are still active. To keep your subscription running smoothly, please update your payment method.
             </Text>
 
             <Text style={text}>
@@ -109,7 +109,7 @@ const PaymentFailedEmail = ({
             </Section>
 
             <Text style={text}>
-              If you've already updated your payment details, you can ignore this email - we'll automatically retry the payment.
+              If you&apos;ve already updated your payment details, you can ignore this email - we&apos;ll automatically retry the payment.
             </Text>
 
             <Text style={text}>

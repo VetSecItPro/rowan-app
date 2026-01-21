@@ -20,6 +20,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decryptSessionData, validateSessionData, encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger-edge';
+import { CSRF_EXEMPT_ROUTES, CSRF_HEADER_NAME } from '@/lib/security/csrf';
 
 /** Admin session duration in seconds (24 hours) - must match login route */
 const ADMIN_SESSION_DURATION = 24 * 60 * 60;
@@ -490,6 +491,25 @@ export async function middleware(req: NextRequest) {
           { error: 'Invalid origin' },
           { status: 403 }
         );
+      }
+    }
+
+    if (isApiRoute) {
+      const pathname = req.nextUrl.pathname;
+      const isCsrfExempt = CSRF_EXEMPT_ROUTES.some(route => pathname.startsWith(route));
+      const authHeader = req.headers.get('authorization');
+      const hasBearerAuth = authHeader?.startsWith('Bearer ');
+
+      if (!isCsrfExempt && !hasBearerAuth) {
+        const csrfCookie = req.cookies.get('__csrf_token')?.value;
+        const csrfHeader = req.headers.get(CSRF_HEADER_NAME);
+
+        if (!csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
+          return NextResponse.json(
+            { error: 'CSRF validation failed' },
+            { status: 403 }
+          );
+        }
       }
     }
   }

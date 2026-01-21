@@ -75,7 +75,7 @@ export const EmailChangeEmail = ({
             </Text>
 
             <Text style={text}>
-              If the button doesn't work, copy and paste this link into your browser:
+              If the button doesn&apos;t work, copy and paste this link into your browser:
             </Text>
 
             <Text style={linkText}>
@@ -88,10 +88,10 @@ export const EmailChangeEmail = ({
 
             {/* Security Notice */}
             <Section style={securitySection}>
-              <Text style={securityTitle}>Didn't request this change?</Text>
+              <Text style={securityTitle}>Didn&apos;t request this change?</Text>
               <Text style={securityText}>
-                If you didn't request to change your email address, please ignore this email.
-                Your current email ({currentEmail}) will remain unchanged. If you're concerned
+                If you didn&apos;t request to change your email address, please ignore this email.
+                Your current email ({currentEmail}) will remain unchanged. If you&apos;re concerned
                 about your account security, please change your password immediately and contact
                 our support team.
               </Text>

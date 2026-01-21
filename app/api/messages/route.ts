@@ -10,6 +10,16 @@ import { checkUsageLimit, trackUsage } from '@/lib/middleware/usage-check';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { withDynamicDataCache } from '@/lib/utils/cache-headers';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
+
+const isSafeHttpUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
 
 // Zod schemas for validation
 const GetMessagesQuerySchema = z.object({
@@ -21,7 +31,7 @@ const CreateMessageSchema = z.object({
   content: z.string().min(1, 'Message content is required').max(10000, 'Message content too long'),
   conversation_id: z.string().uuid('Invalid conversation ID format').nullable().optional().transform(v => v ?? null),
   parent_message_id: z.string().uuid('Invalid parent message ID format').optional(),
-  attachments: z.array(z.string().url('Invalid attachment URL')).optional(),
+  attachments: z.array(z.string().refine(isSafeHttpUrl, 'Invalid attachment URL')).optional(),
 });
 
 /**
@@ -73,7 +83,7 @@ export async function GET(req: NextRequest) {
     const { conversation_id: conversationId } = validationResult.data;
 
     // Get messages from service
-    const messages = await messagesService.getMessages(conversationId);
+    const messages = await messagesService.getMessages(conversationId, supabase);
 
     // Use shorter cache for real-time messaging data
     return withDynamicDataCache(
@@ -161,6 +171,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const sanitizedContent = sanitizePlainText(validationResult.data.content);
+    if (!sanitizedContent) {
+      return NextResponse.json(
+        { error: 'Message content is required' },
+        { status: 400 }
+      );
+    }
+
+    const sanitizedAttachments = validationResult.data.attachments
+      ? validationResult.data.attachments.map((url) => sanitizeUrl(url))
+      : undefined;
+
+    if (sanitizedAttachments && sanitizedAttachments.some((url) => !url)) {
+      return NextResponse.json(
+        { error: 'Invalid attachment URL' },
+        { status: 400 }
+      );
+    }
+
     const { space_id } = validationResult.data;
 
     // Verify user has access to this space
@@ -186,8 +215,10 @@ export async function POST(req: NextRequest) {
     // Create message using service with validated data
     const message = await messagesService.createMessage({
       ...validationResult.data,
+      content: sanitizedContent,
+      attachments: sanitizedAttachments,
       sender_id: user.id,
-    });
+    }, supabase);
 
     // Track message usage
     await trackUsage(user.id, 'messages_sent');

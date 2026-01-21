@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useSyncExternalStore, ReactNode } from 'react';
 
 interface ClientOnlyProps {
   children: ReactNode;
@@ -13,11 +13,7 @@ interface ClientOnlyProps {
  * or have different server/client initial states
  */
 export function ClientOnly({ children, fallback = null }: ClientOnlyProps) {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+  const hasMounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   // During SSR and before hydration, render fallback
   if (!hasMounted) {
@@ -26,4 +22,27 @@ export function ClientOnly({ children, fallback = null }: ClientOnlyProps) {
 
   // After hydration, render children
   return <>{children}</>;
+}
+
+let mounted = false;
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+const getSnapshot = () => mounted;
+const getServerSnapshot = () => false;
+
+if (typeof window !== 'undefined' && !mounted) {
+  const notify = () => {
+    mounted = true;
+    listeners.forEach((listener) => listener());
+  };
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(notify);
+  } else {
+    Promise.resolve().then(notify);
+  }
 }

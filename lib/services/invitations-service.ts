@@ -4,6 +4,13 @@ import { randomBytes } from 'crypto';
 import type { SpaceInvitation, CreateInvitationInput, InvitationStatus } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
+type InvitationWithSpace = SpaceInvitation & {
+  spaces?: {
+    id: string;
+    name: string;
+  } | null;
+};
+
 // =============================================
 // VALIDATION SCHEMAS
 // =============================================
@@ -122,7 +129,7 @@ export async function createInvitation(
  */
 export async function getInvitationByToken(
   token: string
-): Promise<{ success: true; data: any } | { success: false; error: string }> {
+): Promise<{ success: true; data: InvitationWithSpace } | { success: false; error: string }> {
   try {
     const supabase = await createClient();
 
@@ -335,7 +342,7 @@ export async function cancelInvitation(
 export async function getPendingInvitations(
   spaceId: string,
   userId: string
-): Promise<{ success: true; data: any[] } | { success: false; error: string }> {
+): Promise<{ success: true; data: SpaceInvitation[] } | { success: false; error: string }> {
   try {
     const supabase = await createClient();
 
@@ -369,15 +376,16 @@ export async function getPendingInvitations(
 
     // Filter out expired invitations
     const now = new Date();
-    const activeInvitations = data.filter((inv: any) => new Date(inv.expires_at) > now);
+    const invitations = (data ?? []) as SpaceInvitation[];
+    const activeInvitations = invitations.filter((inv) => new Date(inv.expires_at) > now);
 
     // Update expired invitations
-    const expiredInvitations = data.filter((inv: any) => new Date(inv.expires_at) <= now);
+    const expiredInvitations = invitations.filter((inv) => new Date(inv.expires_at) <= now);
     if (expiredInvitations.length > 0) {
       await supabase
         .from('space_invitations')
         .update({ status: 'expired' })
-        .in('id', expiredInvitations.map((inv: any) => inv.id));
+        .in('id', expiredInvitations.map((inv) => inv.id));
     }
 
     return { success: true, data: activeInvitations };

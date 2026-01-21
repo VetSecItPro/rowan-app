@@ -44,7 +44,7 @@ export const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps
 
 CommandInput.displayName = 'CommandInput';
 
-interface CommandListProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CommandListProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const CommandList = React.forwardRef<HTMLDivElement, CommandListProps>(
   ({ className = '', children, ...props }, ref) => {
@@ -62,7 +62,7 @@ export const CommandList = React.forwardRef<HTMLDivElement, CommandListProps>(
 
 CommandList.displayName = 'CommandList';
 
-interface CommandEmptyProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CommandEmptyProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
   ({ className = '', children, ...props }, ref) => {
@@ -135,7 +135,7 @@ export const CommandItem = React.forwardRef<HTMLDivElement, CommandItemProps>(
 
 CommandItem.displayName = 'CommandItem';
 
-interface CommandSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CommandSeparatorProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>(
   ({ className = '', ...props }, ref) => {

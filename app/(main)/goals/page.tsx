@@ -4,15 +4,13 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, GitBranch, X, BarChart3, Calendar, MoreHorizontal, ChevronDown } from 'lucide-react';
+import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, X } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
-import Link from 'next/link';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
-import { GoalCard } from '@/components/goals/GoalCard';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import dynamicImport from 'next/dynamic';
@@ -60,20 +58,47 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
 
-const BadgesWidget = dynamicImport(() => import('@/components/goals/badges/BadgesWidget'), {
-  loading: () => <div className="p-4 flex items-center justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div></div>
-});
-
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { usePresence } from '@/lib/hooks/usePresence';
-import { OnlineUsersIndicator, PresenceIndicator } from '@/components/shared/PresenceIndicator';
+import { OnlineUsersIndicator } from '@/components/shared/PresenceIndicator';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
+type SpaceMemberRow = {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url?: string | null;
+  } | null;
+};
+
+type Habit = {
+  id: string;
+  title: string;
+  description?: string;
+  category?: string;
+  frequency_type: 'daily' | 'weekly' | 'monthly';
+  frequency_value?: number;
+  target_count?: number;
+  space_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type CreateHabitInput = {
+  space_id: string;
+  title: string;
+  description?: string;
+  category?: string;
+  frequency_type: 'daily' | 'weekly' | 'monthly';
+  frequency_value?: number;
+  target_count?: number;
+};
 
 export default function GoalsPage() {
   const { currentSpace, user } = useAuthWithSpaces();
@@ -94,7 +119,7 @@ export default function GoalsPage() {
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
-  const [editingHabit, setEditingHabit] = useState<any | null>(null);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplate | null>(null);
   const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
   const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
@@ -107,7 +132,7 @@ export default function GoalsPage() {
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
 
   // Presence tracking for collaborative editing
-  const { onlineUsers, getUsersViewingGoal, updateViewingGoal } = usePresence({
+  const { onlineUsers, getUsersViewingGoal } = usePresence({
     channelName: 'goals-presence',
     spaceId: spaceId || '',
     userId: user?.id || '',
@@ -312,9 +337,13 @@ export default function GoalsPage() {
 
       // Map space members data
       if (membersResult.data) {
-        const members = membersResult.data
-          .map((m: any) => m.user)
-          .filter((u: any) => u != null);
+        const members = (membersResult.data as SpaceMemberRow[])
+          .map((member) => member.user)
+          .filter((member): member is NonNullable<SpaceMemberRow['user']> => member != null)
+          .map(member => ({
+            ...member,
+            avatar_url: member.avatar_url ?? undefined
+          }));
         setSpaceMembers(members);
       }
 
@@ -382,7 +411,7 @@ export default function GoalsPage() {
     }
   }, [editingMilestone, loadData]);
 
-  const handleCreateHabit = useCallback(async (habitData: any) => {
+  const handleCreateHabit = useCallback(async (habitData: CreateHabitInput) => {
     try {
       // TODO: Implement habit creation service when backend is ready
       logger.info('Creating habit:', { component: 'page', data: habitData });
@@ -394,7 +423,7 @@ export default function GoalsPage() {
       logger.error('Failed to save habit:', error, { component: 'page', action: 'execution' });
       toast.error('Failed to create habit. Please try again.');
     }
-  }, [editingHabit]);
+  }, []);
 
   const handleCreateCheckIn = useCallback(async (checkInData: CreateCheckInInput) => {
     try {

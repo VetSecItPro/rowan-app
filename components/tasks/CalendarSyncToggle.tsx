@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { taskCalendarService } from '@/lib/services/task-calendar-service';
 import { useRouter } from 'next/navigation';
@@ -18,19 +18,19 @@ interface SyncStatus {
   error?: string;
 }
 
+interface CalendarPreferences {
+  auto_sync_tasks: boolean;
+  calendar_task_filter?: string;
+}
+
 export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) {
   const router = useRouter();
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({ isSynced: false });
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [preferences, setPreferences] = useState<any>(null);
+  const [preferences, setPreferences] = useState<CalendarPreferences | null>(null);
 
-  useEffect(() => {
-    loadSyncStatus();
-    loadPreferences();
-  }, [taskId, userId]);
-
-  async function loadSyncStatus() {
+  const loadSyncStatus = useCallback(async () => {
     try {
       // getTaskSyncStatus doesn't exist, so we'll just initialize with default
       setSyncStatus({ isSynced: false });
@@ -39,16 +39,21 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function loadPreferences() {
+  const loadPreferences = useCallback(async () => {
     try {
       const prefs = await taskCalendarService.getCalendarPreferences(userId);
       setPreferences(prefs);
     } catch (error) {
       logger.error('Error loading preferences:', error, { component: 'CalendarSyncToggle', action: 'component_action' });
     }
-  }
+  }, [userId]);
+
+  useEffect(() => {
+    loadSyncStatus();
+    loadPreferences();
+  }, [taskId, userId, loadSyncStatus, loadPreferences]);
 
   async function handleToggleSync() {
     setSyncing(true);
@@ -68,11 +73,12 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
           });
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       logger.error('Error toggling sync:', error, { component: 'CalendarSyncToggle', action: 'component_action' });
+      const message = error instanceof Error ? error.message : 'Failed to sync';
       setSyncStatus(prev => ({
         ...prev,
-        error: error.message || 'Failed to sync',
+        error: message,
       }));
     } finally {
       setSyncing(false);
@@ -199,7 +205,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
       {/* Info */}
       <div className="p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
         <p className="text-xs text-blue-300">
-          <strong>Note:</strong> Calendar sync uses your task's due date and estimated duration.
+          <strong>Note:</strong> Calendar sync uses your task&apos;s due date and estimated duration.
           Changes to the task will automatically update the calendar event.
         </p>
       </div>

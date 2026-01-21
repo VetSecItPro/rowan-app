@@ -27,6 +27,15 @@ interface NewGoalModalProps {
   spaceMembers?: SpaceMember[];
 }
 
+const CATEGORY_OPTIONS = [
+  { value: '💰 Financial', label: '💰 Financial' },
+  { value: '💪 Health & Fitness', label: '💪 Health & Fitness' },
+  { value: '💼 Career', label: '💼 Career' },
+  { value: '📚 Education', label: '📚 Education' },
+  { value: '🌱 Personal Development', label: '🌱 Personal Development' },
+  { value: '📌 Other', label: '📌 Other' },
+];
+
 export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [], selectedTemplate, spaceMembers = [] }: NewGoalModalProps) {
   const [formData, setFormData] = useState<CreateGoalInput>({
     space_id: spaceId,
@@ -42,19 +51,11 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
   const [customCategory, setCustomCategory] = useState<string>('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const categoryOptions = [
-    { value: '💰 Financial', label: '💰 Financial' },
-    { value: '💪 Health & Fitness', label: '💪 Health & Fitness' },
-    { value: '💼 Career', label: '💼 Career' },
-    { value: '📚 Education', label: '📚 Education' },
-    { value: '🌱 Personal Development', label: '🌱 Personal Development' },
-    { value: '📌 Other', label: '📌 Other' },
-  ];
-
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editGoal) {
       const category = editGoal.category || '';
-      const isPresetCategory = categoryOptions.some(option => option.value === category);
+      const isPresetCategory = CATEGORY_OPTIONS.some(option => option.value === category);
 
       setFormData({
         space_id: spaceId,
@@ -77,7 +78,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
     } else if (selectedTemplate) {
       // Prefill from template
       const templateCategory = selectedTemplate.category || '';
-      const isPresetCategory = categoryOptions.some(option => option.value === templateCategory);
+      const isPresetCategory = CATEGORY_OPTIONS.some(option => option.value === templateCategory);
 
       // Calculate target date if template has target_days
       const targetDate = selectedTemplate.target_days
@@ -118,6 +119,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
     }
     setShowEmojiPicker(false);
   }, [editGoal, selectedTemplate, spaceId, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
@@ -269,7 +271,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
               <Dropdown
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                options={categoryOptions}
+                options={CATEGORY_OPTIONS}
                 placeholder="Select a category"
               />
             </div>

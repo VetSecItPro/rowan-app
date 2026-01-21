@@ -4,6 +4,13 @@
 import { UserPrivacyPreferences } from '../types/privacy';
 import { logger } from '@/lib/logger';
 
+type AnalyticsWindow = Window & {
+  gtag?: (...args: unknown[]) => void;
+  dataLayer?: unknown[];
+  fbq?: (...args: unknown[]) => void;
+  va?: (...args: unknown[]) => void;
+};
+
 export interface CookiePreferences {
   necessary: boolean; // Always true, cannot be disabled
   analytics: boolean;
@@ -289,11 +296,14 @@ export function toggleThirdPartyScripts(preferences: CookiePreferences): void {
 function enableGoogleAnalytics(): void {
   if (typeof window === 'undefined' || !process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) return;
 
-  (window as any).gtag = (window as any).gtag || function() {
-    ((window as any).dataLayer = (window as any).dataLayer || []).push(arguments);
-  };
+  const analyticsWindow = window as AnalyticsWindow;
+  analyticsWindow.gtag = analyticsWindow.gtag || ((...args: unknown[]) => {
+    const dataLayer = analyticsWindow.dataLayer || [];
+    dataLayer.push(args);
+    analyticsWindow.dataLayer = dataLayer;
+  });
 
-  (window as any).gtag('consent', 'update', {
+  analyticsWindow.gtag('consent', 'update', {
     analytics_storage: 'granted',
     ad_storage: 'denied',
   });
@@ -302,8 +312,9 @@ function enableGoogleAnalytics(): void {
 function disableGoogleAnalytics(): void {
   if (typeof window === 'undefined') return;
 
-  (window as any).gtag = (window as any).gtag || function() {};
-  (window as any).gtag('consent', 'update', {
+  const analyticsWindow = window as AnalyticsWindow;
+  analyticsWindow.gtag = analyticsWindow.gtag || (() => {});
+  analyticsWindow.gtag('consent', 'update', {
     analytics_storage: 'denied',
     ad_storage: 'denied',
   });
@@ -313,7 +324,7 @@ function disableGoogleAnalytics(): void {
 function enableFacebookPixel(): void {
   if (typeof window === 'undefined' || !process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID) return;
 
-  const fbq = (window as any).fbq;
+  const fbq = (window as AnalyticsWindow).fbq;
   if (fbq) {
     fbq('consent', 'grant');
   }
@@ -322,7 +333,7 @@ function enableFacebookPixel(): void {
 function disableFacebookPixel(): void {
   if (typeof window === 'undefined') return;
 
-  const fbq = (window as any).fbq;
+  const fbq = (window as AnalyticsWindow).fbq;
   if (fbq) {
     fbq('consent', 'revoke');
   }
@@ -332,7 +343,7 @@ function disableFacebookPixel(): void {
 function enableVercelAnalytics(): void {
   if (typeof window === 'undefined') return;
 
-  const va = (window as any).va;
+  const va = (window as AnalyticsWindow).va;
   if (va) {
     va('track', 'consent-granted');
   }
@@ -341,7 +352,7 @@ function enableVercelAnalytics(): void {
 function disableVercelAnalytics(): void {
   if (typeof window === 'undefined') return;
 
-  const va = (window as any).va;
+  const va = (window as AnalyticsWindow).va;
   if (va) {
     va('track', 'consent-revoked');
   }

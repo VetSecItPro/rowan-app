@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
@@ -19,11 +19,11 @@ interface UsePresenceOptions {
 
 export function usePresence({ channelName, spaceId, userId, userEmail }: UsePresenceOptions) {
   const [presenceState, setPresenceState] = useState<Record<string, PresenceUser[]>>({});
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   useEffect(() => {
     if (!spaceId || !userId) {
-      setChannel(null);
+      channelRef.current = null;
       return;
     }
 
@@ -61,26 +61,27 @@ export function usePresence({ channelName, spaceId, userId, userEmail }: UsePres
         }
       });
 
-    setChannel(presenceChannel);
+    channelRef.current = presenceChannel;
 
     // Cleanup
     return () => {
       presenceChannel.untrack();
       supabase.removeChannel(presenceChannel);
+      channelRef.current = null;
     };
   }, [channelName, spaceId, userId, userEmail]);
 
   // Update what goal the user is viewing
   const updateViewingGoal = useCallback(async (goalId: string | null) => {
-    if (channel) {
-      await channel.track({
+    if (channelRef.current) {
+      await channelRef.current.track({
         user_id: userId,
         user_email: userEmail,
         viewing_goal: goalId || undefined,
         online_at: new Date().toISOString(),
       });
     }
-  }, [channel, userId, userEmail]);
+  }, [userId, userEmail]);
 
   // Get all online users except current user
   const onlineUsers = Object.values(presenceState)

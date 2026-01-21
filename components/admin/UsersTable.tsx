@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { User, Shield, Eye, Ban, Trash2, UserX, X, AlertTriangle } from 'lucide-react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface User {
   id: string;
@@ -54,7 +55,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
     setActionError(null);
 
     try {
-      const response = await fetch(`/api/admin/users/${selectedUser.id}/${action}`, {
+      const response = await csrfFetch(`/api/admin/users/${selectedUser.id}/${action}`, {
         method: 'POST',
       });
 

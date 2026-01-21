@@ -87,7 +87,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch user details for each member
-    const userIds = members.map((m: any) => m.user_id);
+    type SpaceMemberRow = { user_id: string; role: string; joined_at: string };
+    const memberRows = (members ?? []) as SpaceMemberRow[];
+    const userIds = memberRows.map((m) => m.user_id);
     const { data: users, error: usersError } = await supabase
       .from('users')
       .select('id, name, email, color_theme')
@@ -105,7 +107,7 @@ export async function GET(req: NextRequest) {
 
     // Transform data for frontend
     // Use user_id as the identifier since space_members has no id column
-    const transformedMembers = members.map((member: { user_id: string; role: string; joined_at: string }) => {
+    const transformedMembers = memberRows.map((member) => {
       const memberDetails = userMap.get(member.user_id);
       return {
         id: member.user_id, // Use user_id as identifier for frontend compatibility

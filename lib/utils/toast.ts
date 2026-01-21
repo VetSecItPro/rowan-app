@@ -3,7 +3,7 @@
  * Wrapper around Sonner toast library for consistent toast notifications
  */
 
-import { toast, type ExternalToast } from 'sonner';
+import { toast } from 'sonner';
 
 interface ToastAction {
   label: string;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +41,6 @@ export function ReceiptScanner({
   });
   const [extractedData, setExtractedData] = useState<ExtractedReceiptData | null>(null);
   const [suggestion, setSuggestion] = useState<ExpenseSuggestion | null>(null);
-  const [receiptId, setReceiptId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [confidenceScore, setConfidenceScore] = useState<number>(0);
@@ -52,7 +52,6 @@ export function ReceiptScanner({
     setProcessingState({ status: 'idle', progress: 0, message: '' });
     setExtractedData(null);
     setSuggestion(null);
-    setReceiptId(null);
     setError(null);
     setPreviewImage(null);
     setConfidenceScore(0);
@@ -113,7 +112,6 @@ export function ReceiptScanner({
 
         setExtractedData(result.extracted_data);
         setSuggestion(result.suggestions);
-        setReceiptId(result.receipt_id || null);
         setConfidenceScore(result.confidence_score || 0);
 
         // Notify parent components
@@ -287,11 +285,13 @@ export function ReceiptScanner({
               {previewImage && (
                 <div>
                   <h4 className="font-medium mb-3">Receipt Image</h4>
-                  <div className="relative">
-                    <img
+                  <div className="relative w-full h-64">
+                    <Image
                       src={previewImage}
                       alt="Receipt preview"
-                      className="w-full h-64 object-cover rounded-lg border"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover rounded-lg border"
                     />
                     <Button
                       variant="secondary"

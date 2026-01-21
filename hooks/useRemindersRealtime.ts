@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Reminder } from '@/lib/services/reminders-service';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
@@ -33,7 +33,7 @@ function reminderPassesFilters(reminder: Reminder, filters?: UseRemindersRealtim
 }
 
 // Debounce helper for state updates
-function debounce<T extends (...args: any[]) => void>(func: T, delay: number): T {
+function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): T {
   let timeoutId: NodeJS.Timeout;
   return ((...args: Parameters<T>) => {
     clearTimeout(timeoutId);
@@ -61,12 +61,7 @@ export function useRemindersRealtime({
   }>({ inserts: [], updates: [], deletes: [] });
 
   // Memoized filters to prevent unnecessary re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters?.status?.join(','),
-    filters?.priority?.join(','),
-    filters?.category?.join(','),
-    filters?.assignedTo
-  ]);
+  const memoizedFilters = useMemo(() => filters, [filters]);
 
   // Memoized filter function to avoid recalculation
   const reminderFilter = useCallback((reminder: Reminder) => reminderPassesFilters(reminder, memoizedFilters), [memoizedFilters]);
@@ -148,8 +143,6 @@ export function useRemindersRealtime({
     }
 
     const supabase = createClient();
-    let channel: RealtimeChannel;
-    let accessCheckInterval: NodeJS.Timeout;
 
     // Verify user still has access to this space
     async function verifyAccess(): Promise<boolean> {
@@ -245,96 +238,93 @@ export function useRemindersRealtime({
       }
     }
 
-    function setupRealtimeSubscription() {
-      channel = supabase
-        .channel(`reminders:${spaceId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'reminders',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Reminder>) => {
-            const newReminder = payload.new as Reminder;
+    const channel = supabase
+      .channel(`reminders:${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'reminders',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Reminder>) => {
+          const newReminder = payload.new as Reminder;
 
-            if (reminderFilter(newReminder)) {
-              // Add to batch queue instead of immediate state update
-              updateQueueRef.current.inserts.push(newReminder);
-              debouncedBatchUpdate();
-              onReminderAdded?.(newReminder);
-
-              // Toast notification for new reminders
-              toast.success('New reminder added', {
-                description: newReminder.title,
-              });
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'reminders',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Reminder>) => {
-            const updatedReminder = payload.new as Reminder;
-
-            if (reminderFilter(updatedReminder)) {
-              // Add to batch queue for updates
-              updateQueueRef.current.updates.push(updatedReminder);
-              debouncedBatchUpdate();
-              onReminderUpdated?.(updatedReminder);
-
-              // Toast notification for status changes
-              if (payload.old && (payload.old as Reminder).status !== updatedReminder.status) {
-                if (updatedReminder.status === 'completed') {
-                  toast.success('Reminder completed', {
-                    description: updatedReminder.title,
-                  });
-                } else if (updatedReminder.status === 'snoozed') {
-                  toast.info('Reminder snoozed', {
-                    description: updatedReminder.title,
-                  });
-                }
-              }
-            } else {
-              // Reminder no longer passes filters, add to deletes queue
-              updateQueueRef.current.deletes.push(updatedReminder.id);
-              debouncedBatchUpdate();
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'reminders',
-            filter: `space_id=eq.${spaceId}`,
-          },
-          (payload: RealtimePostgresChangesPayload<Reminder>) => {
-            const deletedReminderId = (payload.old as Reminder).id;
-            // Add to batch queue for deletes
-            updateQueueRef.current.deletes.push(deletedReminderId);
+          if (reminderFilter(newReminder)) {
+            // Add to batch queue instead of immediate state update
+            updateQueueRef.current.inserts.push(newReminder);
             debouncedBatchUpdate();
-            onReminderDeleted?.(deletedReminderId);
+            onReminderAdded?.(newReminder);
 
-            // Toast notification for deletions
-            toast.info('Reminder deleted');
+            // Toast notification for new reminders
+            toast.success('New reminder added', {
+              description: newReminder.title,
+            });
           }
-        )
-        .subscribe();
-    }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'reminders',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Reminder>) => {
+          const updatedReminder = payload.new as Reminder;
+
+          if (reminderFilter(updatedReminder)) {
+            // Add to batch queue for updates
+            updateQueueRef.current.updates.push(updatedReminder);
+            debouncedBatchUpdate();
+            onReminderUpdated?.(updatedReminder);
+
+            // Toast notification for status changes
+            if (payload.old && (payload.old as Reminder).status !== updatedReminder.status) {
+              if (updatedReminder.status === 'completed') {
+                toast.success('Reminder completed', {
+                  description: updatedReminder.title,
+                });
+              } else if (updatedReminder.status === 'snoozed') {
+                toast.info('Reminder snoozed', {
+                  description: updatedReminder.title,
+                });
+              }
+            }
+          } else {
+            // Reminder no longer passes filters, add to deletes queue
+            updateQueueRef.current.deletes.push(updatedReminder.id);
+            debouncedBatchUpdate();
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'reminders',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        (payload: RealtimePostgresChangesPayload<Reminder>) => {
+          const deletedReminderId = (payload.old as Reminder).id;
+          // Add to batch queue for deletes
+          updateQueueRef.current.deletes.push(deletedReminderId);
+          debouncedBatchUpdate();
+          onReminderDeleted?.(deletedReminderId);
+
+          // Toast notification for deletions
+          toast.info('Reminder deleted');
+        }
+      )
+      .subscribe();
 
     loadReminders();
-    setupRealtimeSubscription();
 
     // Periodic access verification (every 15 minutes)
-    accessCheckInterval = setInterval(async () => {
+    const accessCheckInterval = setInterval(async () => {
       const hasAccess = await verifyAccess();
 
       if (!hasAccess) {

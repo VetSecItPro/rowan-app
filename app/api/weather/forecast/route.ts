@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
           throw new Error(`Weather API error: ${response.status} ${response.statusText}`);
         }
 
-        const data = await response.json();
+        const data = await response.json() as OpenMeteoResponse;
 
         // Process the data and return the formatted forecast
         return processWeatherData(data, date);
@@ -101,10 +101,33 @@ export async function GET(request: NextRequest) {
   }
 }
 
+type OpenMeteoDaily = {
+  time: string[];
+  weathercode: number[];
+  temperature_2m_max: number[];
+  temperature_2m_min: number[];
+  apparent_temperature_max: number[];
+  apparent_temperature_min: number[];
+  windspeed_10m_max: number[];
+};
+
+type OpenMeteoCurrent = {
+  weathercode: number;
+  temperature_2m: number;
+  apparent_temperature: number;
+  relative_humidity_2m: number;
+  windspeed_10m: number;
+};
+
+type OpenMeteoResponse = {
+  daily: OpenMeteoDaily;
+  current: OpenMeteoCurrent;
+};
+
 /**
  * Process weather data and return formatted forecast
  */
-function processWeatherData(data: any, date?: string | null) {
+function processWeatherData(data: OpenMeteoResponse, date?: string | null) {
   // If a specific date is requested, find it in daily forecast
   if (date) {
     const dateIndex = data.daily.time.indexOf(date);

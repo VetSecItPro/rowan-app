@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { Calendar, RefreshCw, Unlink, AlertCircle, CheckCircle, Clock, Loader2, X, Mail, Key, ExternalLink, Link, Upload, FileText } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface CalendarConnection {
   id: string;
@@ -265,7 +266,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
       setShowIcsModal(false);
 
       try {
-        const response = await fetch('/api/calendar/import/ics-file', {
+        const response = await csrfFetch('/api/calendar/import/ics-file', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -315,7 +316,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
     setShowIcsModal(false);
 
     try {
-      const response = await fetch('/api/calendar/connect/ics', {
+      const response = await csrfFetch('/api/calendar/connect/ics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -367,7 +368,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
     setShowCoziModal(false);
 
     try {
-      const response = await fetch('/api/calendar/connect/cozi', {
+      const response = await csrfFetch('/api/calendar/connect/cozi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -423,7 +424,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
     setShowAppleModal(false);
 
     try {
-      const response = await fetch('/api/calendar/connect/apple', {
+      const response = await csrfFetch('/api/calendar/connect/apple', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -485,7 +486,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
     setShowEmailModal(false);
 
     try {
-      const response = await fetch(`/api/calendar/connect/${selectedProvider}`, {
+      const response = await csrfFetch(`/api/calendar/connect/${selectedProvider}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -519,7 +520,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
     setError(null);
 
     try {
-      const response = await fetch('/api/calendar/sync', {
+      const response = await csrfFetch('/api/calendar/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -553,7 +554,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
     setError(null);
 
     try {
-      const response = await fetch('/api/calendar/disconnect', {
+      const response = await csrfFetch('/api/calendar/disconnect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

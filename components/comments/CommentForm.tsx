@@ -34,7 +34,6 @@ export default function CommentForm({
   const [mentions, setMentions] = useState<SpaceMember[]>([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
-  const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 });
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -48,7 +47,7 @@ export default function CommentForm({
         .eq('space_id', spaceId);
 
       if (data) {
-        setMentions(data as any);
+        setMentions(data as SpaceMember[]);
       }
     };
 
@@ -74,14 +73,6 @@ export default function CommentForm({
         setShowMentions(true);
         setSelectedMentionIndex(0);
 
-        // Calculate position for mention dropdown
-        if (textareaRef.current) {
-          const rect = textareaRef.current.getBoundingClientRect();
-          setMentionPosition({
-            top: rect.bottom,
-            left: rect.left,
-          });
-        }
       } else {
         setShowMentions(false);
       }

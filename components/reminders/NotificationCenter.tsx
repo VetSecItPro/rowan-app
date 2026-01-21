@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Bell, Check, Trash2, X } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Bell, Check, X } from 'lucide-react';
 import { reminderNotificationsService, ReminderNotification } from '@/lib/services/reminder-notifications-service';
 import { formatRelativeTime } from '@/lib/utils/date-utils';
 import { useRouter } from 'next/navigation';
@@ -18,10 +18,10 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch notifications
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true);
       const data = await reminderNotificationsService.getUserNotifications(userId, {
@@ -36,12 +36,12 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   // Initial fetch
   useEffect(() => {
     fetchNotifications();
-  }, [userId]);
+  }, [fetchNotifications]);
 
   // Real-time subscription
   useEffect(() => {
@@ -65,7 +65,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [fetchNotifications, supabase, userId]);
 
   // Mark as read
   const handleMarkAsRead = async (notificationId: string) => {
@@ -160,7 +160,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                     No notifications
                   </p>
                   <p className="text-sm text-gray-500">
-                    We'll notify you when reminders are due
+                    We&apos;ll notify you when reminders are due
                   </p>
                 </div>
               ) : (
@@ -209,8 +209,6 @@ interface NotificationItemProps {
 }
 
 function NotificationItem({ notification, onClick, onMarkAsRead }: NotificationItemProps) {
-  const iconName = reminderNotificationsService.getNotificationIcon(notification.type);
-  const colorClasses = reminderNotificationsService.getNotificationColor(notification.type);
   const message = reminderNotificationsService.formatNotificationMessage(notification);
 
   return (

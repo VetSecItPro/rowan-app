@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { X, Sparkles, Trophy, TrendingUp, Target } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -25,7 +25,7 @@ export default function MilestoneCelebration({
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Enhanced confetti celebration functions
-  const triggerConfettiCelebration = () => {
+  const triggerConfettiCelebration = useCallback(() => {
     if (percentageReached === 100) {
       // Epic celebration for 100% completion
       const end = Date.now() + 3000;
@@ -104,7 +104,15 @@ export default function MilestoneCelebration({
         gravity: 0.8,
       });
     }
-  };
+  }, [percentageReached]);
+
+  const handleClose = useCallback(() => {
+    setIsAnimating(false);
+    setTimeout(() => {
+      setIsVisible(false);
+      onClose();
+    }, 300); // Wait for exit animation
+  }, [onClose]);
 
   useEffect(() => {
     // Trigger entrance animation
@@ -125,15 +133,7 @@ export default function MilestoneCelebration({
     return () => {
       clearTimeout(closeTimer);
     };
-  }, [autoCloseDelay, percentageReached]);
-
-  const handleClose = () => {
-    setIsAnimating(false);
-    setTimeout(() => {
-      setIsVisible(false);
-      onClose();
-    }, 300); // Wait for exit animation
-  };
+  }, [autoCloseDelay, handleClose, triggerConfettiCelebration]);
 
   if (!isVisible) return null;
 

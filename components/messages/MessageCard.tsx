@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, Check, CheckCheck, MoreVertical, MessageSquare, Pin, Forward, Edit3, Trash2, Ban } from 'lucide-react';
+import { Check, CheckCheck, Pin, Forward, Edit3, Trash2, Ban } from 'lucide-react';
 import { MessageWithAttachments, MessageWithReplies, MessageReactionSummary, messagesService } from '@/lib/services/messages-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState, useEffect } from 'react';
@@ -8,16 +8,6 @@ import { AttachmentPreview } from './AttachmentPreview';
 import { ReactionPicker } from './ReactionPicker';
 import { MentionHighlight } from './MentionHighlight';
 import { logger } from '@/lib/logger';
-// Simple text sanitization to prevent XSS (avoid DOMPurify during build)
-const stripTags = (str: string) => str.replace(/<[^>]*>/g, '').trim();
-
-// Safe text rendering with basic formatting
-const ReactMarkdown = ({ children }: { children: string }) => {
-  // Sanitize the content by stripping HTML tags and replace newlines with spaces
-  const sanitizedContent = stripTags(children).replace(/\n/g, ' ');
-
-  return <span>{sanitizedContent}</span>;
-};
 
 interface MessageCardProps {
   message: MessageWithAttachments | MessageWithReplies;
@@ -39,26 +29,15 @@ export function MessageCard({
   message,
   onEdit,
   onDelete,
-  onMarkRead,
   onTogglePin,
   onForward,
   isOwn = false,
   currentUserId,
-  partnerName = 'Partner',
-  partnerColor = '#34D399', // Default green color
-  compact = false,
-  onReply,
-  showReplyButton = true
+  compact = false
 }: MessageCardProps) {
   const [reactions, setReactions] = useState<MessageReactionSummary[]>([]);
   const [loadingReaction, setLoadingReaction] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Mock user color (in real app, this would come from user profile)
-  const userColor = '#3B82F6'; // Blue for current user
-
-  const senderColor = isOwn ? userColor : partnerColor;
-  const senderName = isOwn ? 'You' : partnerName;
 
   // Load reactions (only for real messages, not temporary ones)
   useEffect(() => {
@@ -95,23 +74,6 @@ export function MessageCard({
       setLoadingReaction(false);
     }
   };
-
-  // Helper function to get color classes based on sender color
-  const getColorClasses = (color: string) => {
-    if (isOwn) {
-      return {
-        textColor: 'text-blue-400',
-        borderColor: 'border-blue-500',
-      };
-    } else {
-      return {
-        textColor: 'text-green-400',
-        borderColor: 'border-green-500',
-      };
-    }
-  };
-
-  const colorClasses = getColorClasses(senderColor);
 
   // Check if message was deleted for everyone
   const isDeleted = message.deleted_for_everyone || message.deleted_at;

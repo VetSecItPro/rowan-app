@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   Plus,
   Link,
-  GitBranch,
   CheckCircle2,
   Clock,
   Shield,
@@ -86,14 +85,7 @@ export function DependenciesModal({
   const [unlockDelay, setUnlockDelay] = useState(0);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadDependencies();
-      loadAvailableGoals();
-    }
-  }, [isOpen, goal.id]);
-
-  const loadDependencies = async () => {
+  const loadDependencies = useCallback(async () => {
     try {
       setLoading(true);
       const deps = await goalDependenciesService.getGoalDependencies(goal.id);
@@ -104,16 +96,23 @@ export function DependenciesModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [goal.id]);
 
-  const loadAvailableGoals = async () => {
+  const loadAvailableGoals = useCallback(async () => {
     try {
       const goals = await goalDependenciesService.getAvailableGoalsForDependency(spaceId, goal.id);
       setAvailableGoals(goals);
     } catch (err) {
       logger.error('Failed to load available goals:', err, { component: 'DependenciesModal', action: 'component_action' });
     }
-  };
+  }, [goal.id, spaceId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadDependencies();
+      loadAvailableGoals();
+    }
+  }, [isOpen, loadDependencies, loadAvailableGoals]);
 
   const handleAddDependency = async () => {
     if (!selectedGoalId) return;
@@ -139,9 +138,10 @@ export function DependenciesModal({
       setShowAddForm(false);
       resetForm();
       onRefresh?.();
-    } catch (err: any) {
+    } catch (err) {
       logger.error('Failed to create dependency:', err, { component: 'DependenciesModal', action: 'component_action' });
-      setError(err.message || 'Failed to create dependency');
+      const message = err instanceof Error ? err.message : 'Failed to create dependency';
+      setError(message);
     } finally {
       setSaving(false);
     }

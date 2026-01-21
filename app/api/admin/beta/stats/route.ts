@@ -11,6 +11,20 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+type RecentActivityRecord = {
+  email?: string | null;
+  access_granted?: boolean;
+  created_at?: string | null;
+  approved_at?: string | null;
+  user_id?: string | null;
+  notes?: string | null;
+};
+
+type DailyAnalyticsRecord = {
+  requests_count?: number;
+  signups_count?: number;
+};
+
 // Cache key for beta stats
 const BETA_STATS_CACHE_KEY = 'beta:stats';
 
@@ -169,7 +183,7 @@ export async function GET(req: NextRequest) {
 
         // Extract daily analytics
         const dailyAnalytics = dailyAnalyticsResult.status === 'fulfilled' && dailyAnalyticsResult.value.data
-          ? dailyAnalyticsResult.value.data
+          ? (dailyAnalyticsResult.value.data as DailyAnalyticsRecord[])
           : [];
 
         // Process recent activity
@@ -181,34 +195,35 @@ export async function GET(req: NextRequest) {
         }> = [];
 
         if (recentActivityResult.status === 'fulfilled' && recentActivityResult.value.data) {
-          recentActivity = recentActivityResult.value.data.map((record: any) => {
-            const isCodeGenerated = record.notes?.includes('Auto-generated code');
-            if (record.user_id) {
+          recentActivity = recentActivityResult.value.data.map((record) => {
+            const activityRecord = record as RecentActivityRecord;
+            const isCodeGenerated = activityRecord.notes?.includes('Auto-generated code');
+            if (activityRecord.user_id) {
               return {
                 type: 'signup' as const,
-                email: record.email || 'Unknown',
-                timestamp: record.approved_at || record.created_at,
+                email: activityRecord.email || 'Unknown',
+                timestamp: activityRecord.approved_at || activityRecord.created_at || '',
                 details: 'completed beta signup and created account',
               };
             } else if (isCodeGenerated) {
               return {
                 type: 'code_generated' as const,
-                email: record.email || 'Unknown',
-                timestamp: record.created_at,
+                email: activityRecord.email || 'Unknown',
+                timestamp: activityRecord.created_at || '',
                 details: 'requested and received invite code via email',
               };
-            } else if (record.access_granted) {
+            } else if (activityRecord.access_granted) {
               return {
                 type: 'approval' as const,
-                email: record.email || 'Unknown',
-                timestamp: record.approved_at || record.created_at,
+                email: activityRecord.email || 'Unknown',
+                timestamp: activityRecord.approved_at || activityRecord.created_at || '',
                 details: 'received invite code (awaiting signup)',
               };
             } else {
               return {
                 type: 'request' as const,
-                email: record.email || 'Unknown',
-                timestamp: record.created_at,
+                email: activityRecord.email || 'Unknown',
+                timestamp: activityRecord.created_at || '',
                 details: 'validation attempt (no invite sent)',
               };
             }
@@ -229,8 +244,8 @@ export async function GET(req: NextRequest) {
         const averageActivityScore = 7.5; // Mock data - replace with real calculation
 
         // Calculate weekly growth from daily analytics
-        const thisWeekRequests = dailyAnalytics.reduce((sum: number, day: any) => sum + (day.requests_count || 0), 0);
-        const thisWeekSignups = dailyAnalytics.reduce((sum: number, day: any) => sum + (day.signups_count || 0), 0);
+        const thisWeekRequests = dailyAnalytics.reduce((sum, day) => sum + (day.requests_count || 0), 0);
+        const thisWeekSignups = dailyAnalytics.reduce((sum, day) => sum + (day.signups_count || 0), 0);
 
         // Log any errors for debugging
         const allResults = [

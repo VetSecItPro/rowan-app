@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, spaceId);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get calendar events from service
-    const events = await calendarService.getEvents(spaceId);
+    const events = await calendarService.getEvents(spaceId, false, supabase);
 
     // Add cache headers for browser caching
     return withUserDataCache(
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, space_id);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       title: sanitizePlainText(title),
       description: description ? sanitizePlainText(description) : undefined,
       location: location ? sanitizePlainText(location) : undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

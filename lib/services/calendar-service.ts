@@ -1,12 +1,19 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
+import type { EnhancedRecurrencePattern } from './recurring-events-service';
 
 /**
  * Security: Default maximum limit for list queries to prevent unbounded data retrieval
  * This protects against DoS attacks and ensures predictable API response sizes
  */
 const DEFAULT_MAX_LIMIT = 500;
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
+type EventReminderConfig = Record<string, unknown>;
+type EventRecurrenceConfig = Record<string, unknown>;
 
 export interface CalendarEvent {
   id: string;
@@ -72,9 +79,9 @@ export interface EventTemplate {
   default_duration?: number; // minutes
   default_location?: string;
   default_attendees?: string[];
-  default_reminders?: any;
+  default_reminders?: EventReminderConfig;
   default_color?: string;
-  default_recurrence?: any;
+  default_recurrence?: EventRecurrenceConfig;
   use_count: number;
   last_used_at?: string;
   created_at: string;
@@ -90,14 +97,14 @@ export interface CreateTemplateInput {
   default_duration?: number;
   default_location?: string;
   default_attendees?: string[];
-  default_reminders?: any;
+  default_reminders?: EventReminderConfig;
   default_color?: string;
-  default_recurrence?: any;
+  default_recurrence?: EventRecurrenceConfig;
 }
 
 export const calendarService = {
-  async getEvents(spaceId: string, includeDeleted = false): Promise<CalendarEvent[]> {
-    const supabase = createClient();
+  async getEvents(spaceId: string, includeDeleted = false, supabaseClient?: SupabaseClient): Promise<CalendarEvent[]> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     let query = supabase
       .from('events')
@@ -118,8 +125,8 @@ export const calendarService = {
     return data || [];
   },
 
-  async getEventById(id: string): Promise<CalendarEvent | null> {
-    const supabase = createClient();
+  async getEventById(id: string, supabaseClient?: SupabaseClient): Promise<CalendarEvent | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error} = await supabase
       .from('events')
       .select('*')
@@ -130,8 +137,8 @@ export const calendarService = {
     return data;
   },
 
-  async createEvent(input: CreateEventInput): Promise<CalendarEvent> {
-    const supabase = createClient();
+  async createEvent(input: CreateEventInput, supabaseClient?: SupabaseClient): Promise<CalendarEvent> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('events')
       .insert([input])
@@ -142,8 +149,8 @@ export const calendarService = {
     return data;
   },
 
-  async updateEvent(id: string, updates: Partial<CreateEventInput>): Promise<CalendarEvent> {
-    const supabase = createClient();
+  async updateEvent(id: string, updates: Partial<CreateEventInput>, supabaseClient?: SupabaseClient): Promise<CalendarEvent> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('events')
       .update(updates)
@@ -155,8 +162,8 @@ export const calendarService = {
     return data;
   },
 
-  async deleteEvent(id: string, permanent = false): Promise<void> {
-    const supabase = createClient();
+  async deleteEvent(id: string, permanent = false, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     if (permanent) {
       // Permanent delete
@@ -654,7 +661,7 @@ export const calendarService = {
   /**
    * Check if an event is a recurring event occurrence (virtual event)
    */
-  isRecurringOccurrence(event: CalendarEvent): boolean {
+  isRecurringOccurrence(event: CalendarEvent): event is CalendarEvent & { series_id: string; occurrence_date: string } {
     return 'series_id' in event && 'occurrence_date' in event;
   },
 
@@ -666,8 +673,7 @@ export const calendarService = {
       return eventOrOccurrence; // Already a master event
     }
 
-    const occurrence = eventOrOccurrence as any;
-    return this.getEventById(occurrence.series_id);
+    return this.getEventById(eventOrOccurrence.series_id);
   },
 
   /**
@@ -725,7 +731,7 @@ export const calendarService = {
     /**
      * Convert enhanced pattern to simple format for storage
      */
-    async serializePattern(pattern: any) {
+    async serializePattern(pattern: EnhancedRecurrencePattern) {
       const { recurringEventsService } = await import('./recurring-events-service');
       return recurringEventsService.serializeToSimplePattern(pattern);
     }

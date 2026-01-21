@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   Database,
   Trash2,
   Archive,
-  Calendar,
   AlertTriangle,
   CheckCircle,
   Info,
@@ -19,8 +18,6 @@ import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 export default function BulkOperationsPage() {
   const { user, currentSpace } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
-  const router = useRouter();
-
   const [deleteStartDate, setDeleteStartDate] = useState('');
   const [deleteEndDate, setDeleteEndDate] = useState('');
   const [deleteCount, setDeleteCount] = useState<number | null>(null);
@@ -44,7 +41,7 @@ export default function BulkOperationsPage() {
 
     try {
       const response = await fetch(
-        `/api/bulk/delete-expenses?partnership_id=${spaceId}&start_date=${deleteStartDate}&end_date=${deleteEndDate}`
+        `/api/bulk/delete-expenses?space_id=${spaceId}&start_date=${deleteStartDate}&end_date=${deleteEndDate}`
       );
       const data = await response.json();
       setDeleteCount(data.count || 0);
@@ -68,11 +65,11 @@ export default function BulkOperationsPage() {
     setDeleteSuccess(false);
 
     try {
-      const response = await fetch('/api/bulk/delete-expenses', {
+      const response = await csrfFetch('/api/bulk/delete-expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          partnership_id: spaceId,
+          space_id: spaceId,
           options: {
             startDate: deleteStartDate,
             endDate: deleteEndDate,
@@ -116,11 +113,11 @@ export default function BulkOperationsPage() {
     setArchiveSuccess(false);
 
     try {
-      const response = await fetch('/api/bulk/archive-old-data', {
+      const response = await csrfFetch('/api/bulk/archive-old-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          partnership_id: spaceId,
+          space_id: spaceId,
           data_type: 'tasks',
           older_than_date: archiveDate,
         }),
@@ -220,7 +217,7 @@ export default function BulkOperationsPage() {
                   <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-yellow-200">
                     <p className="font-medium">Ready to delete {deleteCount} expenses</p>
-                    <p className="text-xs mt-1">This action cannot be undone. Make sure you've exported any data you want to keep.</p>
+                    <p className="text-xs mt-1">This action cannot be undone. Make sure you&apos;ve exported any data you want to keep.</p>
                   </div>
                 </div>
               </div>
@@ -299,7 +296,7 @@ export default function BulkOperationsPage() {
                 <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-200">
                   <p className="font-medium">About Archiving</p>
-                  <p className="text-xs mt-1">Archived tasks are still accessible but won't appear in your default task views. This helps keep your active task list focused while preserving historical data.</p>
+                  <p className="text-xs mt-1">Archived tasks are still accessible but won&apos;t appear in your default task views. This helps keep your active task list focused while preserving historical data.</p>
                 </div>
               </div>
             </div>

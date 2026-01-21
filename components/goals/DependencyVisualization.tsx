@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
-  ArrowRight,
   CheckCircle2,
   Clock,
   AlertCircle,
@@ -20,7 +19,7 @@ import {
   type DependencyTreeNode,
   type GoalDependencyStats
 } from '@/lib/services/goal-dependencies-service';
-import { goalsService, type Goal } from '@/lib/services/goals-service';
+import { type Goal } from '@/lib/services/goals-service';
 
 interface DependencyVisualizationProps {
   spaceId: string;
@@ -49,6 +48,49 @@ const DEPENDENCY_ICONS = {
   blocking: Ban
 };
 
+const calculateTreePositions = (nodes: GoalNode[]) => {
+  // Simple tree layout: arrange goals in levels based on dependency depth
+  const levels: GoalNode[][] = [];
+
+  // Calculate levels (goals with no dependencies are level 0)
+  nodes.forEach(node => {
+    node.level = node.dependencies.length === 0 ? 0 : 1;
+
+    if (!levels[node.level]) {
+      levels[node.level] = [];
+    }
+    levels[node.level].push(node);
+  });
+
+  // Position nodes in each level
+  levels.forEach((levelNodes, level) => {
+    levelNodes.forEach((node, index) => {
+      node.x = (index + 1) * (300 / (levelNodes.length + 1));
+      node.y = level * 150 + 50;
+    });
+  });
+};
+
+const calculateNetworkPositions = (nodes: GoalNode[]) => {
+  // Simple circular layout for network view
+  const radius = Math.min(200, nodes.length * 30);
+  const angleStep = (2 * Math.PI) / nodes.length;
+
+  nodes.forEach((node, index) => {
+    const angle = index * angleStep;
+    node.x = 250 + radius * Math.cos(angle);
+    node.y = 250 + radius * Math.sin(angle);
+  });
+};
+
+const calculatePositions = (nodes: GoalNode[], mode: 'tree' | 'network') => {
+  if (mode === 'tree') {
+    calculateTreePositions(nodes);
+  } else {
+    calculateNetworkPositions(nodes);
+  }
+};
+
 export function DependencyVisualization({ spaceId, goals, className = '', onGoalClick }: DependencyVisualizationProps) {
   const [stats, setStats] = useState<GoalDependencyStats | null>(null);
   const [goalNodes, setGoalNodes] = useState<GoalNode[]>([]);
@@ -57,11 +99,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
   const [showCompleted, setShowCompleted] = useState(false);
   const [viewMode, setViewMode] = useState<'tree' | 'network'>('tree');
 
-  useEffect(() => {
-    loadDependencyData();
-  }, [spaceId, goals, showCompleted]);
-
-  const loadDependencyData = async () => {
+  const loadDependencyData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -116,58 +154,23 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
         });
       }
 
-      // Calculate positions for visualization
-      calculatePositions(nodes);
       setGoalNodes(nodes);
     } catch (err) {
       logger.error('Failed to load dependency data:', err, { component: 'DependencyVisualization', action: 'component_action' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [goals, showCompleted, spaceId]);
 
-  const calculatePositions = (nodes: GoalNode[]) => {
-    if (viewMode === 'tree') {
-      calculateTreePositions(nodes);
-    } else {
-      calculateNetworkPositions(nodes);
-    }
-  };
+  useEffect(() => {
+    loadDependencyData();
+  }, [loadDependencyData]);
 
-  const calculateTreePositions = (nodes: GoalNode[]) => {
-    // Simple tree layout: arrange goals in levels based on dependency depth
-    const levels: GoalNode[][] = [];
-
-    // Calculate levels (goals with no dependencies are level 0)
-    nodes.forEach(node => {
-      node.level = node.dependencies.length === 0 ? 0 : 1;
-
-      if (!levels[node.level]) {
-        levels[node.level] = [];
-      }
-      levels[node.level].push(node);
-    });
-
-    // Position nodes in each level
-    levels.forEach((levelNodes, level) => {
-      levelNodes.forEach((node, index) => {
-        node.x = (index + 1) * (300 / (levelNodes.length + 1));
-        node.y = level * 150 + 50;
-      });
-    });
-  };
-
-  const calculateNetworkPositions = (nodes: GoalNode[]) => {
-    // Simple circular layout for network view
-    const radius = Math.min(200, nodes.length * 30);
-    const angleStep = (2 * Math.PI) / nodes.length;
-
-    nodes.forEach((node, index) => {
-      const angle = index * angleStep;
-      node.x = 250 + radius * Math.cos(angle);
-      node.y = 250 + radius * Math.sin(angle);
-    });
-  };
+  const positionedNodes = useMemo(() => {
+    const nodes = goalNodes.map(node => ({ ...node }));
+    calculatePositions(nodes, viewMode);
+    return nodes;
+  }, [goalNodes, viewMode]);
 
   const getGoalStatusIcon = (goal: Goal) => {
     switch (goal.status) {
@@ -276,7 +279,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
 
       {/* Visualization */}
       <div className="p-6">
-        {goalNodes.length === 0 ? (
+        {positionedNodes.length === 0 ? (
           <div className="text-center py-12">
             <GitBranch className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-white mb-2">
@@ -295,9 +298,9 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
               className="border border-gray-600 rounded-lg bg-gray-700"
             >
               {/* Dependency Lines */}
-              {goalNodes.map(node =>
+              {positionedNodes.map(node =>
                 node.dependencies.map(dep => {
-                  const dependsOnNode = goalNodes.find(n => n.id === dep.depends_on_goal_id);
+                  const dependsOnNode = positionedNodes.find(n => n.id === dep.depends_on_goal_id);
                   if (!dependsOnNode) return null;
 
                   const Icon = DEPENDENCY_ICONS[dep.dependency_type];
@@ -350,7 +353,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
               </defs>
 
               {/* Goal Nodes */}
-              {goalNodes.map(node => (
+              {positionedNodes.map(node => (
                 <g key={node.id}>
                   {/* Goal Circle */}
                   <circle
@@ -400,7 +403,7 @@ export function DependencyVisualization({ spaceId, goals, className = '', onGoal
             {selectedGoalId && (
               <div className="mt-6 bg-gray-700 rounded-lg p-4">
                 {(() => {
-                  const selectedGoal = goalNodes.find(n => n.id === selectedGoalId);
+                  const selectedGoal = positionedNodes.find(n => n.id === selectedGoalId);
                   if (!selectedGoal) return null;
 
                   return (

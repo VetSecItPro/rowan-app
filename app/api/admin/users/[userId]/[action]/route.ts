@@ -6,9 +6,15 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
+
+const AdminUserActionParamsSchema = z.object({
+  userId: z.string().uuid(),
+  action: z.enum(['ban', 'delete', 'revoke-beta']),
+});
 
 /**
  * POST /api/admin/users/[userId]/[action]
@@ -43,7 +49,7 @@ export async function POST(
     }
 
     // Decrypt and validate admin session
-    let sessionData: any;
+    let sessionData: { email?: string; adminId?: string; role?: string };
     try {
       sessionData = await decryptSessionData(adminSession.value);
 
@@ -61,16 +67,7 @@ export async function POST(
       );
     }
 
-    const { userId, action } = params;
-
-    // Validate action
-    const validActions = ['ban', 'delete', 'revoke-beta'];
-    if (!validActions.includes(action)) {
-      return NextResponse.json(
-        { error: 'Invalid action' },
-        { status: 400 }
-      );
-    }
+    const { userId, action } = AdminUserActionParamsSchema.parse(params);
 
     // Perform action based on type
     switch (action) {
@@ -140,6 +137,12 @@ export async function POST(
       },
     });
     logger.error('[API] /api/admin/users/[userId]/[action] POST error:', error, { component: 'api-route', action: 'api_request' });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request parameters', details: error.issues },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to perform action' },
       { status: 500 }

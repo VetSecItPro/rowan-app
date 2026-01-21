@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Shield, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
 
 interface CCPAOptOutModalProps {
@@ -59,7 +60,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
     setError('');
 
     try {
-      const response = await fetch('/api/ccpa/opt-out', {
+      const response = await csrfFetch('/api/ccpa/opt-out', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                         }`}
                         disabled={isSaving}
                       >
-                        Yes, I'm a CA resident
+                        Yes, I&apos;m a CA resident
                       </button>
                       <button
                         onClick={() => setCaliforniaResident(false)}
@@ -158,7 +159,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                         }`}
                         disabled={isSaving}
                       >
-                        No, I'm not a CA resident
+                        No, I&apos;m not a CA resident
                       </button>
                     </div>
                   </div>

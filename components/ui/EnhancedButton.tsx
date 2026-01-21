@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -77,7 +77,7 @@ function useFeatureDetection(): EnhancedButtonProps['feature'] {
 function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButtonElement | null>) {
   const [isHovering, setIsHovering] = useState(false);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  const handleMouseMove = (e: MouseEvent) => {
     if (!enabled || !ref.current || !isHovering) return;
 
     const rect = ref.current.getBoundingClientRect();
@@ -88,18 +88,18 @@ function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButton
     const deltaY = (e.clientY - centerY) * 0.1;
 
     ref.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-  }, [enabled, isHovering]);
+  };
 
-  const handleMouseEnter = useCallback(() => {
+  const handleMouseEnter = () => {
     setIsHovering(true);
-  }, []);
+  };
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseLeave = () => {
     setIsHovering(false);
     if (ref.current) {
       ref.current.style.transform = '';
     }
-  }, []);
+  };
 
   useEffect(() => {
     if (!enabled) return;
@@ -135,7 +135,7 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
     const detectedFeature = useFeatureDetection();
     const currentFeature = feature || detectedFeature;
 
-    const [isSuccess, setIsSuccess] = useState(false);
+    const isSuccess = Boolean(success);
     const [rippleKey, setRippleKey] = useState(0);
 
     // Combine refs
@@ -147,17 +147,8 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
       buttonRef
     );
 
-    // Success state management
-    useEffect(() => {
-      if (success) {
-        setIsSuccess(true);
-        const timer = setTimeout(() => setIsSuccess(false), 800);
-        return () => clearTimeout(timer);
-      }
-    }, [success]);
-
     // Handle click with ripple effect
-    const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (disabled || loading) return;
 
       if (ripple && animationLevel !== 'basic') {
@@ -165,7 +156,7 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
       }
 
       onClick?.(e);
-    }, [disabled, loading, onClick, ripple, animationLevel]);
+    };
 
     // Build className based on props
     const buttonClasses = cn(

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Search, TrendingUp, ChevronRight } from 'lucide-react';
 import { GoalTemplate } from '@/lib/services/goals-service';
@@ -16,12 +16,107 @@ interface TemplateSelectionModalProps {
   spaceId: string;
 }
 
+// Fallback data for when database is unavailable
+const FALLBACK_TEMPLATES: GoalTemplate[] = [
+  {
+    id: 'fallback-1',
+    title: 'Build Emergency Fund',
+    description: 'Save 3-6 months of living expenses for unexpected situations',
+    category: 'financial',
+    icon: '💰',
+    target_days: 180,
+    is_public: true,
+    usage_count: 245,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-2',
+    title: 'Pay Off Debt',
+    description: 'Eliminate credit card or loan debt systematically',
+    category: 'financial',
+    icon: '💳',
+    target_days: 365,
+    is_public: true,
+    usage_count: 189,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-3',
+    title: 'Weight Loss Journey',
+    description: 'Lose weight through healthy eating and regular exercise',
+    category: 'health',
+    icon: '🏃',
+    target_days: 90,
+    is_public: true,
+    usage_count: 156,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-4',
+    title: 'Save for Home Down Payment',
+    description: 'Accumulate funds for a house or apartment down payment',
+    category: 'home',
+    icon: '🏠',
+    target_days: 730,
+    is_public: true,
+    usage_count: 134,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-5',
+    title: 'Retirement Savings Boost',
+    description: 'Increase retirement account contributions and grow nest egg',
+    category: 'financial',
+    icon: '🏦',
+    target_days: 365,
+    is_public: true,
+    usage_count: 112,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-6',
+    title: 'Investment Portfolio',
+    description: 'Build a diversified investment portfolio',
+    category: 'financial',
+    icon: '📈',
+    target_days: 365,
+    is_public: true,
+    usage_count: 98,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: 'fallback-7',
+    title: 'Career Advancement',
+    description: 'Work towards a promotion or new career opportunity',
+    category: 'career',
+    icon: '💼',
+    target_days: 365,
+    is_public: true,
+    usage_count: 87,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
+const FALLBACK_CATEGORIES = [
+  { category: 'financial', count: 5, icon: '💰' },
+  { category: 'health', count: 4, icon: '🏃' },
+  { category: 'home', count: 4, icon: '🏠' },
+  { category: 'relationship', count: 4, icon: '💕' },
+  { category: 'career', count: 3, icon: '💼' },
+];
+
 export function TemplateSelectionModal({
   isOpen,
   onClose,
   onSelectTemplate,
   onCreateFromScratch,
-  spaceId,
 }: TemplateSelectionModalProps) {
   const [templates, setTemplates] = useState<GoalTemplate[]>([]);
   const [categories, setCategories] = useState<Array<{ category: string; count: number; icon: string }>>([]);
@@ -30,110 +125,7 @@ export function TemplateSelectionModal({
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadTemplates();
-      loadCategories();
-    }
-  }, [isOpen, selectedCategory]);
-
-  // Fallback data for when database is unavailable
-  const fallbackTemplates: GoalTemplate[] = [
-    {
-      id: 'fallback-1',
-      title: 'Build Emergency Fund',
-      description: 'Save 3-6 months of living expenses for unexpected situations',
-      category: 'financial',
-      icon: '💰',
-      target_days: 180,
-      is_public: true,
-      usage_count: 245,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'fallback-2',
-      title: 'Pay Off Debt',
-      description: 'Eliminate credit card or loan debt systematically',
-      category: 'financial',
-      icon: '💳',
-      target_days: 365,
-      is_public: true,
-      usage_count: 189,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'fallback-3',
-      title: 'Weight Loss Journey',
-      description: 'Lose weight through healthy eating and regular exercise',
-      category: 'health',
-      icon: '🏃',
-      target_days: 90,
-      is_public: true,
-      usage_count: 156,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'fallback-4',
-      title: 'Save for Home Down Payment',
-      description: 'Accumulate funds for a house or apartment down payment',
-      category: 'home',
-      icon: '🏠',
-      target_days: 730,
-      is_public: true,
-      usage_count: 134,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'fallback-5',
-      title: 'Retirement Savings Boost',
-      description: 'Increase retirement account contributions and grow nest egg',
-      category: 'financial',
-      icon: '🏦',
-      target_days: 365,
-      is_public: true,
-      usage_count: 112,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'fallback-6',
-      title: 'Investment Portfolio',
-      description: 'Build a diversified investment portfolio',
-      category: 'financial',
-      icon: '📈',
-      target_days: 365,
-      is_public: true,
-      usage_count: 98,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: 'fallback-7',
-      title: 'Career Advancement',
-      description: 'Work towards a promotion or new career opportunity',
-      category: 'career',
-      icon: '💼',
-      target_days: 365,
-      is_public: true,
-      usage_count: 87,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ];
-
-  const fallbackCategories = [
-    { category: 'financial', count: 5, icon: '💰' },
-    { category: 'health', count: 4, icon: '🏃' },
-    { category: 'home', count: 4, icon: '🏠' },
-    { category: 'relationship', count: 4, icon: '💕' },
-    { category: 'career', count: 3, icon: '💼' },
-  ];
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       setLoading(true);
       const data = await goalsService.getGoalTemplates(selectedCategory || undefined);
@@ -142,24 +134,31 @@ export function TemplateSelectionModal({
       logger.error('Error loading templates, using fallback data:', error, { component: 'TemplateSelectionModal', action: 'component_action' });
       // Use fallback data when database is unavailable
       const filtered = selectedCategory
-        ? fallbackTemplates.filter(t => t.category === selectedCategory)
-        : fallbackTemplates;
+        ? FALLBACK_TEMPLATES.filter(t => t.category === selectedCategory)
+        : FALLBACK_TEMPLATES;
       setTemplates(filtered);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory]);
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const data = await goalsService.getTemplateCategories();
       setCategories(data);
     } catch (error) {
       logger.error('Error loading categories, using fallback data:', error, { component: 'TemplateSelectionModal', action: 'component_action' });
       // Use fallback data when database is unavailable
-      setCategories(fallbackCategories);
+      setCategories(FALLBACK_CATEGORIES);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadTemplates();
+      loadCategories();
+    }
+  }, [isOpen, loadCategories, loadTemplates]);
 
   const filteredTemplates = useMemo(() => {
     return templates.filter(template =>

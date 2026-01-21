@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Smartphone, X, Key, QrCode, Copy, Check } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface TwoFactorAuthProps {
   onStatusChange?: (enabled: boolean) => void;
@@ -20,7 +22,6 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
   const [isEnabled, setIsEnabled] = useState(false);
   const [mfaFactor, setMfaFactor] = useState<MFAFactor | null>(null);
   const [showSetupModal, setShowSetupModal] = useState(false);
-  const [setupStep, setSetupStep] = useState<'generate' | 'verify'>('generate');
 
   // Setup state
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -30,12 +31,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [secretCopied, setSecretCopied] = useState(false);
 
-  // Load current 2FA status
-  useEffect(() => {
-    loadMFAStatus();
-  }, []);
-
-  const loadMFAStatus = async () => {
+  const loadMFAStatus = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/auth/mfa/enroll');
@@ -58,14 +54,18 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [onStatusChange]);
+
+  // Load current 2FA status
+  useEffect(() => {
+    loadMFAStatus();
+  }, [loadMFAStatus]);
 
   const startSetup = async () => {
     try {
       setIsProcessing(true);
-      setSetupStep('generate');
 
-      const response = await fetch('/api/auth/mfa/enroll', {
+      const response = await csrfFetch('/api/auth/mfa/enroll', {
         method: 'POST',
       });
 
@@ -76,7 +76,6 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
         setSecret(result.data.secret);
         setFactorId(result.data.id);
         setShowSetupModal(true);
-        setSetupStep('verify');
       } else {
         alert('Failed to start 2FA setup: ' + result.error);
       }
@@ -102,7 +101,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
     setIsProcessing(true);
 
     try {
-      const response = await fetch('/api/auth/mfa/verify', {
+      const response = await csrfFetch('/api/auth/mfa/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +149,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
 
     try {
       setIsProcessing(true);
-      const response = await fetch('/api/auth/mfa/unenroll', {
+      const response = await csrfFetch('/api/auth/mfa/unenroll', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +187,6 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
     setFactorId(null);
     setVerificationCode('');
     setSecretCopied(false);
-    setSetupStep('generate');
   };
 
   const closeModal = () => {
@@ -307,12 +305,13 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
 
                 {qrCode ? (
                   <div className="bg-white p-4 rounded-xl border border-gray-700 text-center">
-                    <img
+                    <Image
                       src={qrCode}
                       alt="2FA QR Code"
-                      loading="eager"
-                      decoding="async"
+                      width={192}
+                      height={192}
                       className="mx-auto w-48 h-48"
+                      unoptimized
                     />
                   </div>
                 ) : (

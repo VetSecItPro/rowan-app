@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, pdf, Image } from '@react-pdf/renderer';
-import { GeneratedReport, ReportData } from './financial-reports-service';
+import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
+import { GeneratedReport, ReportData, ReportMetrics } from './financial-reports-service';
 import { format } from 'date-fns';
 
 // PDF Generation Service for Financial Reports
@@ -186,18 +186,18 @@ const SummarySection: React.FC<{ report: GeneratedReport }> = ({ report }) => (
         This report covers the period from {format(new Date(report.date_range_start), 'MMM dd, yyyy')}
         to {format(new Date(report.date_range_end), 'MMM dd, yyyy')}.
         {report.summary_stats.total_expenses &&
-          ` Total expenses: ${formatCurrency(report.summary_stats.total_expenses)}.`}
+          ` Total expenses: ${formatCurrency(Number(report.summary_stats.total_expenses))}.`}
         {report.summary_stats.total_budget &&
-          ` Budget allocation: ${formatCurrency(report.summary_stats.total_budget)}.`}
+          ` Budget allocation: ${formatCurrency(Number(report.summary_stats.total_budget))}.`}
         {report.summary_stats.budget_utilization &&
-          ` Budget utilization: ${formatPercentage(report.summary_stats.budget_utilization)}.`}
+          ` Budget utilization: ${formatPercentage(Number(report.summary_stats.budget_utilization))}.`}
       </Text>
     </View>
   </View>
 );
 
 // Key Metrics Section Component
-const KeyMetricsSection: React.FC<{ metrics: any }> = ({ metrics }) => (
+const KeyMetricsSection: React.FC<{ metrics: ReportMetrics }> = ({ metrics }) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>Key Metrics</Text>
     <View style={styles.twoColumn}>
@@ -240,15 +240,15 @@ const KeyMetricsSection: React.FC<{ metrics: any }> = ({ metrics }) => (
             </Text>
           </View>
         )}
-        {metrics.budget_remaining !== undefined && (
+        {metrics.budget_remaining != null && (
           <View style={styles.metricCard}>
             <Text style={styles.metricLabel}>Budget Remaining</Text>
             <Text style={[
               styles.metricValue,
               styles.currency,
-              metrics.budget_remaining >= 0 ? styles.positive : styles.negative
+              Number(metrics.budget_remaining) >= 0 ? styles.positive : styles.negative
             ]}>
-              {formatCurrency(metrics.budget_remaining)}
+              {formatCurrency(Number(metrics.budget_remaining))}
             </Text>
           </View>
         )}
@@ -340,7 +340,7 @@ const CategoryBreakdownSection: React.FC<{ data: ReportData }> = ({ data }) => {
 };
 
 // Budget vs Actual Section (if budget data available)
-const BudgetAnalysisSection: React.FC<{ data: ReportData; metrics: any }> = ({ data, metrics }) => {
+const BudgetAnalysisSection: React.FC<{ data: ReportData }> = ({ data }) => {
   if (!data.budgets || data.budgets.length === 0) return null;
 
   const categorySpending = data.expenses.reduce((acc, expense) => {
@@ -458,7 +458,7 @@ const FinancialReportPDF: React.FC<{ report: GeneratedReport }> = ({ report }) =
       <KeyMetricsSection metrics={report.summary_stats} />
 
       {/* Budget Analysis (if available) */}
-      <BudgetAnalysisSection data={report.data} metrics={report.summary_stats} />
+      <BudgetAnalysisSection data={report.data} />
 
       {/* Footer */}
       <Text style={styles.footer}>

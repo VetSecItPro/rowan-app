@@ -17,50 +17,50 @@ interface NewShoppingListModalProps {
   onUseTemplate?: () => void;
 }
 
-export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceId, onUseTemplate }: NewShoppingListModalProps) {
-  const [formData, setFormData] = useState<CreateListInput & { store_name?: string; budget?: number }>({
+type ShoppingListItemForm = { id?: string; name: string; quantity: number; checked: boolean; assigned_to?: string };
+type SpaceMemberOption = { user_id: string; display_name?: string; email?: string; role?: string };
+type SpaceMemberRow = { user_id: string; role?: string; joined_at?: string; users?: { id: string; email?: string; name?: string } };
+
+const buildInitialFormData = (editList: ShoppingList | null | undefined, spaceId: string): CreateListInput & { store_name?: string; budget?: number } => {
+  if (editList) {
+    return {
+      space_id: spaceId,
+      title: editList.title,
+      description: editList.description || '',
+      store_name: editList.store_name || '',
+      budget: editList.budget,
+      status: editList.status,
+    };
+  }
+
+  return {
     space_id: spaceId,
     title: '',
     description: '',
     store_name: '',
     budget: undefined,
     status: 'active',
-  });
+  };
+};
 
-  const [items, setItems] = useState<{ id?: string; name: string; quantity: number; checked: boolean; assigned_to?: string }[]>([]);
+const buildInitialItems = (editList: ShoppingList | null | undefined): ShoppingListItemForm[] => {
+  if (!editList) return [];
+  return (editList.items || []).map(item => ({
+    id: item.id,
+    name: item.name,
+    quantity: item.quantity,
+    checked: item.checked,
+    assigned_to: item.assigned_to,
+  }));
+};
+
+function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTemplate }: NewShoppingListModalProps) {
+  const [formData, setFormData] = useState<CreateListInput & { store_name?: string; budget?: number }>(() => buildInitialFormData(editList, spaceId));
+
+  const [items, setItems] = useState<ShoppingListItemForm[]>(() => buildInitialItems(editList));
   const [newItemName, setNewItemName] = useState('');
-  const [spaceMembers, setSpaceMembers] = useState<any[]>([]);
+  const [spaceMembers, setSpaceMembers] = useState<SpaceMemberOption[]>([]);
   const [defaultAssignee, setDefaultAssignee] = useState<string>('');
-
-  useEffect(() => {
-    if (editList) {
-      setFormData({
-        space_id: spaceId,
-        title: editList.title,
-        description: editList.description || '',
-        store_name: editList.store_name || '',
-        budget: editList.budget,
-        status: editList.status,
-      });
-      setItems((editList.items || []).map(item => ({
-        id: item.id, // Preserve existing item ID
-        name: item.name,
-        quantity: item.quantity,
-        checked: item.checked,
-        assigned_to: item.assigned_to,
-      })));
-    } else {
-      setFormData({
-        space_id: spaceId,
-        title: '',
-        description: '',
-        store_name: '',
-        budget: undefined,
-        status: 'active',
-      });
-      setItems([]);
-    }
-  }, [editList, spaceId]);
 
   // Fetch space members
   useEffect(() => {
@@ -83,7 +83,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
           .order('joined_at', { ascending: true });
 
         if (!error && data) {
-          setSpaceMembers(data.map((member: any) => ({
+          setSpaceMembers((data as SpaceMemberRow[]).map((member) => ({
             user_id: member.user_id,
             display_name: member.users?.name,
             email: member.users?.email,
@@ -135,7 +135,7 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
     spaceMembers.forEach((member) => {
       options.push({
         value: member.user_id,
-        label: member.display_name || member.email
+        label: member.display_name || member.email || 'Unknown'
       });
     });
     return options;
@@ -331,4 +331,10 @@ export function NewShoppingListModal({ isOpen, onClose, onSave, editList, spaceI
       </form>
     </Modal>
   );
+}
+
+export function NewShoppingListModal(props: NewShoppingListModalProps) {
+  const { editList, isOpen, spaceId } = props;
+  const formKey = `${editList?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId}`;
+  return <ShoppingListForm key={formKey} {...props} />;
 }

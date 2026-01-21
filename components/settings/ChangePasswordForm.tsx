@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Lock, Eye, EyeOff, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface PasswordRequirement {
   label: string;
@@ -41,7 +42,7 @@ export function ChangePasswordForm() {
     setSuccess(false);
 
     try {
-      const response = await fetch('/api/user/change-password', {
+      const response = await csrfFetch('/api/user/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ export function ChangePasswordForm() {
         <div className="flex-1 w-full">
           <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Change Password</h3>
           <p className="text-xs sm:text-sm text-gray-400 mb-4">
-            Update your password directly. You'll need to enter your current password for verification.
+            Update your password directly. You&apos;ll need to enter your current password for verification.
           </p>
 
           {/* Success Message */}

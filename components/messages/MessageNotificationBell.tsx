@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Bell } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
@@ -16,11 +16,29 @@ export function MessageNotificationBell({
   spaceId,
   onBellClick,
 }: MessageNotificationBellProps) {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const supabase = createClient();
+  const countRef = useRef(0);
+  const store = useMemo(() => {
+    const listeners = new Set<() => void>();
+
+    return {
+      getSnapshot: () => countRef.current,
+      subscribe: (listener: () => void) => {
+        listeners.add(listener);
+        return () => listeners.delete(listener);
+      },
+      setCount: (next: number) => {
+        if (countRef.current === next) return;
+        countRef.current = next;
+        listeners.forEach((listener) => listener());
+      },
+    };
+  }, []);
+
+  const unreadCount = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch unread count
-  const fetchUnreadCount = async () => {
+  const fetchUnreadCount = useCallback(async () => {
     try {
       const { count, error } = await supabase
         .from('messages')
@@ -34,16 +52,16 @@ export function MessageNotificationBell({
         return;
       }
 
-      setUnreadCount(count || 0);
+      store.setCount(count || 0);
     } catch (error) {
       logger.error('Error fetching unread count:', error, { component: 'MessageNotificationBell', action: 'component_action' });
     }
-  };
+  }, [spaceId, store, supabase, userId]);
 
   // Initial fetch
   useEffect(() => {
     fetchUnreadCount();
-  }, [userId, spaceId]);
+  }, [fetchUnreadCount]);
 
   // Real-time subscription - listen for any message changes and refetch
   useEffect(() => {
@@ -56,7 +74,7 @@ export function MessageNotificationBell({
           schema: 'public',
           table: 'messages',
         },
-        (_payload: unknown) => {
+        () => {
           // Refresh unread count when any message is updated (e.g., marked as read)
           fetchUnreadCount();
         }
@@ -78,7 +96,7 @@ export function MessageNotificationBell({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, spaceId]);
+  }, [fetchUnreadCount, spaceId, supabase]);
 
   return (
     <button

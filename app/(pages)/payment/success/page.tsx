@@ -85,7 +85,7 @@ export default function PaymentSuccessPage() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-emerald-500" />
-            <span className="font-semibold text-white">What's unlocked:</span>
+            <span className="font-semibold text-white">What&apos;s unlocked:</span>
           </div>
           <ul className="space-y-2 text-sm text-gray-400">
             <li className="flex items-center gap-2">

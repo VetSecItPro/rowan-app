@@ -2,7 +2,7 @@
 
 import { useState, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, TrendingUp, CreditCard, ArrowUpRight, Repeat, RefreshCw, Users, AlertCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, CreditCard, ArrowUpRight, Repeat, RefreshCw, AlertCircle } from 'lucide-react';
 import { SubscriptionsPanel } from './SubscriptionsPanel';
 
 type SubTab = 'subscriptions' | 'mrr' | 'conversions';
@@ -242,8 +242,6 @@ const ConversionsPanel = memo(function ConversionsPanel() {
   const freeUsers = metrics?.freeUsers || 0;
   const trialUsers = metrics?.trialUsers || 0;
   const totalSubscribers = metrics?.totalSubscribers || 0;
-  const newSubscriptions = metrics?.newSubscriptionsThisMonth || 0;
-  const cancellations = metrics?.cancellationsThisMonth || 0;
   const recentEvents = metrics?.recentEvents;
 
   // Calculate funnel percentages

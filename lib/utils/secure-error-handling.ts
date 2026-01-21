@@ -17,14 +17,32 @@ export interface SecureError {
  * Maps technical errors to user-friendly messages
  * Logs detailed information only in development
  */
+type ErrorDetails = { message?: unknown };
+
+const getErrorMessage = (technicalError: unknown): string => {
+  if (technicalError instanceof Error) {
+    return technicalError.message;
+  }
+  if (typeof technicalError === 'string') {
+    return technicalError;
+  }
+  if (technicalError && typeof technicalError === 'object' && 'message' in technicalError) {
+    const message = (technicalError as ErrorDetails).message;
+    if (typeof message === 'string') {
+      return message;
+    }
+  }
+  return String(technicalError);
+};
+
 export function createSecureError(
-  technicalError: any,
+  technicalError: unknown,
   context: string,
   fallbackMessage: string = 'Something went wrong. Please try again.'
 ): SecureError {
   // Always log technical details for debugging (only in development)
   if (process.env.NODE_ENV === 'development') {
-    logger.error('[${context}] Technical error:', technicalError, { component: 'lib-secure-error-handling', action: 'service_call' });
+    logger.error(`[${context}] Technical error:`, technicalError, { component: 'lib-secure-error-handling', action: 'service_call' });
   }
 
   // Determine user-friendly message based on error type
@@ -60,7 +78,7 @@ export function createSecureError(
 
   return {
     userMessage,
-    logMessage: technicalError?.message || String(technicalError),
+    logMessage: getErrorMessage(technicalError),
     statusCode
   };
 }
@@ -68,8 +86,9 @@ export function createSecureError(
 /**
  * Secure API response handler that prevents information leakage
  */
-export async function handleApiResponse(response: Response, context: string): Promise<any> {
+export async function handleApiResponse(response: Response, context: string): Promise<unknown> {
   try {
+    void context;
     // Check if response is ok first
     if (!response.ok) {
       // Handle specific HTTP status codes securely
@@ -123,7 +142,7 @@ export const AUTH_ERROR_MESSAGES = {
  */
 export function logSecurityEvent(
   event: string,
-  details: Record<string, any>,
+  details: Record<string, unknown>,
   severity: 'low' | 'medium' | 'high' = 'medium'
 ) {
   // Use structured logger for all security events

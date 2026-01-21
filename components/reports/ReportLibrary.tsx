@@ -7,7 +7,6 @@ import {
   CalendarIcon,
   EyeIcon,
   ArrowDownTrayIcon,
-  ShareIcon,
   TrashIcon,
   ClockIcon,
   UserIcon,
@@ -20,10 +19,12 @@ import { type GeneratedReport } from '@/lib/services/financial-reports-service';
 import { downloadReportPDF, deleteReport, toggleReportFavorite } from '@/lib/services/financial-reports-service';
 
 interface ReportLibraryProps {
-  reports: GeneratedReport[];
+  reports: ReportWithFavorite[];
   onViewReport: (report: GeneratedReport) => void;
   onReportUpdated: () => void;
 }
+
+type ReportWithFavorite = GeneratedReport & { is_favorite?: boolean };
 
 export function ReportLibrary({ reports, onViewReport, onReportUpdated }: ReportLibraryProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +47,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
 
     try {
       setLoading(report.id);
-      const blob = await downloadReportPDF(report.id);
+      await downloadReportPDF(report.id);
       // The function already handles the download automatically
     } catch (error) {
       logger.error('Error downloading report:', error, { component: 'ReportLibrary', action: 'component_action' });
@@ -204,7 +205,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                       onClick={() => handleToggleFavorite(report)}
                       className="text-gray-400 hover:text-red-500"
                     >
-                      <HeartIcon className={`h-5 w-5 ${(report as any).is_favorite ? 'text-red-500' : ''}`} />
+                      <HeartIcon className={`h-5 w-5 ${report.is_favorite ? 'text-red-500' : ''}`} />
                     </button>
                   </div>
 

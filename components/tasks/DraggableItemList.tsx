@@ -23,7 +23,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, CheckCircle, Clock, AlertCircle, MoreVertical, CheckSquare, Home, Pause } from 'lucide-react';
+import { GripVertical, Clock, AlertCircle, MoreVertical, CheckSquare, Pause } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface UnifiedItem {
@@ -43,7 +43,6 @@ interface UnifiedItem {
 interface DraggableItemListProps {
   spaceId: string;
   initialItems: UnifiedItem[];
-  onItemClick?: (item: UnifiedItem) => void;
   onItemsReorder?: (items: UnifiedItem[]) => void;
   onStatusChange?: (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => void;
   onEdit?: (item: UnifiedItem) => void;
@@ -53,14 +52,13 @@ interface DraggableItemListProps {
 
 interface SortableItemProps {
   item: UnifiedItem;
-  onItemClick?: (item: UnifiedItem) => void;
   onStatusChange?: (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => void;
   onEdit?: (item: UnifiedItem) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
   onViewDetails?: (item: UnifiedItem) => void;
 }
 
-function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onViewDetails }: SortableItemProps) {
+function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }: SortableItemProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -282,16 +280,15 @@ function SortableItem({ item, onItemClick, onStatusChange, onEdit, onDelete, onV
 export function DraggableItemList({
   spaceId,
   initialItems,
-  onItemClick,
   onItemsReorder,
   onStatusChange,
   onEdit,
   onDelete,
   onViewDetails,
 }: DraggableItemListProps) {
+  void spaceId;
   const [items, setItems] = useState<UnifiedItem[]>(initialItems);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const touchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Update items when initialItems changes
   useEffect(() => {
@@ -349,6 +346,7 @@ export function DraggableItemList({
 
     // Update local state immediately for smooth UX
     setItems(updatedItems);
+    onItemsReorder?.(updatedItems);
     hapticLight(); // Haptic feedback on successful drop
 
     // Update database with separate logic for tasks and chores
@@ -390,7 +388,7 @@ export function DraggableItemList({
           } else {
             logger.info('🏠 sort_order column not found for chores, skipping chore reordering', { component: 'DraggableItemList' });
           }
-        } catch (sortOrderError) {
+        } catch {
           logger.info('🏠 sort_order column not available for chores yet, skipping chore reordering', { component: 'DraggableItemList' });
         }
       }
@@ -428,7 +426,6 @@ export function DraggableItemList({
               <SortableItem
                 key={item.id}
                 item={item}
-                onItemClick={onItemClick}
                 onStatusChange={onStatusChange}
                 onEdit={onEdit}
                 onDelete={onDelete}

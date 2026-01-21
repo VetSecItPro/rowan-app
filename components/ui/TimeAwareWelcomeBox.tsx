@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { useTimePeriod } from './SmartBackgroundCanvas';
 
 interface TimeAwareWelcomeBoxProps {
@@ -14,7 +15,6 @@ interface TimeAwareWelcomeBoxProps {
 export function TimeAwareWelcomeBox({
   greetingText,
   userName,
-  currentDate,
   className = '',
   children
 }: TimeAwareWelcomeBoxProps) {
@@ -45,11 +45,12 @@ export function TimeAwareWelcomeBox({
     >
       {/* Background Image */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <img
+        <Image
           src={imageUrl}
           alt={`${timePeriod} background`}
-          loading="lazy"
-          decoding="async"
+          width={1600}
+          height={400}
+          sizes="100vw"
           className={`w-full h-full object-contain transition-all duration-1000 ${
             imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}
@@ -116,7 +117,6 @@ export function TimeAwareWelcomeBox({
 export function CompactTimeAwareWelcome({
   greetingText,
   userName,
-  currentDate,
   className = ''
 }: {
   greetingText: string;
@@ -139,11 +139,12 @@ export function CompactTimeAwareWelcome({
     <div className={`group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ${className}`}>
       {/* Background Image */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <img
+        <Image
           src={imageUrl}
           alt={`${timePeriod} background`}
-          loading="lazy"
-          decoding="async"
+          width={1200}
+          height={300}
+          sizes="100vw"
           className={`w-full h-full object-cover transition-all duration-1000 ${
             imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}

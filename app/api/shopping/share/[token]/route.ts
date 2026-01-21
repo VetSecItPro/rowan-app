@@ -6,6 +6,14 @@ import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
+type ShoppingItem = {
+  id: string;
+  category?: string | null;
+  name?: string | null;
+  is_purchased?: boolean | null;
+  [key: string]: unknown;
+};
+
 // Zod schemas for validation
 const ShareTokenSchema = z.string()
   .min(32, 'Share token must be at least 32 characters')
@@ -92,8 +100,8 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
     }
 
     // Group items by category
-    const itemsByCategory: Record<string, any[]> = {};
-    items?.forEach((item: any) => {
+    const itemsByCategory: Record<string, ShoppingItem[]> = {};
+    (items as ShoppingItem[] | null)?.forEach((item) => {
       const category = item.category || 'Other';
       if (!itemsByCategory[category]) {
         itemsByCategory[category] = [];
@@ -112,7 +120,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
         itemsByCategory,
         stats: {
           totalItems: items?.length || 0,
-          purchasedItems: items?.filter((i: any) => i.is_purchased).length || 0,
+          purchasedItems: (items as ShoppingItem[] | null)?.filter((i) => i.is_purchased).length || 0,
           categories: Object.keys(itemsByCategory).length,
         },
       },

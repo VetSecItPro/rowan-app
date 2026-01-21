@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, memo } from 'react';
-import { Cloud, AlertTriangle, Info } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { AlertTriangle, Info } from 'lucide-react';
 import { weatherService, WeatherForecast, WeatherAlert } from '@/lib/services/weather-service';
 
 // Global cache to persist across component re-mounts
@@ -28,23 +28,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
   const [loading, setLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    // Stagger requests with random delay (0-2 seconds) to avoid rate limit bursts
-    const delay = Math.random() * 2000;
-    const timeoutId = setTimeout(() => {
-      loadWeather();
-    }, delay);
-
-    return () => {
-      clearTimeout(timeoutId);
-      // Cleanup on unmount
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, [eventTime, location]);
-
-  const loadWeather = async () => {
+  const loadWeather = useCallback(async () => {
     // Create cache key - handle undefined location for user location detection
     const effectiveLocation = location || 'user-location';
     const cacheKey = `${effectiveLocation}-${eventTime.split('T')[0]}`;
@@ -129,7 +113,23 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventTime, location]);
+
+  useEffect(() => {
+    // Stagger requests with random delay (0-2 seconds) to avoid rate limit bursts
+    const delay = Math.random() * 2000;
+    const timeoutId = setTimeout(() => {
+      loadWeather();
+    }, delay);
+
+    return () => {
+      clearTimeout(timeoutId);
+      // Cleanup on unmount
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [loadWeather]);
 
   if (loading) {
     return (

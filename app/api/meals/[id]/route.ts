@@ -53,7 +53,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get meal
-    const meal = await mealsService.getMealById(params.id);
+    const meal = await mealsService.getMealById(params.id, supabase);
 
     if (!meal) {
       return NextResponse.json(
@@ -133,7 +133,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing meal first
-    const existingMeal = await mealsService.getMealById(params.id);
+    const existingMeal = await mealsService.getMealById(params.id, supabase);
 
     if (!existingMeal) {
       return NextResponse.json(
@@ -180,7 +180,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     const updates = validationResult.data;
 
     // Update meal using service
-    const updatedMeal = await mealsService.updateMeal(params.id, updates);
+    const updatedMeal = await mealsService.updateMeal(params.id, updates, supabase);
 
     return NextResponse.json({
       success: true,
@@ -229,7 +229,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing meal first
-    const existingMeal = await mealsService.getMealById(params.id);
+    const existingMeal = await mealsService.getMealById(params.id, supabase);
 
     if (!existingMeal) {
       return NextResponse.json(
@@ -263,7 +263,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete meal using service
-    await mealsService.deleteMeal(params.id);
+    await mealsService.deleteMeal(params.id, supabase);
 
     return NextResponse.json({
       success: true,

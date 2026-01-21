@@ -8,7 +8,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { getUserTier } from '@/lib/services/subscription-service';
 import { getFeatureLimit } from '@/lib/config/feature-limits';
 import { z } from 'zod';
-import { createSpaceSchema, validateAndSanitizeSpace } from '@/lib/validations/space-schemas';
+import { validateAndSanitizeSpace } from '@/lib/validations/space-schemas';
 
 /**
  * POST /api/spaces/create

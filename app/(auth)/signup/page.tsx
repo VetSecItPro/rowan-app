@@ -29,21 +29,6 @@ const itemVariants = {
 };
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [spaceName, setSpaceName] = useState('My Space');
-  const [spaceTouched, setSpaceTouched] = useState(false);
-  const [colorTheme, setColorTheme] = useState('emerald');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [accountCreated, setAccountCreated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showColorDropdown, setShowColorDropdown] = useState(false);
-  const [emailOptIn, setEmailOptIn] = useState(false);
   const { signUp, signOut } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,18 +47,26 @@ export default function SignUpPage() {
   // Either beta_code or invite_token is valid for signup
   const hasValidAuth = !!(betaCode || inviteToken);
 
-  // Pre-fill form fields from URL params (once on mount)
-  useEffect(() => {
-    if (prefillEmail) {
-      setEmail(prefillEmail);
-    }
-    if (prefillFirstName && prefillLastName) {
-      const fullName = `${prefillFirstName} ${prefillLastName}`.trim();
-      setName(fullName);
-    } else if (prefillFirstName) {
-      setName(prefillFirstName);
-    }
-  }, [prefillEmail, prefillFirstName, prefillLastName]);
+  const initialEmail = prefillEmail || '';
+  const initialName = prefillFirstName && prefillLastName
+    ? `${prefillFirstName} ${prefillLastName}`.trim()
+    : prefillFirstName || '';
+
+  const [email, setEmail] = useState(initialEmail);
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState(initialName);
+  const [spaceName, setSpaceName] = useState('My Space');
+  const [spaceTouched, setSpaceTouched] = useState(false);
+  const [colorTheme, setColorTheme] = useState('emerald');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showColorDropdown, setShowColorDropdown] = useState(false);
+  const [emailOptIn, setEmailOptIn] = useState(false);
 
   // BETA PERIOD: Redirect to landing page if no valid authorization
   // Users must have either a beta code OR an invitation token
@@ -88,18 +81,6 @@ export default function SignUpPage() {
     const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
   }, []);
-
-  // Don't render form if no authorization (redirect will happen)
-  if (!hasValidAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Redirecting...</p>
-        </div>
-      </div>
-    );
-  }
 
   const colorThemes = [
     { value: 'emerald', label: 'Emerald' },
@@ -124,18 +105,12 @@ export default function SignUpPage() {
     { value: 'slate', label: 'Slate' },
   ];
 
-  useEffect(() => {
-    if (spaceTouched) return;
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      setSpaceName('My Space');
-      return;
-    }
-    const firstName = trimmedName.split(' ')[0];
-    if (firstName) {
-      setSpaceName(`${firstName}'s Space`);
-    }
-  }, [name, spaceTouched]);
+  const trimmedName = name.trim();
+  const defaultSpaceName = 'My Space';
+  const derivedSpaceName = trimmedName
+    ? `${trimmedName.split(' ')[0]}'s Space`
+    : defaultSpaceName;
+  const effectiveSpaceName = spaceTouched ? spaceName : derivedSpaceName;
 
   // Password requirement checks for real-time feedback
   const passwordChecks = {
@@ -146,7 +121,18 @@ export default function SignUpPage() {
     special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
   const passwordStrength = Object.values(passwordChecks).filter(Boolean).length;
-  const allRequirementsMet = Object.values(passwordChecks).every(Boolean);
+
+  // Don't render form if no authorization (redirect will happen)
+  if (!hasValidAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   const getColorClasses = (theme: string) => {
     switch (theme) {
@@ -238,7 +224,7 @@ export default function SignUpPage() {
       {
         name,
         color_theme: colorTheme,
-        space_name: spaceName,
+        space_name: effectiveSpaceName,
         marketing_emails_enabled: emailOptIn,
       },
       betaCode || undefined,
@@ -571,10 +557,12 @@ export default function SignUpPage() {
                 <input
                   id="spaceName"
                   type="text"
-                  value={spaceName}
+                  value={effectiveSpaceName}
                   onChange={(e) => {
+                    if (!spaceTouched) {
+                      setSpaceTouched(true);
+                    }
                     setSpaceName(e.target.value);
-                    setSpaceTouched(true);
                   }}
                   required
                   className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"

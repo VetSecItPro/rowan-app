@@ -25,10 +25,10 @@ export function SpaceSelector({
   variant = 'default',
 }: SpaceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isClient = typeof window !== 'undefined';
 
   // Get header background color for user's theme
   const getHeaderBackgroundClass = (theme: string) => {
@@ -46,8 +46,8 @@ export function SpaceSelector({
   };
 
   // Check if a space is a personal workspace
-  const isPersonalWorkspace = (space: Space & { role: string }): boolean => {
-    return (space as any).is_personal === true;
+  const isPersonalWorkspace = (space: Space & { role: string } & { is_personal?: boolean }): boolean => {
+    return space.is_personal === true;
   };
 
   // Get icon for space type
@@ -110,11 +110,6 @@ export function SpaceSelector({
         return 'bg-gradient-to-r from-emerald-500 to-teal-600 bg-clip-text text-transparent';
     }
   };
-
-  // Ensure component is mounted (for SSR)
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Update dropdown position when opened
   useEffect(() => {
@@ -282,7 +277,7 @@ export function SpaceSelector({
       </button>
 
       {/* Portal the dropdown to document.body */}
-      {mounted && isOpen && createPortal(dropdownContent, document.body)}
+      {isClient && isOpen && createPortal(dropdownContent, document.body)}
     </>
   );
 }

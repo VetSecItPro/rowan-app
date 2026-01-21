@@ -8,6 +8,11 @@ import { Page, expect } from '@playwright/test';
 
 // Test user credentials (these should be test accounts in Supabase)
 export const TEST_USERS = {
+  smoke: {
+    email: process.env.SMOKE_TEST_EMAIL || 'smoke.test@rowan-test.app',
+    password: process.env.SMOKE_TEST_PASSWORD || '***',
+    tier: 'pro' as const,
+  },
   free: {
     email: 'test-free@rowan-test.app',
     password: '***',

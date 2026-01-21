@@ -8,13 +8,12 @@ import {
   TrendingDown,
   DollarSign,
   ArrowRightLeft,
-  Calendar,
   BarChart3,
   AlertTriangle,
   CheckCircle,
   Info
 } from 'lucide-react';
-import { format, subMonths } from 'date-fns';
+import { format } from 'date-fns';
 import {
   calculateCurrentBalance,
   getMonthlySettlementTrends,

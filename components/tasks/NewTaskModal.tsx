@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Smile, ChevronDown, Repeat, Loader2 } from 'lucide-react';
 import { CreateTaskInput, Task } from '@/lib/types';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
@@ -34,14 +34,38 @@ interface NewTaskModalProps {
   userId?: string;
 }
 
-export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTaskModalProps) {
-  const { currentSpace, createSpace, hasZeroSpaces } = useAuthWithSpaces();
-  const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
-  const [spaceCreationLoading, setSpaceCreationLoading] = useState(false);
-  const [spaceError, setSpaceError] = useState<string>('');
+type RecurrencePattern = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
 
-  const [formData, setFormData] = useState<CreateTaskInput>({
-    space_id: actualSpaceId || '',
+const buildInitialFormData = (
+  editTask: Task | null | undefined,
+  spaceId: string | undefined,
+  userId: string | undefined
+): CreateTaskInput => {
+  if (editTask) {
+    const editTaskData = editTask as Partial<Task> & {
+      calendar_sync?: boolean;
+      quick_note?: string;
+      tags?: string;
+    };
+
+    return {
+      space_id: spaceId || editTask.space_id || '',
+      title: editTask.title,
+      description: editTask.description || '',
+      category: editTask.category || '',
+      priority: editTask.priority || 'medium',
+      status: editTask.status || 'pending',
+      due_date: editTask.due_date || '',
+      assigned_to: editTask.assigned_to || '',
+      created_by: editTask.created_by || userId || '',
+      calendar_sync: editTaskData.calendar_sync || false,
+      quick_note: editTaskData.quick_note || '',
+      tags: editTaskData.tags || '',
+    };
+  }
+
+  return {
+    space_id: spaceId || '',
     title: '',
     description: '',
     category: '',
@@ -53,81 +77,28 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     calendar_sync: false,
     quick_note: '',
     tags: '',
+  };
+};
+
+function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTaskModalProps) {
+  const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
+  const resolvedSpaceId = spaceId || editTask?.space_id || currentSpace?.id;
+  const spaceCreationLoading = false;
+  const [spaceError, setSpaceError] = useState<string>(
+    hasZeroSpaces && isOpen && !resolvedSpaceId ? 'Please create a workspace before adding tasks.' : ''
+  );
+
+  const [formData, setFormData] = useState<CreateTaskInput>({
+    ...buildInitialFormData(editTask, resolvedSpaceId, userId),
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringData, setRecurringData] = useState({
-    pattern: 'weekly' as 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly',
+    pattern: 'weekly' as RecurrencePattern,
     interval: 1,
     daysOfWeek: [] as number[],
   });
-
-  // Set up space ID when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      if (spaceId) {
-        // Use provided spaceId
-        setActualSpaceId(spaceId);
-        setFormData(prev => ({ ...prev, space_id: spaceId }));
-      } else if (currentSpace && !editTask) {
-        // Use current space from context
-        setActualSpaceId(currentSpace.id);
-        setFormData(prev => ({ ...prev, space_id: currentSpace.id }));
-      } else if (editTask) {
-        // For edit mode, keep existing space_id from the task
-        setActualSpaceId(editTask.space_id);
-        setFormData(prev => ({ ...prev, space_id: editTask.space_id }));
-      } else if (hasZeroSpaces) {
-        // Zero spaces scenario - this should be handled by AppWithOnboarding
-        // but if we get here, show a friendly error
-        setSpaceError('Please create a workspace before adding tasks.');
-      }
-    }
-  }, [isOpen, spaceId, currentSpace, editTask, hasZeroSpaces]);
-
-  // Populate form when editing
-  useEffect(() => {
-    if (editTask) {
-      setFormData({
-        space_id: actualSpaceId || '',
-        title: editTask.title,
-        description: editTask.description || '',
-        category: editTask.category || '',
-        priority: editTask.priority || 'medium',
-        status: editTask.status || 'pending',
-        due_date: editTask.due_date || '',
-        assigned_to: editTask.assigned_to || '',
-        created_by: editTask.created_by || userId || '',
-        calendar_sync: (editTask as any).calendar_sync || false,
-        quick_note: (editTask as any).quick_note || '',
-        tags: (editTask as any).tags || '',
-      });
-    } else {
-      setFormData({
-        space_id: actualSpaceId || '',
-        title: '',
-        description: '',
-        category: '',
-        priority: 'medium',
-        status: 'pending',
-        due_date: '',
-        assigned_to: '',
-        created_by: userId || '',
-        calendar_sync: false,
-        quick_note: '',
-        tags: '',
-      });
-    }
-    setShowEmojiPicker(false);
-    setDateError('');
-    setIsRecurring(false);
-    setRecurringData({
-      pattern: 'weekly',
-      interval: 1,
-      daysOfWeek: [],
-    });
-  }, [editTask, actualSpaceId, isOpen, userId]);
 
   const handleEmojiClick = (emoji: string) => {
     setFormData({ ...formData, title: formData.title + emoji });
@@ -153,7 +124,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     setDateError('');
 
     // Ensure we have a space ID before proceeding
-    if (!actualSpaceId) {
+    if (!resolvedSpaceId) {
       setDateError('Space creation required');
       return;
     }
@@ -162,7 +133,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
     if (isRecurring && !editTask && userId) {
       try {
         await taskRecurrenceService.createRecurringTask({
-          space_id: actualSpaceId,
+          space_id: resolvedSpaceId,
           title: formData.title,
           description: formData.description || undefined,
           category: formData.category || undefined,
@@ -469,7 +440,7 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
                         value={recurringData.pattern}
                         onChange={(e) => setRecurringData({
                           ...recurringData,
-                          pattern: e.target.value as any,
+                          pattern: e.target.value as RecurrencePattern,
                           daysOfWeek: [] // Reset days when pattern changes
                         })}
                         className="w-full pl-4 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white appearance-none"
@@ -539,4 +510,10 @@ export function NewTaskModal({ isOpen, onClose, onSave, editTask, spaceId, userI
       </form>
     </Modal>
   );
+}
+
+export function NewTaskModal(props: NewTaskModalProps) {
+  const { editTask, isOpen, spaceId, userId } = props;
+  const formKey = `${editTask?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId ?? 'none'}-${userId ?? 'anon'}`;
+  return <TaskForm key={formKey} {...props} />;
 }

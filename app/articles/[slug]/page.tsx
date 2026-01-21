@@ -156,7 +156,7 @@ export default function ArticlePage() {
             <FileText className="w-16 h-16 text-gray-600 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-white mb-4">Article Not Found</h1>
             <p className="text-gray-400 mb-8">
-              The article you're looking for doesn't exist or has been moved.
+              The article you&apos;re looking for doesn&apos;t exist or has been moved.
             </p>
             <Link
               href="/articles"
@@ -263,7 +263,7 @@ export default function ArticlePage() {
               </h2>
 
               <p className="text-gray-400 mb-8 max-w-md mx-auto">
-                We're working on creating comprehensive guides and tutorials to help you get the most out of Rowan.
+                We&apos;re working on creating comprehensive guides and tutorials to help you get the most out of Rowan.
                 Check back soon for the full article!
               </p>
 

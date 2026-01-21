@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Sparkles, ArrowRight, Users, Shield, Zap } from 'lucide-react';
@@ -10,15 +10,7 @@ import { logger } from '@/lib/logger';
 export default function UpgradePage() {
   const searchParams = useSearchParams();
   const emailParam = searchParams?.get('email');
-  const [hasTracked, setHasTracked] = useState(false);
-
-  useEffect(() => {
-    // Track page visit for conversion analytics
-    if (!hasTracked && emailParam) {
-      trackUpgradePageVisit(emailParam);
-      setHasTracked(true);
-    }
-  }, [emailParam, hasTracked]);
+  const hasTrackedRef = useRef(false);
 
   async function trackUpgradePageVisit(email: string) {
     try {
@@ -28,6 +20,18 @@ export default function UpgradePage() {
       // Fail silently - don't disrupt user experience
     }
   }
+
+  useEffect(() => {
+    // Track page visit for conversion analytics
+    if (!emailParam || hasTrackedRef.current) {
+      return;
+    }
+
+    hasTrackedRef.current = true;
+    if (emailParam) {
+      trackUpgradePageVisit(emailParam);
+    }
+  }, [emailParam]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
@@ -48,7 +52,7 @@ export default function UpgradePage() {
           Ready to Keep Your Family Organized?
         </h1>
         <p className="text-xl text-center text-gray-400 mb-12 max-w-2xl mx-auto">
-          You've experienced Rowan during the beta. Now continue enjoying all the features with a full account.
+          You&apos;ve experienced Rowan during the beta. Now continue enjoying all the features with a full account.
         </p>
 
         {/* Features Grid */}

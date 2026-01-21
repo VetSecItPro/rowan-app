@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { getAppUrl } from '@/lib/utils/app-url';
 
 interface User {
@@ -154,15 +155,31 @@ export const notificationService = {
     status: 'sent' | 'failed' | 'bounced',
     errorMessage?: string
   ): Promise<void> {
-    const supabase = createClient();
-    await supabase.from('notification_log').insert({
-      user_id: userId,
-      type,
-      category,
-      subject,
-      status,
-      error_message: errorMessage,
-    });
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const response = await csrfFetch('/api/notifications/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          type,
+          category,
+          subject,
+          status,
+          errorMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        logger.error('[notificationService] Failed to log notification:', errorData, { component: 'lib-notification-service', action: 'service_call' });
+      }
+    } catch (error) {
+      logger.error('[notificationService] Failed to log notification:', error, { component: 'lib-notification-service', action: 'service_call' });
+    }
   },
 
   /**
@@ -174,7 +191,11 @@ export const notificationService = {
     html: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch('/api/notifications/email', {
+      const isServer = typeof window === 'undefined';
+      const apiUrl = isServer
+        ? `${getAppUrl()}/api/notifications/email`
+        : '/api/notifications/email';
+      const requestInit = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +206,8 @@ export const notificationService = {
           subject,
           data: { html },
         }),
-      });
+      };
+      const response = isServer ? await fetch(apiUrl, requestInit) : await csrfFetch(apiUrl, requestInit);
 
       const result = await response.json();
       return result;

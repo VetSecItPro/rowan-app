@@ -291,8 +291,9 @@ self.addEventListener('notificationclose', (event) => {
     fetch('/api/notifications/track-dismissal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({
-        notificationId: notificationData.id,
+        notification_id: notificationData.id,
         timestamp: Date.now(),
       }),
     }).catch((error) => console.error('[Service Worker] Error tracking dismissal:', error));

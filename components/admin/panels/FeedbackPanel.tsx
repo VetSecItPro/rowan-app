@@ -3,6 +3,7 @@
 import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   MessageSquare,
   Bug,
@@ -15,7 +16,6 @@ import {
   XCircle,
   Filter,
   RefreshCw,
-  Eye,
   User,
 } from 'lucide-react';
 import { FeedbackSubmission, FeedbackType, FeedbackStatus } from '@/lib/types';
@@ -76,7 +76,7 @@ export const FeedbackPanel = memo(function FeedbackPanel() {
 
   const updateStatus = async (id: string, status: FeedbackStatus) => {
     try {
-      const response = await fetch(`/api/admin/feedback/${id}`, {
+      const response = await csrfFetch(`/api/admin/feedback/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -220,7 +220,7 @@ export const FeedbackPanel = memo(function FeedbackPanel() {
                       <option value={FeedbackStatus.NEW}>New</option>
                       <option value={FeedbackStatus.IN_PROGRESS}>In Progress</option>
                       <option value={FeedbackStatus.RESOLVED}>Resolved</option>
-                      <option value={FeedbackStatus.WONT_FIX}>Won't Fix</option>
+                      <option value={FeedbackStatus.WONT_FIX}>Won&apos;t Fix</option>
                     </select>
                   </div>
                 </div>

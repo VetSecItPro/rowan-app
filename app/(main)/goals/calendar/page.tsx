@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { goalsService, Goal, Milestone } from '@/lib/services/goals-service';
-import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Target, Trophy, Clock, Filter } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Target, Trophy, Clock, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import {
@@ -27,10 +27,6 @@ import {
   startOfDay
 } from 'date-fns';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
-
-interface MilestoneWithGoal extends Milestone {
-  goal: Pick<Goal, 'id' | 'title' | 'category' | 'status'>;
-}
 
 interface CalendarEvent {
   id: string;

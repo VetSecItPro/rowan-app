@@ -85,6 +85,29 @@ export interface NudgeAnalytics {
   weekly_trend: Array<{ week: string; generated: number; acted_upon: number }>;
 }
 
+type GoalActivityRecord = {
+  created_at: string;
+};
+
+type GoalCheckInRecord = {
+  created_at: string;
+};
+
+type GoalMetrics = {
+  goal_id: string;
+  completion_rate: number;
+  days_since_created: number;
+  has_target_date: boolean;
+  days_until_deadline: number | null;
+  days_overdue: number;
+  milestone_count: number;
+  completed_milestones: number;
+  activity_count: number;
+  days_without_progress: number;
+  days_without_checkin: number;
+  overdue_milestone?: Milestone;
+};
+
 // Define comprehensive nudge rules
 const NUDGE_RULES: NudgeRule[] = [
   {
@@ -343,12 +366,12 @@ export const goalNudgesService = {
   /**
    * Get comprehensive metrics for a goal
    */
-  async getGoalMetrics(goal: Goal): Promise<any> {
+  async getGoalMetrics(goal: Goal): Promise<GoalMetrics> {
     const supabase = createClient();
     const today = new Date();
 
     // Calculate basic metrics
-    const metrics: any = {
+    const metrics: GoalMetrics = {
       goal_id: goal.id,
       completion_rate: goal.progress || 0,
       days_since_created: differenceInDays(today, parseISO(goal.created_at)),
@@ -356,7 +379,10 @@ export const goalNudgesService = {
       days_until_deadline: goal.target_date ? differenceInDays(parseISO(goal.target_date), today) : null,
       days_overdue: goal.target_date && isAfter(today, parseISO(goal.target_date)) ? differenceInDays(today, parseISO(goal.target_date)) : 0,
       milestone_count: goal.milestones?.length || 0,
-      completed_milestones: goal.milestones?.filter(m => m.completed).length || 0
+      completed_milestones: goal.milestones?.filter(m => m.completed).length || 0,
+      activity_count: 0,
+      days_without_progress: differenceInDays(today, parseISO(goal.created_at)),
+      days_without_checkin: differenceInDays(today, parseISO(goal.created_at))
     };
 
     // Get recent activity
@@ -368,8 +394,9 @@ export const goalNudgesService = {
         .gte('created_at', subDays(today, 30).toISOString())
         .order('created_at', { ascending: false });
 
-      metrics.activity_count = activities?.length || 0;
-      metrics.days_without_progress = activities && activities.length > 0
+      const activityRecords = (activities ?? []) as GoalActivityRecord[];
+      metrics.activity_count = activityRecords.length;
+      metrics.days_without_progress = activityRecords.length > 0
         ? differenceInDays(today, parseISO(activities[0].created_at))
         : metrics.days_since_created;
 
@@ -388,7 +415,8 @@ export const goalNudgesService = {
         .order('created_at', { ascending: false })
         .limit(1);
 
-      metrics.days_without_checkin = checkIns && checkIns.length > 0
+      const checkInRecords = (checkIns ?? []) as GoalCheckInRecord[];
+      metrics.days_without_checkin = checkInRecords.length > 0
         ? differenceInDays(today, parseISO(checkIns[0].created_at))
         : metrics.days_since_created;
 
@@ -416,7 +444,11 @@ export const goalNudgesService = {
   /**
    * Evaluate nudge conditions against goal metrics
    */
-  async evaluateConditions(conditions: NudgeCondition[], goal: Goal, metrics: any): Promise<Array<{ condition: NudgeCondition; met: boolean; value: any }>> {
+  async evaluateConditions(
+    conditions: NudgeCondition[],
+    goal: Goal,
+    metrics: GoalMetrics
+  ): Promise<Array<{ condition: NudgeCondition; met: boolean; value: number }>> {
     return conditions.map(condition => {
       let actualValue: number;
 
@@ -478,9 +510,9 @@ export const goalNudgesService = {
   async createNudgeFromRule(
     rule: NudgeRule,
     goal: Goal,
-    metrics: any,
+    metrics: GoalMetrics,
     userId: string,
-    conditionResults: Array<{ condition: NudgeCondition; met: boolean; value: any }>
+    conditionResults: Array<{ condition: NudgeCondition; met: boolean; value: number }>
   ): Promise<GoalNudge | null> {
     const supabase = createClient();
 

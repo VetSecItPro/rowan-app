@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   TrendingUp,
@@ -18,7 +18,6 @@ import {
   type SpendingInsight,
   type SpendingForecast,
   type DayOfWeekPattern,
-  type MonthlyTrend,
 } from '@/lib/services/spending-pattern-service';
 
 interface SpendingInsightsDashboardProps {
@@ -30,15 +29,10 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
   const [insights, setInsights] = useState<SpendingInsight[]>([]);
   const [forecast, setForecast] = useState<SpendingForecast[]>([]);
   const [dayPatterns, setDayPatterns] = useState<DayOfWeekPattern[]>([]);
-  const [trends, setTrends] = useState<MonthlyTrend[]>([]);
   const [anomalies, setAnomalies] = useState<SpendingInsight[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadInsights();
-  }, [spaceId]);
-
-  const loadInsights = async () => {
+  const loadInsights = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -47,14 +41,12 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
         insightsData,
         forecastData,
         dayPatternsData,
-        trendsData,
         anomaliesData,
       ] = await Promise.all([
         spendingPatternService.analyzeSpendingPatterns(spaceId, 6),
         spendingPatternService.generateSpendingInsights(spaceId),
         spendingPatternService.forecastNextMonthSpending(spaceId),
         spendingPatternService.analyzeDayOfWeekPatterns(spaceId, 3),
-        spendingPatternService.getMonthlyTrends(spaceId, 6),
         spendingPatternService.detectSpendingAnomalies(spaceId),
       ]);
 
@@ -62,14 +54,17 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
       setInsights(insightsData);
       setForecast(forecastData);
       setDayPatterns(dayPatternsData);
-      setTrends(trendsData);
       setAnomalies(anomaliesData);
     } catch (error) {
       logger.error('Error loading spending insights:', error, { component: 'SpendingInsightsDashboard', action: 'component_action' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    loadInsights();
+  }, [loadInsights]);
 
   const getInsightIcon = (type: SpendingInsight['type']) => {
     switch (type) {

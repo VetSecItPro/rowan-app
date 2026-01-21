@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's own feedback
-    const result = await feedbackService.getUserFeedback(user.id);
+    const result = await feedbackService.getUserFeedback(user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(
@@ -39,10 +39,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: result.data });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: error.message || 'Internal server error' },
+      { success: false, error: message },
       { status: 500 }
     );
   }
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse browser info
-    let browserInfo: Record<string, any> | undefined;
+    let browserInfo: Record<string, unknown> | undefined;
     if (browserInfoRaw) {
       try {
         browserInfo = JSON.parse(browserInfoRaw);
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
       description: sanitizedDescription,
       screenshot: screenshot || undefined,
       browser_info: browserInfo,
-    });
+    }, supabase);
 
     if (!result.success) {
       return NextResponse.json(
@@ -129,10 +130,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: result.data });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: error.message || 'Internal server error' },
+      { success: false, error: message },
       { status: 500 }
     );
   }

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, FileText, Shield, Cookie } from 'lucide-react';
@@ -18,20 +17,18 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
 
 export default function LegalPage() {
   const searchParams = useSearchParams();
-  const initialTab = (searchParams.get('tab') as TabId) || 'terms';
-  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
-
-  useEffect(() => {
-    const tab = searchParams.get('tab') as TabId;
-    if (tab && ['terms', 'privacy', 'cookies'].includes(tab)) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const tabParam = searchParams.get('tab');
+  const activeTab: TabId =
+    tabParam === 'terms' || tabParam === 'privacy' || tabParam === 'cookies'
+      ? tabParam
+      : 'terms';
 
   const handleTabChange = (tabId: TabId) => {
-    setActiveTab(tabId);
-    // Update URL without reload
-    window.history.replaceState(null, '', `/legal?tab=${tabId}`);
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', tabId);
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   return (

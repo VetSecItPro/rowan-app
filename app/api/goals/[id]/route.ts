@@ -45,7 +45,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get goal
-    const goal = await goalsService.getGoalById(params.id);
+    const goal = await goalsService.getGoalById(params.id, supabase);
 
     if (!goal) {
       return NextResponse.json(
@@ -125,7 +125,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing goal first
-    const existingGoal = await goalsService.getGoalById(params.id);
+    const existingGoal = await goalsService.getGoalById(params.id, supabase);
 
     if (!existingGoal) {
       return NextResponse.json(
@@ -179,7 +179,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       ...body,
       title: title ? sanitizePlainText(title) : undefined,
       description: description ? sanitizePlainText(description) : undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,
@@ -228,7 +228,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing goal first
-    const existingGoal = await goalsService.getGoalById(params.id);
+    const existingGoal = await goalsService.getGoalById(params.id, supabase);
 
     if (!existingGoal) {
       return NextResponse.json(
@@ -262,7 +262,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete goal using service
-    await goalsService.deleteGoal(params.id);
+    await goalsService.deleteGoal(params.id, supabase);
 
     return NextResponse.json({
       success: true,

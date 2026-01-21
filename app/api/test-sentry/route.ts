@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import { logger } from '@/lib/logger';
 
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  *
  * This endpoint throws an error to test if Sentry is correctly capturing errors
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   // SECURITY: Block this endpoint in production to prevent information disclosure (L14)
   if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_TEST_ENDPOINTS) {
     return NextResponse.json(

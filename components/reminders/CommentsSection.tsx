@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Send, Edit, Trash2, X } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
+import { MessageCircle, Send, Edit, Trash2 } from 'lucide-react';
 import { reminderCommentsService, ReminderComment } from '@/lib/services/reminder-comments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
@@ -25,10 +26,10 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
   const [editContent, setEditContent] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch comments
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       setLoading(true);
       const data = await reminderCommentsService.getComments(reminderId);
@@ -38,12 +39,12 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [reminderId]);
 
   // Initial fetch
   useEffect(() => {
     fetchComments();
-  }, [reminderId]);
+  }, [fetchComments]);
 
   // Real-time subscription
   useEffect(() => {
@@ -70,7 +71,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [reminderId]);
+  }, [fetchComments, reminderId, supabase]);
 
   // Create comment
   const handleSubmit = async (e: React.FormEvent) => {
@@ -224,11 +225,11 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
         <div className="flex items-start gap-3">
           {/* User Avatar */}
           {user.avatar_url ? (
-            <img
+            <Image
               src={user.avatar_url}
               alt={user.name || 'User'}
-              loading="lazy"
-              decoding="async"
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
           ) : (
@@ -328,11 +329,11 @@ function CommentItem({
     <div className="flex items-start gap-3 group">
       {/* User Avatar */}
       {comment.user?.avatar_url ? (
-        <img
+        <Image
           src={comment.user.avatar_url}
-          alt={comment.user.name}
-          loading="lazy"
-          decoding="async"
+          alt={comment.user.name || 'User'}
+          width={32}
+          height={32}
           className="w-8 h-8 rounded-full object-cover flex-shrink-0"
         />
       ) : (

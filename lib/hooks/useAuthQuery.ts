@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
 import { createClient } from '@/lib/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 /**
  * User profile interface
@@ -24,7 +24,7 @@ export interface UserProfile {
   timezone?: string;
   color_theme?: string;
   pronouns?: string;
-  preferences?: Record<string, any>;
+  preferences?: Record<string, unknown>;
   is_beta_tester?: boolean;
   beta_status?: 'pending' | 'approved' | 'rejected' | 'completed';
   beta_signup_date?: string;
@@ -159,7 +159,7 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (updates: Partial<UserProfile>) => {
+    mutationFn: async (updates: Partial<UserProfile>): Promise<UserProfile> => {
       const supabase = createClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError) throw authError;
@@ -178,8 +178,8 @@ export function useUpdateProfile() {
           .single();
 
         if (error) throw error;
-        return data;
-      });
+        return data as UserProfile;
+      }) as Promise<UserProfile>;
     },
     // Optimistic update
     onMutate: async (updates) => {
@@ -220,7 +220,7 @@ export function useUpdateProfile() {
       }
     },
     // Invalidate cache on success
-    onSuccess: (data) => {
+    onSuccess: (data: UserProfile) => {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.auth.profile(data.id),
       });
@@ -257,7 +257,7 @@ export function useSignOut() {
 export function useAuthStateChange() {
   const queryClient = useQueryClient();
 
-  const handleAuthStateChange = (event: string, session: any) => {
+  const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
     switch (event) {
       case 'SIGNED_IN':
         // Invalidate auth queries to refresh data

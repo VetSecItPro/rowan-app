@@ -18,7 +18,7 @@ interface PieChartData {
   name: string;
   value: number;
   color?: string;
-  [key: string]: any; // Add index signature for recharts compatibility
+  [key: string]: string | number | undefined; // Add index signature for recharts compatibility
 }
 
 interface PieChartComponentProps {
@@ -57,7 +57,9 @@ export function PieChartComponent({
             cy="50%"
             outerRadius={80}
             fill="#8884d8"
-            label={(props: any) => `${props.name} ${((props.percent || 0) * 100).toFixed(0)}%`}
+            label={({ name, percent }: { name?: string; percent?: number }) =>
+              `${name || ''} ${(((percent ?? 0) * 100)).toFixed(0)}%`
+            }
           >
             {data.map((entry, index) => (
               <Cell

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 // Comprehensive notification types
@@ -68,7 +69,11 @@ export interface NotificationFilters {
 }
 
 export class InAppNotificationsService {
-  private supabase = createClient();
+  private supabase: SupabaseClient;
+
+  constructor(supabaseClient?: SupabaseClient) {
+    this.supabase = supabaseClient ?? createClient();
+  }
 
   /**
    * Get notifications for a user

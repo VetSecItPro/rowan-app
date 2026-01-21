@@ -7,9 +7,7 @@ import {
   X,
   Eye,
   Download,
-  Calendar,
-  Tag,
-  Image,
+  Image as ImageIcon,
   FileImage,
   Receipt,
   Hammer,
@@ -18,7 +16,6 @@ import {
   ChevronRight,
   Grid3X3,
   List,
-  Filter
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import type { ProjectPhoto, PhotoType } from '@/lib/services/project-tracking-service';
@@ -29,16 +26,16 @@ interface ProjectPhotoGalleryProps {
   onRefresh: () => void;
 }
 
+type SortBy = 'date' | 'type' | 'order';
+
 export function ProjectPhotoGallery({
-  projectId,
   photos,
-  onRefresh,
 }: ProjectPhotoGalleryProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<ProjectPhoto | null>(null);
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterType, setFilterType] = useState<PhotoType | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'type' | 'order'>('date');
+  const [sortBy, setSortBy] = useState<SortBy>('date');
 
   // Filter and sort photos
   const filteredPhotos = photos.filter(photo =>
@@ -68,7 +65,7 @@ export function ProjectPhotoGallery({
     switch (type) {
       case 'before': return <Camera className="w-4 h-4" />;
       case 'during': return <Hammer className="w-4 h-4" />;
-      case 'after': return <Image className="w-4 h-4" />;
+      case 'after': return <ImageIcon className="w-4 h-4" />;
       case 'progress': return <FileImage className="w-4 h-4" />;
       case 'receipt': return <Receipt className="w-4 h-4" />;
       case 'damage': return <AlertTriangle className="w-4 h-4" />;
@@ -146,7 +143,7 @@ export function ProjectPhotoGallery({
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
             className="px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm"
           >
             <option value="date">Sort by Date</option>
@@ -212,7 +209,7 @@ export function ProjectPhotoGallery({
               <div className="aspect-square bg-gray-700 flex items-center justify-center">
                 {/* Placeholder for actual image */}
                 <div className="w-full h-full bg-gradient-to-br from-gray-200 from-gray-600 to-gray-700 flex items-center justify-center">
-                  <Image className="w-8 h-8 text-gray-400" />
+                  <ImageIcon className="w-8 h-8 text-gray-400" />
                 </div>
               </div>
 
@@ -252,7 +249,7 @@ export function ProjectPhotoGallery({
             >
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Image className="w-6 h-6 text-gray-400" />
+                  <ImageIcon className="w-6 h-6 text-gray-400" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -339,7 +336,7 @@ export function ProjectPhotoGallery({
               <div className="relative bg-gray-700 aspect-video flex items-center justify-center">
                 {/* Placeholder for actual image */}
                 <div className="w-full h-full bg-gradient-to-br from-gray-200 from-gray-600 to-gray-700 flex items-center justify-center">
-                  <Image className="w-16 h-16 text-gray-400" />
+                  <ImageIcon className="w-16 h-16 text-gray-400" />
                 </div>
 
                 {/* Navigation */}

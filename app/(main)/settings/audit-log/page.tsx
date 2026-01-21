@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -8,6 +8,7 @@ import { getUserAuditLog, getUserAuditStats, AuditLogEntry, ActionCategory } fro
 import { SkeletonLoader } from '@/components/shared/SkeletonLoader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import {
+  type LucideIcon,
   Shield,
   Download,
   User,
@@ -28,7 +29,9 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 
-const ACTION_ICONS: Record<string, any> = {
+type AuditStats = NonNullable<Awaited<ReturnType<typeof getUserAuditStats>>['stats']>;
+
+const ACTION_ICONS: Record<string, LucideIcon> = {
   data_export: Download,
   account_login: LogIn,
   account_logout: LogOut,
@@ -53,10 +56,37 @@ export default function AuditLogPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<ActionCategory | 'all'>('all');
   const [showFilters, setShowFilters] = useState(false);
+
+  const loadAuditLog = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const result = await getUserAuditLog(user.id, {
+        limit: 50,
+        category: selectedCategory === 'all' ? undefined : selectedCategory,
+      });
+
+      if (result.success && result.data) {
+        setAuditLog(result.data);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [user, selectedCategory]);
+
+  const loadStats = useCallback(async () => {
+    if (!user) return;
+
+    const result = await getUserAuditStats(user.id);
+    if (result.success && result.stats) {
+      setStats(result.stats);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user) {
@@ -66,31 +96,7 @@ export default function AuditLogPage() {
 
     loadAuditLog();
     loadStats();
-  }, [user, selectedCategory]);
-
-  const loadAuditLog = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    const result = await getUserAuditLog(user.id, {
-      limit: 50,
-      category: selectedCategory === 'all' ? undefined : selectedCategory,
-    });
-
-    if (result.success && result.data) {
-      setAuditLog(result.data);
-    }
-    setLoading(false);
-  };
-
-  const loadStats = async () => {
-    if (!user) return;
-
-    const result = await getUserAuditStats(user.id);
-    if (result.success && result.stats) {
-      setStats(result.stats);
-    }
-  };
+  }, [loadAuditLog, loadStats, router, user]);
 
   const getActionIcon = (action: string) => {
     const Icon = ACTION_ICONS[action] || Activity;
@@ -128,7 +134,7 @@ export default function AuditLogPage() {
               <div className="mt-4 flex items-center gap-2 text-xs text-gray-400 bg-gray-900/50 p-3 rounded-lg">
                 <FileText className="w-4 h-4" />
                 <span>
-                  <strong>GDPR Article 15:</strong> Right of Access - You have the right to know what data we have and how it's processed.
+                  <strong>GDPR Article 15:</strong> Right of Access - You have the right to know what data we have and how it&apos;s processed.
                 </span>
               </div>
             </div>

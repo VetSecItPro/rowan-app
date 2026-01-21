@@ -3,6 +3,7 @@
 import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   MessageSquare,
   Bug,
@@ -13,7 +14,6 @@ import {
   CheckCircle,
   AlertCircle,
   XCircle,
-  Filter,
   RefreshCw,
   Eye,
   User,
@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { FeedbackSubmission, FeedbackType, FeedbackStatus } from '@/lib/types';
 import Image from 'next/image';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 const getTypeIcon = (type: FeedbackType | null, size: string = 'w-3 h-3') => {
   switch (type) {
@@ -63,6 +64,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackSubmission | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const safeSelectedPageUrl = selectedFeedback?.page_url ? sanitizeUrl(selectedFeedback.page_url) : '';
 
   // React Query for feedback with caching
   const { data, isLoading, refetch } = useQuery({
@@ -85,7 +87,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
 
   const updateStatus = async (id: string, status: FeedbackStatus) => {
     try {
-      const response = await fetch(`/api/admin/feedback/${id}`, {
+      const response = await csrfFetch(`/api/admin/feedback/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -104,7 +106,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
   const deleteFeedback = async (id: string) => {
     if (!confirm('Delete this feedback?')) return;
     try {
-      const response = await fetch(`/api/admin/feedback/${id}`, {
+      const response = await csrfFetch(`/api/admin/feedback/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
@@ -367,7 +369,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
                       <option value={FeedbackStatus.NEW}>New</option>
                       <option value={FeedbackStatus.IN_PROGRESS}>In Progress</option>
                       <option value={FeedbackStatus.RESOLVED}>Resolved</option>
-                      <option value={FeedbackStatus.WONT_FIX}>Won't Fix</option>
+                      <option value={FeedbackStatus.WONT_FIX}>Won&apos;t Fix</option>
                     </select>
                   </div>
                   <div className="flex items-center justify-center gap-1">
@@ -469,17 +471,17 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               </div>
 
               {/* Page URL */}
-              {selectedFeedback.page_url && (
+              {safeSelectedPageUrl && (
                 <div>
                   <h3 className="text-xs font-medium text-gray-400 mb-1">Page URL</h3>
                   <a
-                    href={selectedFeedback.page_url}
+                    href={safeSelectedPageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:underline flex items-center gap-2"
                   >
                     <Globe className="w-4 h-4" />
-                    {selectedFeedback.page_url}
+                    {safeSelectedPageUrl}
                   </a>
                 </div>
               )}
@@ -529,7 +531,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
                     <option value={FeedbackStatus.NEW}>New</option>
                     <option value={FeedbackStatus.IN_PROGRESS}>In Progress</option>
                     <option value={FeedbackStatus.RESOLVED}>Resolved</option>
-                    <option value={FeedbackStatus.WONT_FIX}>Won't Fix</option>
+                    <option value={FeedbackStatus.WONT_FIX}>Won&apos;t Fix</option>
                   </select>
                   <button
                     onClick={() => setSelectedFeedback(null)}

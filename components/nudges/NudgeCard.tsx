@@ -19,6 +19,22 @@ import {
 import { SmartNudge } from '@/lib/services/smart-nudges-service';
 import { cn } from '@/lib/utils';
 
+const NUDGE_ICON_MAP = {
+  target: Target,
+  'trending-up': TrendingUp,
+  trophy: Trophy,
+  star: Star,
+  clock: Clock,
+  'alert-triangle': AlertTriangle,
+  calendar: Calendar,
+  'bar-chart': BarChart,
+  zap: Star, // Using Star as fallback for zap
+  award: Trophy,
+  flag: Target,
+  bell: Bell,
+};
+
+
 interface NudgeCardProps {
   nudge: SmartNudge;
   onAction?: (nudgeId: string, action: 'clicked' | 'dismissed' | 'snoozed') => void;
@@ -36,26 +52,6 @@ export function NudgeCard({
 }: NudgeCardProps) {
   const [isActioned, setIsActioned] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
-  const getIcon = (iconName?: string) => {
-    const iconMap = {
-      'target': Target,
-      'trending-up': TrendingUp,
-      'trophy': Trophy,
-      'star': Star,
-      'clock': Clock,
-      'alert-triangle': AlertTriangle,
-      'calendar': Calendar,
-      'bar-chart': BarChart,
-      'zap': Star, // Using Star as fallback for zap
-      'award': Trophy,
-      'flag': Target,
-      'bell': Bell
-    };
-
-    const IconComponent = iconMap[iconName as keyof typeof iconMap] || Bell;
-    return IconComponent;
-  };
 
   const getCategoryStyles = (category: string) => {
     const styles = {
@@ -117,7 +113,8 @@ export function NudgeCard({
     }
   };
 
-  const IconComponent = getIcon(nudge.icon);
+  const iconKey = nudge.icon as keyof typeof NUDGE_ICON_MAP;
+  const IconComponent = NUDGE_ICON_MAP[iconKey] || Bell;
   const categoryStyles = getCategoryStyles(nudge.category);
   const priorityStyles = getPriorityStyles(nudge.priority);
 

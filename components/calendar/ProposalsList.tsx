@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Sparkles, MessageSquarePlus } from 'lucide-react';
 import { EventProposal, eventProposalsService } from '@/lib/services/event-proposals-service';
 import { ProposalCard } from './ProposalCard';
@@ -17,13 +17,10 @@ interface ProposalsListProps {
 export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, onCreateProposal }: ProposalsListProps) {
   const [proposals, setProposals] = useState<EventProposal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  type ProposalStatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+  const [selectedStatus, setSelectedStatus] = useState<ProposalStatusFilter>('pending');
 
-  useEffect(() => {
-    loadProposals();
-  }, [spaceId, selectedStatus]);
-
-  const loadProposals = async () => {
+  const loadProposals = useCallback(async () => {
     setLoading(true);
     try {
       const statusFilter = selectedStatus === 'all' ? undefined : selectedStatus;
@@ -34,7 +31,11 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStatus, spaceId]);
+
+  useEffect(() => {
+    loadProposals();
+  }, [loadProposals]);
 
   // Real-time subscriptions for multi-user collaboration
   useEffect(() => {
@@ -51,7 +52,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
     return () => {
       supabase.removeChannel(proposalsChannel);
     };
-  }, [spaceId]);
+  }, [spaceId, loadProposals]);
 
   const handleApprove = async (proposalId: string) => {
     // Find the proposal
@@ -142,15 +143,15 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
 
       {/* Status Filter */}
       <div className="flex items-center gap-2 border-b border-gray-700">
-        {[
+        {([
           { key: 'pending', label: 'Pending', count: statusCounts.pending },
           { key: 'approved', label: 'Approved', count: statusCounts.approved },
           { key: 'rejected', label: 'Rejected', count: statusCounts.rejected },
           { key: 'all', label: 'All', count: statusCounts.all }
-        ].map((tab) => (
+        ] as Array<{ key: ProposalStatusFilter; label: string; count: number }>).map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setSelectedStatus(tab.key as any)}
+            onClick={() => setSelectedStatus(tab.key)}
             className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
               selectedStatus === tab.key
                 ? 'border-purple-600 text-purple-400'

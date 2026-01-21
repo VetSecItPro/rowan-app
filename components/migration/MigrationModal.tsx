@@ -85,7 +85,7 @@ const MIGRATION_ITEMS: MigrationItem[] = [
 
 type MigrationStep = 'selection' | 'target' | 'confirmation' | 'progress' | 'complete';
 
-export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }: MigrationModalProps) {
+export function MigrationModal({ isOpen, onClose, personalSpace: _personalSpace, targetSpaces }: MigrationModalProps) {
   const [step, setStep] = useState<MigrationStep>('selection');
   const [selectedItems, setSelectedItems] = useState<MigrationItemType[]>(
     MIGRATION_ITEMS.filter(item => item.enabled).map(item => item.type)
@@ -178,7 +178,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
               <Database className="w-8 h-8 text-purple-400" />
             </div>
             <p className="text-gray-400 text-sm">
-              Select the data types you'd like to move from your personal workspace to a shared workspace.
+              Select the data types you&apos;d like to move from your personal workspace to a shared workspace.
             </p>
           </div>
 
@@ -311,7 +311,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
           {targetSpaces.length === 0 && (
             <div className="text-center py-6">
               <p className="text-gray-400 text-sm">
-                You don't have any shared workspaces yet.
+                You don&apos;t have any shared workspaces yet.
                 <br />
                 Create one first before migrating your data.
               </p>
@@ -497,7 +497,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace, targetSpaces }:
           </div>
 
           <div className="p-4 bg-green-900/20 border border-green-800 rounded-lg">
-            <h5 className="font-medium text-green-200 mb-2">What's Next?</h5>
+            <h5 className="font-medium text-green-200 mb-2">What&apos;s Next?</h5>
             <ul className="text-sm text-green-300 space-y-1">
               <li>• Your personal workspace remains available for future personal items</li>
               <li>• Invite others to your shared workspace if needed</li>

@@ -24,6 +24,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
     recurring: false,
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editExpense) {
       setFormData({ space_id: spaceId, title: editExpense.title, amount: editExpense.amount, category: editExpense.category || '', status: editExpense.status, due_date: editExpense.due_date || '', recurring: editExpense.recurring || false });
@@ -31,6 +32,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
       setFormData({ space_id: spaceId, title: '', amount: 0, category: '', status: 'pending', due_date: '', recurring: false });
     }
   }, [editExpense, spaceId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

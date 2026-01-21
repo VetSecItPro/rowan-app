@@ -1,14 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import {
   CheckCircle,
   Clock,
   DollarSign,
-  Calendar,
   CreditCard,
-  FileText,
   Plus,
   AlertCircle,
   Users
@@ -45,7 +43,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
   const [error, setError] = useState<string | null>(null);
 
   // Load splits and settlements
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [splitsData, settlementsData] = await Promise.all([
@@ -62,11 +60,11 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
     } finally {
       setLoading(false);
     }
-  };
+  }, [expenseId, spaceId]);
 
   useEffect(() => {
     loadData();
-  }, [expenseId, spaceId]);
+  }, [loadData]);
 
   // Handle settlement payment
   const handleSettleAmount = async (splitId: string, amount?: number) => {

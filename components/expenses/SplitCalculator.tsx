@@ -226,7 +226,7 @@ export function SplitCalculator({
           <div className="flex items-start gap-2 mb-2">
             <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-blue-200">
-              <strong>Income-based split:</strong> Proportional to each person's income
+              <strong>Income-based split:</strong> Proportional to each person&apos;s income
             </div>
           </div>
           {user1Income > 0 && user2Income > 0 ? (

@@ -19,6 +19,7 @@ interface NewMilestoneModalProps {
 }
 
 export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goalId, availableGoals = [] }: NewMilestoneModalProps) {
+  type MilestoneType = CreateMilestoneInput['type'];
   const [formData, setFormData] = useState<CreateMilestoneInput>({
     goal_id: goalId,
     title: '',
@@ -31,6 +32,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editMilestone) {
       setFormData({
@@ -57,6 +59,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
     }
     setShowEmojiPicker(false);
   }, [editMilestone, goalId, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleDependencyChange = (value: string | undefined) => {
     setFormData({ ...formData, depends_on_goal_id: value || '' });
@@ -100,7 +103,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
     onClose();
   };
 
-  const typeOptions = [
+  const typeOptions: Array<{ value: MilestoneType; label: string; icon: typeof DollarSign; desc: string }> = [
     { value: 'percentage', label: 'Percentage', icon: Percent, desc: 'Track progress as %' },
     { value: 'money', label: 'Money', icon: DollarSign, desc: 'Track financial goals' },
     { value: 'count', label: 'Count', icon: Hash, desc: 'Track countable items' },
@@ -213,7 +216,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setFormData({ ...formData, type: option.value as any })}
+                    onClick={() => setFormData({ ...formData, type: option.value })}
                     className={`p-4 rounded-xl border-2 transition-all text-left ${
                       formData.type === option.value
                         ? 'border-indigo-500 bg-indigo-900/20'

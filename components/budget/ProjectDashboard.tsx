@@ -1,18 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Calendar,
   CheckCircle,
-  Clock,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
   AlertTriangle,
   BarChart3,
   Users,
   MapPin,
-  Tag,
   Edit3,
   Plus
 } from 'lucide-react';
@@ -20,11 +15,26 @@ import { format, parseISO, isAfter } from 'date-fns';
 import { DynamicPieChart, DynamicBarChart } from '@/components/charts/DynamicCharts';
 import type { Project, ProjectLineItem } from '@/lib/services/project-tracking-service';
 
+type CostBreakdownItem = {
+  category: string;
+  total_estimated: number;
+  total_actual: number;
+};
+
+type ProjectExpense = {
+  id?: string;
+  amount: number;
+  date?: string;
+  category?: string;
+  description?: string;
+  vendor?: string;
+};
+
 interface ProjectDashboardProps {
   project: Project;
   lineItems: ProjectLineItem[];
-  costBreakdown: any[];
-  expenses: any[];
+  costBreakdown: CostBreakdownItem[];
+  expenses: ProjectExpense[];
   onRefresh: () => void;
 }
 
@@ -32,16 +42,11 @@ export function ProjectDashboard({
   project,
   lineItems,
   costBreakdown,
-  expenses,
-  onRefresh,
 }: ProjectDashboardProps) {
-  const [showEditProject, setShowEditProject] = useState(false);
-
   // Calculate metrics
   const totalEstimated = lineItems.reduce((sum, item) => sum + item.estimated_cost, 0);
   const totalActual = lineItems.reduce((sum, item) => sum + item.actual_cost, 0);
   const totalPaid = lineItems.filter(item => item.is_paid).reduce((sum, item) => sum + item.actual_cost, 0);
-  const totalUnpaid = lineItems.filter(item => !item.is_paid).reduce((sum, item) => sum + item.estimated_cost, 0);
 
   const completedItems = lineItems.filter(item => item.is_paid).length;
   const pendingItems = lineItems.filter(item => !item.is_paid).length;
@@ -261,7 +266,7 @@ export function ProjectDashboard({
             Project Details
           </h3>
           <button
-            onClick={() => setShowEditProject(true)}
+            onClick={() => { /* TODO: Implement edit project modal */ }}
             className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors text-sm font-medium"
           >
             <Edit3 className="w-4 h-4" />

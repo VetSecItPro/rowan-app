@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, memo } from 'react';
-import { X, Smile, ChevronDown, Repeat, Calendar, User, Clock, MessageSquare, Tag, Star, Users, CheckSquare, Home, Loader2, Trophy } from 'lucide-react';
+import { X, Repeat, Calendar, Tag, Star, Users, CheckSquare, Home, Loader2, Trophy } from 'lucide-react';
 import { CreateTaskInput, CreateChoreInput, Task, Chore } from '@/lib/types';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { taskRecurrenceService } from '@/lib/services/task-recurrence-service';
@@ -15,45 +15,73 @@ import {
   PRIORITY_LEVELS,
   FAMILY_ROLES,
   RECURRING_PATTERNS,
-  STATUS_TYPES,
-  EMOJIS
+  STATUS_TYPES
 } from '@/lib/constants/item-categories';
 
 type ItemType = 'task' | 'chore';
 type ModalMode = 'create' | 'quickEdit';
+type SectionId = 'basic' | 'details' | 'family' | 'schedule';
+
+const SECTION_IDS: SectionId[] = ['basic', 'details', 'family', 'schedule'];
+
+type FormDataState = {
+  space_id: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  status: string;
+  due_date: string;
+  assigned_to: string;
+  estimated_hours: string;
+  tags: string;
+  frequency: string;
+  point_value: number;
+};
+
+type EditItemData = Partial<Task & Chore> & { type?: ItemType };
 
 interface UnifiedItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (item: CreateTaskInput | CreateChoreInput) => void | Promise<void | { id: string }>;
-  editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | null;
+  editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | (Partial<Task & Chore> & { type: 'task' | 'chore' }) | null;
   spaceId?: string;
   userId?: string;
   defaultType?: ItemType;
   mode?: ModalMode;
 }
 
-export const UnifiedItemModal = memo(function UnifiedItemModal({
-  isOpen,
-  onClose,
-  onSave,
-  editItem,
-  spaceId,
-  userId,
-  defaultType = 'task',
-  mode = 'create'
-}: UnifiedItemModalProps) {
-  const { currentSpace, createSpace, hasZeroSpaces } = useAuthWithSpaces();
+interface UnifiedItemModalContentProps extends UnifiedItemModalProps {
+  currentSpaceId?: string;
+  hasZeroSpaces: boolean;
+}
 
-  // Space management state
-  const [actualSpaceId, setActualSpaceId] = useState<string | undefined>(spaceId);
-  const [spaceCreationLoading, setSpaceCreationLoading] = useState(false);
-  const [spaceError, setSpaceError] = useState<string>('');
+const buildInitialFormData = (
+  editItem: UnifiedItemModalProps['editItem'],
+  defaultType: ItemType,
+  spaceId?: string
+): FormDataState => {
+  if (editItem) {
+    const editItemData = editItem as EditItemData;
+    return {
+      space_id: spaceId || '',
+      title: editItemData.title || '',
+      description: editItemData.description || '',
+      category: editItemData.category || '',
+      priority: editItemData.priority || 'medium',
+      status: editItemData.status || 'pending',
+      due_date: editItemData.due_date || '',
+      assigned_to: editItemData.assigned_to || '',
+      estimated_hours: editItemData.estimated_hours?.toString() || '',
+      tags: editItemData.tags || '',
+      frequency: editItemData.frequency || 'once',
+      point_value: editItemData.point_value || 10,
+    };
+  }
 
-  // Core state
-  const [itemType, setItemType] = useState<ItemType>(defaultType);
-  const [formData, setFormData] = useState<any>({
-    space_id: actualSpaceId || '',
+  return {
+    space_id: spaceId || '',
     title: '',
     description: '',
     category: '',
@@ -63,17 +91,42 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     assigned_to: '',
     estimated_hours: '',
     tags: '',
-    frequency: 'once', // Add missing frequency field for chores
-    point_value: 10, // Default points for chores
+    frequency: 'once',
+    point_value: 10,
+  };
+};
+
+const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
+  isOpen,
+  onClose,
+  onSave,
+  editItem,
+  spaceId,
+  userId,
+  defaultType = 'task',
+  mode = 'create',
+  currentSpaceId,
+  hasZeroSpaces,
+}: UnifiedItemModalContentProps) {
+  const resolvedSpaceId = spaceId || editItem?.space_id || currentSpaceId;
+
+  // Space management state
+  const spaceCreationLoading = false;
+  const [spaceError, setSpaceError] = useState<string>(
+    hasZeroSpaces && isOpen && !resolvedSpaceId
+      ? 'Please create a workspace before adding items.'
+      : ''
+  );
+
+  // Core state
+  const [itemType, setItemType] = useState<ItemType>((editItem as EditItemData | null)?.type || defaultType);
+  const [formData, setFormData] = useState<FormDataState>({
+    ...buildInitialFormData(editItem, defaultType, resolvedSpaceId),
   });
 
   // UI state
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
-  const [activeSection, setActiveSection] = useState<string>('basic');
-
-  // Section navigation
-  const sections = ['basic', 'details', 'family', 'schedule'];
+  const [activeSection, setActiveSection] = useState<SectionId>('basic');
 
   // Enhanced features state
   const [isRecurring, setIsRecurring] = useState(false);
@@ -83,73 +136,9 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     days_of_week: [] as number[],
     end_date: '',
   });
-  const [intervalTouched, setIntervalTouched] = useState(false);
   const [calendarSync, setCalendarSync] = useState(false);
   const [familyAssignment, setFamilyAssignment] = useState('unassigned');
   const [quickNote, setQuickNote] = useState('');
-
-  // Set up space ID when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      if (spaceId) {
-        // Use provided spaceId
-        setActualSpaceId(spaceId);
-        setFormData((prev: any) => ({ ...prev, space_id: spaceId }));
-      } else if (currentSpace && !editItem) {
-        // Use current space from context
-        setActualSpaceId(currentSpace.id);
-        setFormData((prev: any) => ({ ...prev, space_id: currentSpace.id }));
-      } else if (editItem) {
-        // For edit mode, keep existing space_id from the item
-        setActualSpaceId(editItem.space_id);
-        setFormData((prev: any) => ({ ...prev, space_id: editItem.space_id }));
-      } else if (hasZeroSpaces) {
-        // Zero spaces scenario - this should be handled by AppWithOnboarding
-        // but if we get here, show a friendly error
-        setSpaceError('Please create a workspace before adding items.');
-      }
-    }
-  }, [isOpen, spaceId, currentSpace, editItem, hasZeroSpaces]);
-
-  // Initialize form data
-  useEffect(() => {
-    if (editItem) {
-      setItemType(editItem.type || 'task');
-      setFormData({
-        space_id: actualSpaceId || '',
-        title: editItem.title || '',
-        description: editItem.description || '',
-        category: (editItem as any).category || '',
-        priority: (editItem as any).priority || 'medium',
-        status: editItem.status || 'pending',
-        due_date: editItem.due_date || '',
-        assigned_to: editItem.assigned_to || '',
-        estimated_hours: (editItem as any).estimated_hours || '',
-        tags: (editItem as any).tags || '',
-        frequency: (editItem as any).frequency || 'once',
-        point_value: (editItem as any).point_value || 10,
-      });
-    } else {
-      // Reset for new items and set to defaultType
-      setItemType(defaultType);
-      setFormData({
-        space_id: actualSpaceId || '',
-        title: '',
-        description: '',
-        category: '',
-        priority: 'medium',
-        status: 'pending',
-        due_date: '',
-        assigned_to: '',
-        estimated_hours: '',
-        tags: '',
-        frequency: 'once',
-        point_value: 10,
-      });
-    }
-    setActiveSection('basic');
-    setIntervalTouched(false); // Reset interval touched state for new modal instances
-  }, [editItem, actualSpaceId, isOpen, defaultType]);
 
   // Tab navigation using keyboard
   useEffect(() => {
@@ -170,35 +159,38 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
         if (!isFormControl) {
           event.preventDefault();
 
-          const currentIndex = sections.indexOf(activeSection);
+          const currentIndex = SECTION_IDS.indexOf(activeSection);
           let nextIndex;
 
           if (event.shiftKey) {
             // Shift+Tab: go to previous section
-            nextIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
+            nextIndex = currentIndex > 0 ? currentIndex - 1 : SECTION_IDS.length - 1;
           } else {
             // Tab: go to next section
-            nextIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
+            nextIndex = currentIndex < SECTION_IDS.length - 1 ? currentIndex + 1 : 0;
           }
 
-          setActiveSection(sections[nextIndex]);
+          setActiveSection(SECTION_IDS[nextIndex]);
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, activeSection, sections]);
+  }, [isOpen, activeSection]);
 
   // Form handlers
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof FormDataState, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: field === 'point_value' ? Number(value) || 0 : value,
+    }));
     if (field === 'due_date') setDateError('');
   };
 
   const handleTypeSwitch = (type: ItemType) => {
     setItemType(type);
-    setFormData((prev: any) => ({ ...prev, category: '' })); // Reset category when switching
+    setFormData((prev) => ({ ...prev, category: '' })); // Reset category when switching
   };
 
   // Validation helper for recurring interval
@@ -245,7 +237,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     }
 
     // Ensure we have a space ID before proceeding
-    if (!actualSpaceId) {
+    if (!resolvedSpaceId) {
       setSpaceError('Space creation required');
       return;
     }
@@ -482,12 +474,12 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
 
             {/* Compact Section Navigation - Horizontal scroll on mobile */}
             <div className="flex gap-1.5 sm:gap-2 p-1 bg-gray-900 rounded-full sm:rounded-xl overflow-x-auto scrollbar-hide">
-              {[
-                { id: 'basic', label: 'Basics', emoji: '📝', icon: Tag },
-                { id: 'details', label: 'Details', emoji: '⚡', icon: Star },
-                { id: 'family', label: 'Family', emoji: '👥', icon: Users },
-                { id: 'schedule', label: 'Schedule', emoji: '📅', icon: Calendar },
-              ].map(section => (
+              {([
+                { id: 'basic' as const, label: 'Basics', emoji: '📝', icon: Tag },
+                { id: 'details' as const, label: 'Details', emoji: '⚡', icon: Star },
+                { id: 'family' as const, label: 'Family', emoji: '👥', icon: Users },
+                { id: 'schedule' as const, label: 'Schedule', emoji: '📅', icon: Calendar },
+              ]).map(section => (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
@@ -543,7 +535,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                     </label>
                     <Dropdown
                       value={formData.category}
-                      onChange={(value) => handleInputChange('category', value)}
+                      onChange={(value) => handleInputChange('category', value || '')}
                       options={getCategoryOptions()}
                       placeholder="Select a category"
                     />
@@ -556,7 +548,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                     </label>
                     <Dropdown
                       value={formData.priority}
-                      onChange={(value) => handleInputChange('priority', value)}
+                      onChange={(value) => handleInputChange('priority', value || '')}
                       options={getPriorityOptions()}
                       placeholder="Select priority..."
                     />
@@ -576,7 +568,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                     </label>
                     <Dropdown
                       value={formData.status}
-                      onChange={(value) => handleInputChange('status', value)}
+                      onChange={(value) => handleInputChange('status', value || '')}
                       options={getStatusOptions()}
                       placeholder="Select status..."
                     />
@@ -708,7 +700,7 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                   <div>
                     <DateTimePicker
                       value={formData.due_date}
-                      onChange={(value) => handleInputChange('due_date', value)}
+                      onChange={(value) => handleInputChange('due_date', value || '')}
                       label="Due Date"
                       placeholder="Click to select date and time..."
                     />
@@ -745,7 +737,6 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
                       <button
                         onClick={() => {
                           setIsRecurring(!isRecurring);
-                          setIntervalTouched(false); // Reset when toggling recurring mode
                         }}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           isRecurring
@@ -923,3 +914,19 @@ export const UnifiedItemModal = memo(function UnifiedItemModal({
     </div>
   );
 });
+
+export function UnifiedItemModal(props: UnifiedItemModalProps) {
+  const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
+  const { editItem, isOpen, spaceId, defaultType = 'task' } = props;
+  const resolvedSpaceId = spaceId || editItem?.space_id || currentSpace?.id || 'none';
+  const modalKey = `${editItem?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${resolvedSpaceId}-${defaultType}`;
+
+  return (
+    <UnifiedItemModalContent
+      key={modalKey}
+      currentSpaceId={currentSpace?.id}
+      hasZeroSpaces={hasZeroSpaces}
+      {...props}
+    />
+  );
+}

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Heart, ThumbsUp, Smile, Users, Calendar, CheckCircle2, Target, Mic, Image as ImageIcon } from 'lucide-react';
-import { GoalActivity, GoalComment, CreateCommentInput } from '@/lib/services/goals-service';
+import { MessageCircle, Users, Calendar, CheckCircle2, Target, Mic } from 'lucide-react';
+import { GoalActivity, GoalComment } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
@@ -13,6 +14,23 @@ interface ActivityFeedProps {
   goalId?: string; // If provided, filter activities for specific goal
   className?: string;
 }
+
+type ActivityData = Partial<{
+  goal_title: string;
+  progress_percentage: number;
+  mood: string;
+  has_voice_note: boolean;
+  has_notes: boolean;
+  need_help: boolean;
+}>;
+
+type AuthUser = {
+  email?: string | null;
+  full_name?: string | null;
+  user_metadata?: {
+    full_name?: string | null;
+  };
+};
 
 const activityIcons = {
   goal_created: Target,
@@ -55,21 +73,16 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   const [newComment, setNewComment] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  useEffect(() => {
-    loadUser();
-    loadActivities();
-  }, [spaceId, goalId]);
-
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
-  };
+  }, [supabase]);
 
-  const loadActivities = async () => {
+  const loadActivities = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -106,7 +119,12 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     } finally {
       setLoading(false);
     }
-  };
+  }, [goalId, spaceId, supabase]);
+
+  useEffect(() => {
+    loadUser();
+    loadActivities();
+  }, [loadUser, loadActivities]);
 
   const loadComments = async (activityId: string) => {
     if (comments[activityId]) return; // Already loaded
@@ -146,12 +164,6 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     try {
       setIsSubmitting(true);
 
-      const commentInput: CreateCommentInput = {
-        goal_id: activityId, // This might need adjustment based on your schema
-        content,
-        content_type: 'text'
-      };
-
       // This would need to be implemented in your goals service
       // await goalsService.createComment(commentInput);
 
@@ -167,6 +179,8 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
   const handleReaction = async (commentId: string, emoji: string) => {
     hapticLight();
+    void commentId;
+    void emoji;
     try {
       // This would need to be implemented in your goals service
       // await goalsService.toggleCommentReaction(commentId, emoji);
@@ -176,7 +190,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   };
 
   const getActivityDescription = (activity: GoalActivity) => {
-    const data = activity.activity_data as any;
+    const data = activity.activity_data as ActivityData;
 
     switch (activity.activity_type) {
       case 'goal_created':
@@ -202,14 +216,14 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
   };
 
   const getActivityMetadata = (activity: GoalActivity) => {
-    const data = activity.activity_data as any;
+    const data = activity.activity_data as ActivityData;
     const metadata = [];
 
     if (data?.has_voice_note) {
       metadata.push(<Mic key="voice" className="h-3 w-3 text-purple-500" />);
     }
 
-    if (data?.has_notes && data.has_notes !== false) {
+    if (data?.has_notes) {
       metadata.push(<MessageCircle key="notes" className="h-3 w-3 text-blue-500" />);
     }
 
@@ -224,9 +238,10 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     return metadata;
   };
 
-  const getUserInitials = (user: any) => {
-    if (user?.full_name) {
-      return user.full_name.split(' ').map((n: string) => n[0]).join('');
+  const getUserInitials = (user: AuthUser | null) => {
+    const fullName = user?.full_name || user?.user_metadata?.full_name;
+    if (fullName) {
+      return fullName.split(' ').map((n) => n[0]).join('');
     }
     return user?.email?.[0].toUpperCase() || '?';
   };
@@ -272,13 +287,15 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                     {/* Avatar */}
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-300">
                       {activity.user?.avatar_url ? (
-                        <img
+                        <Image
                           src={activity.user.avatar_url}
                           alt=""
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        getUserInitials(activity.user)
+                        getUserInitials(activity.user || null)
                       )}
                     </div>
 
@@ -319,13 +336,15 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                             <div key={comment.id} className="flex items-start space-x-2">
                               <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
                                 {comment.user?.avatar_url ? (
-                                  <img
+                                  <Image
                                     src={comment.user.avatar_url}
                                     alt=""
+                                    width={24}
+                                    height={24}
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
-                                  getUserInitials(comment.user)
+                                  getUserInitials(comment.user || null)
                                 )}
                               </div>
                               <div className="flex-1">
@@ -357,10 +376,12 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
                           <div className="flex items-start space-x-2">
                             <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
-                              {user?.avatar_url ? (
-                                <img
-                                  src={user.avatar_url}
+                              {(user as { avatar_url?: string } | null)?.avatar_url ? (
+                                <Image
+                                  src={(user as { avatar_url: string }).avatar_url}
                                   alt=""
+                                  width={24}
+                                  height={24}
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
                               ) : (

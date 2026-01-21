@@ -4,8 +4,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Goal } from '@/lib/services/goals-service';
 import { GoalCard } from './GoalCard';
-import { GripVertical, Pin, Sparkles } from 'lucide-react';
-import { hapticLight, hapticMedium, hapticSuccess } from '@/lib/utils/haptics';
+import { GripVertical, Pin } from 'lucide-react';
+import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { PresenceIndicator } from '@/components/shared/PresenceIndicator';
 import type { PresenceUser } from '@/lib/hooks/usePresence';
 

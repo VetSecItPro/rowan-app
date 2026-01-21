@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
-import { Search, Filter, Trophy, Star, Award, Users, Calendar, Target } from 'lucide-react';
+import { Search, Filter, Trophy } from 'lucide-react';
 import { BadgeCard } from './BadgeCard';
 import { BadgeModal } from './BadgeModal';
 import {
@@ -88,15 +88,6 @@ export function BadgeGallery({
     return filtered;
   }, [badges, selectedCategory, selectedRarity, showEarnedOnly, debouncedSearchQuery, achievementMap]);
 
-  const categoryIcons: Record<BadgeCategory, React.ComponentType<{ className?: string }>> = {
-    goals: Target,
-    milestones: Award,
-    streaks: Star,
-    social: Users,
-    special: Trophy,
-    seasonal: Calendar
-  };
-
   const categoryLabels: Record<BadgeCategory, string> = {
     goals: 'Goals',
     milestones: 'Milestones',
@@ -104,14 +95,6 @@ export function BadgeGallery({
     social: 'Social',
     special: 'Special',
     seasonal: 'Seasonal'
-  };
-
-  const rarityColors: Record<BadgeRarity, string> = {
-    common: 'text-gray-600',
-    uncommon: 'text-green-600',
-    rare: 'text-blue-600',
-    epic: 'text-purple-600',
-    legendary: 'text-orange-600'
   };
 
   return (

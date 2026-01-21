@@ -113,7 +113,7 @@ export function RecurringPatternsList({
           No Recurring Patterns Detected
         </h3>
         <p className="text-sm text-gray-400 mb-4">
-          We haven't found any recurring expense patterns yet. This could mean:
+          We haven&apos;t found any recurring expense patterns yet. This could mean:
         </p>
         <ul className="text-sm text-gray-400 text-left max-w-md mx-auto space-y-1 mb-4">
           <li>• Not enough expense history (need at least 3 occurrences)</li>

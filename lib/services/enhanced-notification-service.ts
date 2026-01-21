@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { pushService } from './push-service';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 // Removed notification-preferences-service and digest-service dependencies - using direct notification system
 
 export interface NotificationPayload {
@@ -8,7 +9,7 @@ export interface NotificationPayload {
   title: string;
   content: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface NotificationResult {
@@ -22,6 +23,14 @@ interface SpaceMember {
   user_id: string;
   email: string;
   name: string;
+}
+
+interface SpaceMemberRow {
+  user_id: string;
+  users: {
+    email: string;
+    name: string | null;
+  };
 }
 
 /**
@@ -51,7 +60,9 @@ export const enhancedNotificationService = {
       return [];
     }
 
-    return (members || []).map((member: any) => ({
+    const typedMembers = (members || []) as SpaceMemberRow[];
+
+    return typedMembers.map((member) => ({
       user_id: member.user_id,
       email: member.users.email,
       name: member.users.name || member.users.email.split('@')[0],
@@ -65,10 +76,10 @@ export const enhancedNotificationService = {
     type: string,
     recipient: string,
     subject: string,
-    data: Record<string, any>
+    data: Record<string, unknown>
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch('/api/notifications/email', {
+      const response = await csrfFetch('/api/notifications/email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

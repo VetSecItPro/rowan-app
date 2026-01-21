@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Eye, EyeOff, Shield } from 'lucide-react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/admin/auth/login', {
+      const response = await csrfFetch('/api/admin/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

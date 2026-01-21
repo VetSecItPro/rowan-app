@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
 import { taskApprovalsService } from '@/lib/services/task-approvals-service';
 import { Modal } from '@/components/ui/Modal';
@@ -29,15 +29,26 @@ interface TaskApproval {
   task_id: string;
   approver_id: string;
   status: 'pending' | 'approved' | 'rejected' | 'changes_requested';
-  note?: string;
+  note?: string | null;
   requested_by: string;
-  requested_by_user?: any;
+  requested_by_user?: {
+    id: string;
+    email: string;
+    full_name: string | null;
+  };
   requested_at?: string;
-  approver_user?: any;
-  review_note?: string;
+  approver_user?: {
+    id: string;
+    email: string;
+    full_name: string | null;
+  };
+  review_note?: string | null;
+  changes_requested?: string | null;
   reviewed_at?: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
+  approver?: Record<string, unknown>;
+  task?: Record<string, unknown>;
 }
 
 export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId }: ApprovalModalProps) {
@@ -48,14 +59,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
   const [selectedApprover, setSelectedApprover] = useState('');
   const [reviewNote, setReviewNote] = useState('');
 
-  useEffect(() => {
-    if (isOpen) {
-      loadApprovals();
-      loadSpaceMembers();
-    }
-  }, [isOpen, taskId]);
-
-  async function loadApprovals() {
+  const loadApprovals = useCallback(async () => {
     try {
       const data = await taskApprovalsService.getApprovals(taskId);
       setApprovals(data);
@@ -64,9 +68,9 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     } finally {
       setLoading(false);
     }
-  }
+  }, [taskId]);
 
-  async function loadSpaceMembers() {
+  const loadSpaceMembers = useCallback(async () => {
     const supabase = createClient();
     const { data } = await supabase
       .from('space_members')
@@ -81,8 +85,15 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       .eq('space_id', spaceId)
       .neq('user_id', currentUserId);
 
-    setSpaceMembers((data || []) as any);
-  }
+    setSpaceMembers((data ?? []) as SpaceMember[]);
+  }, [spaceId, currentUserId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadApprovals();
+      loadSpaceMembers();
+    }
+  }, [isOpen, loadApprovals, loadSpaceMembers]);
 
   async function requestApproval() {
     if (!selectedApprover) return;

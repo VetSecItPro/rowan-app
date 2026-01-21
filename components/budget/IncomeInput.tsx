@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DollarSign, AlertCircle, Check } from 'lucide-react';
+import { AlertCircle, Check } from 'lucide-react';
 import { safeValidateMonthlyIncome } from '@/lib/validations/budget-templates';
 
 interface IncomeInputProps {
@@ -31,6 +31,7 @@ export function IncomeInput({
 
   // Update input when value prop changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(value.toString() || '');
   }, [value]);
 

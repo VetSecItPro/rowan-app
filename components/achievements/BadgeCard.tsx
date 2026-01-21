@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Badge, Lock, Star, Trophy, Crown, Gem } from 'lucide-react';
+import { Badge, Lock, Star, Trophy, Crown, Gem, type LucideIcon } from 'lucide-react';
 import { AchievementBadge, UserAchievement, BadgeRarity } from '@/lib/services/achievement-badges-service';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +18,49 @@ interface BadgeCardProps {
   size?: 'small' | 'medium' | 'large';
   showProgress?: boolean;
 }
+
+const rarityIcons: Record<BadgeRarity, LucideIcon> = {
+  common: Badge,
+  uncommon: Star,
+  rare: Trophy,
+  epic: Crown,
+  legendary: Gem,
+};
+
+const rarityColors = {
+  common: {
+    bg: 'bg-gray-800',
+    border: 'border-gray-600',
+    icon: 'text-gray-400',
+    glow: 'shadow-gray-800/50'
+  },
+  uncommon: {
+    bg: 'bg-green-900/20',
+    border: 'border-green-600',
+    icon: 'text-green-400',
+    glow: 'shadow-green-800/50'
+  },
+  rare: {
+    bg: 'bg-blue-900/20',
+    border: 'border-blue-600',
+    icon: 'text-blue-400',
+    glow: 'shadow-blue-800/50'
+  },
+  epic: {
+    bg: 'bg-purple-900/20',
+    border: 'border-purple-600',
+    icon: 'text-purple-400',
+    glow: 'shadow-purple-800/50'
+  },
+  legendary: {
+    bg: 'bg-orange-900/20',
+    border: 'border-orange-600',
+    icon: 'text-orange-400',
+    glow: 'shadow-orange-800/50'
+  }
+} as const;
+
+const getRarityColors = (rarity: BadgeRarity) => rarityColors[rarity] || rarityColors.common;
 
 export function BadgeCard({
   badge,
@@ -45,55 +88,8 @@ export function BadgeCard({
     large: 'w-16 h-16'
   };
 
-  const getRarityIcon = (rarity: BadgeRarity) => {
-    switch (rarity) {
-      case 'common': return Badge;
-      case 'uncommon': return Star;
-      case 'rare': return Trophy;
-      case 'epic': return Crown;
-      case 'legendary': return Gem;
-      default: return Badge;
-    }
-  };
-
-  const getRarityColors = (rarity: BadgeRarity) => {
-    const colors = {
-      common: {
-        bg: 'bg-gray-800',
-        border: 'border-gray-600',
-        icon: 'text-gray-400',
-        glow: 'shadow-gray-800/50'
-      },
-      uncommon: {
-        bg: 'bg-green-900/20',
-        border: 'border-green-600',
-        icon: 'text-green-400',
-        glow: 'shadow-green-800/50'
-      },
-      rare: {
-        bg: 'bg-blue-900/20',
-        border: 'border-blue-600',
-        icon: 'text-blue-400',
-        glow: 'shadow-blue-800/50'
-      },
-      epic: {
-        bg: 'bg-purple-900/20',
-        border: 'border-purple-600',
-        icon: 'text-purple-400',
-        glow: 'shadow-purple-800/50'
-      },
-      legendary: {
-        bg: 'bg-orange-900/20',
-        border: 'border-orange-600',
-        icon: 'text-orange-400',
-        glow: 'shadow-orange-800/50'
-      }
-    };
-    return colors[rarity] || colors.common;
-  };
-
   const colors = getRarityColors(badge.rarity);
-  const RarityIcon = getRarityIcon(badge.rarity);
+  const RarityIcon = rarityIcons[badge.rarity] || Badge;
 
   return (
     <div

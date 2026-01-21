@@ -8,7 +8,6 @@ import {
   Users,
   Percent,
   TrendingDown,
-  TrendingUp,
   Crown,
   Calendar,
   RefreshCw,

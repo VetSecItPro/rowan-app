@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/client';
 import { remindersService } from './reminders-service';
+import type { Reminder } from './reminders-service';
 
 // =============================================
 // BULK OPERATIONS SERVICE
@@ -18,7 +18,6 @@ export const remindersBulkService = {
    * Complete multiple reminders at once
    */
   async completeReminders(reminderIds: string[]): Promise<BulkOperationResult> {
-    const supabase = createClient();
     let successCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
@@ -48,7 +47,6 @@ export const remindersBulkService = {
    * Delete multiple reminders at once
    */
   async deleteReminders(reminderIds: string[]): Promise<BulkOperationResult> {
-    const supabase = createClient();
     let successCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
@@ -75,7 +73,6 @@ export const remindersBulkService = {
    * Reassign multiple reminders to a new user
    */
   async reassignReminders(reminderIds: string[], newAssigneeId: string | null): Promise<BulkOperationResult> {
-    const supabase = createClient();
     let successCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
@@ -107,7 +104,6 @@ export const remindersBulkService = {
     reminderIds: string[],
     newPriority: 'low' | 'medium' | 'high' | 'urgent'
   ): Promise<BulkOperationResult> {
-    const supabase = createClient();
     let successCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
@@ -139,7 +135,6 @@ export const remindersBulkService = {
     reminderIds: string[],
     newCategory: 'bills' | 'health' | 'work' | 'personal' | 'household'
   ): Promise<BulkOperationResult> {
-    const supabase = createClient();
     let successCount = 0;
     let failedCount = 0;
     const errors: string[] = [];
@@ -167,14 +162,14 @@ export const remindersBulkService = {
   /**
    * Export reminders to JSON
    */
-  exportToJSON(reminders: any[]): string {
+  exportToJSON(reminders: Reminder[]): string {
     return JSON.stringify(reminders, null, 2);
   },
 
   /**
    * Export reminders to CSV
    */
-  exportToCSV(reminders: any[]): string {
+  exportToCSV(reminders: Reminder[]): string {
     if (reminders.length === 0) return '';
 
     // CSV headers

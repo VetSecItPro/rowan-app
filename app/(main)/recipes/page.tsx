@@ -10,6 +10,7 @@ import { mealsService, type Recipe } from '@/lib/services/meals-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 export default function RecipesPage() {
   const { user } = useAuth();
@@ -390,30 +391,35 @@ export default function RecipesPage() {
         {/* Recipe Grid */}
         {!loading && filteredRecipes.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRecipes.map((recipe) => (
-              <div
-                key={recipe.id}
-                className="bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                {/* Recipe Image */}
-                {recipe.image_url ? (
-                  <div className="h-48 overflow-hidden bg-gray-700">
-                    <img
-                      src={recipe.image_url}
-                      alt={recipe.name}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div className="h-48 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                    <ChefHat className="w-16 h-16 text-white/30" />
-                  </div>
-                )}
+            {filteredRecipes.map((recipe) => {
+              const safeImageUrl = recipe.image_url ? sanitizeUrl(recipe.image_url) : '';
+              const safeSourceUrl = recipe.source_url ? sanitizeUrl(recipe.source_url) : '';
+
+              return (
+                <div
+                  key={recipe.id}
+                  className="bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+                >
+                  {/* Recipe Image */}
+                  {safeImageUrl ? (
+                    <div className="h-48 overflow-hidden bg-gray-700">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={safeImageUrl}
+                        alt={recipe.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                      <ChefHat className="w-16 h-16 text-white/30" />
+                    </div>
+                  )}
 
                 <div className="p-5">
                   {/* Recipe Name */}
@@ -472,9 +478,9 @@ export default function RecipesPage() {
                     >
                       View Recipe
                     </Link>
-                    {recipe.source_url && (
+                    {safeSourceUrl && (
                       <a
-                        href={recipe.source_url}
+                        href={safeSourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
@@ -493,8 +499,9 @@ export default function RecipesPage() {
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

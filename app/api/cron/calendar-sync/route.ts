@@ -2,7 +2,7 @@
 // Phase 3: Handles polling-based sync for Apple CalDAV and backup sync for Google
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { calendarSyncService } from '@/lib/services/calendar';
 import { logger } from '@/lib/logger';
 import type { CalendarProvider } from '@/lib/types/calendar-integration';
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
     const results: {
       provider: string;
       connection_id: string;

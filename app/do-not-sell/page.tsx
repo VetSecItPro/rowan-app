@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Shield, MapPin, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface CCPAStatus {
   opted_out: boolean;
@@ -58,7 +59,7 @@ export default function DoNotSellPage() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/ccpa/opt-out', {
+      const response = await csrfFetch('/api/ccpa/opt-out', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ export default function DoNotSellPage() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/ccpa/opt-out', {
+      const response = await csrfFetch('/api/ccpa/opt-out', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,7 +153,7 @@ export default function DoNotSellPage() {
                 </h3>
                 <p className="text-blue-200 mb-4">
                   Under the California Consumer Privacy Act (CCPA), California residents have the right to opt-out of the
-                  "sale" of their personal information to third parties. This includes sharing personal information for
+                  &quot;sale&quot; of their personal information to third parties. This includes sharing personal information for
                   valuable consideration, not just monetary payment.
                 </p>
                 <div className="flex items-center gap-2 text-blue-300">
@@ -165,9 +166,9 @@ export default function DoNotSellPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="p-4 border border-gray-700 rounded-lg">
-                  <h4 className="font-semibold text-white mb-2">What "Sale" Means</h4>
+                  <h4 className="font-semibold text-white mb-2">What &quot;Sale&quot; Means</h4>
                   <p className="text-sm text-gray-400">
-                    Under CCPA, "sale" includes sharing personal information with third parties for valuable consideration,
+                    Under CCPA, &quot;sale&quot; includes sharing personal information with third parties for valuable consideration,
                     including data sharing for advertising purposes.
                   </p>
                 </div>
@@ -229,7 +230,7 @@ export default function DoNotSellPage() {
                         }`}
                         disabled={isSaving}
                       >
-                        Yes, I'm a California resident
+                        Yes, I&apos;m a California resident
                       </button>
                       <button
                         onClick={() => setCaliforniaResident(false)}
@@ -240,7 +241,7 @@ export default function DoNotSellPage() {
                         }`}
                         disabled={isSaving}
                       >
-                        No, I'm not a California resident
+                        No, I&apos;m not a California resident
                       </button>
                     </div>
                   </div>
@@ -380,7 +381,7 @@ export default function DoNotSellPage() {
 
               <div className="mt-6 p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
                 <p className="text-sm text-blue-200">
-                  This page implements the "Do Not Sell My Personal Information" link required by CCPA Section 1798.135.
+                  This page implements the &quot;Do Not Sell My Personal Information&quot; link required by CCPA Section 1798.135.
                   California residents can use this page to exercise their right to opt-out of personal information sales.
                 </p>
               </div>

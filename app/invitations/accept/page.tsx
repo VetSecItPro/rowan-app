@@ -10,6 +10,7 @@ import { Check, X, Loader2, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useValidatedSearchParams, InvitationAcceptParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 function AcceptInvitationContent() {
   const router = useRouter();
@@ -50,7 +51,7 @@ function AcceptInvitationContent() {
 
       try {
         // Accept invitation
-        const response = await fetch('/api/invitations/accept', {
+        const response = await csrfFetch('/api/invitations/accept', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

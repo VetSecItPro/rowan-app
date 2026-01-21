@@ -4,7 +4,7 @@
 // Phase 9: Provides UI for bulk deleting events, especially imported ones
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Trash2, RefreshCw, AlertTriangle, Check, X, Archive, RotateCcw, ExternalLink, Calendar, Filter } from 'lucide-react';
+import { Trash2, RefreshCw, AlertTriangle, Check, X, Archive, RotateCcw, Calendar, Filter } from 'lucide-react';
 import { calendarService, CalendarEvent } from '@/lib/services/calendar-service';
 import { format, parseISO } from 'date-fns';
 import { logger } from '@/lib/logger';
@@ -37,7 +37,6 @@ export function BulkEventManager({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletedEvents, setDeletedEvents] = useState<CalendarEvent[]>([]);
   const [loadingDeleted, setLoadingDeleted] = useState(false);
-  const [selectedSource, setSelectedSource] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ source: string; count: number } | null>(null);
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
   const [operationResult, setOperationResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -72,13 +71,7 @@ export function BulkEventManager({
   }, [events]);
 
   // Load deleted events when trash tab is active
-  useEffect(() => {
-    if (activeTab === 'trash' && spaceId) {
-      loadDeletedEvents();
-    }
-  }, [activeTab, spaceId]);
-
-  const loadDeletedEvents = async () => {
+  const loadDeletedEvents = useCallback(async () => {
     setLoadingDeleted(true);
     try {
       const deleted = await calendarService.getDeletedEvents(spaceId);
@@ -88,7 +81,13 @@ export function BulkEventManager({
     } finally {
       setLoadingDeleted(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    if (activeTab === 'trash' && spaceId) {
+      loadDeletedEvents();
+    }
+  }, [activeTab, spaceId, loadDeletedEvents]);
 
   // Handle bulk delete by source
   const handleDeleteBySource = async () => {
@@ -109,7 +108,7 @@ export function BulkEventManager({
         });
         onEventsDeleted();
       }
-    } catch (error) {
+    } catch {
       setOperationResult({ type: 'error', message: 'Failed to delete events' });
     } finally {
       setIsDeleting(false);
@@ -137,7 +136,7 @@ export function BulkEventManager({
         setSelectedEvents(new Set());
         onEventsDeleted();
       }
-    } catch (error) {
+    } catch {
       setOperationResult({ type: 'error', message: 'Failed to delete events' });
     } finally {
       setIsDeleting(false);
@@ -151,7 +150,7 @@ export function BulkEventManager({
       setDeletedEvents(prev => prev.filter(e => e.id !== eventId));
       setOperationResult({ type: 'success', message: 'Event restored successfully' });
       onEventsDeleted();
-    } catch (error) {
+    } catch {
       setOperationResult({ type: 'error', message: 'Failed to restore event' });
     }
   };
@@ -162,7 +161,7 @@ export function BulkEventManager({
       await calendarService.deleteEvent(eventId, true);
       setDeletedEvents(prev => prev.filter(e => e.id !== eventId));
       setOperationResult({ type: 'success', message: 'Event permanently deleted' });
-    } catch (error) {
+    } catch {
       setOperationResult({ type: 'error', message: 'Failed to permanently delete event' });
     }
   };
@@ -185,37 +184,22 @@ export function BulkEventManager({
         });
         setDeletedEvents([]);
       }
-    } catch (error) {
+    } catch {
       setOperationResult({ type: 'error', message: 'Failed to purge events' });
     } finally {
       setIsDeleting(false);
     }
   };
 
-  // Toggle event selection
-  const toggleEventSelection = (eventId: string) => {
-    setSelectedEvents(prev => {
-      const next = new Set(prev);
-      if (next.has(eventId)) {
-        next.delete(eventId);
-      } else {
-        next.add(eventId);
-      }
-      return next;
-    });
-  };
-
   // Select all events from a source
   const selectAllFromSource = (source: string) => {
     const sourceEvents = events.filter(e => (e.event_type || 'manual') === source);
     setSelectedEvents(new Set(sourceEvents.map(e => e.id)));
-    setSelectedSource(source);
   };
 
   // Clear selection
   const clearSelection = () => {
     setSelectedEvents(new Set());
-    setSelectedSource(null);
   };
 
   if (!isOpen) return null;

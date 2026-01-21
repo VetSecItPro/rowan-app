@@ -2,7 +2,7 @@
 
 import { useMemo, memo, useState, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Sunrise, Sun, Moon, Cookie, CheckSquare, Square, Trash2, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Sunrise, Sun, Moon, Cookie, CheckSquare, Square, Trash2, ShoppingBag } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 import { parseDateString } from '@/lib/utils/date';
 
@@ -75,10 +75,6 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
 
   const handlePreviousWeek = () => onWeekChange(subWeeks(currentWeek, 2));
   const handleNextWeek = () => onWeekChange(addWeeks(currentWeek, 2));
-  const handleToday = () => onWeekChange(new Date());
-
-  const isCurrentWeek = isSameDay(firstWeekStart, startOfWeek(new Date()));
-
   // Selection handlers
   const toggleSelectionMode = useCallback(() => {
     setSelectionMode(prev => !prev);
@@ -104,6 +100,14 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
       setSelectionMode(false);
     }
   }, [selectedMealIds, onBulkDelete]);
+
+  const handleBulkGenerateList = useCallback(() => {
+    if (selectedMealIds.size > 0 && onBulkGenerateList) {
+      onBulkGenerateList(Array.from(selectedMealIds));
+      setSelectedMealIds(new Set());
+      setSelectionMode(false);
+    }
+  }, [selectedMealIds, onBulkGenerateList]);
 
   // Render a single day card for mobile
   const renderMobileDayCard = (day: Date) => {
@@ -262,13 +266,24 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
           <span className="text-sm font-medium text-white">
             {selectedMealIds.size} meal{selectedMealIds.size > 1 ? 's' : ''} selected
           </span>
-          <button
-            onClick={handleBulkDelete}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete Selected
-          </button>
+          <div className="flex items-center gap-2">
+            {onBulkGenerateList && (
+              <button
+                onClick={handleBulkGenerateList}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 text-sm font-medium"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Generate List
+              </button>
+            )}
+            <button
+              onClick={handleBulkDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 text-sm font-medium"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Selected
+            </button>
+          </div>
         </div>
       )}
 

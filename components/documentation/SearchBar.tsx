@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Search, X } from 'lucide-react';
 import Link from 'next/link';
@@ -139,41 +139,32 @@ const DOCUMENTATION_INDEX: SearchResult[] = [
 export function SearchBar() {
   const [query, setQuery] = useState('');
   const [debouncedQuery] = useDebounce(query, 200);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Search functionality - using debounced query to reduce re-renders
-  useEffect(() => {
+  const results = useMemo(() => {
     if (debouncedQuery.length < 2) {
-      setResults([]);
-      setIsOpen(false);
-      setIsTyping(false);
-      return;
+      return [];
     }
 
-    setIsTyping(true);
-    const timeoutId = setTimeout(() => setIsTyping(false), 1000);
-
     const searchTerm = debouncedQuery.toLowerCase();
-    const filtered = DOCUMENTATION_INDEX.filter(item =>
+    return DOCUMENTATION_INDEX.filter(item =>
       (item.title || '').toLowerCase().includes(searchTerm) ||
       (item.description || '').toLowerCase().includes(searchTerm) ||
       (item.category || '').toLowerCase().includes(searchTerm)
     ).slice(0, 8); // Limit to 8 results
-
-    setResults(filtered);
-    setIsOpen(filtered.length > 0);
-
-    return () => clearTimeout(timeoutId);
   }, [debouncedQuery]);
+
+  const isTyping = query.length > 0 && query !== debouncedQuery;
+  const isSearchSettled = debouncedQuery.length >= 2 && query === debouncedQuery;
+  const isOpen = !isDismissed && results.length > 0;
+  const showNoResults = !isDismissed && isSearchSettled && results.length === 0;
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsDismissed(true);
       }
     }
 
@@ -183,9 +174,7 @@ export function SearchBar() {
 
   const handleClear = () => {
     setQuery('');
-    setResults([]);
-    setIsOpen(false);
-    setIsTyping(false);
+    setIsDismissed(false);
   };
 
   return (
@@ -197,7 +186,10 @@ export function SearchBar() {
           type="search"
           placeholder="Search documentation..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setIsDismissed(false);
+          }}
           className={`apple-search-input w-full ${isTyping ? 'typing' : ''}`}
         />
         {query && (
@@ -220,9 +212,8 @@ export function SearchBar() {
                 key={index}
                 href={result.href}
                 onClick={() => {
-                  setIsOpen(false);
+                  setIsDismissed(true);
                   setQuery('');
-                  setIsTyping(false);
                 }}
                 className="btn-touch apple-search-result-item block p-3 active:scale-[0.98] hover-lift shimmer-purple active-press"
               >
@@ -260,11 +251,11 @@ export function SearchBar() {
       )}
 
       {/* Apple-Inspired No Results */}
-      {isOpen && query.length >= 2 && results.length === 0 && (
+      {showNoResults && (
         <div className="absolute top-full left-0 right-0 mt-2 apple-search-results z-50">
           <div className="p-6 text-center">
             <p className="text-sm text-gray-400">
-              No results found for <span className="font-semibold text-gray-300">"{query}"</span>
+              No results found for <span className="font-semibold text-gray-300">&quot;{query}&quot;</span>
             </p>
             <p className="text-xs text-gray-500 mt-1">
               Try searching for a feature name or topic

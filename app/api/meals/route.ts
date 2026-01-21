@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get meals from service
-    const meals = await mealsService.getMeals(spaceId);
+    const meals = await mealsService.getMeals(spaceId, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
       ...body,
       recipe_name: recipe_name ? sanitizePlainText(recipe_name) : undefined,
       notes: notes ? sanitizePlainText(notes) : undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export interface PushSubscription {
   endpoint: string;
@@ -21,7 +22,7 @@ export interface PushNotificationPayload {
     url?: string;
     action?: string;
     id?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   actions?: Array<{
     action: string;
@@ -222,7 +223,7 @@ class PushNotificationService {
     payload: PushNotificationPayload
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch('/api/notifications/send-push', {
+      const response = await csrfFetch('/api/notifications/send-push', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

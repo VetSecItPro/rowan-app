@@ -203,7 +203,6 @@ export async function createBill(
         category: 'bills',
         reminder_time: reminderDate.toISOString(),
         priority: 'high',
-        // @ts-ignore - linked_bill_id will be added to the type
         linked_bill_id: bill.id,
       });
       updates.linked_reminder_id = reminder.id;
@@ -222,7 +221,6 @@ export async function createBill(
       start_time: new Date(input.due_date).toISOString(),
       category: 'personal',
       event_type: 'bill_due',
-      // @ts-ignore - linked_bill_id will be added to the type
       linked_bill_id: bill.id,
     });
     updates.linked_calendar_event_id = event.id;
@@ -286,7 +284,7 @@ export async function deleteBill(billId: string): Promise<void> {
 export async function markBillAsPaid(
   billId: string,
   createExpense = true
-): Promise<{ bill: Bill; expense?: any }> {
+): Promise<{ bill: Bill; expense?: Record<string, unknown> }> {
   const supabase = createClient();
 
   // Get the bill
@@ -372,7 +370,7 @@ export async function markBillAsPaid(
     );
   }
 
-  return { bill: updatedBill, expense };
+  return { bill: updatedBill, expense: expense as Record<string, unknown> | undefined };
 }
 
 /**

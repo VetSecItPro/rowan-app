@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AlertTriangle, Download, Database, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
 
 interface DeleteSpaceModalProps {
@@ -86,7 +87,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await fetch(`/api/spaces/${space.id}/export`, {
+      const response = await csrfFetch(`/api/spaces/${space.id}/export`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/spaces/${space.id}/delete`, {
+      const response = await csrfFetch(`/api/spaces/${space.id}/delete`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -289,7 +290,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                   Permanent Deletion Warning
                 </h3>
                 <p className="text-red-200 mb-3">
-                  This action will permanently delete "<strong>{space.name}</strong>" and all its data including:
+                  This action will permanently delete &quot;<strong>{space.name}</strong>&quot; and all its data including:
                 </p>
                 <ul className="text-red-200 text-sm space-y-1 ml-4">
                   <li>• All tasks and to-do lists</li>
@@ -344,7 +345,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                 <div className="flex items-center gap-2 mb-4">
                   <Database className="w-5 h-5 text-blue-400" />
                   <span className="font-medium text-white">
-                    Data Summary for "{space.name}"
+                    Data Summary for &quot;{space.name}&quot;
                   </span>
                 </div>
 
@@ -457,7 +458,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                 <span className="font-semibold">This action is permanent and cannot be undone</span>
               </div>
               <p className="text-red-300 text-sm">
-                All data in "{space.name}" will be permanently deleted from our servers.
+                All data in &quot;{space.name}&quot; will be permanently deleted from our servers.
               </p>
             </div>
 

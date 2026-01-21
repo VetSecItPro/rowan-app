@@ -14,7 +14,7 @@ import {
   PrinterIcon,
   LinkIcon
 } from '@heroicons/react/24/outline';
-import { type GeneratedReport } from '@/lib/services/financial-reports-service';
+import type { GeneratedReport, ReportData, ReportMetrics } from '@/lib/services/financial-reports-service';
 import { downloadReportPDF, getReportShareUrl, updateReportViews } from '@/lib/services/financial-reports-service';
 
 interface ReportViewerProps {
@@ -37,7 +37,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
 
     try {
       setLoading(true);
-      const blob = await downloadReportPDF(report.id);
+      await downloadReportPDF(report.id);
       // The function handles the download automatically
     } catch (error) {
       logger.error('Error downloading report:', error, { component: 'ReportViewer', action: 'component_action' });
@@ -76,7 +76,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
   const renderMetrics = () => {
     if (!report.summary_stats || typeof report.summary_stats !== 'object') return null;
 
-    const stats = report.summary_stats as Record<string, any>;
+    const stats = report.summary_stats as ReportMetrics;
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -97,7 +97,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
   const renderDataTable = () => {
     if (!report.data || typeof report.data !== 'object') return null;
 
-    const data = report.data as Record<string, any>;
+    const data = report.data as ReportData;
 
     if (data.expenses && Array.isArray(data.expenses) && data.expenses.length > 0) {
       return (
@@ -126,7 +126,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
-                {data.expenses.slice(0, 10).map((expense: any, index: number) => (
+                {data.expenses.slice(0, 10).map((expense, index: number) => (
                   <tr key={expense.id || index}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       {format(new Date(expense.date), 'MMM d, yyyy')}

@@ -1,9 +1,6 @@
 import { z } from 'zod';
 import { sanitizePlainText } from '@/lib/sanitize';
 
-// Space role enum (all roles for general space operations)
-const spaceRoleEnum = z.enum(['owner', 'admin', 'member', 'viewer']);
-
 // Invitation role enum (only roles that can be assigned via invitation)
 // Note: 'owner' cannot be assigned via invitation, and 'viewer' is not used for invitations
 const invitationRoleEnum = z.enum(['member', 'admin']);

@@ -22,6 +22,8 @@ const SpaceExportSchema = z.object({
 // SPACE DATA TYPES
 // =============================================
 
+type ExportRecord = Record<string, unknown>;
+
 interface SpaceExportData {
   space: {
     id: string;
@@ -29,21 +31,21 @@ interface SpaceExportData {
     created_at: string;
     user_role: string;
   };
-  tasks: any[];
-  events: any[];
-  reminders: any[];
-  messages: any[];
-  shopping_lists: any[];
-  shopping_items: any[];
-  recipes: any[];
-  meal_plans: any[];
-  chores: any[];
-  expenses: any[];
-  budgets: any[];
-  goals: any[];
-  goal_milestones: any[];
-  daily_checkins: any[];
-  activity_logs: any[];
+  tasks: ExportRecord[];
+  events: ExportRecord[];
+  reminders: ExportRecord[];
+  messages: ExportRecord[];
+  shopping_lists: ExportRecord[];
+  shopping_items: ExportRecord[];
+  recipes: ExportRecord[];
+  meal_plans: ExportRecord[];
+  chores: ExportRecord[];
+  expenses: ExportRecord[];
+  budgets: ExportRecord[];
+  goals: ExportRecord[];
+  goal_milestones: ExportRecord[];
+  daily_checkins: ExportRecord[];
+  activity_logs: ExportRecord[];
   export_metadata: {
     exported_at: string;
     export_type: 'space_deletion';
@@ -292,7 +294,7 @@ function convertSpaceDataToCSV(data: SpaceExportData): string {
   csvSections.push('');
 
   // Helper function to convert array to CSV
-  const arrayToCSV = (items: any[], title: string): string => {
+  const arrayToCSV = (items: ExportRecord[], title: string): string => {
     if (items.length === 0) return `# ${title}\nNo data\n`;
 
     const headers = Object.keys(items[0]);

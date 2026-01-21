@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Calendar, Clock, Bell, Settings, Repeat } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Calendar, Clock, Bell, Repeat } from 'lucide-react';
 import { goalsService } from '@/lib/services/goals-service';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { logger } from '@/lib/logger';
@@ -63,13 +63,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
   const [saving, setSaving] = useState(false);
   const [hasExistingSettings, setHasExistingSettings] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadSettings();
-    }
-  }, [isOpen, goalId]);
-
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       setLoading(true);
       const existingSettings = await goalsService.getCheckInSettings(goalId);
@@ -94,7 +88,13 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
     } finally {
       setLoading(false);
     }
-  };
+  }, [goalId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadSettings();
+    }
+  }, [isOpen, loadSettings]);
 
   const handleSave = async () => {
     try {
@@ -337,7 +337,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
                         Enable Reminders
                       </div>
                       <div className="text-sm text-gray-400">
-                        Get notified when it's time to check in
+                        Get notified when it&apos;s time to check in
                       </div>
                     </div>
                     <button

@@ -8,6 +8,8 @@ import { CheckCircle, Clock, Mail, Heart } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
 
+const deletionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
+
 export default function GoodbyePage() {
   const { signOut } = useAuth();
 
@@ -48,7 +50,7 @@ export default function GoodbyePage() {
               <h2 className="text-xl font-semibold text-blue-100">30-Day Grace Period</h2>
             </div>
             <p className="text-blue-200 mb-4">
-              Your account will be permanently deleted on <strong>{new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}</strong>.
+              Your account will be permanently deleted on <strong>{deletionDate}</strong>.
             </p>
             <p className="text-sm text-blue-300">
               You can cancel this deletion anytime within 30 days by logging back in.
@@ -64,7 +66,7 @@ export default function GoodbyePage() {
                 <Mail className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium text-white">Email Notifications</p>
-                  <p className="text-sm text-gray-400">You'll receive reminder emails before permanent deletion.</p>
+                  <p className="text-sm text-gray-400">You&apos;ll receive reminder emails before permanent deletion.</p>
                 </div>
               </div>
 
@@ -72,7 +74,7 @@ export default function GoodbyePage() {
                 <Clock className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium text-white">5-Day Warning</p>
-                  <p className="text-sm text-gray-400">You'll get a final warning 5 days before permanent deletion.</p>
+                  <p className="text-sm text-gray-400">You&apos;ll get a final warning 5 days before permanent deletion.</p>
                 </div>
               </div>
 

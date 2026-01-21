@@ -35,23 +35,14 @@ function getEditRoute(item: UnifiedCalendarItem): string {
   }
 }
 
-/**
- * Get the icon component for an item type
- */
-function getItemIcon(itemType: string) {
-  switch (itemType) {
-    case 'task':
-      return CheckCircle2;
-    case 'meal':
-      return UtensilsCrossed;
-    case 'reminder':
-      return Bell;
-    case 'goal':
-      return Target;
-    default:
-      return Calendar;
-  }
-}
+const ITEM_TYPE_ICONS: Record<string, typeof Calendar> = {
+  task: CheckCircle2,
+  meal: UtensilsCrossed,
+  reminder: Bell,
+  goal: Target,
+  calendar: Calendar,
+  event: Calendar,
+};
 
 /**
  * Format time for display
@@ -220,7 +211,7 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
   const [isNavigating, setIsNavigating] = useState(false);
   const colors = UNIFIED_ITEM_COLORS[item.itemType];
   const label = UNIFIED_ITEM_LABELS[item.itemType];
-  const Icon = getItemIcon(item.itemType);
+  const Icon = ITEM_TYPE_ICONS[item.itemType] ?? Calendar;
   const statusBadge = getStatusBadge(item.status);
 
   const handleEditClick = () => {

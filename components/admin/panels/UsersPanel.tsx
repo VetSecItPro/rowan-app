@@ -3,6 +3,7 @@
 import { useState, memo, useCallback, useMemo } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useQuery } from '@tanstack/react-query';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   Users,
   Search,
@@ -11,8 +12,6 @@ import {
   UserX,
   Shield,
   Mail,
-  Calendar,
-  Eye,
   RefreshCw,
   Clock,
   Send,
@@ -82,7 +81,7 @@ export const UsersPanel = memo(function UsersPanel() {
     setResendingEmail(email);
     setResendSuccess(null);
     try {
-      const response = await fetch('/api/admin/beta/resend-invite', {
+      const response = await csrfFetch('/api/admin/beta/resend-invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -138,8 +137,8 @@ export const UsersPanel = memo(function UsersPanel() {
     gcTime: 10 * 60 * 1000,
   });
 
-  const users: User[] = usersData || [];
-  const betaRequests: BetaRequest[] = betaData || [];
+  const users: User[] = useMemo(() => usersData || [], [usersData]);
+  const betaRequests: BetaRequest[] = useMemo(() => betaData || [], [betaData]);
   const isLoading = usersLoading || betaLoading;
 
   const fetchData = useCallback(() => {

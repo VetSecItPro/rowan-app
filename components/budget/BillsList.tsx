@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { BillCard } from '@/components/projects/BillCard';
 import { logger } from '@/lib/logger';
 import {
   getBills,
-  getBillsByStatus,
   type Bill,
   type BillStatus,
 } from '@/lib/services/bills-service';
@@ -46,7 +45,7 @@ export function BillsList({
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch bills with RLS security enforced by service layer
-  const fetchBills = async () => {
+  const fetchBills = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -60,7 +59,7 @@ export function BillsList({
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId]);
 
   // Initial fetch
   useEffect(() => {
@@ -71,7 +70,7 @@ export function BillsList({
     }
 
     fetchBills();
-  }, [spaceId]);
+  }, [spaceId, fetchBills]);
 
   // Real-time subscription with RLS security
   useEffect(() => {
@@ -97,7 +96,7 @@ export function BillsList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [spaceId]);
+  }, [spaceId, fetchBills]);
 
   // Filter and sort bills
   const processedBills = useMemo(() => {

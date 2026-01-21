@@ -2,7 +2,7 @@
 
 import { useState, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { BetaProgramPanel } from './BetaProgramPanel';
 import { NotificationsPanel } from './NotificationsPanel';
 import { ConversionFunnelPanel } from './ConversionFunnelPanel';

@@ -13,6 +13,7 @@ import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, ArrowLeft, CheckCircle } from
 import { RestoreAccountModal } from '@/components/settings/RestoreAccountModal';
 import { useValidatedSearchParams, LoginParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const containerVariants = {
@@ -149,7 +150,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch('/api/auth/magic-link', {
+      const response = await csrfFetch('/api/auth/magic-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -222,7 +223,7 @@ export default function LoginPage() {
           }, 500);
         }
       }
-    } catch (error) {
+    } catch {
       setError('An unexpected error occurred. Please try again.');
       setIsLoading(false);
     }
@@ -407,7 +408,7 @@ export default function LoginPage() {
                   />
                 </div>
                 <p className="mt-2 text-xs text-gray-400 ml-1">
-                  We'll send you a link to sign in without a password.
+                  We&apos;ll send you a link to sign in without a password.
                 </p>
               </div>
 
@@ -551,7 +552,7 @@ export default function LoginPage() {
           {/* Sign up link */}
           <motion.div className="mt-8 text-center" variants={itemVariants}>
             <p className="text-gray-400 text-md">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link
                 href="/signup"
                 className="text-emerald-400 hover:text-emerald-300 font-bold transition-all duration-200 hover:underline"
