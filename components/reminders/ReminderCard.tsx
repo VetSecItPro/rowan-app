@@ -1,6 +1,7 @@
 'use client';
 
-import { Clock, Flag, MoreVertical, Timer, Check, Edit, Trash2, ChevronDown, ChevronUp, MessageCircle, Activity, Paperclip, DollarSign } from 'lucide-react';
+import Image from 'next/image';
+import { Clock, Flag, MoreVertical, Check, Edit, Trash2, ChevronDown, ChevronUp, MessageCircle, Activity, Paperclip, DollarSign } from 'lucide-react';
 import { Reminder } from '@/lib/services/reminders-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';
@@ -27,12 +28,6 @@ const priorityColors = {
   urgent: 'bg-red-500',
 };
 
-const statusColors = {
-  active: 'bg-blue-500',
-  completed: 'bg-green-500',
-  snoozed: 'bg-purple-500',
-};
-
 const categoryConfig = {
   bills: { label: 'Bills', icon: '💰', color: 'bg-green-500', textColor: 'text-green-300', bgColor: 'bg-green-900/30' },
   health: { label: 'Health', icon: '💊', color: 'bg-red-500', textColor: 'text-red-300', bgColor: 'bg-red-900/30' },
@@ -41,16 +36,14 @@ const categoryConfig = {
   household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-300', bgColor: 'bg-amber-900/30' },
 };
 
-export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSnooze, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
+export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const [showSnoozeMenu, setShowSnoozeMenu] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
   const [showComments, setShowComments] = useState(false);
 
   const isOverdue = reminder.reminder_time && new Date(reminder.reminder_time) < new Date() && reminder.status === 'active';
   const priorityColor = priorityColors[reminder.priority as keyof typeof priorityColors] || 'bg-gray-500';
-  const statusColor = statusColors[reminder.status as keyof typeof statusColors] || 'bg-gray-500';
 
   const handleCheckboxClick = () => {
     const states: Array<'active' | 'snoozed' | 'completed'> = ['active', 'snoozed', 'completed'];
@@ -143,11 +136,11 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onSno
               {reminder.assignee && (
                 <div className="relative group/avatar flex-shrink-0">
                   {reminder.assignee.avatar_url ? (
-                    <img
+                    <Image
                       src={reminder.assignee.avatar_url}
                       alt={reminder.assignee.name}
-                      loading="lazy"
-                      decoding="async"
+                      width={24}
+                      height={24}
                       className="w-6 h-6 rounded-full object-cover border-2 border-gray-800"
                     />
                   ) : (

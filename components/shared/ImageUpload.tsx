@@ -2,8 +2,9 @@
 
 import { useState, useRef, DragEvent, ChangeEvent } from 'react';
 import Image from 'next/image';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface ImageUploadProps {
   /**
@@ -99,7 +100,7 @@ export default function ImageUpload({
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(uploadEndpoint, {
+      const response = await csrfFetch(uploadEndpoint, {
         method: 'POST',
         body: formData,
       });
@@ -230,13 +231,13 @@ export default function ImageUpload({
         {preview ? (
           <div className="relative w-full h-full">
             {preview.startsWith('data:') ? (
-              // Use regular img for data URLs (FileReader results)
-              <img
+              <Image
                 src={preview}
                 alt="Preview"
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                unoptimized
               />
             ) : (
               // Use next/image for URLs

@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get goals from service
-    const goals = await goalsService.getGoals(spaceId);
+    const goals = await goalsService.getGoals(spaceId, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
       title: sanitizePlainText(title),
       description: description ? sanitizePlainText(description) : undefined,
       created_by: user.id,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

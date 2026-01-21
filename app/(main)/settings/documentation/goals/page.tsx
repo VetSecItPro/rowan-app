@@ -1,8 +1,10 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
 
 import {
+  type LucideIcon,
   ArrowLeft,
   Target,
   Play,
@@ -27,18 +29,15 @@ import {
   Flame,
   Volume2,
   Settings,
-  Camera,
   Heart,
   BookOpen,
   Activity,
-  Filter,
-  Repeat,
   Hash,
 } from 'lucide-react';
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

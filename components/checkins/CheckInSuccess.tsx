@@ -38,6 +38,7 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
   useEffect(() => {
     if (isOpen) {
       // Pick a random motivational message
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessage(motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]);
 
       // Auto-close after 5 seconds
@@ -100,12 +101,12 @@ export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccess
             )}
             {streak === 30 && (
               <p className="text-center text-sm text-orange-400 mt-2">
-                🌟 One month strong! You're incredible!
+                🌟 One month strong! You&apos;re incredible!
               </p>
             )}
             {streak === 100 && (
               <p className="text-center text-sm text-orange-400 mt-2">
-                🏆 100 days! You're a legend!
+                🏆 100 days! You&apos;re a legend!
               </p>
             )}
           </div>

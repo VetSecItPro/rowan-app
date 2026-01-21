@@ -11,9 +11,10 @@ import { projectsOnlyService } from '@/lib/services/projects-service';
 import { goalsService } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
-import { User, Space } from '@/lib/types';
-import { format, isToday, isThisWeek, isPast, parseISO, startOfWeek, subWeeks } from 'date-fns';
+import { Space } from '@/lib/types';
+import { isToday, isThisWeek, isPast, parseISO, startOfWeek } from 'date-fns';
 import { getCurrentDateString } from '@/lib/utils/date-utils';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface EnhancedDashboardStats {
     tasks: {
@@ -217,7 +218,7 @@ const initialStats: EnhancedDashboardStats = {
     },
 };
 
-export function useDashboardStats(user: User | null, currentSpace: Space | null, authLoading: boolean) {
+export function useDashboardStats(user: { id: string } | null, currentSpace: Space | null, authLoading: boolean) {
     const [stats, setStats] = useState<EnhancedDashboardStats>(initialStats);
     const [loading, setLoading] = useState(true);
 
@@ -245,7 +246,6 @@ export function useDashboardStats(user: User | null, currentSpace: Space | null,
                 shoppingLists,
                 shoppingStats,
                 meals,
-                recipes,
                 mealStats,
                 allChores,
                 choreStats,
@@ -253,7 +253,6 @@ export function useDashboardStats(user: User | null, currentSpace: Space | null,
                 allProjects,
                 projectStats,
                 allGoals,
-                goalStats,
             ] = await Promise.all([
                 tasksService.getTasks(currentSpace.id),
                 tasksService.getTaskStats(currentSpace.id),
@@ -266,7 +265,6 @@ export function useDashboardStats(user: User | null, currentSpace: Space | null,
                 shoppingService.getLists(currentSpace.id),
                 shoppingService.getShoppingStats(currentSpace.id),
                 mealsService.getMeals(currentSpace.id),
-                mealsService.getRecipes(currentSpace.id),
                 mealsService.getMealStats(currentSpace.id),
                 choresService.getChores(currentSpace.id),
                 choresService.getChoreStats(currentSpace.id, user.id),
@@ -274,12 +272,10 @@ export function useDashboardStats(user: User | null, currentSpace: Space | null,
                 projectsOnlyService.getProjects(currentSpace.id),
                 projectsOnlyService.getProjectStats(currentSpace.id),
                 goalsService.getGoals(currentSpace.id),
-                goalsService.getGoalStats(currentSpace.id),
             ]);
 
             const now = new Date();
             const today = getCurrentDateString();
-            const weekAgo = subWeeks(now, 1);
             const weekStart = startOfWeek(now);
 
             // Calculate detailed task stats
@@ -555,7 +551,7 @@ export function useDashboardStats(user: User | null, currentSpace: Space | null,
         loadAllStats();
 
         const supabase = createClient();
-        const channels: any[] = [];
+        const channels: RealtimeChannel[] = [];
 
         // Only subscribe if we have a space
         // Channel names include space_id to ensure proper isolation when switching spaces

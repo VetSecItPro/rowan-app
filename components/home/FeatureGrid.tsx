@@ -163,7 +163,7 @@ export function FeatureGrid() {
                         transition={{ duration: 0.6, delay: 0.4 }}
                         className="text-xl text-gray-300 max-w-2xl mx-auto font-light"
                     >
-                        Powerful features designed to simplify your family's daily life
+                        Powerful features designed to simplify your family&apos;s daily life
                     </motion.p>
                 </motion.div>
 

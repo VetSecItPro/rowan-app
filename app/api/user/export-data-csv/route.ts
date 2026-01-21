@@ -55,27 +55,27 @@ export async function GET(request: NextRequest) {
 
     switch (exportType) {
       case 'expenses':
-        csvContent = await exportExpensesToCsv(user.id);
+        csvContent = await exportExpensesToCsv(user.id, supabase);
         filename = `rowan-expenses-${new Date().toISOString().split('T')[0]}.csv`;
         break;
 
       case 'tasks':
-        csvContent = await exportTasksToCsv(user.id);
+        csvContent = await exportTasksToCsv(user.id, supabase);
         filename = `rowan-tasks-${new Date().toISOString().split('T')[0]}.csv`;
         break;
 
       case 'events':
-        csvContent = await exportEventsToCsv(user.id);
+        csvContent = await exportEventsToCsv(user.id, supabase);
         filename = `rowan-calendar-${new Date().toISOString().split('T')[0]}.csv`;
         break;
 
       case 'shopping':
-        csvContent = await exportShoppingListsToCsv(user.id);
+        csvContent = await exportShoppingListsToCsv(user.id, supabase);
         filename = `rowan-shopping-${new Date().toISOString().split('T')[0]}.csv`;
         break;
 
       case 'messages':
-        csvContent = await exportMessagesToCsv(user.id);
+        csvContent = await exportMessagesToCsv(user.id, supabase);
         filename = `rowan-messages-${new Date().toISOString().split('T')[0]}.csv`;
         break;
 
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       default:
         // For 'all', we'll export the first available CSV (expenses by default)
         // In a real implementation, you'd want to create a ZIP file with all CSVs
-        const allCsvs = await exportAllDataToCsv(user.id);
+        const allCsvs = await exportAllDataToCsv(user.id, supabase);
         const firstCsvKey = Object.keys(allCsvs)[0];
 
         if (!firstCsvKey) {

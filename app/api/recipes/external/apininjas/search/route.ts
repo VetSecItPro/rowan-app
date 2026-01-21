@@ -12,6 +12,13 @@ import { sanitizePlainText } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
+type ApiNinjasRecipe = {
+  title?: string;
+  ingredients?: string;
+  servings?: string | number;
+  instructions?: string;
+};
+
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting with automatic fallback
@@ -63,13 +70,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const data = await response.json();
+    const data: unknown = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
       return NextResponse.json([]);
     }
 
-    const recipes = data.map((recipe: any) => {
+    const recipes = (data as ApiNinjasRecipe[]).map((recipe) => {
+      const title = typeof recipe.title === 'string' ? recipe.title : '';
+      const instructions = typeof recipe.instructions === 'string' ? recipe.instructions : '';
       // Parse and sanitize ingredients from pipe-separated string (external data could contain XSS payloads)
       const ingredients = recipe.ingredients
         ?.split('|')
@@ -78,12 +87,12 @@ export async function GET(request: NextRequest) {
         })) || [];
 
       return {
-        id: `apininjas-${sanitizePlainText(recipe.title)}-${crypto.randomUUID()}`,
+        id: `apininjas-${sanitizePlainText(title)}-${crypto.randomUUID()}`,
         source: 'apininjas',
-        name: sanitizePlainText(recipe.title),
-        servings: recipe.servings ? parseInt(recipe.servings) : undefined,
+        name: sanitizePlainText(title),
+        servings: recipe.servings ? Number.parseInt(String(recipe.servings), 10) : undefined,
         ingredients,
-        instructions: sanitizePlainText(recipe.instructions),
+        instructions: sanitizePlainText(instructions),
       };
     });
 

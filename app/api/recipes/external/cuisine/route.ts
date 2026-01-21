@@ -12,6 +12,30 @@ import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
+type MealSummary = {
+  idMeal: string;
+};
+
+type MealDetail = {
+  idMeal?: string;
+  strMeal?: string;
+  strCategory?: string;
+  strArea?: string;
+  strMealThumb?: string;
+  strInstructions?: string;
+  strSource?: string;
+  strYoutube?: string;
+  [key: string]: string | undefined;
+};
+
+type MealDbFilterResponse = {
+  meals?: MealSummary[] | null;
+};
+
+type MealDbLookupResponse = {
+  meals?: MealDetail[] | null;
+};
+
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting with automatic fallback
@@ -51,50 +75,60 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const data = await response.json();
+    const data: MealDbFilterResponse = await response.json();
 
     if (!data.meals) {
       return NextResponse.json([]);
     }
 
     // Need to fetch full details for each meal (limit to 12)
-    const detailPromises = data.meals.slice(0, 12).map(async (meal: any) => {
+    const detailPromises = data.meals.slice(0, 12).map(async (meal) => {
       const detailResponse = await fetch(
         `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`
       );
-      const detailData = await detailResponse.json();
-      return detailData.meals?.[0];
+      const detailData: MealDbLookupResponse = await detailResponse.json();
+      return detailData.meals?.[0] ?? null;
     });
 
     const meals = await Promise.all(detailPromises);
 
-    const recipes = meals.filter(Boolean).map((meal: any) => {
-      // Parse and sanitize ingredients (external data could contain XSS payloads)
-      const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
-      for (let i = 1; i <= 20; i++) {
-        const ingredient = meal[`strIngredient${i}`];
-        const measure = meal[`strMeasure${i}`];
+    const recipes = meals
+      .filter((meal): meal is MealDetail => Boolean(meal))
+      .map((meal) => {
+        const mealId = meal.idMeal ?? crypto.randomUUID();
+        const mealName = meal.strMeal ?? '';
+        const mealCategory = meal.strCategory ?? '';
+        const mealArea = meal.strArea ?? '';
+        const mealThumb = meal.strMealThumb ?? '';
+        const mealInstructions = meal.strInstructions ?? '';
+        const mealSource = meal.strSource ?? '';
+        const mealYoutube = meal.strYoutube ?? '';
+        // Parse and sanitize ingredients (external data could contain XSS payloads)
+        const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
+        for (let i = 1; i <= 20; i++) {
+          const ingredient = meal[`strIngredient${i}`];
+          const measure = meal[`strMeasure${i}`];
 
-        if (ingredient && ingredient.trim()) {
-          ingredients.push({
-            name: sanitizePlainText(ingredient.trim()),
-            amount: sanitizePlainText(measure?.trim()) || undefined,
-          });
+          if (ingredient && ingredient.trim()) {
+            ingredients.push({
+              name: sanitizePlainText(ingredient.trim()),
+              amount: sanitizePlainText(measure?.trim()) || undefined,
+            });
+          }
         }
-      }
 
-      return {
-        id: `themealdb-${meal.idMeal}`,
-        source: 'themealdb',
-        name: sanitizePlainText(meal.strMeal),
-        description: sanitizePlainText(`${meal.strCategory} - ${meal.strArea} cuisine`),
-        image_url: sanitizeUrl(meal.strMealThumb),
-        cuisine: sanitizePlainText(meal.strArea),
-        ingredients,
-        instructions: sanitizePlainText(meal.strInstructions),
-        source_url: sanitizeUrl(meal.strSource || meal.strYoutube),
-      };
-    });
+        return {
+          id: `themealdb-${mealId}`,
+          source: 'themealdb',
+          name: sanitizePlainText(mealName),
+          description: sanitizePlainText(`${mealCategory} - ${mealArea} cuisine`),
+          image_url: sanitizeUrl(mealThumb),
+          cuisine: sanitizePlainText(mealArea),
+          ingredients,
+          instructions: sanitizePlainText(mealInstructions),
+          source_url: sanitizeUrl(mealSource || mealYoutube),
+        };
+      });
 
     return NextResponse.json(recipes);
   } catch (error) {

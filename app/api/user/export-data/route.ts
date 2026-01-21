@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Export all user data
-    const result = await exportAllUserData(user.id);
+    const result = await exportAllUserData(user.id, supabase);
 
     if (!result.success || !result.data) {
       return NextResponse.json(

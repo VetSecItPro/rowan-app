@@ -8,16 +8,12 @@ import {
   Hammer,
   DollarSign,
   Calendar,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
   TrendingUp,
   TrendingDown,
-  Users,
   Camera,
   FileText
 } from 'lucide-react';
-import { format, parseISO, isAfter, isBefore } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import {
   getProject,
   getProjectLineItems,
@@ -28,12 +24,20 @@ import {
   type ProjectLineItem,
   type ProjectPhoto,
 } from '@/lib/services/project-tracking-service';
+import type { Expense } from '@/lib/services/expense-service';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { ProjectDashboard } from '@/components/budget/ProjectDashboard';
 import { ProjectLineItems } from '@/components/budget/ProjectLineItems';
 import { ProjectPhotoGallery } from '@/components/budget/ProjectPhotoGallery';
 import { BudgetVarianceCard } from '@/components/budget/BudgetVarianceCard';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
+
+type CostBreakdownItem = {
+  category: string;
+  item_count: number;
+  total_estimated: number;
+  total_actual: number;
+};
 
 export default function ProjectTrackingPage() {
   const params = useParams();
@@ -43,8 +47,8 @@ export default function ProjectTrackingPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [lineItems, setLineItems] = useState<ProjectLineItem[]>([]);
   const [photos, setPhotos] = useState<ProjectPhoto[]>([]);
-  const [costBreakdown, setCostBreakdown] = useState<any[]>([]);
-  const [expenses, setExpenses] = useState<any[]>([]);
+  const [costBreakdown, setCostBreakdown] = useState<CostBreakdownItem[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'costs' | 'photos' | 'expenses'>('overview');
@@ -74,8 +78,8 @@ export default function ProjectTrackingPage() {
         setProject(projectData);
         setLineItems(lineItemsData);
         setPhotos(photosData);
-        setCostBreakdown(costBreakdownData);
-        setExpenses(expensesData);
+        setCostBreakdown(costBreakdownData as unknown as CostBreakdownItem[]);
+        setExpenses(expensesData as unknown as Expense[]);
       } catch (err) {
         logger.error('Failed to load project data:', err, { component: 'page', action: 'execution' });
         setError('Failed to load project information');
@@ -134,16 +138,16 @@ export default function ProjectTrackingPage() {
 
   // Calculate project status indicators
   const isOverBudget = project.budget_variance < 0;
-  const isOnTime = project.estimated_completion_date
-    ? (!project.actual_completion_date || !isAfter(parseISO(project.actual_completion_date), parseISO(project.estimated_completion_date)))
-    : true;
-
-  const totalPaid = lineItems.filter(item => item.is_paid).reduce((sum, item) => sum + item.actual_cost, 0);
-  const totalUnpaid = lineItems.filter(item => !item.is_paid).reduce((sum, item) => sum + item.estimated_cost, 0);
-
   const progressPercentage = project.estimated_budget
     ? Math.min(100, (project.actual_cost / project.estimated_budget) * 100)
     : 0;
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: Hammer },
+    { id: 'costs', label: 'Cost Breakdown', icon: DollarSign },
+    { id: 'photos', label: 'Photos', icon: Camera },
+    { id: 'expenses', label: 'Expenses', icon: FileText },
+  ] as const;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -292,15 +296,10 @@ export default function ProjectTrackingPage() {
         {/* Navigation Tabs */}
         <div className="border-b border-gray-700 mb-6">
           <nav className="-mb-px flex space-x-8">
-            {[
-              { id: 'overview', label: 'Overview', icon: Hammer },
-              { id: 'costs', label: 'Cost Breakdown', icon: DollarSign },
-              { id: 'photos', label: 'Photos', icon: Camera },
-              { id: 'expenses', label: 'Expenses', icon: FileText },
-            ].map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-amber-500 text-amber-400'
@@ -388,16 +387,10 @@ export default function ProjectTrackingPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <span>{format(parseISO(expense.date), 'MMM d, yyyy')}</span>
+                        {expense.date && <span>{format(parseISO(expense.date), 'MMM d, yyyy')}</span>}
                         {expense.category && (
                           <span className="px-2 py-1 bg-gray-700 rounded text-xs">
                             {expense.category}
-                          </span>
-                        )}
-                        {expense.vendor_id && (
-                          <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            Vendor linked
                           </span>
                         )}
                       </div>

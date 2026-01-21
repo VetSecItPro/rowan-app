@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import {
@@ -11,7 +11,6 @@ import {
   AlertCircle,
   MapPin,
   ChevronRight,
-  Loader2,
   Sun,
   Coffee,
   Moon,

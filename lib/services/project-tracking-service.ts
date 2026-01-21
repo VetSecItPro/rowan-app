@@ -231,7 +231,7 @@ export async function deleteProject(projectId: string): Promise<void> {
 /**
  * Gets project summary with counts
  */
-export async function getProjectSummary(projectId: string): Promise<any> {
+export async function getProjectSummary(projectId: string): Promise<Record<string, unknown> | null> {
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -384,7 +384,7 @@ export async function getPreferredVendors(spaceId: string): Promise<Vendor[]> {
 /**
  * Gets vendor spend summary
  */
-export async function getVendorSpendSummary(vendorId: string): Promise<any> {
+export async function getVendorSpendSummary(vendorId: string): Promise<Record<string, unknown> | null> {
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -483,7 +483,7 @@ export async function deleteLineItem(lineItemId: string): Promise<void> {
 /**
  * Gets cost breakdown by category
  */
-export async function getProjectCostBreakdown(projectId: string): Promise<any[]> {
+export async function getProjectCostBreakdown(projectId: string): Promise<Record<string, unknown>[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -690,7 +690,7 @@ export async function linkExpenseToProject(
 /**
  * Gets expenses for a project
  */
-export async function getProjectExpenses(projectId: string): Promise<any[]> {
+export async function getProjectExpenses(projectId: string): Promise<Record<string, unknown>[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, DollarSign, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { Expense } from '@/lib/services/expense-service';
@@ -20,40 +20,11 @@ interface BillOccurrence {
 
 export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [recurringExpenses, setRecurringExpenses] = useState<Expense[]>([]);
   const [billOccurrences, setBillOccurrences] = useState<BillOccurrence[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  useEffect(() => {
-    loadRecurringExpenses();
-  }, [spaceId, currentMonth]);
-
-  const loadRecurringExpenses = async () => {
-    try {
-      setLoading(true);
-      const supabase = createClient();
-
-      // Get all recurring expenses for the space
-      const { data, error } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('space_id', spaceId)
-        .eq('is_recurring', true)
-        .order('date', { ascending: true });
-
-      if (error) throw error;
-
-      setRecurringExpenses(data || []);
-      generateBillOccurrences(data || []);
-    } catch (error) {
-      logger.error('Error loading recurring expenses:', error, { component: 'RecurringBillsCalendar', action: 'component_action' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const generateBillOccurrences = (expenses: Expense[]) => {
+  const generateBillOccurrences = useCallback((expenses: Expense[]) => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
     const occurrences: BillOccurrence[] = [];
@@ -121,7 +92,34 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
     });
 
     setBillOccurrences(occurrences);
-  };
+  }, [currentMonth]);
+
+  const loadRecurringExpenses = useCallback(async () => {
+    try {
+      setLoading(true);
+      const supabase = createClient();
+
+      // Get all recurring expenses for the space
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('space_id', spaceId)
+        .eq('is_recurring', true)
+        .order('date', { ascending: true });
+
+      if (error) throw error;
+
+      generateBillOccurrences(data || []);
+    } catch (error) {
+      logger.error('Error loading recurring expenses:', error, { component: 'RecurringBillsCalendar', action: 'component_action' });
+    } finally {
+      setLoading(false);
+    }
+  }, [generateBillOccurrences, spaceId]);
+
+  useEffect(() => {
+    loadRecurringExpenses();
+  }, [loadRecurringExpenses]);
 
   const getDayOccurrences = (day: Date) => {
     return billOccurrences.filter((occ) => isSameDay(occ.date, day));

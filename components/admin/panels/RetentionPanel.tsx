@@ -405,7 +405,7 @@ const ChurnPanel = memo(function ChurnPanel() {
               <h4 className="text-sm font-medium text-red-300">Churned</h4>
             </div>
             <p className="text-xs text-red-400">
-              Users who signed up more than 60 days ago but haven't been active in the last 30 days.
+              Users who signed up more than 60 days ago but haven&apos;t been active in the last 30 days.
             </p>
           </div>
 

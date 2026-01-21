@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     setCsrfCookie(response, newToken);
 
     return response;
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to generate CSRF token' },
       { status: 500 }

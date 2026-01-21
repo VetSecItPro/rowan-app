@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
-import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -49,7 +49,7 @@ export async function processReminderNotifications(): Promise<{
   let emailsSent = 0;
 
   try {
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
 
     // Get reminders that need notifications
     const remindersToNotify = await getRemindersNeedingNotification(supabase);
@@ -65,12 +65,12 @@ export async function processReminderNotifications(): Promise<{
     for (const batch of notificationBatches) {
       try {
         // Send in-app notifications
-        const inAppResults = await sendInAppNotifications(batch);
+        const inAppResults = await sendInAppNotifications(supabase, batch);
         notificationsSent += inAppResults.sent;
         if (inAppResults.error) errors.push(inAppResults.error);
 
         // Send email digest if enabled
-        const emailResult = await sendEmailNotifications(batch);
+        const emailResult = await sendEmailNotifications(supabase, batch);
         if (emailResult.sent) emailsSent++;
         if (emailResult.error) errors.push(emailResult.error);
       } catch (error) {
@@ -95,7 +95,7 @@ export async function processReminderNotifications(): Promise<{
 /**
  * Get reminders that need notifications (due in next 15 min or overdue)
  */
-async function getRemindersNeedingNotification(supabase: any): Promise<ReminderToNotify[]> {
+async function getRemindersNeedingNotification(supabase: SupabaseClient): Promise<ReminderToNotify[]> {
   const now = new Date();
   const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60 * 1000);
 
@@ -133,11 +133,38 @@ async function getRemindersNeedingNotification(supabase: any): Promise<ReminderT
   return remindersWithoutRecentNotifications;
 }
 
+async function shouldSendReminderNotification(
+  supabase: SupabaseClient,
+  userId: string,
+  spaceId: string,
+  type: 'due' | 'overdue',
+  channel: 'in_app' | 'email'
+): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc('should_send_notification', {
+      p_user_id: userId,
+      p_space_id: spaceId,
+      p_notification_type: type,
+      p_channel: channel,
+    });
+
+    if (error) {
+      logger.warn('should_send_notification RPC failed, defaulting to allow', { component: 'reminder-notifications-job', error: error.message });
+      return true;
+    }
+
+    return Boolean(data);
+  } catch (error) {
+    logger.warn('Error evaluating notification preference, defaulting to allow', { component: 'reminder-notifications-job', error: String(error) });
+    return true;
+  }
+}
+
 /**
  * Group notifications by user (assignee or creator)
  */
 async function groupNotificationsByUser(
-  supabase: any,
+  supabase: SupabaseClient,
   reminders: ReminderToNotify[]
 ): Promise<NotificationBatch[]> {
   const userMap = new Map<string, NotificationBatch>();
@@ -195,7 +222,7 @@ async function groupNotificationsByUser(
 /**
  * Send in-app notifications for a user batch
  */
-async function sendInAppNotifications(batch: NotificationBatch): Promise<{
+async function sendInAppNotifications(supabase: SupabaseClient, batch: NotificationBatch): Promise<{
   sent: number;
   error?: string;
 }> {
@@ -204,13 +231,23 @@ async function sendInAppNotifications(batch: NotificationBatch): Promise<{
   try {
     for (const { reminder, type } of batch.notifications) {
       try {
-        await reminderNotificationsService.createNotification({
-          reminder_id: reminder.id,
-          user_id: batch.userId,
-          type: type,
-          channel: 'in_app',
-        });
-        sent++;
+        const allowed = await shouldSendReminderNotification(supabase, batch.userId, reminder.space_id, type, 'in_app');
+        if (!allowed) continue;
+
+        const { error } = await supabase
+          .from('reminder_notifications')
+          .insert({
+            reminder_id: reminder.id,
+            user_id: batch.userId,
+            type: type,
+            channel: 'in_app',
+          });
+
+        if (!error) {
+          sent++;
+        } else {
+          logger.error(`Failed to create in-app notification for reminder ${reminder.id}:`, error, { component: 'reminder-notifications-job', action: 'service_call' });
+        }
       } catch (error) {
         logger.error(`Failed to create in-app notification for reminder ${reminder.id}:`, error, { component: 'reminder-notifications-job', action: 'service_call' });
       }
@@ -226,39 +263,32 @@ async function sendInAppNotifications(batch: NotificationBatch): Promise<{
 /**
  * Send email notifications for a user batch
  */
-async function sendEmailNotifications(batch: NotificationBatch): Promise<{
+async function sendEmailNotifications(supabase: SupabaseClient, batch: NotificationBatch): Promise<{
   sent: boolean;
   error?: string;
 }> {
   try {
-    // Check if user has email notifications enabled
-    const prefs = await reminderNotificationsService.getPreferences(batch.userId);
-
-    // If no preferences, skip
-    if (!prefs) {
-      return { sent: false };
-    }
-
-    // Check if user wants due reminder emails
-    const hasDueReminders = batch.notifications.some((n) => n.type === 'due');
-    const hasOverdueReminders = batch.notifications.some((n) => n.type === 'overdue');
-
-    if (!prefs.email_general_reminders && (hasDueReminders || hasOverdueReminders)) {
-      return { sent: false };
-    }
-
-    // Create email notification records
+    // Create email notification records (respect per-reminder prefs)
     for (const { reminder, type } of batch.notifications) {
+      const allowed = await shouldSendReminderNotification(supabase, batch.userId, reminder.space_id, type, 'email');
+      if (!allowed) continue;
+
       try {
-        await reminderNotificationsService.createNotification({
-          reminder_id: reminder.id,
-          user_id: batch.userId,
-          type: type,
-          channel: 'email',
-        });
+        await supabase
+          .from('reminder_notifications')
+          .insert({
+            reminder_id: reminder.id,
+            user_id: batch.userId,
+            type: type,
+            channel: 'email',
+          });
       } catch (error) {
         logger.error(`Failed to create email notification record for reminder ${reminder.id}:`, error, { component: 'reminder-notifications-job', action: 'service_call' });
       }
+    }
+
+    if (!batch.userEmail) {
+      return { sent: false, error: 'User email not found' };
     }
 
     // Send email via Resend
@@ -270,12 +300,16 @@ async function sendEmailNotifications(batch: NotificationBatch): Promise<{
       return { sent: false };
     }
 
-    await resend.emails.send({
+    const { error: sendError } = await resend.emails.send({
       from: 'Rowan <reminders@rowan.app>',
       to: batch.userEmail,
       subject: emailSubject,
       html: emailHtml,
     });
+
+    if (sendError) {
+      return { sent: false, error: sendError.message || 'Email send failed' };
+    }
 
     return { sent: true };
   } catch (error) {

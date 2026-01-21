@@ -177,8 +177,6 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
           {funnel.steps.map((step, index) => {
             const Icon = stepIcons[step.id as keyof typeof stepIcons] || Activity;
             const colors = stepColors[step.color] || stepColors.blue;
-            const maxCount = Math.max(...funnel.steps.map(s => s.count), 1);
-            const widthPercent = Math.max((step.count / maxCount) * 100, 30);
 
             return (
               <div key={step.id} className="relative">

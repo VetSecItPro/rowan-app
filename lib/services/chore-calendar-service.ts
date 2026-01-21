@@ -1,19 +1,49 @@
 import { createClient } from '@/lib/supabase/client';
 import { addDays, format } from 'date-fns';
 
+type ChoreRecord = {
+  id: string;
+  due_date?: string | null;
+  space_id: string;
+  title: string;
+  description?: string | null;
+  frequency: string;
+  assigned_to?: string | null;
+  created_by?: string | null;
+};
+
+type CalendarEventInsert = {
+  space_id: string;
+  title: string;
+  description?: string | null;
+  event_type: string;
+  start_time: string;
+  end_time: string;
+  category: 'personal';
+  status: 'not-started';
+  assigned_to?: string | null;
+  created_by?: string | null;
+  is_recurring: boolean;
+};
+
+type ChoreCalendarPreferences = {
+  auto_sync_chores: boolean;
+  calendar_chore_filter?: string | null;
+};
+
 export const choreCalendarService = {
   /**
    * Sync a chore to calendar as events
    * Creates recurring events based on chore frequency
    */
-  async syncChoreToCalendar(choreId: string): Promise<any> {
+  async syncChoreToCalendar(choreId: string): Promise<Record<string, unknown>[] | null> {
     const supabase = createClient();
     const { data: chore } = await supabase.from('chores').select('*').eq('id', choreId).single();
 
     if (!chore || !chore.due_date) return null;
 
     // Generate recurring events based on frequency
-    const events = this.generateChoreEvents(chore);
+    const events = this.generateChoreEvents(chore as ChoreRecord);
 
     // Insert events into calendar
     const { data: insertedEvents, error: eventError } = await supabase
@@ -64,8 +94,9 @@ export const choreCalendarService = {
   /**
    * Generate recurring events for a chore based on its frequency
    */
-  generateChoreEvents(chore: any, monthsAhead: number = 3): any[] {
-    const events = [];
+  generateChoreEvents(chore: ChoreRecord, monthsAhead: number = 3): CalendarEventInsert[] {
+    const events: CalendarEventInsert[] = [];
+    if (!chore.due_date) return events; // No due date, no events to generate
     const startDate = new Date(chore.due_date);
     const endDate = addDays(startDate, monthsAhead * 30); // Generate events for next 3 months
 
@@ -73,7 +104,7 @@ export const choreCalendarService = {
 
     while (currentDate <= endDate) {
       // Create calendar event for this occurrence
-      const event = {
+      const event: CalendarEventInsert = {
         space_id: chore.space_id,
         title: `🧹 ${chore.title}`,
         description: chore.description,
@@ -131,7 +162,7 @@ export const choreCalendarService = {
   /**
    * Get calendar preferences for chores
    */
-  async getCalendarPreferences(userId: string): Promise<any> {
+  async getCalendarPreferences(userId: string): Promise<ChoreCalendarPreferences> {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('users')

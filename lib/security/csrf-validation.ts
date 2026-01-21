@@ -36,6 +36,11 @@ export function validateCsrfRequest(request: NextRequest): NextResponse | null {
     return null;
   }
 
+  const authHeader = request.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
+
   // Validate CSRF token
   if (!validateCsrfToken(request)) {
     logger.warn('CSRF validation failed', {

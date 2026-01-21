@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import {
   X, FileText, Paperclip, MessageSquare, CheckSquare, Home,
   Calendar, Clock, User, Send, Trash2, Upload, Edit3,
-  ChevronRight, AlertCircle
 } from 'lucide-react';
 import { Task, Chore } from '@/lib/types';
 import {
@@ -18,56 +16,65 @@ import {
 import { Dropdown } from '@/components/ui/Dropdown';
 
 type ItemType = Task | Chore;
+type ItemKind = 'task' | 'chore';
+type TabId = 'overview' | 'comments' | 'files';
+
+type CommentEntry = {
+  id: number | string;
+  user: string;
+  content: string;
+  timestamp: Date;
+  avatar: string;
+};
+
+type AttachmentEntry = {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: Date;
+};
+
+type ItemWithType = ItemType & { type?: ItemKind };
+type EditableItemData = Partial<Task & Chore>;
 
 interface UnifiedDetailsModalProps {
-  item: (ItemType & { type?: 'task' | 'chore' }) | null;
+  item: ItemWithType | null;
   isOpen: boolean;
   onClose: () => void;
   spaceId: string;
   userId: string;
-  onEdit?: (item: (Task & { type: 'task' }) | (Chore & { type: 'chore' })) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onEdit?: (item: any) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
-  onSave?: (item: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSave?: (item: any) => void | Promise<void | { id: string }>;
   onUpdate?: () => void;
 }
 
-export function UnifiedDetailsModal({
+const buildInitialComments = (isOpen: boolean): CommentEntry[] => {
+  if (!isOpen) return [];
+  return [
+    { id: 1, user: 'Mom', content: 'Don\'t forget to check the expiration dates!', timestamp: new Date(Date.now() - 3600000), avatar: '👩' },
+    { id: 2, user: 'Dad', content: 'I can help with this on Saturday', timestamp: new Date(Date.now() - 1800000), avatar: '👨' }
+  ];
+};
+
+function DetailsModalContent({
   item,
   isOpen,
   onClose,
-  spaceId,
-  userId,
   onEdit,
-  onDelete,
   onSave,
   onUpdate
 }: UnifiedDetailsModalProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'comments' | 'files'>('overview');
-  const [comments, setComments] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [comments, setComments] = useState<CommentEntry[]>(() => buildInitialComments(isOpen));
   const [newComment, setNewComment] = useState('');
-  const [attachments, setAttachments] = useState<any[]>([]);
-  const [editedStatus, setEditedStatus] = useState<string>('');
-  const [editedPriority, setEditedPriority] = useState<string>('');
+  const [attachments, setAttachments] = useState<AttachmentEntry[]>([]);
+  const [editedStatus, setEditedStatus] = useState<string>(item?.status || 'pending');
+  const [editedPriority, setEditedPriority] = useState<string>((item as EditableItemData | null)?.priority || 'medium');
   const [hasChanges, setHasChanges] = useState(false);
-
-  // Initialize edited values when item changes
-  useEffect(() => {
-    if (item) {
-      setEditedStatus(item.status || 'pending');
-      setEditedPriority((item as any).priority || 'medium');
-      setHasChanges(false);
-    }
-  }, [item]);
-
-  // Load mock comments
-  useEffect(() => {
-    if (isOpen) {
-      setComments([
-        { id: 1, user: 'Mom', content: 'Don\'t forget to check the expiration dates!', timestamp: new Date(Date.now() - 3600000), avatar: '👩' },
-        { id: 2, user: 'Dad', content: 'I can help with this on Saturday', timestamp: new Date(Date.now() - 1800000), avatar: '👨' }
-      ]);
-    }
-  }, [isOpen]);
 
   const handleAddComment = () => {
     if (!newComment.trim()) return;
@@ -122,8 +129,9 @@ export function UnifiedDetailsModal({
 
   const itemType = item.type || 'task';
   const categories = itemType === 'task' ? TASK_CATEGORIES : CHORE_CATEGORIES;
-  const category = (item as any).category;
-  const categoryInfo = category && (categories as any)[category];
+  const itemData = item as EditableItemData;
+  const category = itemData.category;
+  const categoryInfo = category ? categories[category as keyof typeof categories] : undefined;
 
   // Format relative time
   const formatRelativeTime = (date: Date) => {
@@ -203,14 +211,14 @@ export function UnifiedDetailsModal({
 
         {/* Tabs - Minimal */}
         <div className="flex border-b border-gray-700 bg-gray-800/50">
-          {[
+          {([
             { id: 'overview', label: 'Overview', icon: FileText },
             { id: 'comments', label: `Comments`, icon: MessageSquare, badge: comments.length },
             { id: 'files', label: 'Files', icon: Paperclip, badge: attachments.length }
-          ].map(tab => (
+          ] as Array<{ id: TabId; label: string; icon: typeof FileText; badge?: number }>).map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? 'text-blue-400 border-b-2 border-blue-400 bg-gray-900'
@@ -421,7 +429,7 @@ export function UnifiedDetailsModal({
         <div className="flex-shrink-0 px-4 py-3 border-t border-gray-700 bg-gray-800/50">
           <div className="flex items-center justify-between gap-3">
             <button
-              onClick={() => onEdit?.(item as any)}
+              onClick={() => onEdit?.(item as (Task & { type: 'task' }) | (Chore & { type: 'chore' }))}
               className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"
             >
               <Edit3 className="w-4 h-4" />
@@ -448,4 +456,10 @@ export function UnifiedDetailsModal({
       </div>
     </div>
   );
+}
+
+export function UnifiedDetailsModal(props: UnifiedDetailsModalProps) {
+  const { item, isOpen } = props;
+  const modalKey = `${item?.id ?? 'none'}-${isOpen ? 'open' : 'closed'}`;
+  return <DetailsModalContent key={modalKey} {...props} />;
 }

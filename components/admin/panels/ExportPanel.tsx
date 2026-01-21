@@ -145,7 +145,7 @@ export const ExportPanel = memo(function ExportPanel() {
 
       const data = await response.json();
       let records: Record<string, unknown>[] = [];
-      let filename = `${option.id}-export-${new Date().toISOString().split('T')[0]}.csv`;
+      const filename = `${option.id}-export-${new Date().toISOString().split('T')[0]}.csv`;
 
       // Handle different response formats
       if (option.id === 'users') {

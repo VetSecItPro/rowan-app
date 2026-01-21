@@ -6,6 +6,26 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+type NotificationRecord = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  source?: string | null;
+  referrer?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  subscribed?: boolean;
+  created_at?: string | null;
+  unsubscribed_at?: string | null;
+};
+
+const ExportRequestSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1).optional(),
+  format: z.enum(['csv', 'json']).optional(),
+  includeAll: z.boolean().optional(),
+}).strict();
 
 /**
  * POST /api/admin/notifications/export
@@ -47,7 +67,7 @@ export async function POST(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -55,8 +75,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse request body
-    const body = await req.json();
-    const { ids, format = 'csv', includeAll = false } = body;
+    const body = await req.json().catch(() => ({}));
+    const parsedBody = ExportRequestSchema.parse(body);
+    const format = parsedBody.format ?? 'csv';
+    const includeAll = parsedBody.includeAll ?? false;
+    const ids = parsedBody.ids;
 
     // Build query
     let query = supabaseAdmin
@@ -92,18 +115,21 @@ export async function POST(req: NextRequest) {
       ];
 
       // CSV rows
-      const rows = (notifications || []).map((notification: any) => [
-        notification.id,
-        `"${(notification.name || '').replace(/"/g, '""')}"`, // Escape quotes
-        `"${(notification.email || '').replace(/"/g, '""')}"`,
-        `"${(notification.source || 'homepage').replace(/"/g, '""')}"`,
-        `"${(notification.referrer || '').replace(/"/g, '""')}"`,
-        `"${(notification.ip_address || '').replace(/"/g, '""')}"`,
-        `"${(notification.user_agent || '').replace(/"/g, '""')}"`,
-        notification.subscribed ? 'Yes' : 'No',
-        notification.created_at ? new Date(notification.created_at).toISOString() : '',
-        notification.unsubscribed_at ? new Date(notification.unsubscribed_at).toISOString() : ''
-      ]);
+      const rows = (notifications || []).map((notification) => {
+        const record = notification as NotificationRecord;
+        return [
+          record.id,
+          `"${(record.name || '').replace(/"/g, '""')}"`, // Escape quotes
+          `"${(record.email || '').replace(/"/g, '""')}"`,
+          `"${(record.source || 'homepage').replace(/"/g, '""')}"`,
+          `"${(record.referrer || '').replace(/"/g, '""')}"`,
+          `"${(record.ip_address || '').replace(/"/g, '""')}"`,
+          `"${(record.user_agent || '').replace(/"/g, '""')}"`,
+          record.subscribed ? 'Yes' : 'No',
+          record.created_at ? new Date(record.created_at).toISOString() : '',
+          record.unsubscribed_at ? new Date(record.unsubscribed_at).toISOString() : ''
+        ];
+      });
 
       // Combine headers and rows
       const csvContent = [headers.join(','), ...rows.map((row: string[]) => row.join(','))].join('\n');
@@ -140,6 +166,12 @@ export async function POST(req: NextRequest) {
       },
     });
     logger.error('[API] /api/admin/notifications/export POST error:', error, { component: 'api-route', action: 'api_request' });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: error.issues },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to export notifications' },
       { status: 500 }
@@ -176,7 +208,7 @@ export async function GET(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }

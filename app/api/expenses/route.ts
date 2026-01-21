@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get expenses from service
-    const expenses = await projectsService.getExpenses(spaceId);
+    const expenses = await projectsService.getExpenses(spaceId, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       paid_by: paid_by ? sanitizePlainText(paid_by) : undefined,
       notes: notes ? sanitizePlainText(notes) : undefined,
       amount: Number(amount),
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

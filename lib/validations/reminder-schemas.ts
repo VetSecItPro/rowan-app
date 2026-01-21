@@ -14,7 +14,7 @@ export const reminderBaseSchema = z.object({
     .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
-    .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}/).safeParse(val).success, 'Invalid date format'),
+    .refine(val => val === null || val === undefined || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}/).safeParse(val).success, 'Invalid date format'),
   priority: reminderPriorityEnum.default('medium'),
   recurrence: reminderRecurrenceEnum.default('none'),
   status: reminderStatusEnum.default('active'),

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
 export interface Reminder {
@@ -75,9 +76,15 @@ export interface ReminderStats {
   overdue: number;
 }
 
+type ReminderUpdatePayload = Omit<UpdateReminderInput, 'completed_at'> & {
+  completed_at?: string | null;
+};
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 export const remindersService = {
-  async getReminders(spaceId: string): Promise<Reminder[]> {
-    const supabase = createClient();
+  async getReminders(spaceId: string, supabaseClient?: SupabaseClient): Promise<Reminder[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('reminders')
       .select(`
@@ -99,15 +106,16 @@ export const remindersService = {
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return (data || []).map((reminder: any) => ({
+    const reminders = (data ?? []) as Reminder[];
+    return reminders.map((reminder) => ({
       ...reminder,
       assignee: reminder.assignee || undefined,
       snoozer: reminder.snoozer || undefined,
     }));
   },
 
-  async getReminderById(id: string): Promise<Reminder | null> {
-    const supabase = createClient();
+  async getReminderById(id: string, supabaseClient?: SupabaseClient): Promise<Reminder | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('reminders')
       .select('*')
@@ -118,8 +126,8 @@ export const remindersService = {
     return data;
   },
 
-  async createReminder(input: CreateReminderInput): Promise<Reminder> {
-    const supabase = createClient();
+  async createReminder(input: CreateReminderInput, supabaseClient?: SupabaseClient): Promise<Reminder> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('reminders')
       .insert([{
@@ -137,9 +145,9 @@ export const remindersService = {
     return data;
   },
 
-  async updateReminder(id: string, updates: UpdateReminderInput): Promise<Reminder> {
-    const supabase = createClient();
-    const finalUpdates: any = { ...updates };
+  async updateReminder(id: string, updates: UpdateReminderInput, supabaseClient?: SupabaseClient): Promise<Reminder> {
+    const supabase = getSupabaseClient(supabaseClient);
+    const finalUpdates: ReminderUpdatePayload = { ...updates };
 
     // Set completed_at timestamp when status is completed
     if (updates.status === 'completed' && !finalUpdates.completed_at) {
@@ -162,8 +170,8 @@ export const remindersService = {
     return data;
   },
 
-  async deleteReminder(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteReminder(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
       .from('reminders')
       .delete()
@@ -258,7 +266,8 @@ export const remindersService = {
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return (data || []).map((reminder: any) => ({
+    const reminders = (data ?? []) as Reminder[];
+    return reminders.map((reminder) => ({
       ...reminder,
       assignee: reminder.assignee || undefined,
     }));
@@ -282,7 +291,8 @@ export const remindersService = {
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return (data || []).map((reminder: any) => ({
+    const reminders = (data ?? []) as Reminder[];
+    return reminders.map((reminder) => ({
       ...reminder,
       assignee: reminder.assignee || undefined,
     }));
@@ -333,7 +343,8 @@ export const remindersService = {
       .order('reminder_time', { ascending: true });
 
     if (error) throw error;
-    return (data || []).map((reminder: any) => ({
+    const reminders = (data ?? []) as Reminder[];
+    return reminders.map((reminder) => ({
       ...reminder,
       assignee: reminder.assignee || undefined,
     }));

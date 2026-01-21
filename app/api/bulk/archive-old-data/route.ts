@@ -44,20 +44,21 @@ export async function POST(request: NextRequest) {
 
     // Get request body
     const body = await request.json();
-    const { partnership_id, data_type, older_than_date } = body;
+    const { partnership_id, space_id, data_type, older_than_date } = body;
+    const spaceId = space_id || partnership_id;
 
-    if (!partnership_id || !data_type || !older_than_date) {
+    if (!spaceId || !data_type || !older_than_date) {
       return NextResponse.json(
-        { error: 'Partnership ID, data type, and older_than_date are required' },
+        { error: 'space_id, data type, and older_than_date are required' },
         { status: 400 }
       );
     }
 
-    // Verify user has access to this partnership
+    // Verify user has access to this space
     const { data: membership } = await supabase
-      .from('partnership_members')
+      .from('space_members')
       .select('*')
-      .eq('partnership_id', partnership_id)
+      .eq('space_id', spaceId)
       .eq('user_id', user.id)
       .single();
 
@@ -69,13 +70,13 @@ export async function POST(request: NextRequest) {
     let result;
     switch (data_type) {
       case 'expenses':
-        result = await archiveOldExpenses(partnership_id, older_than_date);
+        result = await archiveOldExpenses(spaceId, older_than_date, supabase);
         break;
       case 'tasks':
-        result = await archiveOldTasks(partnership_id, older_than_date);
+        result = await archiveOldTasks(spaceId, older_than_date, supabase);
         break;
       case 'calendar_events':
-        result = await archiveOldCalendarEvents(partnership_id, older_than_date);
+        result = await archiveOldCalendarEvents(spaceId, older_than_date, supabase);
         break;
       default:
         return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });

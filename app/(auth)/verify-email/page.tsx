@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Mail, RefreshCw, LogOut, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 /**
  * Email Verification Page
@@ -34,14 +35,7 @@ function VerifyEmailContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle token verification if token is present
-  useEffect(() => {
-    if (token && !isVerifying && !verificationSuccess && !verificationError) {
-      verifyToken(token);
-    }
-  }, [token]);
-
-  const verifyToken = async (verificationToken: string) => {
+  const verifyToken = useCallback(async (verificationToken: string) => {
     setIsVerifying(true);
     setVerificationError('');
 
@@ -57,7 +51,7 @@ function VerifyEmailContent() {
       }
 
       // Now verify the token
-      const response = await fetch('/api/auth/verify-email', {
+      const response = await csrfFetch('/api/auth/verify-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: verificationToken }),
@@ -79,7 +73,14 @@ function VerifyEmailContent() {
     } finally {
       setIsVerifying(false);
     }
-  };
+  }, [router]);
+
+  // Handle token verification if token is present
+  useEffect(() => {
+    if (token && !isVerifying && !verificationSuccess && !verificationError) {
+      verifyToken(token);
+    }
+  }, [token, isVerifying, verificationSuccess, verificationError, verifyToken]);
 
   // Check if user has verified their email (poll every 5 seconds)
   useEffect(() => {
@@ -108,7 +109,7 @@ function VerifyEmailContent() {
     setResendSuccess(false);
 
     try {
-      const response = await fetch('/api/auth/resend-verification', {
+      const response = await csrfFetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

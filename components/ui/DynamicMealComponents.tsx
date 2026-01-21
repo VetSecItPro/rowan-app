@@ -6,6 +6,7 @@
  */
 
 import dynamic from 'next/dynamic';
+import type { ComponentType } from 'react';
 import { Loader2, UtensilsCrossed } from 'lucide-react';
 import { EnhancedModalSkeleton, ProgressiveCalendarSkeleton } from './ProgressiveLoader';
 
@@ -17,7 +18,7 @@ const MealLoadingFallback = ({
   icon: Icon = UtensilsCrossed
 }: {
   text?: string;
-  icon?: any;
+  icon?: ComponentType<{ className?: string }>;
 }) => (
   <div className="flex items-center justify-center p-6">
     <div className="flex flex-col items-center gap-3">

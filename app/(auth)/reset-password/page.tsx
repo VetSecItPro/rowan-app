@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useValidatedSearchParams, AuthCallbackParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const containerVariants = {
@@ -150,7 +151,7 @@ function ResetPasswordForm() {
       }
 
       const supabase = createClient();
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
 
       // Check if user came here from a password reset link (Supabase native)
       const accessToken = params?.access_token;
@@ -172,7 +173,7 @@ function ResetPasswordForm() {
           } else {
             setHasValidSession(true);
           }
-        } catch (err) {
+        } catch {
           setError('Failed to validate reset link. Please try again.');
         }
       } else if (customToken) {
@@ -186,7 +187,7 @@ function ResetPasswordForm() {
           } else {
             setError(data.error || 'Invalid or expired reset link. Please request a new password reset.');
           }
-        } catch (err) {
+        } catch {
           setError('Failed to validate reset link. Please try again.');
         }
       } else if (session) {
@@ -248,7 +249,7 @@ function ResetPasswordForm() {
 
       if (customToken) {
         // Use our custom password reset API
-        const response = await fetch('/api/auth/password-reset/verify', {
+        const response = await csrfFetch('/api/auth/password-reset/verify', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -285,7 +286,7 @@ function ResetPasswordForm() {
         router.push('/login');
       }, 2000);
 
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);

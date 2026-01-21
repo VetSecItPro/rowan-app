@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { BadgeProgress } from '@/lib/types';
 import type { AchievementBadge, UserBadge } from '@/lib/services/achievement-service';
 import BadgeCard from './BadgeCard';
@@ -37,11 +37,7 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, [userId, spaceId]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const [badges, earned, progress, badgeStats] = await Promise.all([
@@ -60,7 +56,11 @@ export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProp
     } finally {
       setLoading(false);
     }
-  }
+  }, [spaceId, userId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Filter badges
   const filteredBadges = allBadges.filter((badge) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Plus, Trash2, Sparkles, FileText, Info, Image as ImageIcon, Loader2, Search, Globe, X } from 'lucide-react';
 import { CreateRecipeInput, Recipe } from '@/lib/services/meals-service';
 import ImageUpload from '@/components/shared/ImageUpload';
@@ -8,6 +9,7 @@ import { searchExternalRecipes, searchByCuisine, getRandomRecipes, SUPPORTED_CUI
 import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface NewRecipeModalProps {
   isOpen: boolean;
@@ -20,6 +22,7 @@ interface NewRecipeModalProps {
 }
 
 type TabType = 'manual' | 'ai' | 'discover';
+type RecipeIngredientInput = string | { name: string; amount?: string; unit?: string };
 
 export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, initialTab = 'manual', onRecipeAdded }: NewRecipeModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
@@ -135,7 +138,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
         });
       }
 
-      const response = await fetch('/api/recipes/parse', {
+      const response = await csrfFetch('/api/recipes/parse', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,10 +158,11 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       const recipe = data.recipe;
 
       // Convert ingredients to proper format
-      let parsedIngredients: any[] = [];
+      let parsedIngredients: RecipeIngredientInput[] = [];
       if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
-        parsedIngredients = recipe.ingredients.map((ing: any) => {
-          if (typeof ing === 'object' && ing.name) {
+        const rawIngredients = recipe.ingredients as RecipeIngredientInput[];
+        parsedIngredients = rawIngredients.map((ing) => {
+          if (typeof ing === 'object' && ing && 'name' in ing) {
             // Keep as object with name, amount, unit
             return ing;
           } else if (typeof ing === 'string') {
@@ -202,7 +206,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
     // Filter out empty ingredients
     const cleanedIngredients = Array.isArray(formData.ingredients)
-      ? formData.ingredients.filter((i: any) => {
+      ? formData.ingredients.filter((i: RecipeIngredientInput) => {
           if (typeof i === 'string') return i.trim() !== '';
           if (typeof i === 'object') return i.name?.trim() !== '';
           return false;
@@ -462,11 +466,14 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   </button>
 
                   {imagePreview && (
-                    <div className="relative">
-                      <img
+                    <div className="relative h-32">
+                      <Image
                         src={imagePreview}
                         alt="Recipe preview"
-                        className="w-full h-32 object-cover rounded-lg"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        className="object-cover rounded-lg"
+                        unoptimized
                       />
                       <button
                         onClick={() => {
@@ -606,6 +613,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                       >
                         {recipe.image_url && (
                           <div className="w-full h-20 mb-1.5 rounded-lg overflow-hidden bg-gray-700">
+                            {/* eslint-disable-next-line @next/next/no-img-element -- external recipe images can be from any domain */}
                             <img
                               src={recipe.image_url}
                               alt={recipe.name}

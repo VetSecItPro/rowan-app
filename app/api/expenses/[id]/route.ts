@@ -54,7 +54,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    const expense = await projectsService.getExpenseById(params.id);
+    const expense = await projectsService.getExpenseById(params.id, supabase);
 
     if (!expense) {
       return NextResponse.json(
@@ -158,7 +158,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     if (validatedData.recurring !== undefined) updates.recurring = validatedData.recurring;
 
     // Get expense first to verify access
-    const existingExpense = await projectsService.getExpenseById(params.id);
+    const existingExpense = await projectsService.getExpenseById(params.id, supabase);
 
     if (!existingExpense) {
       return NextResponse.json(
@@ -188,7 +188,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     }
 
     // Update expense using service
-    const expense = await projectsService.updateExpense(params.id, updates);
+    const expense = await projectsService.updateExpense(params.id, updates, supabase);
 
     return NextResponse.json({
       success: true,
@@ -237,7 +237,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get expense first to verify access
-    const existingExpense = await projectsService.getExpenseById(params.id);
+    const existingExpense = await projectsService.getExpenseById(params.id, supabase);
 
     if (!existingExpense) {
       return NextResponse.json(
@@ -267,7 +267,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete expense using service
-    await projectsService.deleteExpense(params.id);
+    await projectsService.deleteExpense(params.id, supabase);
 
     return NextResponse.json({
       success: true,

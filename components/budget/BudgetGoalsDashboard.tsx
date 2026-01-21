@@ -12,16 +12,12 @@ import { Separator } from '@/components/ui/separator';
 import {
   Target,
   TrendingUp,
-  TrendingDown,
   DollarSign,
-  Calendar,
   Plus,
   AlertTriangle,
   CheckCircle,
   PiggyBank,
   BarChart3,
-  ArrowUpRight,
-  ArrowDownRight,
   Link as LinkIcon
 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -32,7 +28,6 @@ import {
   calculateSavingsGoalProgress,
   autoUpdateBudgetGoalProgress
 } from '@/lib/services/budget-goals-linking-service';
-import { Goal } from '@/lib/services/goals-service';
 import { BudgetGoalLinker } from './BudgetGoalLinker';
 import { cn } from '@/lib/utils';
 

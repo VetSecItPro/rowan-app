@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 // Using native HTML elements and existing components
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

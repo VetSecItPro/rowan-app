@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import type { UserPrivacyPreferences } from '@/lib/types/privacy';
 
 /**
  * Compliance Service
@@ -17,20 +19,7 @@ import { logger } from '@/lib/logger';
  * - Notice at Collection
  */
 
-export interface PrivacyPreferences {
-  id?: string;
-  user_id: string;
-  marketing_emails_enabled: boolean;
-  marketing_sms_enabled: boolean;
-  analytics_cookies_enabled: boolean;
-  performance_cookies_enabled: boolean;
-  advertising_cookies_enabled: boolean;
-  share_data_with_partners: boolean;
-  allow_third_party_analytics: boolean;
-  location_tracking_enabled: boolean;
-  ccpa_do_not_sell: boolean;
-  gdpr_automated_decision_making_opt_out: boolean;
-}
+export type PrivacyPreferences = UserPrivacyPreferences;
 
 export interface CCPAPreference {
   id?: string;
@@ -61,7 +50,7 @@ export interface ComplianceEvent {
   event_type: string;
   event_category: 'gdpr' | 'ccpa' | 'general_privacy';
   description?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at?: string;
 }
 
@@ -74,39 +63,15 @@ export async function getPrivacyPreferences(userId: string): Promise<{
   error?: string;
 }> {
   try {
-    const supabase = createClient();
+    void userId;
+    const response = await fetch('/api/privacy/preferences');
+    const result = await response.json();
 
-    const { data, error } = await supabase
-      .from('user_privacy_preferences')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 is "not found" error
-      logger.error('Error fetching privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
-      return { success: false, error: error.message };
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to fetch privacy preferences');
     }
 
-    // If no preferences exist, return defaults
-    if (!data) {
-      const defaults: PrivacyPreferences = {
-        user_id: userId,
-        marketing_emails_enabled: false,
-        marketing_sms_enabled: false,
-        analytics_cookies_enabled: true,
-        performance_cookies_enabled: true,
-        advertising_cookies_enabled: false,
-        share_data_with_partners: false,
-        allow_third_party_analytics: true,
-        location_tracking_enabled: false,
-        ccpa_do_not_sell: true,
-        gdpr_automated_decision_making_opt_out: false,
-      };
-      return { success: true, data: defaults };
-    }
-
-    return { success: true, data: data as PrivacyPreferences };
+    return { success: true, data: result.data as PrivacyPreferences };
   } catch (error) {
     logger.error('Error fetching privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
@@ -124,22 +89,16 @@ export async function updatePrivacyPreferences(
   preferences: Partial<PrivacyPreferences>
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const response = await csrfFetch('/api/privacy/preferences', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(preferences),
+    });
 
-    const { error } = await supabase
-      .from('user_privacy_preferences')
-      .upsert(
-        {
-          user_id: userId,
-          ...preferences,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      );
+    const result = await response.json();
 
-    if (error) {
-      logger.error('Error updating privacy preferences:', error, { component: 'lib-compliance-service', action: 'service_call' });
-      return { success: false, error: error.message };
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to update privacy preferences');
     }
 
     // Log compliance event
@@ -170,30 +129,15 @@ export async function getCCPAPreference(userId: string): Promise<{
   error?: string;
 }> {
   try {
-    const supabase = createClient();
+    void userId;
+    const response = await fetch('/api/ccpa/opt-out');
+    const result = await response.json();
 
-    const { data, error } = await supabase
-      .from('ccpa_do_not_sell')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      logger.error('Error fetching CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
-      return { success: false, error: error.message };
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to fetch CCPA preference');
     }
 
-    if (!data) {
-      // Return default
-      const defaults: CCPAPreference = {
-        user_id: userId,
-        do_not_sell: true,
-        current_status: 'opted_out',
-      };
-      return { success: true, data: defaults };
-    }
-
-    return { success: true, data: data as CCPAPreference };
+    return { success: true, data: result.data as CCPAPreference };
   } catch (error) {
     logger.error('Error fetching CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
     return {
@@ -211,28 +155,19 @@ export async function updateCCPAPreference(
   doNotSell: boolean
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = createClient();
+    const response = await csrfFetch('/api/ccpa/opt-out', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        optedOut: doNotSell,
+        verificationMethod: 'user_declaration',
+      }),
+    });
 
-    const currentStatus = doNotSell ? 'opted_out' : 'opted_in';
-    const timestamp = new Date().toISOString();
+    const result = await response.json();
 
-    const { error } = await supabase
-      .from('ccpa_do_not_sell')
-      .upsert(
-        {
-          user_id: userId,
-          do_not_sell: doNotSell,
-          current_status: currentStatus,
-          opted_out_at: doNotSell ? timestamp : undefined,
-          opted_in_at: !doNotSell ? timestamp : undefined,
-          updated_at: timestamp,
-        },
-        { onConflict: 'user_id' }
-      );
-
-    if (error) {
-      logger.error('Error updating CCPA preference:', error, { component: 'lib-compliance-service', action: 'service_call' });
-      return { success: false, error: error.message };
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to update CCPA preference');
     }
 
     return { success: true };

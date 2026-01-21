@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FileText, ShoppingCart, Plus, Loader2, GripVertical } from 'lucide-react';
 import { shoppingService, type TemplateItemInput } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { logger } from '@/lib/logger';
 import { CreateCustomTemplateModal } from './CreateCustomTemplateModal';
 
@@ -33,13 +32,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
   const [draggedTemplateId, setDraggedTemplateId] = useState<string | null>(null);
   const [isReorderMode, setIsReorderMode] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && spaceId) {
-      loadTemplates();
-    }
-  }, [isOpen, spaceId]);
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       setLoading(true);
       const data = await shoppingService.getTemplates(spaceId);
@@ -49,7 +42,13 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    if (isOpen && spaceId) {
+      loadTemplates();
+    }
+  }, [isOpen, loadTemplates, spaceId]);
 
   const handleSelectTemplate = async (templateId: string) => {
     try {
@@ -91,6 +90,11 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
     loadTemplates();
   };
 
+  const handleStartFresh = () => {
+    onStartFresh();
+    onClose();
+  };
+
   const footerContent = (
     <div className="flex items-center gap-3">
       <button
@@ -98,6 +102,12 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
         className="flex-1 px-4 sm:px-6 py-2.5 border border-gray-600 text-gray-300 rounded-full hover:bg-gray-700 transition-colors font-medium text-sm sm:text-base"
       >
         Cancel
+      </button>
+      <button
+        onClick={handleStartFresh}
+        className="flex-1 px-4 sm:px-6 py-2.5 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors font-medium text-sm sm:text-base"
+      >
+        Start Fresh
       </button>
     </div>
   );

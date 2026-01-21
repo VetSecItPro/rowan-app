@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Clock, Users, ChefHat, ExternalLink, Edit, Trash2, Loader2, Calendar, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Clock, Users, ChefHat, ExternalLink, Trash2, Loader2, Calendar, ShoppingCart } from 'lucide-react';
 import { mealsService, type Recipe } from '@/lib/services/meals-service';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -10,6 +10,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
+import { sanitizeUrl } from '@/lib/sanitize';
 
 export default function RecipeDetailPage() {
   const router = useRouter();
@@ -22,6 +23,9 @@ export default function RecipeDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [addingToShoppingList, setAddingToShoppingList] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(false);
+
+  type RawIngredient = string | { name?: string; amount?: string | number; unit?: string };
+  type RecipeIngredient = { name: string; amount?: string; unit?: string };
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -79,7 +83,7 @@ export default function RecipeDetailPage() {
       const ingredients = parseIngredients();
       if (ingredients.length > 0) {
         await Promise.all(
-          ingredients.map((ingredient: any) => {
+          ingredients.map((ingredient) => {
             const itemName = ingredient.amount && ingredient.unit
               ? `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`
               : ingredient.name;
@@ -104,13 +108,21 @@ export default function RecipeDetailPage() {
   };
 
   // Parse ingredients to handle both string and object formats
-  const parseIngredients = () => {
+  const parseIngredients = (): RecipeIngredient[] => {
     if (!recipe || !recipe.ingredients) return [];
-    return recipe.ingredients.map((ing: any) => {
-      if (typeof ing === 'string') {
-        return { name: ing, amount: '', unit: '' };
+    return recipe.ingredients.map((ingredient: RawIngredient) => {
+      if (typeof ingredient === 'string') {
+        return { name: ingredient };
       }
-      return ing;
+
+      const name = ingredient?.name?.trim() || '';
+      const amount = ingredient?.amount !== undefined ? String(ingredient.amount).trim() : '';
+      const unit = ingredient?.unit?.trim() || '';
+      return {
+        name: name || [amount, unit].filter(Boolean).join(' ') || 'Ingredient',
+        amount: amount || undefined,
+        unit: unit || undefined,
+      };
     });
   };
 
@@ -132,7 +144,7 @@ export default function RecipeDetailPage() {
           <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Recipe not found</h1>
           <p className="text-gray-400 mb-6">
-            The recipe you're looking for doesn't exist or has been deleted.
+            The recipe you&apos;re looking for doesn&apos;t exist or has been deleted.
           </p>
           <Link
             href="/recipes"
@@ -147,6 +159,8 @@ export default function RecipeDetailPage() {
   }
 
   const ingredients = parseIngredients();
+  const safeImageUrl = recipe.image_url ? sanitizeUrl(recipe.image_url) : '';
+  const safeSourceUrl = recipe.source_url ? sanitizeUrl(recipe.source_url) : '';
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -166,9 +180,9 @@ export default function RecipeDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
-            {recipe.source_url && (
+            {safeSourceUrl && (
               <a
-                href={recipe.source_url}
+                href={safeSourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-2 backdrop-blur-sm border border-white/20"
@@ -201,10 +215,11 @@ export default function RecipeDetailPage() {
       {/* Recipe Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Recipe Image */}
-        {recipe.image_url ? (
+        {safeImageUrl ? (
           <div className="rounded-xl overflow-hidden shadow-lg mb-8 bg-gray-700">
+            {/* eslint-disable-next-line @next/next/no-img-element -- external recipe images can be from any domain */}
             <img
-              src={recipe.image_url}
+              src={safeImageUrl}
               alt={recipe.name}
               loading="lazy"
               decoding="async"
@@ -289,7 +304,7 @@ export default function RecipeDetailPage() {
               Ingredients
             </h3>
             <ul className="space-y-3">
-              {ingredients.map((ingredient: any, idx: number) => (
+              {ingredients.map((ingredient, idx: number) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
                   <span className="text-gray-300">

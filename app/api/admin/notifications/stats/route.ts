@@ -10,6 +10,10 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+type SourceRecord = {
+  source: string | null;
+};
+
 /**
  * GET /api/admin/notifications/stats
  * Get statistics for launch notifications
@@ -50,7 +54,7 @@ export async function GET(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -117,8 +121,9 @@ export async function GET(req: NextRequest) {
     // Process sources
     let topSources: Array<{ source: string; count: number }> = [];
     if (sourcesResult.status === 'fulfilled' && sourcesResult.value.data) {
-      const sourceCounts: { [key: string]: number } = {};
-      sourcesResult.value.data.forEach((item: any) => {
+      const sourceCounts: Record<string, number> = {};
+      const sourceRows = sourcesResult.value.data as SourceRecord[];
+      sourceRows.forEach((item) => {
         const source = item.source || 'homepage';
         sourceCounts[source] = (sourceCounts[source] || 0) + 1;
       });
@@ -154,7 +159,7 @@ export async function GET(req: NextRequest) {
     [totalResult, subscribedResult, unsubscribedResult, todaySignupsResult, weekSignupsResult, sourcesResult]
       .forEach((result, index) => {
         if (result.status === 'rejected') {
-          logger.error('Notification stat query ${index} failed:', undefined, { component: 'api-route', action: 'api_request', details: result.reason });
+          logger.error(`Notification stat query ${index} failed:`, undefined, { component: 'api-route', action: 'api_request', details: result.reason });
         }
       });
 

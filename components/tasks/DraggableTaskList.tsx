@@ -21,7 +21,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, CheckCircle, Clock, AlertCircle, MoreVertical, CheckSquare } from 'lucide-react';
+import { GripVertical, AlertCircle, MoreVertical, CheckSquare } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Task {
@@ -57,7 +57,6 @@ interface SortableTaskItemProps {
 
 function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete, onViewDetails }: SortableTaskItemProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const [isDragReady, setIsDragReady] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const {
@@ -72,7 +71,6 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
   // Long-press handlers for mobile touch
   const handleTouchStart = () => {
     longPressTimer.current = setTimeout(() => {
-      setIsDragReady(true);
       hapticMedium(); // Haptic feedback when drag is ready
     }, 500); // 500ms long press
   };
@@ -82,8 +80,6 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-    // Reset after a delay to allow drag to complete
-    setTimeout(() => setIsDragReady(false), 100);
   };
 
   const handleTouchCancel = () => {
@@ -91,7 +87,6 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-    setIsDragReady(false);
   };
 
   const style = {
@@ -165,6 +160,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
       ref={setNodeRef}
       style={style}
       className={`flex items-center gap-3 p-4 rounded-lg border-l-4 ${getStatusColor(task.status)} border border-gray-700 hover:shadow-md transition-shadow`}
+      onClick={() => onTaskClick?.(task)}
     >
       {/* Drag Handle */}
       <button
@@ -289,6 +285,8 @@ export function DraggableTaskList({
   onDelete,
   onViewDetails,
 }: DraggableTaskListProps) {
+  void spaceId;
+  void onTasksReorder;
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [activeId, setActiveId] = useState<string | null>(null);
 

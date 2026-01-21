@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MessageCircle, Send, Reply, Edit2, Trash2, User } from 'lucide-react';
+import Image from 'next/image';
 import { eventCommentsService, EventComment } from '@/lib/services/event-comments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -25,11 +26,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadComments();
-  }, [eventId]);
-
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     try {
       setLoading(true);
       const data = await eventCommentsService.getComments(eventId);
@@ -39,7 +36,11 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    loadComments();
+  }, [loadComments]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,11 +109,11 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-calendar rounded-full flex items-center justify-center">
                 {comment.user?.avatar_url ? (
-                  <img
+                  <Image
                     src={comment.user.avatar_url}
-                    alt={comment.user.name}
-                    loading="lazy"
-                    decoding="async"
+                    alt={comment.user.name || 'User avatar'}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded-full"
                   />
                 ) : (

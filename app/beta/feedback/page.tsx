@@ -5,21 +5,18 @@ import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { sanitizeUrl } from '@/lib/sanitize';
 import {
   TestTube,
   MessageSquare,
   Plus,
-  ThumbsUp,
-  ThumbsDown,
   ExternalLink,
   ChevronUp,
   ChevronDown,
   Calendar,
   User,
-  Tag,
   AlertTriangle,
-  Clock,
-  Filter
 } from 'lucide-react';
 import { FeedbackForm } from '@/components/beta/FeedbackForm';
 
@@ -67,6 +64,8 @@ const STATUS_COLORS = {
   closed: 'bg-gray-900 text-gray-300'
 };
 
+type SortBy = 'newest' | 'oldest' | 'most_voted';
+
 export default function BetaFeedbackPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -74,7 +73,7 @@ export default function BetaFeedbackPage() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'bugs' | 'features' | 'my_feedback'>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'most_voted'>('newest');
+  const [sortBy, setSortBy] = useState<SortBy>('newest');
 
   // Check if user is a beta tester
   useEffect(() => {
@@ -106,7 +105,7 @@ export default function BetaFeedbackPage() {
 
   const handleVote = async (feedbackId: string, voteType: 'up' | 'down') => {
     try {
-      const response = await fetch('/api/beta/feedback/vote', {
+      const response = await csrfFetch('/api/beta/feedback/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ feedbackId, voteType }),
@@ -217,7 +216,7 @@ export default function BetaFeedbackPage() {
               <div className="flex gap-3">
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
+                  onChange={(e) => setSortBy(e.target.value as SortBy)}
                   className="px-3 py-2 rounded-lg border border-gray-600 bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="newest">Newest First</option>
@@ -261,11 +260,14 @@ export default function BetaFeedbackPage() {
                 </button>
               </div>
             ) : (
-              filteredFeedback.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow"
-                >
+              filteredFeedback.map((item) => {
+                const safePageUrl = item.page_url ? sanitizeUrl(item.page_url) : '';
+
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow"
+                  >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -295,9 +297,9 @@ export default function BetaFeedbackPage() {
                             {item.severity}
                           </span>
                         </div>
-                        {item.page_url && (
+                        {safePageUrl && (
                           <a
-                            href={item.page_url}
+                            href={safePageUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-blue-400 hover:underline"
@@ -352,8 +354,9 @@ export default function BetaFeedbackPage() {
                       <span>{item._count.comments} comments</span>
                     </div>
                   </div>
-                </div>
-              ))
+                  </div>
+                );
+              })
             )}
           </div>
         </div>

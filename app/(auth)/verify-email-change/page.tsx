@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Mail, CheckCircle, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 /**
  * Email Change Verification Page
@@ -27,18 +28,7 @@ function VerifyEmailChangeContent() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle token verification
-  useEffect(() => {
-    if (!token) {
-      setIsVerifying(false);
-      setVerificationError('No verification token provided.');
-      return;
-    }
-
-    verifyToken(token);
-  }, [token]);
-
-  const verifyToken = async (verificationToken: string) => {
+  const verifyToken = useCallback(async (verificationToken: string) => {
     setIsVerifying(true);
     setVerificationError('');
 
@@ -54,7 +44,7 @@ function VerifyEmailChangeContent() {
       }
 
       // Now verify the token (complete the email change)
-      const response = await fetch('/api/auth/email-change/verify', {
+      const response = await csrfFetch('/api/auth/email-change/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: verificationToken }),
@@ -77,7 +67,18 @@ function VerifyEmailChangeContent() {
     } finally {
       setIsVerifying(false);
     }
-  };
+  }, [router]);
+
+  // Handle token verification
+  useEffect(() => {
+    if (!token) {
+      setIsVerifying(false);
+      setVerificationError('No verification token provided.');
+      return;
+    }
+
+    verifyToken(token);
+  }, [token, verifyToken]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-emerald-950 p-4">

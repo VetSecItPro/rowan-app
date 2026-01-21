@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Clock, Plus, Trash2, Star } from 'lucide-react';
-import { calendarService, EventTemplate, CreateTemplateInput } from '@/lib/services/calendar-service';
+import { calendarService, EventTemplate } from '@/lib/services/calendar-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { format, addHours } from 'date-fns';
 import { logger } from '@/lib/logger';
 
 interface TemplateLibraryProps {
@@ -18,17 +17,10 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
   const [templates, setTemplates] = useState<EventTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen && spaceId) {
-      loadTemplates();
-    }
-  }, [isOpen, spaceId]);
-
-  const loadTemplates = async () => {
+  const loadTemplates = useCallback(async () => {
     try {
       setLoading(true);
       // Ensure system templates exist
@@ -41,7 +33,13 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    if (isOpen && spaceId) {
+      loadTemplates();
+    }
+  }, [isOpen, spaceId, loadTemplates]);
 
   const handleSelectTemplate = (template: EventTemplate) => {
     onSelectTemplate(template);

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,17 +11,13 @@ import { logger } from '@/lib/logger';
 import {
   X,
   Plus,
-  Tag,
-  Trash2,
-  Edit,
-  Check
+  Tag
 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import {
   Tag as TagType,
   getTags,
   createTag,
-  deleteTag,
   getExpenseTags,
   addTagToExpense,
   removeTagFromExpense,
@@ -127,7 +122,7 @@ function TagInput({ onTagAdd, existingTagIds, placeholder = "Add tags...", class
                     disabled={loading}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Create "{inputValue}"
+                    Create &quot;{inputValue}&quot;
                   </Button>
                 </div>
               )}

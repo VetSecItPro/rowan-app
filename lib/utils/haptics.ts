@@ -12,6 +12,12 @@ interface HapticPattern {
   intensity?: number;
 }
 
+type HapticNavigator = Navigator & {
+  hapticEngine?: {
+    trigger: (intensity: number) => void;
+  };
+};
+
 const hapticPatterns: Record<HapticFeedbackType, HapticPattern> = {
   light: { vibrate: 10 },
   medium: { vibrate: 20 },
@@ -39,12 +45,13 @@ export function triggerHaptic(type: HapticFeedbackType = 'light'): void {
   const pattern = hapticPatterns[type];
 
   // iOS Haptic Engine (Safari on iOS)
-  if ('hapticEngine' in navigator && typeof (navigator as any).hapticEngine === 'object') {
+  const hapticNavigator = navigator as HapticNavigator;
+  if ('hapticEngine' in navigator && typeof hapticNavigator.hapticEngine === 'object') {
     try {
       const intensity = pattern.intensity || 0.5;
-      (navigator as any).hapticEngine.trigger(intensity);
+      hapticNavigator.hapticEngine?.trigger(intensity);
       return;
-    } catch (error) {
+    } catch {
       // Fallback to vibration API
     }
   }
@@ -118,11 +125,11 @@ export function hapticToggle(): void {
 /**
  * Create a haptic-enabled click handler
  */
-export function withHaptic<T extends (...args: any[]) => any>(
+export function withHaptic<T extends (...args: unknown[]) => unknown>(
   handler: T,
   hapticType: HapticFeedbackType = 'light'
 ): T {
-  return ((...args: any[]) => {
+  return ((...args: Parameters<T>) => {
     triggerHaptic(hapticType);
     return handler(...args);
   }) as T;

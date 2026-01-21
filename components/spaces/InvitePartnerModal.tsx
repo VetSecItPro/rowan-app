@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Mail, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
 
 interface InvitePartnerModalProps {
@@ -48,7 +49,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
     setLoading(true);
 
     try {
-      const response = await fetch('/api/spaces/invite', {
+      const response = await csrfFetch('/api/spaces/invite', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
       setCopied(true);
       toast.success('Invitation link copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy link');
     }
   };

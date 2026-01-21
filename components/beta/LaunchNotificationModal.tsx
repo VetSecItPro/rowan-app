@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface LaunchNotificationModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
     }
 
     try {
-      const response = await fetch('/api/launch/notify', {
+      const response = await csrfFetch('/api/launch/notify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,17 +103,17 @@ export function LaunchNotificationModal({ isOpen, onClose }: LaunchNotificationM
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white">
-              You're on the list! 🎉
+              You&apos;re on the list! 🎉
             </h3>
             <p className="text-gray-400">
-              Thanks for your interest in Rowan! We'll notify you as soon as we launch.
+              Thanks for your interest in Rowan! We&apos;ll notify you as soon as we launch.
             </p>
             <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg text-left">
               <h4 className="text-sm font-medium text-blue-200 mb-2">
                 What happens next:
               </h4>
               <ul className="text-sm text-blue-300 space-y-1">
-                <li>• You'll receive a launch notification email</li>
+                <li>• You&apos;ll receive a launch notification email</li>
                 <li>• Get early access to premium features</li>
                 <li>• No spam, just important updates</li>
                 <li>• Unsubscribe anytime</li>

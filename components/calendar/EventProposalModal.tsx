@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle, X } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Clock, Users, CheckCircle2, XCircle, Star, Send, AlertCircle, X } from 'lucide-react';
 import { eventProposalsService, EventProposal, ProposalVote, CreateProposalInput } from '@/lib/services/event-proposals-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -21,6 +21,13 @@ interface TimeSlot {
   start_time: string;
   end_time: string;
 }
+
+type VoteSummary = Record<number, {
+  available: number;
+  unavailable: number;
+  preferred: number;
+  total: number;
+}>;
 
 export function EventProposalModal({
   isOpen,
@@ -46,29 +53,18 @@ export function EventProposalModal({
   // Vote mode state
   const [proposal, setProposal] = useState<EventProposal | null>(null);
   const [votes, setVotes] = useState<Record<number, 'available' | 'unavailable' | 'preferred'>>({});
-  const [voteSummary, setVoteSummary] = useState<any>(null);
+  const [voteSummary, setVoteSummary] = useState<VoteSummary | null>(null);
 
-  useEffect(() => {
-    if (existingProposal) {
-      setMode('vote');
-      setProposal(existingProposal);
-      loadVoteSummary(existingProposal.id);
-      loadUserVotes(existingProposal.id);
-    } else {
-      setMode('create');
-    }
-  }, [existingProposal]);
-
-  const loadVoteSummary = async (proposalId: string) => {
+  const loadVoteSummary = useCallback(async (proposalId: string) => {
     try {
       const summary = await eventProposalsService.getVoteSummary(proposalId);
       setVoteSummary(summary);
     } catch (error) {
       logger.error('Failed to load vote summary:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
-  };
+  }, []);
 
-  const loadUserVotes = async (proposalId: string) => {
+  const loadUserVotes = useCallback(async (proposalId: string) => {
     try {
       const userVotes = await eventProposalsService.getVotes(proposalId);
       const voteMap: Record<number, 'available' | 'unavailable' | 'preferred'> = {};
@@ -81,7 +77,18 @@ export function EventProposalModal({
     } catch (error) {
       logger.error('Failed to load user votes:', error, { component: 'EventProposalModal', action: 'component_action' });
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (existingProposal) {
+      setMode('vote');
+      setProposal(existingProposal);
+      loadVoteSummary(existingProposal.id);
+      loadUserVotes(existingProposal.id);
+    } else {
+      setMode('create');
+    }
+  }, [existingProposal, loadUserVotes, loadVoteSummary]);
 
   const addTimeSlot = () => {
     if (timeSlots.length < 5) {
@@ -371,7 +378,7 @@ export function EventProposalModal({
                   </div>
                   <div className="flex items-center gap-2">
                     <XCircle className="w-4 h-4 text-red-500" />
-                    <span><strong>Unavailable</strong> - You can't make this time</span>
+                    <span><strong>Unavailable</strong> - You can&apos;t make this time</span>
                   </div>
                 </div>
               </div>
@@ -379,7 +386,7 @@ export function EventProposalModal({
               {/* Time Slot Voting */}
               <div className="space-y-3">
                 {proposal.time_slots.map((slot, index) => {
-                  const slotSummary = voteSummary?.slots[index];
+                  const slotSummary = voteSummary?.[index];
                   const userVote = votes[index];
                   const isCreator = proposal.proposed_by === user?.id;
 

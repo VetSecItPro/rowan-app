@@ -188,7 +188,7 @@ export function NoSpacesFoundState({
             Welcome to Rowan, {userName}!
           </h2>
           <p className="text-sm text-gray-400 max-w-md">
-            It looks like you don't have any workspaces yet. Let's create your first workspace to get started with organizing your life.
+            It looks like you don&apos;t have any workspaces yet. Let&apos;s create your first workspace to get started with organizing your life.
           </p>
         </div>
 
@@ -312,7 +312,7 @@ export function PermissionDeniedState({
             Access Denied
           </h2>
           <p className="text-sm text-gray-400">
-            You don't have permission to access {resource}. Please contact your administrator if you believe this is an error.
+            You don&apos;t have permission to access {resource}. Please contact your administrator if you believe this is an error.
           </p>
         </div>
 

@@ -7,6 +7,7 @@ import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { Mail, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -45,7 +46,7 @@ export default function ForgotPasswordPage() {
 
     try {
       // Use our custom API route which uses Resend for emails
-      const response = await fetch('/api/auth/password-reset', {
+      const response = await csrfFetch('/api/auth/password-reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ export default function ForgotPasswordPage() {
       } else {
         setEmailSent(true);
       }
-    } catch (err: unknown) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -85,10 +86,10 @@ export default function ForgotPasswordPage() {
             Check Your Email
           </motion.h2>
           <motion.p className="text-center text-gray-400 mb-8 text-lg" variants={itemVariants}>
-            We've sent a password reset link to <span className="font-bold text-emerald-400">{email}</span>
+            We&apos;ve sent a password reset link to <span className="font-bold text-emerald-400">{email}</span>
           </motion.p>
           <motion.p className="text-center text-sm text-gray-500 mb-8 leading-relaxed" variants={itemVariants}>
-            Didn't receive the email? Check your spam folder or try again with a different email address.
+            Didn&apos;t receive the email? Check your spam folder or try again with a different email address.
           </motion.p>
           <motion.div className="flex justify-center" variants={itemVariants}>
             <Link
@@ -123,7 +124,7 @@ export default function ForgotPasswordPage() {
           Forgot Password?
         </motion.h2>
         <motion.p className="text-center text-gray-400 mb-10 text-lg leading-relaxed" variants={itemVariants}>
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your password.
         </motion.p>
 
         {/* Error Message */}

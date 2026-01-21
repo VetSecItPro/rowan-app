@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get budget from service
-    const budget = await projectsService.getBudget(spaceId);
+    const budget = await projectsService.getBudget(spaceId, supabase);
 
     return NextResponse.json({
       success: true,
@@ -170,7 +170,8 @@ export async function POST(req: NextRequest) {
     // Create/update budget using service
     const budget = await projectsService.setBudget(
       { space_id, monthly_budget: Number(monthly_budget) },
-      user.id
+      user.id,
+      supabase
     );
 
     return NextResponse.json({

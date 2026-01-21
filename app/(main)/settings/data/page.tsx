@@ -8,11 +8,12 @@
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   HardDrive,
   Trash2,
@@ -31,7 +32,7 @@ interface StorageFile {
   name: string;
   size: number;
   created_at: string;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
 }
 
 export default function DataManagementPage() {
@@ -46,21 +47,7 @@ export default function DataManagementPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load storage usage
-  useEffect(() => {
-    if (!currentSpace?.id) return;
-
-    loadStorageUsage();
-  }, [currentSpace?.id]);
-
-  // Load files list
-  useEffect(() => {
-    if (!currentSpace?.id) return;
-
-    loadFiles();
-  }, [currentSpace?.id]);
-
-  const loadStorageUsage = async () => {
+  const loadStorageUsage = useCallback(async () => {
     if (!currentSpace?.id) return;
 
     setIsLoadingUsage(true);
@@ -82,9 +69,9 @@ export default function DataManagementPage() {
     } finally {
       setIsLoadingUsage(false);
     }
-  };
+  }, [currentSpace?.id]);
 
-  const loadFiles = async () => {
+  const loadFiles = useCallback(async () => {
     if (!currentSpace?.id) return;
 
     setIsLoadingFiles(true);
@@ -105,7 +92,21 @@ export default function DataManagementPage() {
     } finally {
       setIsLoadingFiles(false);
     }
-  };
+  }, [currentSpace?.id]);
+
+  // Load storage usage
+  useEffect(() => {
+    if (!currentSpace?.id) return;
+
+    loadStorageUsage();
+  }, [currentSpace?.id, loadStorageUsage]);
+
+  // Load files list
+  useEffect(() => {
+    if (!currentSpace?.id) return;
+
+    loadFiles();
+  }, [currentSpace?.id, loadFiles]);
 
   const handleDeleteSelected = async () => {
     if (selectedFiles.size === 0) return;
@@ -118,7 +119,7 @@ export default function DataManagementPage() {
     setError(null);
 
     try {
-      const response = await fetch('/api/storage/delete', {
+      const response = await csrfFetch('/api/storage/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -46,7 +46,7 @@ export async function DELETE(
     }
 
     // Delete feedback
-    const result = await feedbackService.deleteFeedback(id);
+    const result = await feedbackService.deleteFeedback(id, supabase);
 
     if (!result.success) {
       return NextResponse.json(
@@ -56,10 +56,11 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in feedback delete API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: error.message || 'Internal server error' },
+      { success: false, error: message },
       { status: 500 }
     );
   }

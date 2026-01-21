@@ -4,18 +4,14 @@ import { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   Search,
-  Filter,
   Download,
   Trash2,
-  Eye,
   DollarSign,
   Calendar,
   Store,
@@ -24,6 +20,7 @@ import {
   List,
   ExternalLink
 } from 'lucide-react';
+import Image from 'next/image';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { receiptScanningService, ReceiptData, ExtractedReceiptData } from '@/lib/services/receipt-scanning-service';
 import { cn } from '@/lib/utils';
@@ -38,7 +35,6 @@ type ViewMode = 'grid' | 'list';
 type SortOption = 'date' | 'amount' | 'merchant' | 'confidence';
 
 export function ReceiptLibrary({
-  onReceiptSelect,
   onCreateExpense,
   className
 }: ReceiptLibraryProps) {
@@ -52,7 +48,6 @@ export function ReceiptLibrary({
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptData | null>(null);
 
   // Load receipts
   useEffect(() => {
@@ -122,7 +117,7 @@ export function ReceiptLibrary({
       if (success) {
         setReceipts(prev => prev.filter(r => r.id !== receiptId));
       }
-    } catch (err) {
+    } catch {
       setError('Failed to delete receipt');
     }
   };
@@ -259,11 +254,13 @@ export function ReceiptLibrary({
                       {viewMode === 'grid' ? (
                         <div className="space-y-3">
                           {/* Receipt Preview */}
-                          <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden">
-                            <img
+                          <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden">
+                            <Image
                               src={receipt.image_url}
                               alt="Receipt"
-                              className="w-full h-full object-cover"
+                              fill
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              className="object-cover"
                             />
                           </div>
 
@@ -293,11 +290,13 @@ export function ReceiptLibrary({
                       ) : (
                         <>
                           <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
-                              <img
+                            <div className="relative w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
+                              <Image
                                 src={receipt.image_url}
                                 alt="Receipt"
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="64px"
+                                className="object-cover"
                               />
                             </div>
 
@@ -346,11 +345,15 @@ export function ReceiptLibrary({
                     {/* Receipt Image */}
                     <div>
                       <h3 className="font-medium mb-3">Receipt Image</h3>
-                      <img
-                        src={receipt.image_url}
-                        alt="Receipt"
-                        className="w-full rounded-lg border"
-                      />
+                      <div className="relative w-full aspect-[3/4] rounded-lg border overflow-hidden">
+                        <Image
+                          src={receipt.image_url}
+                          alt="Receipt"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-contain"
+                        />
+                      </div>
                     </div>
 
                     {/* Extracted Data */}

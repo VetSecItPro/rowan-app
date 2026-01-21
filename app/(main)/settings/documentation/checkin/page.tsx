@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import {
+  type LucideIcon,
   ArrowLeft,
   Heart,
   Sparkles,
@@ -18,7 +19,7 @@ import {
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

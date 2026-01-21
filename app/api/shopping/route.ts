@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get shopping lists from service
-    const lists = await shoppingService.getLists(spaceId);
+    const lists = await shoppingService.getLists(spaceId, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    const { space_id, title } = validatedData;
+    const { space_id } = validatedData;
 
     // Verify user has access to this space
     try {
@@ -191,7 +191,7 @@ export async function POST(req: NextRequest) {
     const list = await shoppingService.createList({
       ...body,
       created_by: user.id,
-    });
+    }, supabase);
 
     // Track shopping update usage
     await trackUsage(user.id, 'shopping_list_updates');

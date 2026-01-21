@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
@@ -29,7 +29,7 @@ export function HamburgerMenu() {
   const { isDesktop } = useDevice();
 
   // Prefetch data for a feature on hover
-  const prefetchData = useCallback((href: string) => {
+  const prefetchData = (href: string) => {
     if (!currentSpace?.id || prefetchedDataRef.current.has(href)) return;
 
     const feature = ROUTE_TO_FEATURE_MAP[href];
@@ -37,7 +37,7 @@ export function HamburgerMenu() {
       prefetchedDataRef.current.add(href);
       prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
     }
-  }, [queryClient, currentSpace?.id]);
+  };
 
   // Prefetch all data when menu opens
   useEffect(() => {
@@ -49,6 +49,7 @@ export function HamburgerMenu() {
 
   // Mount check for portal
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     return () => setMounted(false);
   }, []);
@@ -57,18 +58,21 @@ export function HamburgerMenu() {
   useEffect(() => {
     if (isOpen && buttonRef.current && isDesktop) {
       const rect = buttonRef.current.getBoundingClientRect();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMenuStyle({
         position: 'fixed',
         top: rect.bottom + 8, // 8px gap below button
         right: window.innerWidth - rect.right, // Align right edge with button's right edge
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMenuStyle({});
     }
   }, [isOpen, isDesktop]);
 
   // Close menu when route changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
   }, [pathname]);
 

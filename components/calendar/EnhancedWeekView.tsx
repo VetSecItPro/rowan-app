@@ -12,7 +12,7 @@ interface EnhancedWeekViewProps {
   onEventStatusClick: (e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => void;
   onViewDetails: (event: CalendarEvent) => void;
   onEditEvent: (event: CalendarEvent) => void;
-  getCategoryColor: (category: string) => any;
+  getCategoryColor: (category: string) => { border: string; bg: string; text?: string; color?: string };
 }
 
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (6-23)
@@ -313,7 +313,7 @@ export function EnhancedWeekView({
                           </div>
 
                           {/* Title */}
-                          <h4 className={`font-semibold text-[11px] ${categoryColor.text} truncate mb-0.5`}>
+                          <h4 className={`font-semibold text-[11px] ${categoryColor.text || 'text-white'} truncate mb-0.5`}>
                             {event.title}
                           </h4>
 
@@ -321,7 +321,7 @@ export function EnhancedWeekView({
                           {parseInt(style.height) > 50 && (
                             <div className="flex items-center gap-0.5 flex-wrap">
                               <span className={`text-[9px] px-1 py-0.5 rounded ${
-                                isOverlapping ? 'bg-purple-800 text-purple-100' : categoryColor.color
+                                isOverlapping ? 'bg-purple-800 text-purple-100' : (categoryColor.color || categoryColor.bg)
                               } truncate`}>
                                 {category.icon} {category.label}
                               </span>

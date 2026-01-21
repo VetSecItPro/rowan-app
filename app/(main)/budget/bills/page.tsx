@@ -9,7 +9,6 @@ import { NewBillModal } from '@/components/projects/NewBillModal';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import {
-  billsService,
   createBill,
   updateBill,
   deleteBill,
@@ -19,15 +18,12 @@ import {
   type CreateBillInput,
   type BillStats,
 } from '@/lib/services/bills-service';
-import { useRouter } from 'next/navigation';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 export default function BillsManagementPage() {
   const { currentSpace, user } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
-  const router = useRouter();
 
-  const [bills, setBills] = useState<Bill[]>([]);
   const [stats, setStats] = useState<BillStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,12 +38,7 @@ export default function BillsManagementPage() {
       setLoading(true);
       setError(null);
 
-      const [billsData, statsData] = await Promise.all([
-        billsService.getBills(spaceId),
-        getBillStats(spaceId),
-      ]);
-
-      setBills(billsData);
+      const statsData = await getBillStats(spaceId);
       setStats(statsData);
     } catch (err) {
       logger.error('Failed to load bills:', err, { component: 'page', action: 'execution' });

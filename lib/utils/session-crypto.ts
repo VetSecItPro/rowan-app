@@ -160,13 +160,26 @@ export function decryptSessionData(encryptedData: string): object {
 /**
  * Validates session data integrity and expiration
  */
-export function validateSessionData(sessionData: any): boolean {
-  if (!sessionData || typeof sessionData !== 'object') {
+type SessionData = {
+  adminId: string;
+  email: string;
+  expiresAt: number;
+};
+
+const isSessionData = (value: unknown): value is SessionData => {
+  if (!value || typeof value !== 'object') {
     return false;
   }
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.adminId === 'string' &&
+    typeof record.email === 'string' &&
+    typeof record.expiresAt === 'number'
+  );
+};
 
-  // Check required fields
-  if (!sessionData.adminId || !sessionData.email || !sessionData.expiresAt) {
+export function validateSessionData(sessionData: unknown): boolean {
+  if (!isSessionData(sessionData)) {
     return false;
   }
 

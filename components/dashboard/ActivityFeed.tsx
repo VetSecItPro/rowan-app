@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { Activity, CheckSquare, Target, MessageCircle, Calendar, ShoppingCart, UtensilsCrossed, DollarSign, Folder, Heart, Bell, ChevronRight, Clock } from 'lucide-react';
 import { activityFeedService, type ActivityItem } from '@/lib/services/activity-feed-service';
 import { createClient } from '@/lib/supabase/client';
@@ -19,9 +20,21 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
   const [displayCount, setDisplayCount] = useState(10);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const loadActivities = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await activityFeedService.getRecentActivities(spaceId, limit);
+      setActivities(data);
+    } catch (error) {
+      logger.error('Failed to load activities:', error, { component: 'ActivityFeed', action: 'component_action' });
+    } finally {
+      setLoading(false);
+    }
+  }, [limit, spaceId]);
+
   useEffect(() => {
     loadActivities();
-  }, [spaceId]);
+  }, [loadActivities]);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -36,19 +49,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
     return () => {
       channels.forEach(channel => supabase.removeChannel(channel));
     };
-  }, [spaceId]);
-
-  const loadActivities = async () => {
-    setLoading(true);
-    try {
-      const data = await activityFeedService.getRecentActivities(spaceId, limit);
-      setActivities(data);
-    } catch (error) {
-      logger.error('Failed to load activities:', error, { component: 'ActivityFeed', action: 'component_action' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [loadActivities, spaceId]);
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
@@ -187,9 +188,11 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
                   <div className="flex items-center gap-2 min-w-0">
                     {/* User Avatar */}
                     {activity.user_avatar ? (
-                      <img
+                      <Image
                         src={activity.user_avatar}
                         alt={activity.user_name}
+                        width={20}
+                        height={20}
                         className="w-5 h-5 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (

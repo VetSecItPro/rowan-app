@@ -2,7 +2,6 @@
 
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import {
-  BarChart3,
   CheckSquare,
   Calendar,
   Bell,

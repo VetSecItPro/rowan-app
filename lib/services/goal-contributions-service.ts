@@ -14,6 +14,7 @@ export interface GoalContribution {
   created_at: string;
   updated_at: string;
   created_by: string | null;
+  user_name?: string; // Optional: populated from user join
 }
 
 export interface FinancialGoal {

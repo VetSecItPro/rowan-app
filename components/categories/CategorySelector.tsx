@@ -8,17 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { logger } from '@/lib/logger';
 import {
   Check,
   ChevronDown,
   Plus,
   X,
-  Search,
-  Tag,
-  FolderPlus
+  Tag
 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import {
@@ -32,8 +28,7 @@ import {
 import {
   getDefaultCategoriesForDomain,
   findDefaultCategory,
-  getCategoryIcon,
-  getCategoryColor
+  getCategoryIcon
 } from '@/lib/constants/default-categories';
 import { cn } from '@/lib/utils';
 
@@ -67,7 +62,6 @@ export function CategorySelector({
 }: CategorySelectorProps) {
   const { currentSpace, user } = useAuth();
   const [categories, setCategories] = useState<CustomCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -78,13 +72,10 @@ export function CategorySelector({
       if (!currentSpace) return;
 
       try {
-        setLoading(true);
         const data = await getCustomCategories(currentSpace.id);
         setCategories(data);
       } catch (err) {
         logger.error('Failed to load categories:', err, { component: 'CategorySelector', action: 'component_action' });
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -294,7 +285,6 @@ export function TagSelector({
 }: TagSelectorProps) {
   const { currentSpace, user } = useAuth();
   const [tags, setTags] = useState<TagType[]>([]);
-  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -304,13 +294,10 @@ export function TagSelector({
       if (!currentSpace) return;
 
       try {
-        setLoading(true);
         const data = await getTags(currentSpace.id);
         setTags(data);
       } catch (err) {
         logger.error('Failed to load tags:', err, { component: 'CategorySelector', action: 'component_action' });
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -411,7 +398,7 @@ export function TagSelector({
                         onClick={() => handleCreateTag(inputValue)}
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Create "{inputValue}"
+                        Create &quot;{inputValue}&quot;
                       </Button>
                     </div>
                   )}

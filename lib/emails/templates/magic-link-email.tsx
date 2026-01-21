@@ -77,7 +77,7 @@ export const MagicLinkEmail = ({
             </Text>
 
             <Text style={text}>
-              If the button doesn't work, copy and paste this link into your browser:
+              If the button doesn&apos;t work, copy and paste this link into your browser:
             </Text>
             
             <Text style={linkText}>
@@ -98,11 +98,11 @@ export const MagicLinkEmail = ({
                 • <strong>Time:</strong> {new Date().toLocaleString()}
               </Text>
               <Text style={securityWarning}>
-                If you didn't request this sign-in link, please ignore this email or{' '}
+                If you didn&apos;t request this sign-in link, please ignore this email or{' '}
                 <Link href="mailto:support@rowanapp.com" style={link}>
                   contact our support team
                 </Link>{' '}
-                if you're concerned about your account security.
+                if you&apos;re concerned about your account security.
               </Text>
             </Section>
 
@@ -110,8 +110,8 @@ export const MagicLinkEmail = ({
             <Section style={benefitsSection}>
               <Text style={benefitsTitle}>Why Magic Links?</Text>
               <Text style={benefitsText}>
-                ✨ <strong>No passwords to remember</strong> - Just click and you're in<br/>
-                🔒 <strong>More secure</strong> - Links expire quickly and can't be reused<br/>
+                ✨ <strong>No passwords to remember</strong> - Just click and you&apos;re in<br/>
+                🔒 <strong>More secure</strong> - Links expire quickly and can&apos;t be reused<br/>
                 ⚡ <strong>Faster sign-in</strong> - No typing, no forgetting passwords<br/>
                 📱 <strong>Works everywhere</strong> - Email, phone, tablet, computer
               </Text>

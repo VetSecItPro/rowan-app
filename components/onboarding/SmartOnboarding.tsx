@@ -202,7 +202,7 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
                 Personal Workspace
               </h3>
               <p className="text-sm text-gray-400 mb-6">
-                We'll create your personal workspace with all the features you need for individual productivity.
+                We&apos;ll create your personal workspace with all the features you need for individual productivity.
               </p>
             </>
           ) : (
@@ -214,7 +214,7 @@ export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
                 Shared Workspace
               </h3>
               <p className="text-sm text-gray-400 mb-6">
-                Let's create a shared workspace where you can collaborate with family, partners, or teammates.
+                Let&apos;s create a shared workspace where you can collaborate with family, partners, or teammates.
               </p>
             </>
           )}

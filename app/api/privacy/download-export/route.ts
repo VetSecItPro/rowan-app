@@ -7,14 +7,7 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
-
-// Validation schema
-const DownloadRequestSchema = z.object({
-  file: z.string().min(1),
-  token: z.string().optional(), // For token-based access
-});
 
 // GET - Download export file
 export async function GET(request: NextRequest) {
@@ -150,11 +143,24 @@ async function validateDownloadToken(token: string): Promise<string | null> {
   }
 }
 
-// Generate mock file response (in production this would fetch from storage)
-async function generateMockFileResponse(exportRequest: any, fileName: string) {
-  try {
-    const supabase = await createClient();
+type DownloadExportData = {
+  exportMetadata: {
+    userId: string;
+    exportDate: string;
+    gdprCompliance: string;
+  };
+  profile?: Record<string, unknown> | null;
+  privacyPreferences?: Record<string, unknown> | null;
+  privacyHistory?: Array<Record<string, unknown>>;
+};
 
+type ExportRequestRecord = {
+  user_id: string;
+};
+
+// Generate mock file response (in production this would fetch from storage)
+async function generateMockFileResponse(exportRequest: ExportRequestRecord, fileName: string) {
+  try {
     // Get user data to generate the file
     const userData = await gatherUserDataForDownload(exportRequest.user_id);
 
@@ -205,7 +211,7 @@ async function generateMockFileResponse(exportRequest: any, fileName: string) {
 }
 
 // Simplified data gathering for download (reusing logic from generate-export)
-async function gatherUserDataForDownload(userId: string) {
+async function gatherUserDataForDownload(userId: string): Promise<DownloadExportData> {
   const supabase = await createClient();
 
   // Get essential user data
@@ -241,7 +247,7 @@ async function gatherUserDataForDownload(userId: string) {
 }
 
 // Generate CSV content
-function generateCSVContent(userData: any): string {
+function generateCSVContent(userData: DownloadExportData): string {
   let csvContent = 'Rowan Data Export\n';
   csvContent += `Export Date: ${new Date().toISOString()}\n`;
   csvContent += `User ID: ${userData.exportMetadata.userId}\n`;
@@ -269,7 +275,7 @@ function generateCSVContent(userData: any): string {
 }
 
 // Generate PDF content (simplified text format)
-function generatePDFContent(userData: any): string {
+function generatePDFContent(userData: DownloadExportData): string {
   let pdfContent = 'ROWAN DATA EXPORT\n';
   pdfContent += '==================\n\n';
   pdfContent += `Export Date: ${new Date().toISOString()}\n`;

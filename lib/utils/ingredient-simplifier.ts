@@ -89,9 +89,6 @@ export function simplifyIngredient(ingredient: string): string {
   // Remove leading quantities (numbers, fractions)
   result = result.replace(QUANTITY_PATTERN, '').trim();
 
-  // Convert to lowercase for processing, will capitalize at end
-  const lowerResult = result.toLowerCase();
-
   // Build regex pattern for units (with word boundaries)
   const unitsPattern = new RegExp(
     `^(${UNITS.join('|')})\\s+`,
@@ -187,25 +184,3 @@ export function simplifyIngredients(ingredients: (string | { name?: string; amou
 /**
  * Quick test function for development
  */
-export function testSimplifier() {
-  const testCases = [
-    '1 pinch of salt',
-    '20ml fresh milk',
-    '2 cups all-purpose flour, sifted',
-    '3 large eggs, beaten',
-    '1/2 cup freshly chopped parsley',
-    '4 cloves garlic, minced',
-    '1 (14 oz) can diced tomatoes',
-    '2 tablespoons olive oil',
-    '1 medium onion, finely diced',
-    'Salt and pepper to taste',
-    '½ teaspoon ground cumin',
-    '1 bunch fresh cilantro, chopped (for garnish)',
-  ];
-
-  console.log('Ingredient Simplification Tests:');
-  console.log('================================');
-  testCases.forEach(test => {
-    console.log(`"${test}" → "${simplifyIngredient(test)}"`);
-  });
-}

@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable react/no-unescaped-entities */
+
 import { Shield, Eye, Download, Trash2, MapPin, Users, Lock } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {

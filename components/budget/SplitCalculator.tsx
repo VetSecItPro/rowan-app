@@ -2,7 +2,6 @@
 
 import { Calculator, DollarSign, Percent, Users, TrendingUp } from 'lucide-react';
 import {
-  calculateIncomeBasedSplit,
   type SplitType,
   type PartnershipBalance,
 } from '@/lib/services/expense-splitting-service';
@@ -217,7 +216,7 @@ export function SplitCalculator({
           </div>
           {!isValid && (
             <p className="text-sm text-red-400 mt-2">
-              ⚠️ Split amounts don't equal the total expense
+              ⚠️ Split amounts don&apos;t equal the total expense
             </p>
           )}
         </div>
@@ -233,7 +232,7 @@ export function SplitCalculator({
             <p>
               Income ratio: {((partnership.user1_income / (partnership.user1_income + partnership.user2_income)) * 100).toFixed(1)}% / {((partnership.user2_income / (partnership.user1_income + partnership.user2_income)) * 100).toFixed(1)}%
             </p>
-            <p>This split reflects each partner's earning capacity for fair expense sharing.</p>
+            <p>This split reflects each partner&apos;s earning capacity for fair expense sharing.</p>
           </div>
         </div>
       )}

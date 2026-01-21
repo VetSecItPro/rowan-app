@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TrendingDown, TrendingUp, AlertCircle, CheckCircle, Target, Calendar } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import {
   varianceAnalysisService,
   type MonthlyVariance,
   type BudgetVariance,
-  type VarianceTrend,
 } from '@/lib/services/variance-analysis-service';
 
 interface VarianceDashboardProps {
@@ -17,30 +16,23 @@ interface VarianceDashboardProps {
 export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
   const [currentVariance, setCurrentVariance] = useState<MonthlyVariance | null>(null);
   const [projectedVariance, setProjectedVariance] = useState<MonthlyVariance | null>(null);
-  const [trends, setTrends] = useState<VarianceTrend[]>([]);
   const [problematicCategories, setProblematicCategories] = useState<BudgetVariance[]>([]);
   const [performingCategories, setPerformingCategories] = useState<BudgetVariance[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadVarianceData();
-  }, [spaceId]);
-
-  const loadVarianceData = async () => {
+  const loadVarianceData = useCallback(async () => {
     try {
       setLoading(true);
 
-      const [current, projected, trendData, problematic, performing] = await Promise.all([
+      const [current, projected, problematic, performing] = await Promise.all([
         varianceAnalysisService.getCurrentMonthVariance(spaceId),
         varianceAnalysisService.getProjectedMonthEndVariance(spaceId),
-        varianceAnalysisService.getVarianceTrends(spaceId, 6),
         varianceAnalysisService.getProblematicCategories(spaceId, 3),
         varianceAnalysisService.getPerformingCategories(spaceId),
       ]);
 
       setCurrentVariance(current);
       setProjectedVariance(projected);
-      setTrends(trendData);
       setProblematicCategories(problematic);
       setPerformingCategories(performing);
     } catch (error) {
@@ -48,7 +40,11 @@ export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    loadVarianceData();
+  }, [loadVarianceData]);
 
   const getStatusColor = (color: BudgetVariance['color']) => {
     switch (color) {

@@ -16,7 +16,6 @@ import {
   CheckCircle,
   Clock,
   TrendingUp,
-  Crown,
   Heart,
   Target,
   Award,

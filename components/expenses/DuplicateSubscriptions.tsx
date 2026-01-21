@@ -135,7 +135,7 @@ export function DuplicateSubscriptions({
 
             {/* Help Text */}
             <p className="text-xs text-amber-300 text-center mt-2">
-              Review these expenses to determine if they're truly duplicates or separate services
+              Review these expenses to determine if they&apos;re truly duplicates or separate services
             </p>
           </div>
         );

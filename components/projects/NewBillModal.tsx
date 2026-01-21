@@ -4,12 +4,7 @@ import { useState, useEffect } from 'react';
 import { AlertCircle, DollarSign, ChevronDown } from 'lucide-react';
 import type { Bill, CreateBillInput, BillFrequency } from '@/lib/services/bills-service';
 import { logger } from '@/lib/logger';
-import {
-  createBillSchema,
-  updateBillSchema,
-  safeValidateCreateBill,
-} from '@/lib/validations/bills';
-import type { ZodError } from 'zod';
+import { safeValidateCreateBill } from '@/lib/validations/bills';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { Modal } from '@/components/ui/Modal';
 

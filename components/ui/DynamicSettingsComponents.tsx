@@ -6,6 +6,7 @@
  */
 
 import dynamic from 'next/dynamic';
+import type { ComponentType } from 'react';
 import { Loader2, Settings, Shield, Lock, Download, Trash2, UserCheck } from 'lucide-react';
 
 /**
@@ -16,7 +17,7 @@ const SettingsLoadingFallback = ({
   icon: Icon = Settings
 }: {
   text?: string;
-  icon?: any;
+  icon?: ComponentType<{ className?: string }>;
 }) => (
   <div className="flex items-center justify-center p-6">
     <div className="flex flex-col items-center gap-3">
@@ -32,7 +33,7 @@ const SettingsLoadingFallback = ({
 /**
  * Modal loading skeleton for settings
  */
-const SettingsModalSkeleton = ({ title, icon: Icon = Shield }: { title: string; icon?: any }) => (
+const SettingsModalSkeleton = ({ title, icon: Icon = Shield }: { title: string; icon?: ComponentType<{ className?: string }> }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
     <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
       <div className="flex items-center gap-3 mb-6">

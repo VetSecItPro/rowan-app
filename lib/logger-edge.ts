@@ -7,13 +7,12 @@
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
-interface LogContext {
+type LogContext = {
   component?: string;
   action?: string;
   userId?: string;
   spaceId?: string;
-  [key: string]: any;
-}
+} & Record<string, unknown>;
 
 /**
  * Sensitive field patterns to redact from logs
@@ -37,7 +36,7 @@ class EdgeLogger {
   /**
    * Sanitize data to remove sensitive fields
    */
-  private sanitize(data: any): any {
+  private sanitize(data: unknown): unknown {
     if (data === null || data === undefined) {
       return data;
     }
@@ -51,10 +50,11 @@ class EdgeLogger {
     }
 
     if (typeof data === 'object') {
-      const sanitized: any = {};
+      const sanitized: Record<string, unknown> = {};
+      const record = data as Record<string, unknown>;
 
-      for (const key in data) {
-        if (!Object.prototype.hasOwnProperty.call(data, key)) continue;
+      for (const key in record) {
+        if (!Object.prototype.hasOwnProperty.call(record, key)) continue;
 
         const isSensitive = SENSITIVE_PATTERNS.some((pattern) =>
           key.toLowerCase().includes(pattern)
@@ -62,10 +62,10 @@ class EdgeLogger {
 
         if (isSensitive) {
           sanitized[key] = '[REDACTED]';
-        } else if (typeof data[key] === 'object') {
-          sanitized[key] = this.sanitize(data[key]);
+        } else if (typeof record[key] === 'object') {
+          sanitized[key] = this.sanitize(record[key]);
         } else {
-          sanitized[key] = data[key];
+          sanitized[key] = record[key];
         }
       }
 

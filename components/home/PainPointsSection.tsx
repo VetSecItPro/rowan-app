@@ -27,10 +27,10 @@ export function PainPointsSection() {
                             initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: false }}
-                            transition={{ duration: 0.6, delay: index * 0.15 }}
-                            className="text-xl sm:text-2xl text-gray-300 font-serif italic"
-                        >
-                            "{quote}"
+                        transition={{ duration: 0.6, delay: index * 0.15 }}
+                        className="text-xl sm:text-2xl text-gray-300 font-serif italic"
+                    >
+                            &quot;{quote}&quot;
                         </motion.p>
                     ))}
                 </div>

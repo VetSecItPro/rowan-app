@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -89,22 +88,6 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 /**
- * Server-side function to get or create CSRF token
- * Use this in API routes to get the current token
- */
-export async function getOrCreateCsrfToken(): Promise<{ token: string; isNew: boolean }> {
-  const cookieStore = await cookies();
-  const existingToken = cookieStore.get(CSRF_COOKIE_NAME)?.value;
-
-  if (existingToken) {
-    return { token: existingToken, isNew: false };
-  }
-
-  const newToken = generateCsrfToken();
-  return { token: newToken, isNew: true };
-}
-
-/**
  * List of HTTP methods that require CSRF protection
  * GET, HEAD, OPTIONS are considered "safe" methods
  */
@@ -127,6 +110,8 @@ export const CSRF_EXEMPT_ROUTES = [
   '/api/stripe/webhook',
   '/api/auth/callback',
   '/api/calendar/callback/',
+  '/api/analytics/track',
+  '/api/notifications/track-dismissal',
   // Public endpoints that don't change state
   '/api/health',
   '/api/csrf/token', // Token endpoint itself

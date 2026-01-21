@@ -126,7 +126,7 @@ export default function ShoppingPage() {
   useEffect(() => {
     if (!currentSpace) return;
 
-    const channel = shoppingService.subscribeToLists(currentSpace.id, (payload) => {
+    const channel = shoppingService.subscribeToLists(currentSpace.id, () => {
       // Reload lists when any change occurs
       loadLists();
     });
@@ -155,11 +155,11 @@ export default function ShoppingPage() {
               list_id: editingList.id,
               name: item.name,
               quantity: item.quantity || 1,
-            } as any);
+            });
 
             // Update assigned_to if provided
             if (item.assigned_to) {
-              await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to } as any);
+              await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to });
             }
           }
         }
@@ -177,8 +177,8 @@ export default function ShoppingPage() {
           updated_at: new Date().toISOString(),
           space_id: listDataOnly.space_id,
           description: listDataOnly.description || undefined,
-          store_name: (listDataOnly as any).store_name || undefined,
-          budget: (listDataOnly as any).budget || undefined,
+          store_name: listDataOnly.store_name || undefined,
+          budget: listDataOnly.budget || undefined,
           created_by: user?.id || '', // Add required created_by field
           completed_at: undefined,
         };
@@ -195,11 +195,11 @@ export default function ShoppingPage() {
                 list_id: newList.id,
                 name: item.name,
                 quantity: item.quantity || 1,
-              } as any);
+              });
 
               // Update assigned_to if provided
               if (item.assigned_to) {
-                await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to } as any);
+                await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to });
               }
             }
           }
@@ -245,7 +245,7 @@ export default function ShoppingPage() {
       // Revert on error - reload lists to restore deleted item
       loadLists();
     }
-  }, [confirmDialog]);
+  }, [confirmDialog, loadLists]);
 
   // Memoized callback for completing lists
   const handleCompleteList = useCallback(async (listId: string) => {
@@ -277,7 +277,7 @@ export default function ShoppingPage() {
       // Revert on error
       loadLists();
     }
-  }, []);
+  }, [loadLists]);
 
   // Memoized callback for toggling items
   const handleToggleItem = useCallback(async (itemId: string, checked: boolean) => {
@@ -314,7 +314,7 @@ export default function ShoppingPage() {
       // Revert on error
       loadLists();
     }
-  }, [lists, handleCompleteList]);
+  }, [lists, handleCompleteList, loadLists]);
 
   // Memoized callback for updating item quantity
   const handleUpdateQuantity = useCallback(async (itemId: string, newQuantity: number) => {
@@ -329,13 +329,13 @@ export default function ShoppingPage() {
     );
 
     try {
-      await shoppingService.updateItem(itemId, { quantity: newQuantity } as any);
+      await shoppingService.updateItem(itemId, { quantity: newQuantity });
     } catch (error) {
       logger.error('Failed to update quantity:', error, { component: 'page', action: 'execution' });
       // Revert on error
       loadLists();
     }
-  }, []);
+  }, [loadLists]);
 
   // Memoized callback for editing lists
   const handleEditList = useCallback((list: ShoppingList) => {
@@ -375,7 +375,7 @@ export default function ShoppingPage() {
       logger.error('Failed to create list from template:', error, { component: 'page', action: 'execution' });
       throw error;
     }
-  }, [currentSpace]);
+  }, [currentSpace, loadLists]);
 
   // Handle start fresh (open modal)
   const handleStartFresh = useCallback(() => {
@@ -422,11 +422,6 @@ export default function ShoppingPage() {
   const handleCompletedListsClick = useCallback(() => {
     setStatusFilter('completed');
     setTimeFilter('all');
-  }, []);
-
-  // Memoized callback for status filter change
-  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value as 'all' | 'active' | 'completed');
   }, []);
 
   const handleSaveAsTemplate = useCallback((list: ShoppingList) => {
@@ -612,7 +607,7 @@ export default function ShoppingPage() {
       logger.error('Failed to create task:', error, { component: 'page', action: 'execution' });
       alert('Failed to create task. Please try again.');
     }
-  }, [currentSpace]);
+  }, [currentSpace, user?.id]);
 
   // Handler for adding frequent items
   const handleAddFrequentItem = useCallback(async (itemName: string, category: string) => {
@@ -644,7 +639,7 @@ export default function ShoppingPage() {
     } catch (error) {
       logger.error('Failed to add frequent item:', error, { component: 'page', action: 'execution' });
     }
-  }, [currentSpace, lists]);
+  }, [currentSpace, lists, loadLists]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>

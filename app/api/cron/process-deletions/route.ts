@@ -2,7 +2,7 @@
 // Processes account deletion reminders and executions on a daily schedule
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { getAppUrl } from '@/lib/utils/app-url';
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
     const today = new Date();
     const results = {
       sevenDayReminders: 0,
@@ -324,7 +324,7 @@ async function send1DayDeletionReminder(
 
 // Execute the actual account deletion
 async function executeAccountDeletion(userId: string, email: string, userName: string) {
-  const supabase = await createClient();
+  const supabase = supabaseAdmin;
 
   try {
     // 1. Delete user data from all tables
@@ -397,7 +397,7 @@ async function sendDeletionCompletedEmail(email: string, userName: string) {
     });
 
     // Log the final email notification
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
     await supabase
       .from('privacy_email_notifications')
       .insert({

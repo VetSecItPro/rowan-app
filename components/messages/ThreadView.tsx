@@ -141,7 +141,7 @@ export function ThreadView({
 
   const handleDeleteReply = useCallback(async (messageId: string) => {
     try {
-      await messagesService.deleteMessage(messageId);
+      await messagesService.deleteMessage(messageId, 'for_everyone', { userId: currentUserId });
       toast.success('Reply deleted');
     } catch (error) {
       logger.error('Failed to delete reply:', error, { component: 'ThreadView', action: 'component_action' });

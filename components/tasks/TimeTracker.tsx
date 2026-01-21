@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Play, Pause, Clock } from 'lucide-react';
-import { taskTimeTrackingService } from '@/lib/services/task-time-tracking-service';
+import { taskTimeTrackingService, type TimeEntry } from '@/lib/services/task-time-tracking-service';
 import { logger } from '@/lib/logger';
 
 interface TimeTrackerProps {
@@ -12,25 +12,11 @@ interface TimeTrackerProps {
 
 export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
   const [isTracking, setIsTracking] = useState(false);
-  const [activeEntry, setActiveEntry] = useState<any>(null);
+  const [activeEntry, setActiveEntry] = useState<TimeEntry | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
 
-  useEffect(() => {
-    checkActiveTimer();
-    loadTotalTime();
-  }, [taskId, userId]);
-
-  useEffect(() => {
-    if (isTracking && activeEntry) {
-      const interval = setInterval(() => {
-        setElapsed(Math.floor((Date.now() - new Date(activeEntry.start_time).getTime()) / 1000));
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [isTracking, activeEntry]);
-
-  async function checkActiveTimer() {
+  const checkActiveTimer = useCallback(async () => {
     try {
       const active = await taskTimeTrackingService.getActiveTimer(userId);
       if (active && active.task_id === taskId) {
@@ -40,16 +26,30 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
     } catch (error) {
       logger.error('Error checking timer:', error, { component: 'TimeTracker', action: 'component_action' });
     }
-  }
+  }, [taskId, userId]);
 
-  async function loadTotalTime() {
+  const loadTotalTime = useCallback(async () => {
     try {
       const total = await taskTimeTrackingService.getTotalDuration(taskId);
       setTotalTime(total);
     } catch (error) {
       logger.error('Error loading time:', error, { component: 'TimeTracker', action: 'component_action' });
     }
-  }
+  }, [taskId]);
+
+  useEffect(() => {
+    checkActiveTimer();
+    loadTotalTime();
+  }, [checkActiveTimer, loadTotalTime]);
+
+  useEffect(() => {
+    if (isTracking && activeEntry) {
+      const interval = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - new Date(activeEntry.start_time).getTime()) / 1000));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isTracking, activeEntry]);
 
   async function startTimer() {
     try {

@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import {
   Plus,
   Edit,
@@ -19,13 +18,9 @@ import {
   Tag,
   FolderPlus,
   Search,
-  Filter,
-  Palette,
   DollarSign,
   Eye,
-  EyeOff,
-  ChevronRight,
-  TrendingUp
+  EyeOff
 } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import {
@@ -34,18 +29,13 @@ import {
   getCustomCategories,
   getTags,
   createCustomCategory,
-  updateCustomCategory,
   deleteCustomCategory,
   createTag,
-  updateTag,
   deleteTag,
-  getCategoryHierarchy,
-  getSubcategories
 } from '@/lib/services/categories-tags-service';
 import {
   DefaultCategory,
-  getDefaultCategoriesForDomain,
-  getAllDefaultCategories
+  getDefaultCategoriesForDomain
 } from '@/lib/constants/default-categories';
 import { cn } from '@/lib/utils';
 
@@ -93,7 +83,6 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
   const [searchQuery, setSearchQuery] = useState('');
   const [showInactive, setShowInactive] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CustomCategory | null>(null);
-  const [selectedTag, setSelectedTag] = useState<TagType | null>(null);
   const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
   const [showNewTagDialog, setShowNewTagDialog] = useState(false);
   const [showDefaultsDialog, setShowDefaultsDialog] = useState(false);
@@ -127,8 +116,8 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
         ]);
         setCategories(categoriesData);
         setTags(tagsData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load categories and tags');
+      } catch {
+        setError('Failed to load categories and tags');
       } finally {
         setLoading(false);
       }
@@ -182,7 +171,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
         parent_category_id: '',
         monthly_budget: ''
       });
-    } catch (err) {
+    } catch {
       setError('Failed to create category');
     }
   };
@@ -208,7 +197,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
         description: '',
         color: '#8b5cf6'
       });
-    } catch (err) {
+    } catch {
       setError('Failed to create tag');
     }
   };
@@ -219,7 +208,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
       await deleteCustomCategory(categoryId);
       setCategories(prev => prev.filter(c => c.id !== categoryId));
       setSelectedCategory(null);
-    } catch (err) {
+    } catch {
       setError('Failed to delete category');
     }
   };
@@ -229,8 +218,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
     try {
       await deleteTag(tagId);
       setTags(prev => prev.filter(t => t.id !== tagId));
-      setSelectedTag(null);
-    } catch (err) {
+    } catch {
       setError('Failed to delete tag');
     }
   };
@@ -255,7 +243,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
       const newCategories = await Promise.all(promises);
       setCategories(prev => [...prev, ...newCategories]);
       setShowDefaultsDialog(false);
-    } catch (err) {
+    } catch {
       setError('Failed to create categories from defaults');
     }
   };
@@ -453,8 +441,10 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
                   <p className="text-sm">Create your first category to get started</p>
                 </div>
               ) : (
-                filteredCategories.map((category) => (
-                  <Card key={category.id} className="p-4">
+                filteredCategories.map((category) => {
+                  const isSelected = selectedCategory?.id === category.id;
+                  return (
+                    <Card key={category.id} className={cn('p-4', isSelected && 'border-primary/50 bg-primary/5')}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div
@@ -485,7 +475,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setSelectedCategory(category)}
+                          onClick={() => setSelectedCategory(prev => (prev?.id === category.id ? null : category))}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -499,7 +489,8 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
                       </div>
                     </div>
                   </Card>
-                ))
+                  );
+                })
               )}
             </div>
           </TabsContent>

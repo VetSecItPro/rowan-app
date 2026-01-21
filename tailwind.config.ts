@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const config: Config & { safelist?: any[] } = {
+const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -11,36 +11,7 @@ const config: Config & { safelist?: any[] } = {
     // Scan for dynamic class generation
     "./app/globals.css",
   ],
-  safelist: [
-    // Essential custom classes that might not be detected
-    'bg-gradient-tasks', 'bg-gradient-calendar', 'bg-gradient-reminders',
-    'bg-gradient-messages', 'bg-gradient-shopping', 'bg-gradient-meals',
-    'bg-gradient-projects', 'bg-gradient-goals', 'bg-clip-text', 'text-transparent',
-    'btn-touch', 'stats-grid-mobile', 'custom-scrollbar',
-    // Comprehensive pattern-based safelist for ALL styling
-    {
-      pattern: /^(bg|text|border|ring|shadow|from|to|via)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900|950)(\/\d+)?$/,
-      variants: ['hover', 'focus', 'active', 'disabled', 'dark', 'dark:hover', 'dark:focus', 'dark:active', 'group-hover', 'peer-focus']
-    },
-    {
-      pattern: /^(w|h|min-w|min-h|max-w|max-h)-(\d+|auto|full|screen|min|max|fit|xs|sm|md|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|\[\d+px\]|\[\d+rem\]|\[\d+%\]|\[\d+vh\]|\[\d+vw\])$/,
-    },
-    {
-      pattern: /^(p|px|py|pt|pb|pl|pr|m|mx|my|mt|mb|ml|mr|gap|space-x|space-y)-(\d+|auto|\[\d+px\]|\[\d+rem\])$/,
-    },
-    {
-      pattern: /^(rounded|transition|animate|transform|scale|rotate|translate|duration|ease|delay)-[\w-]+$/,
-    },
-    {
-      pattern: /^(grid|flex|inline|block|hidden|absolute|relative|fixed|sticky|top|bottom|left|right|inset)-[\w-]*$/,
-    },
-    {
-      pattern: /^(text|font|leading|tracking|align|whitespace|break|overflow|truncate)-[\w-]*$/,
-    },
-    {
-      pattern: /^(opacity|backdrop|filter|blur|brightness|contrast|grayscale|hue-rotate|invert|saturate|sepia|drop-shadow)-[\w-]*$/,
-    }
-  ],
+  // Note: In Tailwind CSS 4, safelist is handled via CSS @source directives in globals.css
   theme: {
     extend: {
       fontFamily: {

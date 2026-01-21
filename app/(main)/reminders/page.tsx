@@ -189,9 +189,9 @@ export default function RemindersPage(): React.JSX.Element {
           // Add placeholder user data if not present
           user: user ? {
             id: user.id,
-            name: user.name,
+            name: user.name ?? undefined,
             email: user.email,
-            avatar_url: user.avatar_url
+            avatar_url: user.avatar_url ?? undefined
           } : undefined,
         };
 
@@ -306,11 +306,6 @@ export default function RemindersPage(): React.JSX.Element {
     setSearchQuery(e.target.value);
     setIsSearchTyping(true);
     setTimeout(() => setIsSearchTyping(false), 300);
-  }, []);
-
-  // Memoized callback for status filter changes
-  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value);
   }, []);
 
   const handleSelectionChange = useCallback((reminderId: string, selected: boolean) => {
@@ -520,7 +515,17 @@ export default function RemindersPage(): React.JSX.Element {
                   <div className="relative w-40 flex-shrink-0 hidden sm:block">
                     <select
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as any)}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        if (
+                          nextValue === 'due_date' ||
+                          nextValue === 'priority' ||
+                          nextValue === 'created_date' ||
+                          nextValue === 'title'
+                        ) {
+                          setSortBy(nextValue);
+                        }
+                      }}
                       className="appearance-none pl-4 pr-10 py-2 bg-gray-900 border-2 border-pink-700 rounded-lg text-sm font-medium text-white hover:border-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors cursor-pointer"
                     >
                       <option value="due_date">Sort: Due Date</option>

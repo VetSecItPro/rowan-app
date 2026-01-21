@@ -14,13 +14,9 @@ interface TooltipProps {
 export function Tooltip({ content, children, delay = 300, position = 'top', className = '' }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [mounted, setMounted] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const isClient = typeof window !== 'undefined';
 
   const showTooltip = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -82,7 +78,7 @@ export function Tooltip({ content, children, delay = 300, position = 'top', clas
     }
   };
 
-  const tooltipElement = isVisible && mounted ? (
+  const tooltipElement = isVisible && isClient ? (
     <div
       className={`fixed z-[9999] pointer-events-none ${getPositionClasses()}`}
       style={{ left: `${coords.x}px`, top: `${coords.y}px` }}
@@ -123,7 +119,7 @@ export function Tooltip({ content, children, delay = 300, position = 'top', clas
       >
         {children}
       </div>
-      {mounted && typeof window !== 'undefined' && createPortal(tooltipElement, document.body)}
+      {isClient && createPortal(tooltipElement, document.body)}
     </>
   );
 }

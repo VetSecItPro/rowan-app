@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Export data
-    const result = await bulkExportByDateRange(user.id, dataType, startDate, endDate);
+    const result = await bulkExportByDateRange(user.id, dataType, startDate, endDate, supabase);
 
     if (!result.success || !result.data) {
       return NextResponse.json({ error: result.error || 'Export failed' }, { status: 500 });
@@ -67,12 +67,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'No data found for the specified date range' }, { status: 404 });
       }
 
-      const headers = Object.keys(result.data[0]);
+      const rows = result.data as Record<string, unknown>[];
+      const headers = Object.keys(rows[0]);
       const csvRows = [
         headers.join(','),
-        ...result.data.map(row =>
+        ...rows.map(row =>
           headers.map(header => {
-            const value = (row as any)[header];
+            const value = row[header];
             // Escape values that contain commas, quotes, or newlines
             if (value === null || value === undefined) return '';
             const stringValue = String(value);

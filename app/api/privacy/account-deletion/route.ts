@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    const validatedData = RequestDeletionSchema.parse(body);
+    RequestDeletionSchema.parse(body);
 
     // Check if user already has an active deletion request
     const { data: existingRequest } = await supabase
@@ -266,7 +266,7 @@ export async function DELETE(request: NextRequest) {
 }
 
 // GET - Get deletion status
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

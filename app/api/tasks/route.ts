@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, spaceId);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
     if (search) options.search = search;
 
     // Get tasks from service
-    const tasks = await tasksService.getTasks(spaceId, options);
+    const tasks = await tasksService.getTasks(spaceId, options, supabase);
 
     // Add cache headers for browser caching (30s with stale-while-revalidate)
     return withUserDataCache(
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
           { status: 429 }
         );
       }
-    } catch (rateLimitError) {
+    } catch {
       // Fallback to in-memory rate limiting
       Sentry.captureMessage('Rate limiting degraded (using fallback)', {
         level: 'warning',
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, validatedData.space_id);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -230,7 +230,7 @@ export async function POST(req: NextRequest) {
       tags: validatedData.tags ?? undefined,
       estimated_hours: validatedData.estimated_hours ?? undefined,
       calendar_sync: validatedData.calendar_sync ?? false,
-    });
+    }, supabase);
 
     // Track task creation usage
     await trackUsage(user.id, 'tasks_created');

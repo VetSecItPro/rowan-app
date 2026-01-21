@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Bell, Check, Trash2, X, Filter, CheckCircle2, Circle, DollarSign } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Bell, Check, Trash2, X, Filter, CheckCircle2, DollarSign } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import {
   inAppNotificationsService,
@@ -19,17 +19,19 @@ interface ComprehensiveNotificationCenterProps {
 }
 
 export function ComprehensiveNotificationCenter({ userId, spaceId }: ComprehensiveNotificationCenterProps) {
+  void spaceId;
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<InAppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'unread' | NotificationType>('all');
+  type NotificationFilter = 'all' | 'unread' | NotificationType;
+  const [selectedFilter, setSelectedFilter] = useState<NotificationFilter>('all');
   const [showFilters, setShowFilters] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch notifications
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -53,12 +55,12 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedFilter, userId]);
 
   // Initial fetch
   useEffect(() => {
     fetchNotifications();
-  }, [userId, selectedFilter]);
+  }, [fetchNotifications]);
 
   // Real-time subscription
   useEffect(() => {
@@ -82,7 +84,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [fetchNotifications, supabase, userId]);
 
   // Mark as read
   const handleMarkAsRead = async (notificationId: string) => {
@@ -192,7 +194,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
   };
 
   // Filter options
-  const filterOptions = [
+  const filterOptions: Array<{ value: NotificationFilter; label: string; icon?: string; count?: number }> = [
     { value: 'all', label: 'All', count: notifications.length },
     { value: 'unread', label: 'Unread', count: unreadCount },
     { value: 'task', label: 'Tasks', icon: '✅' },
@@ -281,7 +283,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                     <button
                       key={option.value}
                       onClick={() => {
-                        setSelectedFilter(option.value as any);
+                        setSelectedFilter(option.value);
                         setShowFilters(false);
                       }}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${

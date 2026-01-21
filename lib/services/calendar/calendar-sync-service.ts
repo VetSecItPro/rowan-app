@@ -9,7 +9,6 @@ import { logger } from '@/lib/logger';
 import type {
   CalendarConnection,
   CalendarEventMapping,
-  CalendarSyncLog,
   SyncResult,
   SyncError,
   GoogleCalendarEvent,
@@ -30,8 +29,6 @@ export async function performSync(
   syncType: SyncType = 'incremental'
 ): Promise<SyncResult> {
   const startTime = Date.now();
-  const errors: SyncError[] = [];
-
   const supabase = await createClient();
 
   // Get connection details
@@ -183,8 +180,6 @@ async function syncGoogleCalendar(
   let eventsDeleted = 0;
   let conflictsDetected = 0;
   let nextSyncToken: string | undefined;
-
-  const supabase = await createClient();
 
   logger.info('[Sync] Starting Google Calendar sync for connection:', { component: 'lib-calendar-sync-service', data: connection.id });
   logger.info('[Sync] Sync type and direction:', { component: 'lib-calendar-sync-service', data: { syncType, direction: connection.sync_direction } });
@@ -797,8 +792,6 @@ async function syncAppleCalendar(
   let eventsDeleted = 0;
   let conflictsDetected = 0;
   let nextSyncToken: string | undefined;
-
-  const supabase = await createClient();
 
   logger.info('[Sync] Starting Apple Calendar sync for connection:', { component: 'lib-calendar-sync-service', data: connection.id });
   logger.info('[Sync] Sync type and direction:', { component: 'lib-calendar-sync-service', data: { syncType, direction: connection.sync_direction } });

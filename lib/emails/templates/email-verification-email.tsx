@@ -50,7 +50,7 @@ export const EmailVerificationEmail = ({
             </Text>
             
             <Text style={text}>
-              Thank you for signing up for Rowan! We're excited to have you on board. 
+              Thank you for signing up for Rowan! We&apos;re excited to have you on board. 
               To get started, please verify your email address.
             </Text>
             
@@ -73,7 +73,7 @@ export const EmailVerificationEmail = ({
             </Text>
 
             <Text style={text}>
-              If the button doesn't work, copy and paste this link into your browser:
+              If the button doesn&apos;t work, copy and paste this link into your browser:
             </Text>
             
             <Text style={linkText}>
@@ -86,9 +86,9 @@ export const EmailVerificationEmail = ({
 
             {/* Welcome Section */}
             <Section style={welcomeSection}>
-              <Text style={welcomeTitle}>What's next?</Text>
+              <Text style={welcomeTitle}>What&apos;s next?</Text>
               <Text style={welcomeText}>
-                Once your email is verified, you'll be able to:<br/><br/>
+                Once your email is verified, you&apos;ll be able to:<br/><br/>
                 🏠 <strong>Create your first space</strong> - Set up a shared workspace with your partner<br/>
                 📋 <strong>Start managing tasks</strong> - Keep track of your daily to-dos together<br/>
                 📅 <strong>Plan events</strong> - Coordinate your schedules seamlessly<br/>
@@ -102,7 +102,7 @@ export const EmailVerificationEmail = ({
             <Section style={securitySection}>
               <Text style={securityTitle}>Security Note:</Text>
               <Text style={securityText}>
-                If you didn't create an account with Rowan, please ignore this email. 
+                If you didn&apos;t create an account with Rowan, please ignore this email. 
                 Your email address will not be added to our system without verification.
               </Text>
             </Section>

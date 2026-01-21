@@ -9,7 +9,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -62,7 +61,7 @@ export function SortableGoalsList({
     })
   );
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = () => {
     hapticMedium(); // Haptic feedback when drag starts
   };
 
@@ -95,6 +94,7 @@ export function SortableGoalsList({
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
       <SortableContext

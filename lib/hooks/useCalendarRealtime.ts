@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import type { RealtimeChannel, RealtimePostgresChangesPayload, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js';
@@ -21,11 +21,11 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [presence, setPresence] = useState<Record<string, PresenceUser>>({});
   const [isConnected, setIsConnected] = useState(false);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   // Handle postgres changes
   const handleEventChange = useCallback((
-    payload: RealtimePostgresChangesPayload<any>
+    payload: RealtimePostgresChangesPayload<Record<string, unknown>>
   ) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
 
@@ -34,7 +34,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         case 'INSERT':
           // Add new event if not already in list
           if (!currentEvents.find(e => e.id === newRecord.id)) {
-            return [...currentEvents, newRecord as CalendarEvent].sort(
+            return [...currentEvents, newRecord as unknown as CalendarEvent].sort(
               (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
             );
           }
@@ -43,12 +43,12 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         case 'UPDATE':
           // Update existing event
           return currentEvents.map(event =>
-            event.id === newRecord.id ? { ...event, ...newRecord } : event
+            event.id === newRecord.id ? { ...event, ...(newRecord as unknown as CalendarEvent) } : event
           );
 
         case 'DELETE':
           // Remove deleted event
-          return currentEvents.filter(event => event.id !== oldRecord.id);
+          return currentEvents.filter(event => event.id !== (oldRecord as unknown as CalendarEvent).id);
 
         default:
           return currentEvents;
@@ -58,9 +58,9 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
 
   // Broadcast that user is editing an event
   const broadcastEditing = useCallback((eventId: string | null) => {
-    if (!channel) return;
+    if (!channelRef.current) return;
 
-    channel.send({
+    channelRef.current.send({
       type: 'broadcast',
       event: 'event_editing',
       payload: {
@@ -69,18 +69,18 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         timestamp: Date.now()
       }
     });
-  }, [channel, userId]);
+  }, [userId]);
 
   // Broadcast that user is viewing an event
   const broadcastViewing = useCallback((eventId: string | null) => {
-    if (!channel) return;
+    if (!channelRef.current) return;
 
-    channel.track({
+    channelRef.current.track({
       user_id: userId,
       online_at: new Date().toISOString(),
       viewing_event_id: eventId
     });
-  }, [channel, userId]);
+  }, [userId]);
 
   useEffect(() => {
     if (!spaceId || !userId) return;
@@ -107,7 +107,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         const presenceMap: Record<string, PresenceUser> = {};
 
         Object.keys(state).forEach(key => {
-          const presences = state[key] as any;
+          const presences = state[key] as PresenceUser[];
           if (presences.length > 0) {
             presenceMap[key] = presences[0];
           }
@@ -116,7 +116,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         setPresence(presenceMap);
       })
       // Listen to broadcast messages (editing notifications)
-      .on('broadcast', { event: 'event_editing' }, (payload: any) => {
+      .on('broadcast', { event: 'event_editing' }, (payload: { payload: { user_id?: string; event_id?: string | null; timestamp?: number } }) => {
         // Handle editing notifications
         logger.info('User editing:', { component: 'lib-useCalendarRealtime', data: payload.payload });
       })
@@ -134,12 +134,12 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         }
       });
 
-    setChannel(realtimeChannel);
+    channelRef.current = realtimeChannel;
 
     // Cleanup
     return () => {
       realtimeChannel.unsubscribe();
-      setChannel(null);
+      channelRef.current = null;
       setIsConnected(false);
     };
   }, [spaceId, userId, handleEventChange]);

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { Users, Calendar, Ticket, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface BetaAccessModalProps {
   isOpen: boolean;
@@ -80,7 +81,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/beta/request', {
+      const response = await csrfFetch('/api/beta/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/beta/validate', {
+      const response = await csrfFetch('/api/beta/validate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -190,14 +191,14 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             <p className="text-gray-400">
               {betaStatus.beta_ended
                 ? 'The beta testing period has concluded. Thank you to all our testers!'
-                : `We've reached our limit of ${betaStatus.max_users} beta testers. Thank you for your interest!`
+                : `We&apos;ve reached our limit of ${betaStatus.max_users} beta testers. Thank you for your interest!`
               }
             </p>
           </div>
 
           <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
             <h4 className="text-sm font-medium text-blue-200 mb-2">
-              Don't miss our launch!
+              Don&apos;t miss our launch!
             </h4>
             <p className="text-sm text-blue-300 mb-3">
               Sign up to be notified when Rowan officially launches with all features.
@@ -243,7 +244,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
               Your invite code is on its way!
             </h3>
             <p className="text-gray-400">
-              We've sent a beta invite code to <span className="font-medium text-white">{email}</span>
+              We&apos;ve sent a beta invite code to <span className="font-medium text-white">{email}</span>
             </p>
           </div>
 
@@ -251,13 +252,13 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
           <div className="p-3 bg-amber-900/20 border border-amber-700 rounded-lg flex items-start gap-3">
             <span className="text-amber-500 text-lg">📬</span>
             <div className="text-sm text-amber-200">
-              <span className="font-medium">Can't find it?</span> Check your spam or junk folder. Emails sometimes end up there by mistake.
+              <span className="font-medium">Can&apos;t find it?</span> Check your spam or junk folder. Emails sometimes end up there by mistake.
             </div>
           </div>
 
           <div className="p-4 bg-blue-900/20 border border-blue-800 rounded-lg text-left">
             <h4 className="text-sm font-medium text-blue-200 mb-2">
-              What's next:
+              What&apos;s next:
             </h4>
             <ol className="text-sm text-blue-300 space-y-2 list-decimal list-inside">
               <li>Check your inbox (and spam folder)</li>
@@ -354,7 +355,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                       Request an Invite Code
                     </h4>
                     <p className="text-sm text-gray-400 mt-1">
-                      Enter your email and we'll send you an invite code instantly
+                      Enter your email and we&apos;ll send you an invite code instantly
                     </p>
                   </div>
                 </div>
@@ -415,7 +416,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                 Get Your Invite Code
               </h3>
               <p className="text-gray-400">
-                Enter your email and we'll send you an invite code right away.
+                Enter your email and we&apos;ll send you an invite code right away.
               </p>
             </div>
 
@@ -476,7 +477,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
                   />
                 </div>
                 <p className="mt-1 text-xs text-gray-400">
-                  We'll send your invite code to this address
+                  We&apos;ll send your invite code to this address
                 </p>
               </div>
 
@@ -619,7 +620,7 @@ export function BetaAccessModal({ isOpen, onClose, onSuccess, onSwitchToLaunch }
             {/* Alternative */}
             <div className="pt-4 border-t border-gray-700">
               <p className="text-sm text-gray-400 text-center">
-                Don't have an invite code?{' '}
+                Don&apos;t have an invite code?{' '}
                 <button
                   onClick={() => setViewMode('email')}
                   className="text-blue-400 hover:underline font-medium"

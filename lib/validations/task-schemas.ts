@@ -13,7 +13,7 @@ export const taskBaseSchema = z.object({
     .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
-    .refine(val => val === null || z.string().datetime().safeParse(val).success, 'Invalid date format'),
+    .refine(val => val === null || val === undefined || z.string().datetime().safeParse(val).success, 'Invalid date format'),
   category: z.string().max(100).trim().optional().nullable()
     .transform(val => val === '' ? null : val),
   estimated_hours: z.union([

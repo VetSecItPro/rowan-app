@@ -1,26 +1,17 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
 import {
+  type LucideIcon,
   ArrowLeft,
   CheckSquare,
   Play,
-  Plus,
   Repeat,
-  FileText,
   Grid3x3,
   Users,
   Clock,
-  Paperclip,
-  Link2,
-  Calendar,
-  Bell,
-  UserCheck,
   Shuffle,
-  Download,
-  Filter,
-  MessageSquare,
-  Timer,
   FolderKanban,
   Lightbulb,
   Zap,
@@ -28,7 +19,7 @@ import {
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

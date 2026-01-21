@@ -148,10 +148,6 @@ export class YearInReviewService {
 
     // Fetch all data in parallel for efficiency
     const [
-      tasks,
-      goals,
-      expenses,
-      badges,
       overview,
       monthlyData,
       achievements,
@@ -161,10 +157,6 @@ export class YearInReviewService {
       expensesSummary,
       productivity
     ] = await Promise.all([
-      this.getTasksForYear(supabase, spaceId, yearStart, yearEnd),
-      this.getGoalsForYear(supabase, spaceId, yearStart, yearEnd),
-      this.getExpensesForYear(supabase, spaceId, yearStart, yearEnd),
-      this.getBadgesForYear(userId, yearStart, yearEnd),
       this.calculateOverviewStats(supabase, spaceId, yearStart, yearEnd),
       this.calculateMonthlyBreakdown(supabase, spaceId, year),
       this.generateAchievementSummary(supabase, userId, spaceId, yearStart, yearEnd),
@@ -515,11 +507,18 @@ export class YearInReviewService {
   }
 
   private async getBadgesForYear(userId: string, yearStart: Date, yearEnd: Date) {
+    void userId;
+    void yearStart;
+    void yearEnd;
     // Would integrate with actual badges system
     return [];
   }
 
   private async getTopCategories(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<CategoryStats[]> {
+    void supabase;
+    void spaceId;
+    void yearStart;
+    void yearEnd;
     // Placeholder - would aggregate categories across all entities
     return [
       { category: 'work', count: 45, percentage: 35 },

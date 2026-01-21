@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { Target, Award, TrendingUp, CheckCircle, Calendar, BarChart3, Activity, Zap } from 'lucide-react';
+import { Target, Award, TrendingUp, CheckCircle, Activity } from 'lucide-react';
 import { format, subMonths } from 'date-fns';
 import { DynamicAreaChart, DynamicPieChart, DynamicBarChart } from '@/components/charts/DynamicCharts';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
@@ -15,13 +15,14 @@ import {
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
 type TimeRange = '1m' | '3m' | '6m' | '12m';
+type QuickStats = Awaited<ReturnType<typeof getGoalQuickStats>>;
 
 export default function GoalsAnalyticsPage() {
   const { currentSpace } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const [timeRange, setTimeRange] = useState<TimeRange>('3m');
   const [analytics, setAnalytics] = useState<GoalAnalytics | null>(null);
-  const [quickStats, setQuickStats] = useState<any>(null);
+  const [quickStats, setQuickStats] = useState<QuickStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

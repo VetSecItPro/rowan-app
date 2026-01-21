@@ -4,16 +4,16 @@
  * Runs every 5 minutes to send pending task reminders.
  */
 
-import { createClient } from '@/lib/supabase/client';
-import { taskRemindersService } from '@/lib/services/task-reminders-service';
 import { logger } from '@/lib/logger';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function processTaskReminders() {
   try {
-    const pendingReminders = await taskRemindersService.getPendingReminders();
+    const { data: pendingReminders, error } = await supabaseAdmin.rpc('get_pending_reminders');
+    if (error) throw error;
 
     let sent = 0;
-    for (const reminder of pendingReminders) {
+    for (const reminder of pendingReminders || []) {
       try {
         // Send notification based on reminder_type
         if (reminder.reminder_type === 'notification' || reminder.reminder_type === 'both') {
@@ -25,7 +25,10 @@ export async function processTaskReminders() {
         }
 
         // Mark as sent
-        await taskRemindersService.markReminderSent(reminder.reminder_id);
+        const { error: markError } = await supabaseAdmin.rpc('mark_reminder_sent', {
+          reminder_id: reminder.reminder_id,
+        });
+        if (markError) throw markError;
         sent++;
       } catch (error) {
         logger.error(`Failed to send reminder ${reminder.reminder_id}:`, error, { component: 'task-reminders-job', action: 'service_call' });
@@ -41,15 +44,22 @@ export async function processTaskReminders() {
 }
 
 async function sendPushNotification(reminder: any) {
-  // TODO: Implement push notification via Supabase notifications table
-  const supabase = createClient();
-  await supabase.from('notifications').insert({
-    user_id: reminder.user_id,
-    type: 'task_reminder',
-    title: 'Task Reminder',
-    message: `⏰ Reminder: ${reminder.task_title}`,
-    data: { task_id: reminder.task_id },
-  });
+  const { error } = await supabaseAdmin
+    .from('in_app_notifications')
+    .insert({
+      user_id: reminder.user_id,
+      type: 'reminder',
+      title: 'Task Reminder',
+      content: `⏰ Reminder: ${reminder.task_title}`,
+      priority: 'normal',
+      related_item_id: reminder.task_id,
+      related_item_type: 'task',
+      metadata: { task_id: reminder.task_id },
+    });
+
+  if (error) {
+    throw error;
+  }
 }
 
 async function sendEmailReminder(reminder: any) {

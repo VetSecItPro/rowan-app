@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Project } from '@/lib/services/project-tracking-service';
 import { logger } from '@/lib/logger';
 
@@ -20,6 +21,8 @@ export interface ProjectStats {
   onHold: number;
   totalBudget: number;
 }
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 /**
  * Helper to clean input - convert empty strings to null for date fields
@@ -46,8 +49,8 @@ export const projectsOnlyService = {
   /**
    * Get all projects for a space
    */
-  async getProjects(spaceId: string): Promise<Project[]> {
-    const supabase = createClient();
+  async getProjects(spaceId: string, supabaseClient?: SupabaseClient): Promise<Project[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('projects')
       .select('*')
@@ -61,8 +64,8 @@ export const projectsOnlyService = {
   /**
    * Get a single project by ID
    */
-  async getProjectById(id: string): Promise<Project | null> {
-    const supabase = createClient();
+  async getProjectById(id: string, supabaseClient?: SupabaseClient): Promise<Project | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('projects')
       .select('*')
@@ -76,8 +79,8 @@ export const projectsOnlyService = {
   /**
    * Create a new project
    */
-  async createProject(input: CreateProjectInput): Promise<Project> {
-    const supabase = createClient();
+  async createProject(input: CreateProjectInput, supabaseClient?: SupabaseClient): Promise<Project> {
+    const supabase = getSupabaseClient(supabaseClient);
     const cleaned = cleanProjectInput(input);
 
     const { data, error } = await supabase
@@ -96,8 +99,8 @@ export const projectsOnlyService = {
   /**
    * Update an existing project
    */
-  async updateProject(id: string, updates: Partial<CreateProjectInput>): Promise<Project> {
-    const supabase = createClient();
+  async updateProject(id: string, updates: Partial<CreateProjectInput>, supabaseClient?: SupabaseClient): Promise<Project> {
+    const supabase = getSupabaseClient(supabaseClient);
     const cleaned = cleanProjectInput(updates);
 
     const { data, error } = await supabase
@@ -117,8 +120,8 @@ export const projectsOnlyService = {
   /**
    * Delete a project
    */
-  async deleteProject(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteProject(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
       .from('projects')
       .delete()

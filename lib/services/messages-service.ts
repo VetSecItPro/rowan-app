@@ -1,16 +1,25 @@
 import { createClient } from '@/lib/supabase/client';
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import { RealtimeChannel, RealtimePostgresChangesPayload, SupabaseClient } from '@supabase/supabase-js';
 import { FileUploadResult } from './file-upload-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { sanitizeSearchInput } from '@/lib/utils/input-sanitization';
 import { logger } from '@/lib/logger';
-import { cacheAside, cacheKeys, deleteCache, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { cacheAside, cacheKeys, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
 import { getAppUrl } from '@/lib/utils/app-url';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 /**
  * Security: Default maximum limit for list queries to prevent unbounded data retrieval
  */
 const DEFAULT_MAX_LIMIT = 500;
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
+interface MessageWriteOptions {
+  userId?: string;
+  supabaseClient?: SupabaseClient;
+}
 
 export interface Message {
   id: string;
@@ -131,8 +140,8 @@ export const messagesService = {
     return data || [];
   },
 
-  async getMessages(conversationId: string): Promise<Message[]> {
-    const supabase = createClient();
+  async getMessages(conversationId: string, supabaseClient?: SupabaseClient): Promise<Message[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -158,8 +167,8 @@ export const messagesService = {
     return data || [];
   },
 
-  async getMessageById(id: string): Promise<Message | null> {
-    const supabase = createClient();
+  async getMessageById(id: string, supabaseClient?: SupabaseClient): Promise<Message | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -170,12 +179,27 @@ export const messagesService = {
     return data;
   },
 
-  async createMessage(input: CreateMessageInput): Promise<Message> {
-    const supabase = createClient();
+  async createMessage(input: CreateMessageInput, supabaseClient?: SupabaseClient): Promise<Message> {
+    const supabase = getSupabaseClient(supabaseClient);
+    const sanitizedContent = sanitizePlainText(input.content);
+    if (!sanitizedContent) {
+      throw new Error('Message content is required');
+    }
+
+    let sanitizedAttachments: string[] | undefined;
+    if (input.attachments) {
+      sanitizedAttachments = input.attachments.map((url) => sanitizeUrl(url));
+      if (sanitizedAttachments.some((url) => !url)) {
+        throw new Error('Invalid attachment URL');
+      }
+    }
+
     const { data, error } = await supabase
       .from('messages')
       .insert([{
         ...input,
+        content: sanitizedContent,
+        attachments: sanitizedAttachments,
         read: false,
       }])
       .select()
@@ -223,7 +247,7 @@ export const messagesService = {
               {
                 senderName: senderData.name || 'Someone',
                 senderAvatar: senderData.avatar_url,
-                messagePreview: input.content,
+                messagePreview: sanitizedContent,
                 conversationTitle: conversationData.title,
                 isDirectMessage: conversationData.conversation_type === 'direct',
                 messageCount: 1,
@@ -247,11 +271,46 @@ export const messagesService = {
     return data;
   },
 
-  async updateMessage(id: string, updates: Partial<CreateMessageInput>): Promise<Message> {
-    const supabase = createClient();
+  async updateMessage(
+    id: string,
+    updates: Partial<CreateMessageInput>,
+    options?: MessageWriteOptions
+  ): Promise<Message> {
+    const supabase = getSupabaseClient(options?.supabaseClient);
+    const sanitizedUpdates = { ...updates };
+
+    if (updates.content !== undefined) {
+      const sanitizedContent = sanitizePlainText(updates.content);
+      if (!sanitizedContent) {
+        throw new Error('Message content is required');
+      }
+      sanitizedUpdates.content = sanitizedContent;
+    }
+
+    if (updates.attachments !== undefined) {
+      const sanitizedAttachments = updates.attachments.map((url) => sanitizeUrl(url));
+      if (sanitizedAttachments.some((url) => !url)) {
+        throw new Error('Invalid attachment URL');
+      }
+      sanitizedUpdates.attachments = sanitizedAttachments;
+    }
+
+    if (options?.userId && (updates.content !== undefined || updates.attachments !== undefined)) {
+      const { data: existingMessage, error: fetchError } = await supabase
+        .from('messages')
+        .select('sender_id')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) throw fetchError;
+      if (existingMessage?.sender_id !== options.userId) {
+        throw new Error('Unauthorized: only the sender can edit this message');
+      }
+    }
+
     const { data, error } = await supabase
       .from('messages')
-      .update(updates)
+      .update(sanitizedUpdates)
       .eq('id', id)
       .select()
       .single();
@@ -266,10 +325,17 @@ export const messagesService = {
    * @param userId - Current user ID
    * @param mode - 'for_me' (soft delete for this user only) or 'for_everyone' (soft delete for all)
    */
-  async deleteMessage(id: string, userId?: string, mode: DeleteMessageMode = 'for_everyone'): Promise<void> {
-    const supabase = createClient();
+  async deleteMessage(
+    id: string,
+    mode: DeleteMessageMode = 'for_everyone',
+    options?: MessageWriteOptions
+  ): Promise<void> {
+    const supabase = getSupabaseClient(options?.supabaseClient);
 
-    if (mode === 'for_me' && userId) {
+    if (mode === 'for_me') {
+      if (!options?.userId) {
+        throw new Error('User ID is required to delete a message for yourself');
+      }
       // Delete for me only - add user to deleted_for_users array
       // First get current deleted_for_users
       const { data: message, error: fetchError } = await supabase
@@ -281,24 +347,36 @@ export const messagesService = {
       if (fetchError) throw fetchError;
 
       const currentDeletedUsers = message?.deleted_for_users || [];
-      if (!currentDeletedUsers.includes(userId)) {
+      if (!currentDeletedUsers.includes(options.userId)) {
         const { error } = await supabase
           .from('messages')
           .update({
-            deleted_for_users: [...currentDeletedUsers, userId]
+            deleted_for_users: [...currentDeletedUsers, options.userId]
           })
           .eq('id', id);
 
         if (error) throw error;
       }
     } else {
+      if (options?.userId) {
+        const { data: existingMessage, error: fetchError } = await supabase
+          .from('messages')
+          .select('sender_id')
+          .eq('id', id)
+          .single();
+
+        if (fetchError) throw fetchError;
+        if (existingMessage?.sender_id !== options.userId) {
+          throw new Error('Unauthorized: only the sender can delete this message for everyone');
+        }
+      }
       // Delete for everyone - soft delete with timestamp
       const { error } = await supabase
         .from('messages')
         .update({
           deleted_at: new Date().toISOString(),
           deleted_for_everyone: true,
-          deleted_by: userId || null,
+          deleted_by: options?.userId || null,
           content: '' // Clear content for privacy
         })
         .eq('id', id);
@@ -358,7 +436,7 @@ export const messagesService = {
 
   async markConversationAsRead(conversationId: string): Promise<number> {
     // Use API route to bypass RLS
-    const response = await fetch('/api/messages/mark-conversation-read', {
+    const response = await csrfFetch('/api/messages/mark-conversation-read', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

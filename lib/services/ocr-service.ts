@@ -1,5 +1,6 @@
 import type { OCRResult } from './receipts-service';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 // =====================================================
 // MERCHANT DETECTION PATTERNS
@@ -226,7 +227,7 @@ export async function processReceiptOCR(imageFile: File): Promise<OCRResult> {
     formData.append('image', imageFile);
 
     // Call the API route
-    const response = await fetch('/api/ocr/scan-receipt', {
+    const response = await csrfFetch('/api/ocr/scan-receipt', {
       method: 'POST',
       body: formData,
     });
@@ -244,14 +245,32 @@ export async function processReceiptOCR(imageFile: File): Promise<OCRResult> {
     }
 
     const result: OCRResult = await response.json();
-    return result;
+    const ocrText = result.text || '';
+    const inferredMerchant = result.merchant_name ?? extractMerchantName(ocrText);
+    const inferredTotal = result.total_amount ?? extractTotalAmount(ocrText);
+    const inferredDate = result.receipt_date ?? extractReceiptDate(ocrText);
+    const inferredCategory = result.category ?? determineCategory(inferredMerchant, ocrText);
+
+    return {
+      ...result,
+      merchant_name: inferredMerchant,
+      total_amount: inferredTotal,
+      receipt_date: inferredDate,
+      category: inferredCategory,
+      confidence: result.confidence ?? calculateConfidence(ocrText, {
+        merchant_name: inferredMerchant,
+        total_amount: inferredTotal,
+        receipt_date: inferredDate,
+        category: inferredCategory,
+      }),
+    };
   } catch (error) {
     logger.error('OCR processing error:', error, { component: 'lib-ocr-service', action: 'service_call' });
 
     // Fallback to regex-based extraction on any error
     try {
       return await fallbackOCRExtraction(imageFile);
-    } catch (fallbackError) {
+    } catch {
       throw new Error('Failed to process receipt image');
     }
   }

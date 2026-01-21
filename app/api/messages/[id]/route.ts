@@ -7,6 +7,24 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
+
+const isSafeHttpUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const UpdateMessageSchema = z.object({
+  content: z.string().min(1, 'Message content is required').max(10000, 'Message content too long').optional(),
+  attachments: z.array(z.string().refine(isSafeHttpUrl, 'Invalid attachment URL')).optional(),
+}).refine((data) => data.content !== undefined || data.attachments !== undefined, {
+  message: 'No updates provided',
+});
 
 /**
  * GET /api/messages/[id]
@@ -42,7 +60,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get message
-    const message = await messagesService.getMessageById(params.id);
+    const message = await messagesService.getMessageById(params.id, supabase);
 
     if (!message) {
       return NextResponse.json(
@@ -118,7 +136,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing message first
-    const existingMessage = await messagesService.getMessageById(params.id);
+    const existingMessage = await messagesService.getMessageById(params.id, supabase);
 
     if (!existingMessage) {
       return NextResponse.json(
@@ -147,11 +165,57 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
-    // Parse request body
-    const updates = await req.json();
+    if (existingMessage.sender_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Only the sender can edit this message' },
+        { status: 403 }
+      );
+    }
+
+    // Parse and validate request body
+    const body = await req.json();
+    const validationResult = UpdateMessageSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Validation error', details: validationResult.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const sanitizedContent = validationResult.data.content !== undefined
+      ? sanitizePlainText(validationResult.data.content)
+      : undefined;
+
+    if (validationResult.data.content !== undefined && !sanitizedContent) {
+      return NextResponse.json(
+        { error: 'Message content is required' },
+        { status: 400 }
+      );
+    }
+
+    const sanitizedAttachments = validationResult.data.attachments
+      ? validationResult.data.attachments.map((url) => sanitizeUrl(url))
+      : undefined;
+
+    if (sanitizedAttachments && sanitizedAttachments.some((url) => !url)) {
+      return NextResponse.json(
+        { error: 'Invalid attachment URL' },
+        { status: 400 }
+      );
+    }
+
+    const updates = {
+      ...validationResult.data,
+      ...(validationResult.data.content !== undefined ? { content: sanitizedContent } : {}),
+      ...(validationResult.data.attachments !== undefined ? { attachments: sanitizedAttachments } : {}),
+    };
 
     // Update message using service
-    const updatedMessage = await messagesService.updateMessage(params.id, updates);
+    const updatedMessage = await messagesService.updateMessage(params.id, updates, {
+      userId: user.id,
+      supabaseClient: supabase,
+    });
 
     return NextResponse.json({
       success: true,
@@ -200,7 +264,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing message first
-    const existingMessage = await messagesService.getMessageById(params.id);
+    const existingMessage = await messagesService.getMessageById(params.id, supabase);
 
     if (!existingMessage) {
       return NextResponse.json(
@@ -229,8 +293,21 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       );
     }
 
+    const { searchParams } = new URL(req.url);
+    const mode = searchParams.get('mode') === 'for_me' ? 'for_me' : 'for_everyone';
+
+    if (mode === 'for_everyone' && existingMessage.sender_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Only the sender can delete this message for everyone' },
+        { status: 403 }
+      );
+    }
+
     // Delete message using service
-    await messagesService.deleteMessage(params.id);
+    await messagesService.deleteMessage(params.id, mode, {
+      userId: user.id,
+      supabaseClient: supabase,
+    });
 
     return NextResponse.json({
       success: true,

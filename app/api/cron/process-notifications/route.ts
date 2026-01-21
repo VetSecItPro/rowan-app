@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { notificationQueueService } from '@/lib/services/notification-queue-service';
 import { logger } from '@/lib/logger';
 import {
@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
 
     // Get all pending notifications ready to send
-    const pending = await notificationQueueService.getPendingNotifications(100);
+    const pending = await notificationQueueService.getPendingNotifications(100, supabase);
 
     if (pending.length === 0) {
       return NextResponse.json({
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
             try {
               const result = await sendInstantNotification(userId, notif);
               if (result.success) {
-                await notificationQueueService.markAsSent([notif.id]);
+                await notificationQueueService.markAsSent([notif.id], supabase);
                 sent++;
               } else {
                 throw new Error(result.error || 'Failed to send notification');
@@ -77,7 +77,8 @@ export async function GET(request: NextRequest) {
               await notificationQueueService.markAsFailed(
                 notif.id,
                 error instanceof Error ? error.message : 'Unknown error',
-                notif.retry_count + 1
+                notif.retry_count + 1,
+                supabase
               );
               failed++;
             }
@@ -89,7 +90,8 @@ export async function GET(request: NextRequest) {
             await notificationQueueService.markAsFailed(
               notif.id,
               `Unsupported delivery method: ${deliveryMethod}`,
-              notif.retry_count + 1
+              notif.retry_count + 1,
+              supabase
             );
           }
           failed += notifications.length;
@@ -101,7 +103,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Cleanup old notifications
-    const cleaned = await notificationQueueService.cleanup();
+    const cleaned = await notificationQueueService.cleanup(supabase);
 
     return NextResponse.json({
       success: true,
@@ -122,8 +124,50 @@ export async function GET(request: NextRequest) {
 /**
  * Send instant notification email
  */
-async function sendInstantNotification(userId: string, notification: any): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
+type NotificationPayload = {
+  type?: string;
+  assignerName?: string;
+  title?: string;
+  description?: string;
+  dueDate?: string;
+  priority?: string;
+  spaceId?: string;
+  taskId?: string;
+  spaceName?: string;
+  eventDate?: string;
+  eventTime?: string;
+  location?: string;
+  reminderType?: string;
+  eventId?: string;
+  senderName?: string;
+  senderAvatar?: string;
+  content?: string;
+  conversationTitle?: string;
+  conversationId?: string;
+  items?: Array<Record<string, unknown>>;
+  totalItems?: number;
+  completedItems?: number;
+  actionType?: string;
+  listId?: string;
+  mealType?: string;
+  mealDate?: string;
+  mealTime?: string;
+  ingredients?: Array<Record<string, unknown>> | string[] | null;
+  cookingTime?: string;
+  recipeUrl?: string;
+  mealId?: string;
+  dueTime?: string;
+  category?: string;
+  reminderId?: string;
+  createdBy?: string;
+};
+
+type NotificationRecord = {
+  notification_data: NotificationPayload;
+};
+
+async function sendInstantNotification(userId: string, notification: NotificationRecord): Promise<{ success: boolean; error?: string }> {
+  const supabase = supabaseAdmin;
 
   // Get user details
   const { data: user } = await supabase
@@ -144,12 +188,12 @@ async function sendInstantNotification(userId: string, notification: any): Promi
       case 'task':
         return await sendTaskAssignmentEmail({
           recipientEmail: user.email,
-          recipientName: user.first_name || 'Partner',
+          recipientName: user.name || 'Partner',
           assignerName: notificationData.assignerName || 'System',
-          taskTitle: notificationData.title,
-          taskDescription: notificationData.description,
-          dueDate: notificationData.dueDate,
-          priority: notificationData.priority || 'normal',
+          taskTitle: notificationData.title || 'Untitled Task',
+          taskDescription: notificationData.description || '',
+          dueDate: notificationData.dueDate || '',
+          priority: (notificationData.priority || 'normal') as 'high' | 'low' | 'normal' | 'urgent',
           spaceId: notificationData.spaceId || '',
           taskId: notificationData.taskId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -158,13 +202,13 @@ async function sendInstantNotification(userId: string, notification: any): Promi
       case 'event':
         return await sendEventReminderEmail({
           recipientEmail: user.email,
-          recipientName: user.first_name || 'Partner',
-          eventTitle: notificationData.title,
-          eventDescription: notificationData.description,
+          recipientName: user.name || 'Partner',
+          eventTitle: notificationData.title || 'Untitled Event',
+          eventDescription: notificationData.description || '',
           eventDate: notificationData.eventDate || '',
           eventTime: notificationData.eventTime || '',
-          location: notificationData.location,
-          reminderType: notificationData.reminderType || '15min',
+          location: notificationData.location || '',
+          reminderType: (notificationData.reminderType || '15min') as '15min' | '1hour' | '1day',
           eventId: notificationData.eventId || '',
           spaceId: notificationData.spaceId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -173,28 +217,28 @@ async function sendInstantNotification(userId: string, notification: any): Promi
       case 'message':
         return await sendNewMessageEmail({
           recipientEmail: user.email,
-          recipientName: user.first_name || 'Partner',
+          recipientName: user.name || 'Partner',
           senderName: notificationData.senderName || 'Someone',
-          senderAvatar: notificationData.senderAvatar,
-          messageContent: notificationData.content || notificationData.title,
-          conversationTitle: notificationData.conversationTitle,
+          senderAvatar: notificationData.senderAvatar || '',
+          messageContent: notificationData.content || notificationData.title || '',
+          conversationTitle: notificationData.conversationTitle || '',
           spaceId: notificationData.spaceId || '',
           conversationId: notificationData.conversationId || '',
           spaceName: notificationData.spaceName || 'Unknown Space',
-          messageTimestamp: new Date(notification.created_at).toISOString()
+          messageTimestamp: new Date().toISOString()
         });
 
       case 'shopping':
         return await sendShoppingListEmail({
           recipientEmail: user.email,
-          recipientName: user.first_name || 'Partner',
+          recipientName: user.name || 'Partner',
           senderName: notificationData.senderName || 'Someone',
-          listName: notificationData.title,
-          listDescription: notificationData.description,
-          items: notificationData.items || [],
+          listName: notificationData.title || 'Shopping List',
+          listDescription: notificationData.description || '',
+          items: (notificationData.items || []) as { id: string; name: string; quantity?: string; checked: boolean }[],
           totalItems: notificationData.totalItems || 0,
           completedItems: notificationData.completedItems || 0,
-          actionType: notificationData.actionType || 'shared',
+          actionType: (notificationData.actionType || 'shared') as 'shared' | 'updated' | 'completed',
           spaceId: notificationData.spaceId || '',
           listId: notificationData.listId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -203,15 +247,15 @@ async function sendInstantNotification(userId: string, notification: any): Promi
       case 'meal':
         return await sendMealReminderEmail({
           recipientEmail: user.email,
-          recipientName: user.first_name || 'Partner',
-          mealName: notificationData.title,
-          mealType: notificationData.mealType || 'dinner',
+          recipientName: user.name || 'Partner',
+          mealName: notificationData.title || 'Meal',
+          mealType: (notificationData.mealType || 'dinner') as 'breakfast' | 'lunch' | 'dinner' | 'snack',
           mealDate: notificationData.mealDate || '',
           mealTime: notificationData.mealTime || '',
-          reminderType: notificationData.reminderType || 'prep',
-          ingredients: notificationData.ingredients,
-          cookingTime: notificationData.cookingTime,
-          recipeUrl: notificationData.recipeUrl,
+          reminderType: (notificationData.reminderType || 'prep') as 'cook' | 'plan' | 'prep',
+          ingredients: (notificationData.ingredients || []) as string[],
+          cookingTime: notificationData.cookingTime || '',
+          recipeUrl: notificationData.recipeUrl || '',
           spaceId: notificationData.spaceId || '',
           mealId: notificationData.mealId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -220,18 +264,18 @@ async function sendInstantNotification(userId: string, notification: any): Promi
       case 'reminder':
         return await sendGeneralReminderEmail({
           recipientEmail: user.email,
-          recipientName: user.first_name || 'Partner',
-          reminderTitle: notificationData.title,
-          reminderDescription: notificationData.description,
-          reminderType: notificationData.reminderType || 'personal',
-          dueDate: notificationData.dueDate,
-          dueTime: notificationData.dueTime,
-          priority: notificationData.priority || 'normal',
-          category: notificationData.category,
+          recipientName: user.name || 'Partner',
+          reminderTitle: notificationData.title || 'Reminder',
+          reminderDescription: notificationData.description || '',
+          reminderType: (notificationData.reminderType || 'personal') as 'personal' | 'shared' | 'recurring',
+          dueDate: notificationData.dueDate || '',
+          dueTime: notificationData.dueTime || '',
+          priority: (notificationData.priority || 'normal') as 'high' | 'low' | 'normal' | 'urgent',
+          category: notificationData.category || '',
           spaceId: notificationData.spaceId || '',
           reminderId: notificationData.reminderId || '',
           spaceName: notificationData.spaceName || 'Unknown Space',
-          createdBy: notificationData.createdBy
+          createdBy: notificationData.createdBy || ''
         });
 
       default:
@@ -242,4 +286,3 @@ async function sendInstantNotification(userId: string, notification: any): Promi
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
-

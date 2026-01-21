@@ -12,7 +12,7 @@ interface EnhancedDayViewProps {
   onEventStatusClick: (e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => void;
   onViewDetails: (event: CalendarEvent) => void;
   onEditEvent: (event: CalendarEvent) => void;
-  getCategoryColor: (category: string) => any;
+  getCategoryColor: (category: string) => { border: string; bg: string; text?: string; color?: string };
 }
 
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (6-23)
@@ -248,14 +248,14 @@ export function EnhancedDayView({
                       </div>
 
                       {/* Event title */}
-                      <h4 className={`font-semibold text-sm ${categoryColor.text} truncate`}>
+                      <h4 className={`font-semibold text-sm ${categoryColor.text || 'text-white'} truncate`}>
                         {event.title}
                       </h4>
 
                       {/* Category badge */}
                       <div className="flex items-center gap-1 mt-1 flex-wrap">
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                          isOverlapping ? 'bg-purple-800 text-purple-100' : categoryColor.color
+                          isOverlapping ? 'bg-purple-800 text-purple-100' : (categoryColor.color || categoryColor.bg)
                         }`}>
                           {category.icon} {category.label}
                         </span>

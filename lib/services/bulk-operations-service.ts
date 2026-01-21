@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 /**
@@ -34,26 +35,29 @@ export interface BulkArchiveResult {
   error?: string;
 }
 
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
+
 /**
  * Bulk delete expenses within a date range
  */
 export async function bulkDeleteExpenses(
-  partnershipId: string,
+  spaceId: string,
   options: {
     startDate?: string;
     endDate?: string;
     categoryId?: string;
     budgetId?: string;
     selectedIds?: string[];
-  }
+  },
+  supabaseClient?: SupabaseClient
 ): Promise<BulkDeleteResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     let query = supabase
       .from('expenses')
       .delete()
-      .eq('partnership_id', partnershipId);
+      .eq('space_id', spaceId);
 
     // Filter by selected IDs if provided
     if (options.selectedIds && options.selectedIds.length > 0) {
@@ -103,21 +107,22 @@ export async function bulkDeleteExpenses(
  * Bulk delete tasks within a date range
  */
 export async function bulkDeleteTasks(
-  partnershipId: string,
+  spaceId: string,
   options: {
     startDate?: string;
     endDate?: string;
     completed?: boolean;
     selectedIds?: string[];
-  }
+  },
+  supabaseClient?: SupabaseClient
 ): Promise<BulkDeleteResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     let query = supabase
       .from('tasks')
       .delete()
-      .eq('partnership_id', partnershipId);
+      .eq('space_id', spaceId);
 
     // Filter by selected IDs if provided
     if (options.selectedIds && options.selectedIds.length > 0) {
@@ -133,7 +138,9 @@ export async function bulkDeleteTasks(
 
       // Filter by completion status
       if (options.completed !== undefined) {
-        query = query.eq('completed', options.completed);
+        query = options.completed
+          ? query.eq('status', 'completed')
+          : query.neq('status', 'completed');
       }
     }
 
@@ -166,10 +173,11 @@ export async function bulkExportByDateRange(
   userId: string,
   dataType: 'expenses' | 'tasks' | 'calendar_events' | 'messages' | 'reminders',
   startDate: string,
-  endDate: string
+  endDate: string,
+  supabaseClient?: SupabaseClient
 ): Promise<BulkExportResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     // SECURITY: First get all spaces the user is a member of
     const { data: userSpaces, error: spacesError } = await supabase
@@ -236,18 +244,19 @@ export async function bulkExportByDateRange(
  * Moves them to an archived state without deleting
  */
 export async function archiveOldExpenses(
-  partnershipId: string,
-  olderThanDate: string
+  spaceId: string,
+  olderThanDate: string,
+  supabaseClient?: SupabaseClient
 ): Promise<BulkArchiveResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     // Note: This requires an 'archived' column in the expenses table
     // If it doesn't exist, we can add it via migration
     const { data, error, count } = await supabase
       .from('expenses')
       .update({ archived: true, archived_at: new Date().toISOString() })
-      .eq('partnership_id', partnershipId)
+      .eq('space_id', spaceId)
       .lt('date', olderThanDate)
       .eq('archived', false)
       .select('*');
@@ -274,17 +283,18 @@ export async function archiveOldExpenses(
  * Archive old tasks (completed and older than specified date)
  */
 export async function archiveOldTasks(
-  partnershipId: string,
-  olderThanDate: string
+  spaceId: string,
+  olderThanDate: string,
+  supabaseClient?: SupabaseClient
 ): Promise<BulkArchiveResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { data, error, count } = await supabase
       .from('tasks')
       .update({ archived: true, archived_at: new Date().toISOString() })
-      .eq('partnership_id', partnershipId)
-      .eq('completed', true)
+      .eq('space_id', spaceId)
+      .eq('status', 'completed')
       .lt('completed_at', olderThanDate)
       .eq('archived', false)
       .select('*');
@@ -311,16 +321,17 @@ export async function archiveOldTasks(
  * Archive old calendar events (past events older than specified date)
  */
 export async function archiveOldCalendarEvents(
-  partnershipId: string,
-  olderThanDate: string
+  spaceId: string,
+  olderThanDate: string,
+  supabaseClient?: SupabaseClient
 ): Promise<BulkArchiveResult> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { data, error, count } = await supabase
       .from('calendar_events')
       .update({ archived: true, archived_at: new Date().toISOString() })
-      .eq('partnership_id', partnershipId)
+      .eq('space_id', spaceId)
       .lt('end_time', olderThanDate)
       .eq('archived', false)
       .select('*');
@@ -355,10 +366,11 @@ export async function getExpensesBulkDeleteCount(
     categoryId?: string;
     budgetId?: string;
     selectedIds?: string[];
-  }
+  },
+  supabaseClient?: SupabaseClient
 ): Promise<number> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     let query = supabase
       .from('expenses')

@@ -15,6 +15,7 @@ interface NewChoreModalProps {
 }
 
 export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, userId }: NewChoreModalProps) {
+  type ChoreFrequency = CreateChoreInput['frequency'];
   const [formData, setFormData] = useState<CreateChoreInput>({
     space_id: spaceId,
     title: '',
@@ -27,8 +28,10 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
 
   useEffect(() => {
     if (editChore) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({ space_id: spaceId, title: editChore.title, description: editChore.description || '', frequency: editChore.frequency, status: editChore.status, due_date: editChore.due_date || '', created_by: userId });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({ space_id: spaceId, title: '', description: '', frequency: 'weekly', status: 'pending', due_date: '', created_by: userId });
     }
   }, [editChore, spaceId, userId]);
@@ -92,7 +95,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
             <label className="block text-sm font-medium text-gray-300 mb-2">Frequency</label>
             <select
               value={formData.frequency}
-              onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, frequency: e.target.value as ChoreFrequency })}
               className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"
             >
               <option value="daily">Daily</option>
