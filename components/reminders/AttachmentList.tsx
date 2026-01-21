@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Download, Trash2, ExternalLink, FileIcon } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import { Download, Trash2, ExternalLink } from 'lucide-react';
 import { reminderAttachmentsService, ReminderAttachment } from '@/lib/services/reminder-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -21,7 +22,7 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
   const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
 
   // Fetch attachments
-  const fetchAttachments = async () => {
+  const fetchAttachments = useCallback(async () => {
     // Guard: Don't fetch if reminderId is undefined or invalid
     if (!reminderId || reminderId === 'undefined') {
       setAttachments([]);
@@ -39,11 +40,11 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
     } finally {
       setLoading(false);
     }
-  };
+  }, [reminderId]);
 
   useEffect(() => {
     fetchAttachments();
-  }, [reminderId, refreshTrigger]);
+  }, [fetchAttachments, refreshTrigger]);
 
   // Early return if no valid reminder ID
   if (!reminderId || reminderId === 'undefined') {
@@ -159,11 +160,11 @@ function AttachmentItem({
       <div className="flex-shrink-0">
         {isImage && attachment.type === 'file' && attachment.file_path ? (
           <div className="relative w-12 h-12 rounded overflow-hidden bg-gray-800">
-            <img
+            <Image
               src={reminderAttachmentsService.getFileUrl(attachment.file_path)}
               alt={attachment.display_name}
-              loading="lazy"
-              decoding="async"
+              width={48}
+              height={48}
               className="w-full h-full object-cover"
             />
           </div>

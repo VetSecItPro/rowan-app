@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 function MagicLinkHandler() {
   const router = useRouter();
@@ -23,7 +24,7 @@ function MagicLinkHandler() {
 
       try {
         // Single API call to verify token and get Supabase redirect URL
-        const response = await fetch('/api/auth/magic-link/verify', {
+        const response = await csrfFetch('/api/auth/magic-link/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token })

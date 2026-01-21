@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ExportDataModal } from '@/components/settings/ExportDataModal';
@@ -12,19 +11,18 @@ import {
   FileSpreadsheet,
   FileText,
   Calendar,
-  CheckCircle,
   Info,
   ArrowRight,
 } from 'lucide-react';
 
 type DataType = 'expenses' | 'tasks' | 'calendar_events' | 'messages' | 'reminders';
+type ExportFormat = 'json' | 'csv' | 'pdf';
 
 export default function DataExportPage() {
   const { user } = useAuth();
-  const router = useRouter();
 
   const [showExportModal, setShowExportModal] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'pdf'>('json');
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('json');
   const [selectedDataType, setSelectedDataType] = useState<DataType>('expenses');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -95,7 +93,14 @@ export default function DataExportPage() {
       color: 'purple',
       gradient: 'from-purple-500 to-purple-600',
     },
-  ];
+  ] as const satisfies ReadonlyArray<{
+    id: ExportFormat;
+    name: string;
+    icon: typeof FileJson;
+    description: string;
+    color: string;
+    gradient: string;
+  }>;
 
   const dataTypes = [
     { value: 'expenses' as DataType, label: 'Expenses', description: 'Budget transactions and spending records' },
@@ -192,7 +197,7 @@ export default function DataExportPage() {
                   return (
                     <button
                       key={format.id}
-                      onClick={() => setExportFormat(format.id as any)}
+                      onClick={() => setExportFormat(format.id)}
                       className={`p-4 rounded-xl border-2 transition-all text-left ${
                         exportFormat === format.id
                           ? `border-${format.color}-500 bg-${format.color}-50 bg-${format.color}-900/20`

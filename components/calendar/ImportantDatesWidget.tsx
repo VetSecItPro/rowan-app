@@ -50,6 +50,7 @@ export function ImportantDatesWidget({
   }, [spaceId, maxItems, upcomingDays]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDates();
 
     // Refresh every hour (dates don't change as frequently as countdowns)

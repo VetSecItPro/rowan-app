@@ -16,6 +16,34 @@ const QueryParamsSchema = z.object({
   count: z.coerce.number().int().min(1).max(50).default(12),
 });
 
+type MealDetail = {
+  idMeal?: string;
+  strMeal?: string;
+  strCategory?: string;
+  strArea?: string;
+  strMealThumb?: string;
+  strInstructions?: string;
+  strSource?: string;
+  strYoutube?: string;
+  [key: string]: string | undefined;
+};
+
+type MealDbRandomResponse = {
+  meals?: MealDetail[] | null;
+};
+
+type ExternalRecipe = {
+  id: string;
+  source: string;
+  name: string;
+  description: string;
+  image_url: string;
+  cuisine: string;
+  ingredients: Array<{ name: string; amount?: string; unit?: string }>;
+  instructions: string;
+  source_url: string;
+};
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
@@ -49,21 +77,29 @@ export async function GET(request: NextRequest) {
     });
     const { count } = validatedParams;
 
-    const recipes: any[] = [];
+    const recipes: ExternalRecipe[] = [];
 
     // TheMealDB random endpoint returns 1 recipe at a time
     const promises = Array(count)
       .fill(null)
       .map(() =>
         fetch('https://www.themealdb.com/api/json/v1/1/random.php')
-          .then((res) => res.json())
+          .then(async (res) => (await res.json()) as MealDbRandomResponse)
       );
 
-    const results = await Promise.all(promises);
+    const results: MealDbRandomResponse[] = await Promise.all(promises);
 
     for (const data of results) {
       if (data.meals && data.meals[0]) {
         const meal = data.meals[0];
+        const mealId = meal.idMeal ?? crypto.randomUUID();
+        const mealName = meal.strMeal ?? '';
+        const mealCategory = meal.strCategory ?? '';
+        const mealArea = meal.strArea ?? '';
+        const mealThumb = meal.strMealThumb ?? '';
+        const mealInstructions = meal.strInstructions ?? '';
+        const mealSource = meal.strSource ?? '';
+        const mealYoutube = meal.strYoutube ?? '';
 
         // Parse and sanitize ingredients (external data could contain XSS payloads)
         const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
@@ -80,15 +116,15 @@ export async function GET(request: NextRequest) {
         }
 
         recipes.push({
-          id: `themealdb-${meal.idMeal}`,
+          id: `themealdb-${mealId}`,
           source: 'themealdb',
-          name: sanitizePlainText(meal.strMeal),
-          description: sanitizePlainText(`${meal.strCategory} - ${meal.strArea} cuisine`),
-          image_url: sanitizeUrl(meal.strMealThumb),
-          cuisine: sanitizePlainText(meal.strArea),
+          name: sanitizePlainText(mealName),
+          description: sanitizePlainText(`${mealCategory} - ${mealArea} cuisine`),
+          image_url: sanitizeUrl(mealThumb),
+          cuisine: sanitizePlainText(mealArea),
           ingredients,
-          instructions: sanitizePlainText(meal.strInstructions),
-          source_url: sanitizeUrl(meal.strSource || meal.strYoutube),
+          instructions: sanitizePlainText(mealInstructions),
+          source_url: sanitizeUrl(mealSource || mealYoutube),
         });
       }
     }

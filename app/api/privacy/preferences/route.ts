@@ -6,6 +6,9 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 // Validation schema for privacy preference updates
 const PrivacyPreferenceUpdateSchema = z.object({
@@ -22,7 +25,7 @@ const PrivacyPreferenceUpdateSchema = z.object({
 });
 
 // GET - Fetch user's privacy preferences
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 
@@ -189,7 +192,7 @@ export async function PATCH(request: NextRequest) {
 
 // Log preference changes to audit trail
 async function logPreferenceChanges(
-  supabase: any,
+  supabase: SupabaseServerClient,
   userId: string,
   changes: Record<string, boolean>,
   ipAddress: string,
@@ -277,6 +280,9 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
   try {
     // Get user profile for email/phone
     const supabase = await createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    const accessToken = session?.access_token;
+    const authHeaders: HeadersInit = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
     const { data: profile } = await supabase
       .from('profiles')
       .select('email, phone_number')
@@ -287,9 +293,9 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
 
     if (type === 'email' && profile.email) {
       // Integrate with Resend or your email service
-      await fetch('/api/marketing/email-subscription', {
+      await fetch(`${getAppUrl()}/api/marketing/email-subscription`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           email: profile.email,
           subscribed: enabled,
@@ -300,9 +306,9 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
 
     if (type === 'sms' && profile.phone_number) {
       // Integrate with Twilio or your SMS service
-      await fetch('/api/marketing/sms-subscription', {
+      await fetch(`${getAppUrl()}/api/marketing/sms-subscription`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           phone: profile.phone_number,
           subscribed: enabled,
@@ -336,6 +342,16 @@ async function updateThirdPartyAnalytics(userId: string, enabled: boolean) {
 
     // You could integrate with analytics services here
     // Example: await updateGoogleAnalyticsConsent(userId, enabled);
+    const supabase = await createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    const accessToken = session?.access_token;
+    const authHeaders: HeadersInit = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+
+    await fetch(`${getAppUrl()}/api/privacy/third-party-analytics`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders },
+      body: JSON.stringify({ userId, enabled }),
+    });
   } catch (error) {
     logger.error('Error updating third-party analytics:', error, { component: 'api-route', action: 'api_request' });
   }

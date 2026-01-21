@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Home, LayoutDashboard, CheckSquare, Calendar, MessageCircle, ShoppingCart, UtensilsCrossed, Target, FolderOpen, Settings, BarChart3, Users, FileText, Bell } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface BreadcrumbProps {
   items?: {
@@ -12,7 +13,7 @@ interface BreadcrumbProps {
 
 // Icon mapping for different page types
 const getIconForLabel = (label: string) => {
-  const iconMap: { [key: string]: any } = {
+  const iconMap: Record<string, LucideIcon> = {
     'Home': Home,
     'Dashboard': LayoutDashboard,
     'Tasks & Chores': CheckSquare,

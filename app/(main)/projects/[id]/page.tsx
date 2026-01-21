@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
 import {
@@ -10,7 +10,6 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
-  AlertTriangle,
   CheckCircle,
   Edit,
   Trash2,
@@ -43,11 +42,7 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadProjectData();
-  }, [projectId]);
-
-  const loadProjectData = async () => {
+  const loadProjectData = useCallback(async () => {
     if (!projectId) return;
 
     try {
@@ -61,7 +56,7 @@ export default function ProjectDetailPage() {
       ]);
 
       setProject(projectData);
-      setExpenses(expensesData);
+      setExpenses(expensesData as unknown as Expense[]);
       setPhotos(photosData);
     } catch (err) {
       logger.error('Error loading project:', err, { component: 'page', action: 'execution' });
@@ -69,7 +64,11 @@ export default function ProjectDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
+
+  useEffect(() => {
+    loadProjectData();
+  }, [loadProjectData]);
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) {

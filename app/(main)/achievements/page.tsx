@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Trophy, Star, Award, TrendingUp, Target, Calendar } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -43,11 +43,7 @@ export default function AchievementsPage() {
     userEmail: user?.email,
   });
 
-  useEffect(() => {
-    loadAchievementData();
-  }, [spaceId, user]);
-
-  const loadAchievementData = async () => {
+  const loadAchievementData = useCallback(async () => {
     if (!spaceId || !user) {
       setLoading(false);
       return;
@@ -72,7 +68,11 @@ export default function AchievementsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId, user]);
+
+  useEffect(() => {
+    loadAchievementData();
+  }, [loadAchievementData]);
 
   const handleCheckForNewBadges = async () => {
     if (!user || !spaceId) return;

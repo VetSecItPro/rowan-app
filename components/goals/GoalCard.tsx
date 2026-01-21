@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Target, MoreVertical, Check, History, Settings } from 'lucide-react';
 import { Goal } from '@/lib/services/goals-service';
 import { formatDate } from '@/lib/utils/date-utils';
@@ -172,7 +173,13 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             {goal.assignee && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-900/30 rounded-full">
                 {goal.assignee.avatar_url ? (
-                  <img src={goal.assignee.avatar_url} alt={goal.assignee.name} className="w-4 h-4 rounded-full object-cover" />
+                  <Image
+                    src={goal.assignee.avatar_url}
+                    alt={goal.assignee.name}
+                    width={16}
+                    height={16}
+                    className="w-4 h-4 rounded-full object-cover"
+                  />
                 ) : (
                   <div className="w-4 h-4 rounded-full bg-gradient-goals flex items-center justify-center">
                     <span className="text-[8px] font-semibold text-white">

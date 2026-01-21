@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    const result = await getUserSpaces(user.id);
+    const result = await getUserSpaces(user.id, supabase);
 
     if (!result.success) {
       return NextResponse.json(

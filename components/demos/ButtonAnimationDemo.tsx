@@ -6,7 +6,8 @@ import {
   PrimaryButton,
   SecondaryButton,
   CTAButton,
-  PremiumButton
+  PremiumButton,
+  type EnhancedButtonProps,
 } from '@/components/ui/EnhancedButton';
 import { useButtonAnimations } from '@/hooks/useButtonAnimations';
 import {
@@ -18,8 +19,25 @@ import {
   ArrowRight,
   Play,
   Download,
-  Send
+  Send,
+  type LucideIcon,
 } from 'lucide-react';
+
+type FeatureKey = NonNullable<EnhancedButtonProps['feature']>;
+type FeatureButton = { feature: FeatureKey; icon: LucideIcon; label: string };
+
+const FEATURE_BUTTONS: FeatureButton[] = [
+  { feature: 'tasks', icon: Check, label: 'Tasks' },
+  { feature: 'calendar', icon: Sparkles, label: 'Calendar' },
+  { feature: 'messages', icon: Send, label: 'Messages' },
+  { feature: 'shopping', icon: ArrowRight, label: 'Shopping' },
+  { feature: 'meals', icon: Heart, label: 'Meals' },
+  { feature: 'reminders', icon: Sparkles, label: 'Reminders' },
+  { feature: 'goals', icon: Star, label: 'Goals' },
+  { feature: 'budget', icon: Zap, label: 'Budget' },
+  { feature: 'projects', icon: Play, label: 'Projects' },
+  { feature: 'dashboard', icon: Sparkles, label: 'Dashboard' },
+];
 
 export function ButtonAnimationDemo() {
   const [successStates, setSuccessStates] = useState<Record<string, boolean>>({});
@@ -108,21 +126,10 @@ export function ButtonAnimationDemo() {
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {[
-            { feature: 'tasks', icon: Check, label: 'Tasks' },
-            { feature: 'calendar', icon: Sparkles, label: 'Calendar' },
-            { feature: 'messages', icon: Send, label: 'Messages' },
-            { feature: 'shopping', icon: ArrowRight, label: 'Shopping' },
-            { feature: 'meals', icon: Heart, label: 'Meals' },
-            { feature: 'reminders', icon: Sparkles, label: 'Reminders' },
-            { feature: 'goals', icon: Star, label: 'Goals' },
-            { feature: 'budget', icon: Zap, label: 'Budget' },
-            { feature: 'projects', icon: Play, label: 'Projects' },
-            { feature: 'dashboard', icon: Sparkles, label: 'Dashboard' },
-          ].map(({ feature, icon: Icon, label }) => (
+          {FEATURE_BUTTONS.map(({ feature, icon: Icon, label }) => (
             <EnhancedButton
               key={feature}
-              feature={feature as any}
+              feature={feature}
               animationLevel="dynamic"
               breathing
               icon={<Icon className="w-4 h-4" />}
@@ -276,7 +283,7 @@ export function LegacyButtonExample() {
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
       {...otherProps}
-      onClick={enhancedClickHandler(() => console.log('Legacy button clicked!'))}
+      onClick={enhancedClickHandler(() => console.warn('Legacy button clicked!'))}
       className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full font-medium"
     >
       Enhanced Legacy Button

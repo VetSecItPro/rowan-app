@@ -41,7 +41,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    const project = await projectsOnlyService.getProjectById(params.id);
+    const project = await projectsOnlyService.getProjectById(params.id, supabase);
 
     if (!project) {
       return NextResponse.json(
@@ -125,7 +125,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     const { name, description, status, start_date, target_date, budget_amount } = body;
 
     // Get project first to verify access
-    const existingProject = await projectsOnlyService.getProjectById(params.id);
+    const existingProject = await projectsOnlyService.getProjectById(params.id, supabase);
 
     // Verify user has access to project's space
     try {
@@ -155,7 +155,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       start_date,
       target_date,
       budget_amount,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,
@@ -204,7 +204,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get project first to verify access
-    const existingProject = await projectsOnlyService.getProjectById(params.id);
+    const existingProject = await projectsOnlyService.getProjectById(params.id, supabase);
 
     // Verify user has access to project's space
     try {
@@ -227,7 +227,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete project using service
-    await projectsOnlyService.deleteProject(params.id);
+    await projectsOnlyService.deleteProject(params.id, supabase);
 
     return NextResponse.json({
       success: true,

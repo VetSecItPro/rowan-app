@@ -49,7 +49,7 @@ export function SpaceMembersIndicator() {
         return;
       }
 
-      setMembers((data || []) as any);
+      setMembers((data as SpaceMember[]) || []);
     };
 
     loadMembers();

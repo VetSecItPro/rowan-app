@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export interface PushSubscription {
   id: string;
@@ -265,7 +266,7 @@ export const pushSubscriptionService = {
    * Test push notification
    */
   async sendTestNotification(userId: string): Promise<void> {
-    const response = await fetch('/api/notifications/send-push', {
+    const response = await csrfFetch('/api/notifications/send-push', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

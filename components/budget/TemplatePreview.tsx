@@ -103,7 +103,7 @@ export function TemplatePreview({
         <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4 flex items-start gap-2">
           <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-red-200">
-            <strong>Warning:</strong> This budget allocates more than 100% of your income. You'll
+            <strong>Warning:</strong> This budget allocates more than 100% of your income. You&apos;ll
             need to adjust the categories.
           </div>
         </div>

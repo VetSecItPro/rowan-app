@@ -23,7 +23,6 @@ import {
   closeUpgradeModal,
   verifyFeatureAccess,
   createTask,
-  STRIPE_TEST_CARDS,
 } from './helpers/test-utils';
 
 test.describe('Monetization Features', () => {

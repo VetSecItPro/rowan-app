@@ -16,16 +16,22 @@ const BulkDeleteOptionsSchema = z.object({
 }).optional();
 
 const BulkDeleteRequestSchema = z.object({
-  partnership_id: z.string().uuid('Invalid partnership ID format'),
+  partnership_id: z.string().uuid('Invalid partnership ID format').optional(),
+  space_id: z.string().uuid('Invalid space ID format').optional(),
   options: BulkDeleteOptionsSchema,
+}).refine((data) => data.space_id || data.partnership_id, {
+  message: 'space_id or partnership_id is required',
 });
 
 const GetCountQuerySchema = z.object({
-  partnership_id: z.string().uuid('Invalid partnership ID format'),
+  partnership_id: z.string().uuid('Invalid partnership ID format').optional(),
+  space_id: z.string().uuid('Invalid space ID format').optional(),
   start_date: z.string().datetime().optional(),
   end_date: z.string().datetime().optional(),
   category_id: z.string().uuid('Invalid category ID format').optional(),
   budget_id: z.string().uuid('Invalid budget ID format').optional(),
+}).refine((data) => data.space_id || data.partnership_id, {
+  message: 'space_id or partnership_id is required',
 });
 
 /**
@@ -75,13 +81,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { partnership_id, options } = validationResult.data;
+    const spaceId = validationResult.data.space_id || validationResult.data.partnership_id;
+    const { options } = validationResult.data;
+
+    if (!spaceId) {
+      return NextResponse.json({ error: 'space_id or partnership_id is required' }, { status: 400 });
+    }
 
     // Verify user has access to this partnership
     const { data: membership } = await supabase
-      .from('partnership_members')
+      .from('space_members')
       .select('*')
-      .eq('partnership_id', partnership_id)
+      .eq('space_id', spaceId)
       .eq('user_id', user.id)
       .single();
 
@@ -90,7 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Perform bulk delete
-    const result = await bulkDeleteExpenses(partnership_id, options || {});
+    const result = await bulkDeleteExpenses(spaceId, options || {}, supabase);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });
@@ -135,7 +146,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const queryParams = {
-      partnership_id: searchParams.get('partnership_id') || '',
+      partnership_id: searchParams.get('partnership_id') || undefined,
+      space_id: searchParams.get('space_id') || undefined,
       start_date: searchParams.get('start_date') || undefined,
       end_date: searchParams.get('end_date') || undefined,
       category_id: searchParams.get('category_id') || undefined,
@@ -156,13 +168,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { partnership_id: partnershipId, start_date: startDate, end_date: endDate, category_id: categoryId, budget_id: budgetId } = validationResult.data;
+    const spaceId = validationResult.data.space_id || validationResult.data.partnership_id;
+    const { start_date: startDate, end_date: endDate, category_id: categoryId, budget_id: budgetId } = validationResult.data;
+
+    if (!spaceId) {
+      return NextResponse.json({ error: 'space_id or partnership_id is required' }, { status: 400 });
+    }
 
     // Verify user has access
     const { data: membership } = await supabase
-      .from('partnership_members')
+      .from('space_members')
       .select('*')
-      .eq('partnership_id', partnershipId)
+      .eq('space_id', spaceId)
       .eq('user_id', user.id)
       .single();
 
@@ -170,12 +187,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
-    const count = await getExpensesBulkDeleteCount(partnershipId, {
+    const count = await getExpensesBulkDeleteCount(spaceId, {
       startDate: startDate || undefined,
       endDate: endDate || undefined,
       categoryId: categoryId || undefined,
       budgetId: budgetId || undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({ count });
   } catch (error) {

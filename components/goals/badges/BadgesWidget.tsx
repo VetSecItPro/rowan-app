@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Trophy, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { UserBadge } from '@/lib/services/achievement-service';
@@ -17,11 +17,7 @@ export default function BadgesWidget({ userId, spaceId }: BadgesWidgetProps) {
   const [stats, setStats] = useState({ totalBadges: 0, totalPoints: 0 });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadBadges();
-  }, [userId, spaceId]);
-
-  async function loadBadges() {
+  const loadBadges = useCallback(async () => {
     try {
       const [badges, badgeStats] = await Promise.all([
         getUserBadges(userId, spaceId),
@@ -36,7 +32,11 @@ export default function BadgesWidget({ userId, spaceId }: BadgesWidgetProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [spaceId, userId]);
+
+  useEffect(() => {
+    loadBadges();
+  }, [loadBadges]);
 
   if (loading) {
     return (

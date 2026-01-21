@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Filter, X, Search, Calendar, User, Tag, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -47,15 +47,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   const [members, setMembers] = useState<SpaceMember[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadFilterOptions();
-  }, [spaceId]);
-
-  useEffect(() => {
-    onFilterChange(filters);
-  }, [filters]);
-
-  async function loadFilterOptions() {
+  const loadFilterOptions = useCallback(async () => {
     const supabase = createClient();
 
     const [categoriesData, membersData] = await Promise.all([
@@ -71,11 +63,19 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
     ]);
 
     setCategories(categoriesData.data || []);
-    setMembers((membersData.data || []) as any);
+    setMembers((membersData.data as SpaceMember[]) || []);
     setLoading(false);
-  }
+  }, [spaceId]);
 
-  function updateFilter(key: keyof TaskFilters, value: any) {
+  useEffect(() => {
+    loadFilterOptions();
+  }, [loadFilterOptions]);
+
+  useEffect(() => {
+    onFilterChange(filters);
+  }, [filters, onFilterChange]);
+
+  function updateFilter<K extends keyof TaskFilters>(key: K, value: TaskFilters[K]) {
     setFilters(prev => ({ ...prev, [key]: value }));
   }
 

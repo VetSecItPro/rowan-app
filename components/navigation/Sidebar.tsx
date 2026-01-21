@@ -123,7 +123,7 @@ export function Sidebar() {
   const effectivelyExpanded = isExpanded || isHoverExpanded;
 
   // Prefetch a route AND its data (with deduplication)
-  const prefetchRoute = useCallback((href: string) => {
+  const prefetchRoute = (href: string) => {
     // Prefetch route
     if (!prefetchedRoutesRef.current.has(href)) {
       prefetchedRoutesRef.current.add(href);
@@ -138,7 +138,7 @@ export function Sidebar() {
         prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
       }
     }
-  }, [router, queryClient, currentSpace?.id]);
+  };
 
   // Prefetch ALL data on mount for instant page loads
   useEffect(() => {
@@ -170,14 +170,17 @@ export function Sidebar() {
 
   // Load saved state from localStorage - default collapsed on all screen sizes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const saved = localStorage.getItem(SIDEBAR_STORAGE_KEY);
 
     if (saved !== null) {
       // Use saved preference
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsExpanded(saved === 'true');
     } else {
       // First time user - start collapsed, hover to expand
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsExpanded(false);
       localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
     }

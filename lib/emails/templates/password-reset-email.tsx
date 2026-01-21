@@ -51,7 +51,7 @@ export const PasswordResetEmail = ({
             
             <Text style={text}>
               We received a request to reset the password for your Rowan account (<strong>{userEmail}</strong>). 
-              If you didn't make this request, you can safely ignore this email.
+              If you didn&apos;t make this request, you can safely ignore this email.
             </Text>
             
             <Text style={text}>
@@ -73,7 +73,7 @@ export const PasswordResetEmail = ({
             </Text>
 
             <Text style={text}>
-              If the button doesn't work, copy and paste this link into your browser:
+              If the button doesn&apos;t work, copy and paste this link into your browser:
             </Text>
             
             <Text style={linkText}>

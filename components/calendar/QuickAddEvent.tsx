@@ -2,13 +2,15 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Sparkles, X, Calendar, Clock, MapPin, Tag, Wand2, FileText, AlertCircle, Loader2, Users } from 'lucide-react';
-import { parseEventText, getEventSuggestions, isValidParsedEvent, ParsedEvent } from '@/lib/services/natural-language-parser';
+import { parseEventText, getEventSuggestions, isValidParsedEvent } from '@/lib/services/natural-language-parser';
 import { format } from 'date-fns';
 import type { AIParseResult } from '@/lib/services/ai/event-parser-service';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import type { CreateEventInput } from '@/lib/services/calendar-service';
 
 interface QuickAddEventProps {
-  onCreateEvent: (eventData: any) => void;
+  onCreateEvent: (eventData: CreateEventInput) => void;
   isOpen: boolean;
   onClose: () => void;
   spaceId: string;
@@ -90,7 +92,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
     setAiError(null);
 
     try {
-      const response = await fetch('/api/calendar/parse-event', {
+      const response = await csrfFetch('/api/calendar/parse-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -179,10 +181,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
         location: parsed.location || '',
         category: parsed.category || 'personal',
         is_recurring: parsed.isRecurring || false,
-        recurrence_pattern: parsed.recurrencePattern ? {
-          frequency: parsed.recurrencePattern,
-          interval: 1
-        } : null,
+        recurrence_pattern: parsed.recurrencePattern || undefined,
       });
     } else {
       // AI mode - use parsed preview
@@ -206,12 +205,9 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
           : undefined,
         location: parsedPreview.location || '',
         description: parsedPreview.description || '',
-        category: parsedPreview.category || 'personal',
+        category: (parsedPreview.category as 'work' | 'personal' | 'family' | 'health' | 'social') || 'personal',
         is_recurring: parsedPreview.isRecurring || false,
-        recurrence_pattern: parsedPreview.recurrencePattern ? {
-          frequency: parsedPreview.recurrencePattern,
-          interval: 1
-        } : null,
+        recurrence_pattern: parsedPreview.recurrencePattern || undefined,
       });
     }
 

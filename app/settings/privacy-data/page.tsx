@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { Shield, Download, Trash2, Eye, EyeOff } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export default function PrivacyDataPage() {
   const [privacySettings, setPrivacySettings] = useState({
@@ -48,7 +49,7 @@ export default function PrivacyDataPage() {
   const handleSaveSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/settings/privacy-data', {
+      const response = await csrfFetch('/api/settings/privacy-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

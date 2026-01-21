@@ -46,6 +46,7 @@ export function CountdownWidget({
   }, [spaceId, maxItems]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCountdowns();
 
     // Refresh every minute to keep countdowns accurate

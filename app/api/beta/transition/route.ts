@@ -8,7 +8,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
  * GET /api/beta/transition
  * Check if user is eligible for beta-to-paid transition
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 
@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
     // For now, we'll return a placeholder response
 
     // Mark transition as initiated (not completed until payment succeeds)
-    const { error: updateError } = await supabase
+    await supabase
       .from('users')
       .update({
         // Don't mark as transitioned yet - wait for successful payment

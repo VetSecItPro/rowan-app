@@ -162,7 +162,7 @@ const QuickStat = memo(function QuickStat({
 export const OverviewPanel = memo(function OverviewPanel() {
   // Fetch dashboard stats - shares cache with main dashboard page
   // Returns just the stats object to match the dashboard page's queryFn
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
       const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}&refresh=true`);
@@ -199,7 +199,8 @@ export const OverviewPanel = memo(function OverviewPanel() {
   }
 
   // Use stats directly (already extracted in queryFn), provide defaults
-  const safeStats = stats || {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const safeStats: Partial<DashboardStats> & Record<string, any> = stats || {};
   const analytics: AnalyticsData = analyticsData || {
     summary: { totalPageViews: 0, uniqueVisitors: 0, activeBetaUsers: 0, growthRate: 0 },
     trafficMetrics: { totalPageViews: 0, uniqueSessions: 0 },
@@ -217,7 +218,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             title="Total Users"
-            value={safeStats.totalUsers || 0}
+            value={safeStats.users?.total || 0}
             trend={analytics.summary?.growthRate}
             trendLabel="vs last period"
             icon={Users}

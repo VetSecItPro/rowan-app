@@ -1,12 +1,13 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import Link from 'next/link';
 
-import { ArrowLeft, ShoppingCart, BookOpen, Play, Plus, List, Calendar, CheckSquare, Lightbulb, FileText, Grid3x3, Tags, Share2, Clock } from 'lucide-react';
+import { type LucideIcon, ArrowLeft, ShoppingCart, BookOpen, Play, Plus, List, Calendar, CheckSquare, Lightbulb, FileText, Grid3x3, Tags, Share2, Clock } from 'lucide-react';
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

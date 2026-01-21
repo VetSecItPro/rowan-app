@@ -1,24 +1,23 @@
+/* eslint-disable react/no-unescaped-entities, jsx-a11y/alt-text */
 'use client';
 
 import Link from 'next/link';
 
 import {
+  type LucideIcon,
   ArrowLeft,
   Calendar,
   Play,
   Plus,
   Clock,
   Users,
-  Grid3x3,
   MessageSquare,
-  BarChart3,
   Lightbulb,
   Eye,
   Repeat,
   FileText,
   Zap,
   Target,
-  Bell,
   Share2,
   Sparkles,
   Moon,
@@ -34,7 +33,6 @@ import {
   CalendarRange,
   CalendarClock,
   Palette,
-  MapPin,
   Image,
   Paperclip,
   Smile,
@@ -49,7 +47,7 @@ import {
 
 interface GuideSection {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   color: string;
   articles: {
     title: string;

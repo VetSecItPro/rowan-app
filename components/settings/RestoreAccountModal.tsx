@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AlertTriangle, RefreshCw, Calendar, CheckCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { Modal } from '@/components/ui/Modal';
 
 interface RestoreAccountModalProps {
@@ -21,18 +21,22 @@ export function RestoreAccountModal({
 }: RestoreAccountModalProps) {
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
+  const [daysRemaining, setDaysRemaining] = useState(0);
 
-  const daysRemaining = Math.ceil(
-    (new Date(permanentDeletionAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-  );
+  useEffect(() => {
+    const remaining = Math.ceil(
+      (new Date(permanentDeletionAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- derived countdown updates from server data
+    setDaysRemaining(remaining);
+  }, [permanentDeletionAt]);
 
   const handleRestoreAccount = async () => {
     setIsRestoring(true);
     setError('');
 
     try {
-      const response = await fetch('/api/user/cancel-deletion', {
+      const response = await csrfFetch('/api/user/cancel-deletion', {
         method: 'POST',
       });
 

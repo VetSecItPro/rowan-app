@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ se
     }
 
     // Revoke the session
-    const result = await revokeSession(sessionId);
+    const result = await revokeSession(sessionId, supabase);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });

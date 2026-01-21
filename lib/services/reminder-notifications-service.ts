@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/client';
 import { z } from 'zod';
 import { notificationQueueService } from './notification-queue-service';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 // =============================================
 // TYPES & VALIDATION
@@ -194,7 +196,7 @@ export const reminderNotificationsService = {
     }
 
     // Get user preferences
-    const prefs = await this.getPreferences(validated.user_id, spaceId);
+    const prefs = await this.getPreferences(validated.user_id);
 
     if (!prefs) {
       logger.info('No preferences found for user, using defaults', { component: 'lib-reminder-notifications-service' });
@@ -318,7 +320,11 @@ export const reminderNotificationsService = {
       const title = this.formatNotificationTitle(type);
       const body = this.formatNotificationBody(type, reminder);
 
-      await fetch('/api/notifications/send-push', {
+      const isServer = typeof window === 'undefined';
+      const apiUrl = isServer
+        ? `${getAppUrl()}/api/notifications/send-push`
+        : '/api/notifications/send-push';
+      const requestInit = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -328,7 +334,13 @@ export const reminderNotificationsService = {
           icon: `/icons/${reminder.emoji || '🔔'}.png`,
           tag: `reminder-${type}`,
         }),
-      });
+      };
+
+      if (isServer) {
+        await fetch(apiUrl, requestInit);
+      } else {
+        await csrfFetch(apiUrl, requestInit);
+      }
     } catch (error) {
       logger.error('Error sending push notification:', error, { component: 'lib-reminder-notifications-service', action: 'service_call' });
     }
@@ -477,7 +489,7 @@ export const reminderNotificationsService = {
   /**
    * Get user notification preferences
    */
-  async getPreferences(userId: string, spaceId?: string): Promise<NotificationPreferences | null> {
+  async getPreferences(userId: string): Promise<NotificationPreferences | null> {
     const supabase = createClient();
 
     const query = supabase
@@ -513,7 +525,7 @@ export const reminderNotificationsService = {
     const validated = UpdatePreferencesSchema.parse(updates);
 
     // Check if preferences exist
-    const existing = await this.getPreferences(userId, spaceId || undefined);
+    const existing = await this.getPreferences(userId);
 
     if (existing) {
       // Update existing preferences

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { NotificationFrequency } from './reminder-notifications-service';
 import { logger } from '@/lib/logger';
 
@@ -21,6 +22,10 @@ export interface QueuedNotification {
   updated_at: string;
 }
 
+function getSupabaseClient(supabaseClient?: SupabaseClient) {
+  return supabaseClient || createClient();
+}
+
 export const notificationQueueService = {
   /**
    * Queue a notification for delivery
@@ -30,12 +35,13 @@ export const notificationQueueService = {
     spaceId: string | null,
     notificationType: string,
     notificationData: Record<string, unknown>,
-    frequency: NotificationFrequency = 'instant'
+    frequency: NotificationFrequency = 'instant',
+    supabaseClient?: SupabaseClient
   ): Promise<QueuedNotification> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     // Calculate scheduled time based on frequency
-    const scheduledFor = await this.calculateScheduledTime(userId, spaceId, frequency);
+    const scheduledFor = await this.calculateScheduledTime(userId, spaceId, frequency, supabaseClient);
 
     const { data, error } = await supabase
       .from('notification_queue')
@@ -65,9 +71,10 @@ export const notificationQueueService = {
   async calculateScheduledTime(
     userId: string,
     spaceId: string | null,
-    frequency: NotificationFrequency
+    frequency: NotificationFrequency,
+    supabaseClient?: SupabaseClient
   ): Promise<string> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     // Get current time
     const now = new Date();
@@ -107,8 +114,8 @@ export const notificationQueueService = {
   /**
    * Get pending notifications ready to send
    */
-  async getPendingNotifications(limit: number = 100): Promise<QueuedNotification[]> {
-    const supabase = createClient();
+  async getPendingNotifications(limit: number = 100, supabaseClient?: SupabaseClient): Promise<QueuedNotification[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const now = new Date().toISOString();
 
     const { data, error } = await supabase
@@ -131,8 +138,8 @@ export const notificationQueueService = {
   /**
    * Mark notification as sent
    */
-  async markAsSent(notificationIds: string[]): Promise<void> {
-    const supabase = createClient();
+  async markAsSent(notificationIds: string[], supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
       .from('notification_queue')
@@ -154,9 +161,10 @@ export const notificationQueueService = {
   async markAsFailed(
     notificationId: string,
     failureReason: string,
-    retryCount: number
+    retryCount: number,
+    supabaseClient?: SupabaseClient
   ): Promise<void> {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
       .from('notification_queue')
@@ -177,8 +185,8 @@ export const notificationQueueService = {
   /**
    * Retry failed notification
    */
-  async retryNotification(notificationId: string): Promise<void> {
-    const supabase = createClient();
+  async retryNotification(notificationId: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     // Get current retry count
     const { data: notification, error: fetchError } = await supabase
@@ -216,8 +224,8 @@ export const notificationQueueService = {
   /**
    * Cancel pending notification
    */
-  async cancelNotification(notificationId: string): Promise<void> {
-    const supabase = createClient();
+  async cancelNotification(notificationId: string, supabaseClient?: any): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
       .from('notification_queue')
@@ -233,8 +241,8 @@ export const notificationQueueService = {
   /**
    * Clean up old notifications (older than 30 days)
    */
-  async cleanup(): Promise<number> {
-    const supabase = createClient();
+  async cleanup(supabaseClient?: any): Promise<number> {
+    const supabase = getSupabaseClient(supabaseClient);
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 

@@ -6,7 +6,6 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { verifyAdminAuth } from '@/lib/utils/admin-auth';
 import { withCache, ADMIN_CACHE_KEYS, ADMIN_CACHE_TTL } from '@/lib/services/admin-cache-service';
 import { z } from 'zod';
-import { logger } from '@/lib/logger';
 
 // Query parameter validation schema
 const QueryParamsSchema = z.object({
@@ -17,6 +16,20 @@ const QueryParamsSchema = z.object({
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
+
+type AuthUserRecord = {
+  id: string;
+  email?: string | null;
+  created_at?: string | null;
+  last_sign_in_at?: string | null;
+  email_confirmed_at?: string | null;
+  user_metadata?: Record<string, unknown> | null;
+};
+
+type BetaAccessRecord = {
+  user_id: string | null;
+  access_granted?: boolean | null;
+};
 
 /**
  * GET /api/admin/users
@@ -69,9 +82,10 @@ export async function GET(req: NextRequest) {
         }
 
         // Get beta access information for users
-        const userIds = authUsers.users.map((user: any) => user.id);
+        const authUserRecords = authUsers.users as AuthUserRecord[];
+        const userIds = authUserRecords.map((user) => user.id);
 
-        let betaUsers: any[] = [];
+        let betaUsers: BetaAccessRecord[] = [];
         if (userIds.length > 0) {
           const { data: betaData, error: betaError } = await supabaseAdmin
             .from('beta_access_requests')
@@ -85,10 +99,14 @@ export async function GET(req: NextRequest) {
         }
 
         // Create a set of beta user IDs for quick lookup
-        const betaUserIds = new Set(betaUsers.map(beta => beta.user_id));
+        const betaUserIds = new Set(
+          betaUsers
+            .map((beta) => beta.user_id)
+            .filter((userId): userId is string => Boolean(userId))
+        );
 
         // Transform users data
-        const users = authUsers.users.map((user: any) => ({
+        const users = authUserRecords.map((user) => ({
           id: user.id,
           email: user.email || '',
           created_at: user.created_at,

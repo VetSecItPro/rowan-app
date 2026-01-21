@@ -9,7 +9,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
-import { spaceInviteSchema, validateAndSanitizeInvite } from '@/lib/validations/space-schemas';
+import { validateAndSanitizeInvite } from '@/lib/validations/space-schemas';
 import { buildAppUrl } from '@/lib/utils/app-url';
 
 /**
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     // SECURITY: Verify user is member of space before creating invitation
     try {
       await verifySpaceAccess(user.id, validatedData.space_id);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have permission to invite users to this space' },
         { status: 403 }

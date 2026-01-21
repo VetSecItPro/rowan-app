@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 import { Text, Link, Section } from '@react-email/components';
 import * as React from 'react';
 import BaseTemplate from './BaseTemplate';

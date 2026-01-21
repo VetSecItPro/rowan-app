@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { UserBadge } from '@/lib/services/achievement-service';
 import { format } from 'date-fns';
 import confetti from 'canvas-confetti';
@@ -21,24 +21,7 @@ export default function BadgeNotification({
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
-  useEffect(() => {
-    // Trigger confetti animation
-    triggerConfetti();
-
-    // Entrance animation
-    setTimeout(() => setIsVisible(true), 50);
-
-    // Auto close
-    if (autoClose) {
-      const timer = setTimeout(() => {
-        handleClose();
-      }, autoCloseDelay);
-
-      return () => clearTimeout(timer);
-    }
-  }, [autoClose, autoCloseDelay]);
-
-  function triggerConfetti() {
+  const triggerConfetti = useCallback(() => {
     if (!badge.badge) return;
 
     const rarity = badge.badge.rarity;
@@ -143,15 +126,32 @@ export default function BadgeNotification({
         });
         break;
     }
-  }
+  }, [badge.badge]);
 
-  function handleClose() {
+  const handleClose = useCallback(() => {
     setIsLeaving(true);
     setTimeout(() => {
       setIsVisible(false);
       onClose();
     }, 300);
-  }
+  }, [onClose]);
+
+  useEffect(() => {
+    // Trigger confetti animation
+    triggerConfetti();
+
+    // Entrance animation
+    setTimeout(() => setIsVisible(true), 50);
+
+    // Auto close
+    if (autoClose) {
+      const timer = setTimeout(() => {
+        handleClose();
+      }, autoCloseDelay);
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoClose, autoCloseDelay, handleClose, triggerConfetti]);
 
   async function handleShare() {
     if (!badge.badge) return;
@@ -175,7 +175,7 @@ export default function BadgeNotification({
       // Show success message using toast
       const { showSuccess } = await import('@/lib/utils/toast');
       showSuccess('Achievement copied to clipboard! 📋');
-    } catch (error) {
+    } catch {
       // Final fallback - create a temporary textarea
       const textArea = document.createElement('textarea');
       textArea.value = shareText;
@@ -186,7 +186,7 @@ export default function BadgeNotification({
         document.execCommand('copy');
         const { showSuccess } = await import('@/lib/utils/toast');
         showSuccess('Achievement copied to clipboard! 📋');
-      } catch (fallbackError) {
+      } catch {
         const { showError } = await import('@/lib/utils/toast');
         showError('Unable to share achievement. Please try again.');
       } finally {

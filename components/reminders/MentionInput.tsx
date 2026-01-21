@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -39,7 +39,6 @@ export function MentionInput({
   const [mentionSearch, setMentionSearch] = useState('');
   const [mentionStartPos, setMentionStartPos] = useState(0);
   const [members, setMembers] = useState<SpaceMember[]>([]);
-  const [filteredMembers, setFilteredMembers] = useState<SpaceMember[]>([]);
   const [selectedMentionIndex, setSelectedMentionIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -72,18 +71,15 @@ export function MentionInput({
     fetchMembers();
   }, [spaceId]);
 
-  // Filter members based on search
-  useEffect(() => {
+  const filteredMembers = useMemo(() => {
     if (!mentionSearch) {
-      setFilteredMembers(members);
-      return;
+      return members;
     }
 
-    const filtered = members.filter((member) =>
-      member.user.name.toLowerCase().includes(mentionSearch.toLowerCase())
+    const loweredSearch = mentionSearch.toLowerCase();
+    return members.filter((member) =>
+      member.user.name.toLowerCase().includes(loweredSearch)
     );
-    setFilteredMembers(filtered);
-    setSelectedMentionIndex(0);
   }, [mentionSearch, members]);
 
   // Handle text change
@@ -101,9 +97,11 @@ export function MentionInput({
       setShowMentionDropdown(true);
       setMentionSearch(mentionMatch[1]);
       setMentionStartPos(cursorPos - mentionMatch[0].length);
+      setSelectedMentionIndex(0);
     } else {
       setShowMentionDropdown(false);
       setMentionSearch('');
+      setSelectedMentionIndex(0);
     }
   };
 
@@ -134,6 +132,11 @@ export function MentionInput({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (!showMentionDropdown) return;
 
+    const activeIndex = Math.min(
+      selectedMentionIndex,
+      Math.max(0, filteredMembers.length - 1)
+    );
+
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedMentionIndex((prev) =>
@@ -144,7 +147,7 @@ export function MentionInput({
       setSelectedMentionIndex((prev) => (prev > 0 ? prev - 1 : 0));
     } else if (e.key === 'Enter' && filteredMembers.length > 0) {
       e.preventDefault();
-      insertMention(filteredMembers[selectedMentionIndex]);
+      insertMention(filteredMembers[activeIndex]);
     } else if (e.key === 'Escape') {
       e.preventDefault();
       setShowMentionDropdown(false);
@@ -185,7 +188,7 @@ export function MentionInput({
                 key={member.user_id}
                 onClick={() => insertMention(member)}
                 className={`w-full flex items-center gap-3 p-3 hover:bg-gray-700 transition-colors ${
-                  index === selectedMentionIndex
+                  index === Math.min(selectedMentionIndex, Math.max(0, filteredMembers.length - 1))
                     ? 'bg-gray-700'
                     : ''
                 }`}

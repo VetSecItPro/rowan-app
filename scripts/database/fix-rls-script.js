@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-unused-vars, no-console */
 
 /**
  * Emergency RLS Fix Script

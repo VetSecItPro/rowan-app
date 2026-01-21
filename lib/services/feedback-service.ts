@@ -1,20 +1,26 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { sanitizeSearchInput } from '@/lib/utils';
 import type { FeedbackSubmission, CreateFeedbackInput, UpdateFeedbackInput, FeedbackStatus } from '@/lib/types';
 import { logger } from '@/lib/logger';
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 export const feedbackService = {
   /**
    * Submit new feedback
    */
-  async submitFeedback(input: CreateFeedbackInput & { user_id: string; space_id?: string }): Promise<{ success: boolean; data?: FeedbackSubmission; error?: string }> {
+  async submitFeedback(
+    input: CreateFeedbackInput & { user_id: string; space_id?: string },
+    supabaseClient?: SupabaseClient
+  ): Promise<{ success: boolean; data?: FeedbackSubmission; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       // Upload screenshot if provided
       let screenshot_url: string | null = null;
       if (input.screenshot) {
-        const uploadResult = await this.uploadScreenshot(input.user_id, input.screenshot);
+        const uploadResult = await this.uploadScreenshot(input.user_id, input.screenshot, supabaseClient);
         if (!uploadResult.success) {
           return { success: false, error: uploadResult.error };
         }
@@ -53,9 +59,13 @@ export const feedbackService = {
   /**
    * Upload screenshot to Supabase storage
    */
-  async uploadScreenshot(userId: string, file: File): Promise<{ success: boolean; url?: string; error?: string }> {
+  async uploadScreenshot(
+    userId: string,
+    file: File,
+    supabaseClient?: SupabaseClient
+  ): Promise<{ success: boolean; url?: string; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       // Generate unique filename
       const timestamp = Date.now();
@@ -90,9 +100,12 @@ export const feedbackService = {
   /**
    * Get user's own feedback submissions
    */
-  async getUserFeedback(userId: string): Promise<{ success: boolean; data?: FeedbackSubmission[]; error?: string }> {
+  async getUserFeedback(
+    userId: string,
+    supabaseClient?: SupabaseClient
+  ): Promise<{ success: boolean; data?: FeedbackSubmission[]; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       const { data, error } = await supabase
         .from('feedback_submissions')
@@ -119,9 +132,9 @@ export const feedbackService = {
     status?: FeedbackStatus;
     feedback_type?: string;
     search?: string;
-  }): Promise<{ success: boolean; data?: FeedbackSubmission[]; error?: string }> {
+  }, supabaseClient?: SupabaseClient): Promise<{ success: boolean; data?: FeedbackSubmission[]; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       let query = supabase
         .from('feedback_submissions')
@@ -165,9 +178,12 @@ export const feedbackService = {
   /**
    * Get single feedback submission by ID
    */
-  async getFeedbackById(id: string): Promise<{ success: boolean; data?: FeedbackSubmission; error?: string }> {
+  async getFeedbackById(
+    id: string,
+    supabaseClient?: SupabaseClient
+  ): Promise<{ success: boolean; data?: FeedbackSubmission; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       const { data, error } = await supabase
         .from('feedback_submissions')
@@ -193,9 +209,13 @@ export const feedbackService = {
   /**
    * Update feedback (admin only)
    */
-  async updateFeedback(id: string, input: UpdateFeedbackInput): Promise<{ success: boolean; data?: FeedbackSubmission; error?: string }> {
+  async updateFeedback(
+    id: string,
+    input: UpdateFeedbackInput,
+    supabaseClient?: SupabaseClient
+  ): Promise<{ success: boolean; data?: FeedbackSubmission; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       const { data, error} = await supabase
         .from('feedback_submissions')
@@ -222,9 +242,9 @@ export const feedbackService = {
   /**
    * Delete feedback (admin only)
    */
-  async deleteFeedback(id: string): Promise<{ success: boolean; error?: string }> {
+  async deleteFeedback(id: string, supabaseClient?: SupabaseClient): Promise<{ success: boolean; error?: string }> {
     try {
-      const supabase = createClient();
+      const supabase = getSupabaseClient(supabaseClient);
 
       // Get feedback to delete screenshot if exists
       const { data: feedback } = await supabase

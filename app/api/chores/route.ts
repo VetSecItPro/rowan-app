@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, spaceId);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
     if (search) options.search = search;
 
     // Get chores from service
-    const chores = await choresService.getChores(spaceId, options);
+    const chores = await choresService.getChores(spaceId, options, supabase);
 
     return withUserDataCache(
       NextResponse.json({
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
           { status: 429 }
         );
       }
-    } catch (rateLimitError) {
+    } catch {
       // Fallback to in-memory rate limiting
       Sentry.captureMessage('Rate limiting degraded (using fallback)', {
         level: 'warning',
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
     // Verify user has access to this space
     try {
       await verifySpaceAccess(user.id, validatedData.space_id);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'You do not have access to this space' },
         { status: 403 }
@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
       due_date: validatedData.due_date ?? undefined,
       notes: validatedData.notes ?? undefined,
       sort_order: validatedData.sort_order ?? undefined,
-    });
+    }, supabase);
 
     return NextResponse.json({
       success: true,

@@ -185,7 +185,11 @@ export async function GET(request: NextRequest) {
     try {
       userProfile = await outlookCalendarService.getUserProfile(oauthState.connection_id);
     } catch (profileError) {
-      logger.warn('Failed to get user profile', { component: 'calendar/callback/outlook', action: 'profile_fetch_failed' });
+      logger.warn('Failed to get user profile', {
+        component: 'calendar/callback/outlook',
+        action: 'profile_fetch_failed',
+        error: profileError instanceof Error ? profileError.message : 'Unknown error',
+      });
       // Continue without profile - not critical
     }
 

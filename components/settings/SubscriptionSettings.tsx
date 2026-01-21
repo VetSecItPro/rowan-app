@@ -9,6 +9,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   Crown,
   Clock,
@@ -161,7 +162,7 @@ export function SubscriptionSettings() {
     setBillingError(null);
 
     try {
-      const response = await fetch('/api/stripe/customer-portal', {
+      const response = await csrfFetch('/api/stripe/customer-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -296,7 +297,7 @@ export function SubscriptionSettings() {
               </span>
             </div>
             <p className="text-sm text-red-300">
-              You've been moved to the Free plan with limited features. Upgrade now to regain access to all Pro features.
+              You&apos;ve been moved to the Free plan with limited features. Upgrade now to regain access to all Pro features.
             </p>
           </div>
         )}

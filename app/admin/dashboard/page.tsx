@@ -4,7 +4,7 @@ import { useState, memo, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { adminFetch, AdminSessionExpiredError } from '@/lib/providers/query-client-provider';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   Users,
   UserCheck,
@@ -14,16 +14,11 @@ import {
   Activity,
   RefreshCw,
   Monitor,
-  BarChart3,
   ArrowLeft,
   MessageSquare,
-  CreditCard,
   Layers,
   Clock,
   UserPlus,
-  HeartPulse,
-  Download,
-  GitBranch,
   LayoutDashboard,
   Zap,
   DollarSign,

@@ -10,6 +10,34 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+type BetaRequestRecord = {
+  id: string;
+  email: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  access_granted?: boolean;
+  user_id?: string | null;
+  created_at: string;
+  approved_at?: string | null;
+  notes?: string | null;
+};
+
+type EnhancedRequest = {
+  id: string;
+  email: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  browser_info: string;
+  access_granted?: boolean;
+  user_id?: string | null;
+  created_at: string;
+  approved_at?: string | null;
+  notes?: string | null;
+  status: 'active_user' | 'approved_pending' | 'failed';
+  days_since_request: number;
+  has_account: boolean;
+};
+
 /**
  * GET /api/admin/beta/requests
  * Get beta access requests with enhanced admin data
@@ -108,12 +136,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Enhance the data with additional information
-    const enhancedRequests = (requests || []).map((request: any) => {
+    const enhancedRequests: EnhancedRequest[] = (requests || []).map((request) => {
+      const requestRecord = request as BetaRequestRecord;
       // Determine request status
       let requestStatus: 'active_user' | 'approved_pending' | 'failed';
-      if (request.access_granted && request.user_id) {
+      if (requestRecord.access_granted && requestRecord.user_id) {
         requestStatus = 'active_user';
-      } else if (request.access_granted) {
+      } else if (requestRecord.access_granted) {
         requestStatus = 'approved_pending';
       } else {
         requestStatus = 'failed';
@@ -121,41 +150,41 @@ export async function GET(req: NextRequest) {
 
       // Parse user agent for browser info
       let browserInfo = 'Unknown';
-      if (request.user_agent) {
-        if (request.user_agent.includes('Chrome')) browserInfo = 'Chrome';
-        else if (request.user_agent.includes('Safari')) browserInfo = 'Safari';
-        else if (request.user_agent.includes('Firefox')) browserInfo = 'Firefox';
-        else if (request.user_agent.includes('Edge')) browserInfo = 'Edge';
+      if (requestRecord.user_agent) {
+        if (requestRecord.user_agent.includes('Chrome')) browserInfo = 'Chrome';
+        else if (requestRecord.user_agent.includes('Safari')) browserInfo = 'Safari';
+        else if (requestRecord.user_agent.includes('Firefox')) browserInfo = 'Firefox';
+        else if (requestRecord.user_agent.includes('Edge')) browserInfo = 'Edge';
       }
 
       // Calculate time since request
-      const timeSinceRequest = Date.now() - new Date(request.created_at).getTime();
+      const timeSinceRequest = Date.now() - new Date(requestRecord.created_at).getTime();
       const daysSince = Math.floor(timeSinceRequest / (1000 * 60 * 60 * 24));
 
       return {
-        id: request.id,
-        email: request.email,
-        ip_address: request.ip_address,
-        user_agent: request.user_agent,
+        id: requestRecord.id,
+        email: requestRecord.email,
+        ip_address: requestRecord.ip_address,
+        user_agent: requestRecord.user_agent,
         browser_info: browserInfo,
-        access_granted: request.access_granted,
-        user_id: request.user_id,
-        created_at: request.created_at,
-        approved_at: request.approved_at,
-        notes: request.notes,
+        access_granted: requestRecord.access_granted,
+        user_id: requestRecord.user_id,
+        created_at: requestRecord.created_at,
+        approved_at: requestRecord.approved_at,
+        notes: requestRecord.notes,
         status: requestStatus,
         days_since_request: daysSince,
-        has_account: !!request.user_id,
+        has_account: !!requestRecord.user_id,
       };
     });
 
     // Calculate summary statistics for this query
     const summary = {
       total: count || 0,
-      approved: enhancedRequests.filter((r: any) => r.access_granted).length,
-      active_users: enhancedRequests.filter((r: any) => r.has_account).length,
-      failed: enhancedRequests.filter((r: any) => !r.access_granted).length,
-      pending_signup: enhancedRequests.filter((r: any) => r.access_granted && !r.has_account).length,
+      approved: enhancedRequests.filter((request) => request.access_granted).length,
+      active_users: enhancedRequests.filter((request) => request.has_account).length,
+      failed: enhancedRequests.filter((request) => !request.access_granted).length,
+      pending_signup: enhancedRequests.filter((request) => request.access_granted && !request.has_account).length,
     };
 
     // Log admin access

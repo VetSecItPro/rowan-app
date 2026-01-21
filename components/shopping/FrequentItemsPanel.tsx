@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Sparkles, X } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Sparkles, X } from 'lucide-react';
 import { shoppingService } from '@/lib/services/shopping-service';
-import { getCategoryIcon } from '@/lib/constants/shopping-categories';
+import { getCategoryIcon, type ShoppingCategory } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { logger } from '@/lib/logger';
 
 interface FrequentItem {
   name: string;
   count: number;
-  category: string;
+  category: ShoppingCategory;
 }
 
 interface FrequentItemsPanelProps {
@@ -23,21 +23,21 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(true);
 
-  useEffect(() => {
-    loadFrequentItems();
-  }, [spaceId]);
-
-  const loadFrequentItems = async () => {
+  const loadFrequentItems = useCallback(async () => {
     try {
       setLoading(true);
       const items = await shoppingService.getFrequentItems(spaceId, 12);
-      setFrequentItems(items);
+      setFrequentItems(items as FrequentItem[]);
     } catch (error) {
       logger.error('Failed to load frequent items:', error, { component: 'FrequentItemsPanel', action: 'component_action' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [spaceId]);
+
+  useEffect(() => {
+    loadFrequentItems();
+  }, [loadFrequentItems]);
 
   if (loading) {
     return (
@@ -89,7 +89,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
               onClick={() => onAddItem(item.name, item.category)}
               className="flex items-center gap-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:border-emerald-500 hover:bg-emerald-900/20 transition-all text-left"
             >
-              <span className="text-sm flex-shrink-0">{getCategoryIcon(item.category as any)}</span>
+              <span className="text-sm flex-shrink-0">{getCategoryIcon(item.category)}</span>
               <span className="text-xs font-medium text-gray-300 truncate flex-1">
                 {item.name}
               </span>

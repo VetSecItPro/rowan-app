@@ -4,12 +4,13 @@
  * Runs daily to process chore rotations.
  */
 
-import { choreRotationService } from '@/lib/services/chore-rotation-service';
 import { logger } from '@/lib/logger';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function processChoreRotations() {
   try {
-    await choreRotationService.processRotations();
+    const { error } = await supabaseAdmin.rpc('process_chore_rotations');
+    if (error) throw error;
     logger.info('✓ Processed chore rotations', { component: 'chore-rotation-job' });
     return { success: true };
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Sunrise, Sun, Moon, Cookie, ChefHat, ShoppingCart, Search, Save } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { CreateMealInput, Meal, Recipe } from '@/lib/services/meals-service';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { ShoppingListPreviewModal } from './ShoppingListPreviewModal';
@@ -18,6 +19,8 @@ interface NewMealModalProps {
 }
 
 export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recipes = [], onOpenRecipeDiscover }: NewMealModalProps) {
+  type MealType = CreateMealInput['meal_type'];
+  type MealOption = { value: MealType; label: string; icon: LucideIcon; color: string };
   const [formData, setFormData] = useState<CreateMealInput>({
     space_id: spaceId,
     name: '',
@@ -65,13 +68,14 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
     setDifficultyFilter(null);
   };
 
-  const mealTypeOptions = [
+  const mealTypeOptions: MealOption[] = [
     { value: 'breakfast', label: 'Breakfast', icon: Sunrise, color: 'text-orange-500' },
     { value: 'lunch', label: 'Lunch', icon: Sun, color: 'text-yellow-500' },
     { value: 'dinner', label: 'Dinner', icon: Moon, color: 'text-indigo-500' },
     { value: 'snack', label: 'Snack', icon: Cookie, color: 'text-amber-500' },
   ];
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editMeal) {
       // Convert ISO timestamp to yyyy-MM-dd format for date input
@@ -95,6 +99,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
       });
     }
   }, [editMeal, spaceId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +188,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                       key={option.value}
                       type="button"
                       onClick={() => {
-                        setFormData({ ...formData, meal_type: option.value as any });
+                        setFormData({ ...formData, meal_type: option.value });
                         setIsMealTypeOpen(false);
                       }}
                       className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-700 transition-colors text-left"

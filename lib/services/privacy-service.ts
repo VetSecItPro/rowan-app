@@ -3,6 +3,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import type {
   UserPrivacyPreferences,
   PrivacyPreferenceUpdate,
@@ -13,15 +14,12 @@ import type {
   DeletionWorkflowStatus,
   ExportWorkflowStatus,
   ComplianceStatus,
-  DataExportData,
   RequestDataExportRequest,
-  RequestAccountDeletionRequest,
   CancelAccountDeletionRequest,
 } from '@/lib/types/privacy';
 import {
   CookiePreferences,
   updateCookiePreferences as updateCookiePreferencesUtil,
-  getCookiePreferences,
   privacyToCookiePreferences,
   cookieToPrivacyUpdates,
 } from '@/lib/utils/cookies';
@@ -180,7 +178,7 @@ export async function updateCookieConsent(cookieType: 'analytics' | 'advertising
 async function updateMarketingSubscription(userId: string, type: 'email' | 'sms', enabled: boolean) {
   try {
     // This would integrate with your email service (Resend) and SMS service (Twilio)
-    const response = await fetch('/api/privacy/marketing-subscription', {
+    const response = await csrfFetch('/api/privacy/marketing-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, type, enabled }),
@@ -197,7 +195,7 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
 // Data Sharing Consent
 async function updateDataSharingConsent(userId: string, allowSharing: boolean) {
   try {
-    const response = await fetch('/api/privacy/data-sharing', {
+    const response = await csrfFetch('/api/privacy/data-sharing', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, allowSharing }),
@@ -214,7 +212,7 @@ async function updateDataSharingConsent(userId: string, allowSharing: boolean) {
 // Third-party Analytics
 async function updateThirdPartyAnalytics(userId: string, enabled: boolean) {
   try {
-    const response = await fetch('/api/privacy/third-party-analytics', {
+    const response = await csrfFetch('/api/privacy/third-party-analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, enabled }),
@@ -249,8 +247,7 @@ export async function getPrivacyPreferenceHistory(userId: string): Promise<Priva
 
 // Account Deletion Management
 export async function requestAccountDeletion(
-  userId: string,
-  request: RequestAccountDeletionRequest = {}
+  userId: string
 ): Promise<PrivacyServiceResponse<AccountDeletionRequest>> {
   try {
     const scheduledDate = new Date();
@@ -487,7 +484,7 @@ export async function getComplianceStatus(userId: string): Promise<PrivacyServic
 // Email notification helpers
 async function sendDeletionConfirmationEmail(userId: string, deletionDate: Date) {
   try {
-    await fetch('/api/privacy/emails/deletion-confirmation', {
+    await csrfFetch('/api/privacy/emails/deletion-confirmation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, deletionDate: deletionDate.toISOString() }),
@@ -499,7 +496,7 @@ async function sendDeletionConfirmationEmail(userId: string, deletionDate: Date)
 
 async function sendDeletionCancellationEmail(userId: string) {
   try {
-    await fetch('/api/privacy/emails/deletion-cancelled', {
+    await csrfFetch('/api/privacy/emails/deletion-cancelled', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId }),
@@ -572,7 +569,7 @@ export async function syncCookiePreferencesWithPrivacy(userId: string): Promise<
 // Cookie Consent API Integration
 export async function updateCookieConsentViaAPI(cookiePrefs: CookiePreferences): Promise<PrivacyServiceResponse<CookiePreferences>> {
   try {
-    const response = await fetch('/api/cookies/preferences', {
+    const response = await csrfFetch('/api/cookies/preferences', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(cookiePrefs),
@@ -613,7 +610,7 @@ export async function getCookieConsentViaAPI(): Promise<PrivacyServiceResponse<C
 
 export async function resetCookieConsentViaAPI(): Promise<PrivacyServiceResponse<CookiePreferences>> {
   try {
-    const response = await fetch('/api/cookies/preferences', {
+    const response = await csrfFetch('/api/cookies/preferences', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
     });

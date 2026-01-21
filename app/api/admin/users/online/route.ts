@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
           { status: 401 }
         );
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid session' },
         { status: 401 }
@@ -119,6 +119,14 @@ export async function GET(req: NextRequest) {
       .select('user_id, activity_type, created_at')
       .gte('created_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()) // Last 5 minutes
       .order('created_at', { ascending: false });
+
+    if (betaError) {
+      logger.error('Failed to fetch beta access requests:', betaError, { component: 'api-route', action: 'api_request' });
+    }
+
+    if (activityError) {
+      logger.error('Failed to fetch recent beta tester activity:', activityError, { component: 'api-route', action: 'api_request' });
+    }
 
     // Combine data
     const enrichedUsers = (users as AdminUser[] | null)?.map((user: AdminUser) => {

@@ -26,7 +26,7 @@ export default function Error({
           Something went wrong
         </h2>
         <p className="text-gray-400 mb-8">
-          We're sorry, but something unexpected happened. Please try again.
+          We&apos;re sorry, but something unexpected happened. Please try again.
         </p>
         <div className="flex gap-4 justify-center">
           <button

@@ -112,14 +112,14 @@ const NewMessageEmail = ({
                   </div>
                   {conversationTitle && (
                     <Text style={conversationTitleText}>
-                      in "{conversationTitle}"
+                      in &quot;{conversationTitle}&quot;
                     </Text>
                   )}
                 </Column>
               </Row>
 
               <div style={messageContentStyle}>
-                <Text style={messageText}>"{messageContent}"</Text>
+                <Text style={messageText}>&quot;{messageContent}&quot;</Text>
               </div>
             </Section>
 
@@ -139,7 +139,7 @@ const NewMessageEmail = ({
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              You're receiving this email because you have email notifications enabled for new messages.
+              You&apos;re receiving this email because you have email notifications enabled for new messages.
             </Text>
             <Text style={footerText}>
               <Link href="https://rowanapp.com/settings" style={link}>

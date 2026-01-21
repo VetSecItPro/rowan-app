@@ -12,6 +12,22 @@ import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
+type MealDetail = {
+  idMeal?: string;
+  strMeal?: string;
+  strCategory?: string;
+  strArea?: string;
+  strMealThumb?: string;
+  strInstructions?: string;
+  strSource?: string;
+  strYoutube?: string;
+  [key: string]: string | undefined;
+};
+
+type MealDbSearchResponse = {
+  meals?: MealDetail[] | null;
+};
+
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting with automatic fallback
@@ -51,13 +67,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const data = await response.json();
+    const data: MealDbSearchResponse = await response.json();
 
     if (!data.meals) {
       return NextResponse.json([]);
     }
 
-    const recipes = data.meals.map((meal: any) => {
+    const recipes = data.meals.map((meal) => {
+      const mealId = meal.idMeal ?? crypto.randomUUID();
+      const mealName = meal.strMeal ?? '';
+      const mealCategory = meal.strCategory ?? '';
+      const mealArea = meal.strArea ?? '';
+      const mealThumb = meal.strMealThumb ?? '';
+      const mealInstructions = meal.strInstructions ?? '';
+      const mealSource = meal.strSource ?? '';
+      const mealYoutube = meal.strYoutube ?? '';
       // Parse and sanitize ingredients from TheMealDB format (external data could contain XSS payloads)
       const ingredients: Array<{ name: string; amount?: string; unit?: string }> = [];
       for (let i = 1; i <= 20; i++) {
@@ -73,15 +97,15 @@ export async function GET(request: NextRequest) {
       }
 
       return {
-        id: `themealdb-${meal.idMeal}`,
+        id: `themealdb-${mealId}`,
         source: 'themealdb',
-        name: sanitizePlainText(meal.strMeal),
-        description: sanitizePlainText(`${meal.strCategory} - ${meal.strArea} cuisine`),
-        image_url: sanitizeUrl(meal.strMealThumb),
-        cuisine: sanitizePlainText(meal.strArea),
+        name: sanitizePlainText(mealName),
+        description: sanitizePlainText(`${mealCategory} - ${mealArea} cuisine`),
+        image_url: sanitizeUrl(mealThumb),
+        cuisine: sanitizePlainText(mealArea),
         ingredients,
-        instructions: sanitizePlainText(meal.strInstructions),
-        source_url: sanitizeUrl(meal.strSource || meal.strYoutube),
+        instructions: sanitizePlainText(mealInstructions),
+        source_url: sanitizeUrl(mealSource || mealYoutube),
       };
     });
 

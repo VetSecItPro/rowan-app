@@ -98,20 +98,22 @@ export interface PrivacyEmailNotification {
 }
 
 // API Response types
-export interface PrivacyApiResponse<T = any> {
+export interface PrivacyApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
 }
 
+type ExportRecord = Record<string, unknown>;
+
 export interface DataExportData {
-  profile: any;
-  tasks: any[];
-  messages: any[];
-  expenses: any[];
-  calendar: any[];
-  spaces: any[];
+  profile: ExportRecord;
+  tasks: ExportRecord[];
+  messages: ExportRecord[];
+  expenses: ExportRecord[];
+  calendar: ExportRecord[];
+  spaces: ExportRecord[];
   preferences: UserPrivacyPreferences;
   auditLog: PrivacyPreferenceHistory[];
   exportedAt: string;
@@ -168,7 +170,7 @@ export interface ExportWorkflowStatus {
 }
 
 // Service response types
-export interface PrivacyServiceResponse<T = any> {
+export interface PrivacyServiceResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -192,7 +194,7 @@ export interface PrivacyAuditLogEntry {
   id: string;
   userId: string;
   action: 'preference_changed' | 'data_exported' | 'deletion_requested' | 'deletion_cancelled' | 'consent_given' | 'consent_withdrawn';
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   ipAddress: string | null;
   userAgent: string | null;
   timestamp: string;

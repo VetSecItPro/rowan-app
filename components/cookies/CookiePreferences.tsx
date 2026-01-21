@@ -1,20 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Cookie, Shield, BarChart3, Megaphone, Settings, Palette, Calendar, AlertCircle, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
+import { useState } from 'react';
+import { Cookie, Shield, AlertCircle } from 'lucide-react';
 import {
   getCookiePreferences,
-  updateCookiePreferences,
-  getCookieConsentTimestamp,
   CookiePreferences as CookiePrefs,
-  COOKIE_CATALOG,
-  cookieToPrivacyUpdates,
 } from '@/lib/utils/cookies';
-import { updatePrivacyPreferences } from '@/lib/services/privacy-service';
-import { useAuth } from '@/lib/contexts/auth-context';
 
 interface CookieCategory {
   key: keyof CookiePrefs;
@@ -37,15 +28,7 @@ const COOKIE_CATEGORIES: CookieCategory[] = [
 ];
 
 export function CookiePreferences() {
-  const { user } = useAuth();
   const [preferences, setPreferences] = useState<CookiePrefs>(getCookiePreferences());
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
-
-  useEffect(() => {
-    setLastUpdated(getCookieConsentTimestamp());
-  }, []);
 
   const handlePreferenceChange = (category: keyof CookiePrefs, enabled: boolean) => {
     if (category === 'necessary') return; // Cannot disable necessary cookies
@@ -54,39 +37,6 @@ export function CookiePreferences() {
       ...prev,
       [category]: enabled,
     }));
-  };
-
-  const handleSave = async () => {
-    setIsLoading(true);
-
-    try {
-      // Update cookie preferences locally
-      updateCookiePreferences(preferences);
-
-      // Sync with privacy preferences if user is authenticated
-      if (user) {
-        const privacyUpdates = cookieToPrivacyUpdates(preferences);
-        await updatePrivacyPreferences(user.id, privacyUpdates);
-      }
-
-      setLastUpdated(new Date());
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error) {
-      logger.error('Error saving cookie preferences:', error, { component: 'CookiePreferences', action: 'component_action' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleReset = () => {
-    setPreferences({
-      necessary: true,
-      analytics: false,
-      marketing: false,
-      functional: true,
-      preferences: true,
-    });
   };
 
   const getColorClasses = (color: string, enabled: boolean) => {
@@ -117,20 +67,6 @@ export function CookiePreferences() {
           </p>
         </div>
       </div>
-
-      {/* Success Message */}
-      {showSuccess && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 p-3 bg-green-900/20 border border-green-700 rounded-lg"
-        >
-          <Check className="h-4 w-4 text-green-400" />
-          <span className="text-sm text-green-300">
-            Cookie preferences updated successfully
-          </span>
-        </motion.div>
-      )}
 
       {/* Cookie Categories */}
       <div className="space-y-4">

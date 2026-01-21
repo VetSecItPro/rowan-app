@@ -3,16 +3,13 @@
 import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import {
-  DollarSign,
   Plus,
   Edit3,
   Trash2,
   CheckCircle,
   Clock,
   Package,
-  User,
   Calculator,
-  Receipt,
   AlertCircle,
   TrendingUp,
   TrendingDown
@@ -35,12 +32,9 @@ interface ProjectLineItemsProps {
 }
 
 export function ProjectLineItems({
-  projectId,
   lineItems,
   costBreakdown,
-  onRefresh,
 }: ProjectLineItemsProps) {
-  const [showAddItem, setShowAddItem] = useState(false);
   const [editingItem, setEditingItem] = useState<ProjectLineItem | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'category' | 'cost' | 'date'>('category');
@@ -106,6 +100,10 @@ export function ProjectLineItems({
       // TODO: Implement delete functionality
       logger.info('Delete item:', { component: 'ProjectLineItems', data: itemId });
     }
+  };
+
+  const handleAddItem = () => {
+    logger.info('Add line item requested', { component: 'ProjectLineItems' });
   };
 
   return (
@@ -213,7 +211,7 @@ export function ProjectLineItems({
         </div>
 
         <button
-          onClick={() => setShowAddItem(true)}
+          onClick={handleAddItem}
           className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-medium"
         >
           <Plus className="w-4 h-4" />
@@ -273,7 +271,7 @@ export function ProjectLineItems({
               {selectedCategory === 'all' ? 'No line items yet' : `No items in ${selectedCategory}`}
             </p>
             <button
-              onClick={() => setShowAddItem(true)}
+              onClick={handleAddItem}
               className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
             >
               Add First Item
@@ -281,8 +279,15 @@ export function ProjectLineItems({
           </div>
         ) : (
           <div className="divide-y divide-gray-700">
-            {sortedItems.map((item) => (
-              <div key={item.id} className="p-6 hover:bg-gray-700 transition-colors">
+            {sortedItems.map((item) => {
+              const isEditing = editingItem?.id === item.id;
+              return (
+              <div
+                key={item.id}
+                className={`p-6 transition-colors ${
+                  isEditing ? 'bg-blue-900/10' : 'hover:bg-gray-700'
+                }`}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -367,7 +372,8 @@ export function ProjectLineItems({
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

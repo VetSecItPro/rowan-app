@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { Camera, Plus, Trash2, Target, X } from 'lucide-react';
 import { CreateCheckInInput } from '@/lib/services/goals-service';
 import { AdvancedVoiceRecorder } from './AdvancedVoiceRecorder';
@@ -8,6 +9,15 @@ import { voiceTranscriptionService } from '@/lib/services/voice-transcription-se
 import { PremiumButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
 import { Modal } from '@/components/ui/Modal';
+
+type VoiceNoteMetadata = {
+  transcription?: string;
+  confidence?: number;
+  keywords?: string[];
+  category?: string;
+  tags?: string[];
+  template?: string;
+};
 
 // Mood emoji options
 const MOOD_OPTIONS = [
@@ -45,23 +55,23 @@ export function GoalCheckInModal({
 
   const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
   const [voiceNoteDuration, setVoiceNoteDuration] = useState(0);
-  const [voiceNoteMetadata, setVoiceNoteMetadata] = useState<any>(null);
+  const [voiceNoteMetadata, setVoiceNoteMetadata] = useState<VoiceNoteMetadata | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleVoiceNoteSent = async (audioBlob: Blob, duration: number, metadata?: any) => {
+  const handleVoiceNoteSent = async (audioBlob: Blob, duration: number, metadata?: VoiceNoteMetadata) => {
     setVoiceNoteBlob(audioBlob);
     setVoiceNoteDuration(duration);
-    setVoiceNoteMetadata(metadata);
+    setVoiceNoteMetadata(metadata || null);
     setShowVoiceRecorder(false);
 
     // Automatically transcribe if metadata is available
     if (metadata && audioBlob) {
       try {
         const transcriptionResult = await voiceTranscriptionService.transcribeAudio(audioBlob);
-        setVoiceNoteMetadata((prev: any) => ({
+        setVoiceNoteMetadata((prev) => ({
           ...prev,
           transcription: transcriptionResult.transcription,
           confidence: transcriptionResult.confidence,
@@ -120,7 +130,7 @@ export function GoalCheckInModal({
       const checkInData = {
         ...formData,
         voice_note_duration: voiceNoteBlob ? voiceNoteDuration : undefined,
-        voice_note_category: voiceNoteMetadata?.category || 'general',
+        voice_note_category: (voiceNoteMetadata?.category || 'general') as 'goals' | 'progress' | 'challenges' | 'general' | 'reflections',
         voice_note_template_id: voiceNoteMetadata?.template || null,
         voice_note_metadata: voiceNoteMetadata ? {
           transcription: voiceNoteMetadata.transcription,
@@ -180,7 +190,7 @@ export function GoalCheckInModal({
           {/* Progress Slider */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
-              How's your progress? ({formData.progress_percentage}%)
+              How&apos;s your progress? ({formData.progress_percentage}%)
             </label>
             <div className="space-y-4">
               <input
@@ -264,7 +274,7 @@ export function GoalCheckInModal({
                 Need help from your partner?
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                They'll be notified and can offer support
+                They&apos;ll be notified and can offer support
               </div>
             </div>
             <button
@@ -403,9 +413,11 @@ export function GoalCheckInModal({
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {formData.photos.map((photo, index) => (
                     <div key={index} className="relative group">
-                      <img
+                      <Image
                         src={URL.createObjectURL(photo)}
                         alt={`Progress photo ${index + 1}`}
+                        width={160}
+                        height={96}
                         className="w-full h-24 object-cover rounded-lg"
                       />
                       <button

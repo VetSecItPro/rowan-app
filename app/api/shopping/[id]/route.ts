@@ -42,7 +42,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     setSentryUser(user);
 
     // Get shopping list
-    const list = await shoppingService.getListById(params.id);
+    const list = await shoppingService.getListById(params.id, supabase);
 
     if (!list) {
       return NextResponse.json(
@@ -118,7 +118,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     setSentryUser(user);
 
     // Get existing list first
-    const existingList = await shoppingService.getListById(params.id);
+    const existingList = await shoppingService.getListById(params.id, supabase);
 
     if (!existingList) {
       return NextResponse.json(
@@ -151,7 +151,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     const updates = await req.json();
 
     // Update list using service
-    const updatedList = await shoppingService.updateList(params.id, updates);
+    const updatedList = await shoppingService.updateList(params.id, updates, supabase);
 
     return NextResponse.json({
       success: true,
@@ -200,7 +200,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     setSentryUser(user);
 
     // Get existing list first
-    const existingList = await shoppingService.getListById(params.id);
+    const existingList = await shoppingService.getListById(params.id, supabase);
 
     if (!existingList) {
       return NextResponse.json(
@@ -230,7 +230,7 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     }
 
     // Delete list using service
-    await shoppingService.deleteList(params.id);
+    await shoppingService.deleteList(params.id, supabase);
 
     return NextResponse.json({
       success: true,

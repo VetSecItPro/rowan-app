@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import {
@@ -48,10 +48,10 @@ export function usePrefetchAllData(options: PrefetchDataOptions = {}) {
   }, [queryClient, currentSpace?.id, skipInitial, delay]);
 
   // Return function to manually trigger prefetch
-  const prefetchAll = useCallback(() => {
+  const prefetchAll = () => {
     if (!currentSpace?.id) return;
     prefetchCriticalData(queryClient, currentSpace.id).catch(console.error);
-  }, [queryClient, currentSpace?.id]);
+  };
 
   return { prefetchAll };
 }
@@ -65,22 +65,19 @@ export function usePrefetchFeature() {
   const { currentSpace } = useSpaces();
   const prefetchedFeatures = useRef<Set<string>>(new Set());
 
-  const prefetch = useCallback(
-    (route: string) => {
-      if (!currentSpace?.id) return;
+  const prefetch = (route: string) => {
+    if (!currentSpace?.id) return;
 
-      // Check if already prefetched
-      const cacheKey = `${route}-${currentSpace.id}`;
-      if (prefetchedFeatures.current.has(cacheKey)) return;
+    // Check if already prefetched
+    const cacheKey = `${route}-${currentSpace.id}`;
+    if (prefetchedFeatures.current.has(cacheKey)) return;
 
-      const feature = ROUTE_TO_FEATURE_MAP[route];
-      if (feature) {
-        prefetchedFeatures.current.add(cacheKey);
-        prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
-      }
-    },
-    [queryClient, currentSpace?.id]
-  );
+    const feature = ROUTE_TO_FEATURE_MAP[route];
+    if (feature) {
+      prefetchedFeatures.current.add(cacheKey);
+      prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
+    }
+  };
 
   return { prefetchFeature: prefetch };
 }
@@ -95,45 +92,39 @@ export function useNavigationPrefetch() {
   const pathname = usePathname();
   const prefetchedRoutes = useRef<Set<string>>(new Set());
 
-  const prefetchRoute = useCallback(
-    (route: string) => {
-      if (!currentSpace?.id || route === pathname) return;
+  const prefetchRoute = (route: string) => {
+    if (!currentSpace?.id || route === pathname) return;
 
-      // Check if already prefetched
-      const cacheKey = `${route}-${currentSpace.id}`;
-      if (prefetchedRoutes.current.has(cacheKey)) return;
+    // Check if already prefetched
+    const cacheKey = `${route}-${currentSpace.id}`;
+    if (prefetchedRoutes.current.has(cacheKey)) return;
 
-      prefetchedRoutes.current.add(cacheKey);
+    prefetchedRoutes.current.add(cacheKey);
 
-      // Prefetch data for the feature
-      const feature = ROUTE_TO_FEATURE_MAP[route];
-      if (feature) {
-        prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
-      }
-    },
-    [queryClient, currentSpace?.id, pathname]
-  );
+    // Prefetch data for the feature
+    const feature = ROUTE_TO_FEATURE_MAP[route];
+    if (feature) {
+      prefetchFeatureData(queryClient, feature, currentSpace.id).catch(console.error);
+    }
+  };
 
-  const getPrefetchHandlers = useCallback(
-    (route: string) => {
-      let timeout: NodeJS.Timeout | null = null;
+  const getPrefetchHandlers = (route: string) => {
+    let timeout: NodeJS.Timeout | null = null;
 
-      return {
-        onMouseEnter: () => {
-          // Small delay to avoid prefetching on accidental hovers
-          timeout = setTimeout(() => prefetchRoute(route), 100);
-        },
-        onMouseLeave: () => {
-          if (timeout) {
-            clearTimeout(timeout);
-            timeout = null;
-          }
-        },
-        onFocus: () => prefetchRoute(route),
-      };
-    },
-    [prefetchRoute]
-  );
+    return {
+      onMouseEnter: () => {
+        // Small delay to avoid prefetching on accidental hovers
+        timeout = setTimeout(() => prefetchRoute(route), 100);
+      },
+      onMouseLeave: () => {
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+      },
+      onFocus: () => prefetchRoute(route),
+    };
+  };
 
   return { prefetchRoute, getPrefetchHandlers };
 }

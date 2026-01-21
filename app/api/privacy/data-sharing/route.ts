@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 async function applyDataSharingChanges(
   userId: string,
   allowSharing: boolean,
-  currentPrefs: any
+  currentPrefs: Record<string, unknown>
 ) {
   try {
     // 1. Update analytics providers
@@ -211,7 +211,7 @@ async function logDataSharingChange(
 }
 
 // GET - Get current data sharing status and partner list
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

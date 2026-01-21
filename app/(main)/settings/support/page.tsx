@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Mail, MessageSquare, BookOpen, Github, HelpCircle, Bug, Lightbulb } from 'lucide-react';
+import { ArrowLeft, MessageSquare, BookOpen, Github, HelpCircle, Bug, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SupportPage() {

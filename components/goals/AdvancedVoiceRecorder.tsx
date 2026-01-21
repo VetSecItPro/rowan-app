@@ -13,7 +13,6 @@ import {
   Volume2,
   SkipBack,
   SkipForward,
-  Settings,
   MessageSquare,
   FileText,
   Zap,
@@ -23,6 +22,7 @@ import { toast } from 'sonner';
 
 // WaveSurfer will be imported dynamically in the component
 type WaveSurferType = typeof import('wavesurfer.js').default;
+type WaveSurferInstance = ReturnType<WaveSurferType['create']>;
 
 interface AdvancedVoiceRecorderProps {
   onSendVoice: (audioBlob: Blob, duration: number, metadata?: VoiceNoteMetadata) => Promise<void>;
@@ -118,7 +118,7 @@ export function AdvancedVoiceRecorder({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const wavesurferRef = useRef<any>(null);
+  const wavesurferRef = useRef<WaveSurferInstance | null>(null);
   const waveformRef = useRef<HTMLDivElement>(null);
 
   // Timer for recording duration
@@ -134,21 +134,7 @@ export function AdvancedVoiceRecorder({
     return () => clearInterval(interval);
   }, [isRecording, audioBlob]);
 
-  // Initialize WaveSurfer when audio is ready
-  useEffect(() => {
-    if (audioUrl && waveformRef.current && !wavesurferRef.current) {
-      initializeWaveSurfer();
-    }
-
-    return () => {
-      if (wavesurferRef.current) {
-        wavesurferRef.current.destroy();
-        wavesurferRef.current = null;
-      }
-    };
-  }, [audioUrl]);
-
-  const initializeWaveSurfer = async () => {
+  const initializeWaveSurfer = useCallback(async () => {
     if (!waveformRef.current || !audioUrl) return;
 
     try {
@@ -186,7 +172,21 @@ export function AdvancedVoiceRecorder({
       logger.error('Failed to initialize WaveSurfer:', error, { component: 'AdvancedVoiceRecorder', action: 'component_action' });
       // Fallback to basic audio element
     }
-  };
+  }, [audioUrl]);
+
+  // Initialize WaveSurfer when audio is ready
+  useEffect(() => {
+    if (audioUrl && waveformRef.current && !wavesurferRef.current) {
+      initializeWaveSurfer();
+    }
+
+    return () => {
+      if (wavesurferRef.current) {
+        wavesurferRef.current.destroy();
+        wavesurferRef.current = null;
+      }
+    };
+  }, [audioUrl, initializeWaveSurfer]);
 
   const handleStartRecording = async () => {
     try {
@@ -395,7 +395,7 @@ export function AdvancedVoiceRecorder({
             Voice Check-In
           </h3>
           <p className="text-sm text-gray-400">
-            for "{goalTitle}"
+            for &quot;{goalTitle}&quot;
           </p>
         </div>
       )}

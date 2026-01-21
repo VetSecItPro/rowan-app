@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { RefreshCw, CheckCircle, Calendar, AlertTriangle, Loader2, Home } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export default function RestoreAccountPage() {
   const { user, loading: authLoading } = useAuth();
@@ -22,26 +23,7 @@ export default function RestoreAccountPage() {
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState('');
   const [restored, setRestored] = useState(false);
-
-  // Smooth fade-in animation
-  useEffect(() => {
-    const timer = setTimeout(() => setMounted(true), 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Check deletion status when user is loaded
-  useEffect(() => {
-    if (authLoading) return;
-
-    if (!user) {
-      // Not logged in - redirect to login
-      router.push('/login');
-      return;
-    }
-
-    // User is logged in, check deletion status
-    checkDeletionStatus();
-  }, [user, authLoading]);
+  const [daysRemaining, setDaysRemaining] = useState(0);
 
   const checkDeletionStatus = async () => {
     try {
@@ -65,12 +47,46 @@ export default function RestoreAccountPage() {
     }
   };
 
+  // Smooth fade-in animation
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Check deletion status when user is loaded
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      // Not logged in - redirect to login
+      router.push('/login');
+      return;
+    }
+
+    // User is logged in, check deletion status
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async status fetch updates component state
+    checkDeletionStatus();
+  }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (!deletionInfo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- derived countdown updates from server data
+      setDaysRemaining(0);
+      return;
+    }
+
+    const remaining = Math.ceil(
+      (new Date(deletionInfo.permanentDeletionAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+    setDaysRemaining(remaining);
+  }, [deletionInfo]);
+
   const handleRestoreAccount = async () => {
     setIsRestoring(true);
     setError('');
 
     try {
-      const response = await fetch('/api/user/cancel-deletion', {
+      const response = await csrfFetch('/api/user/cancel-deletion', {
         method: 'POST',
       });
 
@@ -107,10 +123,6 @@ export default function RestoreAccountPage() {
       </div>
     );
   }
-
-  const daysRemaining = deletionInfo
-    ? Math.ceil((new Date(deletionInfo.permanentDeletionAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-    : 0;
 
   return (
     <div

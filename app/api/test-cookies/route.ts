@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const nextCookies = await cookies();
     const directCookies = req.headers.get('cookie');
 
-    console.log('[TEST] Cookie comparison:', {
+    logger.info('[TEST] Cookie comparison:', {
       directFromHeaders: !!directCookies,
       directLength: directCookies?.length || 0,
       nextCookiesSize: nextCookies.size,

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Upload, Image as ImageIcon, FileText, Download, Trash2, X, Loader2, Paperclip } from 'lucide-react';
+import Image from 'next/image';
 import { eventAttachmentsService, EventAttachment } from '@/lib/services/event-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -25,11 +26,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
   const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    loadAttachments();
-  }, [eventId]);
-
-  const loadAttachments = async () => {
+  const loadAttachments = useCallback(async () => {
     try {
       setLoading(true);
       const data = await eventAttachmentsService.getAttachments(eventId);
@@ -42,7 +39,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
           const url = await eventAttachmentsService.getAttachmentUrl(attachment);
           urls[attachment.id] = url;
         } catch (error) {
-          logger.error('Failed to load URL for attachment ${attachment.id}:', error, { component: 'AttachmentGallery', action: 'component_action' });
+          logger.error(`Failed to load URL for attachment ${attachment.id}:`, error, { component: 'AttachmentGallery', action: 'component_action' });
         }
       }
       setAttachmentUrls(urls);
@@ -51,7 +48,11 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
     } finally {
       setLoading(false);
     }
-  };
+  }, [eventId]);
+
+  useEffect(() => {
+    loadAttachments();
+  }, [loadAttachments]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -207,12 +208,12 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
                   className="relative group aspect-square bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:shadow-lg transition-all"
                 >
                   {url ? (
-                    <img
+                    <Image
                       src={url}
                       alt={attachment.file_name}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover cursor-pointer"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      className="object-cover cursor-pointer"
                       onClick={() => setSelectedImage(url)}
                     />
                   ) : (
@@ -319,14 +320,19 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
           >
             <X className="w-6 h-6 text-white" />
           </button>
-          <img
-            src={selectedImage}
-            alt="Preview"
-            loading="eager"
-            decoding="async"
-            className="max-w-full max-h-full rounded-lg shadow-2xl"
+          <div
+            className="relative w-[90vw] h-[90vh] max-w-full max-h-full rounded-lg shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
-          />
+          >
+            <Image
+              src={selectedImage}
+              alt="Preview"
+              fill
+              sizes="90vw"
+              className="object-contain"
+              priority
+            />
+          </div>
         </div>
       )}
 

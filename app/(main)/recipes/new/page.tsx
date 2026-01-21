@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ChefHat, Plus, X, ArrowLeft, Loader2, Sparkles, Image as ImageIcon, FileText, Info } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { mealsService } from '@/lib/services/meals-service';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface Ingredient {
   name: string;
@@ -110,7 +112,7 @@ export default function NewRecipePage() {
         });
       }
 
-      const response = await fetch('/api/recipes/parse', {
+      const response = await csrfFetch('/api/recipes/parse', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -335,11 +337,14 @@ export default function NewRecipePage() {
                 </button>
 
                 {imagePreview && (
-                  <div className="relative">
-                    <img
+                  <div className="relative h-64">
+                    <Image
                       src={imagePreview}
                       alt="Recipe preview"
-                      className="w-full h-64 object-cover rounded-lg"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 600px"
+                      className="object-cover rounded-lg"
+                      unoptimized
                     />
                     <button
                       onClick={() => {

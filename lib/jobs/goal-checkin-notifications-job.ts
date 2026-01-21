@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
-import { reminderNotificationsService } from '@/lib/services/reminder-notifications-service';
-import { notificationService } from '@/lib/services/notification-service';
+import { supabaseAdmin } from '@/lib/supabase/admin';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
 
@@ -28,6 +28,25 @@ interface CheckInNotificationBatch {
   reminders: CheckInReminderToNotify[];
 }
 
+type ReminderRow = {
+  id: string;
+  goal_id: string;
+  user_id: string;
+  scheduled_for: string;
+  goals: {
+    title: string;
+    description?: string | null;
+    space_id: string;
+    spaces: { name: string };
+  };
+  users: {
+    email: string;
+    name: string;
+  };
+};
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
 // =============================================
 // JOB LOGIC
 // =============================================
@@ -48,7 +67,7 @@ export async function processGoalCheckInNotifications(): Promise<{
   let remindersScheduled = 0;
 
   try {
-    const supabase = await createClient();
+    const supabase = supabaseAdmin;
 
     // Get check-in reminders that need notifications
     const remindersToNotify = await getCheckInRemindersNeedingNotification(supabase);
@@ -64,12 +83,12 @@ export async function processGoalCheckInNotifications(): Promise<{
     for (const batch of notificationBatches) {
       try {
         // Send in-app notifications
-        const inAppResults = await sendInAppNotifications(batch);
+        const inAppResults = await sendInAppNotifications(supabase, batch);
         notificationsSent += inAppResults.sent;
         if (inAppResults.error) errors.push(inAppResults.error);
 
         // Send email notifications if enabled
-        const emailResult = await sendEmailNotifications(batch);
+        const emailResult = await sendEmailNotifications(supabase, batch);
         if (emailResult.sent) emailsSent++;
         if (emailResult.error) errors.push(emailResult.error);
 
@@ -99,7 +118,7 @@ export async function processGoalCheckInNotifications(): Promise<{
 /**
  * Get check-in reminders that need notifications (due within next 15 minutes)
  */
-async function getCheckInRemindersNeedingNotification(supabase: any): Promise<CheckInReminderToNotify[]> {
+async function getCheckInRemindersNeedingNotification(supabase: SupabaseClient): Promise<CheckInReminderToNotify[]> {
   const now = new Date();
   const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60 * 1000);
 
@@ -143,19 +162,22 @@ async function getCheckInRemindersNeedingNotification(supabase: any): Promise<Ch
     throw new Error('Failed to fetch check-in reminders');
   }
 
-  // Transform the data
-  return (data || []).map((reminder: any) => ({
-    id: reminder.id,
-    goal_id: reminder.goal_id,
-    user_id: reminder.user_id,
-    scheduled_for: reminder.scheduled_for,
-    goal_title: reminder.goals.title,
-    goal_description: reminder.goals.description,
-    space_id: reminder.goals.space_id,
-    space_name: reminder.goals.spaces.name,
-    user_email: reminder.users.email,
-    user_name: reminder.users.name,
-  }));
+  // Transform the data - cast to handle Supabase join types
+  return (data || []).map((reminder) => {
+    const r = reminder as unknown as ReminderRow;
+    return {
+      id: r.id,
+      goal_id: r.goal_id,
+      user_id: r.user_id,
+      scheduled_for: r.scheduled_for,
+      goal_title: r.goals.title,
+      goal_description: r.goals.description ?? undefined,
+      space_id: r.goals.space_id,
+      space_name: r.goals.spaces.name,
+      user_email: r.users.email,
+      user_name: r.users.name,
+    };
+  });
 }
 
 /**
@@ -186,7 +208,7 @@ function groupNotificationsByUser(reminders: CheckInReminderToNotify[]): CheckIn
 /**
  * Send in-app notifications for a user batch
  */
-async function sendInAppNotifications(batch: CheckInNotificationBatch): Promise<{
+async function sendInAppNotifications(supabase: SupabaseClient, batch: CheckInNotificationBatch): Promise<{
   sent: number;
   error?: string;
 }> {
@@ -195,16 +217,23 @@ async function sendInAppNotifications(batch: CheckInNotificationBatch): Promise<
   try {
     for (const reminder of batch.reminders) {
       try {
-        await reminderNotificationsService.createNotification({
-          reminder_id: null, // Goal check-ins don't use reminder_id
-          goal_id: reminder.goal_id,
-          user_id: batch.userId,
-          type: 'goal_checkin_due',
-          channel: 'in_app',
-          title: `Time for a check-in on "${reminder.goal_title}"`,
-          message: `Your check-in for "${reminder.goal_title}" is scheduled for ${new Date(reminder.scheduled_for).toLocaleString()}`,
-        });
-        sent++;
+        const { error } = await supabase
+          .from('reminder_notifications')
+          .insert({
+            reminder_id: null,
+            goal_id: reminder.goal_id,
+            user_id: batch.userId,
+            type: 'goal_checkin_due',
+            channel: 'in_app',
+            title: `Time for a check-in on "${reminder.goal_title}"`,
+            message: `Your check-in for "${reminder.goal_title}" is scheduled for ${new Date(reminder.scheduled_for).toLocaleString()}`,
+          });
+
+        if (!error) {
+          sent++;
+        } else {
+          logger.error(`Failed to create in-app notification for check-in reminder ${reminder.id}:`, error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
+        }
       } catch (error) {
         logger.error(`Failed to create in-app notification for check-in reminder ${reminder.id}:`, error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
       }
@@ -220,41 +249,43 @@ async function sendInAppNotifications(batch: CheckInNotificationBatch): Promise<
 /**
  * Send email notifications for a user batch
  */
-async function sendEmailNotifications(batch: CheckInNotificationBatch): Promise<{
+async function sendEmailNotifications(supabase: SupabaseClient, batch: CheckInNotificationBatch): Promise<{
   sent: boolean;
   error?: string;
 }> {
   try {
-    // Check if user should receive goal check-in email notifications
-    const shouldSend = await notificationService.shouldSendNotification(
-      batch.userId,
-      'reminder', // Use 'reminder' category for goal check-ins
-      'email'
-    );
+    const shouldSend = await shouldSendGoalCheckinEmail(supabase, batch.userId);
 
     if (!shouldSend) {
       return { sent: false };
     }
 
+    if (!batch.userEmail) {
+      return { sent: false, error: 'User email not found' };
+    }
+
     // Create email notification records
     for (const reminder of batch.reminders) {
       try {
-        await reminderNotificationsService.createNotification({
-          reminder_id: null,
-          goal_id: reminder.goal_id,
-          user_id: batch.userId,
-          type: 'goal_checkin_due',
-          channel: 'email',
-          title: `Time for a check-in on "${reminder.goal_title}"`,
-          message: `Your check-in for "${reminder.goal_title}" is scheduled for ${new Date(reminder.scheduled_for).toLocaleString()}`,
-        });
+        await supabase
+          .from('reminder_notifications')
+          .insert({
+            reminder_id: null,
+            goal_id: reminder.goal_id,
+            user_id: batch.userId,
+            type: 'goal_checkin_due',
+            channel: 'email',
+            title: `Time for a check-in on "${reminder.goal_title}"`,
+            message: `Your check-in for "${reminder.goal_title}" is scheduled for ${new Date(reminder.scheduled_for).toLocaleString()}`,
+          });
       } catch (error) {
         logger.error(`Failed to create email notification record for check-in reminder ${reminder.id}:`, error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
       }
     }
 
-    // Send email via notification service
-    await sendGoalCheckInReminderEmail(batch);
+    const emailResult = await sendGoalCheckInReminderEmail(batch);
+
+    await logGoalCheckinEmail(supabase, batch, emailResult.error);
 
     return { sent: true };
   } catch (error) {
@@ -263,29 +294,123 @@ async function sendEmailNotifications(batch: CheckInNotificationBatch): Promise<
   }
 }
 
+interface NotificationPreferencesRow {
+  email_enabled: boolean;
+  email_reminders: boolean;
+  quiet_hours_enabled: boolean;
+  quiet_hours_start: string | null;
+  quiet_hours_end: string | null;
+  timezone: string | null;
+}
+
+async function shouldSendGoalCheckinEmail(supabase: SupabaseClient, userId: string): Promise<boolean> {
+  const { data: prefs, error } = await supabase
+    .from('notification_preferences')
+    .select('email_enabled, email_reminders, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) {
+    logger.warn('Failed to fetch notification preferences, defaulting to allow', { component: 'goal-checkin-notifications-job', error: error.message });
+    return true;
+  }
+
+  if (!prefs) {
+    return true;
+  }
+
+  const typedPrefs = prefs as NotificationPreferencesRow;
+  if (!typedPrefs.email_enabled || !typedPrefs.email_reminders) {
+    return false;
+  }
+
+  if (isInQuietHours(typedPrefs)) {
+    return false;
+  }
+
+  return true;
+}
+
+function isInQuietHours(prefs: NotificationPreferencesRow): boolean {
+  if (!prefs.quiet_hours_enabled || !prefs.quiet_hours_start || !prefs.quiet_hours_end) {
+    return false;
+  }
+
+  try {
+    const now = new Date();
+    const userTime = new Date(now.toLocaleString('en-US', { timeZone: prefs.timezone || 'UTC' }));
+    const currentTime = userTime.getHours() * 60 + userTime.getMinutes();
+
+    const [startHour, startMin] = prefs.quiet_hours_start.split(':').map(Number);
+    const [endHour, endMin] = prefs.quiet_hours_end.split(':').map(Number);
+
+    const startTime = startHour * 60 + startMin;
+    const endTime = endHour * 60 + endMin;
+
+    if (startTime > endTime) {
+      return currentTime >= startTime || currentTime <= endTime;
+    }
+
+    return currentTime >= startTime && currentTime <= endTime;
+  } catch (error) {
+    logger.error('Error checking quiet hours:', error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
+    return false;
+  }
+}
+
 /**
  * Send goal check-in reminder email
  */
-async function sendGoalCheckInReminderEmail(batch: CheckInNotificationBatch): Promise<void> {
+async function sendGoalCheckInReminderEmail(batch: CheckInNotificationBatch): Promise<{ success: boolean; error?: string }> {
   const emailSubject = generateEmailSubject(batch);
   const emailHtml = generateEmailHtml(batch);
 
-  const result = await notificationService.sendEmail(
-    batch.userEmail,
-    emailSubject,
-    emailHtml
-  );
+  if (!resend) {
+    logger.warn('Resend API key not configured, skipping goal check-in email', { component: 'goal-checkin-notifications-job' });
+    return { success: false, error: 'Email service not configured' };
+  }
 
-  // Log the email notification
+  try {
+    const { error } = await resend.emails.send({
+      from: 'Rowan <reminders@rowan.app>',
+      to: batch.userEmail,
+      subject: emailSubject,
+      html: emailHtml,
+    });
+
+    if (error) {
+      logger.error('Goal check-in email send failed', error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
+      return { success: false, error: error.message || 'Email send failed' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Goal check-in email send failed', error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
+    return { success: false, error: errorMessage };
+  }
+}
+
+async function logGoalCheckinEmail(
+  supabase: SupabaseClient,
+  batch: CheckInNotificationBatch,
+  errorMessage?: string
+): Promise<void> {
   for (const reminder of batch.reminders) {
-    await notificationService.logNotification(
-      batch.userId,
-      'email',
-      'goal_checkin',
-      `Check-in reminder: ${reminder.goal_title}`,
-      result.success ? 'sent' : 'failed',
-      result.error
-    );
+    const { error } = await supabase
+      .from('notification_log')
+      .insert({
+        user_id: batch.userId,
+        type: 'email',
+        category: 'reminder',
+        subject: `Check-in reminder: ${reminder.goal_title}`,
+        status: errorMessage ? 'failed' : 'sent',
+        error_message: errorMessage,
+      });
+
+    if (error) {
+      logger.error('Failed to log goal check-in email', error, { component: 'goal-checkin-notifications-job', action: 'service_call' });
+    }
   }
 }
 
@@ -380,7 +505,7 @@ function generateEmailHtml(batch: CheckInNotificationBatch): string {
 /**
  * Mark reminders as having notification sent
  */
-async function markRemindersAsNotificationSent(supabase: any, reminderIds: string[]): Promise<void> {
+async function markRemindersAsNotificationSent(supabase: SupabaseClient, reminderIds: string[]): Promise<void> {
   if (reminderIds.length === 0) return;
 
   const { error } = await supabase

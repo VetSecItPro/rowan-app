@@ -40,7 +40,7 @@ export default function BetaExpiredPage() {
 
           {/* What's Next */}
           <div className="space-y-3 mb-6">
-            <h2 className="font-semibold text-white">What's next?</h2>
+            <h2 className="font-semibold text-white">What&apos;s next?</h2>
             <ul className="space-y-2 text-sm text-gray-400">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-0.5">✓</span>

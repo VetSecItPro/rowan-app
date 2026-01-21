@@ -63,7 +63,7 @@ export async function PUT(request: NextRequest) {
     let body;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }
@@ -120,7 +120,7 @@ export async function PUT(request: NextRequest) {
     const isEmailChange = sanitizedEmail !== user.email?.toLowerCase();
 
     // Prepare update data (don't include email if it's being changed - that goes through verification)
-    const updateData: any = {
+    const updateData: { name: string; updated_at: string; email?: string; avatar_url?: string | null } = {
       name: sanitizedName,
       updated_at: new Date().toISOString(),
     };

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ShoppingBag, Check, X, Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShoppingBag, Check, Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface ShoppingItem {
   id: string;
@@ -103,7 +104,7 @@ export default function PublicShoppingListPage() {
 
     // Send update to server
     try {
-      const response = await fetch(`/api/shopping/share/${token}`, {
+      const response = await csrfFetch(`/api/shopping/share/${token}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

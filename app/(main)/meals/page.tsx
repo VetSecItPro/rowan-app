@@ -4,9 +4,8 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
-import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, ExternalLink, X, CheckSquare } from 'lucide-react';
+import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, X, CheckSquare } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import Link from 'next/link';
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
@@ -30,25 +29,23 @@ import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '
 import { shoppingService } from '@/lib/services/shopping-service';
 import { createClient } from '@/lib/supabase/client';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
-import { showSuccess, showError, showPromise } from '@/lib/utils/toast';
+import { showSuccess, showError } from '@/lib/utils/toast';
 import { toast } from 'sonner';
-import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 type CalendarViewMode = 'week' | '2weeks' | 'month';
+type RecipeWithStringIngredients = Omit<Recipe, 'ingredients'> & { ingredients: string[] };
 
 // Memoized meal card component with meal planning orange color
 const MemoizedMealCardWithColors = memo(({
   meal,
   onEdit,
-  onDelete,
-  colors
+  onDelete
 }: {
   meal: Meal;
   onEdit: (meal: Meal) => void;
   onDelete: (id: string) => void;
-  colors: { border: string; bg: string; text: string };
 }) => (
   <div className="border-l-4 border-orange-500">
     <MealCard
@@ -86,18 +83,14 @@ MemoizedRecipeCard.displayName = 'MemoizedRecipeCard';
 // Memoized calendar day cell component
 const CalendarDayCell = memo(({
   day,
-  index,
   currentMonth,
   dayMeals,
-  getUserColor,
   onMealClick,
   onAddClick
 }: {
   day: Date;
-  index: number;
   currentMonth: Date;
   dayMeals: Meal[];
-  getUserColor: (userId: string) => { border: string; bg: string; text: string };
   onMealClick: (meal: Meal) => void;
   onAddClick: () => void;
 }) => {
@@ -185,19 +178,10 @@ export default function MealsPage() {
   // Ingredient review modal state
   const [isIngredientReviewOpen, setIsIngredientReviewOpen] = useState(false);
   const [pendingMealData, setPendingMealData] = useState<CreateMealInput | null>(null);
-  const [selectedRecipeForReview, setSelectedRecipeForReview] = useState<Recipe | null>(null);
+  const [selectedRecipeForReview, setSelectedRecipeForReview] = useState<RecipeWithStringIngredients | null>(null);
 
   // Generate shopping list modal state
   const [isGenerateListOpen, setIsGenerateListOpen] = useState(false);
-
-  // Memoized user color mapping
-  const getUserColor = useCallback((userId: string) => {
-    const userColors: Record<string, { border: string; bg: string; text: string }> = {
-      'user-1': { border: 'border-l-purple-500', bg: 'bg-purple-900/20', text: 'text-purple-400' },
-      'user-2': { border: 'border-l-blue-500', bg: 'bg-blue-900/20', text: 'text-blue-400' },
-    };
-    return userColors[userId] || userColors['user-1'];
-  }, []);
 
   // Memoized filtered meals based on search query and date (for list view)
   const filteredMeals = useMemo(() => {
@@ -387,22 +371,25 @@ export default function MealsPage() {
         const recipe = recipes.find(r => r.id === mealData.recipe_id);
         if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
           // Convert ingredients to strings if they're objects
-          const ingredientsAsStrings = recipe.ingredients.map((ing: any) => {
-            if (typeof ing === 'string') return ing;
-            if (typeof ing === 'object' && ing.name) {
-              // Format: "amount unit name" or just "name" if no amount/unit
-              const parts = [];
-              if (ing.amount) parts.push(ing.amount);
-              if (ing.unit) parts.push(ing.unit);
-              parts.push(ing.name);
-              return parts.join(' ');
+          const ingredientsAsStrings = recipe.ingredients.map((ingredient) => {
+            if (typeof ingredient === 'string') return ingredient;
+            if (ingredient && typeof ingredient === 'object') {
+              const typedIngredient = ingredient as {
+                name?: string;
+                amount?: string | number;
+                unit?: string;
+              };
+              const parts = [typedIngredient.amount, typedIngredient.unit, typedIngredient.name]
+                .filter((part) => part !== undefined && part !== null && String(part).trim() !== '')
+                .map((part) => String(part));
+              if (parts.length > 0) return parts.join(' ');
             }
-            return JSON.stringify(ing); // Fallback
+            return String(ingredient ?? '');
           });
 
           // Store the meal data and recipe with formatted ingredients
           setPendingMealData(mealData);
-          setSelectedRecipeForReview({ ...recipe, ingredients: ingredientsAsStrings as any });
+          setSelectedRecipeForReview({ ...recipe, ingredients: ingredientsAsStrings });
           setIsIngredientReviewOpen(true);
           return; // Don't create the meal yet
         }
@@ -1341,16 +1328,14 @@ export default function MealsPage() {
                         ))}
 
                         {/* Calendar days */}
-                        {calendarDays.map((day, index) => {
+                        {calendarDays.map((day) => {
                           const dayMeals = getMealsForDate(day);
                           return (
                             <CalendarDayCell
-                              key={index}
+                              key={day.toISOString()}
                               day={day}
-                              index={index}
                               currentMonth={currentMonth}
                               dayMeals={dayMeals}
-                              getUserColor={getUserColor}
                               onMealClick={handleMealClick}
                               onAddClick={handleAddMealClick}
                             />
@@ -1398,14 +1383,12 @@ export default function MealsPage() {
               ) : (
                 <div className="space-y-4">
                   {filteredMeals.map((meal) => {
-                    const colors = getUserColor(meal.created_by);
                     return (
                       <MemoizedMealCardWithColors
                         key={meal.id}
                         meal={meal}
                         onEdit={handleEditMeal}
                         onDelete={handleDeleteMeal}
-                        colors={colors}
                       />
                     );
                   })}
@@ -1417,24 +1400,28 @@ export default function MealsPage() {
         </div>
       </div>
       {/* Modals */}
-      <NewMealModal
-        isOpen={isModalOpen}
-        onClose={handleCloseMealModal}
-        onSave={handleCreateMeal}
-        editMeal={editingMeal}
-        spaceId={spaceId}
-        recipes={recipes}
-        onOpenRecipeDiscover={handleOpenRecipeDiscover}
-      />
-      <NewRecipeModal
-        isOpen={isRecipeModalOpen}
-        onClose={handleCloseRecipeModal}
-        onSave={handleCreateRecipe}
-        editRecipe={editingRecipe}
-        spaceId={spaceId}
-        initialTab={recipeModalInitialTab}
-        onRecipeAdded={handleRecipeAddedFromDiscover}
-      />
+      {spaceId && (
+        <NewMealModal
+          isOpen={isModalOpen}
+          onClose={handleCloseMealModal}
+          onSave={handleCreateMeal}
+          editMeal={editingMeal}
+          spaceId={spaceId}
+          recipes={recipes}
+          onOpenRecipeDiscover={handleOpenRecipeDiscover}
+        />
+      )}
+      {spaceId && (
+        <NewRecipeModal
+          isOpen={isRecipeModalOpen}
+          onClose={handleCloseRecipeModal}
+          onSave={handleCreateRecipe}
+          editRecipe={editingRecipe}
+          spaceId={spaceId}
+          initialTab={recipeModalInitialTab}
+          onRecipeAdded={handleRecipeAddedFromDiscover}
+        />
+      )}
       {selectedRecipeForReview && (
         <IngredientReviewModal
           isOpen={isIngredientReviewOpen}
@@ -1448,13 +1435,15 @@ export default function MealsPage() {
           recipeName={selectedRecipeForReview.name}
         />
       )}
-      <GenerateListModal
-        isOpen={isGenerateListOpen}
-        onClose={() => setIsGenerateListOpen(false)}
-        meals={meals}
-        spaceId={spaceId}
-        onSuccess={() => loadMeals()}
-      />
+      {spaceId && (
+        <GenerateListModal
+          isOpen={isGenerateListOpen}
+          onClose={() => setIsGenerateListOpen(false)}
+          meals={meals}
+          spaceId={spaceId}
+          onSuccess={() => loadMeals()}
+        />
+      )}
       </PullToRefresh>
     </FeatureLayout>
     </FeatureGateWrapper>

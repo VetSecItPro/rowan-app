@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
 import {
   BarChart3,
@@ -8,7 +8,6 @@ import {
   TrendingDown,
   Minus,
   RefreshCw,
-  Download,
   Smartphone,
   Monitor,
   Tablet,
@@ -92,7 +91,7 @@ export default function FeatureUsagePage() {
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
 
-  const fetchData = async (refresh = false) => {
+  const fetchData = useCallback(async (refresh = false) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -115,11 +114,11 @@ export default function FeatureUsagePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [timeRange]);
 
   useEffect(() => {
     fetchData();
-  }, [timeRange]);
+  }, [fetchData]);
 
   const TrendIcon = ({ direction }: { direction: 'up' | 'down' | 'neutral' }) => {
     switch (direction) {
@@ -470,7 +469,7 @@ export default function FeatureUsagePage() {
                           </span>
                         </div>
                         <div className="space-y-2">
-                          {feature.topActions.map((action, idx) => (
+                          {feature.topActions.map((action) => (
                             <div
                               key={action.action}
                               className="flex items-center justify-between text-sm"

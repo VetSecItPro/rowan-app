@@ -250,7 +250,7 @@ export async function POST(req: NextRequest) {
  * GET /api/beta/validate
  * Get beta program status (slots remaining, deadline, etc.)
  */
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

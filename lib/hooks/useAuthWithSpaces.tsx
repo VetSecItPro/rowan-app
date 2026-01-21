@@ -20,36 +20,36 @@ import { logger } from '@/lib/logger';
 
 export interface AuthWithSpacesState {
   // Combined authentication state
-  user: any | null;
-  session: any | null;
+  user: ReturnType<typeof useAuth>['user'];
+  session: ReturnType<typeof useAuth>['session'];
   isAuthenticated: boolean;
 
   // Combined spaces state
-  spaces: any[];
-  currentSpace: any | null;
-  hasZeroSpaces: boolean;
+  spaces: ReturnType<typeof useSpaces>['spaces'];
+  currentSpace: ReturnType<typeof useSpaces>['currentSpace'];
+  hasZeroSpaces: ReturnType<typeof useSpaces>['hasZeroSpaces'];
 
   // Combined loading states
-  authLoading: boolean;
-  spacesLoading: boolean;
+  authLoading: ReturnType<typeof useAuth>['loading'];
+  spacesLoading: ReturnType<typeof useSpaces>['loading'];
   loading: boolean; // True if either auth or spaces is loading
 
   // Combined error states
-  authError: string | null;
-  spacesError: string | null;
+  authError: ReturnType<typeof useAuth>['error'];
+  spacesError: ReturnType<typeof useSpaces>['error'];
   error: string | null; // Primary error (auth takes precedence)
 
   // Authentication methods (from AuthContext)
-  signUp: (email: string, password: string, profile: any) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  signUp: ReturnType<typeof useAuth>['signUp'];
+  signIn: ReturnType<typeof useAuth>['signIn'];
+  signOut: ReturnType<typeof useAuth>['signOut'];
+  refreshProfile: ReturnType<typeof useAuth>['refreshProfile'];
 
   // Spaces methods (from SpacesContext)
-  switchSpace: (space: any) => void;
-  refreshSpaces: () => Promise<void>;
-  createSpace: (name: string) => Promise<{ success: boolean; spaceId?: string; error?: string }>;
-  deleteSpace: (spaceId: string) => Promise<{ success: boolean; error?: string }>;
+  switchSpace: ReturnType<typeof useSpaces>['switchSpace'];
+  refreshSpaces: ReturnType<typeof useSpaces>['refreshSpaces'];
+  createSpace: ReturnType<typeof useSpaces>['createSpace'];
+  deleteSpace: ReturnType<typeof useSpaces>['deleteSpace'];
 
   // State helpers
   isReady: boolean; // True when auth is complete and spaces are loaded (or confirmed zero)
@@ -140,12 +140,20 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
     auth.session,
     auth.loading,
     auth.error,
+    auth.signUp,
+    auth.signIn,
+    auth.signOut,
+    auth.refreshProfile,
     spaces.spaces,
     spaces.currentSpace,
     spaces.loading,
     spaces.error,
     spaces.hasZeroSpaces,
-    emergencyTimeoutReached
+    spaces.switchSpace,
+    spaces.refreshSpaces,
+    spaces.createSpace,
+    spaces.deleteSpace,
+    emergencyTimeoutReached,
   ]);
 
   return state;

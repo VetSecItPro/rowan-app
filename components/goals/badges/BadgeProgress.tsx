@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { BadgeProgress as BadgeProgressType } from '@/lib/types';
 import type { AchievementBadge } from '@/lib/services/achievement-service';
 import { getBadgeProgress } from '@/lib/services/achievement-service';
@@ -22,11 +22,7 @@ export default function BadgeProgress({
   >([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadProgress();
-  }, [userId, spaceId]);
-
-  async function loadProgress() {
+  const loadProgress = useCallback(async () => {
     setLoading(true);
     try {
       const progress = await getBadgeProgress(userId, spaceId);
@@ -40,7 +36,11 @@ export default function BadgeProgress({
     } finally {
       setLoading(false);
     }
-  }
+  }, [spaceId, userId, limit]);
+
+  useEffect(() => {
+    loadProgress();
+  }, [loadProgress]);
 
   if (loading) {
     return (

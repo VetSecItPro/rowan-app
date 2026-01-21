@@ -15,7 +15,6 @@ interface PartnerBalanceWidgetProps {
 export function PartnerBalanceWidget({
   balances,
   currentUserId,
-  currentUserName,
   partnerName,
   onSettleUp,
   className = '',
@@ -26,7 +25,6 @@ export function PartnerBalanceWidget({
 
   // Determine who owes whom
   const youOwe = netBalance < 0;
-  const theyOwe = netBalance > 0;
   const balanced = Math.abs(netBalance) < 0.01;
   const amount = Math.abs(netBalance);
 

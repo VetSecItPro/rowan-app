@@ -53,6 +53,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editMessage) {
       setContent(editMessage.content);
@@ -64,6 +65,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
     setAttachedFiles([]);
     setShowEmojiPicker(false);
   }, [editMessage, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

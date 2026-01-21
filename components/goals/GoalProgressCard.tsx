@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Target, TrendingUp, Calendar, Users, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
-import type { FinancialGoal } from '@/lib/services/goal-contributions-service';
+import type { FinancialGoal, GoalContribution } from '@/lib/services/goal-contributions-service';
 import { getGoalContributions, calculateProjectedCompletionDate } from '@/lib/services/goal-contributions-service';
 import { formatDistanceToNow } from 'date-fns';
 import { logger } from '@/lib/logger';
@@ -14,13 +14,9 @@ interface GoalProgressCardProps {
 
 export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProps) {
   const [projectedDate, setProjectedDate] = useState<string | null>(null);
-  const [recentContributions, setRecentContributions] = useState<any[]>([]);
+  const [recentContributions, setRecentContributions] = useState<GoalContribution[]>([]);
 
-  useEffect(() => {
-    loadGoalData();
-  }, [goal.id]);
-
-  const loadGoalData = async () => {
+  const loadGoalData = useCallback(async () => {
     try {
       // Get projected completion date
       const projected = await calculateProjectedCompletionDate(goal.id);
@@ -32,7 +28,12 @@ export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProp
     } catch (error) {
       logger.error('Error loading goal data:', error, { component: 'GoalProgressCard', action: 'component_action' });
     }
-  };
+  }, [goal.id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadGoalData();
+  }, [loadGoalData]);
 
   if (!goal.is_financial || !goal.target_amount) {
     return null; // Only show for financial goals

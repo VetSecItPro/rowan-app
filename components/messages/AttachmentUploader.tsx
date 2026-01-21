@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Image as ImageIcon, Video, FileText, X, Upload, Loader2 } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { fileUploadService, FileUploadResult } from '@/lib/services/file-upload-service';
 import { toast } from 'sonner';
 
@@ -47,9 +47,9 @@ export function AttachmentUploader({
       toast.success('File uploaded', {
         description: file.name,
       });
-    } catch (error: any) {
+    } catch (error) {
       toast.error('Upload failed', {
-        description: error.message || 'Please try again',
+        description: error instanceof Error ? error.message : 'Please try again',
       });
     } finally {
       setUploading(false);

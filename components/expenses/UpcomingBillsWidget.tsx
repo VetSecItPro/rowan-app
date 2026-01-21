@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AlertCircle, Calendar, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import { billCalendarService, type UpcomingBill } from '@/lib/services/bill-calendar-service';
-import { formatDistanceToNow } from 'date-fns';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/client';
 
 interface UpcomingBillsWidgetProps {
   spaceId: string;
@@ -22,21 +22,7 @@ export default function UpcomingBillsWidget({
   const [loading, setLoading] = useState(true);
   const [totalAmount, setTotalAmount] = useState(0);
 
-  useEffect(() => {
-    loadBills();
-
-    // Subscribe to real-time updates
-    const channel = billCalendarService.subscribeToUpcomingBills(spaceId, (newBill) => {
-      setUpcomingBills((prev) => [newBill, ...prev].sort((a, b) => a.days_until_due - b.days_until_due));
-    });
-
-    return () => {
-      const supabase = require('@/lib/supabase/client').createClient();
-      supabase.removeChannel(channel);
-    };
-  }, [spaceId, daysAhead]);
-
-  const loadBills = async () => {
+  const loadBills = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -54,7 +40,21 @@ export default function UpcomingBillsWidget({
     } finally {
       setLoading(false);
     }
-  };
+  }, [daysAhead, showOverdue, spaceId]);
+
+  useEffect(() => {
+    loadBills();
+
+    // Subscribe to real-time updates
+    const channel = billCalendarService.subscribeToUpcomingBills(spaceId, (newBill) => {
+      setUpcomingBills((prev) => [newBill, ...prev].sort((a, b) => a.days_until_due - b.days_until_due));
+    });
+
+    return () => {
+      const supabase = createClient();
+      supabase.removeChannel(channel);
+    };
+  }, [spaceId, daysAhead, loadBills]);
 
   const getUrgencyColor = (daysUntilDue: number) => {
     if (daysUntilDue < 0) return 'text-red-400 bg-red-900/20';

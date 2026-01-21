@@ -19,6 +19,8 @@ interface ActivityFeedProps {
   showStats?: boolean;
 }
 
+type ActivityStats = Awaited<ReturnType<typeof getActivityStats>>;
+
 const ACTIVITY_ICONS: Record<ActivityType, string> = {
   created: '✨',
   updated: '✏️',
@@ -57,7 +59,7 @@ export default function ActivityFeed({
   showStats = false,
 }: ActivityFeedProps) {
   const [activities, setActivities] = useState<ActivityLog[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<ActivityStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

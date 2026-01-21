@@ -23,6 +23,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 // Feature names must match the API validation
 export type FeatureName =
@@ -98,7 +99,7 @@ async function flushEvents(): Promise<void> {
   eventQueue.length = 0;
 
   try {
-    const response = await fetch('/api/analytics/track', {
+    const response = await csrfFetch('/api/analytics/track', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -152,7 +153,7 @@ function queueEvent(event: TrackingEvent): void {
 // Track immediately for important events (without batching)
 async function trackImmediate(event: TrackingEvent): Promise<void> {
   try {
-    await fetch('/api/analytics/track', {
+    await csrfFetch('/api/analytics/track', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

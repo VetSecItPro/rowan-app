@@ -1,9 +1,12 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { checkAndAwardBadges } from './achievement-service';
 import { enhancedNotificationService } from './enhanced-notification-service';
 import { logger } from '@/lib/logger';
 import { cacheAside, cacheKeys, deleteCachePattern, CACHE_TTL, CACHE_PREFIXES } from '@/lib/cache';
 import { getAppUrl } from '@/lib/utils/app-url';
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 export interface Milestone {
   id: string;
@@ -248,7 +251,7 @@ export interface GoalActivity {
                  'milestone_created' | 'milestone_completed' | 'milestone_updated' | 'milestone_deleted' |
                  'check_in_created' | 'check_in_updated' |
                  'goal_shared' | 'goal_collaborated' | 'goal_commented';
-  activity_data: Record<string, any>;
+  activity_data: Record<string, unknown>;
   title: string;
   description?: string;
   entity_title?: string;
@@ -323,13 +326,22 @@ export interface CreateActivityInput {
   description?: string;
   entity_title?: string;
   entity_type?: string;
-  activity_data?: Record<string, any>;
+  activity_data?: Record<string, unknown>;
 }
 
+type GoalUpdatePayload = Partial<CreateGoalInput> & {
+  completed_at?: string | null;
+  progress?: number;
+};
+
+type MilestoneUpdatePayload = {
+  completed: boolean;
+  completed_at?: string | null;
+};
 
 export const goalsService = {
-  async getGoals(spaceId: string): Promise<Goal[]> {
-    const supabase = createClient();
+  async getGoals(spaceId: string, supabaseClient?: SupabaseClient): Promise<Goal[]> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('goals')
       .select(`
@@ -349,7 +361,7 @@ export const goalsService = {
     if (error) throw error;
 
     // Map the data to handle null assignee
-    const mappedData = (data || []).map((goal: any) => ({
+    const mappedData = (data || []).map((goal: Goal) => ({
       ...goal,
       assignee: goal.assignee || undefined,
     }));
@@ -357,8 +369,8 @@ export const goalsService = {
     return mappedData;
   },
 
-  async getGoalById(id: string): Promise<Goal | null> {
-    const supabase = createClient();
+  async getGoalById(id: string, supabaseClient?: SupabaseClient): Promise<Goal | null> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('goals')
       .select(`
@@ -387,8 +399,8 @@ export const goalsService = {
     return data;
   },
 
-  async createGoal(input: CreateGoalInput): Promise<Goal> {
-    const supabase = createClient();
+  async createGoal(input: CreateGoalInput, supabaseClient?: SupabaseClient): Promise<Goal> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('goals')
       .insert([{
@@ -409,9 +421,9 @@ export const goalsService = {
     return data;
   },
 
-  async updateGoal(id: string, updates: Partial<CreateGoalInput>): Promise<Goal> {
-    const supabase = createClient();
-    const finalUpdates: any = { ...updates };
+  async updateGoal(id: string, updates: Partial<CreateGoalInput>, supabaseClient?: SupabaseClient): Promise<Goal> {
+    const supabase = getSupabaseClient(supabaseClient);
+    const finalUpdates: GoalUpdatePayload = { ...updates };
 
     // Check if goal is being completed
     const isBeingCompleted = updates.status === 'completed' && !finalUpdates.completed_at;
@@ -461,7 +473,7 @@ export const goalsService = {
                 goalUrl: `${getAppUrl()}/goals/${data.id}?space_id=${data.space_id}`,
                 achievementType: 'goal_completed',
                 completedBy: userData?.name || 'Someone',
-                completionDate: finalUpdates.completed_at,
+                completionDate: finalUpdates.completed_at || new Date().toISOString(),
                 spaceName: spaceData?.name || 'Your Space',
               }
             ).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
@@ -480,8 +492,8 @@ export const goalsService = {
     return data;
   },
 
-  async deleteGoal(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteGoal(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
       .from('goals')
       .delete()
@@ -520,7 +532,7 @@ export const goalsService = {
 
   async toggleMilestone(id: string, completed: boolean): Promise<Milestone> {
     const supabase = createClient();
-    const finalUpdates: any = { completed };
+    const finalUpdates: MilestoneUpdatePayload = { completed };
 
     // Check if milestone is being completed
     const isBeingCompleted = completed && !finalUpdates.completed_at;
@@ -571,7 +583,7 @@ export const goalsService = {
                 goalUrl: `${getAppUrl()}/goals/${data.goal_id}?space_id=${data.goal.space_id}`,
                 achievementType: 'milestone_reached',
                 completedBy: userData?.name || 'Someone',
-                completionDate: finalUpdates.completed_at,
+                completionDate: finalUpdates.completed_at || new Date().toISOString(),
                 spaceName: spaceData?.name || 'Your Space',
                 milestoneTitle: data.title,
               }
@@ -597,7 +609,6 @@ export const goalsService = {
   },
 
   async getAllMilestones(spaceId: string): Promise<Milestone[]> {
-    const supabase = createClient();
     const goals = await this.getGoals(spaceId);
     const allMilestones: Milestone[] = [];
 
@@ -749,8 +760,6 @@ export const goalsService = {
       visibility?: 'private' | 'shared';
     }
   ): Promise<Goal> {
-    const supabase = createClient();
-
     // Get template with milestone templates
     const template = await this.getGoalTemplateById(templateId);
     if (!template) throw new Error('Template not found');
@@ -950,7 +959,7 @@ export const goalsService = {
       const fileName = `${checkInId}_${Date.now()}_${i}.${fileExt}`;
 
       // Upload to storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('goal-check-in-photos')
         .upload(fileName, photo);
 
@@ -990,7 +999,8 @@ export const goalsService = {
     const supabase = createClient();
 
     // Remove photos from updates as they need to be handled separately
-    const { photos, ...checkInUpdates } = updates;
+    const checkInUpdates = { ...updates };
+    delete checkInUpdates.photos;
 
     const { data, error } = await supabase
       .from('goal_check_ins')

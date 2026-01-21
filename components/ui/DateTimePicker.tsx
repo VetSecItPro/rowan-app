@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar, Clock, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
@@ -24,24 +24,25 @@ export function DateTimePicker({
   label
 }: DateTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [manualInput, setManualInput] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+  const isHydrated = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [calendarDate, setCalendarDate] = useState<Date>(() => {
+    if (value) {
+      const parsed = new Date(value);
+      return isNaN(parsed.getTime()) ? new Date() : parsed;
+    }
+    return new Date();
+  });
 
   // Use device detection from context
   // Show mobile UI on small screens OR touch devices (bottom sheets work better with touch)
   const { isMobile: isSmallScreen, hasCoarsePointer } = useDevice();
   const isMobile = isSmallScreen || hasCoarsePointer;
-
-  // Ensure component is mounted on client side
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
 
   // Lock scroll when picker is open on mobile (bottom sheet mode)
   useScrollLock(isOpen && isMobile);
@@ -161,15 +162,6 @@ export function DateTimePicker({
     inputRef.current?.focus();
   };
 
-  // Calendar navigation state
-  const [calendarDate, setCalendarDate] = useState<Date>(() => {
-    if (value) {
-      const parsed = new Date(value);
-      return isNaN(parsed.getTime()) ? new Date() : parsed;
-    }
-    return new Date();
-  });
-
   // Generate calendar days for the current calendar month
   const generateCalendarDays = () => {
     const currentMonth = calendarDate.getMonth();
@@ -217,7 +209,7 @@ export function DateTimePicker({
 
   const timeOptions = generateTimeOptions();
 
-  if (!mounted) {
+  if (!isHydrated) {
     return (
       <div className="relative">
         {label && (
@@ -281,7 +273,7 @@ export function DateTimePicker({
       </div>
 
       {/* Portal Calendar - Mobile: Full screen bottom sheet, Desktop: Positioned dropdown */}
-      {isOpen && mounted && createPortal(
+      {isOpen && isHydrated && createPortal(
         <>
           {/* Mobile backdrop overlay */}
           {isMobile && (
@@ -465,4 +457,27 @@ export function DateTimePicker({
       )}
     </div>
   );
+}
+
+let hydrated = false;
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+const getSnapshot = () => hydrated;
+const getServerSnapshot = () => false;
+
+if (typeof window !== 'undefined' && !hydrated) {
+  const notify = () => {
+    hydrated = true;
+    listeners.forEach((listener) => listener());
+  };
+  if (typeof queueMicrotask === 'function') {
+    queueMicrotask(notify);
+  } else {
+    Promise.resolve().then(notify);
+  }
 }

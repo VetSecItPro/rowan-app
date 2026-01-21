@@ -72,6 +72,7 @@ export function SwipeableConversationItem({
 
   // Reset swipe when conversation changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOffsetX(0);
   }, [conversation.id]);
 

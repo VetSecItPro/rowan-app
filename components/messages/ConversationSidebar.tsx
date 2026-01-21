@@ -43,6 +43,7 @@ export function ConversationSidebar({
 
   // Ensure component is mounted on client side
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

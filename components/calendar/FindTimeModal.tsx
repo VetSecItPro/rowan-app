@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Clock, Calendar, Users, CheckCircle2 } from 'lucide-react';
 import { format, addDays, parseISO } from 'date-fns';
 import { smartSchedulingService, TimeSlot, DURATION_PRESETS } from '@/lib/services/smart-scheduling-service';
@@ -25,13 +25,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
   const [loading, setLoading] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      findAvailableSlots();
-    }
-  }, [isOpen, duration, dateRange]);
-
-  const findAvailableSlots = async () => {
+  const findAvailableSlots = useCallback(async () => {
     setLoading(true);
     try {
       const slots = await smartSchedulingService.findOptimalTimeSlots({
@@ -49,7 +43,13 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange, duration, participants, spaceId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      findAvailableSlots();
+    }
+  }, [isOpen, findAvailableSlots]);
 
   const handleSelectSlot = (slot: TimeSlot) => {
     setSelectedSlot(slot);

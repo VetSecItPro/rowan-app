@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 export interface QueuedAction {
   id: string;
@@ -101,7 +102,10 @@ export function useOfflineQueue() {
       const action = newQueue[i];
 
       try {
-        const response = await fetch(action.endpoint, {
+        const fetchFn = action.endpoint.startsWith('/')
+          ? csrfFetch
+          : fetch;
+        const response = await fetchFn(action.endpoint, {
           method: action.method,
           headers: {
             'Content-Type': 'application/json',
@@ -116,7 +120,7 @@ export function useOfflineQueue() {
         // Remove from queue on success
         newQueue.splice(i, 1);
         i--;
-      } catch (error) {
+      } catch {
         // Increment retry count
         action.retryCount++;
 

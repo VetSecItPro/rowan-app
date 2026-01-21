@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+
+const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 export interface UserSession {
   id: string;
@@ -276,14 +279,14 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
 /**
  * Get all active sessions for a user
  */
-export async function getUserSessions(userId: string, supabaseClient?: any): Promise<{
+export async function getUserSessions(userId: string, supabaseClient?: SupabaseClient): Promise<{
   success: boolean;
   sessions?: UserSession[];
   error?: string;
 }> {
   try {
     // Use provided client (from API route with auth context) or default client
-    const supabase = supabaseClient || createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     logger.info('getUserSessions: querying for user_id:', { component: 'lib-session-tracking-service', data: userId });
 
@@ -328,12 +331,12 @@ export async function getUserSessions(userId: string, supabaseClient?: any): Pro
 /**
  * Revoke a session
  */
-export async function revokeSession(sessionId: string): Promise<{
+export async function revokeSession(sessionId: string, supabaseClient?: SupabaseClient): Promise<{
   success: boolean;
   error?: string;
 }> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
       .from('user_sessions')
@@ -360,13 +363,14 @@ export async function revokeSession(sessionId: string): Promise<{
  */
 export async function revokeAllOtherSessions(
   userId: string,
-  currentSessionId: string
+  currentSessionId: string,
+  supabaseClient?: SupabaseClient
 ): Promise<{
   success: boolean;
   error?: string;
 }> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
       .from('user_sessions')
@@ -393,12 +397,12 @@ export async function revokeAllOtherSessions(
 /**
  * Update session last active timestamp
  */
-export async function updateSessionActivity(sessionId: string): Promise<{
+export async function updateSessionActivity(sessionId: string, supabaseClient?: SupabaseClient): Promise<{
   success: boolean;
   error?: string;
 }> {
   try {
-    const supabase = createClient();
+    const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
       .from('user_sessions')

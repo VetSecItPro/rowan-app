@@ -71,6 +71,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
     target_count: 1,
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (editHabit) {
       setFormData({
@@ -94,6 +95,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
       });
     }
   }, [editHabit, spaceId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleCategoryChange = (value: string | undefined) => {
     setFormData({ ...formData, category: value || '' });
@@ -128,9 +130,6 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
     onSave(formData);
     onClose();
   };
-
-  const selectedCategory = categoryOptions.find(opt => opt.value === formData.category);
-  const selectedFrequency = frequencyOptions.find(opt => opt.value === formData.frequency_type);
 
   const footerContent = (
     <div className="flex items-center gap-3">

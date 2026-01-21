@@ -100,8 +100,6 @@ export const UnifiedCalendarFilters = memo(function UnifiedCalendarFilters({
 
   // All/None toggle helper
   const allEnabled = Object.values(filters).every(Boolean);
-  const noneEnabled = Object.values(filters).every((v) => !v);
-
   const handleToggleAll = () => {
     const newValue = !allEnabled;
     onFilterChange({

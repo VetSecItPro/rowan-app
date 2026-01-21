@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         factors: data.totp || [],
-        is_enrolled: (data.totp || []).some((factor: any) => factor.status === 'verified'),
+        is_enrolled: (data.totp || []).some((factor: { status?: string | null }) => factor.status === 'verified'),
       },
     });
   } catch (error) {
