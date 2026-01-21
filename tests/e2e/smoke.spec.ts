@@ -14,7 +14,7 @@ async function setBetaBypassCookie(page: import('@playwright/test').Page) {
     {
       name: 'beta-validation',
       value: betaCookieValue,
-      domain: '127.0.0.1',
+      domain: 'localhost',
       path: '/',
       httpOnly: true,
       secure: false,
