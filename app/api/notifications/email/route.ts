@@ -11,7 +11,7 @@ const EmailRequestSchema = z.object({
   type: z.string().min(1),
   recipient: z.string().email(),
   subject: z.string().min(1).max(200),
-  data: z.record(z.unknown()).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
 });
 
 async function resolveRequestUser(req: NextRequest) {
@@ -117,16 +117,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { error: sendError } = await resend.emails.send({
+    const emailOptions = {
       from: 'Rowan <notifications@rowanapp.com>',
       to: recipient,
       subject,
-      html,
-      text,
+      ...(html ? { html } : {}),
+      ...(text ? { text } : {}),
       tags: [
         { name: 'type', value: type.slice(0, 64) },
       ],
-    });
+    };
+
+    const { error: sendError } = await resend.emails.send(emailOptions as Parameters<typeof resend.emails.send>[0]);
 
     if (sendError) {
       logger.error('Resend email send failed', sendError, { component: 'api-route', action: 'api_request' });

@@ -228,7 +228,7 @@ export function Dropdown({
       </button>
 
       {/* Portal Dropdown */}
-      {isOpen && mounted && createPortal(
+      {isOpen && isHydrated && createPortal(
         <div
           ref={dropdownRef}
           className="absolute bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-50"

@@ -190,10 +190,10 @@ async function sendInstantNotification(userId: string, notification: Notificatio
           recipientEmail: user.email,
           recipientName: user.name || 'Partner',
           assignerName: notificationData.assignerName || 'System',
-          taskTitle: notificationData.title,
-          taskDescription: notificationData.description,
-          dueDate: notificationData.dueDate,
-          priority: notificationData.priority || 'normal',
+          taskTitle: notificationData.title || 'Untitled Task',
+          taskDescription: notificationData.description || '',
+          dueDate: notificationData.dueDate || '',
+          priority: (notificationData.priority || 'normal') as 'high' | 'low' | 'normal' | 'urgent',
           spaceId: notificationData.spaceId || '',
           taskId: notificationData.taskId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -203,12 +203,12 @@ async function sendInstantNotification(userId: string, notification: Notificatio
         return await sendEventReminderEmail({
           recipientEmail: user.email,
           recipientName: user.name || 'Partner',
-          eventTitle: notificationData.title,
-          eventDescription: notificationData.description,
+          eventTitle: notificationData.title || 'Untitled Event',
+          eventDescription: notificationData.description || '',
           eventDate: notificationData.eventDate || '',
           eventTime: notificationData.eventTime || '',
-          location: notificationData.location,
-          reminderType: notificationData.reminderType || '15min',
+          location: notificationData.location || '',
+          reminderType: (notificationData.reminderType || '15min') as '15min' | '1hour' | '1day',
           eventId: notificationData.eventId || '',
           spaceId: notificationData.spaceId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -219,13 +219,13 @@ async function sendInstantNotification(userId: string, notification: Notificatio
           recipientEmail: user.email,
           recipientName: user.name || 'Partner',
           senderName: notificationData.senderName || 'Someone',
-          senderAvatar: notificationData.senderAvatar,
-          messageContent: notificationData.content || notificationData.title,
-          conversationTitle: notificationData.conversationTitle,
+          senderAvatar: notificationData.senderAvatar || '',
+          messageContent: notificationData.content || notificationData.title || '',
+          conversationTitle: notificationData.conversationTitle || '',
           spaceId: notificationData.spaceId || '',
           conversationId: notificationData.conversationId || '',
           spaceName: notificationData.spaceName || 'Unknown Space',
-          messageTimestamp: new Date(notification.created_at).toISOString()
+          messageTimestamp: new Date().toISOString()
         });
 
       case 'shopping':
@@ -233,12 +233,12 @@ async function sendInstantNotification(userId: string, notification: Notificatio
           recipientEmail: user.email,
           recipientName: user.name || 'Partner',
           senderName: notificationData.senderName || 'Someone',
-          listName: notificationData.title,
-          listDescription: notificationData.description,
-          items: notificationData.items || [],
+          listName: notificationData.title || 'Shopping List',
+          listDescription: notificationData.description || '',
+          items: (notificationData.items || []) as { id: string; name: string; quantity?: string; checked: boolean }[],
           totalItems: notificationData.totalItems || 0,
           completedItems: notificationData.completedItems || 0,
-          actionType: notificationData.actionType || 'shared',
+          actionType: (notificationData.actionType || 'shared') as 'shared' | 'updated' | 'completed',
           spaceId: notificationData.spaceId || '',
           listId: notificationData.listId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -248,14 +248,14 @@ async function sendInstantNotification(userId: string, notification: Notificatio
         return await sendMealReminderEmail({
           recipientEmail: user.email,
           recipientName: user.name || 'Partner',
-          mealName: notificationData.title,
-          mealType: notificationData.mealType || 'dinner',
+          mealName: notificationData.title || 'Meal',
+          mealType: (notificationData.mealType || 'dinner') as 'breakfast' | 'lunch' | 'dinner' | 'snack',
           mealDate: notificationData.mealDate || '',
           mealTime: notificationData.mealTime || '',
-          reminderType: notificationData.reminderType || 'prep',
-          ingredients: notificationData.ingredients,
-          cookingTime: notificationData.cookingTime,
-          recipeUrl: notificationData.recipeUrl,
+          reminderType: (notificationData.reminderType || 'prep') as 'cook' | 'plan' | 'prep',
+          ingredients: (notificationData.ingredients || []) as string[],
+          cookingTime: notificationData.cookingTime || '',
+          recipeUrl: notificationData.recipeUrl || '',
           spaceId: notificationData.spaceId || '',
           mealId: notificationData.mealId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -265,17 +265,17 @@ async function sendInstantNotification(userId: string, notification: Notificatio
         return await sendGeneralReminderEmail({
           recipientEmail: user.email,
           recipientName: user.name || 'Partner',
-          reminderTitle: notificationData.title,
-          reminderDescription: notificationData.description,
-          reminderType: notificationData.reminderType || 'personal',
-          dueDate: notificationData.dueDate,
-          dueTime: notificationData.dueTime,
-          priority: notificationData.priority || 'normal',
-          category: notificationData.category,
+          reminderTitle: notificationData.title || 'Reminder',
+          reminderDescription: notificationData.description || '',
+          reminderType: (notificationData.reminderType || 'personal') as 'personal' | 'shared' | 'recurring',
+          dueDate: notificationData.dueDate || '',
+          dueTime: notificationData.dueTime || '',
+          priority: (notificationData.priority || 'normal') as 'high' | 'low' | 'normal' | 'urgent',
+          category: notificationData.category || '',
           spaceId: notificationData.spaceId || '',
           reminderId: notificationData.reminderId || '',
           spaceName: notificationData.spaceName || 'Unknown Space',
-          createdBy: notificationData.createdBy
+          createdBy: notificationData.createdBy || ''
         });
 
       default:

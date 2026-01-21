@@ -156,7 +156,7 @@ export async function getComments(
   const commentRows = (data || []) as CommentRow[];
   const comments = commentRows.map((c) => ({
     ...c,
-    user_email: c.users?.email,
+    user_email: c.users?.email ?? undefined,
     replies: [],
   }));
 
@@ -235,7 +235,7 @@ export async function getComment(commentId: string): Promise<CommentWithDetails 
   const record = data as CommentRow;
   return {
     ...record,
-    user_email: record.users?.email,
+    user_email: record.users?.email ?? undefined,
   };
 }
 

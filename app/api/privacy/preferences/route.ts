@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ratelimit } from '@/lib/ratelimit';
 import { logger } from '@/lib/logger';
+import { getAppUrl } from '@/lib/utils/app-url';
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -281,7 +282,7 @@ async function updateMarketingSubscription(userId: string, type: 'email' | 'sms'
     const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
     const accessToken = session?.access_token;
-    const authHeaders = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    const authHeaders: HeadersInit = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
     const { data: profile } = await supabase
       .from('profiles')
       .select('email, phone_number')
@@ -344,7 +345,7 @@ async function updateThirdPartyAnalytics(userId: string, enabled: boolean) {
     const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
     const accessToken = session?.access_token;
-    const authHeaders = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    const authHeaders: HeadersInit = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
 
     await fetch(`${getAppUrl()}/api/privacy/third-party-analytics`, {
       method: 'POST',

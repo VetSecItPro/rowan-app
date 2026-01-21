@@ -370,7 +370,7 @@ export async function markBillAsPaid(
     );
   }
 
-  return { bill: updatedBill, expense };
+  return { bill: updatedBill, expense: expense as Record<string, unknown> | undefined };
 }
 
 /**

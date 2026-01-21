@@ -76,7 +76,7 @@ export interface ReminderStats {
   overdue: number;
 }
 
-type ReminderUpdatePayload = UpdateReminderInput & {
+type ReminderUpdatePayload = Omit<UpdateReminderInput, 'completed_at'> & {
   completed_at?: string | null;
 };
 

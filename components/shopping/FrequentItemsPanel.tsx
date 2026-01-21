@@ -27,7 +27,7 @@ export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelPro
     try {
       setLoading(true);
       const items = await shoppingService.getFrequentItems(spaceId, 12);
-      setFrequentItems(items);
+      setFrequentItems(items as FrequentItem[]);
     } catch (error) {
       logger.error('Failed to load frequent items:', error, { component: 'FrequentItemsPanel', action: 'component_action' });
     } finally {

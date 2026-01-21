@@ -44,9 +44,11 @@ interface UnifiedDetailsModalProps {
   onClose: () => void;
   spaceId: string;
   userId: string;
-  onEdit?: (item: (Task & { type: 'task' }) | (Chore & { type: 'chore' })) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onEdit?: (item: any) => void;
   onDelete?: (itemId: string, type?: 'task' | 'chore') => void;
-  onSave?: (item: ItemType) => void | Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSave?: (item: any) => void | Promise<void | { id: string }>;
   onUpdate?: () => void;
 }
 

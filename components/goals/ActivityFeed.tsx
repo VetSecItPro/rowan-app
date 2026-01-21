@@ -223,7 +223,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
       metadata.push(<Mic key="voice" className="h-3 w-3 text-purple-500" />);
     }
 
-    if (data?.has_notes && data.has_notes !== false) {
+    if (data?.has_notes) {
       metadata.push(<MessageCircle key="notes" className="h-3 w-3 text-blue-500" />);
     }
 
@@ -295,7 +295,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        getUserInitials(activity.user)
+                        getUserInitials(activity.user || null)
                       )}
                     </div>
 
@@ -344,7 +344,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                     className="w-6 h-6 rounded-full object-cover"
                                   />
                                 ) : (
-                                  getUserInitials(comment.user)
+                                  getUserInitials(comment.user || null)
                                 )}
                               </div>
                               <div className="flex-1">
@@ -376,9 +376,9 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
                           <div className="flex items-start space-x-2">
                             <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-300">
-                              {user?.avatar_url ? (
+                              {(user as { avatar_url?: string } | null)?.avatar_url ? (
                                 <Image
-                                  src={user.avatar_url}
+                                  src={(user as { avatar_url: string }).avatar_url}
                                   alt=""
                                   width={24}
                                   height={24}

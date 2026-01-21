@@ -177,7 +177,7 @@ Extract the data now:`;
     const ocrResult: OCRResult = {
       text: text,
       merchant_name: parsedData.merchant_name || null,
-      total_amount: parsedData.total_amount ? parseFloat(parsedData.total_amount) : null,
+      total_amount: parsedData.total_amount ? parseFloat(String(parsedData.total_amount)) : null,
       receipt_date: parsedData.receipt_date || null,
       category: parsedData.category || 'Other',
       confidence: parsedData.confidence || 50,

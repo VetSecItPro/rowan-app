@@ -149,7 +149,7 @@ export const shoppingIntegrationService = {
     const rows = (data ?? []) as LinkedListRow[];
     rows.forEach((item) => {
       // Only set if we haven't seen this task yet (take first list)
-      if (item.task_id && !result[item.task_id] && item.list) {
+      if (item.task_id && !result[item.task_id] && item.list && item.list.id && item.list.title) {
         result[item.task_id] = {
           id: item.list.id,
           title: item.list.title,

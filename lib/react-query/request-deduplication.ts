@@ -38,7 +38,7 @@ class RequestThrottler {
     if (lastCall && now - lastCall < this.THROTTLE_DELAY) {
       const existing = this.pendingRequests.get(key);
       if (existing) {
-        return existing;
+        return existing as Promise<T>;
       }
 
       // Delay the new request
@@ -50,7 +50,7 @@ class RequestThrottler {
     // Check if there's already a pending request for this key
     const existingRequest = this.pendingRequests.get(key);
     if (existingRequest) {
-      return existingRequest;
+      return existingRequest as Promise<T>;
     }
 
     // Create new request and track it

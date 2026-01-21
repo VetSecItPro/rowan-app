@@ -112,7 +112,7 @@ const RecurrencePatternSchema = z.object({
   interval: z.number().optional(),
   days_of_week: z.array(z.number().min(0).max(6)).optional(),
   day_of_month: z.number().min(1).max(31).optional(),
-  custom_rules: z.record(z.unknown()).optional(),
+  custom_rules: z.record(z.string(), z.unknown()).optional(),
 });
 
 const CreateRecurringGoalTemplateSchema = z.object({

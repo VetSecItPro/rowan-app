@@ -35,12 +35,13 @@ function getEditRoute(item: UnifiedCalendarItem): string {
   }
 }
 
-const ITEM_TYPE_ICONS = {
+const ITEM_TYPE_ICONS: Record<string, typeof Calendar> = {
   task: CheckCircle2,
   meal: UtensilsCrossed,
   reminder: Bell,
   goal: Target,
   calendar: Calendar,
+  event: Calendar,
 };
 
 /**

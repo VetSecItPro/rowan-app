@@ -23,7 +23,7 @@ type FeedbackCategory = 'bug' | 'feature_request' | 'ui_ux' | 'performance' | 'o
 type FeedbackSeverity = 'critical' | 'high' | 'medium' | 'low';
 type FeedbackPriority = 'must_have' | 'should_have' | 'could_have' | 'wont_have';
 
-const CATEGORIES = [
+const CATEGORIES: Array<{ value: FeedbackCategory; label: string; icon: typeof Bug; color: string }> = [
   { value: 'bug', label: 'Bug Report', icon: Bug, color: 'text-red-600 bg-red-50 border-red-200' },
   { value: 'feature_request', label: 'Feature Request', icon: Lightbulb, color: 'text-blue-600 bg-blue-50 border-blue-200' },
   { value: 'ui_ux', label: 'UI/UX Feedback', icon: Palette, color: 'text-purple-600 bg-purple-50 border-purple-200' },

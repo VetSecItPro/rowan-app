@@ -220,10 +220,13 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
   };
 
   // Get icon component
-  const getIconComponent = (iconName: string) => {
+  const getIconComponent = (iconName: string): React.ComponentType<{ className?: string }> => {
     const iconKey = iconName as keyof typeof Icons;
-    const IconComponent = Icons[iconKey] || Icons.FolderOpen;
-    return IconComponent;
+    const IconComponent = Icons[iconKey];
+    if (IconComponent && typeof IconComponent === 'function') {
+      return IconComponent as React.ComponentType<{ className?: string }>;
+    }
+    return Icons.FolderOpen;
   };
 
   if (isLoading) {

@@ -159,7 +159,7 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (updates: Partial<UserProfile>) => {
+    mutationFn: async (updates: Partial<UserProfile>): Promise<UserProfile> => {
       const supabase = createClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError) throw authError;
@@ -178,8 +178,8 @@ export function useUpdateProfile() {
           .single();
 
         if (error) throw error;
-        return data;
-      });
+        return data as UserProfile;
+      }) as Promise<UserProfile>;
     },
     // Optimistic update
     onMutate: async (updates) => {
@@ -220,7 +220,7 @@ export function useUpdateProfile() {
       }
     },
     // Invalidate cache on success
-    onSuccess: (data) => {
+    onSuccess: (data: UserProfile) => {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.auth.profile(data.id),
       });

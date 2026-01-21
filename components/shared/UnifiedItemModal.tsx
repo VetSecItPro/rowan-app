@@ -45,7 +45,7 @@ interface UnifiedItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (item: CreateTaskInput | CreateChoreInput) => void | Promise<void | { id: string }>;
-  editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | null;
+  editItem?: (Task & { type?: 'task' }) | (Chore & { type?: 'chore' }) | (Partial<Task & Chore> & { type: 'task' | 'chore' }) | null;
   spaceId?: string;
   userId?: string;
   defaultType?: ItemType;
@@ -73,7 +73,7 @@ const buildInitialFormData = (
       status: editItemData.status || 'pending',
       due_date: editItemData.due_date || '',
       assigned_to: editItemData.assigned_to || '',
-      estimated_hours: editItemData.estimated_hours || '',
+      estimated_hours: editItemData.estimated_hours?.toString() || '',
       tags: editItemData.tags || '',
       frequency: editItemData.frequency || 'once',
       point_value: editItemData.point_value || 10,
@@ -474,12 +474,12 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
 
             {/* Compact Section Navigation - Horizontal scroll on mobile */}
             <div className="flex gap-1.5 sm:gap-2 p-1 bg-gray-900 rounded-full sm:rounded-xl overflow-x-auto scrollbar-hide">
-              {[
-                { id: 'basic', label: 'Basics', emoji: '📝', icon: Tag },
-                { id: 'details', label: 'Details', emoji: '⚡', icon: Star },
-                { id: 'family', label: 'Family', emoji: '👥', icon: Users },
-                { id: 'schedule', label: 'Schedule', emoji: '📅', icon: Calendar },
-              ].map(section => (
+              {([
+                { id: 'basic' as const, label: 'Basics', emoji: '📝', icon: Tag },
+                { id: 'details' as const, label: 'Details', emoji: '⚡', icon: Star },
+                { id: 'family' as const, label: 'Family', emoji: '👥', icon: Users },
+                { id: 'schedule' as const, label: 'Schedule', emoji: '📅', icon: Calendar },
+              ]).map(section => (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
@@ -737,7 +737,6 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                       <button
                         onClick={() => {
                           setIsRecurring(!isRecurring);
-                          setIntervalTouched(false); // Reset when toggling recurring mode
                         }}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                           isRecurring

@@ -16,6 +16,7 @@ type VoiceNoteMetadata = {
   keywords?: string[];
   category?: string;
   tags?: string[];
+  template?: string;
 };
 
 // Mood emoji options
@@ -63,7 +64,7 @@ export function GoalCheckInModal({
   const handleVoiceNoteSent = async (audioBlob: Blob, duration: number, metadata?: VoiceNoteMetadata) => {
     setVoiceNoteBlob(audioBlob);
     setVoiceNoteDuration(duration);
-    setVoiceNoteMetadata(metadata);
+    setVoiceNoteMetadata(metadata || null);
     setShowVoiceRecorder(false);
 
     // Automatically transcribe if metadata is available
@@ -129,7 +130,7 @@ export function GoalCheckInModal({
       const checkInData = {
         ...formData,
         voice_note_duration: voiceNoteBlob ? voiceNoteDuration : undefined,
-        voice_note_category: voiceNoteMetadata?.category || 'general',
+        voice_note_category: (voiceNoteMetadata?.category || 'general') as 'goals' | 'progress' | 'challenges' | 'general' | 'reflections',
         voice_note_template_id: voiceNoteMetadata?.template || null,
         voice_note_metadata: voiceNoteMetadata ? {
           transcription: voiceNoteMetadata.transcription,

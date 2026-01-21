@@ -440,8 +440,9 @@ export function getDataSubset(data: UserDataExport, dataType: string): { title: 
     return { title: 'Unknown Data Type', data: [] };
   }
 
+  const subsetData = data[mapping.key];
   return {
     title: mapping.title,
-    data: data[mapping.key] || []
+    data: (Array.isArray(subsetData) ? subsetData : []) as ExportRecord[]
   };
 }

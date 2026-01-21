@@ -473,7 +473,7 @@ export const goalsService = {
                 goalUrl: `${getAppUrl()}/goals/${data.id}?space_id=${data.space_id}`,
                 achievementType: 'goal_completed',
                 completedBy: userData?.name || 'Someone',
-                completionDate: finalUpdates.completed_at,
+                completionDate: finalUpdates.completed_at || new Date().toISOString(),
                 spaceName: spaceData?.name || 'Your Space',
               }
             ).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
@@ -583,7 +583,7 @@ export const goalsService = {
                 goalUrl: `${getAppUrl()}/goals/${data.goal_id}?space_id=${data.goal.space_id}`,
                 achievementType: 'milestone_reached',
                 completedBy: userData?.name || 'Someone',
-                completionDate: finalUpdates.completed_at,
+                completionDate: finalUpdates.completed_at || new Date().toISOString(),
                 spaceName: spaceData?.name || 'Your Space',
                 milestoneTitle: data.title,
               }

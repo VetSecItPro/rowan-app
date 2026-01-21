@@ -96,6 +96,7 @@ export const choreCalendarService = {
    */
   generateChoreEvents(chore: ChoreRecord, monthsAhead: number = 3): CalendarEventInsert[] {
     const events: CalendarEventInsert[] = [];
+    if (!chore.due_date) return events; // No due date, no events to generate
     const startDate = new Date(chore.due_date);
     const endDate = addDays(startDate, monthsAhead * 30); // Generate events for next 3 months
 

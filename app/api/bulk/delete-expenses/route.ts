@@ -84,6 +84,10 @@ export async function POST(request: NextRequest) {
     const spaceId = validationResult.data.space_id || validationResult.data.partnership_id;
     const { options } = validationResult.data;
 
+    if (!spaceId) {
+      return NextResponse.json({ error: 'space_id or partnership_id is required' }, { status: 400 });
+    }
+
     // Verify user has access to this partnership
     const { data: membership } = await supabase
       .from('space_members')
@@ -166,6 +170,10 @@ export async function GET(request: NextRequest) {
 
     const spaceId = validationResult.data.space_id || validationResult.data.partnership_id;
     const { start_date: startDate, end_date: endDate, category_id: categoryId, budget_id: budgetId } = validationResult.data;
+
+    if (!spaceId) {
+      return NextResponse.json({ error: 'space_id or partnership_id is required' }, { status: 400 });
+    }
 
     // Verify user has access
     const { data: membership } = await supabase

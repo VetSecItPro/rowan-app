@@ -402,6 +402,8 @@ export interface Chore {
   updated_at: string;
   sort_order?: number;
   calendar_sync?: boolean;
+  category?: string;
+  point_value?: number;
 }
 
 export interface ChoreCompletion {

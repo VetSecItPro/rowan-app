@@ -13,9 +13,11 @@ interface LinkedShoppingList {
   items_count?: number;
 }
 
+type TaskStatus = 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
+
 interface TaskCardProps {
   task: Task & { type?: 'task' | 'chore' };
-  onStatusChange: (taskId: string, status: string, type?: 'task' | 'chore') => void;
+  onStatusChange: (taskId: string, status: TaskStatus, type?: 'task' | 'chore') => void;
   onEdit: (task: Task & { type?: 'task' | 'chore' }) => void;
   onDelete: (taskId: string, type?: 'task' | 'chore') => void;
   onViewDetails?: (task: Task & { type?: 'task' | 'chore' }) => void;
@@ -38,7 +40,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
 
   // Handle status rotation: pending → in_progress → completed → pending
   const handleStatusClick = () => {
-    let newStatus = 'pending';
+    let newStatus: TaskStatus = 'pending';
     if (task.status === 'pending') {
       newStatus = 'in-progress';
     } else if (task.status === 'in-progress') {

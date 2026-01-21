@@ -55,8 +55,17 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
     try {
       const data = await choreRotationService.getRotation(taskId);
       if (data) {
-        setRotation(data);
-        setFormData(data);
+        // Map service response to local RotationConfig format
+        const mappedData: RotationConfig = {
+          id: data.id,
+          rotation_type: (data.rotation_type as 'round-robin' | 'random') || 'round-robin',
+          interval_type: (data.rotation_frequency as 'daily' | 'weekly' | 'monthly') || 'weekly',
+          interval_value: 1,
+          member_ids: data.user_order || [],
+          is_active: true,
+        };
+        setRotation(mappedData);
+        setFormData(mappedData);
       }
     } catch (error) {
       logger.error('Error loading rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
@@ -135,10 +144,9 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
     if (!rotation?.id) return;
 
     try {
-      await choreRotationService.updateRotation(rotation.id, {
-        is_active: !rotation.is_active,
-      });
-      loadRotation();
+      // Toggle active state locally (is_active not stored in DB schema)
+      setRotation(prev => prev ? { ...prev, is_active: !prev.is_active } : null);
+      setFormData(prev => ({ ...prev, is_active: !prev.is_active }));
     } catch (error) {
       logger.error('Error toggling rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
     }

@@ -186,11 +186,11 @@ const SummarySection: React.FC<{ report: GeneratedReport }> = ({ report }) => (
         This report covers the period from {format(new Date(report.date_range_start), 'MMM dd, yyyy')}
         to {format(new Date(report.date_range_end), 'MMM dd, yyyy')}.
         {report.summary_stats.total_expenses &&
-          ` Total expenses: ${formatCurrency(report.summary_stats.total_expenses)}.`}
+          ` Total expenses: ${formatCurrency(Number(report.summary_stats.total_expenses))}.`}
         {report.summary_stats.total_budget &&
-          ` Budget allocation: ${formatCurrency(report.summary_stats.total_budget)}.`}
+          ` Budget allocation: ${formatCurrency(Number(report.summary_stats.total_budget))}.`}
         {report.summary_stats.budget_utilization &&
-          ` Budget utilization: ${formatPercentage(report.summary_stats.budget_utilization)}.`}
+          ` Budget utilization: ${formatPercentage(Number(report.summary_stats.budget_utilization))}.`}
       </Text>
     </View>
   </View>
@@ -240,15 +240,15 @@ const KeyMetricsSection: React.FC<{ metrics: ReportMetrics }> = ({ metrics }) =>
             </Text>
           </View>
         )}
-        {metrics.budget_remaining !== undefined && (
+        {metrics.budget_remaining != null && (
           <View style={styles.metricCard}>
             <Text style={styles.metricLabel}>Budget Remaining</Text>
             <Text style={[
               styles.metricValue,
               styles.currency,
-              metrics.budget_remaining >= 0 ? styles.positive : styles.negative
+              Number(metrics.budget_remaining) >= 0 ? styles.positive : styles.negative
             ]}>
-              {formatCurrency(metrics.budget_remaining)}
+              {formatCurrency(Number(metrics.budget_remaining))}
             </Text>
           </View>
         )}

@@ -44,6 +44,21 @@ type TaskOrChore = Task & {
   sort_order: number;
 };
 
+// Common interface for task/chore items from various components
+interface ItemLike {
+  id: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  sort_order?: number;
+  due_date?: string;
+  assigned_to?: string;
+  type?: 'task' | 'chore';
+  frequency?: string;
+  category?: string;
+}
+
 export default function TasksPage() {
   const { currentSpace, user } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
@@ -499,13 +514,15 @@ export default function TasksPage() {
     }
   }, [refreshChores, refreshTasks, setChoreLoading, setTasks]);
 
-  const handleEditItem = useCallback((item: TaskOrChore) => {
-    setEditingItem({ ...item, type: item.type });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleEditItem = useCallback((item: any) => {
+    setEditingItem({ ...item, type: item.type || 'task' } as TaskOrChore);
     setIsUnifiedModalOpen(true);
   }, []);
 
-  const handleViewDetails = useCallback((item: TaskOrChore) => {
-    setSelectedItem({ ...item, type: item.type });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleViewDetails = useCallback((item: any) => {
+    setSelectedItem({ ...item, type: item.type || 'task' } as TaskOrChore);
     setIsDetailsModalOpen(true);
   }, []);
 

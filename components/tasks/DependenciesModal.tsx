@@ -27,8 +27,8 @@ interface TaskDependency {
   task_id: string;
   depends_on_task_id: string;
   dependency_type: string;
-  dependent_task?: Task;
-  created_at: string;
+  dependent_task?: Task | Record<string, unknown>;
+  created_at?: string;
 }
 
 export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: DependenciesModalProps) {
@@ -230,7 +230,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-white">
-                            {dep.dependent_task?.title || 'Unknown Task'}
+                            {(dep.dependent_task as Task | undefined)?.title || 'Unknown Task'}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
                             This task blocks the dependent task
@@ -262,7 +262,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                       >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-white">
-                            {dep.dependent_task?.title || 'Unknown Task'}
+                            {(dep.dependent_task as Task | undefined)?.title || 'Unknown Task'}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
                             Related to this task

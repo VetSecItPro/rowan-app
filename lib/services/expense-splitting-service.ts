@@ -414,7 +414,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
     const userId = split.user_id;
     if (!balanceMap[userId]) {
       balanceMap[userId] = {
-        email: split.users?.email,
+        email: split.users?.email ?? undefined,
         owed: 0,
         owedToThem: 0,
       };
@@ -548,7 +548,8 @@ export async function getExpensesByOwnership(
   if (error) throw error;
 
   // Group by ownership
-  const stats = (data ?? []).reduce<OwnershipStats>((acc, expense: ExpenseOwnershipRow) => {
+  const rows = (data ?? []) as ExpenseOwnershipRow[];
+  const stats = rows.reduce<OwnershipStats>((acc, expense) => {
     const ownership = (expense.ownership || 'shared') as OwnershipType;
     if (!acc[ownership]) {
       acc[ownership] = { ownership, total: 0, count: 0 };

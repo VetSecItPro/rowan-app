@@ -109,7 +109,7 @@ class Logger {
             component: context?.component,
             action: context?.action,
           },
-          extra: sanitizedContext,
+          extra: sanitizedContext as Record<string, unknown> | undefined,
         });
       }
     }
@@ -151,7 +151,7 @@ class Logger {
           component: context?.component,
           action: context?.action,
         },
-        extra: this.sanitize(context),
+        extra: this.sanitize(context) as Record<string, unknown> | undefined,
       });
     } else {
       this.log('error', message, { ...context, error });

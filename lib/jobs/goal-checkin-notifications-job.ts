@@ -162,19 +162,22 @@ async function getCheckInRemindersNeedingNotification(supabase: SupabaseClient):
     throw new Error('Failed to fetch check-in reminders');
   }
 
-  // Transform the data
-  return (data || []).map((reminder: ReminderRow) => ({
-    id: reminder.id,
-    goal_id: reminder.goal_id,
-    user_id: reminder.user_id,
-    scheduled_for: reminder.scheduled_for,
-    goal_title: reminder.goals.title,
-    goal_description: reminder.goals.description,
-    space_id: reminder.goals.space_id,
-    space_name: reminder.goals.spaces.name,
-    user_email: reminder.users.email,
-    user_name: reminder.users.name,
-  }));
+  // Transform the data - cast to handle Supabase join types
+  return (data || []).map((reminder) => {
+    const r = reminder as unknown as ReminderRow;
+    return {
+      id: r.id,
+      goal_id: r.goal_id,
+      user_id: r.user_id,
+      scheduled_for: r.scheduled_for,
+      goal_title: r.goals.title,
+      goal_description: r.goals.description ?? undefined,
+      space_id: r.goals.space_id,
+      space_name: r.goals.spaces.name,
+      user_email: r.users.email,
+      user_name: r.users.name,
+    };
+  });
 }
 
 /**

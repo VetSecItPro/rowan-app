@@ -184,6 +184,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create notification
+    const notificationsService = new InAppNotificationsService(supabase);
     const success = await notificationsService.createNotification(input);
 
     if (!success) {
@@ -251,6 +252,8 @@ export async function PATCH(req: NextRequest) {
     }
 
     const { notification_ids, mark_all } = parseResult.data;
+
+    const notificationsService = new InAppNotificationsService(supabase);
 
     if (mark_all) {
       // Mark all as read

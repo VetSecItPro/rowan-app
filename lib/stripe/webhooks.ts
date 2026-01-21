@@ -245,8 +245,10 @@ async function handleSubscriptionCreated(
 
   // Subscription should already exist from checkout.session.completed
   // This just ensures it's in the correct state
-  const periodStart = subscription.current_period_start;
-  const periodEnd = subscription.current_period_end;
+  // Access period fields with type assertion for Stripe SDK v20 compatibility
+  const subData = subscription as unknown as { current_period_start?: number; current_period_end?: number };
+  const periodStart = subData.current_period_start;
+  const periodEnd = subData.current_period_end;
 
   const { error } = await supabase
     .from('subscriptions')
@@ -279,7 +281,8 @@ async function handleSubscriptionUpdated(
 
   // Map Stripe status to our status
   const status = mapStripeStatus(subscription.status);
-  const periodEnd = subscription.current_period_end;
+  // Access period fields with type assertion for Stripe SDK v20 compatibility
+  const periodEnd = (subscription as unknown as { current_period_end?: number }).current_period_end;
 
   const { error } = await supabase
     .from('subscriptions')
@@ -344,7 +347,8 @@ async function handleSubscriptionDeleted(
     .single();
 
   // Update to canceled status (keep record for history)
-  const periodEnd = subscription.current_period_end;
+  // Access period fields with type assertion for Stripe SDK v20 compatibility
+  const periodEnd = (subscription as unknown as { current_period_end?: number }).current_period_end;
   const accessUntilDate = periodEnd ? new Date(periodEnd * 1000) : new Date();
 
   const { error } = await supabase
@@ -427,9 +431,11 @@ async function handleInvoicePaymentSucceeded(
   invoice: Stripe.Invoice
 ): Promise<void> {
   const supabase = supabaseAdmin;
-  const subscriptionId = typeof invoice.subscription === 'string'
-    ? invoice.subscription
-    : invoice.subscription?.id;
+  // Access subscription with type assertion for Stripe SDK v20 compatibility
+  const invoiceData = invoice as unknown as { subscription?: string | { id?: string } | null };
+  const subscriptionId = typeof invoiceData.subscription === 'string'
+    ? invoiceData.subscription
+    : invoiceData.subscription?.id;
 
   if (!subscriptionId || typeof subscriptionId !== 'string') {
     return; // Not a subscription invoice
@@ -467,9 +473,11 @@ async function handleInvoicePaymentFailed(
   invoice: Stripe.Invoice
 ): Promise<void> {
   const supabase = supabaseAdmin;
-  const subscriptionId = typeof invoice.subscription === 'string'
-    ? invoice.subscription
-    : invoice.subscription?.id;
+  // Access subscription with type assertion for Stripe SDK v20 compatibility
+  const invoiceData = invoice as unknown as { subscription?: string | { id?: string } | null };
+  const subscriptionId = typeof invoiceData.subscription === 'string'
+    ? invoiceData.subscription
+    : invoiceData.subscription?.id;
 
   if (!subscriptionId || typeof subscriptionId !== 'string') {
     return; // Not a subscription invoice

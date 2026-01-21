@@ -181,10 +181,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
         location: parsed.location || '',
         category: parsed.category || 'personal',
         is_recurring: parsed.isRecurring || false,
-        recurrence_pattern: parsed.recurrencePattern ? {
-          frequency: parsed.recurrencePattern,
-          interval: 1
-        } : null,
+        recurrence_pattern: parsed.recurrencePattern || undefined,
       });
     } else {
       // AI mode - use parsed preview
@@ -208,12 +205,9 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
           : undefined,
         location: parsedPreview.location || '',
         description: parsedPreview.description || '',
-        category: parsedPreview.category || 'personal',
+        category: (parsedPreview.category as 'work' | 'personal' | 'family' | 'health' | 'social') || 'personal',
         is_recurring: parsedPreview.isRecurring || false,
-        recurrence_pattern: parsedPreview.recurrencePattern ? {
-          frequency: parsedPreview.recurrencePattern,
-          interval: 1
-        } : null,
+        recurrence_pattern: parsedPreview.recurrencePattern || undefined,
       });
     }
 

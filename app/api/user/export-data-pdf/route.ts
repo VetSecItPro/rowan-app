@@ -137,7 +137,10 @@ export async function GET(request: NextRequest) {
 
           // Format dates
           if (header.includes('date') || header.includes('_at')) {
-            return value ? new Date(value).toLocaleDateString() : '';
+            if (typeof value === 'string' || typeof value === 'number') {
+              return new Date(value).toLocaleDateString();
+            }
+            return '';
           }
 
           // Format booleans

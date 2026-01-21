@@ -5,7 +5,8 @@ type CookieStore = Awaited<ReturnType<typeof cookies>>;
 type CookieOptions = Parameters<CookieStore['set']>[2];
 
 // Mock cookie store for build time
-const mockCookieStore: CookieStore = {
+// Use type assertion since we're providing a partial mock that won't be used at runtime
+const mockCookieStore = {
   get: (name: string) => {
     void name;
     return undefined;
@@ -14,10 +15,13 @@ const mockCookieStore: CookieStore = {
     void name;
     void value;
     void options;
+    // Return self to satisfy the chainable ResponseCookies return type
+    return mockCookieStore;
   },
   delete: (name: string, options?: CookieOptions) => {
     void name;
     void options;
+    return mockCookieStore;
   },
   has: (name: string) => {
     void name;
@@ -25,7 +29,7 @@ const mockCookieStore: CookieStore = {
   },
   getAll: () => [],
   toString: () => '',
-};
+} as unknown as CookieStore;
 
 /**
  * Async safe cookie accessor for API routes
@@ -60,11 +64,11 @@ export async function safeCookiesAsync(): Promise<CookieStore> {
 export function safeCookies(): CookieStore {
   try {
     const store = cookies();
-    if (typeof (store as Promise<CookieStore>).then === 'function') {
+    if (typeof (store as unknown as Promise<CookieStore>).then === 'function') {
       logger.warn('Sync cookies access unavailable, returning mock store', { component: 'lib-safe-cookies' });
       return mockCookieStore;
     }
-    return store as CookieStore;
+    return store as unknown as CookieStore;
   } catch {
     // During build time or API routes, provide a mock cookie store
     logger.warn('Cookies not available during build time, using mock store', { component: 'lib-safe-cookies' });

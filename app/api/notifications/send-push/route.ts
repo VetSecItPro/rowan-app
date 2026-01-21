@@ -137,8 +137,8 @@ export async function POST(req: NextRequest) {
 
       const callerSpaces = callerSpacesResult.data || [];
       const targetSpaces = targetSpacesResult.data || [];
-      const targetSpaceIds = new Set(targetSpaces.map((space) => space.space_id));
-      return callerSpaces.some((space) => targetSpaceIds.has(space.space_id));
+      const targetSpaceIds = new Set(targetSpaces.map((space: { space_id: string }) => space.space_id));
+      return callerSpaces.some((space: { space_id: string }) => targetSpaceIds.has(space.space_id));
     }
 
     if (isBulk) {

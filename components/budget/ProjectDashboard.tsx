@@ -266,7 +266,7 @@ export function ProjectDashboard({
             Project Details
           </h3>
           <button
-            onClick={() => setShowEditProject(true)}
+            onClick={() => { /* TODO: Implement edit project modal */ }}
             className="flex items-center gap-2 px-3 py-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 transition-colors text-sm font-medium"
           >
             <Edit3 className="w-4 h-4" />

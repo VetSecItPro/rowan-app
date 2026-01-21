@@ -355,7 +355,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
         .from('space_members')
         .select('spaces(*)')
         .eq('user_id', userId);
-      const spaceMembers = (spaces || []) as Array<{ spaces?: ExportRecord | null }>;
+      const spaceMembers = (spaces || []) as unknown as Array<{ spaces?: ExportRecord | null }>;
       data.spaces = spaceMembers.map((sm) => sm.spaces || {}).filter((space) => Object.keys(space).length > 0);
     }
 

@@ -29,7 +29,7 @@ interface TaskApproval {
   task_id: string;
   approver_id: string;
   status: 'pending' | 'approved' | 'rejected' | 'changes_requested';
-  note?: string;
+  note?: string | null;
   requested_by: string;
   requested_by_user?: {
     id: string;
@@ -42,10 +42,13 @@ interface TaskApproval {
     email: string;
     full_name: string | null;
   };
-  review_note?: string;
+  review_note?: string | null;
+  changes_requested?: string | null;
   reviewed_at?: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
+  approver?: Record<string, unknown>;
+  task?: Record<string, unknown>;
 }
 
 export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId }: ApprovalModalProps) {

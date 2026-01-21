@@ -34,7 +34,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         case 'INSERT':
           // Add new event if not already in list
           if (!currentEvents.find(e => e.id === newRecord.id)) {
-            return [...currentEvents, newRecord as CalendarEvent].sort(
+            return [...currentEvents, newRecord as unknown as CalendarEvent].sort(
               (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
             );
           }
@@ -43,12 +43,12 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         case 'UPDATE':
           // Update existing event
           return currentEvents.map(event =>
-            event.id === newRecord.id ? { ...event, ...newRecord } : event
+            event.id === newRecord.id ? { ...event, ...(newRecord as unknown as CalendarEvent) } : event
           );
 
         case 'DELETE':
           // Remove deleted event
-          return currentEvents.filter(event => event.id !== oldRecord.id);
+          return currentEvents.filter(event => event.id !== (oldRecord as unknown as CalendarEvent).id);
 
         default:
           return currentEvents;
@@ -69,7 +69,7 @@ export function useCalendarRealtime(spaceId: string | undefined, userId: string 
         timestamp: Date.now()
       }
     });
-  }, [channel, userId]);
+  }, [userId]);
 
   // Broadcast that user is viewing an event
   const broadcastViewing = useCallback((eventId: string | null) => {

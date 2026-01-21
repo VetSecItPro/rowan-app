@@ -135,7 +135,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
     spaceMembers.forEach((member) => {
       options.push({
         value: member.user_id,
-        label: member.display_name || member.email
+        label: member.display_name || member.email || 'Unknown'
       });
     });
     return options;

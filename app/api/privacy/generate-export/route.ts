@@ -200,7 +200,7 @@ async function gatherUserData(userId: string) {
   // Get user's tasks across all spaces
   const spaceIds = (spaceMembers || [])
     .map((sm: SpaceMemberRecord) => sm.space_id)
-    .filter((spaceId): spaceId is string => Boolean(spaceId));
+    .filter((spaceId: string | undefined | null): spaceId is string => Boolean(spaceId));
   const { data: tasks } = spaceIds.length > 0 ? await supabase
     .from('tasks')
     .select('*')
@@ -350,7 +350,7 @@ async function generateCSVExport(userData: ExportBundle): Promise<Buffer> {
   }
 
   // Privacy history
-  if (userData.privacyHistory?.length > 0) {
+  if (userData.privacyHistory && userData.privacyHistory.length > 0) {
     csvContent += 'PRIVACY SETTINGS HISTORY\n';
     csvContent += 'Preference,Old Value,New Value,Changed At\n';
     userData.privacyHistory.forEach((change: ExportRecord) => {
