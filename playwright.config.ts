@@ -30,7 +30,8 @@ export default defineConfig({
   // Shared settings for all the projects below
   use: {
     // Base URL to use in actions like `await page.goto('/')`
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3100',
+    // Must match the webServer port (3000) or CI's PLAYWRIGHT_BASE_URL
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
 
     // Collect trace when retrying the failed test
     trace: 'on-first-retry',
@@ -77,9 +78,9 @@ export default defineConfig({
 
   // Run your local dev server before starting the tests
   webServer: {
-    command: 'npm run dev -- --hostname 127.0.0.1 --port 3100',
-    url: 'http://127.0.0.1:3100',
-    reuseExistingServer: false,
+    command: 'npm run dev -- --hostname localhost --port 3000',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI, // Reuse if running locally, not in CI
     timeout: 120000,
   },
 });
