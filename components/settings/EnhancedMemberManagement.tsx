@@ -8,7 +8,7 @@ import { MemberListItem } from '@/components/presence/MemberListItem';
 import { PresenceIndicator } from '@/components/presence/PresenceIndicator';
 import { getPendingInvitations } from '@/lib/services/invitations-service';
 import { removeMember, changeMemberRole } from '@/lib/services/member-management-service';
-import type { SpaceMemberWithPresence, SpaceInvitation } from '@/lib/types';
+import type { SpaceInvitation } from '@/lib/types';
 import { PresenceStatus } from '@/lib/types';
 import { logger } from '@/lib/logger';
 

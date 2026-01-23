@@ -4,12 +4,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import type {
-  CalendarConnection,
   OutlookCalendarEvent,
   OutlookCalendar,
   OutlookDeltaResponse,
-  SyncResult,
   TokenRefreshResult,
+  SyncResult,
 } from '@/lib/types/calendar-integration';
 
 // =============================================================================

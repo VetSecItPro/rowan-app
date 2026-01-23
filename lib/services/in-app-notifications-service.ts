@@ -38,7 +38,7 @@ export interface InAppNotification {
   sender_name?: string;
   created_at: string;
   read_at?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean | null>;
 }
 
 export interface CreateNotificationInput {
@@ -56,7 +56,7 @@ export interface CreateNotificationInput {
   emoji?: string;
   sender_id?: string;
   sender_name?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean | null>;
 }
 
 export interface NotificationFilters {

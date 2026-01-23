@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, TrendingUp, AlertTriangle, Check, X, Plus, Calendar } from 'lucide-react';
+import { Clock, AlertTriangle, Check, X, Plus, Calendar } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import {
   type RecurringExpensePattern,
@@ -40,6 +40,7 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
 
   useEffect(() => {
     loadPatterns();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadPatterns is a stable function
   }, [spaceId]);
 
   const loadPatterns = async () => {

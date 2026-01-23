@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Check, MoreVertical } from 'lucide-react';
+import { Check, MoreVertical } from 'lucide-react';
 import { Chore } from '@/lib/types';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { useState } from 'react';

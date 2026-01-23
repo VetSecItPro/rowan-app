@@ -136,7 +136,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
     }
   };
 
-  const handleInputChange = (field: keyof CreateVendorInput, value: any) => {
+  const handleInputChange = (field: keyof CreateVendorInput, value: string | number | boolean | undefined) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));

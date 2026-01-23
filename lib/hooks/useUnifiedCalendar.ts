@@ -151,7 +151,7 @@ export function useUnifiedCalendar({
   }, [persistFilters]);
 
   // Memoize date range keys to avoid unnecessary fetches
-  const dateRangeKey = useMemo(() => {
+  const _dateRangeKey = useMemo(() => {
     return `${startDate.toISOString()}-${endDate.toISOString()}`;
   }, [startDate, endDate]);
 
@@ -243,6 +243,7 @@ export function useUnifiedCalendarDate(
     };
 
     fetchItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- date is represented by dateKey
   }, [spaceId, dateKey, filters]);
 
   return { items, isLoading };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, Trash2, UserPlus, Flag, Tag, Download, X, ChevronDown } from 'lucide-react';
+import { CheckCircle2, Trash2, Flag, Tag, Download, X, ChevronDown } from 'lucide-react';
 import { remindersBulkService } from '@/lib/services/reminders-bulk-service';
 import { Reminder } from '@/lib/services/reminders-service';
 import { logger } from '@/lib/logger';
@@ -11,7 +11,6 @@ interface BulkActionsToolbarProps {
   selectedReminders: Reminder[];
   onClearSelection: () => void;
   onComplete: () => void;
-  spaceId: string;
 }
 
 export function BulkActionsToolbar({
@@ -19,7 +18,6 @@ export function BulkActionsToolbar({
   selectedReminders,
   onClearSelection,
   onComplete,
-  spaceId,
 }: BulkActionsToolbarProps) {
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);

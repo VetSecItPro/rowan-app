@@ -264,7 +264,7 @@ export const fileUploadService = {
     file: File,
     spaceId: string,
     messageId: string,
-    onProgress?: (progress: number) => void
+    _onProgress?: (progress: number) => void
   ): Promise<FileUploadResult> {
     const supabase = createClient();
 
@@ -293,7 +293,7 @@ export const fileUploadService = {
     const storagePath = `${spaceId}/${messageId}/${fileName}`;
 
     // Upload main file - explicitly set contentType to handle browser variations
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('message-attachments')
       .upload(storagePath, file, {
         cacheControl: '3600',

@@ -5,11 +5,9 @@ import { google, calendar_v3 } from 'googleapis';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import type {
-  CalendarConnection,
   GoogleCalendarEvent,
   GoogleCalendarList,
   GoogleSyncResponse,
-  SyncResult,
   TokenRefreshResult,
   WebhookRegistration,
 } from '@/lib/types/calendar-integration';

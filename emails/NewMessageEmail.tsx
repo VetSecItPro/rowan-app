@@ -77,6 +77,7 @@ export const NewMessageEmail = ({
         <div style={messageHeader}>
           <div style={senderInfo}>
             {senderAvatar && (
+              /* eslint-disable-next-line @next/next/no-img-element -- email templates don't support next/image */
               <img
                 src={senderAvatar}
                 alt={senderName}
@@ -104,7 +105,7 @@ export const NewMessageEmail = ({
           ) : null}
 
           <Text style={messageText}>
-            "{messagePreview}"
+            &quot;{messagePreview}&quot;
           </Text>
         </Section>
       </Section>

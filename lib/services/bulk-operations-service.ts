@@ -24,7 +24,7 @@ export interface BulkDeleteResult {
 
 export interface BulkExportResult {
   success: boolean;
-  data?: any[];
+  data?: Record<string, unknown>[];
   count?: number;
   error?: string;
 }

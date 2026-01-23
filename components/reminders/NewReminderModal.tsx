@@ -77,15 +77,15 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
       // Populate repeat days based on pattern
       if (editReminder.repeat_pattern === 'weekly' && editReminder.repeat_days) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+         
         setSelectedWeekdays(editReminder.repeat_days);
       } else if (editReminder.repeat_pattern === 'monthly' && editReminder.repeat_days) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+         
         setSelectedMonthDays(editReminder.repeat_days);
       }
     } else {
       // Creating new reminder - reset to clean state
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({
         space_id: spaceId,
         title: '',
@@ -97,20 +97,20 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         status: 'active',
         assigned_to: undefined,
       });
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setSelectedWeekdays([]);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setSelectedMonthDays([]);
     }
 
     // Reset other form state
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setDateError('');
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setShowEmojiPicker(false);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setShowTemplatePicker(false);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setAttachmentRefreshTrigger(prev => prev + 1);
   }, [isOpen, editReminder, spaceId]);
 

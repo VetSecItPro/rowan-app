@@ -9,8 +9,6 @@ import type {
   CreatePointTransactionInput,
   UserRewardsStats,
   LeaderboardEntry,
-  LEVEL_DEFINITIONS,
-  POINTS_CONFIG,
 } from '@/lib/types/rewards';
 import {
   LEVEL_DEFINITIONS as LEVELS,

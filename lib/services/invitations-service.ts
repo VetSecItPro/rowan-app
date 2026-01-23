@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { randomBytes } from 'crypto';
-import type { SpaceInvitation, CreateInvitationInput, InvitationStatus } from '@/lib/types';
+import type { SpaceInvitation } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
 type InvitationWithSpace = SpaceInvitation & {
@@ -482,7 +482,7 @@ export async function cleanupExpiredInvitations(
       query = query.eq('space_id', spaceId);
     }
 
-    const { data, error, count } = await query.select();
+    const { error, count } = await query.select();
 
     if (error) {
       logger.error('[invitations-service] cleanupExpiredInvitations error:', error, { component: 'lib-invitations-service', action: 'service_call' });

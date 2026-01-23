@@ -126,10 +126,10 @@ async function searchEdamam(query: string): Promise<ExternalRecipe[]> {
 
     if (!data.hits) return [];
 
-    return data.hits.map((hit: any) => {
+    return data.hits.map((hit: { recipe: { uri: string; label: string; image: string; totalTime?: number; yield?: number; ingredients: Array<{ food: string; quantity?: number; measure?: string }>; calories?: number; dietLabels?: string[]; healthLabels?: string[]; cuisineType?: string[]; dishType?: string[]; source?: string; url?: string } }) => {
       const recipe = hit.recipe;
 
-      const ingredients = recipe.ingredients.map((ing: any) => ({
+      const ingredients = recipe.ingredients.map((ing: { food: string; quantity?: number; measure?: string }) => ({
         name: ing.food,
         amount: ing.quantity ? Math.round(ing.quantity).toString() : undefined,
         unit: ing.measure,

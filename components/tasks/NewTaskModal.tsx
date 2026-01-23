@@ -84,7 +84,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
   const { currentSpace, hasZeroSpaces } = useAuthWithSpaces();
   const resolvedSpaceId = spaceId || editTask?.space_id || currentSpace?.id;
   const spaceCreationLoading = false;
-  const [spaceError, setSpaceError] = useState<string>(
+  const [spaceError, _setSpaceError] = useState<string>(
     hasZeroSpaces && isOpen && !resolvedSpaceId ? 'Please create a workspace before adding tasks.' : ''
   );
 

@@ -322,7 +322,7 @@ function ConversationItem({
   onCancelRename,
   onKeyDown,
   canRename = false,
-  onDelete,
+  onDelete: _onDelete,
   onOpenDropdown,
   onClick
 }: ConversationItemProps) {
@@ -356,6 +356,7 @@ function ConversationItem({
       {/* Avatar/Icon */}
       <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 via-green-500 to-teal-500 flex items-center justify-center text-2xl shadow-lg ring-2 ring-gray-700/50">
         {conversation.avatar_url ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={conversation.avatar_url}
             alt={conversation.title || 'Conversation'}

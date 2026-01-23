@@ -190,7 +190,7 @@ const ShoppingListEmail = ({
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              You're receiving this email because you have email notifications enabled for shopping lists.
+              You&apos;re receiving this email because you have email notifications enabled for shopping lists.
             </Text>
             <Text style={footerText}>
               <Link href="https://rowanapp.com/settings" style={link}>

@@ -125,7 +125,7 @@ function FeatureGateBlockedPage({
   requiredTier,
   isInTrial,
   trialDaysRemaining,
-  onUpgrade,
+  onUpgrade: _onUpgrade,
 }: {
   featureName: string;
   description?: string;

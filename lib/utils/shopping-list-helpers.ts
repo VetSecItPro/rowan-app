@@ -33,8 +33,23 @@ export async function createShoppingListFromRecipe(
     if (recipe.ingredients && recipe.ingredients.length > 0) {
       await Promise.all(
         recipe.ingredients.map((ingredient) => {
-          // Parse ingredient text to extract quantity, unit, and name
-          const parsed = parseIngredient(ingredient, recipe.id, recipe.name);
+          // Handle both string and object ingredient formats
+          let parsed;
+          if (typeof ingredient === 'string') {
+            // Parse ingredient text to extract quantity, unit, and name
+            parsed = parseIngredient(ingredient, recipe.id, recipe.name);
+          } else {
+            // Ingredient is already an object with name, amount, unit
+            const amount = typeof ingredient.amount === 'string' ? parseFloat(ingredient.amount) || 1 : (ingredient.amount || 1);
+            parsed = {
+              name: ingredient.name,
+              amount,
+              unit: ingredient.unit || '',
+              originalText: `${ingredient.amount || ''} ${ingredient.unit || ''} ${ingredient.name}`.trim(),
+              recipeId: recipe.id,
+              recipeName: recipe.name,
+            };
+          }
           return shoppingService.createItem({
             list_id: list.id,
             name: parsed.name,

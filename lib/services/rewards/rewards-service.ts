@@ -7,9 +7,7 @@ import type {
   RewardRedemption,
   CreateRewardInput,
   UpdateRewardInput,
-  CreateRedemptionInput,
   RedemptionStatus,
-  DEFAULT_REWARDS,
 } from '@/lib/types/rewards';
 import { DEFAULT_REWARDS as DEFAULTS } from '@/lib/types/rewards';
 import { pointsService } from './points-service';

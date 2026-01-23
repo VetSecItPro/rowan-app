@@ -19,6 +19,11 @@ interface FeatureLayoutProps {
   hideFooterOnMobile?: boolean;
 }
 
+// Feature route types and helpers (outside component to prevent recreation)
+type FeatureRoute = 'tasks' | 'calendar' | 'messages' | 'shopping' | 'meals' | 'reminders' | 'goals' | 'budget' | 'projects' | 'dashboard';
+const featureRoutes: FeatureRoute[] = ['tasks', 'calendar', 'messages', 'shopping', 'meals', 'reminders', 'goals', 'budget', 'projects', 'dashboard'];
+const isFeatureRoute = (value: string): value is FeatureRoute => featureRoutes.includes(value as FeatureRoute);
+
 export function FeatureLayout({
   children,
   breadcrumbItems,
@@ -27,9 +32,6 @@ export function FeatureLayout({
   hideFooterOnMobile = true
 }: FeatureLayoutProps) {
   const pathname = usePathname();
-  type FeatureRoute = 'tasks' | 'calendar' | 'messages' | 'shopping' | 'meals' | 'reminders' | 'goals' | 'budget' | 'projects' | 'dashboard';
-  const featureRoutes: FeatureRoute[] = ['tasks', 'calendar', 'messages', 'shopping', 'meals', 'reminders', 'goals', 'budget', 'projects', 'dashboard'];
-  const isFeatureRoute = (value: string): value is FeatureRoute => featureRoutes.includes(value as FeatureRoute);
 
   // Auto-detect feature from pathname
   const currentFeature = useMemo(() => {

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { projectsService, type Budget } from './budgets-service';
+import { projectsService } from './budgets-service';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -33,8 +33,6 @@ export interface BudgetThresholdConfig {
 export async function checkBudgetThreshold(
   spaceId: string
 ): Promise<BudgetAlertResult> {
-  const supabase = createClient();
-
   // Get budget settings
   const budget = await projectsService.getBudget(spaceId);
 
@@ -114,7 +112,6 @@ export async function triggerBudgetAlert(
   // Show toast notification (default enabled)
   if (prefs.toast !== false) {
     const emoji = alert.threshold === 90 ? '🚨' : alert.threshold === 75 ? '⚠️' : '💡';
-    const color = alert.threshold === 90 ? 'destructive' : alert.threshold === 75 ? 'warning' : 'default';
 
     toast.warning(
       `${emoji} Budget Alert: ${alert.threshold}% Spent`,

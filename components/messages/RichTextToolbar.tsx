@@ -17,7 +17,7 @@ const TOOLBAR_BUTTONS = [
 
 export function RichTextToolbar({ textareaRef, onFormatApplied }: RichTextToolbarProps) {
   const insertFormatting = (before: string, after: string, placeholder: string = '') => {
-    // eslint-disable-next-line react-hooks/refs
+     
     const textarea = textareaRef.current;
     if (!textarea) return;
 

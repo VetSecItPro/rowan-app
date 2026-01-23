@@ -55,12 +55,14 @@ export function usePWAInstall() {
 
   useEffect(() => {
     // Update installed state based on standalone mode from device context
-    setState(prev => ({
-      ...prev,
-      isInstalled: isStandalone,
-      // iOS doesn't support beforeinstallprompt but can still install
-      isInstallable: isIOS && !isStandalone,
-    }));
+    queueMicrotask(() => {
+      setState(prev => ({
+        ...prev,
+        isInstalled: isStandalone,
+        // iOS doesn't support beforeinstallprompt but can still install
+        isInstallable: isIOS && !isStandalone,
+      }));
+    });
 
     // Listen for the beforeinstallprompt event (Chrome, Edge, etc.)
     const handleBeforeInstallPrompt = (e: Event) => {

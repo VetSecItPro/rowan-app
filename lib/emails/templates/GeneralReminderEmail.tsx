@@ -110,7 +110,7 @@ const GeneralReminderEmail = ({
               {typeEmojis[reminderType]} {typeLabels[reminderType]}
             </div>
 
-            <Heading style={h1}>Don't forget!</Heading>
+            <Heading style={h1}>Don&apos;t forget!</Heading>
 
             <Text style={text}>
               Hi {recipientName},
@@ -212,7 +212,7 @@ const GeneralReminderEmail = ({
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              You're receiving this email because you have email notifications enabled for general reminders.
+              You&apos;re receiving this email because you have email notifications enabled for general reminders.
             </Text>
             <Text style={footerText}>
               <Link href="https://rowanapp.com/settings" style={link}>

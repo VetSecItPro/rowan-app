@@ -54,11 +54,14 @@ export async function POST(request: NextRequest) {
     const validatedData = MarketingSubscriptionUpdateSchema.parse(body);
 
     // Get current preferences, create default if none exist
-    let { data: currentPrefs, error: prefsError } = await supabase
+    const prefsResult = await supabase
       .from('user_privacy_preferences')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
+
+    let currentPrefs = prefsResult.data;
+    const prefsError = prefsResult.error;
 
     // Create default preferences if user doesn't have any
     if (!currentPrefs && !prefsError) {

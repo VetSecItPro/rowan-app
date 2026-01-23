@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Clock, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Volume2, VolumeX } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import {
   smartNudgesService,

@@ -6,7 +6,6 @@
  */
 
 import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query';
-import { useCallback } from 'react';
 
 export interface OptimisticMutationOptions<TData, TVariables, TContext = unknown> {
   /** Query key(s) to invalidate on success */

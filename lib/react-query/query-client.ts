@@ -35,14 +35,15 @@ export const queryClient = new QueryClient({
       refetchOnMount: false,        // Trust cache - don't refetch if data exists (staleTime handles freshness)
 
       // RETRY CONFIGURATION: Smart retries for failed requests
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: Error & { name?: string; code?: string; response?: { status?: number } }) => {
         // Don't retry on timeout errors to prevent extended loading times
         if (error?.name === 'AbortError' || error?.code === 'TIMEOUT') {
           return false;
         }
 
         // Don't retry on 4xx errors (client errors like 401, 404)
-        if (error?.response?.status >= 400 && error?.response?.status < 500) {
+        const status = error?.response?.status;
+        if (status !== undefined && status >= 400 && status < 500) {
           return false;
         }
 
@@ -297,7 +298,7 @@ export const intelligentInvalidation = {
      * Only invalidate if data is currently cached and stale
      */
     async ifStale(queryKey: unknown[], maxAge: number = 5 * 60 * 1000) {
-      const queryState = queryClient.getQueryState(queryKey as any);
+      const queryState = queryClient.getQueryState(queryKey);
 
       if (!queryState || !queryState.dataUpdatedAt) {
         return false;

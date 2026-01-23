@@ -49,28 +49,30 @@ export function DateTimePicker({
 
   // Parse existing value into date and time components
   useEffect(() => {
-    if (value) {
-      try {
-        const date = new Date(value);
-        if (!isNaN(date.getTime())) {
-          const dateStr = date.toISOString().split('T')[0];
-          const timeStr = date.toTimeString().split(' ')[0].substring(0, 5);
-          setSelectedDate(dateStr);
-          setSelectedTime(timeStr);
-          setManualInput(value);
-          // Update calendar month to match the selected date
-          setCalendarDate(date);
-        } else {
+    queueMicrotask(() => {
+      if (value) {
+        try {
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) {
+            const dateStr = date.toISOString().split('T')[0];
+            const timeStr = date.toTimeString().split(' ')[0].substring(0, 5);
+            setSelectedDate(dateStr);
+            setSelectedTime(timeStr);
+            setManualInput(value);
+            // Update calendar month to match the selected date
+            setCalendarDate(date);
+          } else {
+            setManualInput(value);
+          }
+        } catch {
           setManualInput(value);
         }
-      } catch {
-        setManualInput(value);
+      } else {
+        setSelectedDate('');
+        setSelectedTime('');
+        setManualInput('');
       }
-    } else {
-      setSelectedDate('');
-      setSelectedTime('');
-      setManualInput('');
-    }
+    });
   }, [value]);
 
   // Calculate calendar position
@@ -167,7 +169,6 @@ export function DateTimePicker({
     const currentMonth = calendarDate.getMonth();
     const currentYear = calendarDate.getFullYear();
     const firstDay = new Date(currentYear, currentMonth, 1);
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 

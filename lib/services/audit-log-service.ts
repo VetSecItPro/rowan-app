@@ -35,7 +35,7 @@ export interface AuditLogEntry {
   ip_address?: string;
   user_agent?: string;
   location?: string;
-  details?: Record<string, any>;
+  details?: Record<string, string | number | boolean | null>;
   timestamp?: string;
   created_at?: string;
 }
@@ -200,7 +200,7 @@ export async function getUserAuditStats(userId: string): Promise<{
       .eq('user_id', userId);
 
     const actionCounts: Record<string, number> = {};
-    (actions || []).forEach((entry: any) => {
+    (actions || []).forEach((entry: { action: string }) => {
       actionCounts[entry.action] = (actionCounts[entry.action] || 0) + 1;
     });
 
@@ -236,7 +236,7 @@ export async function logDataExport(userId: string, format: 'json' | 'csv', data
     action: 'data_export',
     action_category: 'data_access',
     resource_type: 'user_data',
-    details: { format, dataType },
+    details: { format, dataType: dataType ?? null },
   });
 }
 
@@ -323,6 +323,6 @@ export async function logProfileUpdate(userId: string, fields: string[]) {
     action: 'profile_update',
     action_category: 'data_access',
     resource_type: 'profile',
-    details: { updated_fields: fields },
+    details: { updated_fields: fields.join(', ') },
   });
 }

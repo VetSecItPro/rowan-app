@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Check, MoreVertical, Clock, AlertCircle, Pause } from 'lucide-react';
+import { Check, MoreVertical, Clock, AlertCircle, Pause } from 'lucide-react';
 import { Chore } from '@/lib/types';
 import { format } from 'date-fns';
 import { useState } from 'react';

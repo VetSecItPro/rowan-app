@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { Goal, Milestone, createGoal, updateGoal, createMilestone } from './goals-service';
+import { Goal, createGoal, updateGoal, createMilestone } from './goals-service';
 import { getExpenseStatsByCategory } from './categories-tags-service';
 import { getDefaultCategoriesForDomain } from '@/lib/constants/default-categories';
 import { logger } from '@/lib/logger';
@@ -197,7 +197,7 @@ export async function updateBudgetGoalLinkProgress(
 ): Promise<BudgetGoalLink> {
   const supabase = createClient();
 
-  const updateData: any = { updated_at: new Date().toISOString() };
+  const updateData: { updated_at: string; current_amount?: number; current_percentage?: number } = { updated_at: new Date().toISOString() };
   if (currentAmount !== undefined) updateData.current_amount = currentAmount;
   if (currentPercentage !== undefined) updateData.current_percentage = currentPercentage;
 

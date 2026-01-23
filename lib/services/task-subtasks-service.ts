@@ -87,7 +87,7 @@ export const taskSubtasksService = {
     const supabase = createClient();
     try {
       // If marking as completed, set completed_at
-      const finalUpdates: any = { ...updates };
+      const finalUpdates: Partial<CreateSubtaskInput> & { completed_at?: string | null } = { ...updates };
       if (updates.status === 'completed' && !finalUpdates.completed_at) {
         finalUpdates.completed_at = new Date().toISOString();
       }

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, CheckCircle2, Circle, Target } from 'lucide-react';
 import type { Project } from '@/lib/services/project-tracking-service';
 import type { CreateProjectInput } from '@/lib/services/projects-service';
-import { projectMilestonesService, type ProjectMilestone } from '@/lib/services/project-milestones-service';
+import { projectMilestonesService } from '@/lib/services/project-milestones-service';
 import { logger } from '@/lib/logger';
 import { Modal } from '@/components/ui/Modal';
 

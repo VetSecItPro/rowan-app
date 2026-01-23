@@ -183,6 +183,7 @@ export function RecipePreviewModal({
 
           {safeImageUrl && (
             <div className="h-48 sm:h-64 overflow-hidden bg-gray-700 rounded-t-2xl sm:rounded-t-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={safeImageUrl}
                 alt={recipe.name}

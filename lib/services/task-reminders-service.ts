@@ -39,7 +39,7 @@ export const taskRemindersService = {
     if (error) throw error;
   },
 
-  async getPendingReminders(): Promise<any[]> {
+  async getPendingReminders(): Promise<Array<{ id: string; task_id: string; reminder_time: string; sent: boolean }>> {
     const supabase = createClient();
     const { data, error } = await supabase.rpc('get_pending_reminders');
     if (error) throw error;

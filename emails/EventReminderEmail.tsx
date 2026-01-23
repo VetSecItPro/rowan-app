@@ -72,7 +72,7 @@ export const EventReminderEmail = ({
       unsubscribeUrl={unsubscribeUrl}
     >
       <Text style={reminderText}>
-        Your event <strong>"{eventTitle}"</strong> {reminderTexts[reminderType]}.
+        Your event <strong>&quot;{eventTitle}&quot;</strong> {reminderTexts[reminderType]}.
       </Text>
 
       <Section style={eventCard}>

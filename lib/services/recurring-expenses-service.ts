@@ -112,7 +112,7 @@ function detectPatterns(expenses: ExpenseForAnalysis[]): PatternCandidate[] {
   // Group expenses by merchant (or category if no merchant)
   const groupedExpenses = groupExpenses(expenses);
 
-  for (const [key, expenseGroup] of Object.entries(groupedExpenses)) {
+  for (const [, expenseGroup] of Object.entries(groupedExpenses)) {
     if (expenseGroup.length < 3) continue; // Need at least 3 occurrences
 
     // Sort by date

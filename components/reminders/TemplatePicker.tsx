@@ -25,6 +25,7 @@ export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplateP
   // Load templates
   useEffect(() => {
     loadTemplates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadTemplates is a stable function
   }, [spaceId]);
 
   const loadTemplates = async () => {

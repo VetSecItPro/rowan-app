@@ -11,7 +11,7 @@ export const quickActionsService = {
     });
   },
 
-  async getTopActions(spaceId: string, userId: string, limit: number = 5): Promise<any[]> {
+  async getTopActions(spaceId: string, userId: string, limit: number = 5): Promise<Array<{ action_type: string; usage_count: number }>> {
     const supabase = createClient();
     const { data, error } = await supabase.from('quick_action_stats')
       .select('*')

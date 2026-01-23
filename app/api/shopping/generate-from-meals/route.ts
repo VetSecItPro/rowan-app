@@ -24,7 +24,7 @@ const GenerateShoppingListSchema = z.object({
 type MealRecipe = {
   id: string;
   name: string;
-  ingredients: unknown;
+  ingredients: Array<string | { name: string; amount?: string | number; unit?: string; originalText?: string }> | null;
 };
 
 type MealWithRecipe = {

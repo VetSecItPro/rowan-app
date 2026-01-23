@@ -61,7 +61,7 @@ export function PasswordConfirmModal({
       // Password verified, proceed with action
       onConfirm();
       handleClose();
-    } catch (error) {
+    } catch {
       setError('Failed to verify password');
       setIsVerifying(false);
     }

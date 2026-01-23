@@ -344,7 +344,7 @@ export async function getGoalContributors(goalId: string): Promise<ContributorSu
         total: 0,
         count: 0,
         lastDate: contrib.contribution_date,
-        email: (contrib as any).users?.email,
+        email: (contrib as GoalContribution & { users?: { email?: string } }).users?.email,
       };
     }
     contributorMap[contrib.user_id].total += parseFloat(contrib.amount.toString());
@@ -449,7 +449,7 @@ export async function getRecentContributions(
 
   if (error) throw error;
 
-  return (data || []).map((contrib: any) => ({
+  return (data || []).map((contrib: GoalContribution & { goals?: { title?: string }; users?: { email?: string } }) => ({
     ...contrib,
     goal_title: contrib.goals?.title,
     user_email: contrib.users?.email,

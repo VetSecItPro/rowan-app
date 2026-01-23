@@ -11,7 +11,6 @@ import {
   Section,
   Row,
   Column,
-  Heading,
   Text,
   Link,
   Button,
@@ -63,7 +62,7 @@ interface AIDailyDigestEmailProps {
 }
 
 const AIDailyDigestEmail = ({
-  recipientName = 'Partner',
+  recipientName: _recipientName = 'Partner',
   date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
   events = [],
   tasksDue = [],

@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { Users, ChevronDown } from 'lucide-react';
 import { useOnlineCount } from '@/hooks/usePresence';
 import { PresenceIndicator } from './PresenceIndicator';
-import { MemberListItem } from './MemberListItem';
-import type { SpaceMemberWithPresence } from '@/lib/types';
 import { PresenceStatus } from '@/lib/types';
 
 interface HeaderMemberIndicatorProps {

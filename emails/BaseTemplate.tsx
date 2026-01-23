@@ -89,7 +89,7 @@ export const BaseTemplate = ({
             </Text>
 
             <Text style={footerText}>
-              You're receiving this because you're a member of <strong>{spaceName}</strong>.
+              You&apos;re receiving this because you&apos;re a member of <strong>{spaceName}</strong>.
             </Text>
 
             {unsubscribeUrl && (

@@ -38,7 +38,8 @@ export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPla
     }
   };
 
-  const selectedOption = mealTypeOptions.find(opt => opt.value === selectedMealType) || mealTypeOptions[2];
+  // selectedOption can be used for future UI enhancements
+  const _selectedOption = mealTypeOptions.find(opt => opt.value === selectedMealType) || mealTypeOptions[2];
 
   const footerContent = (
     <div className="flex items-center justify-end gap-3">

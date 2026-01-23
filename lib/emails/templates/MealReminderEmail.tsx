@@ -211,7 +211,7 @@ const MealReminderEmail = ({
           <Hr style={hr} />
           <Section style={footer}>
             <Text style={footerText}>
-              You're receiving this email because you have email notifications enabled for meal reminders.
+              You&apos;re receiving this email because you have email notifications enabled for meal reminders.
             </Text>
             <Text style={footerText}>
               <Link href="https://rowanapp.com/settings" style={link}>

@@ -398,7 +398,7 @@ export const tasksService = {
     const supabase = getSupabaseClient(supabaseClient);
     try {
       // If marking as completed, set completed_at timestamp
-      const finalUpdates: any = { ...updates };
+      const finalUpdates: UpdateTaskInput & { completed_at?: string | null } = { ...updates };
       if (updates.status === 'completed' && !finalUpdates.completed_at) {
         finalUpdates.completed_at = new Date().toISOString();
       }
@@ -444,7 +444,7 @@ export const tasksService = {
   async updateTasksBatch(ids: string[], updates: UpdateTaskInput): Promise<Task[]> {
     const supabase = createClient();
     try {
-      const finalUpdates: any = { ...updates };
+      const finalUpdates: UpdateTaskInput & { completed_at?: string | null } = { ...updates };
       if (updates.status === 'completed' && !finalUpdates.completed_at) {
         finalUpdates.completed_at = new Date().toISOString();
       }
@@ -638,7 +638,6 @@ export const tasksService = {
    * ```
    */
   async getTasksByUser(spaceId: string, userId: string): Promise<Task[]> {
-    const supabase = createClient();
     return this.getTasks(spaceId, { assigned_to: userId });
   },
 

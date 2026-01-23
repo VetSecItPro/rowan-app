@@ -859,7 +859,6 @@ export default function RemindersPage(): React.JSX.Element {
           selectedReminders={selectedReminders}
           onClearSelection={handleClearSelection}
           onComplete={handleBulkOperationComplete}
-          spaceId={currentSpace.id}
         />
       )}
     </FeatureLayout>

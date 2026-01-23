@@ -15,6 +15,7 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
     <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
       {recipe.image_url && (
         <div className="w-full h-48 bg-gray-700 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={recipe.image_url}
             alt={recipe.name}

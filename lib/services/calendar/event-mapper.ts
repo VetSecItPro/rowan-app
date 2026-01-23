@@ -160,7 +160,7 @@ export function mapICalendarToRowan(
 
 export function createExternalSnapshot(
   event: GoogleCalendarEvent | ParsedICalEvent,
-  source: 'google' | 'apple' | 'cozi'
+  _source: 'google' | 'apple' | 'cozi'
 ): ExternalEventSnapshot {
   if ('summary' in event && 'etag' in event) {
     // Google Calendar event
@@ -269,7 +269,7 @@ function parseICalDateTime(icalDateTime: string): string {
 // HELPER FUNCTIONS: COLOR MAPPING
 // =============================================================================
 
-const GOOGLE_COLORS: Record<string, string> = {
+const _GOOGLE_COLORS: Record<string, string> = {
   '1': '#a4bdfc', // Lavender
   '2': '#7ae7bf', // Sage
   '3': '#dbadff', // Grape

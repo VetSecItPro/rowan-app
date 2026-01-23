@@ -117,6 +117,7 @@ export const featureFlagHelpers = {
    */
   logFeatureFlags(): void {
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console -- intentional debug logging
       console.log('🚩 Feature Flags Status:', FEATURE_FLAGS);
     }
   },

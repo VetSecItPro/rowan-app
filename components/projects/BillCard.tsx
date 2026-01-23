@@ -12,7 +12,7 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
-import { format, parseISO, isPast, differenceInDays } from 'date-fns';
+import { format, parseISO, differenceInDays } from 'date-fns';
 import type { Bill } from '@/lib/services/bills-service';
 
 interface BillCardProps {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Check, FileText } from 'lucide-react';
-import { CreateListInput, ShoppingList, shoppingService } from '@/lib/services/shopping-service';
+import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
 import { CTAButton, SecondaryButton } from '@/components/ui/EnhancedButton';

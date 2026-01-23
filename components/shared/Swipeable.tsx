@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, ReactNode, useEffect } from 'react';
-import { Trash2, Check, Archive } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { hapticLight } from '@/lib/utils/haptics';
 
 interface SwipeableProps {

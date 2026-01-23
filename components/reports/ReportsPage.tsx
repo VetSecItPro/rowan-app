@@ -40,6 +40,7 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadData is a stable function
   }, [spaceId]);
 
   const loadData = async () => {

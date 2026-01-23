@@ -18,6 +18,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
 
   useEffect(() => {
     loadComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadComments is a stable function
   }, [taskId]);
 
   async function loadComments() {

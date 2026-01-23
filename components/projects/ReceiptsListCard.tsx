@@ -19,6 +19,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
 
   useEffect(() => {
     loadReceipts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadReceipts is a stable function
   }, [spaceId, searchParams]);
 
   async function loadReceipts() {

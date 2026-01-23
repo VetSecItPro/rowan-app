@@ -69,11 +69,10 @@ export const feedbackService = {
 
       // Generate unique filename
       const timestamp = Date.now();
-      const fileExt = file.name.split('.').pop();
       const filePath = `${userId}/${timestamp}-${file.name}`;
 
       // Upload file
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('feedback-screenshots')
         .upload(filePath, file, {
           cacheControl: '3600',

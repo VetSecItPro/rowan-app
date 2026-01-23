@@ -31,7 +31,7 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({ space_id: spaceId, title: editChore.title, description: editChore.description || '', frequency: editChore.frequency, status: editChore.status, due_date: editChore.due_date || '', created_by: userId });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({ space_id: spaceId, title: '', description: '', frequency: 'weekly', status: 'pending', due_date: '', created_by: userId });
     }
   }, [editChore, spaceId, userId]);

@@ -1,7 +1,6 @@
 // Unified Calendar Service
 // Phase 9: Fetches and combines all calendar-displayable items
 
-import { createClient } from '@/lib/supabase/client';
 import { calendarService } from '@/lib/services/calendar-service';
 import { tasksService } from '@/lib/services/tasks-service';
 import { mealsService } from '@/lib/services/meals-service';
@@ -14,7 +13,6 @@ import type {
   UnifiedCalendarFilters,
   UnifiedCalendarFetchOptions,
   UnifiedCalendarFetchResult,
-  DEFAULT_UNIFIED_FILTERS,
 } from '@/lib/types/unified-calendar-item';
 
 /**

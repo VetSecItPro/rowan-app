@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import type { SpaceMemberRole } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
 // =============================================

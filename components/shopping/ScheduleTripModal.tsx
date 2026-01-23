@@ -180,7 +180,7 @@ export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: Schedul
 
         <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4">
           <p className="text-sm text-purple-300">
-            📋 This will create a calendar event linked to your shopping list "{list.title}"
+            📋 This will create a calendar event linked to your shopping list &quot;{list.title}&quot;
             {list.store_name && ` at ${list.store_name}`}.
           </p>
         </div>

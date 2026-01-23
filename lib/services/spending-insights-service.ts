@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear, subMonths, format } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfQuarter, startOfYear, subMonths, format } from 'date-fns';
 
 // =====================================================
 // TYPES

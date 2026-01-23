@@ -125,11 +125,12 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
   // Mark bill as paid from notification
   const handleMarkBillPaid = async (notification: InAppNotification) => {
     // Get bill ID from related_item_id or metadata
-    const billId = notification.related_item_id || notification.metadata?.billId;
-    if (!billId) {
+    const rawBillId = notification.related_item_id || notification.metadata?.billId;
+    if (!rawBillId || typeof rawBillId === 'boolean') {
       logger.error('No bill ID found in notification', undefined, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
       return;
     }
+    const billId = String(rawBillId);
 
     try {
       await billsService.markBillAsPaid(billId);
