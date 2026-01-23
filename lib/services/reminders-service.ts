@@ -223,7 +223,6 @@ export const remindersService = {
   },
 
   async snoozeReminder(id: string, minutes: number, userId: string): Promise<Reminder> {
-    const supabase = createClient();
     const snoozeUntil = new Date();
     snoozeUntil.setMinutes(snoozeUntil.getMinutes() + minutes);
 

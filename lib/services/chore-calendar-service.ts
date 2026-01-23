@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { addDays, format } from 'date-fns';
+import { addDays } from 'date-fns';
 
 type ChoreRecord = {
   id: string;

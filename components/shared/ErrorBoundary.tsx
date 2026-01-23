@@ -129,7 +129,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </h1>
 
               <p className="text-sm text-gray-400 mb-6">
-                We encountered an unexpected error. Don't worry, your data is safe.
+                We encountered an unexpected error. Don&apos;t worry, your data is safe.
                 Try refreshing the page or go back to continue using Rowan.
               </p>
 

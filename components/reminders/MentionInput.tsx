@@ -69,6 +69,7 @@ export function MentionInput({
     };
 
     fetchMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- supabase instance is stable
   }, [spaceId]);
 
   const filteredMembers = useMemo(() => {
@@ -195,6 +196,7 @@ export function MentionInput({
               >
                 {/* Avatar */}
                 {member.user.avatar_url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={member.user.avatar_url}
                     alt={member.user.name}

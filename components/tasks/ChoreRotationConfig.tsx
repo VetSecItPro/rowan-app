@@ -49,6 +49,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
   useEffect(() => {
     loadRotation();
     loadSpaceMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load functions are stable
   }, [taskId, spaceId]);
 
   async function loadRotation() {

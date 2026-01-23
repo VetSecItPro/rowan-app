@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { format, subDays, startOfDay, endOfDay, parseISO, differenceInDays } from 'date-fns';
+import { format, subDays, parseISO, differenceInDays } from 'date-fns';
 import { getCurrentDateString } from '@/lib/utils/date-utils';
 
 export interface DailyCheckIn {
@@ -294,7 +294,7 @@ export const checkInsService = {
   /**
    * Subscribe to check-in changes for a space
    */
-  subscribeToCheckIns(spaceId: string, callback: (payload: any) => void) {
+  subscribeToCheckIns(spaceId: string, callback: (payload: { new: DailyCheckIn; old: DailyCheckIn | null; eventType: string }) => void) {
     const supabase = createClient();
     const channel = supabase
       .channel(`checkins:${spaceId}`)

@@ -38,8 +38,10 @@ export function TimeTracker({ taskId, userId }: TimeTrackerProps) {
   }, [taskId]);
 
   useEffect(() => {
-    checkActiveTimer();
-    loadTotalTime();
+    queueMicrotask(() => {
+      checkActiveTimer();
+      loadTotalTime();
+    });
   }, [checkActiveTimer, loadTotalTime]);
 
   useEffect(() => {

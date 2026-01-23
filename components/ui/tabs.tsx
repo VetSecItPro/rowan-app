@@ -32,7 +32,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child as React.ReactElement<any>, {
+            return React.cloneElement(child as React.ReactElement<{ value?: string; onValueChange?: (value: string) => void }>, {
               value: activeValue,
               onValueChange: handleValueChange,
             });
@@ -61,7 +61,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       >
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child as React.ReactElement<any>, {
+            return React.cloneElement(child as React.ReactElement<{ value?: string; onValueChange?: (value: string) => void }>, {
               value,
               onValueChange,
             });

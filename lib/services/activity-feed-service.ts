@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { cacheAside, cacheKeys, CACHE_TTL } from '@/lib/cache';
 
@@ -12,7 +12,7 @@ export interface ActivityItem {
   user_id: string;
   user_avatar?: string;
   created_at: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean | null>;
 }
 
 export const activityFeedService = {

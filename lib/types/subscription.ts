@@ -113,7 +113,7 @@ export interface SubscriptionEvent {
   trigger_source: TriggerSource | null;
 
   // Additional context
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean | null>;
 
   // Timestamp
   created_at: string;

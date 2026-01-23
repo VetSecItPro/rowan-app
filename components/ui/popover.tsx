@@ -11,7 +11,7 @@ export const Popover: React.FC<PopoverProps> = ({ open, onOpenChange, children }
     <div data-state={open ? 'open' : 'closed'}>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<any>, {
+          return React.cloneElement(child as React.ReactElement<{ open?: boolean; onOpenChange?: (open: boolean) => void }>, {
             open,
             onOpenChange,
           });
@@ -35,7 +35,7 @@ export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTrigger
     };
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as React.ReactElement<any>, {
+      return React.cloneElement(children as React.ReactElement<{ onClick?: () => void }>, {
         onClick: handleClick,
       });
     }

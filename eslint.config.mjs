@@ -44,6 +44,16 @@ const eslintConfig = [
 
       // General quality
       "no-console": ["warn", { allow: ["warn", "error"] }],
+
+      // Allow underscore-prefixed variables to mark intentionally unused vars
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
   },
 ];

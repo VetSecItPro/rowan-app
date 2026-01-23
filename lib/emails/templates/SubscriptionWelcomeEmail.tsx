@@ -107,7 +107,7 @@ const SubscriptionWelcomeEmail = ({
             </Section>
 
             <Text style={text}>
-              Here's what you can now do with your {tierName} plan:
+              Here&apos;s what you can now do with your {tierName} plan:
             </Text>
 
             {/* Features List */}

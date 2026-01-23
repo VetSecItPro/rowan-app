@@ -42,6 +42,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
 
   useEffect(() => {
     if (isOpen) loadDependencies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadDependencies is a stable function
   }, [isOpen, taskId]);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
     } else {
       setSearchResults([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- searchTasks is a stable function
   }, [debouncedSearchTerm]);
 
   async function loadDependencies() {

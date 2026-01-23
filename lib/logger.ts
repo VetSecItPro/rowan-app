@@ -92,6 +92,7 @@ class Logger {
 
     // Development: console logging
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console -- this IS the logger implementation
       const logFn = console[level] || console.log;
       if (sanitizedContext) {
         logFn(`[${level.toUpperCase()}] ${message}`, sanitizedContext);

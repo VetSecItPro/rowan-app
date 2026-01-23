@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, History } from 'lucide-react';
+import { History } from 'lucide-react';
 import { taskSnoozeService } from '@/lib/services/task-snooze-service';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
@@ -41,6 +41,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
       setCustomDate(tomorrow.toISOString().split('T')[0]);
       setCustomTime('09:00');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadHistory is a stable function
   }, [isOpen, taskId]);
 
   async function loadHistory() {

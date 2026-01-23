@@ -14,7 +14,7 @@ interface SwipeableConversationItemProps {
 
 export function SwipeableConversationItem({
   conversation,
-  isSelected,
+  isSelected: _isSelected,
   onClick,
   onDelete,
   children,

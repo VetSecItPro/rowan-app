@@ -292,7 +292,7 @@ export async function processDailyDigest(): Promise<DigestResult> {
 function shouldSendDigest(digestTime: string, timezone: string, now: Date): boolean {
   try {
     // Parse the digest_time (format: HH:MM:SS)
-    const [hours, minutes] = digestTime.split(':').map(Number);
+    const [hours] = digestTime.split(':').map(Number);
 
     // Get the current time in the user's timezone
     const userTimeFormatter = new Intl.DateTimeFormat('en-US', {

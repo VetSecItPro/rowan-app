@@ -93,6 +93,7 @@ export default function ActivityFeed({
   useEffect(() => {
     loadActivities();
     loadStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load functions are stable callbacks
   }, [spaceId, entityType, entityId, limit]);
 
   // Real-time subscription
@@ -119,6 +120,7 @@ export default function ActivityFeed({
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load functions are stable callbacks
   }, [spaceId]);
 
   if (loading) {

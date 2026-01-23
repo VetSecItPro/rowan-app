@@ -36,7 +36,7 @@ export async function sendDeletionInitiatedEmail(
     const deletionDate = new Date();
     deletionDate.setDate(deletionDate.getDate() + 30);
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: 'Rowan <noreply@rowan-app.com>',
       to: userEmail,
       subject: 'Account Deletion Initiated - 30 Day Grace Period',
@@ -145,7 +145,7 @@ export async function send30DayWarningEmail(
 
     const finalDate = deletionDate || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: 'Rowan <noreply@rowan-app.com>',
       to: userEmail,
       subject: '⚠️ Final Warning: Account Deletion in 5 Days',
@@ -246,7 +246,7 @@ export async function sendPermanentDeletionConfirmationEmail(
       return { success: false, error: 'Email service not configured' };
     }
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: 'Rowan <noreply@rowan-app.com>',
       to: userEmail,
       subject: '✅ Account Permanently Deleted - Confirmation',

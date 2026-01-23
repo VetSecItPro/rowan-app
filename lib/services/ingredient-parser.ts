@@ -200,7 +200,7 @@ export function parseRecipeIngredients(
   recipe: {
     id: string;
     name: string;
-    ingredients: any;
+    ingredients: Array<string | { name: string; amount?: string | number; unit?: string; originalText?: string }> | null;
   }
 ): ParsedIngredient[] {
   if (!recipe.ingredients) return [];
@@ -210,9 +210,11 @@ export function parseRecipeIngredients(
     return recipe.ingredients.map((ing) => {
       // If ingredient is already an object with structure
       if (typeof ing === 'object' && ing.name) {
+        // Convert amount to number if it's a string
+        const amount = typeof ing.amount === 'string' ? parseFloat(ing.amount) || 1 : (ing.amount || 1);
         return {
           name: ing.name,
-          amount: ing.amount || 1,
+          amount,
           unit: ing.unit ? normalizeUnit(ing.unit) : '',
           originalText: ing.originalText || `${ing.amount || ''} ${ing.unit || ''} ${ing.name}`.trim(),
           recipeId: recipe.id,
@@ -305,7 +307,7 @@ export function generateShoppingList(
   recipes: Array<{
     id: string;
     name: string;
-    ingredients: any;
+    ingredients: Array<string | { name: string; amount?: string | number; unit?: string; originalText?: string }> | null;
   }>
 ): AggregatedIngredient[] {
   // Parse all ingredients from all recipes

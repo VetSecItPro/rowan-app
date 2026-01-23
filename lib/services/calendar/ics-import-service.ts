@@ -689,7 +689,7 @@ async function testICSFeed(url: string): Promise<{
       eventCount: events.length,
       calendarName: calendarName as string | undefined,
     };
-  } catch (parseError) {
+  } catch {
     return {
       success: false,
       error: 'Failed to parse ICS data - invalid calendar format'

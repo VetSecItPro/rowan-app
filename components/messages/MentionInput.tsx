@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, KeyboardEvent, ChangeEvent, forwardRef } from 'react';
+import { useState, useEffect, useRef, KeyboardEvent, ChangeEvent } from 'react';
 import { MentionableUser, mentionsService } from '@/lib/services/mentions-service';
 import { AtSign } from 'lucide-react';
 import { RichTextToolbar } from './RichTextToolbar';

@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import type { Expense } from './expense-service';
-import type { Project } from './project-tracking-service';
 
 // ==================== TYPES ====================
 

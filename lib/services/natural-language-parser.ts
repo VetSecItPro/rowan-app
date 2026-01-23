@@ -125,7 +125,7 @@ function predictCategory(title: string): 'work' | 'personal' | 'family' | 'healt
 
   for (const [category, terms] of Object.entries(keywords)) {
     if (terms.some(term => titleLower.includes(term))) {
-      return category as any;
+      return category as 'work' | 'health' | 'family' | 'social';
     }
   }
 

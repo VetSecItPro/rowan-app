@@ -211,7 +211,7 @@ class GeographicDetectionService {
   /**
    * Determine if location data indicates California residency
    */
-  private isCaliforniaLocation(data: any): boolean {
+  private isCaliforniaLocation(data: { region_code?: string; state_code?: string; region?: string; state_prov?: string; city?: string; timezone?: string; country_code?: string; postal?: string; zipcode?: string; latitude?: string; longitude?: string }): boolean {
     // Check state/region code
     const stateCode = data.region_code || data.state_code || '';
     if (this.CALIFORNIA_IDENTIFIERS.includes(stateCode)) {
@@ -264,7 +264,7 @@ class GeographicDetectionService {
   /**
    * Calculate confidence level of the detection
    */
-  private calculateConfidence(data: any): 'high' | 'medium' | 'low' {
+  private calculateConfidence(data: { region_code?: string; state_code?: string; region?: string; state_prov?: string; city?: string; timezone?: string; country_code?: string; postal?: string; zipcode?: string; latitude?: string; longitude?: string }): 'high' | 'medium' | 'low' {
     let score = 0;
 
     // State/region data available

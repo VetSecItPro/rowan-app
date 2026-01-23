@@ -76,19 +76,12 @@ function useFeatureDetection(): EnhancedButtonProps['feature'] {
 // Hook for magnetic attraction effect
 function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButtonElement | null>) {
   const [isHovering, setIsHovering] = useState(false);
+  const isHoveringRef = useRef(false);
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!enabled || !ref.current || !isHovering) return;
-
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const deltaX = (e.clientX - centerX) * 0.1;
-    const deltaY = (e.clientY - centerY) * 0.1;
-
-    ref.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-  };
+  // Sync isHovering state to ref
+  useEffect(() => {
+    isHoveringRef.current = isHovering;
+  }, [isHovering]);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -104,9 +97,22 @@ function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButton
   useEffect(() => {
     if (!enabled) return;
 
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!enabled || !ref.current || !isHoveringRef.current) return;
+
+      const rect = ref.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const deltaX = (e.clientX - centerX) * 0.1;
+      const deltaY = (e.clientY - centerY) * 0.1;
+
+      ref.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    };
+
     document.addEventListener('mousemove', handleMouseMove);
     return () => document.removeEventListener('mousemove', handleMouseMove);
-  }, [handleMouseMove, enabled]);
+  }, [enabled, ref]);
 
   return { handleMouseEnter, handleMouseLeave };
 }
@@ -136,7 +142,7 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
     const currentFeature = feature || detectedFeature;
 
     const isSuccess = Boolean(success);
-    const [rippleKey, setRippleKey] = useState(0);
+    const [, setRippleKey] = useState(0);
 
     // Combine refs
     React.useImperativeHandle(ref, () => buttonRef.current!);

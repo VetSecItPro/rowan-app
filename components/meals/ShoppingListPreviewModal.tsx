@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 interface ShoppingListPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ingredients: (string | { name?: string; amount?: string; unit?: string })[];
+  ingredients: (string | { name?: string; amount?: string | number; unit?: string })[];
   recipeName: string;
   spaceId: string;
   onSuccess?: () => void;

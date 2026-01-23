@@ -77,7 +77,7 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
           text: `Check out this shopping list`,
           url: shareUrl,
         });
-      } catch (error) {
+      } catch {
         // User cancelled or share failed, fallback to copy
         handleCopyLink();
       }

@@ -157,7 +157,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
 
             {/* Activities */}
             <div className="space-y-4">
-              {displayedActivities.map((activity, index) => {
+              {displayedActivities.map((activity) => {
                 const IconComponent = getIconComponent(
                   reminderActivityService.getActivityIcon(activity.action)
                 );
@@ -181,6 +181,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
                           {activity.user && (
                             <div className="flex items-center gap-2 mb-1">
                               {activity.user.avatar_url ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
                                   src={activity.user.avatar_url}
                                   alt={activity.user.name}
@@ -205,7 +206,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
                           {/* Metadata */}
                           {activity.metadata && Object.keys(activity.metadata).length > 0 && (
                             <div className="mt-1 text-xs text-gray-400">
-                              {activity.action === 'snoozed' && activity.metadata.snooze_until && (
+                              {activity.action === 'snoozed' && activity.metadata.snooze_until && typeof activity.metadata.snooze_until !== 'boolean' && (
                                 <span>
                                   Until {new Date(activity.metadata.snooze_until).toLocaleString()}
                                 </span>

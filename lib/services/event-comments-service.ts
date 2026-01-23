@@ -293,7 +293,7 @@ export const eventCommentsService = {
   async notifyMentionedUsers(
     eventId: string,
     userIds: string[],
-    content: string
+    _content: string
   ): Promise<void> {
     const supabase = createClient();
 

@@ -109,7 +109,7 @@ export async function validateImageMagicBytes(file: File): Promise<FileValidatio
       declaredMime: file.type,
       error: 'File does not have a valid image signature',
     };
-  } catch (error) {
+  } catch {
     return {
       valid: false,
       declaredMime: file.type,

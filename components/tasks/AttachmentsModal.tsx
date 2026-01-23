@@ -26,6 +26,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
 
   useEffect(() => {
     if (isOpen) loadAttachments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadAttachments is a stable function
   }, [isOpen, taskId]);
 
   async function loadAttachments() {
@@ -78,7 +79,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
 
   async function handleDownload(attachment: TaskAttachment) {
     try {
-      const url = await taskAttachmentsService.getAttachmentUrl((attachment as any).file_path);
+      const url = await taskAttachmentsService.getAttachmentUrl((attachment as TaskAttachment & { file_path?: string }).file_path ?? '');
       window.open(url, '_blank');
     } catch (error) {
       logger.error('Error downloading file:', error, { component: 'AttachmentsModal', action: 'component_action' });
@@ -159,7 +160,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                       key={attachment.id}
                       className="flex items-center gap-3 p-4 bg-gray-900 rounded-lg"
                     >
-                      {getFileIcon((attachment as any).mime_type)}
+                      {getFileIcon((attachment as TaskAttachment & { mime_type?: string }).mime_type ?? 'application/octet-stream')}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-white truncate">
                           {attachment.file_name}

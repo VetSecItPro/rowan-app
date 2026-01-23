@@ -22,7 +22,7 @@ interface NewRecipeModalProps {
 }
 
 type TabType = 'manual' | 'ai' | 'discover';
-type RecipeIngredientInput = string | { name: string; amount?: string; unit?: string };
+type RecipeIngredientInput = string | { name: string; amount?: string | number; unit?: string };
 
 export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, initialTab = 'manual', onRecipeAdded }: NewRecipeModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);

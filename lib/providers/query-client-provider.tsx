@@ -1,8 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 /**
  * Custom error class for 401 errors to identify session expiration
@@ -32,8 +31,6 @@ export async function adminFetch(url: string, options?: RequestInit): Promise<Re
  * Handles 401 errors globally and redirects to login
  */
 export function AdminQueryProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-
   const [queryClient] = useState(
     () =>
       new QueryClient({

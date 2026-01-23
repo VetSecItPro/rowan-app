@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 
 export const taskHandoffService = {
-  async handoffTask(taskId: string, toUserId: string, performedBy: string, note?: string, reason?: string): Promise<any> {
+  async handoffTask(taskId: string, toUserId: string, performedBy: string, note?: string, reason?: string): Promise<{ id: string; task_id: string; from_user_id: string | null; to_user_id: string }> {
     const supabase = createClient();
     const { data: task } = await supabase.from('tasks').select('assigned_to').eq('id', taskId).single();
 
@@ -20,7 +20,7 @@ export const taskHandoffService = {
     return data;
   },
 
-  async getHandoffHistory(taskId: string): Promise<any[]> {
+  async getHandoffHistory(taskId: string): Promise<Array<{ id: string; task_id: string; from_user_id: string | null; to_user_id: string; handoff_note?: string; reason?: string; performed_at: string; from_user?: Record<string, unknown>; to_user?: Record<string, unknown> }>> {
     const supabase = createClient();
     const { data, error } = await supabase.from('task_handoffs')
       .select('*, from_user:from_user_id(*), to_user:to_user_id(*)')

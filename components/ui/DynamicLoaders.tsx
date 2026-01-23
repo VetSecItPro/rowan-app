@@ -6,7 +6,7 @@
  */
 
 import dynamic from 'next/dynamic';
-import { ComponentType, ReactNode } from 'react';
+import { ComponentType } from 'react';
 import { Loader2 } from 'lucide-react';
 import { ProgressiveTableSkeleton } from './ProgressiveLoader';
 
@@ -39,7 +39,7 @@ const LoadingFallback = ({
 /**
  * Error boundary fallback for dynamic imports
  */
-const ErrorFallback = ({
+const _ErrorFallback = ({
   error,
   retry
 }: {

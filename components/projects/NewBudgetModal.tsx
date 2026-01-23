@@ -17,7 +17,7 @@ export function NewBudgetModal({
   onClose,
   onSave,
   currentBudget,
-  spaceId,
+  spaceId: _spaceId,
 }: NewBudgetModalProps) {
   const [amount, setAmount] = useState<string>(() => (currentBudget ? currentBudget.toString() : ''));
 

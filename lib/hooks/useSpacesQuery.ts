@@ -439,7 +439,7 @@ export function useDeleteSpace() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ spaceId, userId }: { spaceId: string; userId: string }) => {
+    mutationFn: async ({ spaceId }: { spaceId: string; userId: string }) => {
       const supabase = createClient();
       const { error } = await supabase
         .from('spaces')
@@ -485,14 +485,14 @@ export function useDeleteSpace() {
       return { previousSpaces, previousCurrentSpace };
     },
     // Clean up additional caches on success
-    onSuccess: (deletedSpaceId, { userId }) => {
+    onSuccess: (deletedSpaceId) => {
       // Invalidate space members cache
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.spaces.members(deletedSpaceId),
       });
     },
     // Revert optimistic updates on error
-    onError: (error, { spaceId, userId }, context) => {
+    onError: (_error, { userId }, context) => {
       if (context?.previousSpaces) {
         queryClient.setQueryData(QUERY_KEYS.spaces.all(userId), context.previousSpaces);
       }

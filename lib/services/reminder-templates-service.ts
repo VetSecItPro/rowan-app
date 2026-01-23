@@ -91,7 +91,7 @@ export const reminderTemplatesService = {
       throw new Error('Failed to fetch templates');
     }
 
-    return (data || []).map((template: any) => ({
+    return (data || []).map((template: ReminderTemplate & { creator?: Record<string, unknown> }) => ({
       ...template,
       creator: template.creator || undefined,
     }));
@@ -143,7 +143,7 @@ export const reminderTemplatesService = {
       throw new Error('Failed to fetch space templates');
     }
 
-    return (data || []).map((template: any) => ({
+    return (data || []).map((template: ReminderTemplate & { creator?: Record<string, unknown> }) => ({
       ...template,
       creator: template.creator || undefined,
     }));

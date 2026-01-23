@@ -104,7 +104,7 @@ export async function getOverdueBills(spaceId: string): Promise<UpcomingBill[]> 
 
   // Transform data to UpcomingBill format
   return (
-    data?.map((event: any) => ({
+    data?.map((event: { id: string; title: string; start_time: string; expenses?: { id?: string; amount?: number; category?: string; payment_method?: string } }) => ({
       event_id: event.id,
       expense_id: event.expenses?.id || '',
       title: event.title,

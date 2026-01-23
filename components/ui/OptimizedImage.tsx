@@ -127,6 +127,7 @@ export function OptimizedImage({
   // For data URLs or blob URLs, use regular img tag
   if (src.startsWith('data:') || src.startsWith('blob:')) {
     return (
+      /* eslint-disable-next-line @next/next/no-img-element -- data/blob URLs not supported by next/image */
       <img
         src={src}
         alt={alt}

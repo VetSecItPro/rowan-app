@@ -5,7 +5,7 @@
  */
 
 import { Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 /**
  * Enhanced progressive loading with staggered content reveal
@@ -22,6 +22,9 @@ export function ProgressiveContentLoader({
   className?: string;
 }) {
   const [currentStage, setCurrentStage] = useState(0);
+
+  // Pre-compute random widths to avoid impure render
+  const skeletonWidths = useMemo(() => [75, 85, 65, 90], []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -65,7 +68,7 @@ export function ProgressiveContentLoader({
               i <= currentStage ? 'opacity-100' : 'opacity-40'
             }`}
             style={{
-              width: `${Math.random() * 40 + 60}%`,
+              width: `${skeletonWidths[i]}%`,
               animationDelay: `${i * 100}ms`,
             }}
           />
@@ -86,7 +89,7 @@ export function EnhancedModalSkeleton({
   size = 'default',
 }: {
   title: string;
-  icon?: any;
+  icon?: React.ComponentType<{ className?: string }>;
   size?: 'sm' | 'default' | 'lg';
 }) {
   const [loadingStage, setLoadingStage] = useState(0);
@@ -173,6 +176,10 @@ export function ProgressiveTableSkeleton({
 }) {
   const [loadedRows, setLoadedRows] = useState(0);
 
+  // Pre-computed widths to avoid impure render - deterministic pattern
+  const headerWidths = useMemo(() => [100, 120, 90, 110, 95], []);
+  const cellWidths = useMemo(() => [80, 100, 70, 90, 85], []);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setLoadedRows((prev) => {
@@ -205,7 +212,7 @@ export function ProgressiveTableSkeleton({
               <div
                 key={i}
                 className="h-4 bg-gray-600 rounded animate-pulse"
-                style={{ width: `${Math.random() * 60 + 80}px` }}
+                style={{ width: `${headerWidths[i % headerWidths.length]}px` }}
               />
             ))}
           </div>
@@ -226,7 +233,7 @@ export function ProgressiveTableSkeleton({
                     key={colIndex}
                     className="h-4 bg-gray-700 rounded animate-pulse"
                     style={{
-                      width: `${Math.random() * 80 + 60}px`,
+                      width: `${cellWidths[(colIndex + rowIndex) % cellWidths.length]}px`,
                       animationDelay: `${colIndex * 50 + rowIndex * 100}ms`,
                     }}
                   />

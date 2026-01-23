@@ -224,7 +224,7 @@ export const notificationQueueService = {
   /**
    * Cancel pending notification
    */
-  async cancelNotification(notificationId: string, supabaseClient?: any): Promise<void> {
+  async cancelNotification(notificationId: string, supabaseClient?: ReturnType<typeof createClient>): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
 
     const { error } = await supabase
@@ -241,7 +241,7 @@ export const notificationQueueService = {
   /**
    * Clean up old notifications (older than 30 days)
    */
-  async cleanup(supabaseClient?: any): Promise<number> {
+  async cleanup(supabaseClient?: ReturnType<typeof createClient>): Promise<number> {
     const supabase = getSupabaseClient(supabaseClient);
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);

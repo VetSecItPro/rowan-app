@@ -6,7 +6,7 @@
  */
 
 import { getUserTier } from './subscription-service';
-import { getFeatureLimits, hasFeatureAccess } from '../config/feature-limits';
+import { getFeatureLimits } from '../config/feature-limits';
 import { canPerformAction, getTodayUsage } from './usage-service';
 import type { SubscriptionTier, UsageType } from '../types';
 

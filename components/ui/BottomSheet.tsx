@@ -26,8 +26,6 @@ interface BottomSheetProps {
   className?: string;
 }
 
-// Height of the drag handle area for gesture detection
-const HANDLE_HEIGHT = 36;
 // Minimum velocity to trigger dismiss
 const DISMISS_VELOCITY = 0.5;
 // Minimum distance to trigger dismiss
@@ -135,11 +133,11 @@ export function BottomSheet({
     e.preventDefault();
   }, [handleDragStart]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const _handleMouseMove = useCallback((e: React.MouseEvent) => {
     handleDragMove(e.clientY);
   }, [handleDragMove]);
 
-  const handleMouseUp = useCallback(() => {
+  const _handleMouseUp = useCallback(() => {
     handleDragEnd();
   }, [handleDragEnd]);
 

@@ -72,7 +72,7 @@ export function LeaderboardWidget({
     }
   };
 
-  const getPeriodLabel = () => {
+  const _getPeriodLabel = () => {
     switch (activePeriod) {
       case 'week':
         return 'This Week';
@@ -186,6 +186,7 @@ export function LeaderboardWidget({
                 {/* Avatar */}
                 <div className="relative">
                   {entry.avatar_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={entry.avatar_url}
                       alt={entry.name}

@@ -69,7 +69,7 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
       isValid: true,
       adminId: typedSession.adminId,
     };
-  } catch (error) {
+  } catch {
     return {
       isValid: false,
       error: 'Invalid session',

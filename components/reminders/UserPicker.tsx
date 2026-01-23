@@ -129,6 +129,7 @@ export function UserPicker({
           <div className="flex items-center gap-3">
             {/* Avatar */}
             {selectedMember.users?.avatar_url ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={selectedMember.users.avatar_url}
                 alt={selectedMember.users.name}
@@ -229,6 +230,7 @@ export function UserPicker({
                     >
                       {/* Avatar */}
                       {member.users?.avatar_url ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={member.users.avatar_url}
                           alt={member.users.name}

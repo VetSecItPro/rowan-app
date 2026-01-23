@@ -284,7 +284,7 @@ export function RewardsCatalog({
                 This will cost <span className="font-bold text-amber-400">{showConfirm.cost_points} points</span>
               </p>
               <p className="text-sm text-gray-500 mb-6">
-                You'll have {userPoints - showConfirm.cost_points} points remaining
+                You&apos;ll have {userPoints - showConfirm.cost_points} points remaining
               </p>
               <div className="flex gap-3">
                 <button

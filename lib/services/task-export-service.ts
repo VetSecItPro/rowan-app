@@ -1,7 +1,33 @@
 import { createClient } from '@/lib/supabase/client';
 
+type TaskRow = {
+  title: string;
+  description?: string | null;
+  status: string;
+  priority: string;
+  category?: string | null;
+  due_date?: string | null;
+  assigned_to?: string | null;
+  created_at: string;
+};
+
+type ColumnKey = 'title' | 'description' | 'status' | 'priority' | 'category' | 'due_date' | 'assigned_to' | 'created_at';
+
+const COLUMN_CONFIG: Record<ColumnKey, { header: string; getValue: (task: TaskRow) => string }> = {
+  title: { header: 'Title', getValue: (task) => task.title },
+  description: { header: 'Description', getValue: (task) => task.description || '' },
+  status: { header: 'Status', getValue: (task) => task.status },
+  priority: { header: 'Priority', getValue: (task) => task.priority },
+  category: { header: 'Category', getValue: (task) => task.category || '' },
+  due_date: { header: 'Due Date', getValue: (task) => task.due_date || '' },
+  assigned_to: { header: 'Assigned To', getValue: (task) => task.assigned_to || '' },
+  created_at: { header: 'Created At', getValue: (task) => new Date(task.created_at).toLocaleDateString() },
+};
+
+const DEFAULT_COLUMNS: ColumnKey[] = ['title', 'description', 'status', 'priority', 'category', 'due_date', 'assigned_to', 'created_at'];
+
 export const taskExportService = {
-  async exportToCSV(spaceId: string, filters?: any): Promise<string> {
+  async exportToCSV(spaceId: string, filters?: { status?: string; category?: string; assigned_to?: string; columns?: string[] }): Promise<string> {
     const supabase = createClient();
     let query = supabase.from('tasks').select('*').eq('space_id', spaceId);
 
@@ -12,17 +38,13 @@ export const taskExportService = {
     const { data, error } = await query;
     if (error) throw error;
 
-    const headers = ['Title', 'Description', 'Status', 'Priority', 'Category', 'Due Date', 'Assigned To', 'Created At'];
-    const rows = data?.map((task: { title: string; description?: string | null; status: string; priority: string; category?: string | null; due_date?: string | null; assigned_to?: string | null; created_at: string }) => [
-      task.title,
-      task.description || '',
-      task.status,
-      task.priority,
-      task.category || '',
-      task.due_date || '',
-      task.assigned_to || '',
-      new Date(task.created_at).toLocaleDateString(),
-    ]);
+    // Use provided columns or default to all
+    const columns = (filters?.columns?.filter((c): c is ColumnKey => c in COLUMN_CONFIG) || DEFAULT_COLUMNS);
+
+    const headers = columns.map(col => COLUMN_CONFIG[col].header);
+    const rows = data?.map((task: TaskRow) =>
+      columns.map(col => COLUMN_CONFIG[col].getValue(task))
+    );
 
     let csv = headers.join(',') + '\n';
     rows?.forEach((row: string[]) => {

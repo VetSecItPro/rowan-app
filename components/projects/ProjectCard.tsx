@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useState, useEffect } from 'react';
-import { Folder, Calendar, DollarSign, MoreVertical, AlertTriangle, CheckCircle, FileText, Target } from 'lucide-react';
+import { Folder, Calendar, MoreVertical, AlertTriangle, CheckCircle, FileText, Target } from 'lucide-react';
 import Link from 'next/link';
 import type { Project } from '@/lib/services/project-tracking-service';
 import { pdfExportService } from '@/lib/services/pdf-export-service';
@@ -43,7 +43,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
         if (progress.total > 0) {
           setMilestoneProgress(progress);
         }
-      } catch (error) {
+      } catch {
         // Silently fail - milestones are optional
       }
     }

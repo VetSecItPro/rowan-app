@@ -215,6 +215,7 @@ export function OptimizedVideo({
 
       {/* Poster placeholder before video loads */}
       {!isInView && poster && (
+        /* eslint-disable-next-line @next/next/no-img-element -- poster can be any external URL */
         <img
           src={poster}
           alt={alt}

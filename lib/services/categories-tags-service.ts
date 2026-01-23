@@ -509,8 +509,6 @@ export async function getExpenseStatsByTag(
   startDate?: string,
   endDate?: string
 ): Promise<{ tag: Tag; total: number; count: number }[]> {
-  const supabase = createClient();
-
   // Get all tags for the space
   const tags = await getTags(spaceId);
 

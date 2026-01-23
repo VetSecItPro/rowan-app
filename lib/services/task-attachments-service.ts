@@ -23,7 +23,7 @@ export const taskAttachmentsService = {
     const filePath = `${taskId}/${fileName}`;
 
     // Upload to storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('task-attachments')
       .upload(filePath, file);
 

@@ -24,7 +24,7 @@ export function HamburgerMenu() {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const { currentSpace } = useSpaces();
   const { isDesktop } = useDevice();
 
@@ -58,14 +58,14 @@ export function HamburgerMenu() {
   useEffect(() => {
     if (isOpen && buttonRef.current && isDesktop) {
       const rect = buttonRef.current.getBoundingClientRect();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setMenuStyle({
         position: 'fixed',
         top: rect.bottom + 8, // 8px gap below button
         right: window.innerWidth - rect.right, // Align right edge with button's right edge
       });
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setMenuStyle({});
     }
   }, [isOpen, isDesktop]);

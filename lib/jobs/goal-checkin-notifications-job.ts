@@ -64,7 +64,7 @@ export async function processGoalCheckInNotifications(): Promise<{
   const errors: string[] = [];
   let notificationsSent = 0;
   let emailsSent = 0;
-  let remindersScheduled = 0;
+  const remindersScheduled = 0;
 
   try {
     const supabase = supabaseAdmin;

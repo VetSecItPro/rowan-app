@@ -230,12 +230,12 @@ export async function exportCategoryBreakdown(
     .sort()
     .forEach((category) => {
       const categoryExpenses = grouped[category];
-      const categoryTotal = categoryExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0);
+      const categoryTotal = categoryExpenses.reduce((sum: number, exp: { amount: number }) => sum + exp.amount, 0);
 
       csvRows.push(''); // Empty row
       csvRows.push(`${category} (Total: $${categoryTotal.toFixed(2)})`);
 
-      categoryExpenses.forEach((expense: any) => {
+      categoryExpenses.forEach((expense: { date: string; description?: string; amount: number; payment_method?: string }) => {
         csvRows.push(
           [
             '',

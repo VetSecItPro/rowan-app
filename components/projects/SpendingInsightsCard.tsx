@@ -16,6 +16,7 @@ export function SpendingInsightsCard({ spaceId }: SpendingInsightsCardProps) {
 
   useEffect(() => {
     loadInsights();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadInsights is a stable function
   }, [spaceId, timeRange]);
 
   async function loadInsights() {

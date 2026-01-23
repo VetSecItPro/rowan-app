@@ -71,7 +71,7 @@ export const eventAttachmentsService = {
     const storagePath = `events/${input.event_id}/${timestamp}-${randomString}.${fileExtension}`;
 
     // Upload to Supabase Storage
-    const { data: storageData, error: storageError } = await supabase
+    const { error: storageError } = await supabase
       .storage
       .from('event-attachments')
       .upload(storagePath, input.file, {

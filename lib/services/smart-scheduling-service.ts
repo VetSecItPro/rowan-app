@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { CalendarEvent } from './calendar-service';
-import { addDays, addMinutes, format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
+import { addDays, addMinutes, format, parseISO, startOfDay } from 'date-fns';
 
 export interface TimeSlot {
   start_time: string; // ISO 8601
@@ -109,7 +109,6 @@ export const smartSchedulingService = {
     while (currentDate <= endDate) {
       const dayOfWeek = currentDate.getDay();
       const dayStart = startOfDay(currentDate);
-      const dayEnd = endOfDay(currentDate);
 
       // Get work hours for this day (default 9am-5pm)
       const workHoursBlocks = availabilityBlocks.filter(

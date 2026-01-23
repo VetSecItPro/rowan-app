@@ -13,11 +13,6 @@ interface UpdateDateRow {
   created_at: string;
 }
 
-interface MilestoneRow {
-  id: string;
-  goal_id: string;
-}
-
 interface GoalDurationRow {
   created_at: string;
   completed_at: string | null;

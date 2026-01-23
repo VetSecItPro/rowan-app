@@ -14,7 +14,7 @@ interface MentionHighlightProps {
  */
 export function MentionHighlight({
   content,
-  currentUserId,
+  currentUserId: _currentUserId,
   className = '',
 }: MentionHighlightProps) {
   // Split content by @mentions

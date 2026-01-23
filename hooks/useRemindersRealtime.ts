@@ -349,7 +349,8 @@ export function useRemindersRealtime({
       // Clear any pending debounced updates
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId, memoizedFilters]); // Only depend on spaceId and memoized filters
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally limited dependencies to avoid infinite re-subscribe loops
+  }, [spaceId, memoizedFilters]);
 
   function refreshReminders() {
     setLoading(true);

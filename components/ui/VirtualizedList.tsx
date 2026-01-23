@@ -91,7 +91,7 @@ export function VirtualizedList<T>({
   const totalHeight = items.length * effectiveItemHeight - (items.length > 0 ? gap : 0);
 
   // Calculate visible range
-  const { startIndex, endIndex, visibleItems } = useMemo(() => {
+  const { startIndex, visibleItems } = useMemo(() => {
     if (containerHeightPx === 0 || items.length === 0) {
       return { startIndex: 0, endIndex: 0, visibleItems: [] };
     }

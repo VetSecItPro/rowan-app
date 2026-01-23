@@ -145,7 +145,7 @@ export const reactionsService = {
   /**
    * Subscribe to reaction changes for a specific check-in
    */
-  subscribeToReactions(checkinId: string, callback: (payload: any) => void) {
+  subscribeToReactions(checkinId: string, callback: (payload: { eventType: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) => void) {
     const supabase = createClient();
 
     const channel = supabase
@@ -168,7 +168,7 @@ export const reactionsService = {
   /**
    * Subscribe to all reactions in a space (for notifications)
    */
-  subscribeToSpaceReactions(spaceId: string, callback: (payload: any) => void) {
+  subscribeToSpaceReactions(spaceId: string, callback: (payload: { eventType: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) => void) {
     const supabase = createClient();
 
     // Note: We need to join through checkins to filter by space

@@ -6,7 +6,7 @@ interface SkeletonLoaderProps {
   variant?: string;
 }
 
-export function SkeletonLoader({ count = 1, className = '', height = 'h-20', width = '', variant }: SkeletonLoaderProps) {
+export function SkeletonLoader({ count = 1, className = '', height = 'h-20', width = '', variant: _variant }: SkeletonLoaderProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       {Array.from({ length: count }).map((_, index) => (

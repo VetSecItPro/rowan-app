@@ -117,7 +117,7 @@ export const projectsService = {
 
   async updateExpense(id: string, updates: Partial<CreateExpenseInput>, supabaseClient?: SupabaseClient): Promise<Expense> {
     const supabase = getSupabaseClient(supabaseClient);
-    const finalUpdates: any = { ...updates };
+    const finalUpdates: Partial<Omit<CreateExpenseInput, 'paid_at'>> & { paid_at?: string | null } = { ...updates };
 
     if (updates.status === 'paid' && !finalUpdates.paid_at) {
       finalUpdates.paid_at = new Date().toISOString();

@@ -123,7 +123,7 @@ async function outputLog(entry: MonetizationLogEntry): Promise<void> {
       logger.warn(prefix, { component: 'lib-monetization-logger', error: logLine });
       break;
     default:
-      console.log(prefix, logLine);
+      logger.info(prefix, { component: 'lib-monetization-logger', data: logLine });
   }
 
   // Persist to database (non-blocking)

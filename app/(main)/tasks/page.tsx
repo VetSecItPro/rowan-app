@@ -44,21 +44,6 @@ type TaskOrChore = Task & {
   sort_order: number;
 };
 
-// Common interface for task/chore items from various components
-interface ItemLike {
-  id: string;
-  title: string;
-  description?: string;
-  status: string;
-  priority: string;
-  sort_order?: number;
-  due_date?: string;
-  assigned_to?: string;
-  type?: 'task' | 'chore';
-  frequency?: string;
-  category?: string;
-}
-
 export default function TasksPage() {
   const { currentSpace, user } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;

@@ -60,9 +60,9 @@ export async function GET(request: NextRequest) {
         // Get current CCPA status
         const currentStatus = await ccpaService.getOptOutStatus(user.id);
 
-        if (currentStatus.success && currentStatus.data.california_resident === null) {
+        if (currentStatus.success && currentStatus.data && (currentStatus.data as { california_resident?: boolean | null }).california_resident === null) {
           // Auto-update their CA resident status if not set
-          await ccpaService.setOptOutStatus(user.id, currentStatus.data.opted_out || false, {
+          await ccpaService.setOptOutStatus(user.id, (currentStatus.data as { opted_out?: boolean }).opted_out || false, {
             ipAddress: clientIP,
             userAgent: request.headers.get('user-agent') || 'unknown',
             californiaResident: true,

@@ -252,7 +252,7 @@ export const receiptScanningService = {
    * Simulate OCR for demo purposes
    * In production, replace with actual OCR service
    */
-  async simulateOCR(imageUrl: string): Promise<string> {
+  async simulateOCR(_imageUrl: string): Promise<string> {
     // This would be replaced with actual OCR
     return `ACME GROCERY STORE
 123 Main Street

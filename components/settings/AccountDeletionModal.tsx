@@ -36,7 +36,7 @@ export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalPr
       document.body.removeChild(a);
 
       setHasExported(true);
-    } catch (error) {
+    } catch {
       alert('Failed to export data. Please try again.');
     }
   };

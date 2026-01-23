@@ -176,11 +176,11 @@ export function Sidebar() {
 
     if (saved !== null) {
       // Use saved preference
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setIsExpanded(saved === 'true');
     } else {
       // First time user - start collapsed, hover to expand
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setIsExpanded(false);
       localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
     }
