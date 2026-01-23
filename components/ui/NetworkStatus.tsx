@@ -132,7 +132,7 @@ export function NetworkStatus({
         }}
       >
         <Wifi className="w-4 h-4" />
-        <span>You're back online</span>
+        <span>You&apos;re back online</span>
       </div>
     );
   }

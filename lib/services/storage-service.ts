@@ -342,7 +342,7 @@ export async function getSpaceStorageUsage(
 
     // If no usage record exists yet, calculate it
     if (!usage) {
-      const { data: calculated, error: calcError } = await supabase.rpc(
+      const { error: calcError } = await supabase.rpc(
         'calculate_space_storage',
         { p_space_id: spaceId }
       );
@@ -564,7 +564,7 @@ export async function recalculateStorageUsage(
     const supabase = await createClient();
 
     // Call database function to recalculate
-    const { data, error } = await supabase.rpc('calculate_space_storage', {
+    const { error } = await supabase.rpc('calculate_space_storage', {
       p_space_id: spaceId,
     });
 
@@ -621,18 +621,19 @@ function generateWarningMessage(warningType: WarningType, percentageUsed: number
 /**
  * Map database usage record to StorageUsage interface
  */
-function mapUsageToStorageUsage(usage: any, spaceId: string): StorageUsage {
+function mapUsageToStorageUsage(usage: { total_bytes?: number; file_count?: number; last_calculated_at?: string }, spaceId: string): StorageUsage {
   // Get tier and calculate limit
   // Note: This is a simplified version - in production you'd fetch the actual space's subscription tier
   const limitBytes = getStorageLimitBytes('free'); // Default to free, should be dynamic
 
+  const totalBytes = usage.total_bytes || 0;
   return {
     spaceId,
-    totalBytes: usage.total_bytes || 0,
+    totalBytes,
     fileCount: usage.file_count || 0,
     limitBytes,
-    percentageUsed: limitBytes > 0 ? (usage.total_bytes / limitBytes) * 100 : 0,
-    lastCalculated: new Date(usage.last_calculated_at),
+    percentageUsed: limitBytes > 0 ? (totalBytes / limitBytes) * 100 : 0,
+    lastCalculated: new Date(usage.last_calculated_at || Date.now()),
   };
 }
 

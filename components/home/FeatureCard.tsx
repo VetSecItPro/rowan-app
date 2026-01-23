@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
 
@@ -13,7 +12,7 @@ interface FeatureCardProps {
   href: string;
 }
 
-export function FeatureCard({ title, description, icon: Icon, gradient, shadowColor, href }: FeatureCardProps) {
+export function FeatureCard({ title, description, icon: Icon, gradient, href }: FeatureCardProps) {
   return (
     <Link href={href} className="block group">
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 transition-colors duration-200 hover:border-gray-700">

@@ -30,7 +30,7 @@ export async function isUserSpaceMember(
     }
 
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

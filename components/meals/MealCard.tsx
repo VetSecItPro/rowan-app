@@ -1,6 +1,6 @@
 'use client';
 
-import { UtensilsCrossed, Clock, MoreVertical, CheckSquare } from 'lucide-react';
+import { UtensilsCrossed, MoreVertical, CheckSquare } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
 import { parseDateString } from '@/lib/utils/date';
@@ -52,6 +52,7 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
               {meal.assignee && (
                 <div className="flex items-center gap-1.5 mt-1 px-2 py-0.5 bg-orange-900/30 rounded-full w-fit">
                   {meal.assignee.avatar_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={meal.assignee.avatar_url} alt={meal.assignee.name} className="w-3 h-3 rounded-full object-cover" />
                   ) : (
                     <div className="w-3 h-3 rounded-full bg-gradient-meals flex items-center justify-center">

@@ -45,7 +45,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   const [isExpanded, setIsExpanded] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [members, setMembers] = useState<SpaceMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   const loadFilterOptions = useCallback(async () => {
     const supabase = createClient();
@@ -68,7 +68,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   }, [spaceId]);
 
   useEffect(() => {
-    loadFilterOptions();
+    queueMicrotask(() => loadFilterOptions());
   }, [loadFilterOptions]);
 
   useEffect(() => {

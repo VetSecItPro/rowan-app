@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle, DollarSign, Calendar } from 'lucide-react';
+import { TrendingDown, AlertCircle, CheckCircle, DollarSign, Calendar } from 'lucide-react';
 import { budgetAlertsService } from '@/lib/services/budget-alerts-service';
 import { logger } from '@/lib/logger';
 
@@ -45,7 +45,7 @@ export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
     );
   }
 
-  const { safeToSpend, status, percentageUsed, daysLeftInMonth, dailyBudget } = safeToSpendInfo;
+  const { safeToSpend, status, percentageUsed: _percentageUsed, daysLeftInMonth, dailyBudget } = safeToSpendInfo;
 
   // Determine colors and icons based on status
   const getStatusConfig = () => {

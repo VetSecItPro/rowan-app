@@ -40,9 +40,11 @@ export function SmartBackgroundCanvas({
   children
 }: BackgroundCanvasProps) {
   const [mounted, setMounted] = useState(false);
+  // Generate animation delay once on mount to avoid impure render
+  const [animationDelay] = useState(() => Math.random() * 10);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => setMounted(true));
   }, []);
 
   // Time-aware color calculation
@@ -112,9 +114,9 @@ export function SmartBackgroundCanvas({
       '--bg-secondary-50': `rgb(var(--${colors.secondary}-50) / ${accentOpacity})`,
       '--bg-accent-50': `rgb(var(--${colors.accent}-50) / ${accentOpacity * 0.5})`,
       '--animation-duration': timeAware ? '20s' : '15s',
-      '--animation-delay': timeAware ? Math.random() * 10 + 's' : '0s',
+      '--animation-delay': timeAware ? animationDelay + 's' : '0s',
     } as React.CSSProperties;
-  }, [colors, variant, timeAware, mounted]);
+  }, [colors, variant, timeAware, mounted, animationDelay]);
 
   const backgroundClasses = useMemo(() => {
     const base = 'relative overflow-hidden';

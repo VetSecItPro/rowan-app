@@ -1,4 +1,4 @@
-import { format, parseISO, addDays, differenceInDays } from 'date-fns';
+import { format, parseISO, differenceInDays } from 'date-fns';
 import { weatherCacheService } from './weather-cache-service';
 import { logger } from '@/lib/logger';
 
@@ -30,7 +30,7 @@ export const weatherService = {
    * Check if we should fetch weather for this event
    * Smart fetching: Only fetch for events within 5 days
    */
-  shouldFetchWeather(eventTime: string, location?: string): boolean {
+  shouldFetchWeather(eventTime: string, _location?: string): boolean {
     // Allow weather fetching even without location (we'll auto-detect user location)
     try {
       const eventDate = parseISO(eventTime);
@@ -41,7 +41,7 @@ export const weatherService = {
       // 1. In the future (not past)
       // 2. Within 5 days (forecast limit)
       return daysUntilEvent >= 0 && daysUntilEvent <= 5;
-    } catch (error) {
+    } catch {
       return false;
     }
   },

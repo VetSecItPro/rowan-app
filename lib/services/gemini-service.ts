@@ -282,8 +282,8 @@ FORMAT as JSON: {"subject": "Daily Digest - [Date]", "html": "complete HTML emai
     }
 
     // Build sections
-    let htmlSections: string[] = [];
-    let textSections: string[] = [];
+    const htmlSections: string[] = [];
+    const textSections: string[] = [];
 
     if (userData.tasks.length > 0) {
       const taskHtml = `

@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, X, Check, Loader2, Gift } from 'lucide-react';
 import { rewardsService } from '@/lib/services/rewards';
 import { sanitizePlainText } from '@/lib/sanitize';
-import type { RewardCatalogItem, RewardCategory, CreateRewardInput } from '@/lib/types/rewards';
+import type { RewardCatalogItem, RewardCategory } from '@/lib/types/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { logger } from '@/lib/logger';
 
@@ -58,6 +58,7 @@ export function RewardsManagement({
 
   useEffect(() => {
     loadRewards();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadRewards is a stable function
   }, [spaceId]);
 
   async function loadRewards() {

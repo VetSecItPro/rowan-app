@@ -143,7 +143,7 @@ export function simplifyIngredient(ingredient: string): string {
  * Processes an array of ingredients and returns simplified versions
  * with selection state for the preview modal
  */
-export function simplifyIngredients(ingredients: (string | { name?: string; amount?: string; unit?: string })[]): SimplifiedIngredient[] {
+export function simplifyIngredients(ingredients: (string | { name?: string; amount?: string | number; unit?: string })[]): SimplifiedIngredient[] {
   const seen = new Set<string>();
   const results: SimplifiedIngredient[] = [];
 

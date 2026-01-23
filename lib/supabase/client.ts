@@ -32,45 +32,49 @@ export const createClient = () => {
   // Create singleton client instance
   supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
+      getAll() {
         // Only access document in browser environment
-        if (typeof window === 'undefined') return undefined;
+        if (typeof window === 'undefined') return [];
 
-        // Get cookie from document (reads current session)
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        // Parse all cookies from document
+        const cookies: Array<{ name: string; value: string }> = [];
+        if (document.cookie) {
+          document.cookie.split(';').forEach((cookie) => {
+            const [name, ...valueParts] = cookie.trim().split('=');
+            if (name) {
+              cookies.push({ name, value: valueParts.join('=') });
+            }
+          });
+        }
+        return cookies;
       },
-      set(name: string, value: string, options: any) {
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: { maxAge?: number; path?: string; domain?: string; sameSite?: boolean | 'strict' | 'lax' | 'none'; secure?: boolean } }>) {
         // Only access document in browser environment
         if (typeof window === 'undefined') return;
 
-        // Set cookie in document with persistent login (1 year default)
-        let cookie = `${name}=${value}`;
-        // Use provided maxAge or default to 1 year for persistent login
-        const maxAge = options?.maxAge || SESSION_COOKIE_MAX_AGE;
-        cookie += `; max-age=${maxAge}`;
-        cookie += `; path=${options?.path || '/'}`;
-        if (options?.domain) {
-          cookie += `; domain=${options.domain}`;
-        }
-        cookie += `; samesite=${options?.sameSite || 'lax'}`;
-        // Always use secure in production
-        if (options?.secure || (typeof window !== 'undefined' && window.location.protocol === 'https:')) {
-          cookie += '; secure';
-        }
-        document.cookie = cookie;
-      },
-      remove(name: string, options: any) {
-        // Only access document in browser environment
-        if (typeof window === 'undefined') return;
-
-        // Remove cookie by setting expired date
-        let cookie = `${name}=; max-age=0`;
-        if (options?.path) {
-          cookie += `; path=${options.path}`;
-        }
-        document.cookie = cookie;
+        // Set each cookie
+        cookiesToSet.forEach(({ name, value, options }) => {
+          let cookie = `${name}=${value}`;
+          // Use provided maxAge or default to 1 year for persistent login
+          const maxAge = options?.maxAge || SESSION_COOKIE_MAX_AGE;
+          cookie += `; max-age=${maxAge}`;
+          cookie += `; path=${options?.path || '/'}`;
+          if (options?.domain) {
+            cookie += `; domain=${options.domain}`;
+          }
+          // Handle sameSite - convert boolean to string value
+          const sameSite = options?.sameSite;
+          if (sameSite === false || sameSite === true) {
+            cookie += `; samesite=${sameSite ? 'strict' : 'none'}`;
+          } else {
+            cookie += `; samesite=${sameSite || 'lax'}`;
+          }
+          // Always use secure in production
+          if (options?.secure || (typeof window !== 'undefined' && window.location.protocol === 'https:')) {
+            cookie += '; secure';
+          }
+          document.cookie = cookie;
+        });
       },
     },
     global: {

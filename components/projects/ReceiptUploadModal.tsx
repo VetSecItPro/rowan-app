@@ -220,6 +220,7 @@ export function ReceiptUploadModal({
                 {/* Preview */}
                 <div className="relative rounded-lg overflow-hidden bg-gray-900">
                   {previewUrl && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={previewUrl}
                       alt="Receipt preview"

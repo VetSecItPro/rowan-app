@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, X, CheckCheck, Trash2, ExternalLink } from 'lucide-react';
+import { Bell, CheckCheck, Trash2, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';

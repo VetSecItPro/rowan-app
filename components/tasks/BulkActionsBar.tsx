@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, Trash2, User, Tag, AlertCircle, X, MoreHorizontal } from 'lucide-react';
+import { CheckCircle, Trash2, AlertCircle, X, MoreHorizontal } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';

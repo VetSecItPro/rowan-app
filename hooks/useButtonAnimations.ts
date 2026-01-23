@@ -85,7 +85,9 @@ export function useSuccessAnimation(trigger: boolean) {
 
   useEffect(() => {
     if (trigger) {
-      setIsAnimating(true);
+      queueMicrotask(() => {
+        setIsAnimating(true);
+      });
       const timer = setTimeout(() => setIsAnimating(false), 800);
       return () => clearTimeout(timer);
     }
@@ -128,7 +130,7 @@ export function useButtonAnimations(options: ButtonAnimationOptions = {}) {
   );
 
   const isSuccessAnimating = useSuccessAnimation(success);
-  const { rippleKey, triggerRipple } = useRippleEffect(ripple && level !== 'basic');
+  const { triggerRipple } = useRippleEffect(ripple && level !== 'basic');
 
   // Build animation classes
   const getAnimationClasses = useCallback(() => {
@@ -220,10 +222,11 @@ export function useQuickButtonEnhancement(
         buttonRef.current.addEventListener('mouseenter', onMouseEnter);
         buttonRef.current.addEventListener('mouseleave', onMouseLeave);
 
+        const button = buttonRef.current;
         return () => {
-          if (buttonRef.current) {
-            buttonRef.current.removeEventListener('mouseenter', onMouseEnter);
-            buttonRef.current.removeEventListener('mouseleave', onMouseLeave);
+          if (button) {
+            button.removeEventListener('mouseenter', onMouseEnter);
+            button.removeEventListener('mouseleave', onMouseLeave);
           }
         };
       }

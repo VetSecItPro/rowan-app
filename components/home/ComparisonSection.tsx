@@ -56,7 +56,7 @@ export function ComparisonSection() {
                                 { feature: 'Family Sharing', cols: ['some', 'some', 'some', 'rare', 'rare', true] },
                                 { feature: 'One Login', cols: [false, false, false, false, false, true] },
                                 { feature: 'Everything Synced', cols: [false, false, false, false, false, true] },
-                            ].map((row, idx) => (
+                            ].map((row) => (
                                 <tr key={row.feature} className="hover:bg-gray-800/30 transition-colors">
                                     <td className="py-3 px-4 font-medium text-white">{row.feature}</td>
                                     {row.cols.map((val, colIdx) => (

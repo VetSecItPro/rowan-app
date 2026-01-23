@@ -138,8 +138,8 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     trialEndsAt: null,
     trialStartedAt: null,
   });
-  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
-  const [upgradeFeature, setUpgradeFeature] = useState<string | undefined>();
+  const [, setUpgradeModalOpen] = useState(false);
+  const [, setUpgradeFeature] = useState<string | undefined>();
 
   // Fetch subscription status
   const fetchSubscription = useCallback(async () => {

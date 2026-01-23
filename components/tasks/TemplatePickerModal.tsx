@@ -22,6 +22,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
 
   useEffect(() => {
     if (isOpen) loadTemplates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadTemplates is a stable function
   }, [isOpen, spaceId]);
 
   async function loadTemplates() {

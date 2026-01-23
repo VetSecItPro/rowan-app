@@ -43,7 +43,7 @@ export async function processTaskReminders() {
   }
 }
 
-async function sendPushNotification(reminder: any) {
+async function sendPushNotification(reminder: { user_id: string; task_id: string; task_title: string }) {
   const { error } = await supabaseAdmin
     .from('in_app_notifications')
     .insert({
@@ -62,7 +62,7 @@ async function sendPushNotification(reminder: any) {
   }
 }
 
-async function sendEmailReminder(reminder: any) {
+async function sendEmailReminder(reminder: { user_id: string; task_id: string; task_title: string }) {
   // TODO: Implement email via Resend or similar
   logger.info(`Email reminder for task ${reminder.task_id}`, { component: 'task-reminders-job' });
 }

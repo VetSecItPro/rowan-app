@@ -36,50 +36,53 @@ export function Tooltip({ content, children, position = 'top', delay = 0 }: Tool
   // Smart positioning to prevent overflow
   useEffect(() => {
     if (isVisible && tooltipRef.current && triggerRef.current) {
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const viewport = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
+      queueMicrotask(() => {
+        if (!tooltipRef.current) return;
+        const tooltipRect = tooltipRef.current.getBoundingClientRect();
+        const viewport = {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        };
 
-      let newPosition = position;
+        let newPosition = position;
 
-      // Check if tooltip overflows viewport vertically and adjust
-      if (position === 'top' && tooltipRect.top < 0) {
-        newPosition = 'bottom';
-      } else if (position === 'bottom' && tooltipRect.bottom > viewport.height) {
-        newPosition = 'top';
-      } else if (position === 'left' && tooltipRect.left < 0) {
-        newPosition = 'right';
-      } else if (position === 'right' && tooltipRect.right > viewport.width) {
-        newPosition = 'left';
-      }
-
-      if (newPosition !== tooltipPosition) {
-        setTooltipPosition(newPosition);
-      }
-
-      // Check horizontal overflow for top/bottom positioned tooltips
-      if (newPosition === 'top' || newPosition === 'bottom') {
-        const padding = 8; // Padding from viewport edge
-        let offset = 0;
-
-        if (tooltipRect.left < padding) {
-          // Tooltip is cut off on the left
-          offset = padding - tooltipRect.left;
-        } else if (tooltipRect.right > viewport.width - padding) {
-          // Tooltip is cut off on the right
-          offset = viewport.width - padding - tooltipRect.right;
+        // Check if tooltip overflows viewport vertically and adjust
+        if (position === 'top' && tooltipRect.top < 0) {
+          newPosition = 'bottom';
+        } else if (position === 'bottom' && tooltipRect.bottom > viewport.height) {
+          newPosition = 'top';
+        } else if (position === 'left' && tooltipRect.left < 0) {
+          newPosition = 'right';
+        } else if (position === 'right' && tooltipRect.right > viewport.width) {
+          newPosition = 'left';
         }
 
-        if (offset !== horizontalOffset) {
-          setHorizontalOffset(offset);
+        if (newPosition !== tooltipPosition) {
+          setTooltipPosition(newPosition);
         }
-      } else {
-        if (horizontalOffset !== 0) {
-          setHorizontalOffset(0);
+
+        // Check horizontal overflow for top/bottom positioned tooltips
+        if (newPosition === 'top' || newPosition === 'bottom') {
+          const padding = 8; // Padding from viewport edge
+          let offset = 0;
+
+          if (tooltipRect.left < padding) {
+            // Tooltip is cut off on the left
+            offset = padding - tooltipRect.left;
+          } else if (tooltipRect.right > viewport.width - padding) {
+            // Tooltip is cut off on the right
+            offset = viewport.width - padding - tooltipRect.right;
+          }
+
+          if (offset !== horizontalOffset) {
+            setHorizontalOffset(offset);
+          }
+        } else {
+          if (horizontalOffset !== 0) {
+            setHorizontalOffset(0);
+          }
         }
-      }
+      });
     }
   }, [isVisible, position, tooltipPosition, horizontalOffset]);
 

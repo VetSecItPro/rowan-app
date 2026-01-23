@@ -49,7 +49,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         } else if (variant === 'destructive') {
           haptic.warning();
         } else {
-          haptic[hapticFeedback] || haptic.light();
+          (haptic[hapticFeedback] || haptic.light)();
         }
       }
 

@@ -55,10 +55,14 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
   async function handleExport() {
     setLoading(true);
     try {
-      const csv = await taskExportService.exportToCSV(spaceId, {
-        ...currentFilters,
+      // Extract only the filter properties the service supports (first value from arrays)
+      const exportFilters = {
+        status: currentFilters?.status?.[0],
+        category: currentFilters?.categories?.[0],
+        assigned_to: currentFilters?.assignees?.[0],
         columns: selectedColumns,
-      });
+      };
+      const csv = await taskExportService.exportToCSV(spaceId, exportFilters);
 
       // Create filename with timestamp
       const timestamp = new Date().toISOString().split('T')[0];

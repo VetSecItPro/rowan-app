@@ -10,7 +10,6 @@ import {
   ReactNode,
 } from 'react';
 import {
-  DEVICE_BREAKPOINTS,
   HEIGHT_THRESHOLDS,
   getDeviceType,
   type DeviceType,

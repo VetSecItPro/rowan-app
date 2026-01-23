@@ -81,8 +81,8 @@ class HapticFeedbackManager {
       if (navigator.vibrate) {
         navigator.vibrate(pattern);
       }
-    } catch (error) {
-      console.debug('iOS haptic feedback failed:', error);
+    } catch {
+      // iOS haptic feedback failed, fall back to vibration
       this.triggerVibration(type);
     }
   }

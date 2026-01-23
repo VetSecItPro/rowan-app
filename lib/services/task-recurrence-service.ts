@@ -155,9 +155,9 @@ export const taskRecurrenceService = {
   async updateRecurringTemplate(templateId: string, updates: Partial<RecurringTaskInput>): Promise<Task> {
     const supabase = createClient();
     try {
-      const { recurrence, ...taskUpdates } = updates as any;
+      const { recurrence, ...taskUpdates } = updates as RecurringTaskInput & { recurrence?: RecurrencePattern };
 
-      const finalUpdates: any = { ...taskUpdates };
+      const finalUpdates: Record<string, unknown> = { ...taskUpdates };
 
       if (recurrence) {
         finalUpdates.recurrence_pattern = recurrence.pattern;

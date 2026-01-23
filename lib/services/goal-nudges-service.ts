@@ -333,7 +333,6 @@ export const goalNudgesService = {
    * Generate nudges for a specific goal
    */
   async generateNudgesForGoal(goal: Goal, userId: string): Promise<GoalNudge[]> {
-    const supabase = createClient();
     const generatedNudges: GoalNudge[] = [];
 
     // Get goal metrics

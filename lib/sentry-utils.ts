@@ -26,7 +26,7 @@ export function addSentryBreadcrumb(
   message: string,
   category: string,
   level: 'debug' | 'info' | 'warning' | 'error' = 'info',
-  data?: Record<string, any>
+  data?: Record<string, string | number | boolean | null | undefined>
 ) {
   Sentry.addBreadcrumb({
     message,
@@ -47,7 +47,7 @@ export function captureSentryException(
     method: string;
     userId?: string;
     spaceId?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined;
   }
 ) {
   Sentry.captureException(error, {

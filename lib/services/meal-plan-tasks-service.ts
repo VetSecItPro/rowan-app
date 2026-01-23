@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 
 export const mealPlanTasksService = {
-  async createTaskFromMealPlan(mealPlanId: string, spaceId: string, createdBy: string): Promise<any> {
+  async createTaskFromMealPlan(mealPlanId: string, spaceId: string, createdBy: string): Promise<{ task_id: string; success: boolean } | null> {
     const supabase = createClient();
     const { data, error } = await supabase.rpc('create_meal_prep_task', {
       p_meal_plan_id: mealPlanId,
@@ -12,7 +12,7 @@ export const mealPlanTasksService = {
     return data;
   },
 
-  async getMealPlanTask(mealPlanId: string): Promise<any> {
+  async getMealPlanTask(mealPlanId: string): Promise<{ meal_plan_id: string; task_id: string; task?: Record<string, unknown> } | null> {
     const supabase = createClient();
     const { data, error } = await supabase.from('meal_plan_tasks')
       .select('*, task:task_id(*)')

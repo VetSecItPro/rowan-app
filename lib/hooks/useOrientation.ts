@@ -1,6 +1,6 @@
 'use client';
 
-import { useDevice, type DeviceContextValue } from '@/lib/contexts/DeviceContext';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 
 export type Orientation = 'portrait' | 'landscape';
 

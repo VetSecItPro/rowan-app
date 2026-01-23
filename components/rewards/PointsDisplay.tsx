@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react';
 import { pointsService } from '@/lib/services/rewards';
 import { LEVEL_DEFINITIONS } from '@/lib/types/rewards';
-import type { UserRewardsStats, LevelDefinition } from '@/lib/types/rewards';
+import type { UserRewardsStats } from '@/lib/types/rewards';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { logger } from '@/lib/logger';
 

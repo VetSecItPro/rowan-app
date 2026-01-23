@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import type { Task } from '@/lib/types';
 
 /**
  * Task Templates Service
@@ -253,7 +254,7 @@ export const taskTemplatesService = {
       assigned_to?: string;
       description?: string;
     }
-  ): Promise<any> {
+  ): Promise<Task> {
     const supabase = createClient();
     try {
       // Get template

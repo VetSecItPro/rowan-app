@@ -363,7 +363,7 @@ export const eventProposalsService = {
     spaceId: string,
     type: string,
     proposalId: string,
-    eventId?: string
+    _eventId?: string
   ): Promise<void> {
     // Placeholder for notification logic
     logger.info(`Notify space ${spaceId} about ${type} for proposal ${proposalId}`, { component: 'lib-event-proposals-service' });

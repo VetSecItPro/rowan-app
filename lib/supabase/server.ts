@@ -41,7 +41,7 @@ export async function createClient() {
         signOut: () => ({ error: null }),
       },
       rpc: () => ({ data: null, error: null }),
-    } as any;
+    } as ReturnType<typeof createServerClient>;
   }
 
   // In Next.js 15+, cookies() returns a Promise - must await it

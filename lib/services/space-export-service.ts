@@ -75,7 +75,7 @@ export async function exportSpaceData(
     const supabase = await createClient();
 
     // Validate input
-    const validated = SpaceExportSchema.parse({ spaceId, userId, format });
+    SpaceExportSchema.parse({ spaceId, userId, format });
 
     // SECURITY: Verify user is owner of the space
     const { data: membership, error: memberError } = await supabase

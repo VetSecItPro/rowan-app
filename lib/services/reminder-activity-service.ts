@@ -26,7 +26,7 @@ export interface ReminderActivity {
   reminder_id: string;
   user_id: string;
   action: ActivityAction;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean | null>;
   created_at: string;
   user?: {
     id: string;
@@ -37,7 +37,7 @@ export interface ReminderActivity {
 }
 
 // Zod schema for activity validation
-const ActivityMetadataSchema = z.record(z.string(), z.any()).optional();
+const ActivityMetadataSchema = z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional();
 
 const CreateActivitySchema = z.object({
   reminder_id: z.string().uuid(),
@@ -131,7 +131,7 @@ export const reminderActivityService = {
     const { limit = 50, offset = 0 } = options || {};
 
     // Security: RLS will enforce space membership
-    let query = supabase
+    const query = supabase
       .from('reminder_activities')
       .select(`
         *,
@@ -230,7 +230,7 @@ export const reminderActivityService = {
         return `${userName} marked this as incomplete`;
 
       case 'snoozed':
-        if (activity.metadata?.snooze_until) {
+        if (activity.metadata?.snooze_until && typeof activity.metadata.snooze_until !== 'boolean') {
           const snoozeDate = new Date(activity.metadata.snooze_until);
           return `${userName} snoozed until ${snoozeDate.toLocaleString()}`;
         }

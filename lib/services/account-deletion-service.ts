@@ -40,7 +40,7 @@ export interface DeletionResult {
 async function logDeletionAction(
   userId: string,
   action: 'initiated' | 'cancelled' | 'permanent' | 'email_sent',
-  actionDetails?: Record<string, any>,
+  actionDetails?: Record<string, string | number | boolean | null>,
   supabase?: SupabaseClient
 ) {
   if (!supabase) {

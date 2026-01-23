@@ -104,7 +104,9 @@ export function UpgradeModal({
   const isInTrial = subscription?.isInTrial ?? false;
   const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
   const hasTrialExpired = subscription?.hasTrialExpired ?? false;
-  const effectiveTier = subscription?.effectiveTier ?? 'free';
+  // Tier info available from subscription context but not used in current UI
+  const _effectiveTier = subscription?.effectiveTier ?? 'free';
+  void _effectiveTier;
 
   const featureInfo = feature ? FEATURE_MESSAGES[feature] : null;
   const title = customTitle || featureInfo?.title || 'Upgrade to Pro';
@@ -169,7 +171,7 @@ export function UpgradeModal({
         {isInTrial && (
           <div className="rounded-lg bg-amber-900/20 p-4 border border-amber-800">
             <p className="text-sm text-amber-200">
-              <strong>You're on a free trial!</strong> You currently have access to this feature.
+              <strong>You&apos;re on a free trial!</strong> You currently have access to this feature.
               Upgrade before your trial ends to keep using it.
             </p>
           </div>
@@ -221,7 +223,7 @@ export function FeatureLockOverlay({
   const featureKey = feature as keyof typeof FEATURE_MESSAGES;
 
   // Check if feature is accessible (default to true if no provider)
-  const hasAccess = canAccess(featureKey as any);
+  const hasAccess = canAccess(featureKey as Parameters<typeof canAccess>[0]);
 
   if (hasAccess || !subscription) {
     return <>{children}</>;

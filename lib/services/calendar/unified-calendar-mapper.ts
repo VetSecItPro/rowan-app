@@ -56,8 +56,7 @@ export const unifiedCalendarMapper = {
       return null;
     }
 
-    // Parse the due date and set to end of day if no time specified
-    const dueDate = new Date(task.due_date);
+    // Check if there's a time specified in the due date
     const hasTime = task.due_date.includes('T') && !task.due_date.endsWith('T00:00:00');
 
     return {

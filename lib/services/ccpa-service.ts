@@ -26,7 +26,7 @@ export interface CCPAOptOutStatus {
 
 export interface CCPAServiceResult {
   success: boolean;
-  data?: any;
+  data?: Record<string, unknown>;
   error?: string;
 }
 
@@ -193,7 +193,7 @@ class CCPAService {
   async logCCPAAction(
     userId: string,
     action: 'opt_out_enabled' | 'opt_out_disabled' | 'data_request' | 'california_resident_verified',
-    details: Record<string, any> = {}
+    details: Record<string, string | number | boolean | null | undefined | Record<string, string | number | boolean | null>> = {}
   ): Promise<void> {
     try {
       const supabase = await createClient();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Check, Plus, X, GripVertical } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { taskSubtasksService, Subtask } from '@/lib/services/task-subtasks-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
@@ -18,6 +18,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
 
   useEffect(() => {
     loadSubtasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadSubtasks is a stable function
   }, [taskId]);
 
   async function loadSubtasks() {

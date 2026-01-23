@@ -147,6 +147,7 @@ export function ThreadView({
       logger.error('Failed to delete reply:', error, { component: 'ThreadView', action: 'component_action' });
       toast.error('Failed to delete reply');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- currentUserId is stable
   }, []);
 
   return (

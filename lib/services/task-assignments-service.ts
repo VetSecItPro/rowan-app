@@ -1,14 +1,14 @@
 import { createClient } from '@/lib/supabase/client';
 
 export const taskAssignmentsService = {
-  async getAssignments(taskId: string): Promise<any[]> {
+  async getAssignments(taskId: string): Promise<Array<{ id: string; task_id: string; user_id: string; role: string; is_primary: boolean; user?: Record<string, unknown> }>> {
     const supabase = createClient();
     const { data, error } = await supabase.from('task_assignments').select('*, user:user_id(*)').eq('task_id', taskId);
     if (error) throw error;
     return data || [];
   },
 
-  async assignUser(taskId: string, userId: string, role: 'assignee' | 'reviewer' | 'observer' = 'assignee', isPrimary: boolean = false, assignedBy?: string): Promise<any> {
+  async assignUser(taskId: string, userId: string, role: 'assignee' | 'reviewer' | 'observer' = 'assignee', isPrimary: boolean = false, assignedBy?: string): Promise<{ id: string; task_id: string; user_id: string; role: string; is_primary: boolean }> {
     const supabase = createClient();
     const { data, error } = await supabase.from('task_assignments').insert({
       task_id: taskId, user_id: userId, role, is_primary: isPrimary, assigned_by: assignedBy

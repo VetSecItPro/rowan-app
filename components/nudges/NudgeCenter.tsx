@@ -45,6 +45,7 @@ export function NudgeCenter({
       loadNudges();
       loadSettings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load functions are stable
   }, [user, currentSpace, limit]);
 
   const loadNudges = async () => {

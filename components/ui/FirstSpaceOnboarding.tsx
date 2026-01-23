@@ -8,7 +8,7 @@ interface FirstSpaceOnboardingProps {
   onSkip?: () => void;
 }
 
-export function FirstSpaceOnboarding({ userName, onSpaceCreated, onSkip }: FirstSpaceOnboardingProps) {
+export function FirstSpaceOnboarding({ userName: _userName, onSpaceCreated: _onSpaceCreated, onSkip: _onSkip }: FirstSpaceOnboardingProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="max-w-md mx-auto text-center p-8">

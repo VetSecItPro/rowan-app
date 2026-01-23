@@ -11,7 +11,7 @@ interface TaskSnoozeHistory {
 }
 
 export const taskSnoozeService = {
-  async snoozeTask(taskId: string, snoozedUntil: string, userId: string, reason?: string): Promise<Task> {
+  async snoozeTask(taskId: string, snoozedUntil: string, userId: string, _reason?: string): Promise<Task> {
     const supabase = createClient();
     const { data, error } = await supabase.from('tasks').update({
       is_snoozed: true, snoozed_until: snoozedUntil, snoozed_by: userId

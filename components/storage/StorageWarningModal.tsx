@@ -24,7 +24,7 @@ interface StorageWarningModalProps {
 export function StorageWarningModal({
   isOpen,
   onClose,
-  warningType,
+  warningType: _warningType,
   message,
   percentageUsed,
   onDismiss,

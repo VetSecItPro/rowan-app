@@ -293,7 +293,7 @@ export async function getMentionableUsers(
 
   // Transform to MentionableUser format
   const mentionableUsers: MentionableUser[] = (members || [])
-    .map((member: any) => {
+    .map((member: { users?: { id: string; name?: string; email: string } }) => {
       const user = member.users;
       if (!user) return null;
 

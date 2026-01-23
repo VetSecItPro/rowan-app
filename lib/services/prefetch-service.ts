@@ -7,7 +7,7 @@
 
 import { QueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
-import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
+import { QUERY_OPTIONS } from '@/lib/react-query/query-client';
 
 // Feature-specific query keys for prefetching
 export const PREFETCH_KEYS = {

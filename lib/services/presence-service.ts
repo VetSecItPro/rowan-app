@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import type { SpaceMemberWithPresence, UserPresence } from '@/lib/types';
+import type { SpaceMemberWithPresence } from '@/lib/types';
 import { PresenceStatus } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
@@ -76,7 +76,7 @@ export async function getSpaceMembersWithPresence(
     }
 
     // Transform data to match our TypeScript interface
-    const members: SpaceMemberWithPresence[] = (data || []).map((member: any) => ({
+    const members: SpaceMemberWithPresence[] = (data || []).map((member: Record<string, unknown>) => ({
       space_id: member.space_id,
       user_id: member.user_id,
       role: member.role,

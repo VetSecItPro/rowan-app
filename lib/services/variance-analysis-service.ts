@@ -246,7 +246,6 @@ export async function getProjectedMonthEndVariance(
   spaceId: string
 ): Promise<MonthlyVariance | null> {
   const now = new Date();
-  const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
 
   // Calculate days elapsed and total days in month
