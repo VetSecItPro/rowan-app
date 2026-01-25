@@ -37,9 +37,9 @@ export interface Subscription {
   status: SubscriptionStatus;
   period: SubscriptionPeriod;
 
-  // Stripe integration
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
+  // Polar integration
+  polar_customer_id: string | null;
+  polar_subscription_id: string | null;
 
   // Trial period
   trial_started_at: string | null;
