@@ -122,6 +122,7 @@ export function SubscriptionSettings() {
     canUseReminders: true,
     canUseGoals: true,
     canUseHousehold: true,
+    canUseLocation: true,
     canUseAI: true,
     canUseIntegrations: true,
     canUseEventProposals: true,

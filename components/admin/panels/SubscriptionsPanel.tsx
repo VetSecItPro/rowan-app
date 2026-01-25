@@ -146,7 +146,7 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
             onClick={() => setActiveView('overview')}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               activeView === 'overview'
-                ? 'bg-emerald-100 bg-emerald-900/30 text-emerald-400'
+                ? 'bg-emerald-900/30 text-emerald-400'
                 : 'text-gray-400 hover:bg-gray-700'
             }`}
           >
@@ -156,7 +156,7 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
             onClick={() => setActiveView('events')}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               activeView === 'events'
-                ? 'bg-emerald-100 bg-emerald-900/30 text-emerald-400'
+                ? 'bg-emerald-900/30 text-emerald-400'
                 : 'text-gray-400 hover:bg-gray-700'
             }`}
           >

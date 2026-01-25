@@ -203,13 +203,13 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
         {/* Status badge */}
         <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${
           item.status === 'completed'
-            ? 'bg-green-100 bg-green-900/30 text-green-400'
+            ? 'bg-green-900/30 text-green-400'
             : item.status === 'in-progress'
-            ? 'bg-amber-100 bg-amber-900/30 text-amber-400'
+            ? 'bg-amber-900/30 text-amber-400'
             : item.status === 'blocked'
-            ? 'bg-red-100 bg-red-900/30 text-red-400'
+            ? 'bg-red-900/30 text-red-400'
             : item.status === 'on-hold'
-            ? 'bg-purple-100 bg-purple-900/30 text-purple-400'
+            ? 'bg-purple-900/30 text-purple-400'
             : 'bg-gray-700 text-gray-400'
         }`}>
           {item.status === 'in-progress' ? 'Active' : item.status === 'on-hold' ? 'Hold' : item.status === 'completed' ? 'Done' : item.status === 'blocked' ? 'Blocked' : 'Pending'}
@@ -446,8 +446,8 @@ export function DraggableItemList({
             </h3>
             <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
               activeItem.type === 'chore'
-                ? 'text-amber-600 bg-amber-100'
-                : 'text-blue-600 bg-blue-100'
+                ? 'text-amber-400 bg-amber-900/30'
+                : 'text-blue-400 bg-blue-900/30'
             }`}>
               {activeItem.type === 'chore' ? 'Chore' : 'Task'}
             </span>

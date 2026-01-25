@@ -67,7 +67,7 @@ export function ImportantDatesWidget({
   // Loading skeleton - grid layout
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 bg-gray-900">
+      <div className="rounded-2xl border border-gray-700 bg-gray-900 p-4 bg-gray-900">
         {showHeader && (
           <div className="mb-3 flex items-center justify-between">
             <div className="h-5 w-32 animate-pulse rounded-lg bg-gray-700" />
@@ -112,7 +112,7 @@ export function ImportantDatesWidget({
   // Empty state - compact
   if (dates.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-900 p-4 to-gray-800">
+      <div className="rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 p-4 to-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-400">
             <Cake className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function ImportantDatesWidget({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 bg-gray-900">
+    <div className="rounded-2xl border border-gray-700 bg-gray-900 p-4 bg-gray-900">
       {showHeader && (
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-300">
@@ -147,7 +147,7 @@ export function ImportantDatesWidget({
             <div className="relative group">
               <button
                 onClick={onAddDate}
-                className="flex items-center gap-1 rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 text-gray-400 hover:text-pink-400"
+                className="flex items-center gap-1 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-800 hover:text-pink-400"
               >
                 <Plus className="h-4 w-4" />
               </button>

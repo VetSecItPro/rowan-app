@@ -3,30 +3,24 @@
 /* Font is now loaded via next/font in layout.tsx for better performance */
 /* Playfair Display is available via --font-playfair CSS variable */
 
+/* ==================== DARK MODE ONLY ==================== */
+/* Rowan is a DARK MODE ONLY application. No light mode support. */
+/* This eliminates the need for dark: prefixes throughout the codebase */
+
 /* Enable class-based dark mode for Tailwind CSS v4 */
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* Light mode improvements - More forgiving off-white backgrounds */
-:root:not(.dark) {
-  --tw-bg-white: #fafafa; /* More forgiving off-white instead of pure white */
-}
-
-/* Apply off-white to common background classes in light mode */
-html:not(.dark) .bg-white {
-  background-color: #fafafa !important;
-}
 
 /* ==================== TRUE DARK MODE SYSTEM ==================== */
 /* True dark (#0a0a0a) instead of gray dark for a more premium feel */
 
-/* CSS Custom Properties for consistent theming */
+/* CSS Custom Properties - DARK MODE ONLY (no light mode) */
 :root {
-  /* Light mode - Refined slate-based neutrals */
-  --color-surface-primary: #fafafa;
-  --color-surface-secondary: #f1f5f9;
-  --color-surface-elevated: #ffffff;
-  --color-border-subtle: rgba(148, 163, 184, 0.2);
-  --color-border-default: rgba(148, 163, 184, 0.3);
+  /* Dark mode - Deep blacks with subtle differentiation */
+  --color-surface-primary: #0a0a0a;
+  --color-surface-secondary: #111111;
+  --color-surface-elevated: #171717;
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-default: rgba(255, 255, 255, 0.1);
 
   /* Semantic colors */
   --color-success: #22c55e;
@@ -35,13 +29,81 @@ html:not(.dark) .bg-white {
   --color-info: #3b82f6;
 }
 
+/* Same variables for .dark class (backwards compatibility) */
 .dark {
-  /* True dark mode - Deep blacks with subtle differentiation */
   --color-surface-primary: #0a0a0a;
   --color-surface-secondary: #111111;
   --color-surface-elevated: #171717;
   --color-border-subtle: rgba(255, 255, 255, 0.06);
   --color-border-default: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== GLOBAL LIGHT MODE OVERRIDES ==================== */
+/* Force all light mode classes to use dark mode equivalents */
+/* This ensures dark mode even if components have light mode classes */
+
+/* Background overrides - Convert all light backgrounds to dark */
+.bg-white {
+  background-color: #141414 !important;
+}
+
+html:not(.dark) .bg-white {
+  background-color: #141414 !important;
+}
+
+.bg-gray-50, html:not(.dark) .bg-gray-50 {
+  background-color: #0a0a0a !important;
+}
+
+.bg-gray-100, html:not(.dark) .bg-gray-100 {
+  background-color: #111111 !important;
+}
+
+.bg-gray-200, html:not(.dark) .bg-gray-200 {
+  background-color: #171717 !important;
+}
+
+.bg-gray-300, html:not(.dark) .bg-gray-300 {
+  background-color: #1f1f1f !important;
+}
+
+/* Text overrides - Convert light mode text to dark mode */
+.text-gray-900, html:not(.dark) .text-gray-900 {
+  color: #ffffff !important;
+}
+
+.text-gray-800, html:not(.dark) .text-gray-800 {
+  color: #f3f4f6 !important;
+}
+
+.text-gray-700, html:not(.dark) .text-gray-700 {
+  color: #e5e7eb !important;
+}
+
+.text-gray-600, html:not(.dark) .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.text-black, html:not(.dark) .text-black {
+  color: #ffffff !important;
+}
+
+/* Border overrides - Convert light borders to dark */
+.border-gray-200, html:not(.dark) .border-gray-200 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.border-gray-300, html:not(.dark) .border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Placeholder text overrides */
+.placeholder-gray-500::placeholder, html:not(.dark) .placeholder-gray-500::placeholder {
+  color: #9ca3af !important;
+}
+
+.placeholder-gray-400::placeholder, html:not(.dark) .placeholder-gray-400::placeholder {
+  color: #9ca3af !important;
 }
 
 /* Override gray-900 backgrounds to true dark in dark mode */
@@ -353,7 +415,8 @@ select:focus,
   --background-image-gradient-meals: linear-gradient(to right, rgb(249 115 22), rgb(234 88 12));
   --background-image-gradient-projects: linear-gradient(to right, rgb(245 158 11), rgb(217 119 6));
   --background-image-gradient-goals: linear-gradient(to right, rgb(99 102 241), rgb(79 70 229));
-  
+  --background-image-gradient-location: linear-gradient(to right, rgb(6 182 212), rgb(8 145 178));
+
   /* Define custom animations */
   --animation-bounce-subtle: bounce-subtle 2s ease-in-out infinite;
   --animation-fade-in: fade-in 0.3s ease-in-out;
@@ -402,21 +465,24 @@ select:focus,
 }
 
 @layer base {
+  /* DARK MODE ONLY - Single theme variables */
   :root {
-    --background: 0 0% 98%;
-    --foreground: 222.2 84% 4.9%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 0 0% 4%; /* #0a0a0a */
     --foreground: 210 40% 98%;
   }
 
-  /* Global background colors for light mode */
-  /* body {
-    @apply bg-gray-50 dark:bg-black;
-  } */
-  
+  /* Same for .dark class (backwards compatibility) */
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 210 40% 98%;
+  }
+
+  /* Force dark body background */
+  body {
+    background-color: #0a0a0a;
+    color: #f5f5f5;
+  }
+
   /* ADDED: Subtle grain texture for premium feel */
   body::before {
     content: "";

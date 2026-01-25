@@ -195,7 +195,7 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
                 <p className="text-sm text-gray-400">{channel.channel}</p>
                 <p className="text-xl font-bold text-white mt-1">{channel.visitors}</p>
                 {channel.trend !== 0 && (
-                  <div className={`flex items-center gap-1 mt-1 ${channel.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`flex items-center gap-1 mt-1 ${channel.trend > 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {channel.trend > 0 ? (
                       <ArrowUpRight className="w-3 h-3" />
                     ) : (

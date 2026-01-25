@@ -138,7 +138,7 @@ export default function CommentThread({
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 bg-red-900/20">
+      <div className="rounded-lg border border-red-800 bg-red-900/20 p-4">
         <p className="text-sm text-red-400">{error}</p>
       </div>
     );
@@ -151,7 +151,7 @@ export default function CommentThread({
   return (
     <div className="space-y-6">
       {/* Comment Form */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 bg-gray-800">
+      <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
         <h3 className="mb-3 text-sm font-medium text-gray-100">
           Add a comment
         </h3>
@@ -222,7 +222,7 @@ export default function CommentThread({
           </div>
         ) : (
           !pinnedComments.length && (
-            <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 border-gray-700 bg-gray-800/50">
+            <div className="rounded-lg border border-dashed border-gray-700 bg-gray-800/50 p-8">
               <svg
                 className="mx-auto h-12 w-12 text-gray-400"
                 fill="none"

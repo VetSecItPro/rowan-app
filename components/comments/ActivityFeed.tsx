@@ -133,7 +133,7 @@ export default function ActivityFeed({
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 bg-red-900/20">
+      <div className="rounded-lg border border-red-800 bg-red-900/20 p-4">
         <p className="text-sm text-red-400">{error}</p>
       </div>
     );
@@ -143,7 +143,7 @@ export default function ActivityFeed({
     <div className="space-y-4">
       {/* Stats Section */}
       {showStats && stats && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 bg-gray-800">
+        <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
           <h3 className="mb-3 text-sm font-medium text-gray-100">
             Activity Stats (Last 30 Days)
           </h3>
@@ -179,7 +179,7 @@ export default function ActivityFeed({
       {/* Activity List */}
       <div className="space-y-2">
         {activities.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 border-gray-700 bg-gray-800/50">
+          <div className="rounded-lg border border-dashed border-gray-700 bg-gray-800/50 p-8">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
               fill="none"
@@ -201,7 +201,7 @@ export default function ActivityFeed({
           activities.map((activity) => (
             <div
               key={activity.id}
-              className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 transition-shadow border-gray-700 bg-gray-800"
+              className="flex items-start gap-3 rounded-lg border border-gray-700 bg-gray-800 p-3 transition-shadow"
             >
               {/* Activity Icon */}
               <div
@@ -236,7 +236,7 @@ export default function ActivityFeed({
 
                   {/* System Badge */}
                   {activity.is_system && (
-                    <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs bg-gray-700 text-gray-400">
+                    <span className="shrink-0 rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-400">
                       System
                     </span>
                   )}
@@ -244,7 +244,7 @@ export default function ActivityFeed({
 
                 {/* Metadata */}
                 {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                  <div className="mt-2 rounded bg-gray-50 p-2 bg-gray-700/50">
+                  <div className="mt-2 rounded bg-gray-700/50 p-2">
                     <p className="text-xs text-gray-400">
                       {JSON.stringify(activity.metadata, null, 2)}
                     </p>
@@ -261,7 +261,7 @@ export default function ActivityFeed({
         <div className="text-center">
           <button
             onClick={loadActivities}
-            className="text-sm text-blue-600 text-blue-400 hover:text-blue-300"
+            className="text-sm text-blue-400 hover:text-blue-300"
           >
             Load more
           </button>

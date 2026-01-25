@@ -284,7 +284,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
               <h3 className="text-xl font-bold text-white">Enable 2FA</h3>
               <button
                 onClick={closeModal}
-                className="text-gray-500 text-gray-400 hover:text-gray-200"
+                className="text-gray-400 hover:text-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>

@@ -103,9 +103,9 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         {/* Status badge */}
         <span className={`flex-shrink-0 px-1.5 py-0.5 text-[10px] font-medium rounded ${
           task.status === 'completed'
-            ? 'bg-green-100 bg-green-900/30 text-green-400'
+            ? 'bg-green-900/30 text-green-400'
             : task.status === 'in-progress'
-            ? 'bg-amber-100 bg-amber-900/30 text-amber-400'
+            ? 'bg-amber-900/30 text-amber-400'
             : 'bg-gray-700 text-gray-400'
         }`}>
           {task.status === 'in-progress' ? 'Active' : task.status === 'completed' ? 'Done' : 'Pending'}

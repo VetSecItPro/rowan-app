@@ -197,7 +197,7 @@ export function CCPACompactNotice({ onDismiss }: { onDismiss?: () => void }) {
     <div className="fixed bottom-4 right-4 max-w-sm bg-gray-800 border border-gray-700 rounded-xl shadow-lg z-40">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-semibold text-white mb-1">
               California Privacy Rights
@@ -214,7 +214,7 @@ export function CCPACompactNotice({ onDismiss }: { onDismiss?: () => void }) {
               </a>
               <button
                 onClick={handleDismiss}
-                className="text-xs px-2 py-1 text-gray-500 text-gray-400 hover:text-gray-200"
+                className="text-xs px-2 py-1 text-gray-400 hover:text-gray-200"
               >
                 Dismiss
               </button>

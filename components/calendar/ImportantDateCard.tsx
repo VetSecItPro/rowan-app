@@ -87,12 +87,12 @@ export function ImportantDateCard({ date, onClick }: ImportantDateCardProps) {
   return (
     <button
       onClick={onClick}
-      className="group relative w-full overflow-hidden rounded-xl border border-gray-200/50 p-3 text-left transition-all duration-200 hover:scale-[1.02] border-gray-700/50"
+      className="group relative w-full overflow-hidden rounded-xl border border-gray-700/50 p-3 text-left transition-all duration-200 hover:scale-[1.02]"
       style={{ background: gradientStyle.background }}
     >
       {/* Dark mode overlay */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 opacity-100"
+        className="pointer-events-none absolute inset-0 opacity-100"
         style={{ background: gradientStyle.darkBackground }}
       />
 

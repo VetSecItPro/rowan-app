@@ -496,4 +496,62 @@ export const choresService = {
       completed_at: null,
     });
   },
+
+  /**
+   * Complete a chore via API with full rewards and late penalty support
+   * This is the preferred method as it handles server-side penalty calculations
+   *
+   * @param choreId - Chore ID to complete
+   * @returns Promise with chore, rewards, and penalty info
+   */
+  async completeChoreViaAPI(
+    choreId: string
+  ): Promise<{
+    success: boolean;
+    chore?: Chore;
+    rewards?: {
+      pointsAwarded: number;
+      streakBonus: number;
+      newStreak: number;
+    };
+    penalty?: {
+      applied: boolean;
+      pointsDeducted: number;
+      daysLate: number;
+    };
+    netPoints?: number;
+    error?: string;
+  }> {
+    try {
+      const response = await fetch(`/api/chores/${choreId}/complete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: data.error || 'Failed to complete chore',
+        };
+      }
+
+      return {
+        success: true,
+        chore: data.chore,
+        rewards: data.rewards,
+        penalty: data.penalty,
+        netPoints: data.netPoints,
+      };
+    } catch (error) {
+      logger.error('Error completing chore via API:', error, { component: 'lib-chores-service', action: 'service_call' });
+      return {
+        success: false,
+        error: 'Network error',
+      };
+    }
+  },
 };

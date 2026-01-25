@@ -249,13 +249,13 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
           {project.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-gray-100 px-2 py-0.5 text-xs bg-gray-700 text-gray-300"
+              className="rounded-full px-2 py-0.5 text-xs bg-gray-700 text-gray-300"
             >
               #{tag}
             </span>
           ))}
           {project.tags.length > 3 && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs bg-gray-700 text-gray-300">
+            <span className="rounded-full px-2 py-0.5 text-xs bg-gray-700 text-gray-300">
               +{project.tags.length - 3}
             </span>
           )}

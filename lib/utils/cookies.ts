@@ -45,7 +45,7 @@ export const COOKIE_CATALOG: CookieDetails[] = [
   {
     name: 'Theme settings',
     category: 'necessary',
-    purpose: 'Remember your dark/light mode preference',
+    purpose: 'Maintain consistent dark mode appearance',
     duration: '1 year',
   },
   {

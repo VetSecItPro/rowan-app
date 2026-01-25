@@ -77,7 +77,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
   const getUserStatusBadge = (user: User) => {
     if (user.is_beta) {
       return (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 bg-purple-900/20 text-purple-400">
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/20 text-purple-400">
           <Shield className="w-3 h-3 mr-1" />
           Beta
         </span>
@@ -87,7 +87,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
     switch (user.status) {
       case 'active':
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 bg-green-900/20 text-green-400">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900/20 text-green-400">
             Active
           </span>
         );
@@ -99,7 +99,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
         );
       case 'suspended':
         return (
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 bg-red-900/20 text-red-400">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-900/20 text-red-400">
             Suspended
           </span>
         );
@@ -176,7 +176,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
                     e.stopPropagation();
                     setSelectedUser(user);
                   }}
-                  className="text-blue-600 text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
                   title="Manage user"
                 >
                   <Eye className="w-4 h-4" />

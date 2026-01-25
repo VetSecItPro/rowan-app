@@ -363,7 +363,7 @@ export function DataManagementTab() {
         </p>
         <button
           onClick={() => router.push('/pricing')}
-          className="px-4 py-2 bg-blue-600 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
         >
           View Pricing
         </button>

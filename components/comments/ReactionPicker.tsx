@@ -56,7 +56,7 @@ export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProp
   return (
     <div
       ref={pickerRef}
-      className="rounded-lg border border-gray-200 bg-white p-2 border-gray-700 bg-gray-800"
+      className="rounded-lg border border-gray-700 bg-gray-800 p-2"
     >
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-medium text-gray-300">

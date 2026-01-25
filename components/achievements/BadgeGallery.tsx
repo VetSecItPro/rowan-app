@@ -111,7 +111,7 @@ export function BadgeGallery({
                 placeholder="Search badges..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-white placeholder-gray-400"
               />
             </div>
           )}
@@ -126,7 +126,7 @@ export function BadgeGallery({
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value as BadgeCategory | 'all')}
-                  className="px-3 py-1 bg-gray-800 border border-gray-700 rounded-md text-sm"
+                  className="px-3 py-1 bg-gray-900 border border-gray-700 rounded-md text-sm text-white"
                 >
                   <option value="all">All Categories</option>
                   {Object.entries(categoryLabels).map(([key, label]) => (
@@ -141,7 +141,7 @@ export function BadgeGallery({
                 <select
                   value={selectedRarity}
                   onChange={(e) => setSelectedRarity(e.target.value as BadgeRarity | 'all')}
-                  className="px-3 py-1 bg-gray-800 border border-gray-700 rounded-md text-sm"
+                  className="px-3 py-1 bg-gray-900 border border-gray-700 rounded-md text-sm text-white"
                 >
                   <option value="all">All Rarities</option>
                   <option value="common">Common</option>
@@ -158,7 +158,7 @@ export function BadgeGallery({
                   type="checkbox"
                   checked={showEarnedOnly}
                   onChange={(e) => setShowEarnedOnly(e.target.checked)}
-                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-gray-600 bg-gray-900 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="text-sm font-medium text-gray-300">Earned only</span>
               </label>
@@ -169,20 +169,20 @@ export function BadgeGallery({
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+        <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
           <div className="text-2xl font-bold text-white">{filteredBadges.length}</div>
           <div className="text-sm text-gray-400">Total Badges</div>
         </div>
-        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-          <div className="text-2xl font-bold text-green-600">{userAchievements.length}</div>
+        <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
+          <div className="text-2xl font-bold text-green-400">{userAchievements.length}</div>
           <div className="text-sm text-gray-400">Earned</div>
         </div>
-        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-          <div className="text-2xl font-bold text-blue-600">{progress.length}</div>
+        <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
+          <div className="text-2xl font-bold text-blue-400">{progress.length}</div>
           <div className="text-sm text-gray-400">In Progress</div>
         </div>
-        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-          <div className="text-2xl font-bold text-yellow-600">
+        <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
+          <div className="text-2xl font-bold text-yellow-400">
             {userAchievements.reduce((sum, achievement) => sum + (achievement.badge?.points || 0), 0)}
           </div>
           <div className="text-sm text-gray-400">Total Points</div>

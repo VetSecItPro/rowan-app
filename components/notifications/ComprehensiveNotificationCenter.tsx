@@ -501,7 +501,7 @@ function NotificationItem({ notification, onClick, onMarkAsRead, onDelete, onMar
             className="p-1.5 hover:bg-red-900/20 rounded-full transition-colors"
             aria-label="Delete notification"
           >
-            <Trash2 className="w-3.5 h-3.5 text-gray-500 text-gray-400 hover:text-red-400" />
+            <Trash2 className="w-3.5 h-3.5 text-gray-400 hover:text-red-400" />
           </button>
         </div>
       </div>

@@ -39,31 +39,31 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
       work: {
         icon: '💼',
         label: 'Work',
-        color: 'bg-blue-100 bg-blue-900/30 text-blue-300',
+        color: 'bg-blue-900/30 text-blue-300',
         barColor: 'bg-blue-500'
       },
       personal: {
         icon: '👤',
         label: 'Personal',
-        color: 'bg-purple-100 bg-purple-900/30 text-purple-300',
+        color: 'bg-purple-900/30 text-purple-300',
         barColor: 'bg-purple-500'
       },
       family: {
         icon: '👨‍👩‍👧‍👦',
         label: 'Family',
-        color: 'bg-pink-100 bg-pink-900/30 text-pink-300',
+        color: 'bg-pink-900/30 text-pink-300',
         barColor: 'bg-pink-500'
       },
       health: {
         icon: '💪',
         label: 'Health',
-        color: 'bg-green-100 bg-green-900/30 text-green-300',
+        color: 'bg-green-900/30 text-green-300',
         barColor: 'bg-green-500'
       },
       social: {
         icon: '🎉',
         label: 'Social',
-        color: 'bg-orange-100 bg-orange-900/30 text-orange-300',
+        color: 'bg-orange-900/30 text-orange-300',
         barColor: 'bg-orange-500'
       },
     };
@@ -78,7 +78,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
   };
 
   return (
-    <div className="bg-gray-800 sm:bg-gray-800/60 sm:backdrop-blur-md border border-gray-700 sm:border-gray-200/50 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-gray-800 sm:bg-gray-800/60 sm:backdrop-blur-md border border-gray-700 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">

@@ -1017,7 +1017,7 @@ export default function MealsPage() {
           </CollapsibleStatsGrid>
 
           {/* Search Bar - No container box on mobile */}
-          <div className="sm:bg-gray-800 sm:border sm:border-gray-200 sm:border-gray-700 sm:rounded-xl sm:p-4">
+          <div className="sm:bg-gray-800 sm:border sm:border-gray-700 sm:rounded-xl sm:p-4">
             <div className="apple-search-container meals-search">
               <Search className="apple-search-icon" />
               <input

@@ -343,7 +343,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="checkbox"
                 checked={formData.insurance_verified}
                 onChange={(e) => handleInputChange('insurance_verified', e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-600 ring-offset-gray-800"
               />
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-gray-400" />
@@ -358,7 +358,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="checkbox"
                 checked={formData.is_preferred}
                 onChange={(e) => handleInputChange('is_preferred', e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-600 ring-offset-gray-800"
               />
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-gray-400" />
@@ -373,7 +373,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
                 type="checkbox"
                 checked={formData.is_active}
                 onChange={(e) => handleInputChange('is_active', e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600"
+                className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-600 ring-offset-gray-800"
               />
               <span className="text-sm text-gray-300">
                 Active Vendor

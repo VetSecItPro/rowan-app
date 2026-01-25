@@ -208,7 +208,7 @@ export function ProjectPhotoGallery({
             >
               <div className="aspect-square bg-gray-700 flex items-center justify-center">
                 {/* Placeholder for actual image */}
-                <div className="w-full h-full bg-gradient-to-br from-gray-200 from-gray-600 to-gray-700 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
                   <ImageIcon className="w-8 h-8 text-gray-400" />
                 </div>
               </div>
@@ -335,7 +335,7 @@ export function ProjectPhotoGallery({
               {/* Image */}
               <div className="relative bg-gray-700 aspect-video flex items-center justify-center">
                 {/* Placeholder for actual image */}
-                <div className="w-full h-full bg-gradient-to-br from-gray-200 from-gray-600 to-gray-700 flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
                   <ImageIcon className="w-16 h-16 text-gray-400" />
                 </div>
 

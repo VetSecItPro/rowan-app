@@ -409,7 +409,7 @@ export function AdvancedVoiceRecorder({
             </h4>
             <button
               onClick={() => setShowTemplates(!showTemplates)}
-              className="text-sm text-indigo-600 text-indigo-400"
+              className="text-sm text-indigo-400"
             >
               {showTemplates ? 'Hide' : 'Show'} templates
             </button>
@@ -481,7 +481,7 @@ export function AdvancedVoiceRecorder({
             {selectedTemplate && (
               <button
                 onClick={() => setSelectedTemplate(null)}
-                className="text-xs text-gray-500 text-gray-400 hover:text-gray-200 mt-1"
+                className="text-xs text-gray-400 hover:text-gray-200 mt-1"
               >
                 Cancel template
               </button>
