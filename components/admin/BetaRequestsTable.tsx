@@ -76,7 +76,7 @@ export function BetaRequestsTable({ betaRequests, isLoading, searchTerm }: BetaR
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {request.access_granted ? (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 bg-green-900/20 text-green-400">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900/20 text-green-400">
                     <UserCheck className="w-3 h-3 mr-1" />
                     Invite Sent
                   </span>
@@ -98,7 +98,7 @@ export function BetaRequestsTable({ betaRequests, isLoading, searchTerm }: BetaR
                 )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button className="text-blue-600 text-blue-400 hover:text-blue-300">
+                <button className="text-blue-400 hover:text-blue-300">
                   <Eye className="w-4 h-4" />
                 </button>
               </td>

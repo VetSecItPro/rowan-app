@@ -132,7 +132,7 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 timeRange === range
-                  ? 'bg-amber-100 bg-amber-900/30 text-amber-400'
+                  ? 'bg-amber-900/30 text-amber-400'
                   : 'text-gray-400 hover:bg-gray-700'
               }`}
             >

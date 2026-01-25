@@ -16,7 +16,7 @@ export const CHORE_CATEGORIES = {
   dishes: { emoji: '🍽️', label: 'Dishes', color: 'bg-teal-500', textColor: 'text-teal-600', lightBg: 'bg-teal-900/30' },
   cooking: { emoji: '🍳', label: 'Cooking', color: 'bg-orange-500', textColor: 'text-orange-600', lightBg: 'bg-orange-900/30' },
   yard_work: { emoji: '🌿', label: 'Yard Work', color: 'bg-green-500', textColor: 'text-green-600', lightBg: 'bg-green-900/30' },
-  maintenance: { emoji: '🔧', label: 'Maintenance', color: 'bg-gray-500', textColor: 'text-gray-600', lightBg: 'bg-gray-900/30' },
+  maintenance: { emoji: '🔧', label: 'Maintenance', color: 'bg-gray-500', textColor: 'text-gray-400', lightBg: 'bg-gray-900/30' },
   pet_care: { emoji: '🐾', label: 'Pet Care', color: 'bg-amber-500', textColor: 'text-amber-600', lightBg: 'bg-amber-900/30' },
   organizing: { emoji: '📦', label: 'Organizing', color: 'bg-purple-500', textColor: 'text-purple-600', lightBg: 'bg-purple-900/30' },
   trash: { emoji: '🗑️', label: 'Trash/Recycling', color: 'bg-emerald-500', textColor: 'text-emerald-600', lightBg: 'bg-emerald-900/30' },

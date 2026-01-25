@@ -32,7 +32,7 @@ interface NotificationStats {
 
 const StatusBadge = memo(function StatusBadge({ subscribed }: { subscribed: boolean }) {
   return subscribed ? (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 bg-green-900/30 text-green-400">
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
       <CheckCircle className="w-3 h-3 mr-1" />
       Subscribed
     </span>
@@ -46,9 +46,9 @@ const StatusBadge = memo(function StatusBadge({ subscribed }: { subscribed: bool
 
 const SourceBadge = memo(function SourceBadge({ source }: { source: string }) {
   const colors: Record<string, string> = {
-    homepage: 'bg-blue-100 bg-blue-900/30 text-blue-400',
-    beta: 'bg-purple-100 bg-purple-900/30 text-purple-400',
-    referral: 'bg-green-100 bg-green-900/30 text-green-400',
+    homepage: 'bg-blue-900/30 text-blue-400',
+    beta: 'bg-purple-900/30 text-purple-400',
+    referral: 'bg-green-900/30 text-green-400',
     direct: 'bg-gray-700 text-gray-400',
   };
 
@@ -157,7 +157,7 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 filter === f
-                  ? 'bg-green-100 bg-green-900/30 text-green-400'
+                  ? 'bg-green-900/30 text-green-400'
                   : 'text-gray-400 hover:bg-gray-700'
               }`}
             >

@@ -35,27 +35,27 @@ export function AchievementNotification({
       common: {
         gradient: 'from-gray-400 to-gray-600',
         glow: 'shadow-gray-400/50',
-        text: 'text-gray-800'
+        text: 'text-gray-200'
       },
       uncommon: {
         gradient: 'from-green-400 to-green-600',
         glow: 'shadow-green-400/50',
-        text: 'text-green-800'
+        text: 'text-green-200'
       },
       rare: {
         gradient: 'from-blue-400 to-blue-600',
         glow: 'shadow-blue-400/50',
-        text: 'text-blue-800'
+        text: 'text-blue-200'
       },
       epic: {
         gradient: 'from-purple-400 to-purple-600',
         glow: 'shadow-purple-400/50',
-        text: 'text-purple-800'
+        text: 'text-purple-200'
       },
       legendary: {
         gradient: 'from-orange-400 via-yellow-400 to-orange-600',
         glow: 'shadow-orange-400/50',
-        text: 'text-orange-800'
+        text: 'text-orange-200'
       }
     };
     return styles[rarity as keyof typeof styles] || styles.common;
@@ -89,9 +89,9 @@ export function AchievementNotification({
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-0 right-0 -mt-1 -mr-1 w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
+              className="absolute top-0 right-0 -mt-1 -mr-1 w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
             >
-              <X className="w-3 h-3 text-gray-500" />
+              <X className="w-3 h-3 text-gray-400" />
             </button>
 
             {/* Header */}

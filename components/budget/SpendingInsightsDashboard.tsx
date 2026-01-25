@@ -137,10 +137,10 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
                   <span
                     className={`text-xs px-2 py-1 rounded-full font-medium ${
                       insight.severity === 'high'
-                        ? 'bg-red-100 bg-red-900/30 text-red-300'
+                        ? 'bg-red-900/30 text-red-300'
                         : insight.severity === 'medium'
-                        ? 'bg-yellow-100 bg-yellow-900/30 text-yellow-300'
-                        : 'bg-blue-100 bg-blue-900/30 text-blue-300'
+                        ? 'bg-yellow-900/30 text-yellow-300'
+                        : 'bg-blue-900/30 text-blue-300'
                     }`}
                   >
                     {insight.severity}
@@ -212,10 +212,10 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
                   <span
                     className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
                       pattern.seasonality === 'high'
-                        ? 'bg-orange-100 bg-orange-900/30 text-orange-300'
+                        ? 'bg-orange-900/30 text-orange-300'
                         : pattern.seasonality === 'medium'
-                        ? 'bg-yellow-100 bg-yellow-900/30 text-yellow-300'
-                        : 'bg-green-100 bg-green-900/30 text-green-300'
+                        ? 'bg-yellow-900/30 text-yellow-300'
+                        : 'bg-green-900/30 text-green-300'
                     }`}
                   >
                     {pattern.seasonality}

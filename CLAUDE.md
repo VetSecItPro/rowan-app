@@ -8,6 +8,8 @@
 
 **Work slowly, safely, strategically, and comprehensively.**
 
+**Work like a 10x senior developer and an expert Apple designer** - all code must be correct and the UI must be super elegant. Every interaction should feel polished, every animation purposeful, every layout pixel-perfect.
+
 ### Core Principles
 1. **Safety First** - Every change must be implemented carefully to avoid breaking existing functionality elsewhere in the app
 2. **No Band-Aid Fixes** - When troubleshooting, think around the whole problem. Understand root causes before implementing solutions
@@ -60,8 +62,20 @@ pkill -f "next" 2>/dev/null; rm -rf ".next 2" "node_modules 2" ".next 3" "node_m
 
 ## UI/UX Requirements
 
+### Dark Mode Only (GOVERNING PRINCIPLE)
+
+> **CRITICAL**: Rowan is a **dark mode ONLY** application. There is NO light mode. This is a deliberate design decision for elegance and simplicity.
+
+- **No light mode support** - Do not add light mode variants or toggles
+- **No `dark:` prefixes needed** - Since we're dark-only, just use dark colors directly
+- **Single icon set** - No need for light/dark icon variants
+- **Background colors**: Use dark grays (`gray-900`, `gray-800`, `#0a0a0a`, etc.)
+- **Text colors**: Use white and light grays for readability
+- **Mobile apps**: Splash screen and status bar are configured for dark mode
+- **Do NOT add light mode** - If you see light mode code, remove it
+
+### General UI/UX
 - Loading states for async operations; empty states for lists
-- Dark mode: `dark:` variants on all colors
 - **PortalDropdown** (`/components/ui/Dropdown.tsx`): Use for dropdown positioning issues in modals
 
 ## MCP Configuration
@@ -126,7 +140,7 @@ claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.su
 
 ## Feature Colors
 ```typescript
-const COLORS = { tasks: 'blue', calendar: 'purple', reminders: 'pink', messages: 'green', shopping: 'emerald', meals: 'orange', household: 'amber', goals: 'indigo' };
+const COLORS = { tasks: 'blue', calendar: 'purple', reminders: 'pink', messages: 'green', shopping: 'emerald', meals: 'orange', household: 'amber', goals: 'indigo', location: 'cyan' };
 ```
 
 ## Common Mistakes

@@ -233,9 +233,9 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                   {/* Status and Stats */}
                   <div className="flex items-center gap-4 mt-3">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      report.status === 'generated' ? 'bg-green-100 bg-green-900/20 text-green-400' :
-                      report.status === 'generating' ? 'bg-yellow-100 bg-yellow-900/20 text-yellow-400' :
-                      report.status === 'failed' ? 'bg-red-100 bg-red-900/20 text-red-400' :
+                      report.status === 'generated' ? 'bg-green-900/20 text-green-400' :
+                      report.status === 'generating' ? 'bg-yellow-900/20 text-yellow-400' :
+                      report.status === 'failed' ? 'bg-red-900/20 text-red-400' :
                       'bg-gray-900/20 text-gray-400'
                     }`}>
                       {report.status}

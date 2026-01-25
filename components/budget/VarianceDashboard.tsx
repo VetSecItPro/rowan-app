@@ -149,8 +149,8 @@ export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
                 <span
                   className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
                     currentVariance.variance_percentage < 0
-                      ? 'bg-green-100 bg-green-900/30 text-green-400'
-                      : 'bg-red-100 bg-red-900/30 text-red-400'
+                      ? 'bg-green-900/30 text-green-400'
+                      : 'bg-red-900/30 text-red-400'
                   }`}
                 >
                   {currentVariance.variance_percentage < 0 ? (
@@ -204,8 +204,8 @@ export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
                   <span
                     className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
                       projectedVariance.variance_percentage < 0
-                        ? 'bg-green-100 bg-green-900/30 text-green-400'
-                        : 'bg-red-100 bg-red-900/30 text-red-400'
+                        ? 'bg-green-900/30 text-green-400'
+                        : 'bg-red-900/30 text-red-400'
                     }`}
                   >
                     {projectedVariance.variance_percentage < 0 ? (

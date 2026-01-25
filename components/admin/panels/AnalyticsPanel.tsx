@@ -382,7 +382,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 timeRange === range
-                  ? 'bg-cyan-100 bg-cyan-900/30 text-cyan-400'
+                  ? 'bg-cyan-900/30 text-cyan-400'
                   : 'text-gray-400 hover:bg-gray-700'
               }`}
             >

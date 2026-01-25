@@ -353,7 +353,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace: _personalSpace,
                 <p className="text-sm text-red-300">{error}</p>
                 <button
                   onClick={clearError}
-                  className="text-red-500 text-red-400 hover:text-red-300"
+                  className="text-red-400 hover:text-red-300"
                 >
                   ×
                 </button>
@@ -425,7 +425,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace: _personalSpace,
             <Button
               variant="default"
               onClick={handleStartMigration}
-              className="bg-purple-600 bg-purple-500 hover:bg-purple-600"
+              className="bg-purple-500 hover:bg-purple-600"
             >
               Start Migration
             </Button>
@@ -509,7 +509,7 @@ export function MigrationModal({ isOpen, onClose, personalSpace: _personalSpace,
             <Button
               variant="default"
               onClick={handleCompleteMigration}
-              className="bg-green-600 bg-green-500 hover:bg-green-600"
+              className="bg-green-500 hover:bg-green-600"
             >
               Go to {targetSpace?.name}
             </Button>

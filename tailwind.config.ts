@@ -24,8 +24,9 @@ const config: Config = {
         playfair: ['var(--font-playfair)', 'serif'],
       },
       colors: {
-        // Custom off-white for light mode backgrounds
-        'off-white': '#fafafa', // gray-50 equivalent for softer light mode
+        // Dark mode surface colors
+        'dark-surface': '#141414',
+        'dark-elevated': '#1a1a1a',
       },
       // Feature color gradients
       backgroundImage: {
@@ -37,6 +38,7 @@ const config: Config = {
         'gradient-meals': 'linear-gradient(to right, rgb(249 115 22), rgb(234 88 12))', // orange-500 to orange-600
         'gradient-projects': 'linear-gradient(to right, rgb(245 158 11), rgb(217 119 6))', // amber-500 to amber-600
         'gradient-goals': 'linear-gradient(to right, rgb(99 102 241), rgb(79 70 229))', // indigo-500 to indigo-600
+        'gradient-location': 'linear-gradient(to right, rgb(6 182 212), rgb(8 145 178))', // cyan-500 to cyan-600
       },
       // Custom animations
       animation: {

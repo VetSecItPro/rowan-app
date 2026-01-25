@@ -56,10 +56,10 @@ export function ProposalCard({ proposal, onVote, onApprove, onReject }: Proposal
 
   const getStatusBadge = () => {
     const colors = {
-      pending: 'bg-yellow-100 bg-yellow-900/30 text-yellow-400',
-      approved: 'bg-green-100 bg-green-900/30 text-green-400',
-      rejected: 'bg-red-100 bg-red-900/30 text-red-400',
-      countered: 'bg-blue-100 bg-blue-900/30 text-blue-400'
+      pending: 'bg-yellow-900/30 text-yellow-400',
+      approved: 'bg-green-900/30 text-green-400',
+      rejected: 'bg-red-900/30 text-red-400',
+      countered: 'bg-blue-900/30 text-blue-400'
     };
 
     const labels = {

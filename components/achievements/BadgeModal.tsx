@@ -29,11 +29,11 @@ export function BadgeModal({
 
   const getRarityDisplayInfo = (rarity: string) => {
     const info = {
-      common: { label: 'Common', color: 'text-gray-600', bg: 'bg-gray-100', gradient: 'bg-gray-600' },
-      uncommon: { label: 'Uncommon', color: 'text-green-600', bg: 'bg-green-100', gradient: 'bg-green-600' },
-      rare: { label: 'Rare', color: 'text-blue-600', bg: 'bg-blue-100', gradient: 'bg-blue-600' },
-      epic: { label: 'Epic', color: 'text-purple-600', bg: 'bg-purple-100', gradient: 'bg-purple-600' },
-      legendary: { label: 'Legendary', color: 'text-orange-600', bg: 'bg-orange-100', gradient: 'bg-gradient-to-r from-orange-500 to-yellow-500' }
+      common: { label: 'Common', color: 'text-gray-400', bg: 'bg-gray-800', gradient: 'bg-gray-600' },
+      uncommon: { label: 'Uncommon', color: 'text-green-400', bg: 'bg-green-900/20', gradient: 'bg-green-600' },
+      rare: { label: 'Rare', color: 'text-blue-400', bg: 'bg-blue-900/20', gradient: 'bg-blue-600' },
+      epic: { label: 'Epic', color: 'text-purple-400', bg: 'bg-purple-900/20', gradient: 'bg-purple-600' },
+      legendary: { label: 'Legendary', color: 'text-orange-400', bg: 'bg-orange-900/20', gradient: 'bg-gradient-to-r from-orange-500 to-yellow-500' }
     };
     return info[rarity as keyof typeof info] || info.common;
   };
@@ -145,13 +145,13 @@ export function BadgeModal({
 
         {/* Badge Details */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-3 bg-gray-700 rounded-lg">
+          <div className="text-center p-3 bg-gray-800 rounded-lg">
             <div className="text-lg font-bold text-white">
               {isLocked ? '?' : badge.points}
             </div>
             <div className="text-sm text-gray-400">Points</div>
           </div>
-          <div className="text-center p-3 bg-gray-700 rounded-lg">
+          <div className="text-center p-3 bg-gray-800 rounded-lg">
             <div className={cn('text-lg font-bold capitalize', rarityInfo.color)}>
               {badge.rarity}
             </div>

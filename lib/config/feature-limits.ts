@@ -37,6 +37,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseReminders: true,
     canUseGoals: false,
     canUseHousehold: false,
+    canUseLocation: false,
     canUseAI: false,
     canUseIntegrations: false,
     canUseEventProposals: false,
@@ -81,6 +82,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseReminders: true,
     canUseGoals: true,
     canUseHousehold: true,
+    canUseLocation: true,
     canUseAI: false, // Family tier only
     canUseIntegrations: false, // Family tier only
     canUseEventProposals: true, // Pro tier and above
@@ -125,6 +127,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseReminders: true,
     canUseGoals: true,
     canUseHousehold: true,
+    canUseLocation: true,
     canUseAI: true,
     canUseIntegrations: true,
     canUseEventProposals: true,
@@ -229,6 +232,7 @@ export const FEATURE_NAMES: Record<string, string> = {
   canUseReminders: 'Reminders',
   canUseGoals: 'Goals & Milestones',
   canUseHousehold: 'Household Management',
+  canUseLocation: 'Family Location',
   canUseAI: 'AI Features',
   canUseIntegrations: 'External Integrations',
   canUseEventProposals: 'Event Proposals & Find Time',

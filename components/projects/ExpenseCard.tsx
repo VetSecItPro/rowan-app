@@ -63,8 +63,8 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
         </div>
       </div>
       <span className={`inline-block mt-3 px-3 py-1 text-xs font-medium rounded-full ${expense.status === 'paid'
-          ? 'bg-green-100 bg-green-900/30 text-green-400'
-          : 'bg-orange-100 bg-orange-900/30 text-orange-400'
+          ? 'bg-green-900/30 text-green-400'
+          : 'bg-orange-900/30 text-orange-400'
         }`}>
         {expense.status}
       </span>

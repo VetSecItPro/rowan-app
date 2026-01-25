@@ -77,7 +77,7 @@ export function ButtonAnimationDemo() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-white">Basic</h3>
+            <h3 className="font-semibold">Basic</h3>
             <p className="text-sm text-gray-300">
               Standard transitions only
             </p>
@@ -87,7 +87,7 @@ export function ButtonAnimationDemo() {
           </div>
 
           <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-white">Enhanced</h3>
+            <h3 className="font-semibold">Enhanced</h3>
             <p className="text-sm text-gray-300">
               Hover scale + glow effects
             </p>
@@ -97,7 +97,7 @@ export function ButtonAnimationDemo() {
           </div>
 
           <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-white">Dynamic</h3>
+            <h3 className="font-semibold">Dynamic</h3>
             <p className="text-sm text-gray-300">
               + Ripple effects + breathing
             </p>
@@ -107,7 +107,7 @@ export function ButtonAnimationDemo() {
           </div>
 
           <div className="space-y-4 p-6 bg-gray-800 rounded-xl shadow-lg">
-            <h3 className="font-semibold text-white">Premium</h3>
+            <h3 className="font-semibold">Premium</h3>
             <p className="text-sm text-gray-300">
               + Magnetic attraction + gradient shift
             </p>

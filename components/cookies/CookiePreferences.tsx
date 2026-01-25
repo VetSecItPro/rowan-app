@@ -41,12 +41,12 @@ export function CookiePreferences() {
 
   const getColorClasses = (color: string, enabled: boolean) => {
     const colors = {
-      green: enabled ? 'bg-green-100 border-green-300 bg-green-900/20 text-green-300' : 'bg-gray-100 border-gray-300 bg-gray-800 text-gray-400',
-      blue: enabled ? 'bg-blue-100 border-blue-300 bg-blue-900/20 text-blue-300' : 'bg-gray-100 border-gray-300 bg-gray-800 text-gray-400',
-      purple: enabled ? 'bg-purple-100 border-purple-300 bg-purple-900/20 text-purple-300' : 'bg-gray-100 border-gray-300 bg-gray-800 text-gray-400',
-      emerald: enabled ? 'bg-emerald-100 border-emerald-300 bg-emerald-900/20 text-emerald-300' : 'bg-gray-100 border-gray-300 bg-gray-800 text-gray-400',
-      orange: enabled ? 'bg-orange-100 border-orange-300 bg-orange-900/20 text-orange-300' : 'bg-gray-100 border-gray-300 bg-gray-800 text-gray-400',
-      gray: 'bg-gray-100 border-gray-300 bg-gray-800 text-gray-400',
+      green: enabled ? 'bg-green-900/20 border-green-700 text-green-300' : 'bg-gray-800 border-gray-600 text-gray-400',
+      blue: enabled ? 'bg-blue-900/20 border-blue-700 text-blue-300' : 'bg-gray-800 border-gray-600 text-gray-400',
+      purple: enabled ? 'bg-purple-900/20 border-purple-700 text-purple-300' : 'bg-gray-800 border-gray-600 text-gray-400',
+      emerald: enabled ? 'bg-emerald-900/20 border-emerald-700 text-emerald-300' : 'bg-gray-800 border-gray-600 text-gray-400',
+      orange: enabled ? 'bg-orange-900/20 border-orange-700 text-orange-300' : 'bg-gray-800 border-gray-600 text-gray-400',
+      gray: 'bg-gray-800 border-gray-600 text-gray-400',
     };
     return colors[color as keyof typeof colors] || colors.gray;
   };

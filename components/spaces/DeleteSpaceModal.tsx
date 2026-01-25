@@ -395,7 +395,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                       value="json"
                       checked={exportFormat === 'json'}
                       onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                     />
                     <span className="ml-2 text-sm text-gray-300">JSON (structured data)</span>
                   </label>
@@ -406,7 +406,7 @@ export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: Del
                       value="csv"
                       checked={exportFormat === 'csv'}
                       onChange={(e) => setExportFormat(e.target.value as 'json' | 'csv')}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                     />
                     <span className="ml-2 text-sm text-gray-300">CSV (spreadsheet format)</span>
                   </label>
