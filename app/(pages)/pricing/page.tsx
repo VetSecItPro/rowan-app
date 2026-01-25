@@ -3,7 +3,7 @@
 /**
  * Pricing Page
  * Displays subscription tiers and pricing options
- * Updated for 14-day trial model with Stripe checkout integration
+ * Updated for 14-day trial model with Polar checkout integration
  */
 
 import { useState, useEffect } from 'react';
@@ -12,15 +12,9 @@ import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
 import Image from 'next/image';
 import { Sparkles, Clock, Shield } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
-
-// Initialize Stripe.js
-const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null;
 
 export default function PricingPage() {
   const router = useRouter();
@@ -52,20 +46,14 @@ export default function PricingPage() {
       return;
     }
 
-    // Check if Stripe is configured
-    if (!stripePromise) {
-      setError('Payments are not configured yet. Please try again later.');
-      return;
-    }
-
     setLoading(tier);
 
     try {
-      // Create checkout session
-      const response = await csrfFetch('/api/stripe/create-checkout-session', {
+      // Create Polar checkout session
+      const response = await csrfFetch('/api/polar/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier, period }),
+        body: JSON.stringify({ plan: tier, billingInterval: period }),
       });
 
       const data = await response.json();
@@ -80,19 +68,11 @@ export default function PricingPage() {
         throw new Error(data.message || data.error || 'Failed to create checkout session');
       }
 
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Failed to load Stripe');
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: stripeError } = await (stripe as any).redirectToCheckout({
-        sessionId: data.sessionId,
-      });
-
-      if (stripeError) {
-        throw new Error(stripeError.message);
+      // Redirect to Polar Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
       }
     } catch (err) {
       logger.error('Checkout error:', err, { component: 'page', action: 'execution' });

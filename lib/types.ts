@@ -6,7 +6,7 @@
 export type { CreateTaskInput, UpdateTaskInput as UpdateTaskInputZod } from './validations/task-schemas';
 
 // =============================================
-// RE-EXPORTS: SUBSCRIPTION & STRIPE TYPES
+// RE-EXPORTS: SUBSCRIPTION TYPES
 // =============================================
 
 // Subscription types
@@ -34,23 +34,12 @@ export type {
   UsageCheckResult,
 } from './types/subscription';
 
-// Stripe types
-export type {
-  StripeProduct,
-  StripePrice,
-  StripePriceInfo,
-  StripeCheckoutSessionConfig,
-  StripeCheckoutSession,
-  StripeCustomer,
-  StripeSubscription,
-  StripeInvoice,
-  StripeWebhookEventType,
-  StripeWebhookEvent,
-  WebhookHandlerResult,
-  StripeErrorType,
-  StripeError,
-  StripePaymentMethod,
-} from './types/stripe';
+// Polar webhook handler result type
+export interface WebhookHandlerResult {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
 
 // =============================================
 // ENUMS
