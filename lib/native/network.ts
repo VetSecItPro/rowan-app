@@ -179,3 +179,102 @@ export function getTimeoutForQuality(quality: ConnectionQuality): number {
 export function shouldDeferRequest(quality: ConnectionQuality): boolean {
   return quality === 'poor' || quality === 'offline';
 }
+
+// Cached network quality for synchronous access
+let cachedQuality: ConnectionQuality = 'good';
+let cacheTimestamp = 0;
+const CACHE_TTL = 5000; // 5 seconds
+
+/**
+ * Get connection quality synchronously (uses cached value)
+ * Call updateNetworkCache() periodically to keep cache fresh
+ */
+export function getConnectionQualitySync(): ConnectionQuality {
+  // Return cached if fresh
+  if (Date.now() - cacheTimestamp < CACHE_TTL) {
+    return cachedQuality;
+  }
+
+  // Fallback to browser API for immediate response
+  if (typeof navigator !== 'undefined') {
+    if (!navigator.onLine) {
+      cachedQuality = 'offline';
+      cacheTimestamp = Date.now();
+      return 'offline';
+    }
+
+    // Check Network Information API if available
+    const connection = (navigator as Navigator & { connection?: { effectiveType?: string } })
+      .connection;
+    if (connection?.effectiveType) {
+      switch (connection.effectiveType) {
+        case '4g':
+          cachedQuality = 'excellent';
+          break;
+        case '3g':
+          cachedQuality = 'good';
+          break;
+        case '2g':
+        case 'slow-2g':
+          cachedQuality = 'poor';
+          break;
+        default:
+          cachedQuality = 'good';
+      }
+      cacheTimestamp = Date.now();
+      return cachedQuality;
+    }
+  }
+
+  return cachedQuality;
+}
+
+/**
+ * Update the network quality cache (call this from a React effect)
+ */
+export async function updateNetworkCache(): Promise<ConnectionQuality> {
+  const status = await getNetworkStatus();
+  cachedQuality = status.quality;
+  cacheTimestamp = Date.now();
+  return cachedQuality;
+}
+
+/**
+ * Initialize network cache and set up auto-refresh
+ */
+export function initNetworkCache(): () => void {
+  // Initial update
+  updateNetworkCache();
+
+  // Listen for changes
+  if (typeof window !== 'undefined') {
+    const handleOnline = () => {
+      cachedQuality = 'good';
+      cacheTimestamp = Date.now();
+      updateNetworkCache(); // Get accurate quality
+    };
+
+    const handleOffline = () => {
+      cachedQuality = 'offline';
+      cacheTimestamp = Date.now();
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Also listen for connection type changes
+    const connection = (navigator as Navigator & { connection?: EventTarget }).connection;
+    const handleConnectionChange = () => {
+      updateNetworkCache();
+    };
+    connection?.addEventListener?.('change', handleConnectionChange);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      connection?.removeEventListener?.('change', handleConnectionChange);
+    };
+  }
+
+  return () => {};
+}
