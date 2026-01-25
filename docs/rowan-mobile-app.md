@@ -66,84 +66,108 @@ Next.js App (Vercel)
 
 ## Capacitor Plugins
 
-### Currently Installed
+### Installed (36 total)
 
-| Plugin | Status | Purpose |
-|--------|--------|---------|
-| @capacitor/core | ✅ 8.0.1 | Core runtime |
-| @capacitor/ios | ✅ 8.0.1 | iOS platform |
-| @capacitor/android | ✅ 8.0.1 | Android platform |
-| @capacitor/app | ✅ 8.0.0 | App lifecycle, deep links |
-| @capacitor/camera | ✅ 8.0.0 | Receipt scanning, photos |
-| @capacitor/geolocation | ✅ 8.0.0 | Family location |
-| @capacitor/haptics | ✅ 8.0.0 | Tactile feedback |
-| @capacitor/keyboard | ✅ 8.0.0 | Chat input |
-| @capacitor/push-notifications | ✅ 8.0.0 | Firebase push |
-| @capacitor/splash-screen | ✅ 8.0.0 | Launch screen |
-| @capacitor/status-bar | ✅ 8.0.0 | Dark styling |
+#### Core & Platform
 
-### Plugins to Add
-
-Install all now to avoid future App Store reviews.
-
-#### Tier 1: Essential
-
-| Plugin | Install | Purpose |
+| Plugin | Version | Purpose |
 |--------|---------|---------|
-| @capacitor/local-notifications | ⬜ | Scheduled reminders |
-| @capacitor/share | ⬜ | Share lists/invites |
-| @capacitor/network | ⬜ | Offline detection |
-| @capacitor/preferences | ⬜ | Local settings |
-| @capacitor/browser | ⬜ | Stripe, OAuth |
-| @capacitor/clipboard | ⬜ | Copy links |
-| @capacitor/device | ⬜ | Analytics |
-| @capacitor/dialog | ⬜ | Native alerts |
-| @capacitor/toast | ⬜ | Quick feedback |
+| @capacitor/core | 8.0.1 | Core runtime |
+| @capacitor/cli | 8.0.1 | CLI tools |
+| @capacitor/ios | 8.0.1 | iOS platform |
+| @capacitor/android | 8.0.1 | Android platform |
+| @capacitor/app | 8.0.0 | App lifecycle, deep links |
+| @capacitor/app-launcher | 8.0.0 | Open other apps |
 
-#### Tier 2: Enhanced UX
+#### Device Features
 
-| Plugin | Install | Purpose |
+| Plugin | Version | Purpose |
 |--------|---------|---------|
-| @capacitor/action-sheet | ⬜ | Action menus |
-| @capawesome/capacitor-badge | ⬜ | App icon badge |
-| @capacitor/screen-reader | ⬜ | Accessibility |
+| @capacitor/camera | 8.0.0 | Receipt scanning, photos |
+| @capacitor/geolocation | 8.0.0 | Family location |
+| @capacitor/haptics | 8.0.0 | Tactile feedback |
+| @capacitor/keyboard | 8.0.0 | Chat input |
+| @capacitor/push-notifications | 8.0.0 | Firebase push |
+| @capacitor/local-notifications | 8.0.0 | Scheduled reminders |
+| @capacitor/screen-orientation | 8.0.0 | Lock orientation |
+| capacitor-voice-recorder | 7.0.6 | Voice messages |
 
-#### Tier 3: Future Features
+#### UI & System
 
-| Plugin | Install | Purpose |
+| Plugin | Version | Purpose |
 |--------|---------|---------|
-| @capacitor-community/barcode-scanner | ⬜ | Scan products |
-| @capacitor-community/contacts | ⬜ | Invite from contacts |
-| @capacitor-community/calendar | ⬜ | Sync to device calendar |
-| @capacitor-community/apple-sign-in | ⬜ | Native Apple login |
-| @capawesome/capacitor-file-picker | ⬜ | Import files |
-| @capacitor/filesystem | ⬜ | Save/export files |
+| @capacitor/splash-screen | 8.0.0 | Launch screen |
+| @capacitor/status-bar | 8.0.0 | Dark styling |
+| @capacitor/dialog | 8.0.0 | Native alerts |
+| @capacitor/toast | 8.0.0 | Quick feedback |
+| @capacitor/action-sheet | 8.0.0 | Action menus |
+| @capawesome/capacitor-badge | 8.0.0 | App icon badge |
 
-### Installation Command
+#### Data & Storage
+
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| @capacitor/preferences | 8.0.0 | Local settings |
+| @capacitor/filesystem | 8.1.0 | Save/export files |
+| @capacitor/clipboard | 8.0.0 | Copy links |
+| @capawesome/capacitor-file-picker | 8.0.1 | Import files |
+| capacitor-secure-storage-plugin | 0.13.0 | Secure token storage |
+
+#### Networking & Sharing
+
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| @capacitor/network | 8.0.0 | Offline detection |
+| @capacitor/share | 8.0.0 | Share lists/invites |
+| @capacitor/browser | 8.0.0 | Stripe, OAuth |
+
+#### Platform Integration
+
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| @capacitor/device | 8.0.0 | Analytics |
+| @capacitor/screen-reader | 8.0.0 | Accessibility |
+| @capacitor-community/contacts | 7.1.0 | Invite from contacts |
+| @capacitor-community/apple-sign-in | 7.1.0 | Native Apple login |
+| @ebarooni/capacitor-calendar | 8.0.0 | Sync to device calendar |
+| capacitor-native-settings | 8.0.0 | Open device settings |
+
+#### Security & Authentication
+
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| @aparajita/capacitor-biometric-auth | 9.1.2 | Face ID / Touch ID / Fingerprint |
+
+#### App Store Features
+
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| @capacitor-community/in-app-review | 8.0.0 | Request app ratings |
+| @capacitor-community/native-market | 8.0.0 | Open app store |
+
+#### Background Tasks
+
+| Plugin | Version | Purpose |
+|--------|---------|---------|
+| @transistorsoft/capacitor-background-fetch | 8.0.0 | Background sync |
+
+#### Web-Based (No Native Plugin)
+
+| Library | Purpose |
+|---------|---------|
+| html5-qrcode | Barcode/QR scanning via camera |
+
+### Not Compatible (Skipped)
+
+| Plugin | Issue |
+|--------|-------|
+| @capacitor-community/barcode-scanner | Requires Capacitor 5 (we use 8) |
+| @capacitor-community/calendar | Package doesn't exist on npm |
+
+### All Plugins Installed
 
 ```bash
-# All plugins at once
-npm install \
-  @capacitor/local-notifications \
-  @capacitor/share \
-  @capacitor/network \
-  @capacitor/preferences \
-  @capacitor/browser \
-  @capacitor/clipboard \
-  @capacitor/device \
-  @capacitor/dialog \
-  @capacitor/toast \
-  @capacitor/action-sheet \
-  @capawesome/capacitor-badge \
-  @capacitor/screen-reader \
-  @capacitor-community/barcode-scanner \
-  @capacitor-community/contacts \
-  @capacitor-community/calendar \
-  @capacitor-community/apple-sign-in \
-  @capawesome/capacitor-file-picker \
-  @capacitor/filesystem
-
-# Sync to native projects
+# Already installed - run npx cap sync after Firebase setup
 npx cap sync
 ```
 
@@ -267,11 +291,13 @@ Add to `android/app/src/main/AndroidManifest.xml`:
 - [x] Push notification code ready
 - [x] Location tracking code ready
 - [x] Database tables created
-- [ ] Install additional plugins (18 plugins)
+- [x] Install additional plugins (36 total now)
+- [x] Barcode scanning (html5-qrcode)
+- [x] Calendar sync bridge
+- [x] Run `npx cap sync`
 - [ ] Firebase project created
 - [ ] Firebase config files placed
 - [ ] APNs key uploaded
-- [ ] Run `npx cap sync`
 
 ### Phase 2: Testing
 
@@ -362,17 +388,18 @@ TypeScript wrappers in `lib/native/`:
 
 | File | Status | Purpose |
 |------|--------|---------|
+| index.ts | ✅ | Barrel exports |
 | capacitor.ts | ✅ | Platform detection |
 | push-notifications.ts | ✅ | Push notifications |
-| geolocation.ts | ⬜ | Location tracking |
+| geolocation.ts | ✅ | Location tracking |
+| calendar.ts | ✅ | Calendar sync |
+| barcode.ts | ✅ | Barcode scanner (html5-qrcode) |
 | local-notifications.ts | ⬜ | Scheduled reminders |
 | share.ts | ⬜ | Share sheet |
 | network.ts | ⬜ | Connection status |
 | storage.ts | ⬜ | Local preferences |
 | camera.ts | ⬜ | Camera access |
 | contacts.ts | ⬜ | Contact picker |
-| calendar.ts | ⬜ | Calendar sync |
-| barcode.ts | ⬜ | Barcode scanner |
 | haptics.ts | ⬜ | Vibration feedback |
 
 ---
@@ -383,14 +410,17 @@ TypeScript wrappers in `lib/native/`:
 |--------------|--------------|
 | Reminders | local-notifications, push-notifications, badge |
 | Family Location | geolocation, push-notifications |
-| Messages | push-notifications, badge, haptics |
-| Shopping Lists | share, barcode-scanner, clipboard |
+| Messages | push-notifications, badge, haptics, voice-recorder |
+| Shopping Lists | share, html5-qrcode, clipboard |
 | Receipts/Expenses | camera, filesystem |
 | Calendar/Events | calendar, local-notifications |
 | Invite Family | contacts, share |
-| Offline Mode | network, preferences |
-| Authentication | apple-sign-in, browser |
+| Offline Mode | network, preferences, background-fetch |
+| Authentication | apple-sign-in, browser, biometric-auth |
 | Export Reports | filesystem, share |
+| App Ratings | in-app-review, native-market |
+| Settings | native-settings |
+| Security | secure-storage, biometric-auth |
 
 ---
 
