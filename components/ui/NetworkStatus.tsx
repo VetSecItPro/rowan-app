@@ -1,33 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, CloudOff, RefreshCw, AlertCircle, SignalLow } from 'lucide-react';
+import { Wifi, WifiOff, CloudOff, RefreshCw, AlertCircle, SignalLow, Database } from 'lucide-react';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useOfflineQueue } from '@/lib/hooks/useOfflineQueue';
 
 /**
- * Network Status Indicator
+ * Network Status Banner
  *
- * Shows a banner when the user loses network connectivity.
- * Displays pending offline actions count and sync status.
- * Shows connection quality warnings for poor networks.
- * Automatically dismisses when connection is restored.
+ * YouTube-style offline/online notification banner.
+ * Shows when user loses connection and confirms when back online.
+ * Displays pending actions and sync status.
+ * Self-contained - connects to offline queue automatically.
  */
 
-interface NetworkStatusProps {
-  /** Number of pending offline actions */
-  pendingActions?: number;
-  /** Whether the queue is currently syncing */
-  isSyncing?: boolean;
-  /** Number of failed actions */
-  failedCount?: number;
-}
-
-export function NetworkStatus({
-  pendingActions = 0,
-  isSyncing = false,
-  failedCount = 0,
-}: NetworkStatusProps) {
+export function NetworkStatus() {
   const { isOnline, quality } = useNetworkStatus();
+  const { pendingCount, failedCount, isProcessing } = useOfflineQueue();
+
   const [showBanner, setShowBanner] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
   const [showPoorConnectionWarning, setShowPoorConnectionWarning] = useState(false);
@@ -54,72 +44,72 @@ export function NetworkStatus({
   }, [quality, isOnline]);
 
   // Determine what to show
-  const shouldShowBanner = !isOnline || showBanner || (pendingActions > 0 && !isOnline);
+  const shouldShowBanner = !isOnline || showBanner || (pendingCount > 0 && !isOnline);
 
-  if (!shouldShowBanner && pendingActions === 0 && failedCount === 0) return null;
+  if (!shouldShowBanner && pendingCount === 0 && failedCount === 0 && !showPoorConnectionWarning) return null;
 
   // Offline with pending actions - show persistent indicator
-  if (!isOnline && pendingActions > 0) {
+  if (!isOnline && pendingCount > 0) {
     return (
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-3 text-sm font-medium bg-amber-500 text-white transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-3 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
       >
-        <CloudOff className="w-4 h-4" />
-        <span>Offline - {pendingActions} action{pendingActions !== 1 ? 's' : ''} will sync when online</span>
-        <div className="flex items-center gap-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
-          <RefreshCw className="w-3 h-3" />
-          <span>Queued</span>
+        <WifiOff className="w-4 h-4 text-amber-400" />
+        <span>You&apos;re offline. {pendingCount} change{pendingCount !== 1 ? 's' : ''} will sync when connected.</span>
+        <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-full text-xs">
+          <Database className="w-3 h-3" />
+          <span>Saved locally</span>
         </div>
       </div>
     );
   }
 
-  // Just went offline
+  // Just went offline - YouTube-style banner
   if (!isOnline) {
     return (
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-red-500 text-white transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
       >
-        <WifiOff className="w-4 h-4" />
-        <span>No internet connection</span>
+        <WifiOff className="w-4 h-4 text-amber-400" />
+        <span>You&apos;re offline. Viewing cached data.</span>
       </div>
     );
   }
 
   // Syncing indicator
-  if (isSyncing && pendingActions > 0) {
+  if (isProcessing && pendingCount > 0) {
     return (
       <div
         role="status"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-blue-500 text-white transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-blue-600 text-white transition-all duration-300 animate-slide-down"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
       >
         <RefreshCw className="w-4 h-4 animate-spin" />
-        <span>Syncing {pendingActions} action{pendingActions !== 1 ? 's' : ''}...</span>
+        <span>Syncing {pendingCount} change{pendingCount !== 1 ? 's' : ''}...</span>
       </div>
     );
   }
 
-  // Back online message
+  // Back online message - YouTube-style confirmation
   if (showBanner && isOnline) {
     return (
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-green-500 text-white animate-slide-down transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-emerald-600 text-white animate-slide-down transition-all duration-300"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
@@ -136,13 +126,13 @@ export function NetworkStatus({
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-orange-500 text-white transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-red-600 text-white transition-all duration-300 animate-slide-down"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
       >
         <AlertCircle className="w-4 h-4" />
-        <span>{failedCount} action{failedCount !== 1 ? 's' : ''} failed to sync</span>
+        <span>{failedCount} change{failedCount !== 1 ? 's' : ''} couldn&apos;t sync. Tap to retry.</span>
       </div>
     );
   }
@@ -153,13 +143,13 @@ export function NetworkStatus({
       <div
         role="status"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-amber-600 text-white transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
       >
-        <SignalLow className="w-4 h-4" />
-        <span>Poor connection - using cached data</span>
+        <SignalLow className="w-4 h-4 text-amber-400" />
+        <span>Slow connection. Using cached data.</span>
       </div>
     );
   }
