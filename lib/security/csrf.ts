@@ -107,7 +107,6 @@ export function requiresCsrfProtection(method: string): boolean {
 export const CSRF_EXEMPT_ROUTES = [
   '/api/webhooks/',
   '/api/cron/',
-  '/api/stripe/webhook',
   '/api/auth/callback',
   '/api/calendar/callback/',
   '/api/analytics/track',

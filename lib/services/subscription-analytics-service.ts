@@ -10,7 +10,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { PRICING } from '@/lib/stripe/products';
+import { POLAR_PLANS } from '@/lib/polar';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -90,8 +90,8 @@ interface SubscriptionRow {
   tier: string;
   status: string;
   period: string;
-  stripe_customer_id: string | null;
-  stripe_subscription_id: string | null;
+  polar_customer_id: string | null;
+  polar_subscription_id: string | null;
   subscription_started_at: string | null;
   subscription_ends_at: string | null;
   trial_started_at: string | null;
@@ -122,14 +122,14 @@ function calculateMRR(tier: string, period: string): number {
   if (tier === 'free' || !tier) return 0;
 
   const tierKey = tier as 'pro' | 'family';
-  if (!PRICING[tierKey]) return 0;
+  if (!POLAR_PLANS[tierKey]) return 0;
 
   if (period === 'annual') {
     // Annual subscribers contribute their annual price / 12 to MRR
-    return PRICING[tierKey].annual.amount / 12 / 100; // Convert cents to dollars
+    return POLAR_PLANS[tierKey].annualPrice / 12;
   } else {
     // Monthly subscribers contribute their monthly price to MRR
-    return PRICING[tierKey].monthly.amount / 100; // Convert cents to dollars
+    return POLAR_PLANS[tierKey].price;
   }
 }
 
