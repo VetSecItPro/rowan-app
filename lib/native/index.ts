@@ -44,3 +44,26 @@ export {
   type LocationData,
   type LocationPermissionStatus,
 } from './geolocation';
+
+// Barcode scanning
+export {
+  isScannerAvailable,
+  startScanner,
+  stopScanner,
+  scanFromFile,
+  type ScanResult,
+  type ScannerOptions,
+} from './barcode';
+
+// Calendar sync
+export {
+  isCalendarAvailable,
+  requestCalendarPermission,
+  checkCalendarPermission,
+  addEventToCalendar,
+  deleteCalendarEvent,
+  getDeviceCalendars,
+  openDeviceCalendar,
+  type CalendarEvent,
+  type CalendarPermissionStatus,
+} from './calendar';
