@@ -1,10 +1,13 @@
 // Service Worker for Push Notifications and Offline Support
 // This runs in the background and handles push notifications and caching
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE_NAME = `rowan-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `rowan-dynamic-${CACHE_VERSION}`;
 const NOTIFICATION_CACHE_NAME = 'rowan-notifications-v1';
+
+// Request timeout for slow networks (3 seconds)
+const NETWORK_TIMEOUT = 3000;
 
 // Assets to cache immediately on install (app shell)
 const STATIC_ASSETS = [
@@ -14,6 +17,17 @@ const STATIC_ASSETS = [
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/offline.html', // Fallback page for offline
+];
+
+// Critical app routes to cache for instant loading
+const APP_SHELL_ROUTES = [
+  '/dashboard',
+  '/tasks',
+  '/calendar',
+  '/reminders',
+  '/messages',
+  '/shopping',
+  '/goals',
 ];
 
 // API routes that should use network-first strategy
@@ -29,23 +43,43 @@ const STALE_WHILE_REVALIDATE_ROUTES = [
   '/images/',
 ];
 
-// Install event - cache static assets
+// Install event - cache static assets and app shell
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing...');
 
   event.waitUntil(
-    caches.open(STATIC_CACHE_NAME)
-      .then((cache) => {
-        console.log('[Service Worker] Caching static assets');
-        // Don't fail install if some assets fail to cache
-        return Promise.allSettled(
-          STATIC_ASSETS.map((asset) =>
-            cache.add(asset).catch((err) => {
-              console.warn(`[Service Worker] Failed to cache: ${asset}`, err);
-            })
-          )
-        );
-      })
+    Promise.all([
+      // Cache static assets
+      caches.open(STATIC_CACHE_NAME)
+        .then((cache) => {
+          console.log('[Service Worker] Caching static assets');
+          return Promise.allSettled(
+            STATIC_ASSETS.map((asset) =>
+              cache.add(asset).catch((err) => {
+                console.warn(`[Service Worker] Failed to cache: ${asset}`, err);
+              })
+            )
+          );
+        }),
+      // Precache app shell routes for instant loading
+      caches.open(DYNAMIC_CACHE_NAME)
+        .then((cache) => {
+          console.log('[Service Worker] Precaching app shell routes');
+          return Promise.allSettled(
+            APP_SHELL_ROUTES.map((route) =>
+              fetch(route, { credentials: 'same-origin' })
+                .then((response) => {
+                  if (response.ok) {
+                    return cache.put(route, response);
+                  }
+                })
+                .catch((err) => {
+                  console.warn(`[Service Worker] Failed to precache: ${route}`, err);
+                })
+            )
+          );
+        }),
+    ])
       .then(() => self.skipWaiting())
   );
 });
@@ -99,8 +133,11 @@ self.addEventListener('fetch', (event) => {
   } else if (url.pathname.match(/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/)) {
     // Cache-first for static files
     event.respondWith(cacheFirst(request));
+  } else if (APP_SHELL_ROUTES.some((route) => url.pathname === route || url.pathname.startsWith(route + '/'))) {
+    // Network-first with timeout for app shell routes (instant on slow networks)
+    event.respondWith(networkFirstWithTimeout(request));
   } else {
-    // Network-first with offline fallback for pages
+    // Network-first with offline fallback for other pages
     event.respondWith(networkFirstWithOfflineFallback(request));
   }
 });
@@ -140,6 +177,48 @@ async function networkFirst(request) {
     if (cachedResponse) {
       return cachedResponse;
     }
+    throw error;
+  }
+}
+
+// Network-first with timeout (for slow connections)
+// Falls back to cache if network takes too long
+async function networkFirstWithTimeout(request, timeout = NETWORK_TIMEOUT) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const networkResponse = await fetch(request, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (networkResponse.ok) {
+      const cache = await caches.open(DYNAMIC_CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    clearTimeout(timeoutId);
+
+    // Check if it was a timeout
+    if (error.name === 'AbortError') {
+      console.log('[Service Worker] Request timed out, falling back to cache:', request.url);
+    } else {
+      console.error('[Service Worker] Network request failed:', error);
+    }
+
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      const offlinePage = await caches.match('/offline.html');
+      if (offlinePage) {
+        return offlinePage;
+      }
+    }
+
     throw error;
   }
 }

@@ -5,6 +5,11 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { queryClient } from '@/lib/react-query/query-client';
 import {
+  restoreQueryCache,
+  restoreFromBackup,
+  setupCachePersistence,
+} from '@/lib/react-query/offline-persistence';
+import {
   useAuth as useAuthQuery,
   useSignOut,
   useUpdateProfile,
@@ -67,6 +72,25 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   const authQuery = useAuthQuery();
   const signOutMutation = useSignOut();
   const handleAuthStateChange = useAuthStateChange();
+
+  // Set up offline cache persistence
+  useEffect(() => {
+    // Restore cached data from IndexedDB on app load
+    const restoreCache = async () => {
+      const restoredFromIDB = await restoreQueryCache(queryClient);
+      if (!restoredFromIDB) {
+        // Try localStorage backup (for page refreshes)
+        await restoreFromBackup(queryClient);
+      }
+    };
+
+    restoreCache();
+
+    // Set up automatic cache persistence
+    const cleanup = setupCachePersistence(queryClient);
+
+    return cleanup;
+  }, []);
 
   // Set up real-time auth state change listener
   useEffect(() => {
