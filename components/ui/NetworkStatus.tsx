@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, CloudOff, RefreshCw, AlertCircle } from 'lucide-react';
+import { Wifi, WifiOff, CloudOff, RefreshCw, AlertCircle, SignalLow } from 'lucide-react';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 /**
  * Network Status Indicator
  *
  * Shows a banner when the user loses network connectivity.
  * Displays pending offline actions count and sync status.
+ * Shows connection quality warnings for poor networks.
  * Automatically dismisses when connection is restored.
  */
 
@@ -25,40 +27,31 @@ export function NetworkStatus({
   isSyncing = false,
   failedCount = 0,
 }: NetworkStatusProps) {
-  const [isOnline, setIsOnline] = useState(() => {
-    if (typeof navigator === 'undefined') {
-      return true;
-    }
-    return navigator.onLine;
-  });
+  const { isOnline, quality } = useNetworkStatus();
   const [showBanner, setShowBanner] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
+  const [showPoorConnectionWarning, setShowPoorConnectionWarning] = useState(false);
 
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
+    if (isOnline && wasOffline) {
       // Show "back online" message briefly if we were offline
-      if (wasOffline) {
-        setShowBanner(true);
-        setTimeout(() => setShowBanner(false), 3000);
-      }
+      setShowBanner(true);
+      setTimeout(() => setShowBanner(false), 3000);
       setWasOffline(false);
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
+    } else if (!isOnline) {
       setShowBanner(true);
       setWasOffline(true);
-    };
+    }
+  }, [isOnline, wasOffline]);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [wasOffline]);
+  // Show poor connection warning briefly
+  useEffect(() => {
+    if (quality === 'poor' && isOnline) {
+      setShowPoorConnectionWarning(true);
+      const timer = setTimeout(() => setShowPoorConnectionWarning(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [quality, isOnline]);
 
   // Determine what to show
   const shouldShowBanner = !isOnline || showBanner || (pendingActions > 0 && !isOnline);
@@ -150,6 +143,23 @@ export function NetworkStatus({
       >
         <AlertCircle className="w-4 h-4" />
         <span>{failedCount} action{failedCount !== 1 ? 's' : ''} failed to sync</span>
+      </div>
+    );
+  }
+
+  // Poor connection warning (brief, auto-dismiss)
+  if (showPoorConnectionWarning && quality === 'poor') {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-amber-600 text-white transition-all duration-300"
+        style={{
+          paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
+        }}
+      >
+        <SignalLow className="w-4 h-4" />
+        <span>Poor connection - using cached data</span>
       </div>
     );
   }

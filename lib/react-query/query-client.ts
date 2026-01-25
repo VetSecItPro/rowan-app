@@ -2,7 +2,12 @@
  * React Query Configuration
  *
  * Professional-grade caching and data management setup
- * replacing manual localStorage patterns with optimized React Query
+ * replacing manual localStorage patterns with optimized React Query.
+ *
+ * Offline Support:
+ * - Uses 'offlineFirst' network mode for resilient data fetching
+ * - Cache persists to IndexedDB via offline-persistence.ts
+ * - Mutations queue when offline and retry on reconnect
  */
 
 import { QueryClient } from '@tanstack/react-query';
@@ -59,8 +64,9 @@ export const queryClient = new QueryClient({
         return baseDelay + jitter;
       },
 
-      // NETWORK MODE: Define behavior when offline
-      networkMode: 'online', // Only run queries when online (can be changed to 'always' for offline support)
+      // NETWORK MODE: offlineFirst allows showing cached data while offline
+      // Queries will use cache first, then revalidate when online
+      networkMode: 'offlineFirst',
     },
 
     mutations: {
@@ -72,8 +78,8 @@ export const queryClient = new QueryClient({
       // MUTATION RETRY DELAY: Quick retry for mutations
       retryDelay: 1000, // 1 second delay
 
-      // NETWORK MODE: Only run mutations when online
-      networkMode: 'online',
+      // NETWORK MODE: offlineFirst pauses mutations when offline, resumes when online
+      networkMode: 'offlineFirst',
     },
   },
 });

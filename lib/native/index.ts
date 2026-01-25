@@ -67,3 +67,16 @@ export {
   type CalendarEvent,
   type CalendarPermissionStatus,
 } from './calendar';
+
+// Network status
+export {
+  isNetworkAvailable,
+  getNetworkStatus,
+  isOnline,
+  getConnectionQuality,
+  watchNetworkStatus,
+  getTimeoutForQuality,
+  shouldDeferRequest,
+  type NetworkStatus,
+  type ConnectionQuality,
+} from './network';
