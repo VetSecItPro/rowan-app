@@ -14,11 +14,39 @@ Family/household management app - tasks, chores, meals, budgets, goals, calendar
 ### Completed ✅
 - **Core Features**: All household management features functional
 - **Dark Mode Only**: Entire codebase cleaned (5,600+ patterns removed) - NO light mode
-- **Native Mobile Scaffold**: Capacitor 8.x configured for iOS/Android
+- **Native Mobile Ready**: Capacitor 8.x with 36 plugins for iOS/Android
 - **Location Tracking**: Family location sharing with geofences, privacy controls
 - **Push Notifications**: Native bridge ready, API routes, in-app notifications
 - **Late Penalty System**: Chore penalties with forgiveness, progressive scaling
 - **Database**: All migrations applied, RLS on all tables, security audited
+- **Offline Support**: Full offline-first architecture (see details below)
+
+### Offline & Low-Connectivity Support ✅
+| Feature | Implementation |
+|---------|----------------|
+| **Service Worker v3** | App shell precaching, 3s timeout fallback to cache |
+| **React Query Persistence** | Cache persists to IndexedDB, survives app close |
+| **Network Detection** | Native bridge via @capacitor/network (wifi/4G/3G/2G) |
+| **Offline Banner** | YouTube-style notifications (offline/back online/syncing) |
+| **Connection Quality UI** | Badges and warnings for poor connectivity |
+| **Offline Queue** | Actions queue locally, sync when reconnected |
+
+Key files: `lib/native/network.ts`, `lib/react-query/offline-persistence.ts`, `hooks/useNetworkStatus.ts`, `components/ui/NetworkStatus.tsx`, `public/sw.js`
+
+### Native Mobile Plugins (36 total)
+All plugins installed upfront to minimize future App Store reviews:
+- **Core**: app, app-launcher, cli, ios, android
+- **Device**: camera, geolocation, haptics, keyboard, voice-recorder, screen-orientation
+- **Notifications**: push-notifications, local-notifications
+- **UI**: splash-screen, status-bar, dialog, toast, action-sheet, badge
+- **Storage**: preferences, filesystem, clipboard, file-picker, secure-storage
+- **Network**: network, share, browser
+- **Platform**: device, screen-reader, contacts, apple-sign-in, calendar, native-settings
+- **Security**: biometric-auth
+- **App Store**: in-app-review, native-market
+- **Background**: background-fetch
+
+Native bridges: `lib/native/` (capacitor, push-notifications, geolocation, barcode, calendar, network)
 
 ### Remaining (External Setup)
 | Task | Notes |
@@ -31,10 +59,20 @@ Family/household management app - tasks, chores, meals, budgets, goals, calendar
 | Test native builds | Android Studio / Xcode |
 | App store submissions | Icons, screenshots, listings |
 
+### Future Enhancements (Code Ready When Needed)
+- Mutation queue integration with React Query (Phase 5)
+- Request optimization for 2G/3G (Phase 6)
+- Apple Watch / Android widgets (requires Swift/Kotlin)
+
 ### Architecture Notes
-- **Capacitor**: Loads from Vercel URL (`server.url` in config) - no local build needed
+- **Capacitor**: Loads from Vercel URL (`server.url` in config) - instant updates without App Store
+- **Offline-first**: Service worker caches app shell, React Query caches data to IndexedDB
 - **Native folders**: `android/` and `ios/` are gitignored (generated, contain secrets)
 - **Push tokens**: Stored in `push_tokens` table, per-user per-device
+
+### Key Documentation
+- `docs/rowan-mobile-app.md` - Native app implementation guide
+- `docs/rowan-mobile-offline.md` - Offline support documentation
 
 ---
 
