@@ -4,6 +4,40 @@
 
 > **CRITICAL - GIT WORKFLOW**: NEVER push or commit code to GitHub unless explicitly instructed by the user. You may suggest committing or pushing, but NEVER execute git commit, git push, or any GitHub operations without explicit user approval. GitHub Actions workflows have costs - work on features and fixes locally, validate on localhost first, then push to GitHub only when the user says so.
 
+---
+
+## Project Status (Jan 2026)
+
+### What Rowan Is
+Family/household management app - tasks, chores, meals, budgets, goals, calendar, shopping lists, rewards system. Multi-space architecture (one family = one space).
+
+### Completed ✅
+- **Core Features**: All household management features functional
+- **Dark Mode Only**: Entire codebase cleaned (5,600+ patterns removed) - NO light mode
+- **Native Mobile Scaffold**: Capacitor 8.x configured for iOS/Android
+- **Location Tracking**: Family location sharing with geofences, privacy controls
+- **Push Notifications**: Native bridge ready, API routes, in-app notifications
+- **Late Penalty System**: Chore penalties with forgiveness, progressive scaling
+- **Database**: All migrations applied, RLS on all tables, security audited
+
+### Remaining (External Setup)
+| Task | Notes |
+|------|-------|
+| Firebase project | Create project, enable FCM |
+| `google-services.json` | Download → `android/app/` |
+| `GoogleService-Info.plist` | Download → `ios/App/App/` |
+| APNs key | Apple Developer → upload to Firebase |
+| `npx cap sync` | After Firebase config files placed |
+| Test native builds | Android Studio / Xcode |
+| App store submissions | Icons, screenshots, listings |
+
+### Architecture Notes
+- **Capacitor**: Loads from Vercel URL (`server.url` in config) - no local build needed
+- **Native folders**: `android/` and `ios/` are gitignored (generated, contain secrets)
+- **Push tokens**: Stored in `push_tokens` table, per-user per-device
+
+---
+
 ## Development Philosophy (MAIN MANDATE)
 
 **Work slowly, safely, strategically, and comprehensively.**
@@ -91,7 +125,7 @@ pkill -f "next" 2>/dev/null; rm -rf ".next 2" "node_modules 2" ".next 3" "node_m
 
 **NEVER use any other project ref. If `get_project_url` returns a different URL, STOP and reconfigure.**
 
-**Tables**: `spaces`, `space_members`, `users`, `tasks`, `events`, `reminders`, `messages`, `shopping_lists`, `shopping_items`, `recipes`, `meal_plans`, `meals`, `budgets`, `budget_categories`, `expenses`, `bills`, `chores`, `goals`, `daily_checkins`
+**Tables**: `spaces`, `space_members`, `users`, `tasks`, `events`, `reminders`, `messages`, `shopping_lists`, `shopping_items`, `recipes`, `meal_plans`, `meals`, `budgets`, `budget_categories`, `expenses`, `bills`, `chores`, `goals`, `daily_checkins`, `user_locations`, `family_places`, `location_sharing_settings`, `geofence_events`, `push_tokens`, `late_penalties`
 
 ### Isolated Tables (DO NOT USE IN ROWAN)
 
