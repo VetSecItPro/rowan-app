@@ -623,7 +623,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 type="checkbox"
                 checked={formData.is_recurring}
                 onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
+                className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded"
               />
               <span className="text-sm font-medium text-gray-300">Recurring event</span>
             </label>
@@ -719,7 +719,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 type="checkbox"
                 checked={linkToShopping}
                 onChange={(e) => setLinkToShopping(e.target.checked)}
-                className="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
+                className="w-4 h-4 text-emerald-600 bg-gray-700 border-gray-600 rounded"
               />
               <span className="text-sm font-medium text-gray-300 flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" />
@@ -765,7 +765,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                 type="checkbox"
                 checked={showCountdown}
                 onChange={(e) => setShowCountdown(e.target.checked)}
-                className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
+                className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded"
               />
               <span className="text-sm font-medium text-gray-300 flex items-center gap-2">
                 <Timer className="w-4 h-4" />
@@ -790,7 +790,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
                   onChange={(e) => setCountdownLabel(e.target.value)}
                   placeholder="e.g., Birthday!, Vacation, Wedding Day"
                   maxLength={50}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder:text-gray-400 placeholder:text-gray-500"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-white placeholder:text-gray-500"
                 />
                 <p className="mt-2 text-xs text-gray-400">
                   A custom label to display instead of the event title. Leave empty to use the event title.

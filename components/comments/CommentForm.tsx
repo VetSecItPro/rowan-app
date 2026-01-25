@@ -160,12 +160,12 @@ export default function CommentForm({
         placeholder={placeholder}
         rows={3}
         disabled={isSubmitting}
-        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 bg-gray-700 placeholder-gray-400"
+        className="w-full rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-sm text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
       />
 
       {/* Mention Autocomplete Dropdown */}
       {showMentions && filteredMentions.length > 0 && (
-        <div className="absolute z-10 mt-1 max-h-48 w-64 overflow-auto rounded-lg border border-gray-300 bg-white border-gray-600 bg-gray-800">
+        <div className="absolute z-10 mt-1 max-h-48 w-64 overflow-auto rounded-lg border border-gray-600 bg-gray-800">
           {filteredMentions.map((member, index) => (
             <button
               key={member.user_id}
@@ -177,7 +177,7 @@ export default function CommentForm({
                   : 'text-gray-300 hover:bg-gray-700'
               }`}
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-medium bg-blue-900 text-blue-300">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-900 text-xs font-medium text-blue-300">
                 {member.users.email.charAt(0).toUpperCase()}
               </div>
               <span>{member.users.email.split('@')[0]}</span>

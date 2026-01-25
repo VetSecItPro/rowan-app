@@ -257,7 +257,7 @@ export const BetaFeedbackPanel = memo(function BetaFeedbackPanel() {
               onClick={() => setFilter(f)}
               className={`px-2 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                 filter === f
-                  ? 'bg-violet-100 bg-violet-900/30 text-violet-400'
+                  ? 'bg-violet-900/30 text-violet-400'
                   : 'text-gray-400 hover:bg-gray-700'
               }`}
             >

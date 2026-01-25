@@ -95,7 +95,7 @@ export const UnifiedCalendarLegendCompact = memo(function UnifiedCalendarLegendC
       </div>
 
       {/* Hover popover */}
-      <div className="pointer-events-none absolute left-0 top-full z-50 mt-2 hidden w-32 rounded-md border border-gray-200 bg-white p-2 shadow-lg group-hover:block bg-gray-800">
+      <div className="pointer-events-none absolute left-0 top-full z-50 mt-2 hidden w-32 rounded-md border border-gray-700 bg-gray-800 p-2 shadow-lg group-hover:block">
         <div className="flex flex-col gap-1.5">
           {itemTypes.map((type) => (
             <LegendItem key={type} type={type} showIcon={true} />

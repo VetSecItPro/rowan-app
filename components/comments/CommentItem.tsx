@@ -107,12 +107,12 @@ export default function CommentItem({
 
   return (
     <div className="group relative">
-      <div className="rounded-lg border border-gray-200 bg-white p-4 transition-shadow border-gray-700 bg-gray-800">
+      <div className="rounded-lg border border-gray-700 bg-gray-800 p-4 transition-shadow">
         {/* Header */}
         <div className="mb-2 flex items-start justify-between">
           <div className="flex items-center gap-2">
             {/* Avatar */}
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium bg-blue-900 text-blue-300">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-900 text-sm font-medium text-blue-300">
               {comment.user_email?.charAt(0).toUpperCase() || '?'}
             </div>
             {/* User Info */}
@@ -164,7 +164,7 @@ export default function CommentItem({
               </button>
               <button
                 onClick={() => onDelete(comment.id)}
-                className="btn-touch rounded p-1 text-gray-400 hover:bg-red-100 hover:bg-red-900/20 hover:text-red-400 transition-all active:scale-95 hover:shadow-md"
+                className="btn-touch rounded p-1 text-gray-400 hover:bg-red-900/20 hover:text-red-400 transition-all active:scale-95 hover:shadow-md"
                 title="Delete"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,8 +208,8 @@ export default function CommentItem({
                   onClick={() => handleReaction(reaction.emoji)}
                   className={`btn-touch rounded-full border px-2 py-1 text-xs transition-all active:scale-95 hover:shadow-md ${
                     hasReacted
-                      ? 'border-blue-500 bg-blue-50 border-blue-400 text-blue-400'
-                      : 'border-gray-300 bg-gray-50 text-gray-600 border-gray-600 text-gray-300'
+                      ? 'border-blue-400 bg-blue-900/20 text-blue-400'
+                      : 'border-gray-600 bg-gray-800 text-gray-300'
                   }`}
                 >
                   {reaction.emoji} {reaction.count}
@@ -224,14 +224,14 @@ export default function CommentItem({
           {canReply && (
             <button
               onClick={() => setIsReplying(!isReplying)}
-              className="btn-touch text-gray-500 text-gray-400 hover:text-blue-400 transition-all active:scale-95 hover:shadow-sm px-2 py-1 rounded"
+              className="btn-touch text-gray-400 hover:text-blue-400 transition-all active:scale-95 hover:shadow-sm px-2 py-1 rounded"
             >
               Reply
             </button>
           )}
           <button
             onClick={() => setShowReactionPicker(!showReactionPicker)}
-            className="btn-touch text-gray-500 text-gray-400 hover:text-blue-400 transition-all active:scale-95 hover:shadow-sm px-2 py-1 rounded"
+            className="btn-touch text-gray-400 hover:text-blue-400 transition-all active:scale-95 hover:shadow-sm px-2 py-1 rounded"
           >
             React
           </button>
@@ -246,7 +246,7 @@ export default function CommentItem({
 
         {/* Reply Form */}
         {isReplying && (
-          <div className="mt-3 rounded-lg border-l-2 border-blue-500 bg-gray-50 p-3 bg-gray-700/50">
+          <div className="mt-3 rounded-lg border-l-2 border-blue-500 bg-gray-700/50 p-3">
             <CommentForm
               onSubmit={handleReplySubmit}
               onCancel={() => setIsReplying(false)}
@@ -259,7 +259,7 @@ export default function CommentItem({
 
       {/* Nested Replies */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="ml-8 mt-3 space-y-3 border-l-2 border-gray-200 pl-4 border-gray-700">
+        <div className="ml-8 mt-3 space-y-3 border-l-2 border-gray-700 pl-4">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply.id}

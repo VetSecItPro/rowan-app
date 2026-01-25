@@ -341,7 +341,7 @@ export function NewBillModal({
                     type="checkbox"
                     checked={reminderEnabled}
                     onChange={(e) => setReminderEnabled(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="w-5 h-5 rounded border-gray-600 text-amber-600 focus:ring-amber-500"
                   />
                   <span className="text-sm font-medium text-gray-300">
                     Enable Reminder

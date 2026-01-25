@@ -87,7 +87,7 @@ const KPICard = memo(function KPICard({
           <p className="text-sm font-medium text-gray-400">{title}</p>
           <p className="text-3xl font-bold text-white mt-2">{value}</p>
           {trend !== undefined && (
-            <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
+            <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
               {isPositive ? (
                 <ArrowUpRight className="w-4 h-4" />
               ) : (

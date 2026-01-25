@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rowan Dark Theme Colors -->
+    <color name="colorPrimary">#0ea5e9</color>      <!-- Cyan-500 accent -->
+    <color name="colorPrimaryDark">#0a0a0a</color>  <!-- App background -->
+    <color name="colorAccent">#0ea5e9</color>       <!-- Cyan-500 accent -->
+
+    <!-- Additional dark theme colors -->
+    <color name="background">#0a0a0a</color>
+    <color name="surface">#1f2937</color>           <!-- Gray-800 -->
+    <color name="onBackground">#ffffff</color>
+    <color name="onSurface">#ffffff</color>
+</resources>

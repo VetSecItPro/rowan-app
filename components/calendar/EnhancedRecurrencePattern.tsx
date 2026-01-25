@@ -117,7 +117,7 @@ export function EnhancedRecurrencePattern({
             type="checkbox"
             checked={enabled}
             onChange={(e) => handleEnabledToggle(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded"
           />
           <span className="text-sm font-medium text-gray-300">
             Recurring event
@@ -136,7 +136,7 @@ export function EnhancedRecurrencePattern({
             type="checkbox"
             checked={enabled}
             onChange={(e) => handleEnabledToggle(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded bg-gray-700 border-gray-600"
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded"
           />
           <span className="text-sm font-medium text-gray-300">
             Recurring event

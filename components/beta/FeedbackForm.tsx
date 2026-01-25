@@ -24,18 +24,18 @@ type FeedbackSeverity = 'critical' | 'high' | 'medium' | 'low';
 type FeedbackPriority = 'must_have' | 'should_have' | 'could_have' | 'wont_have';
 
 const CATEGORIES: Array<{ value: FeedbackCategory; label: string; icon: typeof Bug; color: string }> = [
-  { value: 'bug', label: 'Bug Report', icon: Bug, color: 'text-red-600 bg-red-50 border-red-200' },
-  { value: 'feature_request', label: 'Feature Request', icon: Lightbulb, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-  { value: 'ui_ux', label: 'UI/UX Feedback', icon: Palette, color: 'text-purple-600 bg-purple-50 border-purple-200' },
-  { value: 'performance', label: 'Performance', icon: Zap, color: 'text-orange-600 bg-orange-50 border-orange-200' },
-  { value: 'other', label: 'Other', icon: MoreHorizontal, color: 'text-gray-600 bg-gray-50 border-gray-200' }
+  { value: 'bug', label: 'Bug Report', icon: Bug, color: 'text-red-400 bg-red-900/20 border-red-700' },
+  { value: 'feature_request', label: 'Feature Request', icon: Lightbulb, color: 'text-blue-400 bg-blue-900/20 border-blue-700' },
+  { value: 'ui_ux', label: 'UI/UX Feedback', icon: Palette, color: 'text-purple-400 bg-purple-900/20 border-purple-700' },
+  { value: 'performance', label: 'Performance', icon: Zap, color: 'text-orange-400 bg-orange-900/20 border-orange-700' },
+  { value: 'other', label: 'Other', icon: MoreHorizontal, color: 'text-gray-400 bg-gray-800 border-gray-600' }
 ];
 
 const SEVERITIES = [
-  { value: 'critical', label: 'Critical', description: 'App crashes, data loss, security issues', color: 'text-red-600' },
-  { value: 'high', label: 'High', description: 'Feature doesn\'t work, blocks main workflows', color: 'text-orange-600' },
-  { value: 'medium', label: 'Medium', description: 'Minor functionality issues, UI glitches', color: 'text-yellow-600' },
-  { value: 'low', label: 'Low', description: 'Cosmetic issues, nice-to-have improvements', color: 'text-green-600' }
+  { value: 'critical', label: 'Critical', description: 'App crashes, data loss, security issues', color: 'text-red-400' },
+  { value: 'high', label: 'High', description: 'Feature doesn\'t work, blocks main workflows', color: 'text-orange-400' },
+  { value: 'medium', label: 'Medium', description: 'Minor functionality issues, UI glitches', color: 'text-yellow-400' },
+  { value: 'low', label: 'Low', description: 'Cosmetic issues, nice-to-have improvements', color: 'text-green-400' }
 ];
 
 const PRIORITIES = [

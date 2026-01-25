@@ -43,7 +43,7 @@ interface BetaRequest {
 const StatusBadge = memo(function StatusBadge({ status, isBeta }: { status: string; isBeta: boolean }) {
   if (isBeta) {
     return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 bg-purple-900/30 text-purple-400">
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-900/30 text-purple-400">
         <Shield className="w-3 h-3 mr-1" />
         Beta
       </span>
@@ -192,7 +192,7 @@ export const UsersPanel = memo(function UsersPanel() {
             onClick={() => setActiveTab('users')}
             className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
               activeTab === 'users'
-                ? 'bg-blue-100 bg-blue-900/30 text-blue-400'
+                ? 'bg-blue-900/30 text-blue-400'
                 : 'text-gray-400 hover:bg-gray-700'
             }`}
           >
@@ -202,7 +202,7 @@ export const UsersPanel = memo(function UsersPanel() {
             onClick={() => setActiveTab('beta')}
             className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
               activeTab === 'beta'
-                ? 'bg-purple-100 bg-purple-900/30 text-purple-400'
+                ? 'bg-purple-900/30 text-purple-400'
                 : 'text-gray-400 hover:bg-gray-700'
             }`}
           >
@@ -353,12 +353,12 @@ export const UsersPanel = memo(function UsersPanel() {
                     </td>
                     <td className="px-4 py-3">
                       {request.access_granted ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 bg-green-900/30 text-green-400">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-900/30 text-green-400">
                           <Mail className="w-3 h-3 mr-1" />
                           Code Sent
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 bg-yellow-900/30 text-yellow-400">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400">
                           <Clock className="w-3 h-3 mr-1" />
                           Pending
                         </span>
@@ -366,12 +366,12 @@ export const UsersPanel = memo(function UsersPanel() {
                     </td>
                     <td className="px-4 py-3">
                       {request.user_id ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 bg-emerald-900/30 text-emerald-400">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-900/30 text-emerald-400">
                           <UserCheck className="w-3 h-3 mr-1" />
                           Signed Up
                         </span>
                       ) : request.access_granted ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 bg-orange-900/30 text-orange-400">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-900/30 text-orange-400">
                           <Clock className="w-3 h-3 mr-1" />
                           Pending Signup
                         </span>
@@ -391,8 +391,8 @@ export const UsersPanel = memo(function UsersPanel() {
                           disabled={resendingEmail === request.email}
                           className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
                             resendSuccess === request.email
-                              ? 'bg-green-100 bg-green-900/30 text-green-400'
-                              : 'bg-blue-100 bg-blue-900/30 text-blue-400 hover:bg-blue-800/40'
+                              ? 'bg-green-900/30 text-green-400'
+                              : 'bg-blue-900/30 text-blue-400 hover:bg-blue-800/40'
                           } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                           {resendingEmail === request.email ? (

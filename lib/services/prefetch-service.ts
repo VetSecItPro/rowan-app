@@ -154,6 +154,17 @@ const prefetchFunctions = {
     return data || [];
   },
 
+  async location(spaceId: string) {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('user_locations')
+      .select('user_id, latitude, longitude, recorded_at')
+      .eq('space_id', spaceId)
+      .order('recorded_at', { ascending: false })
+      .limit(20);
+    return data || [];
+  },
+
   async spaceMembers(spaceId: string) {
     const supabase = createClient();
     const { data } = await supabase
@@ -318,6 +329,7 @@ export const ROUTE_TO_FEATURE_MAP: Record<string, keyof typeof prefetchFunctions
   '/shopping': 'shopping',
   '/meals': 'meals',
   '/goals': 'goals',
+  '/location': 'location',
   '/projects': 'projects',
   '/rewards': 'rewards',
 };

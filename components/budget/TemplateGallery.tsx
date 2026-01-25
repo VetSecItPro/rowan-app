@@ -112,7 +112,7 @@ export function TemplateGallery({
                   type="checkbox"
                   checked={showOnlyRecommended}
                   onChange={(e) => setShowOnlyRecommended(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="w-4 h-4 rounded border-gray-600 text-amber-600 focus:ring-amber-500"
                 />
                 <span className="text-sm text-gray-300">
                   Show only recommended for my income

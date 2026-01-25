@@ -26,11 +26,11 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  budget: 'bg-green-100 bg-green-900/20 text-green-400',
-  expenses: 'bg-red-100 bg-red-900/20 text-red-400',
-  goals: 'bg-blue-100 bg-blue-900/20 text-blue-400',
-  trends: 'bg-purple-100 bg-purple-900/20 text-purple-400',
-  summary: 'bg-orange-100 bg-orange-900/20 text-orange-400'
+  budget: 'bg-green-900/20 text-green-400',
+  expenses: 'bg-red-900/20 text-red-400',
+  goals: 'bg-blue-900/20 text-blue-400',
+  trends: 'bg-purple-900/20 text-purple-400',
+  summary: 'bg-orange-900/20 text-orange-400'
 };
 
 export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTemplateSelectorProps) {
@@ -147,18 +147,18 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
                 <div className="mt-4">
                   <div className="flex flex-wrap gap-2">
                     {template.config?.charts && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 bg-blue-900/20 text-blue-400">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-900/20 text-blue-400">
                         <ChartBarIcon className="h-3 w-3 mr-1" />
                         Charts
                       </span>
                     )}
                     {template.requires_goals && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-purple-100 bg-purple-900/20 text-purple-400">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-purple-900/20 text-purple-400">
                         Goals
                       </span>
                     )}
                     {template.requires_budget && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-green-100 bg-green-900/20 text-green-400">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-green-900/20 text-green-400">
                         Budget
                       </span>
                     )}
@@ -167,7 +167,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
 
                 {/* Action */}
                 <div className="mt-4 pt-4 border-t border-gray-700">
-                  <button className="btn-touch text-sm font-medium text-blue-600 text-blue-400 hover:text-blue-300 transition-colors active:scale-95">
+                  <button className="btn-touch text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors active:scale-95">
                     Use Template →
                   </button>
                 </div>

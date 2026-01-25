@@ -150,7 +150,7 @@ export function ReceiptLibrary({
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-            <p>Loading receipts...</p>
+            <p className="text-gray-300">Loading receipts...</p>
           </div>
         </CardContent>
       </Card>
@@ -254,7 +254,7 @@ export function ReceiptLibrary({
                       {viewMode === 'grid' ? (
                         <div className="space-y-3">
                           {/* Receipt Preview */}
-                          <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden">
+                          <div className="relative aspect-[3/4] bg-gray-900 rounded-lg overflow-hidden">
                             <Image
                               src={receipt.image_url}
                               alt="Receipt"
@@ -290,7 +290,7 @@ export function ReceiptLibrary({
                       ) : (
                         <>
                           <div className="flex items-center gap-4">
-                            <div className="relative w-16 h-16 bg-gray-800 rounded-lg overflow-hidden">
+                            <div className="relative w-16 h-16 bg-gray-900 rounded-lg overflow-hidden">
                               <Image
                                 src={receipt.image_url}
                                 alt="Receipt"

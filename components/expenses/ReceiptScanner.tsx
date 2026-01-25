@@ -251,7 +251,7 @@ export function ReceiptScanner({
                   <Loader2 className="h-5 w-5 animate-spin" />
                   <span className="font-medium">{processingState.message}</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-800 rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full transition-all duration-500"
                     style={{ width: `${processingState.progress}%` }}
@@ -356,7 +356,7 @@ export function ReceiptScanner({
                   {extractedData.items.map((item, index) => (
                     <div
                       key={index}
-                      className="flex justify-between items-center p-2 bg-muted/50 rounded text-sm"
+                      className="flex justify-between items-center p-2 bg-gray-800/50 rounded text-sm"
                     >
                       <span>{item.name}</span>
                       {item.total_price && (
@@ -373,8 +373,8 @@ export function ReceiptScanner({
             <Separator />
 
             {/* Expense Suggestion */}
-            <div className="p-4 bg-green-950 rounded-lg">
-              <h4 className="font-medium text-green-200 mb-3">
+            <div className="p-4 bg-green-900/20 rounded-lg">
+              <h4 className="font-medium text-green-300 mb-3">
                 Suggested Expense
               </h4>
               <div className="space-y-2 text-sm">

@@ -10,6 +10,7 @@ import {
   Heart,
   Sparkles,
   Gift,
+  MapPin,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -77,6 +78,13 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     icon: Target,
     gradient: 'bg-gradient-goals',
     description: 'Track progress',
+  },
+  {
+    name: 'Family Location',
+    href: '/location',
+    icon: MapPin,
+    gradient: 'bg-gradient-location',
+    description: 'Stay connected',
   },
   {
     name: 'Rewards Shop',
