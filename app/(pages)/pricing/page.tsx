@@ -4,6 +4,7 @@
  * Pricing Page
  * Displays subscription tiers and pricing options
  * Updated for 14-day trial model with Polar checkout integration
+ * Includes Founding Member program for first 1000 subscribers
  */
 
 import { useState, useEffect } from 'react';
@@ -11,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
 import Image from 'next/image';
-import { Sparkles, Clock, Shield } from 'lucide-react';
+import { Sparkles, Clock, Shield, Users } from 'lucide-react';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
@@ -21,6 +22,15 @@ export default function PricingPage() {
   const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [foundingMemberSpots, setFoundingMemberSpots] = useState<number | null>(null);
+
+  // Fetch founding member spots remaining
+  useEffect(() => {
+    fetch('/api/founding-members')
+      .then(res => res.json())
+      .then(data => setFoundingMemberSpots(data.spotsRemaining))
+      .catch(() => setFoundingMemberSpots(1000)); // Default to 1000 on error
+  }, []);
 
   // Redirect if monetization is disabled
   useEffect(() => {
@@ -100,12 +110,22 @@ export default function PricingPage() {
             </div>
 
             {/* Trial Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-2">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-2">
               <Sparkles className="h-4 w-4 text-emerald-400" />
               <span className="text-sm font-medium text-emerald-300">
                 Start with a 14-day free trial - no credit card required
               </span>
             </div>
+
+            {/* Founding Member Badge */}
+            {foundingMemberSpots !== null && foundingMemberSpots > 0 && (
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 px-4 py-2">
+                <Users className="h-4 w-4 text-amber-400" />
+                <span className="text-sm font-medium text-amber-300">
+                  <strong>{foundingMemberSpots.toLocaleString()}</strong> founding member spots left - lock in this price forever
+                </span>
+              </div>
+            )}
 
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
               The family command center that works
@@ -160,8 +180,8 @@ export default function PricingPage() {
               tier="pro"
               title="Pro"
               description="Everything you need for household collaboration"
-              monthlyPrice={11.99}
-              annualPrice={119}
+              monthlyPrice={12}
+              annualPrice={120}
               period={period}
               features={[
                 'Unlimited tasks & calendar',
@@ -187,8 +207,8 @@ export default function PricingPage() {
               tier="family"
               title="Family"
               description="Complete family organization for up to 6 members"
-              monthlyPrice={17.99}
-              annualPrice={179}
+              monthlyPrice={18}
+              annualPrice={180}
               period={period}
               features={[
                 'Everything in Pro, plus:',
@@ -224,7 +244,7 @@ export default function PricingPage() {
               </div>
             </div>
             <p className="mt-4 text-center text-sm text-gray-500">
-              30-day money-back guarantee on paid plans • Secure payment via Stripe
+              30-day money-back guarantee on paid plans • Secure payment via Polar
             </p>
           </div>
 
@@ -281,7 +301,18 @@ export default function PricingPage() {
                 </h3>
                 <p className="mt-2 text-gray-400">
                   We accept all major credit cards (Visa, Mastercard, American Express, Discover)
-                  through our secure payment processor, Stripe.
+                  through our secure payment processor, Polar.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white">
+                  What is the Founding Member program?
+                </h3>
+                <p className="mt-2 text-gray-400">
+                  Our first 1,000 paying subscribers become Founding Members and lock in their
+                  current price forever, even when we raise prices in the future. It&apos;s our way
+                  of thanking early supporters who believe in Rowan.
                 </p>
               </div>
             </div>

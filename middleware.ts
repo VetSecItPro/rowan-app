@@ -531,13 +531,13 @@ export async function middleware(req: NextRequest) {
     response.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com https://js.stripe.com;" +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com;" +
       "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
       "img-src 'self' data: https: blob:; " +
       "font-src 'self' data: https:; " +
-      "connect-src 'self' https: wss: data: https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://www.themealdb.com https://api.spoonacular.com https://api.edamam.com https://api.stripe.com;" +
+      "connect-src 'self' https: wss: data: https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://www.themealdb.com https://api.spoonacular.com https://api.edamam.com https://api.polar.sh;" +
       "frame-ancestors 'none'; " +
-      "frame-src 'self' https://vercel.live https://js.stripe.com https://hooks.stripe.com;" +
+      "frame-src 'self' https://vercel.live;" +
       "base-uri 'self'; " +
       "form-action 'self'; " +
       "object-src 'none';"

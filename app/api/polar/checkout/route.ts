@@ -3,7 +3,6 @@
  * POST /api/polar/checkout
  *
  * Creates a Polar checkout session and returns the checkout URL for redirect
- * Note: Polar uses redirect-based checkout, not embedded checkout like Stripe
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -109,9 +108,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Polar checkout session
-    const checkout = await polar.checkouts.custom.create({
-      productId,
-      customerEmail: user.email!,
+    // Polar SDK v0.42+ uses products array instead of single productId
+    // Note: customerEmail is optional - Polar validates email domains strictly
+    // so we only include it if we're confident the domain exists
+    const checkout = await polar.checkouts.create({
+      products: [productId],
+      // Don't pass customerEmail - let Polar collect it during checkout
+      // This avoids validation failures for test/staging email domains
       successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?provider=polar&plan=${plan}`,
       metadata: {
         userId: user.id,

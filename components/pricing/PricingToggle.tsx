@@ -2,7 +2,7 @@
 
 /**
  * Pricing Toggle Component
- * Monthly/Annual billing period switcher
+ * Monthly/Annual billing period switcher with pill-shaped buttons
  */
 
 interface PricingToggleProps {
@@ -12,40 +12,43 @@ interface PricingToggleProps {
 
 export function PricingToggle({ value, onChange }: PricingToggleProps) {
   return (
-    <div className="flex items-center justify-center gap-3">
-      {/* Segmented Control Style Toggle */}
-      <div className="inline-flex rounded-lg bg-gray-700 p-1">
+    <div className="flex items-center justify-center">
+      {/* Pill-shaped Toggle Container */}
+      <div className="inline-flex rounded-full bg-gray-700/80 p-1.5">
+        {/* Monthly Button */}
         <button
           type="button"
           onClick={() => onChange('monthly')}
-          className={`rounded-md px-7 py-2.5 text-base font-semibold transition-all ${
+          className={`rounded-full px-8 py-2.5 text-base font-semibold transition-all ${
             value === 'monthly'
-              ? 'bg-gray-800 text-emerald-400 shadow-sm'
+              ? 'bg-gray-800 text-emerald-400 shadow-md'
               : 'text-gray-300 hover:text-gray-100'
           }`}
         >
           Monthly
         </button>
-        <button
-          type="button"
-          onClick={() => onChange('annual')}
-          className={`rounded-md px-7 py-2.5 text-base font-semibold transition-all ${
-            value === 'annual'
-              ? 'bg-gray-800 text-emerald-400 shadow-sm'
-              : 'text-gray-300 hover:text-gray-100'
-          }`}
-        >
-          Annual
-        </button>
-      </div>
 
-      {/* Save Badge - Fixed width to prevent layout shift */}
-      <div className="w-24">
-        {value === 'annual' && (
-          <div className="rounded-full bg-green-900 px-3 py-1 text-xs font-semibold text-green-300 text-center whitespace-nowrap">
-            Save 17%
+        {/* Annual Button with Badge */}
+        <div className="relative">
+          {/* "2 months free" badge - positioned on top */}
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+            <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+              2 months free
+            </span>
           </div>
-        )}
+
+          <button
+            type="button"
+            onClick={() => onChange('annual')}
+            className={`rounded-full px-8 py-2.5 text-base font-semibold transition-all ${
+              value === 'annual'
+                ? 'bg-gray-800 text-emerald-400 shadow-md'
+                : 'text-gray-300 hover:text-gray-100'
+            }`}
+          >
+            Annual
+          </button>
+        </div>
       </div>
     </div>
   );

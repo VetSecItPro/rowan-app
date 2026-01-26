@@ -30,8 +30,8 @@ export const TEST_USERS = {
   },
 };
 
-// Stripe test cards
-export const STRIPE_TEST_CARDS = {
+// Payment test cards (Polar uses Stripe under the hood)
+export const TEST_CARDS = {
   success: '4242424242424242',
   declined: '4000000000000002',
   insufficientFunds: '4000000000009995',
@@ -212,9 +212,9 @@ export async function getTaskCount(page: Page): Promise<number> {
 }
 
 /**
- * Simulate Stripe webhook (for local testing only)
+ * Simulate Polar webhook (for local testing only)
  */
-export async function simulateStripeWebhook(
+export async function simulatePolarWebhook(
   page: Page,
   eventType: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -222,17 +222,17 @@ export async function simulateStripeWebhook(
 ): Promise<Response> {
   const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 
-  // This is for local testing only - in CI, use Stripe CLI
-  const response = await fetch(`${baseURL}/api/webhooks/stripe`, {
+  // This is for local testing only - in CI, use Polar CLI
+  const response = await fetch(`${baseURL}/api/webhooks/polar`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       // Note: Real webhook signature would be required in production
-      'Stripe-Signature': 'test_signature',
+      'Polar-Signature': 'test_signature',
     },
     body: JSON.stringify({
       type: eventType,
-      data: { object: payload },
+      data: payload,
     }),
   });
 

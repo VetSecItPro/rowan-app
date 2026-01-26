@@ -113,7 +113,7 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Accepted Payment Methods',
-        description: 'Credit cards, debit cards, and other payment options via Stripe',
+        description: 'Credit cards, debit cards, and other payment options via Polar',
         readTime: '2 min read',
         href: '#payment-methods',
       },
@@ -138,7 +138,7 @@ const guideSections: GuideSection[] = [
     articles: [
       {
         title: 'Accessing the Billing Portal',
-        description: 'Use Stripe\'s secure portal to manage all subscription settings',
+        description: 'Use Polar\'s secure portal to manage all subscription settings',
         readTime: '2 min read',
         href: '#billing-portal',
       },
@@ -175,13 +175,13 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Pro Plan Features',
-        description: 'Advanced features for individuals and couples - $11.99/month',
+        description: 'Advanced features for individuals and couples - $12/month',
         readTime: '5 min read',
         href: '#pro-features',
       },
       {
         title: 'Family Plan Features',
-        description: 'Everything in Pro plus family features for up to 6 members - $17.99/month',
+        description: 'Everything in Pro plus family features for up to 6 members - $18/month',
         readTime: '5 min read',
         href: '#family-features',
       },
@@ -278,7 +278,7 @@ export default function SubscriptionsDocumentationPage() {
                   <Crown className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
-                <p className="text-2xl font-bold text-white mb-2">$11.99<span className="text-sm font-normal text-gray-500">/month</span></p>
+                <p className="text-2xl font-bold text-white mb-2">$12<span className="text-sm font-normal text-gray-500">/month</span></p>
                 <p className="text-sm text-gray-400">
                   Advanced features for individuals and couples
                 </p>
@@ -290,7 +290,7 @@ export default function SubscriptionsDocumentationPage() {
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1">Family</h3>
-                <p className="text-2xl font-bold text-white mb-2">$17.99<span className="text-sm font-normal text-gray-500">/month</span></p>
+                <p className="text-2xl font-bold text-white mb-2">$18<span className="text-sm font-normal text-gray-500">/month</span></p>
                 <p className="text-sm text-gray-400">
                   Everything in Pro + family features for up to 6 members
                 </p>
@@ -485,7 +485,7 @@ export default function SubscriptionsDocumentationPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-gray-400">Powered by Stripe</span>
+                      <span className="text-gray-400">Powered by Polar</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500" />
@@ -509,8 +509,8 @@ export default function SubscriptionsDocumentationPage() {
                   Annual Savings
                 </h4>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Save up to 17% with annual billing! Pro is just $119/year (vs $143.88 monthly) and
-                  Family is $179/year (vs $215.88 monthly). Annual plans are charged once per year and
+                  Save up to 17% with annual billing! Pro is just $120/year (vs $144 monthly) and
+                  Family is $180/year (vs $216 monthly). Annual plans are charged once per year and
                   include all the same features.
                 </p>
               </div>
@@ -541,8 +541,8 @@ export default function SubscriptionsDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">The Three Plans</h3>
                 <ul className="list-disc list-inside space-y-3 text-gray-400">
                   <li><strong>Free ($0/month):</strong> Essential features for basic household organization. Tasks, shopping lists, calendar, and messaging for up to 2 people.</li>
-                  <li><strong>Pro ($11.99/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and priority support.</li>
-                  <li><strong>Family ($17.99/month):</strong> Everything in Pro plus support for up to 6 household members, family-specific features, and additional storage.</li>
+                  <li><strong>Pro ($12/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and priority support.</li>
+                  <li><strong>Family ($18/month):</strong> Everything in Pro plus support for up to 6 household members, family-specific features, and additional storage.</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Who Is Each Plan For?</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
@@ -641,10 +641,10 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Price Comparison</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>Pro Monthly:</strong> $11.99/month ($143.88/year total)</li>
-                  <li><strong>Pro Annual:</strong> $119/year ($9.92/month equivalent) - Save 17%</li>
-                  <li><strong>Family Monthly:</strong> $17.99/month ($215.88/year total)</li>
-                  <li><strong>Family Annual:</strong> $179/year ($14.92/month equivalent) - Save 17%</li>
+                  <li><strong>Pro Monthly:</strong> $12/month ($144/year total)</li>
+                  <li><strong>Pro Annual:</strong> $120/year ($9.92/month equivalent) - Save 17%</li>
+                  <li><strong>Family Monthly:</strong> $18/month ($216/year total)</li>
+                  <li><strong>Family Annual:</strong> $180/year ($14.92/month equivalent) - Save 17%</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">When to Choose Each</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
@@ -820,7 +820,7 @@ export default function SubscriptionsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan uses Stripe, a leading payment processor, to handle all billing securely. Understanding how billing works helps you manage your subscription confidently.
+                  Rowan uses Polar, a leading payment processor, to handle all billing securely. Understanding how billing works helps you manage your subscription confidently.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Billing Cycle</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -854,7 +854,7 @@ export default function SubscriptionsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  We accept a wide range of payment methods through Stripe to make subscribing convenient no matter how you prefer to pay.
+                  We accept a wide range of payment methods through Polar to make subscribing convenient no matter how you prefer to pay.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Supported Cards</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -870,7 +870,7 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <div className="p-4 bg-blue-900/30 border border-blue-800 rounded-lg mt-6">
                   <p className="text-blue-200 text-sm">
-                    <strong>Secure Processing:</strong> Rowan never sees your full card number. All payment data is handled securely by Stripe with 256-bit SSL encryption.
+                    <strong>Secure Processing:</strong> Rowan never sees your full card number. All payment data is handled securely by Polar with 256-bit SSL encryption.
                   </p>
                 </div>
               </div>
@@ -894,7 +894,7 @@ export default function SubscriptionsDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Access Invoices</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings → Subscription</li>
-                  <li>Click &quot;Manage Billing&quot; to open the Stripe portal</li>
+                  <li>Click &quot;Manage Billing&quot; to open the Polar portal</li>
                   <li>Select &quot;Billing History&quot; or &quot;Invoices&quot;</li>
                   <li>Click any invoice to view or download as PDF</li>
                 </ol>
@@ -964,14 +964,14 @@ export default function SubscriptionsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The Stripe billing portal is your central hub for managing everything related to your Rowan subscription.
+                  The Polar billing portal is your central hub for managing everything related to your Rowan subscription.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Access</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings in Rowan</li>
                   <li>Click on the &quot;Subscription&quot; tab</li>
                   <li>Click &quot;Manage Billing&quot; button</li>
-                  <li>You&apos;ll be securely redirected to Stripe&apos;s portal</li>
+                  <li>You&apos;ll be securely redirected to Polar&apos;s portal</li>
                 </ol>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What You Can Do</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -984,7 +984,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <div className="p-4 bg-orange-900/30 border border-orange-800 rounded-lg mt-6">
                   <p className="text-orange-200 text-sm">
-                    <strong>Secure Portal:</strong> The billing portal is hosted by Stripe, not Rowan. Your payment details are never stored on our servers.
+                    <strong>Secure Portal:</strong> The billing portal is hosted by Polar, not Rowan. Your payment details are never stored on our servers.
                   </p>
                 </div>
               </div>
@@ -1158,7 +1158,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  $11.99/month or $119/year (save 17% with annual). Both options include all Pro features with no restrictions.
+                  $12/month or $120/year (save 17% with annual). Both options include all Pro features with no restrictions.
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
@@ -1194,7 +1194,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  $17.99/month or $179/year (save 17% with annual). That&apos;s less than $3/month per member for a family of 6!
+                  $18/month or $180/year (save 17% with annual). That&apos;s less than $3/month per member for a family of 6!
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
