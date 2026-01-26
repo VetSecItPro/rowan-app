@@ -52,7 +52,7 @@ export default defineConfig({
   // Configure projects - Chrome only for now
   projects: [
     {
-      name: 'chrome',
+      name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
         headless: process.env.CI ? true : false,
