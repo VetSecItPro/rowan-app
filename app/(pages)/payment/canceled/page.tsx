@@ -2,7 +2,7 @@
 
 /**
  * Payment Canceled Page
- * Shown when user cancels Stripe checkout
+ * Shown when user cancels Polar checkout
  */
 
 import Link from 'next/link';

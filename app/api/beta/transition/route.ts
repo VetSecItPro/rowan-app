@@ -183,8 +183,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create Stripe checkout session with beta discount
-    // This would integrate with your existing Stripe setup
+    // Create Polar checkout session with beta discount
+    // This would integrate with your existing Polar setup
     // For now, we'll return a placeholder response
 
     // Mark transition as initiated (not completed until payment succeeds)
@@ -197,14 +197,14 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', user.id);
 
-    // TODO: Create Stripe checkout session with appropriate discount
+    // TODO: Create Polar checkout session with appropriate discount
     // based on offer_id (early_bird = 50% off, beta_monthly = 25% off)
 
     return NextResponse.json({
       success: true,
       message: 'Transition initiated. Complete payment to activate your subscription.',
       offer_id,
-      // checkout_url: stripeCheckoutUrl, // Add when Stripe integration is ready
+      // checkout_url: polarCheckoutUrl, // Add when Polar integration is ready
       next_steps: [
         'Complete the payment process',
         'Your beta tester data will be preserved',
