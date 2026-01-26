@@ -270,7 +270,7 @@ export default function PrivacyPage() {
                       <td className="px-4 py-2 text-gray-300">Request logs, IP addresses</td>
                     </tr>
                     <tr className="bg-gray-900">
-                      <td className="px-4 py-2 text-gray-300">Stripe</td>
+                      <td className="px-4 py-2 text-gray-300">Polar</td>
                       <td className="px-4 py-2 text-gray-300">Payment Processing</td>
                       <td className="px-4 py-2 text-gray-300">United States</td>
                       <td className="px-4 py-2 text-gray-300">Payment info, billing address</td>
@@ -310,7 +310,7 @@ export default function PrivacyPage() {
                 For transfers of personal data from the EEA/UK to the US, we rely on:
               </p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li><strong>EU-US Data Privacy Framework:</strong> Our key service providers (Stripe, Google, Vercel) are certified under the EU-US Data Privacy Framework</li>
+                <li><strong>EU-US Data Privacy Framework:</strong> Our key service providers (Polar, Google, Vercel) are certified under the EU-US Data Privacy Framework</li>
                 <li><strong>Standard Contractual Clauses (SCCs):</strong> Where the Data Privacy Framework doesn't apply, we ensure our processors have SCCs in place</li>
                 <li><strong>Supplementary Measures:</strong> We implement additional technical and organizational measures including encryption in transit and at rest</li>
               </ul>

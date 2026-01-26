@@ -77,10 +77,10 @@ export interface MonetizationLogEntry {
   period?: string;
   amount?: number;
   currency?: string;
-  stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
-  stripeSessionId?: string;
-  stripeEventId?: string;
+  polarCustomerId?: string;
+  polarSubscriptionId?: string;
+  polarSessionId?: string;
+  polarEventId?: string;
   triggerSource?: string;
   error?: string;
   metadata?: Record<string, unknown>;
@@ -149,10 +149,10 @@ async function persistLogToDatabase(entry: MonetizationLogEntry): Promise<void> 
       period: entry.period || null,
       amount: entry.amount || null,
       currency: entry.currency || 'usd',
-      stripe_customer_id: entry.stripeCustomerId || null,
-      stripe_subscription_id: entry.stripeSubscriptionId || null,
-      stripe_session_id: entry.stripeSessionId || null,
-      stripe_event_id: entry.stripeEventId || null,
+      polar_customer_id: entry.polarCustomerId || null,
+      polar_subscription_id: entry.polarSubscriptionId || null,
+      polar_session_id: entry.polarSessionId || null,
+      polar_event_id: entry.polarEventId || null,
       trigger_source: entry.triggerSource || null,
       error_message: entry.error || null,
       metadata: entry.metadata || {},
@@ -179,7 +179,7 @@ export function logCheckoutInitiated(data: {
   period: string;
   amount?: number;
   currency?: string;
-  stripeSessionId?: string;
+  polarSessionId?: string;
   triggerSource?: string;
 }): void {
   const entry = createLogEntry('info', 'checkout_initiated', data);
@@ -195,9 +195,9 @@ export function logCheckoutSuccess(data: {
   period: string;
   amount?: number;
   currency?: string;
-  stripeSessionId: string;
-  stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
+  polarSessionId: string;
+  polarCustomerId?: string;
+  polarSubscriptionId?: string;
 }): void {
   const entry = createLogEntry('info', 'checkout_success', data);
   outputLog(entry);
@@ -211,7 +211,7 @@ export function logCheckoutFailed(data: {
   tier: string;
   period: string;
   error: string;
-  stripeSessionId?: string;
+  polarSessionId?: string;
   metadata?: Record<string, unknown>;
 }): void {
   const entry = createLogEntry('error', 'checkout_failed', data);
@@ -225,7 +225,7 @@ export function logCheckoutAbandoned(data: {
   userId?: string;
   tier?: string;
   period?: string;
-  stripeSessionId: string;
+  polarSessionId: string;
 }): void {
   const entry = createLogEntry('warn', 'checkout_abandoned', data);
   outputLog(entry);
@@ -239,14 +239,14 @@ export function logCheckoutAbandoned(data: {
  * Log webhook received
  */
 export function logWebhookReceived(data: {
-  stripeEventId: string;
+  polarEventId: string;
   eventType: string;
   metadata?: Record<string, unknown>;
 }): void {
   const entry = createLogEntry('info', 'webhook_received', {
-    stripeEventId: data.stripeEventId,
+    polarEventId: data.polarEventId,
     metadata: {
-      stripeEventType: data.eventType,
+      polarEventType: data.eventType,
       ...data.metadata,
     },
   });
@@ -257,16 +257,16 @@ export function logWebhookReceived(data: {
  * Log webhook processed successfully
  */
 export function logWebhookProcessed(data: {
-  stripeEventId: string;
+  polarEventId: string;
   eventType: string;
   userId?: string;
   processingTimeMs?: number;
 }): void {
   const entry = createLogEntry('info', 'webhook_processed', {
-    stripeEventId: data.stripeEventId,
+    polarEventId: data.polarEventId,
     userId: data.userId,
     metadata: {
-      stripeEventType: data.eventType,
+      polarEventType: data.eventType,
       processingTimeMs: data.processingTimeMs,
     },
   });
@@ -277,18 +277,18 @@ export function logWebhookProcessed(data: {
  * Log webhook processing error
  */
 export function logWebhookError(data: {
-  stripeEventId: string;
+  polarEventId: string;
   eventType: string;
   error: string;
   userId?: string;
   metadata?: Record<string, unknown>;
 }): void {
   const entry = createLogEntry('error', 'webhook_error', {
-    stripeEventId: data.stripeEventId,
+    polarEventId: data.polarEventId,
     userId: data.userId,
     error: data.error,
     metadata: {
-      stripeEventType: data.eventType,
+      polarEventType: data.eventType,
       ...data.metadata,
     },
   });
@@ -306,8 +306,8 @@ export function logSubscriptionCreated(data: {
   userId: string;
   tier: string;
   period: string;
-  stripeCustomerId: string;
-  stripeSubscriptionId: string;
+  polarCustomerId: string;
+  polarSubscriptionId: string;
   amount?: number;
   currency?: string;
 }): void {
@@ -322,7 +322,7 @@ export function logSubscriptionUpdated(data: {
   userId: string;
   tier: string;
   period: string;
-  stripeSubscriptionId: string;
+  polarSubscriptionId: string;
   previousTier?: string;
   previousPeriod?: string;
   metadata?: Record<string, unknown>;
@@ -344,7 +344,7 @@ export function logSubscriptionUpdated(data: {
 export function logSubscriptionCancelled(data: {
   userId: string;
   tier: string;
-  stripeSubscriptionId: string;
+  polarSubscriptionId: string;
   reason?: string;
   cancelAtPeriodEnd?: boolean;
   periodEndDate?: string;
@@ -352,7 +352,7 @@ export function logSubscriptionCancelled(data: {
   const entry = createLogEntry('info', 'subscription_cancelled', {
     userId: data.userId,
     tier: data.tier,
-    stripeSubscriptionId: data.stripeSubscriptionId,
+    polarSubscriptionId: data.polarSubscriptionId,
     metadata: {
       reason: data.reason,
       cancelAtPeriodEnd: data.cancelAtPeriodEnd,
@@ -368,7 +368,7 @@ export function logSubscriptionCancelled(data: {
 export function logSubscriptionReactivated(data: {
   userId: string;
   tier: string;
-  stripeSubscriptionId: string;
+  polarSubscriptionId: string;
 }): void {
   const entry = createLogEntry('info', 'subscription_reactivated', data);
   outputLog(entry);
@@ -385,7 +385,7 @@ export function logPaymentSucceeded(data: {
   userId: string;
   amount: number;
   currency: string;
-  stripeSubscriptionId: string;
+  polarSubscriptionId: string;
   invoiceId?: string;
 }): void {
   const entry = createLogEntry('info', 'payment_succeeded', {
@@ -404,7 +404,7 @@ export function logPaymentFailed(data: {
   userId: string;
   amount?: number;
   currency?: string;
-  stripeSubscriptionId: string;
+  polarSubscriptionId: string;
   error: string;
   attemptCount?: number;
   invoiceId?: string;
@@ -413,7 +413,7 @@ export function logPaymentFailed(data: {
     userId: data.userId,
     amount: data.amount,
     currency: data.currency,
-    stripeSubscriptionId: data.stripeSubscriptionId,
+    polarSubscriptionId: data.polarSubscriptionId,
     error: data.error,
     metadata: {
       attemptCount: data.attemptCount,

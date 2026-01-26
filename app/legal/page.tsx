@@ -261,7 +261,7 @@ function PrivacyContent() {
         <h3 className="text-xl font-semibold text-white mb-3 mt-6">When We Share Information</h3>
         <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li><strong>Within Your Space:</strong> Information you create is shared with other members of your family/couple space</li>
-          <li><strong>Service Providers:</strong> Trusted partners who help deliver our service (Stripe, Supabase, Vercel)</li>
+          <li><strong>Service Providers:</strong> Trusted partners who help deliver our service (Polar, Supabase, Vercel)</li>
           <li><strong>Legal Requirements:</strong> We may disclose information if required by law</li>
         </ul>
       </section>

@@ -41,6 +41,11 @@ export interface Subscription {
   polar_customer_id: string | null;
   polar_subscription_id: string | null;
 
+  // Founding member program (first 1000 paid subscribers)
+  is_founding_member: boolean;
+  founding_member_number: number | null;
+  founding_member_locked_price_id: string | null;
+
   // Trial period
   trial_started_at: string | null;
   trial_ends_at: string | null;
@@ -237,8 +242,8 @@ export interface CreateCheckoutSessionRequest {
  * Response from create checkout session
  */
 export interface CreateCheckoutSessionResponse {
-  sessionId: string;
-  publishableKey: string;
+  url: string;
+  checkoutId: string;
 }
 
 /**
