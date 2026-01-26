@@ -141,7 +141,7 @@ export function SubscriptionSettings() {
   useEffect(() => {
     if (tier === 'pro' || tier === 'family') {
       setIsBillingInfoLoading(true);
-      fetch('/api/stripe/billing-info')
+      fetch('/api/polar/billing-info')
         .then(res => res.json())
         .then(data => {
           setBillingInfo(data);
@@ -156,14 +156,14 @@ export function SubscriptionSettings() {
   }, [tier]);
 
   /**
-   * Opens Stripe Customer Portal for billing management
+   * Opens Polar Customer Portal for billing management
    */
   const handleManageBilling = async () => {
     setIsBillingLoading(true);
     setBillingError(null);
 
     try {
-      const response = await csrfFetch('/api/stripe/customer-portal', {
+      const response = await csrfFetch('/api/polar/customer-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -175,7 +175,7 @@ export function SubscriptionSettings() {
 
       const { url } = await response.json();
 
-      // Redirect to Stripe Customer Portal
+      // Redirect to Polar Customer Portal
       window.location.href = url;
     } catch (error) {
       logger.error('Error opening billing portal:', error, { component: 'SubscriptionSettings', action: 'component_action' });
@@ -353,7 +353,7 @@ export function SubscriptionSettings() {
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  Manage in Stripe
+                  Manage in Polar
                   <ExternalLink className="h-3 w-3" />
                 </>
               )}
@@ -437,7 +437,7 @@ export function SubscriptionSettings() {
               {/* Quick note */}
               <p className="text-xs text-gray-400 flex items-center gap-2">
                 <Shield className="h-3 w-3 text-green-500" />
-                View full billing history and invoices in Stripe
+                View full billing history and invoices in Polar
               </p>
             </>
           )}
@@ -586,7 +586,7 @@ export function SubscriptionSettings() {
         <div className="mt-5 p-4 rounded-xl bg-gray-700/50">
           <p className="text-xs text-gray-400 flex items-center gap-2">
             <Shield className="h-4 w-4 text-green-500" />
-            Secure payments processed by Stripe. Your payment information is never stored on our servers.
+            Secure payments processed by Polar. Your payment information is never stored on our servers.
           </p>
         </div>
       </motion.div>

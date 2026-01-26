@@ -252,7 +252,7 @@ export async function trackPaymentFailure(data: {
   userId?: string;
   amount?: number;
   error: string;
-  stripeSubscriptionId?: string;
+  polarSubscriptionId?: string;
 }): Promise<void> {
   checkAndResetWindow();
   errorTracker.paymentFailures++;
@@ -278,7 +278,7 @@ export async function trackPaymentFailure(data: {
         userId: data.userId || 'unknown',
         amount: `$${data.amount}`,
         error: data.error,
-        subscriptionId: data.stripeSubscriptionId || 'N/A',
+        subscriptionId: data.polarSubscriptionId || 'N/A',
       },
       timestamp: new Date(),
     });
@@ -290,7 +290,7 @@ export async function trackPaymentFailure(data: {
  */
 export async function trackWebhookError(data: {
   eventType: string;
-  stripeEventId: string;
+  polarEventId: string;
   error: string;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
@@ -300,7 +300,7 @@ export async function trackWebhookError(data: {
   logger.error('[ERROR_ALERTING] Webhook error', undefined, {
     component: 'error-alerting',
     action: 'webhook_error',
-    details: { eventType: data.eventType, eventId: data.stripeEventId }
+    details: { eventType: data.eventType, eventId: data.polarEventId }
   });
 
   // Check thresholds

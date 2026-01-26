@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
         // Find user by Polar customer ID
         const { data: subscription, error: findError } = await supabaseAdmin
           .from('subscriptions')
-          .select('user_id')
+          .select('user_id, is_founding_member')
           .eq('polar_customer_id', customerId)
           .single();
 
@@ -184,17 +184,55 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // Update subscription
+        // Check if user is already a founding member
+        let foundingMemberNumber: number | null = null;
+        let isFoundingMember = subscription.is_founding_member || false;
+
+        // Only try to claim founding member status for new paid subscriptions (pro or family)
+        if (!isFoundingMember && (plan === 'pro' || plan === 'family')) {
+          // Try to claim a founding member number atomically
+          const { data: claimResult, error: claimError } = await supabaseAdmin
+            .rpc('claim_founding_member_number');
+
+          if (!claimError && claimResult) {
+            foundingMemberNumber = claimResult;
+            isFoundingMember = true;
+
+            logger.info('Claimed founding member number', {
+              component: 'PolarWebhook',
+              userId: subscription.user_id,
+              foundingMemberNumber,
+            });
+          } else if (claimError) {
+            // Function might not exist yet (migration not run) - log and continue
+            logger.warn('Could not claim founding member number (function may not exist)', {
+              component: 'PolarWebhook',
+              error: claimError.message,
+            });
+          }
+          // If claimResult is null, founding member spots are full - not an error
+        }
+
+        // Update subscription with founding member info
+        const updateData: Record<string, unknown> = {
+          polar_subscription_id: subscriptionId,
+          tier: plan,
+          status: 'active',
+          subscription_started_at: currentPeriodStart || new Date().toISOString(),
+          subscription_ends_at: currentPeriodEnd,
+          updated_at: new Date().toISOString(),
+        };
+
+        // Add founding member fields if they became a founding member
+        if (foundingMemberNumber) {
+          updateData.is_founding_member = true;
+          updateData.founding_member_number = foundingMemberNumber;
+          updateData.founding_member_locked_price_id = productId;
+        }
+
         const { error: updateError } = await supabaseAdmin
           .from('subscriptions')
-          .update({
-            polar_subscription_id: subscriptionId,
-            tier: plan,
-            status: 'active',
-            subscription_started_at: currentPeriodStart || new Date().toISOString(),
-            subscription_ends_at: currentPeriodEnd,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq('user_id', subscription.user_id);
 
         if (updateError) {
@@ -214,6 +252,7 @@ export async function POST(request: NextRequest) {
 
         if (userData?.email) {
           // Send welcome email (non-blocking)
+          // TODO: Send different email for founding members
           sendSubscriptionWelcomeEmail({
             recipientEmail: userData.email,
             recipientName: userData.full_name || 'there',
@@ -232,6 +271,8 @@ export async function POST(request: NextRequest) {
           userId: subscription.user_id,
           plan,
           subscriptionId,
+          isFoundingMember,
+          foundingMemberNumber,
         });
         break;
       }

@@ -8,16 +8,15 @@
 import type { SubscriptionTier, SubscriptionPeriod } from './types/subscription';
 
 // Polar SDK - dynamically imported to prevent build errors when not installed
+// SDK v0.42+ uses different method signatures than earlier versions
 type PolarClient = {
   checkouts: {
-    custom: {
-      create: (params: {
-        productId: string;
-        customerEmail: string;
-        successUrl: string;
-        metadata?: Record<string, string>;
-      }) => Promise<{ id: string; url: string }>;
-    };
+    create: (params: {
+      products: string[];  // Array of product IDs
+      customerEmail?: string;
+      successUrl?: string;
+      metadata?: Record<string, string>;
+    }) => Promise<{ id: string; url: string }>;
   };
   customerSessions: {
     create: (params: { customerId: string }) => Promise<{ customerPortalUrl: string }>;
@@ -25,10 +24,8 @@ type PolarClient = {
   subscriptions: {
     update: (params: {
       id: string;
-      subscriptionUpdate: {
-        revoke?: boolean;
-        cancelAtPeriodEnd?: boolean;
-      };
+      revoke?: boolean;
+      cancelAtPeriodEnd?: boolean;
     }) => Promise<{ id: string; status: string }>;
   };
 };
@@ -90,8 +87,8 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
   pro: {
     name: "Pro",
     description: "For growing families",
-    price: 11.99,
-    annualPrice: 119, // Save $24/year
+    price: 12,
+    annualPrice: 120, // 2 months free ($144 → $120)
     trialDays: 14,
     features: [
       "Unlimited tasks",
@@ -109,8 +106,8 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
   family: {
     name: "Family",
     description: "For large families",
-    price: 17.99,
-    annualPrice: 179, // Save $36/year
+    price: 18,
+    annualPrice: 180, // 2 months free ($216 → $180)
     trialDays: 14,
     features: [
       "Everything in Pro",
@@ -195,8 +192,9 @@ export async function createCheckoutUrl(
   }
 
   try {
-    const checkout = await polar.checkouts.custom.create({
-      productId,
+    // Polar SDK v0.42+ uses products array instead of single productId
+    const checkout = await polar.checkouts.create({
+      products: [productId],
       customerEmail,
       successUrl,
       metadata,
@@ -241,11 +239,12 @@ export async function cancelSubscription(
   }
 
   try {
+    // Polar SDK v0.42+ uses flat parameters for subscription updates
     await polar.subscriptions.update({
       id: subscriptionId,
-      subscriptionUpdate: options.immediate
+      ...(options.immediate
         ? { revoke: true }
-        : { cancelAtPeriodEnd: true },
+        : { cancelAtPeriodEnd: true }),
     });
     return true;
   } catch (error) {

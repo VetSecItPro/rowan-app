@@ -145,8 +145,8 @@ test.describe('Monetization Features', () => {
     /**
      * Test 4: User upgrades to Pro → payment success flow
      */
-    test('checkout redirects to Stripe', async ({ page }) => {
-      test.skip(true, 'Requires authenticated user and Stripe test mode');
+    test('checkout redirects to Polar', async ({ page }) => {
+      test.skip(true, 'Requires authenticated user and Polar test mode');
 
       await loginAsUser(page, 'free');
       await goToPricingPage(page);
@@ -155,14 +155,14 @@ test.describe('Monetization Features', () => {
       const upgradeButton = page.locator('button:has-text("Upgrade to Pro"), button:has-text("Get Pro"), [data-testid="pro-upgrade"]');
       await upgradeButton.click();
 
-      // Should redirect to Stripe Checkout or show embedded checkout
+      // Should redirect to Polar Checkout
       await expect(
-        page.locator('text=/checkout|payment|stripe/i, [class*="stripe"]')
+        page.locator('text=/checkout|payment|polar/i')
       ).toBeVisible({ timeout: 10000 });
     });
 
     test('payment success page shows confirmation', async ({ page }) => {
-      // Navigate directly to success page (simulating return from Stripe)
+      // Navigate directly to success page (simulating return from Polar)
       await page.goto('/payment/success?tier=pro');
 
       // Should show success message

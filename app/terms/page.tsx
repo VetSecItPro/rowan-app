@@ -156,7 +156,7 @@ export default function TermsPage() {
                 Rowan integrates with third-party services to provide functionality. By using our service, you acknowledge:
               </p>
               <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li><strong>Payment Processing:</strong> Stripe handles all payment transactions securely</li>
+                <li><strong>Payment Processing:</strong> Polar handles all payment transactions securely</li>
                 <li><strong>Calendar Integration:</strong> Google Calendar sync is available for scheduling features</li>
                 <li><strong>Email Services:</strong> Resend delivers transactional emails on our behalf</li>
                 <li><strong>AI Processing:</strong> Google Gemini powers our recipe and receipt scanning features</li>

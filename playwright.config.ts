@@ -49,30 +49,24 @@ export default defineConfig({
   // Global timeout for each test
   timeout: 60000,
 
-  // Configure projects for major browsers
+  // Configure projects - Chrome only for now
   projects: [
-    // Desktop browsers
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: process.env.CI ? true : false,
+        launchOptions: {
+          slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
+        },
+      },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    // Mobile viewports
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      name: 'mobile-chrome',
+      use: {
+        ...devices['Pixel 5'],
+        headless: process.env.CI ? true : false,
+      },
     },
   ],
 

@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { withPayload } from '@payloadcms/next/withPayload';
 import bundleAnalyzer from '@next/bundle-analyzer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -267,5 +268,6 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
-// Export with bundle analyzer and Sentry wrapper
-export default withBundleAnalyzer(withSentryConfig(nextConfig, sentryWebpackPluginOptions));
+// Export with Payload CMS, bundle analyzer, and Sentry wrappers
+// withPayload must be outermost to set up @payload-config webpack alias
+export default withPayload(withBundleAnalyzer(withSentryConfig(nextConfig, sentryWebpackPluginOptions)));

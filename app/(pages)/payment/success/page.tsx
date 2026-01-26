@@ -2,7 +2,7 @@
 
 /**
  * Payment Success Page
- * Shown after successful Stripe checkout
+ * Shown after successful Polar checkout
  */
 
 import { useEffect, useState } from 'react';
