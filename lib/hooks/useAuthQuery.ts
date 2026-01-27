@@ -25,9 +25,6 @@ export interface UserProfile {
   color_theme?: string;
   pronouns?: string;
   preferences?: Record<string, unknown>;
-  is_beta_tester?: boolean;
-  beta_status?: 'pending' | 'approved' | 'rejected' | 'completed';
-  beta_signup_date?: string;
 }
 
 /**
@@ -67,7 +64,7 @@ export function useUserProfile(userId: string | undefined) {
 
       const { data, error } = await supabase
         .from('users')
-        .select('id, email, name, avatar_url, created_at, updated_at, timezone, privacy_settings, is_beta_tester, beta_status, beta_signup_date, color_theme')
+        .select('id, email, name, avatar_url, created_at, updated_at, timezone, privacy_settings, color_theme')
         .eq('id', userId)
         .single();
 
@@ -86,9 +83,6 @@ export function useUserProfile(userId: string | undefined) {
           updated_at: new Date().toISOString(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           preferences: {},
-          is_beta_tester: false,
-          beta_status: undefined,
-          beta_signup_date: undefined,
         };
       }
 

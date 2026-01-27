@@ -131,9 +131,7 @@ export async function GET(req: NextRequest) {
         // Fetch data in parallel
         const [
           launchNotificationsResult,
-          betaRequestsResult,
           previousLaunchResult,
-          previousBetaResult,
           usersResult,
         ] = await Promise.allSettled([
           // Launch notifications (visitors who signed up for launch notification)
@@ -143,23 +141,9 @@ export async function GET(req: NextRequest) {
             .gte('created_at', startDate.toISOString())
             .order('created_at', { ascending: true }),
 
-          // Beta access requests
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('id, source, created_at, email, user_id, access_granted')
-            .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
-
           // Previous period launch notifications for trend
           supabaseAdmin
             .from('launch_notifications')
-            .select('source', { count: 'exact', head: true })
-            .gte('created_at', previousStart.toISOString())
-            .lt('created_at', startDate.toISOString()),
-
-          // Previous period beta requests for trend
-          supabaseAdmin
-            .from('beta_access_requests')
             .select('source', { count: 'exact', head: true })
             .gte('created_at', previousStart.toISOString())
             .lt('created_at', startDate.toISOString()),
@@ -175,21 +159,15 @@ export async function GET(req: NextRequest) {
         const launchNotifications = launchNotificationsResult.status === 'fulfilled'
           ? (launchNotificationsResult.value.data || [])
           : [];
-        const betaRequests = betaRequestsResult.status === 'fulfilled'
-          ? (betaRequestsResult.value.data || [])
-          : [];
         const previousLaunchCount = previousLaunchResult.status === 'fulfilled'
           ? (previousLaunchResult.value.count || 0)
-          : 0;
-        const previousBetaCount = previousBetaResult.status === 'fulfilled'
-          ? (previousBetaResult.value.count || 0)
           : 0;
         const users = usersResult.status === 'fulfilled'
           ? (usersResult.value.data || [])
           : [];
 
-        // Total visitors = launch notifications + beta requests
-        const totalVisitors = launchNotifications.length + betaRequests.length;
+        // Total visitors = launch notifications
+        const totalVisitors = launchNotifications.length;
         const totalSignups = users.length;
         const overallConversionRate = totalVisitors > 0
           ? Math.round((totalSignups / totalVisitors) * 100)
@@ -205,19 +183,6 @@ export async function GET(req: NextRequest) {
             sourceCounts[source] = { total: 0, conversions: 0 };
           }
           sourceCounts[source].total++;
-        });
-
-        // Process beta requests
-        betaRequests.forEach((req: { source: string | null; user_id: string | null }) => {
-          const source = normalizeSource(req.source);
-          if (!sourceCounts[source]) {
-            sourceCounts[source] = { total: 0, conversions: 0 };
-          }
-          sourceCounts[source].total++;
-          // Count as conversion if user_id exists (they signed up)
-          if (req.user_id) {
-            sourceCounts[source].conversions++;
-          }
         });
 
         const sources: SourceBreakdown[] = Object.entries(sourceCounts)
@@ -254,7 +219,7 @@ export async function GET(req: NextRequest) {
         const dailySignups: Record<string, number> = {};
 
         // Count visitors per day
-        [...launchNotifications, ...betaRequests].forEach((item: { created_at: string }) => {
+        launchNotifications.forEach((item: { created_at: string }) => {
           const dateStr = item.created_at.split('T')[0];
           dailyVisitors[dateStr] = (dailyVisitors[dateStr] || 0) + 1;
         });
@@ -277,7 +242,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Top channels with trend comparison
-        const previousTotal = previousLaunchCount + previousBetaCount;
+        const previousTotal = previousLaunchCount;
         const channelData: Record<string, number> = {};
 
         sources.forEach(s => {

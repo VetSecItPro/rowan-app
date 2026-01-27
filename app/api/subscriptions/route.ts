@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserFeatureAccess } from '@/lib/services/feature-access-service';
-import { getSubscriptionStatus, getBetaTesterStatus } from '@/lib/services/subscription-service';
+import { getSubscriptionStatus } from '@/lib/services/subscription-service';
 import type { SubscriptionTier } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
@@ -78,27 +78,13 @@ export async function GET(request: NextRequest) {
     // Get subscription status
     const subscriptionStatus = await getSubscriptionStatus(user.id);
 
-    // Get beta tester status
-    const betaStatus = await getBetaTesterStatus(user.id);
-
-    // Get feature access details (already considers beta status via getUserTier)
+    // Get feature access details
     const featureAccess = await getUserFeatureAccess(user.id);
-
-    // Determine effective tier - beta testers get 'family' tier
-    const effectiveTier = betaStatus.isBetaTester ? 'family' : subscriptionStatus.tier;
 
     // Combine into comprehensive response
     const response = {
-      // Top-level tier for easy access (effective tier considering beta status)
-      tier: effectiveTier,
-
-      // Beta tester status (for client-side beta banner/badge)
-      beta: {
-        isBetaTester: betaStatus.isBetaTester,
-        betaEndsAt: betaStatus.betaEndsAt,
-        daysRemaining: betaStatus.daysRemaining,
-        isExpired: betaStatus.isExpired,
-      },
+      // Top-level tier
+      tier: subscriptionStatus.tier,
 
       // Trial status (for client-side trial banner/modal)
       trial: {
@@ -110,8 +96,7 @@ export async function GET(request: NextRequest) {
 
       // Full subscription details
       subscription: {
-        tier: subscriptionStatus.tier, // Actual subscription tier (not considering beta)
-        effectiveTier, // Tier with beta considered
+        tier: subscriptionStatus.tier,
         status: subscriptionStatus.status,
         isActive: subscriptionStatus.isActive,
         isPastDue: subscriptionStatus.isPastDue,

@@ -5,7 +5,7 @@
  * Displays a single pricing tier with features and CTA
  */
 
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Users } from 'lucide-react';
 
 export interface PricingCardProps {
   tier: 'free' | 'pro' | 'family';
@@ -19,6 +19,7 @@ export interface PricingCardProps {
   popular?: boolean;
   loading?: boolean;
   disabled?: boolean;
+  showFoundingMember?: boolean;
   onSelect: () => void;
 }
 
@@ -34,6 +35,7 @@ export function PricingCard({
   popular = false,
   loading = false,
   disabled = false,
+  showFoundingMember = false,
   onSelect,
 }: PricingCardProps) {
   const price = period === 'monthly' ? monthlyPrice : annualPrice;
@@ -65,7 +67,7 @@ export function PricingCard({
       </div>
 
       {/* Price */}
-      <div className="mb-6 min-h-[120px]">
+      <div className="mb-3 min-h-[80px]">
         {isFree ? (
           <div className="flex items-baseline">
             <span className="text-5xl font-bold text-white">Free</span>
@@ -105,6 +107,16 @@ export function PricingCard({
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
         {loading ? 'Processing...' : cta}
       </button>
+
+      {/* Founding Member Badge */}
+      {showFoundingMember && (
+        <div className="mb-6 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 px-4 py-2">
+          <Users className="h-4 w-4 flex-shrink-0 text-amber-400" />
+          <span className="text-xs font-medium text-amber-300">
+            Founding member pricing — lock in this rate forever
+          </span>
+        </div>
+      )}
 
       {/* Features List */}
       <div className="flex-1">

@@ -55,7 +55,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        headless: process.env.CI ? true : false,
+        headless: true,
         launchOptions: {
           slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
         },
@@ -65,7 +65,7 @@ export default defineConfig({
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        headless: process.env.CI ? true : false,
+        headless: true,
       },
     },
   ],
@@ -74,7 +74,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --hostname localhost --port 3000',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI, // Reuse if running locally, not in CI
+    reuseExistingServer: true,
     timeout: 120000,
   },
 });

@@ -25,27 +25,21 @@ interface FunnelStep {
 interface FunnelData {
   steps: FunnelStep[];
   conversionRates: {
-    requestToCode: number;
-    codeToSignup: number;
+    notificationToSignup: number;
+    signupToActive: number;
     overallConversion: number;
   };
-  recentConversions: Array<{
-    email: string;
-    step: string;
-    timestamp: string;
-  }>;
   lastUpdated: string;
 }
 
 /**
  * GET /api/admin/analytics/funnel
- * Get conversion funnel data for beta signups
+ * Get conversion funnel data for user signups
  *
  * Funnel stages:
- * 1. Beta Requests - Users who submitted their email
- * 2. Codes Sent - Users who received an invite code
- * 3. Accounts Created - Users who completed signup
- * 4. Active Users - Users who have logged in
+ * 1. Launch Notifications - Users who signed up for notifications
+ * 2. Accounts Created - Users who completed signup
+ * 3. Active Users - Users who have logged in
  */
 export async function GET(req: NextRequest) {
   try {
@@ -100,51 +94,32 @@ export async function GET(req: NextRequest) {
       async () => {
         // Fetch all funnel metrics in parallel
         const [
-          // Total beta access requests (people who submitted email)
-          totalRequestsResult,
-          // Requests that have access_granted = true (code was sent)
-          codesSentResult,
-          // Requests where user_id is not null (completed signup)
+          // Launch notification signups
+          notificationsResult,
+          // Total user accounts created
           signupsResult,
           // Active users from users table (have logged in)
           activeUsersResult,
-          // Recent activity for the timeline
-          recentActivityResult,
         ] = await Promise.allSettled([
           supabaseAdmin
-            .from('beta_access_requests')
+            .from('launch_notifications')
             .select('*', { count: 'exact', head: true }),
 
+          // Count total registered users
           supabaseAdmin
-            .from('beta_access_requests')
-            .select('*', { count: 'exact', head: true })
-            .eq('access_granted', true),
-
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('*', { count: 'exact', head: true })
-            .eq('access_granted', true)
-            .not('user_id', 'is', null),
+            .from('users')
+            .select('*', { count: 'exact', head: true }),
 
           // Count users who have logged in (have last_seen set)
           supabaseAdmin
             .from('users')
             .select('*', { count: 'exact', head: true })
             .not('last_seen', 'is', null),
-
-          // Get recent conversions
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('email, access_granted, user_id, created_at, approved_at')
-            .order('created_at', { ascending: false })
-            .limit(10),
         ]);
 
         // Extract counts
-        const totalRequests = totalRequestsResult.status === 'fulfilled'
-          ? (totalRequestsResult.value.count || 0) : 0;
-        const codesSent = codesSentResult.status === 'fulfilled'
-          ? (codesSentResult.value.count || 0) : 0;
+        const totalNotifications = notificationsResult.status === 'fulfilled'
+          ? (notificationsResult.value.count || 0) : 0;
         const signups = signupsResult.status === 'fulfilled'
           ? (signupsResult.value.count || 0) : 0;
         const activeUsers = activeUsersResult.status === 'fulfilled'
@@ -153,18 +128,11 @@ export async function GET(req: NextRequest) {
         // Build funnel steps
         const steps: FunnelStep[] = [
           {
-            id: 'requests',
-            label: 'Beta Requests',
-            count: totalRequests,
+            id: 'notifications',
+            label: 'Launch Notifications',
+            count: totalNotifications,
             color: 'blue',
-            description: 'Submitted email for beta access',
-          },
-          {
-            id: 'codes',
-            label: 'Codes Sent',
-            count: codesSent,
-            color: 'purple',
-            description: 'Received invite code via email',
+            description: 'Signed up for launch notifications',
           },
           {
             id: 'signups',
@@ -184,47 +152,17 @@ export async function GET(req: NextRequest) {
 
         // Calculate conversion rates
         const conversionRates = {
-          requestToCode: totalRequests > 0
-            ? Math.round((codesSent / totalRequests) * 100) : 0,
-          codeToSignup: codesSent > 0
-            ? Math.round((signups / codesSent) * 100) : 0,
-          overallConversion: totalRequests > 0
-            ? Math.round((activeUsers / totalRequests) * 100) : 0,
+          notificationToSignup: totalNotifications > 0
+            ? Math.round((signups / totalNotifications) * 100) : 0,
+          signupToActive: signups > 0
+            ? Math.round((activeUsers / signups) * 100) : 0,
+          overallConversion: totalNotifications > 0
+            ? Math.round((activeUsers / totalNotifications) * 100) : 0,
         };
-
-        // Process recent conversions
-        const recentConversions: Array<{
-          email: string;
-          step: string;
-          timestamp: string;
-        }> = [];
-
-        if (recentActivityResult.status === 'fulfilled' && recentActivityResult.value.data) {
-          for (const record of recentActivityResult.value.data) {
-            // Determine which step this represents
-            let step = 'Requested beta access';
-            let timestamp = record.created_at;
-
-            if (record.user_id) {
-              step = 'Created account';
-              timestamp = record.approved_at || record.created_at;
-            } else if (record.access_granted) {
-              step = 'Received invite code';
-              timestamp = record.approved_at || record.created_at;
-            }
-
-            recentConversions.push({
-              email: record.email || 'Unknown',
-              step,
-              timestamp,
-            });
-          }
-        }
 
         return {
           steps,
           conversionRates,
-          recentConversions,
           lastUpdated: new Date().toISOString(),
         };
       },

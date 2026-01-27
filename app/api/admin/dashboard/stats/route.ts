@@ -67,30 +67,14 @@ export async function GET(req: NextRequest) {
 
         // Fetch other statistics in parallel
         const [
-          betaUsersResult,
           launchSignupsResult,
-          betaRequestsTodayResult,
           signupsTodayResult,
         ] = await Promise.allSettled([
-          // Beta users (approved beta access requests with user_id)
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('*', { count: 'exact', head: true })
-            .eq('access_granted', true)
-            .not('user_id', 'is', null),
-
           // Launch notification signups
           supabaseAdmin
             .from('launch_notifications')
             .select('*', { count: 'exact', head: true })
             .eq('subscribed', true),
-
-          // Beta requests today
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('*', { count: 'exact', head: true })
-            .gte('created_at', `${today}T00:00:00.000Z`)
-            .lt('created_at', `${today}T23:59:59.999Z`),
 
           // Launch signups today
           supabaseAdmin
@@ -101,25 +85,11 @@ export async function GET(req: NextRequest) {
         ]);
 
         // Extract counts from results (handle errors gracefully)
-        // Debug: Log the actual results to understand what's being returned
-        if (betaUsersResult.status === 'fulfilled') {
-          logger.info('[Dashboard Stats] Beta users query result:', {
-            component: 'api-route',
-            data: {
-              count: betaUsersResult.value.count,
-              error: betaUsersResult.value.error,
-              hasData: betaUsersResult.value.data !== null
-            }
-          });
-        }
-
-        const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.count ?? 0) : 0;
         const launchSignups = launchSignupsResult.status === 'fulfilled' ? (launchSignupsResult.value.count ?? 0) : 0;
-        const betaRequestsToday = betaRequestsTodayResult.status === 'fulfilled' ? (betaRequestsTodayResult.value.count ?? 0) : 0;
         const signupsToday = signupsTodayResult.status === 'fulfilled' ? (signupsTodayResult.value.count ?? 0) : 0;
 
         // Log any errors for debugging
-        [betaUsersResult, launchSignupsResult, betaRequestsTodayResult, signupsTodayResult]
+        [launchSignupsResult, signupsTodayResult]
           .forEach((result, index) => {
             if (result.status === 'rejected') {
               logger.error(`Dashboard stat query ${index} failed:`, undefined, { component: 'api-route', action: 'api_request', details: result.reason });
@@ -131,9 +101,7 @@ export async function GET(req: NextRequest) {
         const result = {
           totalUsers,
           activeUsers,
-          betaUsers,
           launchSignups,
-          betaRequestsToday,
           signupsToday,
           lastUpdated: new Date().toISOString(),
         };
@@ -152,7 +120,6 @@ export async function GET(req: NextRequest) {
     logger.info('[Dashboard Stats] Returning response:', {
       component: 'api-route',
       data: {
-        betaUsers: stats.betaUsers,
         totalUsers: stats.totalUsers,
         activeUsers: stats.activeUsers,
         fromCache: !forceRefresh
