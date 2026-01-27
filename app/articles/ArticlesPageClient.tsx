@@ -10,7 +10,7 @@ import {
   Clock,
   Search,
 } from 'lucide-react'
-import { Header } from '@/components/layout/Header'
+import { PublicHeader } from '@/components/layout/PublicHeader'
 import { Footer } from '@/components/layout/Footer'
 import { getIconComponent, colorClasses } from '@/lib/utils/article-icons'
 
@@ -56,11 +56,7 @@ export default function ArticlesPageClient({ articles }: ArticlesPageClientProps
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Header
-        onSignupClick={() => window.location.href = '/signup'}
-        onPricingClick={() => window.location.href = '/pricing'}
-        isPublicFeaturePage={true}
-      />
+      <PublicHeader />
 
       <main>
         {/* Hero Section */}
