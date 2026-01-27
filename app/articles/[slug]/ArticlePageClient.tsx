@@ -10,7 +10,7 @@ import {
   Share2,
   BookOpen,
 } from 'lucide-react'
-import { Header } from '@/components/layout/Header'
+import { PublicHeader } from '@/components/layout/PublicHeader'
 import { Footer } from '@/components/layout/Footer'
 import { getIconComponent, colorClasses } from '@/lib/utils/article-icons'
 import type { SerializedArticle } from '../ArticlesPageClient'
@@ -30,11 +30,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
   if (!article) {
     return (
       <div className="min-h-screen bg-gray-900">
-        <Header
-          onSignupClick={() => window.location.href = '/signup'}
-          onPricingClick={() => window.location.href = '/pricing'}
-          isPublicFeaturePage={true}
-        />
+        <PublicHeader />
         <main className="pt-32 pb-20 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <BookOpen className="w-16 h-16 text-gray-600 mx-auto mb-6" />
@@ -62,11 +58,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Header
-        onSignupClick={() => window.location.href = '/signup'}
-        onPricingClick={() => window.location.href = '/pricing'}
-        isPublicFeaturePage={true}
-      />
+      <PublicHeader />
 
       <main>
         {/* Article Header */}
