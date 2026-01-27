@@ -14,80 +14,6 @@ import { cacheAside, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
 // Trial configuration
 export const TRIAL_DURATION_DAYS = 14;
 
-// Beta program configuration
-export const BETA_DEADLINE = new Date('2026-02-15T23:59:59Z');
-
-/**
- * Beta tester status result
- */
-export interface BetaTesterStatus {
-  isBetaTester: boolean;
-  betaEndsAt: Date | null;
-  daysRemaining: number;
-  isExpired: boolean;
-}
-
-/**
- * Check if user is an active beta tester with valid beta access
- * Beta testers get full 'family' tier access until Feb 15, 2026
- */
-export async function getBetaTesterStatus(userId: string): Promise<BetaTesterStatus> {
-  const supabase = await createClient();
-
-  // Get user's beta status from users table
-  const { data: userData, error } = await supabase
-    .from('users')
-    .select('is_beta_tester, beta_status, beta_ends_at, beta_invite_code_id')
-    .eq('id', userId)
-    .single();
-
-  if (error || !userData) {
-    return {
-      isBetaTester: false,
-      betaEndsAt: null,
-      daysRemaining: 0,
-      isExpired: false,
-    };
-  }
-
-  const now = new Date();
-
-  // Check legacy beta tester (is_beta_tester flag with approved status)
-  if (userData.is_beta_tester && userData.beta_status === 'approved') {
-    const betaEndsAt = userData.beta_ends_at ? new Date(userData.beta_ends_at) : BETA_DEADLINE;
-    const isExpired = betaEndsAt <= now;
-    const daysRemaining = isExpired ? 0 : Math.ceil((betaEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-    return {
-      isBetaTester: !isExpired,
-      betaEndsAt,
-      daysRemaining,
-      isExpired,
-    };
-  }
-
-  // Check invite code beta tester
-  if (userData.beta_invite_code_id && userData.beta_ends_at) {
-    const betaEndsAt = new Date(userData.beta_ends_at);
-    const isExpired = betaEndsAt <= now;
-    const daysRemaining = isExpired ? 0 : Math.ceil((betaEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-    return {
-      isBetaTester: !isExpired,
-      betaEndsAt,
-      daysRemaining,
-      isExpired,
-    };
-  }
-
-  return {
-    isBetaTester: false,
-    betaEndsAt: null,
-    daysRemaining: 0,
-    isExpired: false,
-  };
-}
-
 /**
  * Get user's current subscription
  * OPTIMIZATION: Cached in Redis for 5 minutes to reduce DB lookups
@@ -118,16 +44,10 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
 }
 
 /**
- * Get user's subscription tier (considers beta testers and trial)
- * Priority: Beta tester (family) > Paid tier > Trial (pro) > Free
+ * Get user's subscription tier (considers trial)
+ * Priority: Paid tier > Trial (pro) > Free
  */
 export async function getUserTier(userId: string): Promise<SubscriptionTier> {
-  // First check if user is an active beta tester - they get full 'family' tier
-  const betaStatus = await getBetaTesterStatus(userId);
-  if (betaStatus.isBetaTester) {
-    return 'family'; // Beta testers get full access to ALL features
-  }
-
   const subscription = await getUserSubscription(userId);
 
   // If no subscription or not active, return free tier
@@ -420,16 +340,10 @@ export async function isUserInTrial(userId: string): Promise<boolean> {
 }
 
 /**
- * Get the effective tier for a user (considers beta testers and trial)
- * Beta testers get Family-level access, trial users get Pro-level access
+ * Get the effective tier for a user (considers trial)
+ * Trial users get Pro-level access
  */
 export async function getEffectiveTier(userId: string): Promise<SubscriptionTier> {
-  // First check if user is an active beta tester - they get full 'family' tier
-  const betaStatus = await getBetaTesterStatus(userId);
-  if (betaStatus.isBetaTester) {
-    return 'family'; // Beta testers get full access to ALL features
-  }
-
   const subscription = await getUserSubscription(userId);
 
   // No subscription = free

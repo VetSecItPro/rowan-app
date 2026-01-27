@@ -3,7 +3,6 @@
 import { useState, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { BetaProgramPanel } from './BetaProgramPanel';
 import { NotificationsPanel } from './NotificationsPanel';
 import { ConversionFunnelPanel } from './ConversionFunnelPanel';
 
@@ -12,7 +11,7 @@ type SubTab = 'acquisition' | 'funnel' | 'signups';
 const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'acquisition', label: 'Acquisition', icon: Sparkles },
   { id: 'funnel', label: 'Funnel', icon: GitBranch },
-  { id: 'signups', label: 'Beta & Launch', icon: Mail },
+  { id: 'signups', label: 'Signups', icon: Mail },
 ];
 
 interface AcquisitionData {
@@ -248,40 +247,9 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
   );
 });
 
-// Signups Panel - combines Beta and Launch
+// Signups Panel
 const SignupsPanel = memo(function SignupsPanel() {
-  const [view, setView] = useState<'beta' | 'launch'>('beta');
-
-  return (
-    <div className="space-y-4">
-      {/* View Toggle */}
-      <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1 w-fit">
-        <button
-          onClick={() => setView('beta')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            view === 'beta'
-              ? 'bg-gray-700 text-white shadow-sm'
-              : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          Beta Program
-        </button>
-        <button
-          onClick={() => setView('launch')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            view === 'launch'
-              ? 'bg-gray-700 text-white shadow-sm'
-              : 'text-gray-400 hover:text-white'
-          }`}
-        >
-          Launch Signups
-        </button>
-      </div>
-
-      {/* Content */}
-      {view === 'beta' ? <BetaProgramPanel /> : <NotificationsPanel />}
-    </div>
-  );
+  return <NotificationsPanel />;
 });
 
 export const GrowthPanel = memo(function GrowthPanel() {

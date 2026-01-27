@@ -493,7 +493,7 @@ export const POST = withSubscriptionCheck(
   - [ ] Feature comparison table (expandable)
   - [ ] FAQ section (5-7 common questions)
   - [ ] Social proof section ("Join 10,000+ families...")
-  - [ ] Trust signals (cancel anytime, 30-day guarantee)
+  - [ ] Trust signals (cancel anytime, no credit card for trial)
   - [ ] Mobile responsive layout
   - [ ] Dark mode support
 - [ ] Create `components/pricing/PricingCard.tsx`:
@@ -520,7 +520,7 @@ export const POST = withSubscriptionCheck(
   - [ ] Questions:
     - [ ] "Can I switch plans later?"
     - [ ] "What happens to my data if I cancel?"
-    - [ ] "Do you offer refunds?"
+    - [ ] "What is your refund policy?"
     - [ ] "How do I cancel my subscription?"
     - [ ] "Can I upgrade/downgrade anytime?"
     - [ ] "What payment methods do you accept?"
@@ -1476,8 +1476,8 @@ Redirecting in 5 seconds...
 **Legal & Compliance:**
 - [ ] Terms of Service updated (subscription terms)
 - [ ] Privacy Policy updated (payment data handling)
-- [ ] Refund policy documented
-- [ ] Cancellation policy documented
+- [ ] No-refund policy documented (all sales final)
+- [ ] Cancellation policy documented (active until end of billing period)
 - [ ] GDPR compliance verified (for EU users)
 - [ ] Payment processor disclosed (Stripe)
 
@@ -1487,7 +1487,7 @@ Redirecting in 5 seconds...
   - [ ] "How to cancel my subscription"
   - [ ] "How to change my plan"
   - [ ] "What happens to my data if I cancel?"
-  - [ ] "How do I get a refund?"
+  - [ ] "What is your cancellation/refund policy?"
   - [ ] "What payment methods do you accept?"
 - [ ] Update FAQ page with monetization questions
 - [ ] Prepare support email templates

@@ -85,10 +85,8 @@ export async function GET(req: NextRequest) {
 
         // Fetch comprehensive analytics data in parallel
         const [
-          betaRequestsResult,
           launchNotificationsResult,
           usersResult,
-          betaUsersResult,
           // Feature events for traffic analytics
           featureEventsResult,
           featureEventsTotalResult,
@@ -97,13 +95,6 @@ export async function GET(req: NextRequest) {
           topPagesResult,
           hourlyActivityResult,
         ] = await Promise.allSettled([
-          // Beta requests over time (using admin client to bypass RLS)
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('created_at, access_granted')
-            .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
-
           // Launch notifications over time
           supabaseAdmin
             .from('launch_notifications')
@@ -111,20 +102,12 @@ export async function GET(req: NextRequest) {
             .gte('created_at', startDate.toISOString())
             .order('created_at', { ascending: true }),
 
-          // User registrations over time (from beta users)
+          // User registrations over time
           supabaseAdmin
-            .from('beta_access_requests')
-            .select('approved_at, user_id')
-            .not('user_id', 'is', null)
-            .gte('approved_at', startDate.toISOString())
-            .order('approved_at', { ascending: true }),
-
-          // Current beta user activity
-          supabaseAdmin
-            .from('beta_access_requests')
-            .select('user_id, email, created_at, approved_at')
-            .eq('access_granted', true)
-            .not('user_id', 'is', null),
+            .from('users')
+            .select('created_at, id')
+            .gte('created_at', startDate.toISOString())
+            .order('created_at', { ascending: true }),
 
           // Feature events for page view tracking
           supabaseAdmin
@@ -166,11 +149,9 @@ export async function GET(req: NextRequest) {
             .gte('created_at', startDate.toISOString()),
         ]);
 
-        // Process beta requests data
-        const betaRequests = betaRequestsResult.status === 'fulfilled' ? (betaRequestsResult.value.data || []) : [];
+        // Process results
         const launchNotifications = launchNotificationsResult.status === 'fulfilled' ? (launchNotificationsResult.value.data || []) : [];
         const userRegistrations = usersResult.status === 'fulfilled' ? (usersResult.value.data || []) : [];
-        const betaUsers = betaUsersResult.status === 'fulfilled' ? (betaUsersResult.value.data || []) : [];
 
         // Process feature events data
         const featureEvents = featureEventsResult.status === 'fulfilled' ? (featureEventsResult.value.data || []) : [];
@@ -269,17 +250,12 @@ export async function GET(req: NextRequest) {
           const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
           const dateStr = date.toISOString().split('T')[0];
 
-          // Count events for this day
-          const betaRequestsCount = betaRequests.filter((req: { created_at: string }) =>
-            req.created_at.startsWith(dateStr)
-          ).length;
-
           const launchNotificationsCount = launchNotifications.filter((notif: { created_at: string }) =>
             notif.created_at.startsWith(dateStr)
           ).length;
 
-          const userRegistrationsCount = userRegistrations.filter((user: { approved_at?: string | null }) =>
-            user.approved_at && user.approved_at.startsWith(dateStr)
+          const userRegistrationsCount = userRegistrations.filter((user: { created_at: string }) =>
+            user.created_at.startsWith(dateStr)
           ).length;
 
           // Page views for this day
@@ -287,23 +263,15 @@ export async function GET(req: NextRequest) {
 
           dailyData.push({
             date: dateStr,
-            betaRequests: betaRequestsCount,
             launchNotifications: launchNotificationsCount,
             userRegistrations: userRegistrationsCount,
             pageViews: pageViewsCount,
           });
         }
 
-            // Calculate success metrics
-        const totalBetaRequests = betaRequests.length;
-        const approvedBetaRequests = betaRequests.filter((req: { access_granted?: boolean }) => req.access_granted).length;
+        // Calculate success metrics
         const totalLaunchNotifications = launchNotifications.length;
         const totalUserRegistrations = userRegistrations.length;
-
-        // Beta program status (100 users limit)
-        const betaCapacity = 100;
-        const activeBetaUsers = betaUsers.length;
-        const capacityUsage = Math.round((activeBetaUsers / betaCapacity) * 100);
 
         // Source distribution for launch notifications
         const sourceDistribution = launchNotifications.reduce((acc: Record<string, number>, notif: { source?: string }) => {
@@ -312,17 +280,8 @@ export async function GET(req: NextRequest) {
           return acc;
         }, {} as Record<string, number>);
 
-        // Conversion rates
-        const betaApprovalRate = totalBetaRequests > 0 ? Math.round((approvedBetaRequests / totalBetaRequests) * 100) : 0;
-        const betaSignupRate = approvedBetaRequests > 0 ? Math.round((totalUserRegistrations / approvedBetaRequests) * 100) : 0;
-
         // Growth rates (comparing first half vs second half of period)
         const midPoint = Math.floor(days / 2);
-        const firstHalfBetaRequests = dailyData.slice(0, midPoint).reduce((sum, day) => sum + day.betaRequests, 0);
-        const secondHalfBetaRequests = dailyData.slice(midPoint).reduce((sum, day) => sum + day.betaRequests, 0);
-        const betaGrowthRate = firstHalfBetaRequests > 0
-          ? Math.round(((secondHalfBetaRequests - firstHalfBetaRequests) / firstHalfBetaRequests) * 100)
-          : 0;
 
         const firstHalfNotifications = dailyData.slice(0, midPoint).reduce((sum, day) => sum + day.launchNotifications, 0);
         const secondHalfNotifications = dailyData.slice(midPoint).reduce((sum, day) => sum + day.launchNotifications, 0);
@@ -335,7 +294,6 @@ export async function GET(req: NextRequest) {
           userGrowth: dailyData.map(day => ({
             date: day.date,
             users: day.userRegistrations,
-            betaUsers: day.betaRequests,
           })),
           signupTrends: dailyData.map(day => ({
             date: day.date,
@@ -347,12 +305,6 @@ export async function GET(req: NextRequest) {
             date: day.date,
             pageViews: day.pageViews,
           })),
-          betaMetrics: {
-            conversionRate: betaSignupRate,
-            approvalRate: betaApprovalRate,
-            retentionRate: activeBetaUsers > 0 ? Math.min(100, (activeBetaUsers / betaCapacity) * 100) : 0,
-            averageActivityScore: activeBetaUsers > 0 ? Math.min(10, (activeBetaUsers / 30) * 10) : 0,
-          },
           // Traffic metrics
           trafficMetrics: {
             totalPageViews,
@@ -375,14 +327,12 @@ export async function GET(req: NextRequest) {
           activityHeatmap: dailyData.map(day => ({
             hour: new Date(day.date).getDay(), // Use day of week as hour for simplification
             day: new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
-            activity: day.betaRequests + day.launchNotifications + day.userRegistrations + day.pageViews,
+            activity: day.launchNotifications + day.userRegistrations + day.pageViews,
           })),
           summary: {
             totalUsers: totalUserRegistrations,
             totalNotifications: totalLaunchNotifications,
-            totalBetaRequests: totalBetaRequests,
-            activeBetaUsers: activeBetaUsers,
-            growthRate: betaGrowthRate,
+            growthRate: notificationGrowthRate,
             churnRate: 0, // Calculate churn rate when we have retention data
             // Traffic summary
             totalPageViews,
@@ -398,15 +348,8 @@ export async function GET(req: NextRequest) {
             },
             dailyData,
             summary: {
-              totalBetaRequests,
-              approvedBetaRequests,
               totalLaunchNotifications,
               totalUserRegistrations,
-              activeBetaUsers,
-              capacityUsage,
-              betaApprovalRate,
-              betaSignupRate,
-              betaGrowthRate,
               notificationGrowthRate,
             },
           },
