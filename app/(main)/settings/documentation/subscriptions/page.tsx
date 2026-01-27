@@ -211,10 +211,10 @@ const guideSections: GuideSection[] = [
         href: '#payment-failed',
       },
       {
-        title: 'Requesting a Refund',
-        description: 'Our refund policy and how to request one if needed',
+        title: 'Cancellation Policy',
+        description: 'How cancellation works and what to expect',
         readTime: '3 min read',
-        href: '#refunds',
+        href: '#cancellation-policy',
       },
       {
         title: 'Contact Support',
@@ -468,7 +468,7 @@ export default function SubscriptionsDocumentationPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500" />
-                      <span className="text-gray-400">Cancel anytime - no obligation</span>
+                      <span className="text-gray-400">Cancel anytime - access continues until end of billing period</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-500" />
@@ -1261,9 +1261,9 @@ export default function SubscriptionsDocumentationPage() {
                 <p className="text-gray-400 leading-relaxed mb-4">
                   A: You&apos;re charged immediately when you first subscribe, then on the same day each billing cycle (monthly or annually).
                 </p>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Q: Can I get a refund if I don&apos;t like it?</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Q: What is your refund policy?</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  A: Since we offer a free trial with no credit card required, we encourage trying before buying. However, if you have concerns, contact support - we handle requests case by case.
+                  A: All sales are final. We offer a 14-day free trial with no credit card required so you can fully evaluate Rowan before subscribing. If you cancel, your plan stays active until the end of your billing period.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Q: What happens if my payment fails?</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
@@ -1317,35 +1317,34 @@ export default function SubscriptionsDocumentationPage() {
               </a>
             </section>
 
-            {/* Requesting a Refund */}
-            <section id="refunds" className="scroll-mt-24">
+            {/* Cancellation Policy */}
+            <section id="cancellation-policy" className="scroll-mt-24">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white">Requesting a Refund</h2>
+                <h2 className="text-2xl font-bold text-white">Cancellation Policy</h2>
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  While we offer a free trial to avoid unwanted purchases, we understand situations arise. Here&apos;s our refund policy.
+                  We offer a 14-day free trial so you can fully evaluate Rowan before subscribing. All sales are final once you purchase a subscription.
                 </p>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Refund Policy</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">How Cancellation Works</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Refund requests are handled on a case-by-case basis</li>
-                  <li>Requests within 7 days of charge are most likely to be approved</li>
-                  <li>Annual subscriptions may receive prorated refunds</li>
-                  <li>Refunds are not automatic - you must request them</li>
+                  <li>You can cancel your subscription at any time from Settings</li>
+                  <li>Your plan remains active until the end of your current billing period</li>
+                  <li>After the billing period ends, you&apos;ll be moved to the free tier</li>
+                  <li>Your data is preserved and accessible within free tier limits</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Request</h3>
-                <ol className="list-decimal list-inside space-y-2 text-gray-400">
-                  <li>Email support@rowan.app with your account email</li>
-                  <li>Include the reason for your request</li>
-                  <li>Provide the date and amount of the charge</li>
-                  <li>We&apos;ll respond within 1-2 business days</li>
-                </ol>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">No Refunds</h3>
+                <ul className="list-disc list-inside space-y-2 text-gray-400">
+                  <li>All sales are final — no refunds will be issued</li>
+                  <li>The free trial exists so you can try everything before committing</li>
+                  <li>No credit card is required during the trial</li>
+                </ul>
                 <div className="p-4 bg-pink-900/30 border border-pink-800 rounded-lg mt-6">
                   <p className="text-pink-200 text-sm">
-                    <strong>Alternative:</strong> Instead of a refund, we may offer subscription credit, an extended trial, or help resolve whatever issue caused dissatisfaction.
+                    <strong>Tip:</strong> Take full advantage of your 14-day free trial to explore all features before subscribing.
                   </p>
                 </div>
               </div>

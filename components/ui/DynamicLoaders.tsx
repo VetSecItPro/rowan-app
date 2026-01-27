@@ -93,13 +93,6 @@ export const AdminUsersTable = dynamic(
   }
 );
 
-export const AdminBetaRequestsTable = dynamic(
-  () => import('@/components/admin/BetaRequestsTable').then(mod => ({ default: mod.BetaRequestsTable })),
-  {
-    loading: () => <ProgressiveTableSkeleton title="beta requests" columns={5} rows={6} />,
-    ssr: false,
-  }
-);
 
 /**
  * Settings Main Page - Dynamic Import

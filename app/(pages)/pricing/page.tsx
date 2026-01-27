@@ -11,8 +11,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
-import Image from 'next/image';
-import { Sparkles, Clock, Shield, Users } from 'lucide-react';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { Sparkles, Clock, Shield } from 'lucide-react';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
@@ -94,21 +95,17 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
+      <Header
+        onSignupClick={() => router.push('/signup')}
+        onPricingClick={() => {}}
+        isPublicFeaturePage={true}
+      />
+
+      <main>
       {/* Hero Section */}
       <div className="px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl">
-          {/* Header */}
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-              <Image
-                src="/rowan-logo.png"
-                alt="Rowan"
-                width={64}
-                height={64}
-                className="rounded-2xl"
-              />
-            </div>
-
             {/* Trial Badge */}
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 px-4 py-2">
               <Sparkles className="h-4 w-4 text-emerald-400" />
@@ -116,16 +113,6 @@ export default function PricingPage() {
                 Start with a 14-day free trial - no credit card required
               </span>
             </div>
-
-            {/* Founding Member Badge */}
-            {foundingMemberSpots !== null && foundingMemberSpots > 0 && (
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 px-4 py-2">
-                <Users className="h-4 w-4 text-amber-400" />
-                <span className="text-sm font-medium text-amber-300">
-                  <strong>{foundingMemberSpots.toLocaleString()}</strong> founding member spots left - lock in this price forever
-                </span>
-              </div>
-            )}
 
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
               The family command center that works
@@ -199,6 +186,7 @@ export default function PricingPage() {
               popular={true}
               loading={loading === 'pro'}
               disabled={loading !== null}
+              showFoundingMember={foundingMemberSpots !== null && foundingMemberSpots > 0}
               onSelect={() => handleSelectPlan('pro')}
             />
 
@@ -223,6 +211,7 @@ export default function PricingPage() {
               cta="Upgrade to Family"
               loading={loading === 'family'}
               disabled={loading !== null}
+              showFoundingMember={foundingMemberSpots !== null && foundingMemberSpots > 0}
               onSelect={() => handleSelectPlan('family')}
             />
           </div>
@@ -240,11 +229,11 @@ export default function PricingPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-emerald-400" />
-                <span>Cancel anytime</span>
+                <span>Cancel anytime, keep access through billing period</span>
               </div>
             </div>
             <p className="mt-4 text-center text-sm text-gray-500">
-              30-day money-back guarantee on paid plans • Secure payment via Polar
+              Secure payment via Polar
             </p>
           </div>
 
@@ -277,11 +266,12 @@ export default function PricingPage() {
 
               <div>
                 <h3 className="text-lg font-semibold text-white">
-                  Do you offer refunds?
+                  What is your refund policy?
                 </h3>
                 <p className="mt-2 text-gray-400">
-                  We offer a 30-day money-back guarantee. If you&apos;re not satisfied within the first
-                  30 days, contact us for a full refund, no questions asked.
+                  All sales are final. We offer a generous 14-day free trial so you can fully
+                  evaluate Rowan before subscribing. If you cancel, your plan remains active
+                  until the end of the current billing period.
                 </p>
               </div>
 
@@ -319,6 +309,9 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

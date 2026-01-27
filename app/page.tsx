@@ -1,11 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
-import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
-import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
 import { HeroSection } from '@/components/home/HeroSection';
 import { FeatureGrid } from '@/components/home/FeatureGrid';
 import { PainPointsSection } from '@/components/home/PainPointsSection';
@@ -15,27 +12,6 @@ import { ScrollToTop } from '@/components/ui/scroll-to-top';
 
 export default function HomePage() {
   const router = useRouter();
-  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
-  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
-
-  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
-    if (inviteCode) {
-      const params = new URLSearchParams();
-      params.set('beta_code', inviteCode);
-      if (email) {
-        params.set('email', email);
-      }
-      if (firstName) {
-        params.set('first_name', firstName);
-      }
-      if (lastName) {
-        params.set('last_name', lastName);
-      }
-      router.push(`/signup?${params.toString()}`);
-    } else {
-      router.push('/signup');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
@@ -52,8 +28,8 @@ export default function HomePage() {
       {/* Main Content Components */}
       <main className="relative">
         <HeroSection
-          onBetaClick={() => setIsBetaModalOpen(true)}
-          onLaunchClick={() => setIsLaunchModalOpen(true)}
+          onSignupClick={() => router.push('/signup')}
+          onPricingClick={() => router.push('/pricing')}
         />
 
         <PainPointsSection />
@@ -91,21 +67,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      {/* Modals */}
-      <BetaAccessModal
-        isOpen={isBetaModalOpen}
-        onClose={() => setIsBetaModalOpen(false)}
-        onSuccess={handleBetaSuccess}
-        onSwitchToLaunch={() => {
-          setIsBetaModalOpen(false);
-          setIsLaunchModalOpen(true);
-        }}
-      />
-      <LaunchNotificationModal
-        isOpen={isLaunchModalOpen}
-        onClose={() => setIsLaunchModalOpen(false)}
-      />
     </div>
   );
 }

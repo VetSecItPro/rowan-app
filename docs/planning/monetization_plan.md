@@ -2301,7 +2301,7 @@ Upgrade to Pro to create unlimited tasks and unlock:
 - **Annual pricing toggle** at top: Monthly / Annual (save 17%)
 - **Feature comparison table** below cards (expandable)
 - **Social proof**: "Join 10,000+ families staying organized"
-- **Trust signals**: "Cancel anytime" • "30-day money-back guarantee"
+- **Trust signals**: "Cancel anytime" • "No credit card required for trial"
 - **FAQ section** below pricing (addresses objections)
 
 ### Stripe Integration Strategy
