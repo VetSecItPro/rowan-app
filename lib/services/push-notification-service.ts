@@ -252,7 +252,8 @@ export async function getActiveTokensForUsers(
  *
  * NOTE: This function requires a push notification provider to be configured.
  * Currently supports:
- * - Firebase Cloud Messaging (FCM) - set FIREBASE_SERVER_KEY env var
+ * - Firebase Cloud Messaging (FCM v1 API) - set FIREBASE_SERVICE_ACCOUNT env var
+ *   (JSON string of the Firebase service account key file)
  * - Expo Push - set EXPO_ACCESS_TOKEN env var (if using Expo)
  *
  * The actual sending is abstracted to allow easy provider switching.
@@ -384,11 +385,11 @@ async function sendToProvider(
   type: NotificationType
 ): Promise<ProviderResult> {
   // Check which provider is configured
-  const firebaseKey = process.env.FIREBASE_SERVER_KEY;
+  const firebaseServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
   const expoToken = process.env.EXPO_ACCESS_TOKEN;
 
-  if (firebaseKey) {
-    return sendViaFCM(token, notification, type, firebaseKey);
+  if (firebaseServiceAccount) {
+    return sendViaFCM(token, notification, type, firebaseServiceAccount);
   }
 
   if (expoToken && token.platform !== 'web') {
@@ -397,7 +398,7 @@ async function sendToProvider(
 
   // No provider configured - log and return success (silent fail)
   logger.warn('No push notification provider configured', {
-    hint: 'Set FIREBASE_SERVER_KEY or EXPO_ACCESS_TOKEN environment variable',
+    hint: 'Set FIREBASE_SERVICE_ACCOUNT or EXPO_ACCESS_TOKEN environment variable',
   });
 
   // In development, we'll just log the notification
@@ -415,70 +416,111 @@ async function sendToProvider(
 }
 
 /**
- * Send via Firebase Cloud Messaging
+ * Send via Firebase Cloud Messaging (HTTP v1 API)
+ *
+ * Uses the modern FCM HTTP v1 API with OAuth 2.0 service account auth.
+ * The legacy API (fcm.googleapis.com/fcm/send) was deprecated June 2024.
+ *
+ * Requires FIREBASE_SERVICE_ACCOUNT env var containing the service account JSON.
  */
 async function sendViaFCM(
   token: PushToken,
   notification: NotificationPayload,
   type: NotificationType,
-  serverKey: string
+  _serverKey: string // kept for interface compat, ignored — uses service account
 ): Promise<ProviderResult> {
   try {
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (!serviceAccountJson) {
+      logger.warn('FIREBASE_SERVICE_ACCOUNT not set — cannot send FCM notification');
+      return { success: false, error: 'Firebase service account not configured' };
+    }
+
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    const projectId = serviceAccount.project_id;
+
+    if (!projectId) {
+      return { success: false, error: 'Invalid Firebase service account: missing project_id' };
+    }
+
+    // Get OAuth 2.0 access token via google-auth-library (bundled with googleapis)
+    const { GoogleAuth } = await import('google-auth-library');
+    const auth = new GoogleAuth({
+      credentials: serviceAccount,
+      scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
+    });
+    const client = await auth.getClient();
+    const tokenResponse = await client.getAccessToken();
+    const accessToken = typeof tokenResponse === 'string' ? tokenResponse : tokenResponse.token;
+
+    if (!accessToken) {
+      return { success: false, error: 'Failed to obtain Firebase access token' };
+    }
+
+    // FCM v1 API message format
     const message = {
-      to: token.token,
-      notification: {
-        title: notification.title,
-        body: notification.body,
-        sound: notification.sound || 'default',
-        badge: notification.badge,
-        image: notification.image,
-      },
-      data: {
-        ...notification.data,
-        type,
-        actionUrl: notification.actionUrl,
-      },
-      // iOS specific
-      apns: {
-        payload: {
-          aps: {
-            sound: notification.sound || 'default',
-            badge: notification.badge,
+      message: {
+        token: token.token,
+        notification: {
+          title: notification.title,
+          body: notification.body,
+          image: notification.image,
+        },
+        data: {
+          ...notification.data,
+          type,
+          ...(notification.actionUrl && { actionUrl: notification.actionUrl }),
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: notification.sound || 'default',
+              badge: notification.badge,
+              'mutable-content': 1,
+            },
           },
         },
-      },
-      // Android specific
-      android: {
-        priority: 'high' as const,
-        notification: {
-          sound: notification.sound || 'default',
-          channelId: getChannelForType(type),
+        android: {
+          priority: 'high' as const,
+          notification: {
+            sound: notification.sound || 'default',
+            channelId: getChannelForType(type),
+          },
         },
       },
     };
 
-    const response = await fetch('https://fcm.googleapis.com/fcm/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `key=${serverKey}`,
-      },
-      body: JSON.stringify(message),
-    });
+    const response = await fetch(
+      `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(message),
+      }
+    );
 
-    const result = await response.json();
-
-    if (result.success === 1) {
+    if (response.ok) {
       return { success: true };
     }
 
-    // Check for invalid token errors
-    if (result.results?.[0]?.error === 'NotRegistered' ||
-        result.results?.[0]?.error === 'InvalidRegistration') {
-      return { success: false, error: result.results[0].error, shouldDeactivate: true };
+    const errorBody = await response.json().catch(() => ({}));
+    const errorCode = errorBody?.error?.details?.[0]?.errorCode || errorBody?.error?.status;
+
+    // Token is no longer valid — deactivate it
+    if (errorCode === 'UNREGISTERED' || errorCode === 'INVALID_ARGUMENT') {
+      return { success: false, error: errorCode, shouldDeactivate: true };
     }
 
-    return { success: false, error: result.results?.[0]?.error || 'FCM send failed' };
+    logger.error('FCM v1 API error', undefined, {
+      status: response.status,
+      errorCode,
+      message: errorBody?.error?.message,
+    });
+
+    return { success: false, error: errorBody?.error?.message || `FCM error ${response.status}` };
   } catch (error) {
     logger.error('FCM send error', error instanceof Error ? error : undefined);
     return { success: false, error: 'FCM request failed' };
