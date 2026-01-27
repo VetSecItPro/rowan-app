@@ -2,7 +2,7 @@
 
 import { motion, Variants } from 'framer-motion';
 import { Wallet, Check, TrendingUp, PieChart, Shield, Sparkles, ArrowRight } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Footer } from '@/components/layout/Footer';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { MagneticButton } from '@/components/ui/magnetic-button';
@@ -32,11 +32,7 @@ const itemVariants: Variants = {
 export default function BudgetFeaturePage() {
   return (
     <div className="min-h-screen bg-gray-900 overflow-x-hidden">
-      <Header
-        onSignupClick={() => window.location.href = '/signup'}
-        onPricingClick={() => window.location.href = '/pricing'}
-        isPublicFeaturePage={true}
-      />
+      <PublicHeader />
 
       <main>
         {/* Hero Section */}

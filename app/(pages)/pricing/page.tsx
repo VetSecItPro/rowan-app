@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/pricing/PricingCard';
 import { PricingToggle } from '@/components/pricing/PricingToggle';
-import { Header } from '@/components/layout/Header';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Sparkles, Clock, Shield } from 'lucide-react';
 import { featureFlags } from '@/lib/constants/feature-flags';
@@ -95,11 +95,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
-      <Header
-        onSignupClick={() => router.push('/signup')}
-        onPricingClick={() => {}}
-        isPublicFeaturePage={true}
-      />
+      <PublicHeader />
 
       <main>
       {/* Hero Section */}
@@ -248,8 +244,9 @@ export default function PricingPage() {
                   Can I switch plans later?
                 </h3>
                 <p className="mt-2 text-gray-400">
-                  Yes! You can upgrade or downgrade your plan at any time. Changes take effect
-                  immediately, and we&apos;ll prorate any charges or credits.
+                  Yes! You can upgrade or downgrade your plan at any time from your account
+                  settings. When you switch plans, your current plan remains active until the end
+                  of the billing period, and the new plan takes effect at the start of the next period.
                 </p>
               </div>
 
@@ -290,8 +287,8 @@ export default function PricingPage() {
                   What payment methods do you accept?
                 </h3>
                 <p className="mt-2 text-gray-400">
-                  We accept all major credit cards (Visa, Mastercard, American Express, Discover)
-                  through our secure payment processor, Polar.
+                  We accept all major credit and debit cards through our secure payment
+                  processor, Polar.
                 </p>
               </div>
 

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 import { HeroSection } from '@/components/home/HeroSection';
 import { FeatureGrid } from '@/components/home/FeatureGrid';
 import { PainPointsSection } from '@/components/home/PainPointsSection';
@@ -23,7 +23,7 @@ export default function HomePage() {
       </div>
 
       {/* Header */}
-      <Header variant="landing" />
+      <PublicHeader animated />
 
       {/* Main Content Components */}
       <main className="relative">
