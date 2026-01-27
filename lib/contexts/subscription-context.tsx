@@ -9,14 +9,6 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import type { SubscriptionTier, TrialStatus, FeatureLimits } from '@/lib/types';
 import { logger } from '@/lib/logger';
 
-// Beta tester status
-export interface BetaStatus {
-  isBetaTester: boolean;
-  betaEndsAt: Date | null;
-  daysRemaining: number;
-  isExpired: boolean;
-}
-
 // Feature limits by tier
 const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
   free: {
@@ -96,13 +88,8 @@ const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 export interface SubscriptionContextValue {
   // Core subscription state
   tier: SubscriptionTier;
-  effectiveTier: SubscriptionTier; // Considers beta testers (family) and trial (pro)
+  effectiveTier: SubscriptionTier; // Considers trial (pro)
   isLoading: boolean;
-
-  // Beta tester state
-  beta: BetaStatus;
-  isBetaTester: boolean;
-  betaDaysRemaining: number;
 
   // Trial state
   trial: TrialStatus;
@@ -129,12 +116,6 @@ interface SubscriptionProviderProps {
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [tier, setTier] = useState<SubscriptionTier>('free');
   const [isLoading, setIsLoading] = useState(true);
-  const [beta, setBeta] = useState<BetaStatus>({
-    isBetaTester: false,
-    betaEndsAt: null,
-    daysRemaining: 0,
-    isExpired: false,
-  });
   const [trial, setTrial] = useState<TrialStatus>({
     isInTrial: false,
     daysRemaining: 0,
@@ -162,12 +143,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
       if (!response.ok) {
         // Not logged in or error - default to free
         setTier('free');
-        setBeta({
-          isBetaTester: false,
-          betaEndsAt: null,
-          daysRemaining: 0,
-          isExpired: false,
-        });
         setTrial({
           isInTrial: false,
           daysRemaining: 0,
@@ -179,16 +154,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
 
       const data = await response.json();
       setTier(data.tier || 'free');
-
-      // Handle beta status
-      if (data.beta) {
-        setBeta({
-          isBetaTester: data.beta.isBetaTester || false,
-          betaEndsAt: data.beta.betaEndsAt ? new Date(data.beta.betaEndsAt) : null,
-          daysRemaining: data.beta.daysRemaining || 0,
-          isExpired: data.beta.isExpired || false,
-        });
-      }
 
       if (data.trial) {
         setTrial({
@@ -211,22 +176,17 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  // Computed values - Beta
-  const isBetaTester = beta.isBetaTester;
-  const betaDaysRemaining = beta.daysRemaining;
-
   // Computed values - Trial
   const isInTrial = trial.isInTrial;
   const trialDaysRemaining = trial.daysRemaining;
   const isTrialExpiringSoon = isInTrial && trialDaysRemaining <= 3;
   const hasTrialExpired = !isInTrial && trial.trialStartedAt !== null && trial.trialEndsAt !== null;
 
-  // Effective tier considers beta testers (family) and trial (pro)
+  // Effective tier considers trial (pro)
   const effectiveTier = useMemo(() => {
-    if (isBetaTester) return 'family'; // Beta testers get full access
     if (isInTrial) return 'pro';
     return tier;
-  }, [isBetaTester, isInTrial, tier]);
+  }, [isInTrial, tier]);
 
   const limits = useMemo(() => FEATURE_LIMITS[effectiveTier], [effectiveTier]);
 
@@ -246,9 +206,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     tier,
     effectiveTier,
     isLoading,
-    beta,
-    isBetaTester,
-    betaDaysRemaining,
     trial,
     isInTrial,
     trialDaysRemaining,
@@ -262,9 +219,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     tier,
     effectiveTier,
     isLoading,
-    beta,
-    isBetaTester,
-    betaDaysRemaining,
     trial,
     isInTrial,
     trialDaysRemaining,

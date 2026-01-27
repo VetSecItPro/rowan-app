@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 interface ActivityItem {
   id: string;
-  type: 'user_signup' | 'beta_granted' | 'beta_feedback' | 'feedback';
+  type: 'user_signup' | 'beta_feedback' | 'feedback';
   title: string;
   description: string;
   timestamp: string;
@@ -22,12 +22,6 @@ interface ProfileRecord {
   email?: string;
   full_name?: string;
   created_at: string;
-}
-
-interface BetaGrantRecord {
-  id: string;
-  email?: string;
-  access_granted_at: string;
 }
 
 interface BetaFeedbackRecord {
@@ -98,30 +92,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 2. Recent beta access grants
-    const { data: betaGrants, error: betaError } = await supabaseAdmin
-      .from('beta_access_requests')
-      .select('id, email, access_granted_at')
-      .eq('access_granted', true)
-      .not('access_granted_at', 'is', null)
-      .gte('access_granted_at', cutoffIso)
-      .order('access_granted_at', { ascending: false })
-      .limit(limit);
-
-    if (!betaError && betaGrants) {
-      (betaGrants as BetaGrantRecord[]).forEach((grant) => {
-        activities.push({
-          id: `beta-${grant.id}`,
-          type: 'beta_granted',
-          title: 'Beta access granted',
-          description: grant.email?.split('@')[0] || 'User',
-          timestamp: grant.access_granted_at,
-          email: grant.email,
-        });
-      });
-    }
-
-    // 3. Recent beta feedback
+    // 2. Recent beta feedback
     const { data: betaFeedback, error: feedbackError } = await supabaseAdmin
       .from('beta_feedback')
       .select(`

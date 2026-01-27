@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -14,8 +12,6 @@ import {
 } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { BetaAccessModal } from '@/components/beta/BetaAccessModal'
-import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal'
 import { getIconComponent, colorClasses } from '@/lib/utils/article-icons'
 import type { SerializedArticle } from '../ArticlesPageClient'
 
@@ -30,30 +26,13 @@ interface ArticlePageClientProps {
 }
 
 export default function ArticlePageClient({ article, relatedArticles, renderedContent }: ArticlePageClientProps) {
-  const router = useRouter()
-  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false)
-  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false)
-
-  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
-    if (inviteCode) {
-      const urlParams = new URLSearchParams()
-      urlParams.set('beta_code', inviteCode)
-      if (email) urlParams.set('email', email)
-      if (firstName) urlParams.set('first_name', firstName)
-      if (lastName) urlParams.set('last_name', lastName)
-      router.push(`/signup?${urlParams.toString()}`)
-    } else {
-      router.push('/signup')
-    }
-  }
-
   // 404 for unknown articles
   if (!article) {
     return (
       <div className="min-h-screen bg-gray-900">
         <Header
-          onBetaClick={() => setIsBetaModalOpen(true)}
-          onLaunchClick={() => setIsLaunchModalOpen(true)}
+          onSignupClick={() => window.location.href = '/signup'}
+          onPricingClick={() => window.location.href = '/pricing'}
           isPublicFeaturePage={true}
         />
         <main className="pt-32 pb-20 px-4">
@@ -84,8 +63,8 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
   return (
     <div className="min-h-screen bg-gray-900">
       <Header
-        onBetaClick={() => setIsBetaModalOpen(true)}
-        onLaunchClick={() => setIsLaunchModalOpen(true)}
+        onSignupClick={() => window.location.href = '/signup'}
+        onPricingClick={() => window.location.href = '/pricing'}
         isPublicFeaturePage={true}
       />
 
@@ -200,17 +179,17 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button
-                    onClick={() => setIsBetaModalOpen(true)}
+                    onClick={() => window.location.href = '/signup'}
                     className={`px-6 py-3 bg-gradient-to-r ${colors.gradient} text-white rounded-full font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2`}
                   >
                     Try Rowan Now
                     <ArrowRight className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => setIsLaunchModalOpen(true)}
+                    onClick={() => window.location.href = '/pricing'}
                     className="px-6 py-3 bg-gray-700 text-white rounded-full font-semibold hover:bg-gray-600 transition-colors"
                   >
-                    Get Notified
+                    View Pricing
                   </button>
                 </div>
               </motion.div>
@@ -255,19 +234,6 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
 
       <Footer />
 
-      <BetaAccessModal
-        isOpen={isBetaModalOpen}
-        onClose={() => setIsBetaModalOpen(false)}
-        onSuccess={handleBetaSuccess}
-        onSwitchToLaunch={() => {
-          setIsBetaModalOpen(false)
-          setIsLaunchModalOpen(true)
-        }}
-      />
-      <LaunchNotificationModal
-        isOpen={isLaunchModalOpen}
-        onClose={() => setIsLaunchModalOpen(false)}
-      />
     </div>
   )
 }

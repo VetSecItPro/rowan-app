@@ -33,28 +33,12 @@ export default function SignUpPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get beta code OR invite token from URL params
-  // beta_code: /signup?beta_code=XXXX-XXXX-XXXX (original beta users)
-  // invite_token: /signup?invite_token=xyz (users invited to a space)
-  const betaCode = searchParams.get('beta_code');
+  // Get invite token from URL params (for users invited to a space)
   const inviteToken = searchParams.get('invite_token');
 
-  // Get pre-fill data from URL (when coming from beta code validation)
-  const prefillEmail = searchParams.get('email');
-  const prefillFirstName = searchParams.get('first_name');
-  const prefillLastName = searchParams.get('last_name');
-
-  // Either beta_code or invite_token is valid for signup
-  const hasValidAuth = !!(betaCode || inviteToken);
-
-  const initialEmail = prefillEmail || '';
-  const initialName = prefillFirstName && prefillLastName
-    ? `${prefillFirstName} ${prefillLastName}`.trim()
-    : prefillFirstName || '';
-
-  const [email, setEmail] = useState(initialEmail);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState(initialName);
+  const [name, setName] = useState('');
   const [spaceName, setSpaceName] = useState('My Space');
   const [spaceTouched, setSpaceTouched] = useState(false);
   const [colorTheme, setColorTheme] = useState('emerald');
@@ -67,14 +51,6 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
   const [emailOptIn, setEmailOptIn] = useState(false);
-
-  // BETA PERIOD: Redirect to landing page if no valid authorization
-  // Users must have either a beta code OR an invitation token
-  useEffect(() => {
-    if (!hasValidAuth) {
-      router.replace('/?error=beta_required');
-    }
-  }, [hasValidAuth, router]);
 
   // Smooth fade-in animation on mount
   useEffect(() => {
@@ -121,18 +97,6 @@ export default function SignUpPage() {
     special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
   const passwordStrength = Object.values(passwordChecks).filter(Boolean).length;
-
-  // Don't render form if no authorization (redirect will happen)
-  if (!hasValidAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Redirecting...</p>
-        </div>
-      </div>
-    );
-  }
 
   const getColorClasses = (theme: string) => {
     switch (theme) {
@@ -215,9 +179,6 @@ export default function SignUpPage() {
 
     setIsLoading(true);
 
-    // Pass beta code OR invite token (from URL params)
-    // - beta_code: for original beta users (marks code as used)
-    // - invite_token: for users invited to a space (validates against space_invitations)
     const { error } = await signUp(
       email,
       password,
@@ -227,7 +188,6 @@ export default function SignUpPage() {
         space_name: effectiveSpaceName,
         marketing_emails_enabled: emailOptIn,
       },
-      betaCode || undefined,
       inviteToken || undefined
     );
 

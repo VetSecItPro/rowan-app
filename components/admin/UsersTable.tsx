@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Shield, Eye, Ban, Trash2, UserX, X, AlertTriangle } from 'lucide-react';
+import { User, Eye, Ban, Trash2, X, AlertTriangle } from 'lucide-react';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 interface User {
@@ -10,7 +10,6 @@ interface User {
   created_at: string;
   last_sign_in_at: string | null;
   email_confirmed_at: string | null;
-  is_beta: boolean;
   status: 'active' | 'inactive' | 'suspended';
 }
 
@@ -18,7 +17,7 @@ interface UsersTableProps {
   users: User[];
   isLoading: boolean;
   searchTerm: string;
-  filter: 'all' | 'beta' | 'active' | 'inactive';
+  filter: 'all' | 'active' | 'inactive';
 }
 
 export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableProps) {
@@ -30,7 +29,6 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
     const matchesSearch = (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
       filter === 'all' ||
-      (filter === 'beta' && user.is_beta) ||
       (filter === 'active' && user.status === 'active') ||
       (filter === 'inactive' && user.status === 'inactive');
 
@@ -48,7 +46,7 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
     });
   };
 
-  const handleUserAction = async (action: 'ban' | 'delete' | 'revoke-beta') => {
+  const handleUserAction = async (action: 'ban' | 'delete') => {
     if (!selectedUser) return;
 
     setActionInProgress(true);
@@ -75,15 +73,6 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
   };
 
   const getUserStatusBadge = (user: User) => {
-    if (user.is_beta) {
-      return (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/20 text-purple-400">
-          <Shield className="w-3 h-3 mr-1" />
-          Beta
-        </span>
-      );
-    }
-
     switch (user.status) {
       case 'active':
         return (
@@ -261,24 +250,6 @@ export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableP
                     </p>
                   </div>
                 </button>
-
-                {selectedUser.is_beta && (
-                  <button
-                    onClick={() => handleUserAction('revoke-beta')}
-                    disabled={actionInProgress}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-purple-900/20 border border-purple-800 rounded-lg hover:bg-purple-900/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <UserX className="w-5 h-5 text-purple-400" />
-                    <div className="text-left flex-1">
-                      <p className="text-sm font-medium text-purple-300">
-                        Revoke Beta Access
-                      </p>
-                      <p className="text-xs text-purple-400">
-                        Remove beta testing privileges
-                      </p>
-                    </div>
-                  </button>
-                )}
 
                 <button
                   onClick={() => handleUserAction('delete')}
