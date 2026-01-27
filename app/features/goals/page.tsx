@@ -1,14 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import { Trophy, Check, Target, Flame, Star, Sparkles, ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
-import { BetaAccessModal } from '@/components/beta/BetaAccessModal';
-import { LaunchNotificationModal } from '@/components/beta/LaunchNotificationModal';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 
 const containerVariants: Variants = {
@@ -34,28 +30,11 @@ const itemVariants: Variants = {
 };
 
 export default function GoalsFeaturePage() {
-  const router = useRouter();
-  const [isBetaModalOpen, setIsBetaModalOpen] = useState(false);
-  const [isLaunchModalOpen, setIsLaunchModalOpen] = useState(false);
-
-  const handleBetaSuccess = (inviteCode?: string, email?: string, firstName?: string, lastName?: string) => {
-    if (inviteCode) {
-      const params = new URLSearchParams();
-      params.set('beta_code', inviteCode);
-      if (email) params.set('email', email);
-      if (firstName) params.set('first_name', firstName);
-      if (lastName) params.set('last_name', lastName);
-      router.push(`/signup?${params.toString()}`);
-    } else {
-      router.push('/signup');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 overflow-x-hidden">
       <Header
-        onBetaClick={() => setIsBetaModalOpen(true)}
-        onLaunchClick={() => setIsLaunchModalOpen(true)}
+        onSignupClick={() => window.location.href = '/signup'}
+        onPricingClick={() => window.location.href = '/pricing'}
         isPublicFeaturePage={true}
       />
 
@@ -95,16 +74,16 @@ export default function GoalsFeaturePage() {
                 variants={itemVariants}
                 className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
               >
-                <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+                <MagneticButton className="group" onClick={() => window.location.href = '/signup'}>
                   <div className="px-8 py-4 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-purple-500/20 flex items-center justify-center gap-2">
-                    Access Beta Test
+                    Sign Up Free
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </MagneticButton>
 
-                <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+                <MagneticButton strength={15} onClick={() => window.location.href = '/pricing'}>
                   <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
-                    Get Notified on Launch
+                    View Pricing
                   </div>
                 </MagneticButton>
               </motion.div>
@@ -214,16 +193,16 @@ export default function GoalsFeaturePage() {
               Ready to achieve your family dreams?
             </h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <MagneticButton className="group" onClick={() => setIsBetaModalOpen(true)}>
+              <MagneticButton className="group" onClick={() => window.location.href = '/signup'}>
                 <div className="px-8 py-4 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full font-semibold text-base transition-all shadow-xl shadow-purple-500/20 flex items-center justify-center gap-2">
-                  Access Beta Test
+                  Sign Up Free
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </div>
               </MagneticButton>
 
-              <MagneticButton strength={15} onClick={() => setIsLaunchModalOpen(true)}>
+              <MagneticButton strength={15} onClick={() => window.location.href = '/pricing'}>
                 <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
-                  Get Notified on Launch
+                  View Pricing
                 </div>
               </MagneticButton>
             </div>
@@ -233,19 +212,6 @@ export default function GoalsFeaturePage() {
 
       <Footer />
 
-      <BetaAccessModal
-        isOpen={isBetaModalOpen}
-        onClose={() => setIsBetaModalOpen(false)}
-        onSuccess={handleBetaSuccess}
-        onSwitchToLaunch={() => {
-          setIsBetaModalOpen(false);
-          setIsLaunchModalOpen(true);
-        }}
-      />
-      <LaunchNotificationModal
-        isOpen={isLaunchModalOpen}
-        onClose={() => setIsLaunchModalOpen(false)}
-      />
     </div>
   );
 }

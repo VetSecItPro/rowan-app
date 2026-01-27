@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
       (async (): Promise<HealthMetric> => {
         try {
           const start = Date.now();
-          const { error } = await supabaseAdmin.from('beta_access_requests').select('id').limit(1);
+          const { error } = await supabaseAdmin.from('users').select('id').limit(1);
           const responseTime = Date.now() - start;
 
           if (error) {
@@ -110,39 +110,6 @@ export async function GET(req: NextRequest) {
             status: 'critical',
             value: 'Error',
             description: 'Failed to connect to database',
-            lastChecked: now,
-          };
-        }
-      })(),
-
-      // Beta program capacity check
-      (async (): Promise<HealthMetric> => {
-        try {
-          const { count, error } = await supabaseAdmin
-            .from('beta_access_requests')
-            .select('*', { count: 'exact', head: true })
-            .eq('access_granted', true)
-            .not('user_id', 'is', null);
-
-          if (error) throw error;
-
-          const activeBetaUsers = count ?? 0;
-          const capacity = 100; // Beta program capacity is 100 users
-          const usage = Math.round((activeBetaUsers / capacity) * 100);
-
-          return {
-            name: 'Beta Program Capacity',
-            status: usage < 80 ? 'healthy' : usage < 95 ? 'warning' : 'critical',
-            value: `${usage}%`,
-            description: `${activeBetaUsers}/${capacity} beta slots used`,
-            lastChecked: now,
-          };
-        } catch {
-          return {
-            name: 'Beta Program Capacity',
-            status: 'critical',
-            value: 'Error',
-            description: 'Failed to check beta capacity',
             lastChecked: now,
           };
         }
@@ -206,7 +173,7 @@ export async function GET(req: NextRequest) {
         try {
           const testStart = Date.now();
           // Test a simple database query to measure API response time
-          await supabaseAdmin.from('beta_access_requests').select('id').limit(1);
+          await supabaseAdmin.from('users').select('id').limit(1);
           const apiResponseTime = Date.now() - testStart;
 
           return {
@@ -279,7 +246,7 @@ export async function GET(req: NextRequest) {
     // Performance metrics for API endpoints
     const performanceMetrics: PerformanceMetric[] = [
       {
-        endpoint: '/api/beta/validate',
+        endpoint: '/api/subscriptions',
         avgResponseTime: 120 + Math.floor(Math.random() * 100),
         errorRate: Math.random() * 2,
         requestCount: 1250 + Math.floor(Math.random() * 500),

@@ -34,21 +34,19 @@ import {
   RetentionPanel,
   RevenuePanel,
   SystemPanel,
-  BetaFeedbackPanel,
+  FeedbackPanel,
 } from '@/components/admin/panels';
 
 interface DashboardStats {
   totalUsers: number;
   activeUsers: number;
-  betaUsers: number;
   launchSignups: number;
-  betaRequestsToday: number;
   signupsToday: number;
 }
 
 interface ActivityItem {
   id: string;
-  type: 'user_signup' | 'beta_granted' | 'beta_feedback' | 'feedback';
+  type: 'user_signup' | 'feedback';
   title: string;
   description: string;
   timestamp: string;
@@ -72,7 +70,7 @@ const TABS: Tab[] = [
   { id: 'engagement', label: 'Engagement', icon: Zap, color: 'text-cyan-500', description: 'Traffic & features' },
   { id: 'retention', label: 'Retention', icon: Activity, color: 'text-purple-500', description: 'DAU/MAU & cohorts' },
   { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-orange-500', description: 'Subscriptions & MRR' },
-  { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-pink-500', description: 'Beta user feedback' },
+  { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-amber-500', description: 'User feedback & bugs' },
   { id: 'system', label: 'System', icon: Settings, color: 'text-gray-500', description: 'Health & settings' },
 ];
 
@@ -283,18 +281,11 @@ function AdminDashboardContent() {
           iconBg: 'bg-green-900/30',
           iconColor: 'text-green-400',
         };
-      case 'beta_granted':
-        return {
-          icon: Shield,
-          iconBg: 'bg-purple-900/30',
-          iconColor: 'text-purple-400',
-        };
-      case 'beta_feedback':
       case 'feedback':
         return {
           icon: MessageSquare,
-          iconBg: 'bg-pink-900/30',
-          iconColor: 'text-pink-400',
+          iconBg: 'bg-amber-900/30',
+          iconColor: 'text-amber-400',
         };
       default:
         return {
@@ -321,7 +312,7 @@ function AdminDashboardContent() {
       case 'revenue':
         return <RevenuePanel />;
       case 'feedback':
-        return <BetaFeedbackPanel />;
+        return <FeedbackPanel />;
       case 'system':
         return <SystemPanel />;
       default:
@@ -375,7 +366,7 @@ function AdminDashboardContent() {
         {isLoading || !stats ? (
           <StatsSkeleton />
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
               title="Total Users"
               value={stats.totalUsers ?? 0}
@@ -393,14 +384,6 @@ function AdminDashboardContent() {
               trendValue={(stats.activeUsers ?? 0) > 0 ? "Active" : undefined}
             />
             <StatCard
-              title="Beta Users"
-              value={`${stats.betaUsers ?? 0}/100`}
-              icon={Shield}
-              color="purple"
-              trend={(stats.betaUsers ?? 0) > 0 ? "up" : undefined}
-              trendValue={(stats.betaUsers ?? 0) < 100 ? `${100 - (stats.betaUsers ?? 0)} slots left` : "Full"}
-            />
-            <StatCard
               title="Launch Signups"
               value={stats.launchSignups ?? 0}
               icon={Mail}
@@ -409,18 +392,10 @@ function AdminDashboardContent() {
               trendValue={(stats.launchSignups ?? 0) > 0 ? "Interested" : undefined}
             />
             <StatCard
-              title="Beta Requests"
-              value={stats.betaRequestsToday ?? 0}
-              icon={Activity}
-              color="red"
-              trend={(stats.betaRequestsToday ?? 0) > 0 ? "neutral" : undefined}
-              trendValue={(stats.betaRequestsToday ?? 0) > 0 ? "Today" : undefined}
-            />
-            <StatCard
               title="Signups Today"
               value={stats.signupsToday ?? 0}
               icon={TrendingUp}
-              color="gray"
+              color="purple"
               trend={(stats.signupsToday ?? 0) > 0 ? "up" : undefined}
               trendValue={(stats.signupsToday ?? 0) > 0 ? "Today" : undefined}
             />
@@ -470,8 +445,8 @@ function AdminDashboardContent() {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
-                <p className="text-sm font-medium text-white">Beta</p>
-                <p className="text-xs text-gray-500">{stats?.betaUsers ?? 0}/100</p>
+                <p className="text-sm font-medium text-white">Email</p>
+                <p className="text-xs text-gray-500">Connected</p>
               </div>
             </div>
           </div>

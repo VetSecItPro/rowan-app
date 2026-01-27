@@ -9,8 +9,8 @@ import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { Users, Zap, Shield, Compass as CompassIcon } from 'lucide-react';
 
 interface HeroSectionProps {
-    onBetaClick: () => void;
-    onLaunchClick: () => void;
+    onSignupClick: () => void;
+    onPricingClick: () => void;
 }
 
 const benefits = [
@@ -40,7 +40,7 @@ const benefits = [
     }
 ];
 
-export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
+export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps) {
     const heroRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: heroRef,
@@ -118,16 +118,16 @@ export function HeroSection({ onBetaClick, onLaunchClick }: HeroSectionProps) {
                             transition={{ duration: 0.6, delay: 0.4 }}
                             className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 w-full sm:w-auto mt-2"
                         >
-                            <MagneticButton className="group" onClick={onBetaClick}>
+                            <MagneticButton className="group" onClick={onSignupClick}>
                                 <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full font-semibold text-base transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
-                                    Access Beta Test
+                                    Get Started Free
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </div>
                             </MagneticButton>
 
-                            <MagneticButton strength={15} onClick={onLaunchClick}>
+                            <MagneticButton strength={15} onClick={onPricingClick}>
                                 <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
-                                    Get Notified on Launch
+                                    See Pricing
                                 </div>
                             </MagneticButton>
                         </motion.div>

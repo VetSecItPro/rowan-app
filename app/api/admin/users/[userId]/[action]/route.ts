@@ -13,12 +13,12 @@ export const dynamic = 'force-dynamic';
 
 const AdminUserActionParamsSchema = z.object({
   userId: z.string().uuid(),
-  action: z.enum(['ban', 'delete', 'revoke-beta']),
+  action: z.enum(['ban', 'delete']),
 });
 
 /**
  * POST /api/admin/users/[userId]/[action]
- * Perform admin actions on users (ban, delete, revoke-beta)
+ * Perform admin actions on users (ban, delete)
  */
 export async function POST(
   req: NextRequest,
@@ -93,26 +93,6 @@ export async function POST(
 
         if (deleteError) {
           throw new Error(`Failed to delete user: ${deleteError.message}`);
-        }
-
-        // Also clean up beta access requests if any
-        await supabaseAdmin
-          .from('beta_access_requests')
-          .delete()
-          .eq('user_id', userId);
-
-        break;
-      }
-
-      case 'revoke-beta': {
-        // Revoke beta access by setting access_granted to false
-        const { error: revokeError } = await supabaseAdmin
-          .from('beta_access_requests')
-          .update({ access_granted: false, approved_at: null })
-          .eq('user_id', userId);
-
-        if (revokeError) {
-          throw new Error(`Failed to revoke beta access: ${revokeError.message}`);
         }
 
         break;

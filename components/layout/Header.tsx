@@ -14,35 +14,6 @@ import { useSpaces } from '@/lib/contexts/spaces-context';
 import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus, TestTube } from 'lucide-react';
 import { hasAdminAccess } from '@/lib/utils/admin-utils';
 
-// Beta period end date - Feb 15, 2026
-const BETA_END_DATE = new Date('2026-02-15T23:59:59Z');
-
-// Helper to check beta tester status
-// All users created before Feb 15, 2026 are beta testers
-const isBetaTester = (user: {
-  is_beta_tester?: boolean;
-  beta_status?: string;
-  beta_invite_code_id?: string;
-  beta_ends_at?: string;
-  created_at?: string;
-} | null) => {
-  if (!user) return false;
-
-  // BETA PERIOD: All users created before Feb 15, 2026 are beta testers
-  if (user.created_at) {
-    const createdAt = new Date(user.created_at);
-    if (createdAt < BETA_END_DATE) return true;
-  }
-
-  // Legacy checks (for backward compatibility)
-  if (user.is_beta_tester && user.beta_status === 'approved') return true;
-  if (user.beta_invite_code_id && user.beta_ends_at) {
-    const endsAt = new Date(user.beta_ends_at);
-    return endsAt > new Date();
-  }
-  return false;
-};
-
 const COLOR_THEMES = {
   emerald: 'bg-emerald-500',
   blue: 'bg-blue-500',
@@ -55,14 +26,14 @@ const COLOR_THEMES = {
 };
 
 interface HeaderProps {
-  onBetaClick?: () => void;
-  onLaunchClick?: () => void;
+  onSignupClick?: () => void;
+  onPricingClick?: () => void;
   isPublicFeaturePage?: boolean;
   /** Use 'landing' for homepage with animations, 'default' for app pages */
   variant?: 'default' | 'landing';
 }
 
-export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, variant = 'default' }: HeaderProps) {
+export function Header({ onSignupClick, onPricingClick, isPublicFeaturePage, variant = 'default' }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { currentSpace } = useSpaces();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -252,10 +223,10 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
                 Dashboard
               </Link>
 
-              {/* Admin/Beta Badge - default variant only */}
-              {!isLanding && (hasAdminAccess(user) || isBetaTester(user)) && (
-                <div className="flex">
-                  {hasAdminAccess(user) ? (
+              {/* Admin Badge + Beta Badge - default variant only */}
+              {!isLanding && (
+                <div className="flex items-center gap-2">
+                  {hasAdminAccess(user) && (
                     <Link
                       href="/admin/dashboard"
                       className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-900/30 border border-indigo-700 text-indigo-300 rounded-full text-xs font-medium hover:bg-indigo-900/50 transition-colors"
@@ -263,12 +234,11 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
                       <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       <span className="hidden sm:inline">Admin</span>
                     </Link>
-                  ) : (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-900/30 border border-amber-700 text-amber-300 rounded-full text-xs font-medium">
-                      <TestTube className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>Beta</span>
-                    </div>
                   )}
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-900/30 border border-amber-700 text-amber-300 rounded-full text-xs font-medium">
+                    <TestTube className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span>Beta</span>
+                  </div>
                 </div>
               )}
 
@@ -395,16 +365,16 @@ export function Header({ onBetaClick, onLaunchClick, isPublicFeaturePage, varian
             // Public feature page buttons
             <div className="flex items-center gap-2 sm:gap-3">
               <button
-                onClick={onBetaClick}
+                onClick={onSignupClick}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-[10px] sm:text-xs font-bold rounded-full transition-all shadow-md active:scale-95 whitespace-nowrap"
               >
-                Join Beta
+                Sign Up
               </button>
               <button
-                onClick={onLaunchClick}
+                onClick={onPricingClick}
                 className="hidden sm:block px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 text-[10px] sm:text-xs font-bold rounded-full transition-all shadow-sm active:scale-95 whitespace-nowrap"
               >
-                Get Notified
+                See Pricing
               </button>
             </div>
           ) : (

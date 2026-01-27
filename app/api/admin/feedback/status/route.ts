@@ -94,23 +94,6 @@ export async function PATCH(req: NextRequest) {
       throw new Error(`Failed to update feedback: ${updateError.message}`);
     }
 
-    // Log admin action
-
-    // Track admin activity
-    await supabaseAdmin
-      .from('beta_tester_activity')
-      .insert({
-        user_id: sessionData.adminId,
-        activity_type: 'admin_feedback_update',
-        feature_used: `status_change_${validatedData.status}`,
-        device_info: {
-          feedback_id: validatedData.feedbackId,
-          old_status: 'unknown', // We could track this if needed
-          new_status: validatedData.status,
-          admin_email: sessionData.email
-        }
-      });
-
     return NextResponse.json({
       success: true,
       feedback,

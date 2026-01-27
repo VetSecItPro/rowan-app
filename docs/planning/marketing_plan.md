@@ -601,7 +601,7 @@ This comprehensive marketing plan leverages your unique position as a solo devel
 **Premium Positioning Strategy:**
 - **Quality Focus:** "Premium family collaboration for discerning households"
 - **Exclusivity:** "Join families who refuse to settle for basic apps"
-- **Results Guarantee:** "30-day money-back guarantee"
+- **Risk-Free Trial:** "14-day free trial — no credit card required"
 
 ### Revenue Maximization Tactics
 
@@ -671,7 +671,7 @@ This comprehensive marketing plan leverages your unique position as a solo devel
 **In-App Conversion Elements:**
 - **Progress Indicators:** Show how much more organized they could be
 - **Social Proof:** Number of families using Rowan successfully
-- **Risk Reversal:** 30-day money-back guarantee prominently displayed
+- **Risk Reversal:** 14-day free trial with no credit card required
 
 ---
 
