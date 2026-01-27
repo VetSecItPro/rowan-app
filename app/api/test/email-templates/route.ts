@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
-import BetaInviteEmail from '@/lib/emails/templates/BetaInviteEmail';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -208,34 +207,10 @@ export async function POST(request: NextRequest) {
         result = await verifyEmailService();
         break;
 
-      case 'beta-invite':
-        if (!resend) {
-          return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
-        }
-        const betaCode = body.betaCode || 'TEST-CODE-1234';
-        const signupUrl = `https://rowanapp.com/signup?beta_code=${betaCode}`;
-        const betaEmailHtml = await render(
-          BetaInviteEmail({
-            recipientEmail: email,
-            inviteCode: betaCode,
-            signupUrl,
-            expiresAt: 'February 15, 2026',
-          })
-        );
-        const { data: betaData, error: betaError } = await resend.emails.send({
-          from: 'Rowan <notifications@rowanapp.com>',
-          replyTo: 'support@rowanapp.com',
-          to: email,
-          subject: "You're invited to Rowan Beta! 🌳",
-          html: betaEmailHtml,
-        });
-        result = betaError ? { success: false, error: betaError.message } : { success: true, messageId: betaData?.id };
-        break;
-
       default:
         return NextResponse.json({
           error: 'Invalid email type',
-          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'password-reset', 'magic-link', 'email-verification', 'beta-invite', 'verify']
+          validTypes: ['task', 'event', 'message', 'shopping', 'meal', 'reminder', 'password-reset', 'magic-link', 'email-verification', 'verify']
         }, { status: 400 });
     }
 

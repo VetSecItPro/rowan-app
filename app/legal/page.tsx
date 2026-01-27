@@ -165,12 +165,13 @@ function TermsContent() {
           <li>You&apos;re responsible for any taxes or fees</li>
         </ul>
 
-        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Cancellation and Refunds</h3>
+        <h3 className="text-xl font-semibold text-white mb-3 mt-6">Cancellation Policy</h3>
         <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
           <li>You can cancel your subscription at any time</li>
           <li>Cancellation takes effect at the end of the current billing period</li>
-          <li>No refunds for partial months or unused portions</li>
+          <li>All sales are final — no refunds will be issued</li>
           <li>Access continues until the end of your paid period</li>
+          <li>A free trial is provided so you can evaluate the service before purchasing</li>
         </ul>
       </section>
 

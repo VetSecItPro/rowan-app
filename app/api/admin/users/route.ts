@@ -26,11 +26,6 @@ type AuthUserRecord = {
   user_metadata?: Record<string, unknown> | null;
 };
 
-type BetaAccessRecord = {
-  user_id: string | null;
-  access_granted?: boolean | null;
-};
-
 /**
  * GET /api/admin/users
  * Get all users for admin management
@@ -81,29 +76,7 @@ export async function GET(req: NextRequest) {
           throw new Error(`Failed to fetch auth users: ${authError.message}`);
         }
 
-        // Get beta access information for users
         const authUserRecords = authUsers.users as AuthUserRecord[];
-        const userIds = authUserRecords.map((user) => user.id);
-
-        let betaUsers: BetaAccessRecord[] = [];
-        if (userIds.length > 0) {
-          const { data: betaData, error: betaError } = await supabaseAdmin
-            .from('beta_access_requests')
-            .select('user_id, access_granted')
-            .in('user_id', userIds)
-            .eq('access_granted', true);
-
-          if (!betaError) {
-            betaUsers = betaData || [];
-          }
-        }
-
-        // Create a set of beta user IDs for quick lookup
-        const betaUserIds = new Set(
-          betaUsers
-            .map((beta) => beta.user_id)
-            .filter((userId): userId is string => Boolean(userId))
-        );
 
         // Transform users data
         const users = authUserRecords.map((user) => ({
@@ -112,7 +85,6 @@ export async function GET(req: NextRequest) {
           created_at: user.created_at,
           last_sign_in_at: user.last_sign_in_at,
           email_confirmed_at: user.email_confirmed_at,
-          is_beta: betaUserIds.has(user.id),
           status: user.last_sign_in_at ? 'active' : 'inactive',
           user_metadata: user.user_metadata,
         }));

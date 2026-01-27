@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * This route only handles:
  * 1. Rate limiting
  * 2. Input validation
- * 3. Beta code / invite token validation
+ * 3. Invite token validation (for space invitations)
  * 4. Calling Supabase auth.signUp() with metadata
  *
  * All user provisioning (spaces, subscriptions, etc.) is handled by
@@ -81,12 +81,8 @@ export async function POST(request: NextRequest) {
         space_name: z.string().min(1, 'Space name is required').max(100).trim(),
         marketing_emails_enabled: z.boolean().optional(),
       }),
-      beta_code: z.string().min(8).max(20).optional(),
       invite_token: z.string().min(1).max(500).optional(),
-    }).refine(
-      (data) => data.beta_code || data.invite_token,
-      { message: 'A beta invite code or invitation token is required' }
-    );
+    });
 
     const body = await request.json();
     const validated = SignUpSchema.parse(body);
@@ -100,61 +96,9 @@ export async function POST(request: NextRequest) {
     };
 
     // ========================================================================
-    // STEP 3: Validate beta code OR invite token (fail fast)
+    // STEP 3: Validate invite token if provided (for space invitations)
     // ========================================================================
-    if (validated.beta_code) {
-      const normalizedCode = validated.beta_code.replace(/-/g, '').toUpperCase().trim();
-      const originalCode = validated.beta_code.toUpperCase().trim();
-
-      // Use .in() instead of .or() - safer for codes with special characters like hyphens
-      const codesToCheck = [originalCode];
-      if (normalizedCode !== originalCode) {
-        codesToCheck.push(normalizedCode);
-      }
-
-      const { data: codeData, error: codeError } = await supabaseAdmin
-        .from('beta_invite_codes')
-        .select('id, code, used_by, expires_at, is_active')
-        .in('code', codesToCheck)
-        .limit(1)
-        .maybeSingle();
-
-      if (codeError) {
-        console.error('Beta code lookup error:', codeError);
-        return NextResponse.json(
-          { error: 'Error validating beta code. Please try again.' },
-          { status: 500 }
-        );
-      }
-
-      if (!codeData) {
-        return NextResponse.json(
-          { error: 'Invalid beta invite code. Please check your code and try again.' },
-          { status: 400 }
-        );
-      }
-
-      if (codeData.used_by) {
-        return NextResponse.json(
-          { error: 'This beta invite code has already been used.' },
-          { status: 400 }
-        );
-      }
-
-      if (!codeData.is_active) {
-        return NextResponse.json(
-          { error: 'This beta invite code is no longer active.' },
-          { status: 400 }
-        );
-      }
-
-      if (codeData.expires_at && new Date(codeData.expires_at) < new Date()) {
-        return NextResponse.json(
-          { error: 'This beta invite code has expired.' },
-          { status: 400 }
-        );
-      }
-    } else if (validated.invite_token) {
+    if (validated.invite_token) {
       const { data: inviteData, error: inviteError } = await supabaseAdmin
         .from('space_invitations')
         .select('id, status, expires_at')
@@ -210,7 +154,6 @@ export async function POST(request: NextRequest) {
           name: sanitizedProfile.name,
           space_name: sanitizedProfile.space_name,
           color_theme: sanitizedProfile.color_theme,
-          beta_code: validated.beta_code || null,
           invite_token: validated.invite_token || null,
           marketing_emails_enabled: sanitizedProfile.marketing_emails_enabled,
         },
