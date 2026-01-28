@@ -48,16 +48,45 @@ All plugins installed upfront to minimize future App Store reviews:
 
 Native bridges: `lib/native/` (capacitor, push-notifications, geolocation, barcode, calendar, network)
 
-### Remaining (External Setup)
-| Task | Notes |
-|------|-------|
-| Firebase project | Create project, enable FCM |
-| `google-services.json` | Download → `android/app/` |
-| `GoogleService-Info.plist` | Download → `ios/App/App/` |
-| APNs key | Apple Developer → upload to Firebase |
-| `npx cap sync` | After Firebase config files placed |
-| Test native builds | Android Studio / Xcode |
-| App store submissions | Icons, screenshots, listings |
+### Push Notification Setup Status
+| Item | Status |
+|------|--------|
+| Firebase project (`rowan-c8006`) | ✅ Created, FCM enabled |
+| `google-services.json` (Android) | ✅ In `android/app/` (gitignored) |
+| `GoogleService-Info.plist` (iOS) | ✅ In `ios/App/App/` (gitignored) |
+| FCM HTTP v1 API | ✅ Upgraded from legacy API (PR #162) |
+| VAPID keys (web push) | ✅ Configured in `.env.local` |
+| Native push bridge code | ✅ `lib/native/push-notifications.ts` |
+| `push_tokens` DB table + RLS | ✅ Ready |
+| `android/` and `ios/` gitignored | ✅ Fixed (PR #162) |
+
+### Remaining (Blocked on Developer Accounts)
+
+> **Blocker**: Apple Developer account validation pending (created Jan 2026). Google Play account also pending. Need Android phone for testing.
+
+**When Apple Developer account is approved:**
+1. Go to [Apple Developer → Keys](https://developer.apple.com/account/resources/authkeys/list)
+2. Create a new key, enable "Apple Push Notifications service (APNs)"
+3. Download the `.p8` file (only downloadable once!)
+4. Note the **Key ID** (10-char string) and your **Team ID** (from Membership page)
+5. Go to [Firebase Console → Project Settings → Cloud Messaging](https://console.firebase.google.com/project/rowan-c8006/settings/cloudmessaging)
+6. Under "Apple app configuration", upload the `.p8` key, enter Key ID and Team ID
+7. Build and test on physical iOS device via Xcode (`npx cap open ios`)
+
+**When Google Play account is approved:**
+1. Build and test on physical Android device via Android Studio (`npx cap open android`)
+2. Set up Google Play Console listing (app name, description, screenshots, icons)
+
+**Server-side (do anytime — no account needed):**
+1. Go to [Firebase Console → Project Settings → Service accounts](https://console.firebase.google.com/project/rowan-c8006/settings/serviceaccounts/adminsdk)
+2. Click "Generate new private key" → downloads JSON file
+3. Set the entire JSON as `FIREBASE_SERVICE_ACCOUNT` env var in [Vercel dashboard](https://vercel.com) (single-line string)
+4. Also set in `.env.local` for local testing
+
+**Final steps after all accounts ready:**
+1. `npx cap sync` — syncs web assets and native config
+2. Test push notifications end-to-end on both platforms
+3. Submit to App Store and Google Play
 
 ### Future Enhancements (Code Ready When Needed)
 - Mutation queue integration with React Query (Phase 5)

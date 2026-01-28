@@ -192,13 +192,16 @@ function applyPrecision(
   switch (precision) {
     case 'exact':
       return { latitude, longitude };
-    case 'approximate':
-      // Fuzz to ~500m radius
+    case 'approximate': {
+      // Fuzz to ~500m radius using cryptographically secure randomness
       const fuzzFactor = 0.005; // ~500m at equator
+      const bytes = new Uint32Array(2);
+      crypto.getRandomValues(bytes);
       return {
-        latitude: latitude + (Math.random() - 0.5) * fuzzFactor,
-        longitude: longitude + (Math.random() - 0.5) * fuzzFactor,
+        latitude: latitude + (bytes[0] / 0xFFFFFFFF - 0.5) * fuzzFactor,
+        longitude: longitude + (bytes[1] / 0xFFFFFFFF - 0.5) * fuzzFactor,
       };
+    }
     case 'city':
       // Round to 2 decimal places (~1km precision)
       return {

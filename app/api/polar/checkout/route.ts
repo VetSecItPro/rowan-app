@@ -143,10 +143,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      {
-        error: 'Failed to create checkout session',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to create checkout session. Please try again.' },
       { status: 500 }
     );
   }

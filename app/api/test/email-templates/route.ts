@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
+import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
+import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -33,14 +37,38 @@ export const dynamic = 'force-dynamic';
 //
 // SECURITY: This endpoint is disabled in production to prevent abuse (spam, phishing, cost burn)
 
-export async function POST(request: NextRequest) {
-  // SECURITY: Block this endpoint in production to prevent spam/phishing abuse
-  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_TEST_ENDPOINTS) {
-    return NextResponse.json(
-      { error: 'Not found' },
-      { status: 404 }
-    );
+async function requireTestAccess(): Promise<NextResponse | null> {
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.ALLOW_TEST_ENDPOINTS) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
+    // Defense-in-depth: require admin auth even when env var is set
+    try {
+      const cookieStore = await safeCookiesAsync();
+      const adminSession = cookieStore.get('admin-session');
+      if (!adminSession) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      const sessionData = await decryptSessionData(adminSession.value);
+      if (!validateSessionData(sessionData)) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      }
+    } catch {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    }
   }
+  return null;
+}
+
+export async function POST(request: NextRequest) {
+  // Rate limiting
+  const ip = extractIP(request.headers);
+  const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+  if (!rateLimitSuccess) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  // SECURITY: Block in production unless ALLOW_TEST_ENDPOINTS + admin auth
+  const accessDenied = await requireTestAccess();
+  if (accessDenied) return accessDenied;
 
   try {
     const body = await request.json();
@@ -225,20 +253,23 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Email test error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
-export async function GET() {
-  // SECURITY: Block this endpoint in production to prevent information disclosure
-  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_TEST_ENDPOINTS) {
-    return NextResponse.json(
-      { error: 'Not found' },
-      { status: 404 }
-    );
+export async function GET(request: NextRequest) {
+  // Rate limiting
+  const ipGet = extractIP(request.headers);
+  const { success: rateLimitGet } = await checkGeneralRateLimit(ipGet);
+  if (!rateLimitGet) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
+
+  // SECURITY: Block in production unless ALLOW_TEST_ENDPOINTS + admin auth
+  const accessDenied = await requireTestAccess();
+  if (accessDenied) return accessDenied;
 
   return NextResponse.json({
     message: 'Email Templates Test Endpoint',

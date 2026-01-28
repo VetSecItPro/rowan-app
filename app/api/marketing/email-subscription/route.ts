@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
 const EmailSubscriptionSchema = z.object({
@@ -27,6 +29,12 @@ async function resolveRequestUser(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body = await req.json();
     const parsed = EmailSubscriptionSchema.safeParse(body);
     if (!parsed.success) {

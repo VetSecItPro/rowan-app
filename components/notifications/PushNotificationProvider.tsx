@@ -82,7 +82,7 @@ export function PushNotificationProvider({ children }: PushNotificationProviderP
    * Show an in-app notification toast
    */
   const showNotification = useCallback((notification: Omit<InAppNotification, 'id' | 'timestamp'>) => {
-    const id = Math.random().toString(36).slice(2);
+    const id = crypto.randomUUID();
     const newNotification: InAppNotification = {
       ...notification,
       id,
