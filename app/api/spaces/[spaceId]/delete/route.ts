@@ -6,7 +6,17 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { z } from 'zod';
 import { logger } from '@/lib/logger';
+
+const SpaceParamsSchema = z.object({
+  spaceId: z.string().uuid('Invalid space ID format'),
+});
+
+const DeleteSpaceBodySchema = z.object({
+  confirmation: z.literal('DELETE_SPACE'),
+  spaceName: z.string().min(1, 'Space name is required for confirmation'),
+});
 
 /**
  * DELETE /api/spaces/[spaceId]/delete
@@ -44,36 +54,22 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ spaceI
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    const { spaceId } = params;
-
-    // SECURITY: UUID validation for space_id
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(spaceId)) {
-      return NextResponse.json(
-        { error: 'Invalid Space ID format' },
-        { status: 400 }
-      );
+    const paramsParsed = SpaceParamsSchema.safeParse(params);
+    if (!paramsParsed.success) {
+      return NextResponse.json({ error: 'Invalid Space ID format' }, { status: 400 });
     }
+    const { spaceId } = paramsParsed.data;
 
-    // Parse request body for confirmation
+    // Parse and validate request body
     const body = await req.json();
-    const { confirmation, spaceName } = body;
-
-    // SECURITY: Require explicit confirmation
-    if (confirmation !== 'DELETE_SPACE') {
+    const bodyParsed = DeleteSpaceBodySchema.safeParse(body);
+    if (!bodyParsed.success) {
       return NextResponse.json(
-        { error: 'Invalid confirmation. Space deletion requires explicit confirmation.' },
+        { error: 'Invalid request. Confirmation and space name are required.' },
         { status: 400 }
       );
     }
-
-    // SECURITY: Verify space name matches (additional security)
-    if (!spaceName || typeof spaceName !== 'string') {
-      return NextResponse.json(
-        { error: 'Space name is required for confirmation' },
-        { status: 400 }
-      );
-    }
+    const { spaceName } = bodyParsed.data;
 
     // First, get the space details
     const { data: space, error: spaceError } = await supabase

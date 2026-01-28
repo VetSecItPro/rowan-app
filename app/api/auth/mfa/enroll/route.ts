@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         action: 'ENROLL',
       });
       return NextResponse.json(
-        { error: 'Failed to enroll in MFA: ' + error.message },
+        { error: 'Failed to enroll in MFA. Please try again.' },
         { status: 500 }
       );
     }
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
         action: 'LIST_FACTORS',
       });
       return NextResponse.json(
-        { error: 'Failed to list MFA factors: ' + error.message },
+        { error: 'Failed to list MFA factors. Please try again.' },
         { status: 500 }
       );
     }

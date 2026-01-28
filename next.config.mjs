@@ -217,6 +217,10 @@ const nextConfig = {
             value: 'max-age=31536000; includeSubDomains; preload',
           },
           {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
             key: 'Cache-Control',
             value: 'no-cache, no-store, must-revalidate',
           },

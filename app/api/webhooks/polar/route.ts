@@ -15,6 +15,8 @@ import { createHmac, timingSafeEqual } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getPlanFromProductId } from '@/lib/polar';
 import { sendSubscriptionWelcomeEmail, sendSubscriptionCancelledEmail } from '@/lib/services/email-service';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import type { SubscriptionTier, SubscriptionPeriod } from '@/lib/types';
 
@@ -54,6 +56,13 @@ function verifyWebhookSignature(
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit by IP as defense-in-depth (signature verification is primary auth)
+  const ip = extractIP(request.headers);
+  const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+  if (!rateLimitSuccess) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   const body = await request.text();
   const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 

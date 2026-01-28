@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
 
       if (error) {
         logger.error('Error recording feature event:', error, { component: 'api-route', action: 'api_request' });
-        return { success: false, error: error.message };
+        return { success: false, error: 'Failed to record event' };
       }
 
       return { success: true, id: data };

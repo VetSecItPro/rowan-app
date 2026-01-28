@@ -40,10 +40,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -131,10 +130,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

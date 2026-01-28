@@ -8,6 +8,9 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { validateImageMagicBytes, isFormatAllowed, ALLOWED_AVATAR_FORMATS } from '@/lib/utils/file-validation';
 import { logger } from '@/lib/logger';
 
+// Avatar file size limit: 5MB
+const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024;
+
 /**
  * POST /api/upload/avatar
  * Upload user avatar image
@@ -46,6 +49,14 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { error: 'No file provided' },
+        { status: 400 }
+      );
+    }
+
+    // Validate file size
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: 'File too large. Maximum avatar size is 5MB.' },
         { status: 400 }
       );
     }

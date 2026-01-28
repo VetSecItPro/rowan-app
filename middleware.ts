@@ -475,6 +475,11 @@ export async function middleware(req: NextRequest) {
       'Permissions-Policy',
       'camera=(), microphone=(), geolocation=()'
     );
+
+    response.headers.set(
+      'X-XSS-Protection',
+      '1; mode=block'
+    );
   }
 
   return response;

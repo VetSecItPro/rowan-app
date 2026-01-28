@@ -95,13 +95,13 @@ export function PricingCard({
       <button
         onClick={onSelect}
         disabled={loading || disabled}
-        className={`mb-6 w-full rounded-lg px-6 py-3 text-base font-semibold transition-all flex items-center justify-center gap-2 ${
+        className={`mb-6 w-full rounded-full px-6 py-3 text-base font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
           popular
             ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 shadow-md hover:shadow-lg'
             : isFree
               ? 'bg-gray-700 text-white hover:bg-gray-600'
               : 'bg-gray-700 text-white hover:bg-gray-600'
-        } ${(loading || disabled) ? 'opacity-60 cursor-not-allowed' : ''}`}
+        } ${(loading || disabled) ? 'opacity-60 cursor-not-allowed' : 'hover:-translate-y-0.5 hover:shadow-lg'}`}
         aria-label={`${cta} for ${title} plan`}
       >
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
