@@ -64,7 +64,7 @@ export interface ConflictQueueState {
  * Generate unique mutation ID
  */
 function generateMutationId(): string {
-  return `mut_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  return `mut_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

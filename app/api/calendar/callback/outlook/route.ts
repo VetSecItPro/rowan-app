@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { outlookCalendarService } from '@/lib/services/calendar';
 import { z } from 'zod';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
 
@@ -28,6 +30,13 @@ const OAUTH_STATE_EXPIRATION_MS = 10 * 60 * 1000;
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const baseUrl = getAppUrl();
+
+  // Rate limit OAuth callbacks to prevent abuse
+  const ip = extractIP(request.headers);
+  const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+  if (!rateLimitSuccess) {
+    return NextResponse.redirect(`${baseUrl}/settings?error=too_many_requests`);
+  }
 
   try {
     // Parse and validate callback parameters

@@ -90,9 +90,8 @@ export async function POST(request: NextRequest) {
       action: 'POST',
     });
 
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create portal session', details: errorMessage },
+      { error: 'Failed to create portal session. Please try again.' },
       { status: 500 }
     );
   }

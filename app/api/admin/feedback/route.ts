@@ -84,17 +84,16 @@ export async function GET(request: NextRequest) {
     if (error) {
       logger.error('Error fetching feedback:', error, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: 'Failed to fetch feedback data' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in admin feedback API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

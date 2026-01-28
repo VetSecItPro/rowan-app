@@ -8,6 +8,9 @@ import { uploadRecipeImage } from '@/lib/services/storage-service';
 import { validateImageMagicBytes, isFormatAllowed, ALLOWED_RECIPE_FORMATS } from '@/lib/utils/file-validation';
 import { logger } from '@/lib/logger';
 
+// Recipe image file size limit: 10MB
+const MAX_RECIPE_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+
 /**
  * POST /api/upload/recipe
  * Upload recipe image
@@ -46,6 +49,14 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { error: 'No file provided' },
+        { status: 400 }
+      );
+    }
+
+    // Validate file size
+    if (file.size > MAX_RECIPE_IMAGE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: 'File too large. Maximum recipe image size is 10MB.' },
         { status: 400 }
       );
     }

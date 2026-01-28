@@ -323,7 +323,7 @@ function handleSupabaseError(error: { message: string }) {
       );
     }
     return NextResponse.json(
-      { error: error.message },
+      { error: 'Password does not meet requirements. Please choose a stronger password.' },
       { status: 400 }
     );
   }
@@ -336,7 +336,7 @@ function handleSupabaseError(error: { message: string }) {
   }
 
   return NextResponse.json(
-    { error: `Account creation failed: ${error.message}` },
+    { error: 'Account creation failed. Please try again.' },
     { status: 500 }
   );
 }

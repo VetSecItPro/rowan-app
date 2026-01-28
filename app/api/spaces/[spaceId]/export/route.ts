@@ -5,7 +5,16 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
+import { z } from 'zod';
 import { logger } from '@/lib/logger';
+
+const SpaceParamsSchema = z.object({
+  spaceId: z.string().uuid('Invalid space ID format'),
+});
+
+const ExportBodySchema = z.object({
+  format: z.enum(['json', 'csv']).default('json'),
+});
 
 /**
  * GET /api/spaces/[spaceId]/export
@@ -39,16 +48,11 @@ export async function GET(req: NextRequest, props: { params: Promise<{ spaceId: 
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    const { spaceId } = params;
-
-    // SECURITY: UUID validation for space_id
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(spaceId)) {
-      return NextResponse.json(
-        { error: 'Invalid Space ID format' },
-        { status: 400 }
-      );
+    const paramsParsed = SpaceParamsSchema.safeParse(params);
+    if (!paramsParsed.success) {
+      return NextResponse.json({ error: 'Invalid Space ID format' }, { status: 400 });
     }
+    const { spaceId } = paramsParsed.data;
 
     // Get export summary
     const result = await getSpaceExportSummary(spaceId, user.id);
@@ -116,28 +120,19 @@ export async function POST(req: NextRequest, props: { params: Promise<{ spaceId:
     // Set user context for Sentry error tracking
     setSentryUser(user);
 
-    const { spaceId } = params;
-
-    // SECURITY: UUID validation for space_id
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(spaceId)) {
-      return NextResponse.json(
-        { error: 'Invalid Space ID format' },
-        { status: 400 }
-      );
+    const paramsParsed = SpaceParamsSchema.safeParse(params);
+    if (!paramsParsed.success) {
+      return NextResponse.json({ error: 'Invalid Space ID format' }, { status: 400 });
     }
+    const { spaceId } = paramsParsed.data;
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { format = 'json' } = body;
-
-    // SECURITY: Validate format parameter
-    if (!['json', 'csv'].includes(format)) {
-      return NextResponse.json(
-        { error: 'Invalid format. Must be json or csv.' },
-        { status: 400 }
-      );
+    const bodyParsed = ExportBodySchema.safeParse(body);
+    if (!bodyParsed.success) {
+      return NextResponse.json({ error: 'Invalid format. Must be json or csv.' }, { status: 400 });
     }
+    const { format } = bodyParsed.data;
 
     // Export space data
     const result = await exportSpaceData(spaceId, user.id, format);

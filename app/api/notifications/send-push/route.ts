@@ -247,7 +247,7 @@ async function sendPushToUser(
 
     if (fetchError) {
       logger.error('Error fetching subscriptions:', fetchError, { component: 'api-route', action: 'api_request' });
-      return { success: false, sent: 0, failed: 0, error: fetchError.message };
+      return { success: false, sent: 0, failed: 0, error: 'Failed to fetch push subscriptions' };
     }
 
     if (!subscriptions || subscriptions.length === 0) {
@@ -303,7 +303,7 @@ async function sendPushToUser(
       success: false,
       sent: 0,
       failed: 0,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Failed to send push notification',
     };
   }
 }
