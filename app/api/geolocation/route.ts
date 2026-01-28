@@ -129,7 +129,6 @@ export async function GET(request: NextRequest) {
       postal: '75201',
       ip: 'unknown',
       fallback: true,
-      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }

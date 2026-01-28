@@ -70,10 +70,9 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in admin feedback update API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -132,10 +131,9 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Internal server error';
     logger.error('Error in admin feedback delete API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

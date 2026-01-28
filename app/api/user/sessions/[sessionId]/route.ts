@@ -3,7 +3,12 @@ import { createClient } from '@/lib/supabase/server';
 import { revokeSession } from '@/lib/services/session-tracking-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+import { z } from 'zod';
 import { logger } from '@/lib/logger';
+
+const SessionParamsSchema = z.object({
+  sessionId: z.string().uuid('Invalid session ID format'),
+});
 
 /**
  * DELETE /api/user/sessions/[sessionId]
@@ -31,7 +36,11 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ se
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionId = params.sessionId;
+    const parsed = SessionParamsSchema.safeParse(params);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid session ID format' }, { status: 400 });
+    }
+    const { sessionId } = parsed.data;
 
     // Verify the session belongs to the user
     const { data: session, error: sessionError } = await supabase

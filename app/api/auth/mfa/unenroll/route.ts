@@ -56,7 +56,7 @@ export async function DELETE(request: NextRequest) {
         action: 'UNENROLL',
       });
       return NextResponse.json(
-        { error: 'Failed to disable MFA: ' + error.message },
+        { error: 'Failed to disable MFA. Please try again.' },
         { status: 500 }
       );
     }

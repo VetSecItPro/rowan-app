@@ -11,7 +11,7 @@ import { FeedbackButton } from '@/components/feedback/FeedbackButton';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus } from 'lucide-react';
-import { hasAdminAccess } from '@/lib/utils/admin-utils';
+import { useAdminStatus } from '@/lib/hooks/useAdminStatus';
 
 const COLOR_THEMES = {
   emerald: 'bg-emerald-500',
@@ -27,6 +27,7 @@ const COLOR_THEMES = {
 export function Header() {
   const { user, signOut } = useAuth();
   const { currentSpace } = useSpaces();
+  const { data: isAdmin } = useAdminStatus(user?.id);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
@@ -160,7 +161,7 @@ export function Header() {
                 </Link>
 
                 {/* Admin Badge */}
-                {hasAdminAccess(user) && (
+                {isAdmin && (
                   <Link
                     href="/admin/dashboard"
                     className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-900/30 border border-indigo-700 text-indigo-300 rounded-full text-xs font-medium hover:bg-indigo-900/50 transition-colors"
@@ -266,7 +267,7 @@ export function Header() {
                         </Link>
                       )}
 
-                      {hasAdminAccess(user) && (
+                      {isAdmin && (
                         <Link
                           href="/admin/dashboard"
                           onClick={() => setIsDropdownOpen(false)}

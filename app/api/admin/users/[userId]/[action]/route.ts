@@ -81,7 +81,8 @@ export async function POST(
         );
 
         if (banError) {
-          throw new Error(`Failed to suspend user: ${banError.message}`);
+          logger.error('Failed to suspend user:', banError, { component: 'api-route', action: 'admin_ban', userId });
+          throw new Error('Failed to suspend user');
         }
 
         break;
@@ -92,7 +93,8 @@ export async function POST(
         const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
         if (deleteError) {
-          throw new Error(`Failed to delete user: ${deleteError.message}`);
+          logger.error('Failed to delete user:', deleteError, { component: 'api-route', action: 'admin_delete', userId });
+          throw new Error('Failed to delete user');
         }
 
         break;
@@ -124,7 +126,7 @@ export async function POST(
       );
     }
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to perform action' },
+      { error: 'Failed to perform action' },
       { status: 500 }
     );
   }

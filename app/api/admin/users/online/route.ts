@@ -85,7 +85,8 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (usersError) {
-      throw new Error(`Failed to fetch users: ${usersError.message}`);
+      logger.error('Failed to fetch users:', usersError, { component: 'api-route', action: 'admin_users_online' });
+      throw new Error('Failed to fetch users');
     }
 
     // Determine online status based on last_seen within 5 minutes
@@ -119,24 +120,15 @@ export async function GET(req: NextRequest) {
     });
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-
     Sentry.captureException(error, {
       tags: {
         endpoint: '/api/admin/users/online',
         method: 'GET',
       },
-      extra: {
-        timestamp: new Date().toISOString(),
-        errorMessage,
-        errorStack,
-      },
     });
     logger.error('[API] /api/admin/users/online GET error:', error, {
       component: 'api-route',
       action: 'api_request',
-      errorMessage,
     });
     return NextResponse.json(
       { error: 'Failed to fetch user data' },
