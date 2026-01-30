@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import LRUCache from 'lru-cache';
+import { LRUCache } from 'lru-cache';
 import { eventParserService } from '@/lib/services/ai/event-parser-service';
 import { logger } from '@/lib/logger';
 

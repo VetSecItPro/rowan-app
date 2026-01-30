@@ -29,6 +29,8 @@ const nextConfig = {
   generateBuildId: async () => {
     return 'build-' + Date.now();
   },
+  // Prevent webpack from bundling packages that need native Node.js fs access
+  serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
   experimental: {
     // Re-enabled: hang was caused by duplicate node_modules folders, not this feature
     optimizePackageImports: ['lucide-react', 'framer-motion'],

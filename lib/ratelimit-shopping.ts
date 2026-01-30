@@ -1,6 +1,6 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
-import LRUCache from 'lru-cache';
+import { LRUCache } from 'lru-cache';
 import { randomBytes } from 'crypto';
 import { logger } from '@/lib/logger';
 
