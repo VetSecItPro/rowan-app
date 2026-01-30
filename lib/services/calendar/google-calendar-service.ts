@@ -1,7 +1,7 @@
 // Google Calendar Service
 // Phase 2: OAuth flow, API wrapper, and sync operations
 
-import { google, calendar_v3 } from 'googleapis';
+import { calendar as googleCalendar, calendar_v3, auth } from '@googleapis/calendar';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import type {
@@ -37,7 +37,7 @@ function createOAuth2Client() {
     throw new Error('Google Calendar credentials not configured');
   }
 
-  return new google.auth.OAuth2(
+  return new auth.OAuth2(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URI
@@ -234,7 +234,7 @@ export async function exchangeCodeForTokens(
 
     // Get user's primary calendar ID and account email
     oauth2Client.setCredentials(tokens);
-    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
     const { data: calendarList } = await calendar.calendarList.list();
 
     const primaryCalendar = calendarList.items?.find((c) => c.primary);
@@ -265,7 +265,7 @@ export async function exchangeCodeForTokens(
 
 export async function listCalendars(connectionId: string): Promise<GoogleCalendarList[]> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   const { data } = await calendar.calendarList.list();
 
@@ -294,7 +294,7 @@ export async function getEvents(
   } = {}
 ): Promise<GoogleSyncResponse> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   const calendarId = options.calendarId || 'primary';
 
@@ -355,7 +355,7 @@ export async function createEvent(
   calendarId = 'primary'
 ): Promise<GoogleCalendarEvent> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   const { data } = await calendar.events.insert({
     calendarId,
@@ -381,7 +381,7 @@ export async function updateEvent(
   calendarId = 'primary'
 ): Promise<GoogleCalendarEvent> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   const { data } = await calendar.events.update({
     calendarId,
@@ -407,7 +407,7 @@ export async function deleteEvent(
   calendarId = 'primary'
 ): Promise<void> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   await calendar.events.delete({
     calendarId,
@@ -421,7 +421,7 @@ export async function getEvent(
   calendarId = 'primary'
 ): Promise<GoogleCalendarEvent | null> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   try {
     const { data } = await calendar.events.get({
@@ -448,7 +448,7 @@ export async function setupWebhook(
   calendarId = 'primary'
 ): Promise<WebhookRegistration> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   const channelId = crypto.randomUUID();
   const expiration = new Date(Date.now() + WEBHOOK_TTL_DAYS * 24 * 60 * 60 * 1000);
@@ -478,7 +478,7 @@ export async function stopWebhook(
   resourceId: string
 ): Promise<void> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
-  const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+  const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
 
   await calendar.channels.stop({
     requestBody: {
