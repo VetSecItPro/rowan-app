@@ -78,11 +78,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.apple.com',
       },
+      // Placeholder images (picsum)
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
       // Development only
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '3000',
+        port: '3333',
       },
     ],
     formats: ['image/webp', 'image/avif'],
