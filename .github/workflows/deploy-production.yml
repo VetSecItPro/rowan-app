@@ -102,6 +102,8 @@ jobs:
 
       - name: Build
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_INSTALL_COMMAND: pnpm install --frozen-lockfile
 
       - name: Deploy
         id: deploy
