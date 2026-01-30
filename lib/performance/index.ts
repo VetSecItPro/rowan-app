@@ -14,15 +14,6 @@ export {
   type OfflineQueueContextValue,
 } from '../hooks/useOfflineQueue';
 
-// Optimistic Mutations
-export {
-  useOptimisticMutation,
-  useOptimisticListMutation,
-  useOptimisticToggle,
-  createOfflineOptimisticMutation,
-  type OptimisticMutationOptions,
-} from '../hooks/useOptimisticMutation';
-
 // Prefetching
 export {
   usePrefetchOnHover,
