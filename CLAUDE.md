@@ -244,6 +244,14 @@ claude mcp remove supabase -s project && claude mcp add supabase "https://mcp.su
 const COLORS = { tasks: 'blue', calendar: 'purple', reminders: 'pink', messages: 'green', shopping: 'emerald', meals: 'orange', household: 'amber', goals: 'indigo', location: 'cyan' };
 ```
 
+## Build Notes
+
+### lru-cache Import
+`lru-cache` v11+ uses **named exports** (`import { LRUCache } from 'lru-cache'`), NOT default exports. Never use `import LRUCache from 'lru-cache'`.
+
+### isomorphic-dompurify / jsdom
+`isomorphic-dompurify` depends on `jsdom` which uses `fs.readFileSync` to load `default-stylesheet.css`. If webpack bundles it, the build fails with `ENOENT: default-stylesheet.css`. Fix: `serverExternalPackages: ['isomorphic-dompurify', 'jsdom']` in `next.config.mjs`.
+
 ## Common Mistakes
 - ❌ Committing to main → ✅ Feature branches
 - ❌ Direct Supabase in components → ✅ Service layer
