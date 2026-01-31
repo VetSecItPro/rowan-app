@@ -197,6 +197,39 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
           </div>
         </section>
 
+        {/* CTA Card */}
+        {hasContent && (
+          <section className="px-4 sm:px-6 lg:px-8 pb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="max-w-3xl mx-auto bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 rounded-2xl border border-gray-700 p-8 sm:p-12 text-center"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Start Organizing Your Family Today
+              </h2>
+              <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                Rowan brings tasks, calendars, meals, and messaging into one app. Free to get started.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  onClick={() => window.location.href = '/signup'}
+                  className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  Get Started Free →
+                </button>
+                <button
+                  onClick={() => window.location.href = '/pricing'}
+                  className="px-8 py-3 bg-gray-800 text-white rounded-full font-semibold border border-gray-700 hover:bg-gray-700 transition-colors"
+                >
+                  View Pricing
+                </button>
+              </div>
+            </motion.div>
+          </section>
+        )}
+
         {/* Related Articles */}
         {relatedArticles.length > 0 && (
           <section className="px-4 sm:px-6 lg:px-8 pb-20">
