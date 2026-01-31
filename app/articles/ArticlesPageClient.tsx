@@ -24,6 +24,8 @@ export interface SerializedArticle {
   readTime: string
   featured: boolean
   featuredImageUrl?: string
+  publishedDate?: string
+  htmlContent?: string
 }
 
 interface ArticlesPageClientProps {
@@ -157,13 +159,21 @@ export default function ArticlesPageClient({ articles }: ArticlesPageClientProps
                                 <Icon className={`w-6 h-6 ${colors.text}`} />
                               </div>
                             )}
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-2 mb-2 flex-wrap">
                               <span className={`text-xs font-medium ${colors.text}`}>{article.categoryName}</span>
                               <span className="text-xs text-gray-400">&middot;</span>
                               <span className="text-xs text-gray-400 flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {article.readTime}
                               </span>
+                              {article.publishedDate && (
+                                <>
+                                  <span className="text-xs text-gray-400">&middot;</span>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(article.publishedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </span>
+                                </>
+                              )}
                             </div>
                             <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
                               {article.title}
@@ -236,7 +246,17 @@ export default function ArticlesPageClient({ articles }: ArticlesPageClientProps
                                 {article.readTime}
                               </span>
                             </div>
-                            <span className={`text-xs font-medium ${colors.text} mb-2 block`}>{article.categoryName}</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className={`text-xs font-medium ${colors.text}`}>{article.categoryName}</span>
+                              {article.publishedDate && (
+                                <>
+                                  <span className="text-xs text-gray-400">&middot;</span>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(article.publishedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </span>
+                                </>
+                              )}
+                            </div>
                             <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2">
                               {article.title}
                             </h3>
