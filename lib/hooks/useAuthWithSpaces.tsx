@@ -2,20 +2,15 @@
 
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
-import { useMemo, useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
+import { useMemo } from 'react';
 
 /**
  * UNIFIED AUTH WITH SPACES HOOK - PHASE 3 INTEGRATION
  *
  * Provides a unified interface combining AuthContext and SpacesContext
- * - Maintains backward compatibility during migration
  * - Handles complex state interactions between auth and spaces
  * - Provides comprehensive loading and error states
  * - Manages zero-spaces scenarios properly
- *
- * This hook will gradually replace direct useAuth() calls as we migrate
- * components to use the new separated architecture.
  */
 
 export interface AuthWithSpacesState {
@@ -61,43 +56,20 @@ export interface AuthWithSpacesState {
 export function useAuthWithSpaces(): AuthWithSpacesState {
   const auth = useAuth();
   const spaces = useSpaces();
-  const [emergencyTimeoutReached, setEmergencyTimeoutReached] = useState(false);
-
-  // Emergency timeout to prevent perpetual loading (15 seconds max)
-  useEffect(() => {
-    const isLoading = auth.loading || (!!auth.user && spaces.loading);
-
-    if (isLoading && !emergencyTimeoutReached) {
-      const emergencyTimeout = setTimeout(() => {
-        logger.warn('[useAuthWithSpaces] Emergency timeout reached - forcing loading completion', { component: 'lib-useAuthWithSpaces' });
-        setEmergencyTimeoutReached(true);
-      }, 15000); // 15 second emergency timeout
-
-      return () => clearTimeout(emergencyTimeout);
-    }
-  }, [auth.loading, spaces.loading, auth.user, emergencyTimeoutReached]);
 
   const state = useMemo(() => {
-    // Authentication state
     const isAuthenticated = !!(auth.user && auth.session);
 
-    // Apply emergency timeout overrides
-    const authLoading = emergencyTimeoutReached ? false : auth.loading;
-    const spacesLoading = emergencyTimeoutReached ? false : spaces.loading;
+    const authLoading = auth.loading;
+    const spacesLoading = spaces.loading;
 
     const authError = auth.error;
     const spacesError = spaces.error;
     const hasZeroSpaces = spaces.hasZeroSpaces;
 
-    // Combined loading state (forced to false if emergency timeout reached)
-    const loading = emergencyTimeoutReached ? false : (authLoading || (isAuthenticated && spacesLoading));
-
-    // Combined error state (auth errors take precedence, add timeout error if needed)
-    const timeoutError = emergencyTimeoutReached ? 'Loading timeout - some data may be incomplete' : null;
-    const error = authError || spacesError || timeoutError;
-
-    // App readiness state (forced ready if emergency timeout reached)
-    const isReady = emergencyTimeoutReached ? true : (!authLoading && (!isAuthenticated || !spacesLoading));
+    const loading = authLoading || (isAuthenticated && spacesLoading);
+    const error = authError || spacesError;
+    const isReady = !authLoading && (!isAuthenticated || !spacesLoading);
 
     return {
       // Combined authentication state
@@ -153,53 +125,7 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
     spaces.refreshSpaces,
     spaces.createSpace,
     spaces.deleteSpace,
-    emergencyTimeoutReached,
   ]);
 
   return state;
 }
-
-/**
- * Backward compatibility hook - maintains existing useAuth interface
- *
- * This allows existing components to continue working unchanged during
- * the migration period. Gradually replace with useAuthWithSpaces() or
- * separate useAuth() and useSpaces() calls.
- */
-export function useAuthLegacy() {
-  const {
-    user,
-    session,
-    spaces,
-    currentSpace,
-    loading,
-    error,
-    signUp,
-    signIn,
-    signOut,
-    refreshProfile,
-    switchSpace,
-    refreshSpaces
-  } = useAuthWithSpaces();
-
-  // Return the exact same interface as the old useAuth hook
-  return {
-    user,
-    session,
-    spaces,
-    currentSpace,
-    loading,
-    signUp,
-    signIn,
-    signOut,
-    switchSpace,
-    refreshSpaces,
-    refreshProfile,
-    // Note: error is now available but wasn't in the old interface
-    error,
-  };
-}
-
-/**
- * Zero-spaces detection hook for triggering onboarding
- */
