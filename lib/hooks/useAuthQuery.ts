@@ -42,10 +42,7 @@ export function useAuthSession() {
       return session;
     },
     ...QUERY_OPTIONS.auth,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh session data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
-    refetchInterval: 5 * 60 * 1000, // Still refresh every 5 minutes in background
+    refetchInterval: 5 * 60 * 1000,
     refetchIntervalInBackground: false,
   });
 }
@@ -95,9 +92,6 @@ export function useUserProfile(userId: string | undefined) {
     },
     enabled: !!userId, // Only run query if userId exists
     ...QUERY_OPTIONS.auth,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh profile data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 

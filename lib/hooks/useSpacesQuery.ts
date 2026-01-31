@@ -96,9 +96,6 @@ export function useUserSpaces(userId: string | undefined) {
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh spaces data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -162,9 +159,6 @@ export function useCurrentSpace(userId: string | undefined) {
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh current space data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
