@@ -65,7 +65,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
         <section className="relative pt-24 pb-12 px-4 sm:px-6 lg:px-8">
           <div className={`absolute inset-0 -z-10 bg-gradient-to-b ${colors.gradient} opacity-5`} />
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <Link
               href="/articles"
               className="inline-flex items-center gap-2 text-gray-400 hover:text-emerald-400 transition-colors mb-8"
@@ -79,7 +79,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4 flex-wrap">
                 <div className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center`}>
                   <Icon className={`w-5 h-5 ${colors.text}`} />
                 </div>
@@ -89,6 +89,14 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
                   <Clock className="w-4 h-4" />
                   {article.readTime}
                 </span>
+                {article.publishedDate && (
+                  <>
+                    <span className="text-gray-400">&middot;</span>
+                    <span className="text-sm text-gray-400">
+                      {new Date(article.publishedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </>
+                )}
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-bold text-white mb-6">
@@ -123,7 +131,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
         {/* Featured Image */}
         {article.featuredImageUrl && (
           <section className="px-4 sm:px-6 lg:px-8 pb-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-3xl mx-auto">
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
                 <Image
                   src={article.featuredImageUrl}
@@ -139,13 +147,13 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
 
         {/* Article Content or Coming Soon */}
         <section className="px-4 sm:px-6 lg:px-8 pb-20">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             {hasContent ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="bg-gray-800 rounded-3xl border border-gray-700 p-8 sm:p-12"
+                className="article-body"
               >
                 {renderedContent}
               </motion.div>
@@ -192,7 +200,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
         {/* Related Articles */}
         {relatedArticles.length > 0 && (
           <section className="px-4 sm:px-6 lg:px-8 pb-20">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold text-white mb-6">More Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {relatedArticles.map((art) => {
