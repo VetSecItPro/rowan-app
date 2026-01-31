@@ -87,12 +87,8 @@ export default function TasksPage() {
     filters: {
       status: filters.status,
       priority: filters.priority,
-      assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
-      // Exclude frequency and other chore-specific filters
+      assignedTo: filters.assignees?.[0],
     },
-    onTaskAdded: () => {}, // Silently handle - real-time updates shown via UI
-    onTaskUpdated: () => {}, // Silently handle - real-time updates shown via UI
-    onTaskDeleted: () => {}, // Silently handle - real-time updates shown via UI
   });
 
   // Real-time chores with enhanced filters
@@ -100,14 +96,10 @@ export default function TasksPage() {
     spaceId: spaceId || '',
     filters: {
       status: filters.status,
-      frequency: filters.frequency, // Add frequency filter for chores
-      // Map task filters to chore equivalents
-      assignedTo: filters.assignees?.[0], // Take first assignee for simplicity
-      search: filters.search, // Add search filter at hook level
+      frequency: filters.frequency,
+      assignedTo: filters.assignees?.[0],
+      search: filters.search,
     },
-    onChoreAdded: () => {}, // Silently handle - real-time updates shown via UI
-    onChoreUpdated: () => {}, // Silently handle - real-time updates shown via UI
-    onChoreDeleted: () => {}, // Silently handle - real-time updates shown via UI
   });
 
   // Always use realtime data
