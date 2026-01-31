@@ -5,6 +5,7 @@
  * Features: stale-while-revalidate, background refetching, intelligent caching
  */
 
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
@@ -245,7 +246,7 @@ export function useSignOut() {
 export function useAuthStateChange() {
   const queryClient = useQueryClient();
 
-  const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
+  const handleAuthStateChange = useCallback((event: AuthChangeEvent, session: Session | null) => {
     switch (event) {
       case 'SIGNED_IN':
         // Invalidate auth queries to refresh data
@@ -260,7 +261,7 @@ export function useAuthStateChange() {
         queryClient.setQueryData(QUERY_KEYS.auth.session(), session);
         break;
     }
-  };
+  }, [queryClient]);
 
   return handleAuthStateChange;
 }

@@ -5,6 +5,7 @@
  * Features: stale-while-revalidate, optimistic updates, intelligent invalidation
  */
 
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
@@ -545,7 +546,7 @@ export function useJoinSpace() {
 export function useSpacesStateChange() {
   const queryClient = useQueryClient();
 
-  const handleSpacesChange = (payload: SpaceChangePayload) => {
+  const handleSpacesChange = useCallback((payload: SpaceChangePayload) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
     const newSpaceId = typeof newRecord?.space_id === 'string' ? newRecord.space_id : null;
     const newUserId = typeof newRecord?.user_id === 'string' ? newRecord.user_id : null;
@@ -583,7 +584,7 @@ export function useSpacesStateChange() {
         }
         break;
     }
-  };
+  }, [queryClient]);
 
   return handleSpacesChange;
 }
