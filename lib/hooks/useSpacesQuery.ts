@@ -224,8 +224,8 @@ export function useSpaces(userId: string | undefined) {
   const hasZeroSpaces = spacesQuery.isSuccess && spaces.length === 0;
 
   return {
-    // EMERGENCY FIX: Include isFetching to cover background refetch scenarios
-    isLoading: spacesQuery.isLoading || spacesQuery.isFetching || currentSpaceQuery.isLoading || currentSpaceQuery.isFetching,
+    // Initial load = no data yet. Background refetches should NOT block the app.
+    isLoading: spacesQuery.isLoading || currentSpaceQuery.isLoading,
     isRefetching: spacesQuery.isFetching || currentSpaceQuery.isFetching,
 
     // Data

@@ -110,9 +110,9 @@ export function useAuth() {
   const sessionQuery = useAuthSession();
   const profileQuery = useUserProfile(sessionQuery.data?.user?.id);
 
-  // EMERGENCY FIX: Include isFetching to cover background refetch scenarios
-  const isLoading = sessionQuery.isLoading || sessionQuery.isFetching;
-  const isProfileLoading = profileQuery.isLoading || profileQuery.isFetching;
+  // isLoading = true only on initial fetch (no cached data). isFetching covers background refetches.
+  const isLoading = sessionQuery.isLoading;
+  const isProfileLoading = profileQuery.isLoading;
   const error = sessionQuery.error || profileQuery.error;
 
   // Determine auth state
