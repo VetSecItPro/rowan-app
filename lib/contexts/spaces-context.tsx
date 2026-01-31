@@ -131,7 +131,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     if (!user?.id) return;
     if (hasInitializedSpace.current) return;
     if (authLoading) return;
-    if (spacesQuery.isLoading || spacesQuery.isRefetching) return;
+    if (spacesQuery.isLoading) return;
 
     if (!spacesQuery.spaces?.length) {
       hasInitializedSpace.current = true;
@@ -151,7 +151,6 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
   }, [
     authLoading,
     spacesQuery.currentSpace,
-    spacesQuery.isRefetching,
     spacesQuery.isLoading,
     spacesQuery.spaces,
     switchSpace,

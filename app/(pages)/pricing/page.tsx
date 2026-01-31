@@ -14,7 +14,6 @@ import { PricingToggle } from '@/components/pricing/PricingToggle';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Footer } from '@/components/layout/Footer';
 import { Sparkles, Clock, Shield } from 'lucide-react';
-import { featureFlags } from '@/lib/constants/feature-flags';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
@@ -32,18 +31,6 @@ export default function PricingPage() {
       .then(data => setFoundingMemberSpots(data.spotsRemaining))
       .catch(() => setFoundingMemberSpots(1000)); // Default to 1000 on error
   }, []);
-
-  // Redirect if monetization is disabled
-  useEffect(() => {
-    if (!featureFlags.isMonetizationEnabled()) {
-      router.replace('/dashboard');
-    }
-  }, [router]);
-
-  // Don't render anything if monetization is disabled (will redirect)
-  if (!featureFlags.isMonetizationEnabled()) {
-    return null;
-  }
 
   const handlePeriodChange = (newPeriod: 'monthly' | 'annual') => {
     setPeriod(newPeriod);

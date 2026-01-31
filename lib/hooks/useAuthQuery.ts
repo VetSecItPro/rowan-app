@@ -5,6 +5,7 @@
  * Features: stale-while-revalidate, background refetching, intelligent caching
  */
 
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
@@ -42,10 +43,7 @@ export function useAuthSession() {
       return session;
     },
     ...QUERY_OPTIONS.auth,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh session data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
-    refetchInterval: 5 * 60 * 1000, // Still refresh every 5 minutes in background
+    refetchInterval: 5 * 60 * 1000,
     refetchIntervalInBackground: false,
   });
 }
@@ -95,9 +93,6 @@ export function useUserProfile(userId: string | undefined) {
     },
     enabled: !!userId, // Only run query if userId exists
     ...QUERY_OPTIONS.auth,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh profile data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -110,9 +105,9 @@ export function useAuth() {
   const sessionQuery = useAuthSession();
   const profileQuery = useUserProfile(sessionQuery.data?.user?.id);
 
-  // EMERGENCY FIX: Include isFetching to cover background refetch scenarios
-  const isLoading = sessionQuery.isLoading || sessionQuery.isFetching;
-  const isProfileLoading = profileQuery.isLoading || profileQuery.isFetching;
+  // isLoading = true only on initial fetch (no cached data). isFetching covers background refetches.
+  const isLoading = sessionQuery.isLoading;
+  const isProfileLoading = profileQuery.isLoading;
   const error = sessionQuery.error || profileQuery.error;
 
   // Determine auth state
@@ -251,7 +246,7 @@ export function useSignOut() {
 export function useAuthStateChange() {
   const queryClient = useQueryClient();
 
-  const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
+  const handleAuthStateChange = useCallback((event: AuthChangeEvent, session: Session | null) => {
     switch (event) {
       case 'SIGNED_IN':
         // Invalidate auth queries to refresh data
@@ -266,7 +261,7 @@ export function useAuthStateChange() {
         queryClient.setQueryData(QUERY_KEYS.auth.session(), session);
         break;
     }
-  };
+  }, [queryClient]);
 
   return handleAuthStateChange;
 }

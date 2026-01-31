@@ -5,6 +5,7 @@
  * Features: stale-while-revalidate, optimistic updates, intelligent invalidation
  */
 
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
@@ -96,9 +97,6 @@ export function useUserSpaces(userId: string | undefined) {
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh spaces data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -162,9 +160,6 @@ export function useCurrentSpace(userId: string | undefined) {
     },
     enabled: !!userId,
     ...QUERY_OPTIONS.spaces,
-    // EMERGENCY FIX: Always refetch to prevent perpetual loading with stale cache
-    refetchOnMount: true, // Always fetch fresh current space data on mount
-    staleTime: 30 * 1000, // 30 seconds - balanced caching without breaking loading states
   });
 }
 
@@ -224,8 +219,8 @@ export function useSpaces(userId: string | undefined) {
   const hasZeroSpaces = spacesQuery.isSuccess && spaces.length === 0;
 
   return {
-    // EMERGENCY FIX: Include isFetching to cover background refetch scenarios
-    isLoading: spacesQuery.isLoading || spacesQuery.isFetching || currentSpaceQuery.isLoading || currentSpaceQuery.isFetching,
+    // Initial load = no data yet. Background refetches should NOT block the app.
+    isLoading: spacesQuery.isLoading || currentSpaceQuery.isLoading,
     isRefetching: spacesQuery.isFetching || currentSpaceQuery.isFetching,
 
     // Data
@@ -551,7 +546,7 @@ export function useJoinSpace() {
 export function useSpacesStateChange() {
   const queryClient = useQueryClient();
 
-  const handleSpacesChange = (payload: SpaceChangePayload) => {
+  const handleSpacesChange = useCallback((payload: SpaceChangePayload) => {
     const { eventType, new: newRecord, old: oldRecord } = payload;
     const newSpaceId = typeof newRecord?.space_id === 'string' ? newRecord.space_id : null;
     const newUserId = typeof newRecord?.user_id === 'string' ? newRecord.user_id : null;
@@ -589,7 +584,7 @@ export function useSpacesStateChange() {
         }
         break;
     }
-  };
+  }, [queryClient]);
 
   return handleSpacesChange;
 }
