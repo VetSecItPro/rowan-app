@@ -8,6 +8,7 @@ export interface DailyCheckIn {
   space_id: string;
   date: string;
   mood: string;
+  energy_level?: number;
   note?: string;
   highlights?: string;
   challenges?: string;
@@ -19,6 +20,7 @@ export interface DailyCheckIn {
 export interface CreateCheckInInput {
   space_id: string;
   mood: string;
+  energy_level?: number;
   note?: string;
   highlights?: string;
   challenges?: string;
@@ -133,6 +135,7 @@ export const checkInsService = {
         space_id: input.space_id,
         date,
         mood: input.mood,
+        energy_level: input.energy_level,
         note: input.note,
         highlights: input.highlights,
         challenges: input.challenges,
