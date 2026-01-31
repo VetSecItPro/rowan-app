@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type { Task } from '@/lib/types';
@@ -67,7 +67,13 @@ export function useTaskRealtime({
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [timeoutReached, setTimeoutReached] = useState(false);
+
+  // Stable refs for values that shouldn't trigger effect re-runs
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+
+  const callbacksRef = useRef({ onTaskAdded, onTaskUpdated, onTaskDeleted });
+  callbacksRef.current = { onTaskAdded, onTaskUpdated, onTaskDeleted };
 
   // Performance optimizations
   const updateQueueRef = useRef<{
@@ -75,9 +81,6 @@ export function useTaskRealtime({
     updates: Task[];
     deletes: string[];
   }>({ inserts: [], updates: [], deletes: [] });
-
-  // Memoized filter function to avoid recalculation
-  const taskFilter = useCallback((task: Task) => taskPassesFilters(task, filters), [filters]);
 
   // Debounced batch update function - use useRef to avoid recreation
   const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
@@ -122,26 +125,7 @@ export function useTaskRealtime({
 
   const debouncedBatchUpdate = debouncedBatchUpdateRef.current;
 
-  // Emergency timeout to prevent perpetual loading (12 seconds max)
   useEffect(() => {
-    if (!spaceId) return;
-
-    const emergencyTimeout = setTimeout(() => {
-      if (loading) {
-        logger.warn('[useTaskRealtime] Emergency timeout reached - forcing loading completion', { component: 'hook-useTaskRealtime' });
-        setTimeoutReached(true);
-        setLoading(false);
-        setError(new Error('Loading timeout - please refresh to try again'));
-      }
-    }, 12000); // 12 second emergency timeout
-
-    return () => clearTimeout(emergencyTimeout);
-  }, [spaceId, loading]);
-
-  useEffect(() => {
-    // Reset timeout state when spaceId changes
-    setTimeoutReached(false);
-
     // Guard against invalid spaceId to prevent unnecessary queries
     if (!spaceId || spaceId.trim() === '') {
       setTasks([]);
@@ -177,21 +161,15 @@ export function useTaskRealtime({
 
     async function loadTasks() {
       try {
-        // If timeout already reached, skip loading and use empty state
-        if (timeoutReached) {
-          logger.warn('[useTaskRealtime] Timeout reached - skipping data load', { component: 'hook-useTaskRealtime' });
-          setTasks([]);
-          setLoading(false);
-          return;
-        }
-
-        // Verify access before loading with timeout protection
+        // Verify access before loading
         const hasAccess = await verifyAccess();
         if (!hasAccess) {
           setError(new Error('You do not have access to this space'));
           setLoading(false);
           return;
         }
+
+        const currentFilters = filtersRef.current;
 
         let query = supabase
           .from('tasks')
@@ -213,15 +191,15 @@ export function useTaskRealtime({
           .eq('space_id', spaceId)
           .order('sort_order', { ascending: true });
 
-        // Apply filters
-        if (filters?.status && filters.status.length > 0) {
-          query = query.in('status', filters.status);
+        // Apply filters from ref
+        if (currentFilters?.status && currentFilters.status.length > 0) {
+          query = query.in('status', currentFilters.status);
         }
-        if (filters?.priority && filters.priority.length > 0) {
-          query = query.in('priority', filters.priority);
+        if (currentFilters?.priority && currentFilters.priority.length > 0) {
+          query = query.in('priority', currentFilters.priority);
         }
-        if (filters?.assignedTo) {
-          query = query.eq('assigned_to', filters.assignedTo);
+        if (currentFilters?.assignedTo) {
+          query = query.eq('assigned_to', currentFilters.assignedTo);
         }
 
         const { data, error: fetchError } = await query;
@@ -249,11 +227,11 @@ export function useTaskRealtime({
         (payload: RealtimePostgresChangesPayload<Task>) => {
           const newTask = payload.new as Task;
 
-          if (taskFilter(newTask)) {
+          if (taskPassesFilters(newTask, filtersRef.current)) {
             // Add to batch queue instead of immediate state update
             updateQueueRef.current.inserts.push(newTask);
             debouncedBatchUpdate();
-            onTaskAdded?.(newTask);
+            callbacksRef.current.onTaskAdded?.(newTask);
           }
         }
       )
@@ -268,11 +246,11 @@ export function useTaskRealtime({
         (payload: RealtimePostgresChangesPayload<Task>) => {
           const updatedTask = payload.new as Task;
 
-          if (taskFilter(updatedTask)) {
+          if (taskPassesFilters(updatedTask, filtersRef.current)) {
             // Add to batch queue for updates
             updateQueueRef.current.updates.push(updatedTask);
             debouncedBatchUpdate();
-            onTaskUpdated?.(updatedTask);
+            callbacksRef.current.onTaskUpdated?.(updatedTask);
           } else {
             // Task no longer passes filters, add to deletes queue
             updateQueueRef.current.deletes.push(updatedTask.id);
@@ -293,7 +271,7 @@ export function useTaskRealtime({
           // Add to batch queue for deletes
           updateQueueRef.current.deletes.push(deletedTaskId);
           debouncedBatchUpdate();
-          onTaskDeleted?.(deletedTaskId);
+          callbacksRef.current.onTaskDeleted?.(deletedTaskId);
         }
       )
       .subscribe();
@@ -326,16 +304,7 @@ export function useTaskRealtime({
       // Clear any pending debounced updates
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [
-    spaceId,
-    filters,
-    taskFilter,
-    debouncedBatchUpdate,
-    onTaskAdded,
-    onTaskUpdated,
-    onTaskDeleted,
-    timeoutReached
-  ]);
+  }, [spaceId]); // Only spaceId triggers teardown/rebuild
 
   function refreshTasks() {
     setLoading(true);
