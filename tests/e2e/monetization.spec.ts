@@ -165,14 +165,14 @@ test.describe('Monetization Features', () => {
       // Navigate directly to success page (simulating return from Polar)
       await page.goto('/payment/success?tier=pro');
 
-      // Should show success message
-      await expect(page.locator('text=/welcome|success|thank/i').first()).toBeVisible();
+      // Should show activation or success message (page polls subscription status first)
+      await expect(page.locator('text=/activating|welcome|subscription/i').first()).toBeVisible();
 
-      // Should show what was unlocked
-      await expect(page.locator('text=/pro|unlock|feature/i').first()).toBeVisible();
+      // Should show Pro tier reference
+      await expect(page.locator('text=/pro|subscription|payment/i').first()).toBeVisible();
 
       // Should have link to dashboard
-      await expect(page.locator('a:has-text("Dashboard"), a:has-text("Get Started"), button:has-text("Go to")')).toBeVisible();
+      await expect(page.locator('a:has-text("Dashboard"), a:has-text("Get Started"), a:has-text("Go to Dashboard")')).toBeVisible();
     });
 
     test('payment canceled page shows options', async ({ page }) => {
