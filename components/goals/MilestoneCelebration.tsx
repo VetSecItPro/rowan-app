@@ -2,8 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { X, Sparkles, Trophy, TrendingUp, Target } from 'lucide-react';
-import confetti from 'canvas-confetti';
-
 interface MilestoneCelebrationProps {
   goalTitle: string;
   milestoneTitle: string;
@@ -25,7 +23,9 @@ export default function MilestoneCelebration({
   const [isAnimating, setIsAnimating] = useState(false);
 
   // Enhanced confetti celebration functions
-  const triggerConfettiCelebration = useCallback(() => {
+  const triggerConfettiCelebration = useCallback(async () => {
+    const confetti = (await import('canvas-confetti')).default;
+
     if (percentageReached === 100) {
       // Epic celebration for 100% completion
       const end = Date.now() + 3000;

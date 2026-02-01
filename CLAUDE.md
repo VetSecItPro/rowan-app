@@ -161,6 +161,22 @@ pkill -f "next" 2>/dev/null; rm -rf ".next 2" "node_modules 2" ".next 3" "node_m
 - ALL database operations go through `lib/services/` (MANDATORY)
 - Always cleanup real-time subscriptions in useEffect return
 
+### Ongoing: Replace `select('*')` with specific columns
+
+> **When working on any feature**, check its service file(s) in `lib/services/` for `.select('*')` on READ queries. Replace `'*'` with only the columns the callers actually use.
+
+**Why:** Reduces API response size, lowers memory usage, enables Postgres covering indexes. Matters most on high-traffic services (messages, calendar, tasks, checkins, goals).
+
+**How:**
+1. Find `.select('*')` in the service file you're touching
+2. Check the TypeScript interface and trace callers to see which columns are accessed
+3. Replace `'*'` with the specific column list (e.g., `.select('id, title, status, created_at')`)
+4. Skip write responses (`.insert().select('*')`, `.update().select('*')`) — those legitimately return the written row
+5. Skip export/backup services — they need all columns by design
+6. Run `tsc --noEmit` and **test the feature on localhost** — Supabase returns loosely typed data, so TypeScript won't catch a missing column
+
+**Status:** 287 read queries remain across ~70 service files. See `rowan-optimize-feb26.md` item #5 for details.
+
 ## UI/UX Requirements
 
 ### Dark Mode Only (GOVERNING PRINCIPLE)

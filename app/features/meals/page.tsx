@@ -169,13 +169,36 @@ export default function MealsFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-orange-400 via-red-400 to-pink-500 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <Utensils className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Meals Preview</span>
+                <div className="h-full flex flex-col">
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Utensils className="w-4 h-4 text-orange-400" />
+                      <span className="text-sm font-semibold text-white">This Week&apos;s Meals</span>
+                    </div>
+                    <span className="text-[11px] text-gray-500">Feb 3 – 7</span>
+                  </div>
+                  <div className="flex-1 px-4 py-3">
+                    <div className="grid grid-cols-5 gap-2 h-full">
+                      {[
+                        { day: "Mon", meal: "Chicken Stir-fry", emoji: "🍗", note: "with rice" },
+                        { day: "Tue", meal: "Pasta Carbonara", emoji: "🍝", note: "Jake's request" },
+                        { day: "Wed", meal: "Fish Tacos", emoji: "🌮", note: "cilantro lime" },
+                        { day: "Thu", meal: "Slow Cooker Chili", emoji: "🍲", note: "cornbread" },
+                        { day: "Fri", meal: "Homemade Pizza", emoji: "🍕", note: "family night!" },
+                      ].map((m) => (
+                        <div key={m.day} className="flex flex-col items-center text-center">
+                          <div className="text-[10px] text-gray-500 mb-2">{m.day}</div>
+                          <div className="w-full rounded-xl bg-gray-800/50 border border-gray-700/50 p-2 flex-1 flex flex-col items-center justify-center gap-1">
+                            <span className="text-xl">{m.emoji}</span>
+                            <span className="text-[10px] text-gray-200 font-medium leading-tight">{m.meal}</span>
+                            <span className="text-[9px] text-gray-500">{m.note}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </div>

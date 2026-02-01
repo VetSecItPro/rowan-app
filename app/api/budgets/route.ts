@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 import { z } from 'zod';
 import { createBudgetSchema } from '@/lib/validations/budget-schemas';
 
@@ -77,10 +78,10 @@ export async function GET(req: NextRequest) {
     // Get budget from service
     const budget = await projectsService.getBudget(spaceId, supabase);
 
-    return NextResponse.json({
+    return withUserDataCache(NextResponse.json({
       success: true,
       data: budget,
-    });
+    }));
   } catch (error) {
     Sentry.captureException(error, {
       tags: {

@@ -3,8 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { UserBadge } from '@/lib/services/achievement-service';
 import { format } from 'date-fns';
-import confetti from 'canvas-confetti';
-
 interface BadgeNotificationProps {
   badge: UserBadge;
   onClose: () => void;
@@ -21,9 +19,10 @@ export default function BadgeNotification({
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
-  const triggerConfetti = useCallback(() => {
+  const triggerConfetti = useCallback(async () => {
     if (!badge.badge) return;
 
+    const confetti = (await import('canvas-confetti')).default;
     const rarity = badge.badge.rarity;
 
     // Define confetti patterns based on badge rarity

@@ -63,16 +63,14 @@ const scaleIn = {
 const mobileCardAnimation = {
   hidden: {
     opacity: 0,
-    y: 16,
-    scale: 0.98
+    y: 12,
   },
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.3,
-      delay: index * 0.05, // Stagger based on index
+      duration: 0.25,
+      delay: index * 0.04, // Stagger based on index
       ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] // Smooth easing
     }
   })

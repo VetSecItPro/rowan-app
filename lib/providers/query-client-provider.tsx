@@ -1,7 +1,34 @@
 'use client';
 
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { queryClient } from '@/lib/react-query/query-client';
+import { restoreQueryCache, restoreFromBackup, setupCachePersistence } from '@/lib/react-query/offline-persistence';
+
+/**
+ * Main App Query Provider
+ *
+ * Uses the singleton queryClient with offline persistence.
+ * Wraps the entire app to enable useQuery/useMutation in all feature pages.
+ */
+export function AppQueryProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Restore cache from IndexedDB, fallback to localStorage backup
+    const restore = async () => {
+      const restored = await restoreQueryCache(queryClient);
+      if (!restored) {
+        await restoreFromBackup(queryClient);
+      }
+    };
+    restore();
+
+    // Set up periodic cache persistence + save on unload
+    const cleanup = setupCachePersistence(queryClient);
+    return cleanup;
+  }, []);
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+}
 
 /**
  * Custom error class for 401 errors to identify session expiration
@@ -31,7 +58,7 @@ export async function adminFetch(url: string, options?: RequestInit): Promise<Re
  * Handles 401 errors globally and redirects to login
  */
 export function AdminQueryProvider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(
+  const [adminClient] = useState(
     () =>
       new QueryClient({
         queryCache: new QueryCache({
@@ -71,5 +98,5 @@ export function AdminQueryProvider({ children }: { children: React.ReactNode }) 
       })
   );
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return <QueryClientProvider client={adminClient}>{children}</QueryClientProvider>;
 }

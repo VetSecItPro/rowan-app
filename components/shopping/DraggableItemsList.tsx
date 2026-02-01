@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import {
   DndContext,
   closestCenter,
@@ -130,8 +131,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
           {item.assignee && (
             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-900/30 rounded-full">
               {item.assignee.avatar_url ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={item.assignee.avatar_url} alt={item.assignee.name} className="w-3 h-3 rounded-full object-cover" />
+                <Image src={item.assignee.avatar_url} alt={item.assignee.name} width={12} height={12} className="w-3 h-3 rounded-full object-cover" />
               ) : (
                 <div className="w-3 h-3 rounded-full bg-gradient-shopping flex items-center justify-center">
                   <span className="text-[6px] font-semibold text-white">

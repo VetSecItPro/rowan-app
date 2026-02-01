@@ -48,38 +48,19 @@ self.addEventListener('install', (event) => {
   console.log('[Service Worker] Installing...');
 
   event.waitUntil(
-    Promise.all([
-      // Cache static assets
-      caches.open(STATIC_CACHE_NAME)
-        .then((cache) => {
-          console.log('[Service Worker] Caching static assets');
-          return Promise.allSettled(
-            STATIC_ASSETS.map((asset) =>
-              cache.add(asset).catch((err) => {
-                console.warn(`[Service Worker] Failed to cache: ${asset}`, err);
-              })
-            )
-          );
-        }),
-      // Precache app shell routes for instant loading
-      caches.open(DYNAMIC_CACHE_NAME)
-        .then((cache) => {
-          console.log('[Service Worker] Precaching app shell routes');
-          return Promise.allSettled(
-            APP_SHELL_ROUTES.map((route) =>
-              fetch(route, { credentials: 'same-origin' })
-                .then((response) => {
-                  if (response.ok) {
-                    return cache.put(route, response);
-                  }
-                })
-                .catch((err) => {
-                  console.warn(`[Service Worker] Failed to precache: ${route}`, err);
-                })
-            )
-          );
-        }),
-    ])
+    // Cache static assets only — auth-protected app shell routes are cached
+    // dynamically on first successful visit (avoids caching redirect responses)
+    caches.open(STATIC_CACHE_NAME)
+      .then((cache) => {
+        console.log('[Service Worker] Caching static assets');
+        return Promise.allSettled(
+          STATIC_ASSETS.map((asset) =>
+            cache.add(asset).catch((err) => {
+              console.warn(`[Service Worker] Failed to cache: ${asset}`, err);
+            })
+          )
+        );
+      })
       .then(() => self.skipWaiting())
   );
 });
@@ -170,6 +151,11 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
   try {
     const networkResponse = await fetch(request);
+    // Cache successful GET responses for offline fallback
+    if (networkResponse.ok && request.method === 'GET') {
+      const cache = await caches.open(DYNAMIC_CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
     return networkResponse;
   } catch (error) {
     console.error('[Service Worker] Network-first fetch failed:', error);
