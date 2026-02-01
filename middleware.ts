@@ -473,7 +473,7 @@ export async function middleware(req: NextRequest) {
 
     response.headers.set(
       'Permissions-Policy',
-      'camera=(), microphone=(), geolocation=()'
+      'camera=(), microphone=(), geolocation=(self)'
     );
 
     response.headers.set(
