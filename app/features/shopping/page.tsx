@@ -169,13 +169,56 @@ export default function ShoppingFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <ShoppingCart className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Shopping Preview</span>
+                <div className="h-full flex flex-col">
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ShoppingCart className="w-4 h-4 text-emerald-400" />
+                      <span className="text-sm font-semibold text-white">Weekly Grocery</span>
+                    </div>
+                    <span className="text-[11px] text-gray-500">8 items · 3 done</span>
+                  </div>
+                  <div className="flex-1 px-5 py-3 overflow-hidden">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-[10px] font-semibold text-emerald-400 mb-2">Produce</div>
+                        <div className="space-y-1.5">
+                          {[
+                            { text: "Avocados (3)", done: true },
+                            { text: "Baby spinach", done: true },
+                            { text: "Bananas", done: false },
+                            { text: "Bell peppers (2)", done: false },
+                          ].map((item) => (
+                            <div key={item.text} className="flex items-center gap-2 py-1 px-2 rounded-md bg-gray-800/40">
+                              <div className={`w-3.5 h-3.5 rounded flex-shrink-0 flex items-center justify-center ${item.done ? 'bg-emerald-500/30' : 'border border-gray-600'}`}>
+                                {item.done && <Check className="w-2 h-2 text-emerald-400" />}
+                              </div>
+                              <span className={`text-[11px] ${item.done ? 'text-gray-500 line-through' : 'text-gray-200'}`}>{item.text}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-semibold text-teal-400 mb-2">Dairy &amp; Meat</div>
+                        <div className="space-y-1.5">
+                          {[
+                            { text: "Whole milk", done: true },
+                            { text: "Greek yogurt", done: false },
+                            { text: "Chicken breast (2 lb)", done: false },
+                            { text: "Cheddar cheese", done: false },
+                          ].map((item) => (
+                            <div key={item.text} className="flex items-center gap-2 py-1 px-2 rounded-md bg-gray-800/40">
+                              <div className={`w-3.5 h-3.5 rounded flex-shrink-0 flex items-center justify-center ${item.done ? 'bg-emerald-500/30' : 'border border-gray-600'}`}>
+                                {item.done && <Check className="w-2 h-2 text-emerald-400" />}
+                              </div>
+                              <span className={`text-[11px] ${item.done ? 'text-gray-500 line-through' : 'text-gray-200'}`}>{item.text}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </div>

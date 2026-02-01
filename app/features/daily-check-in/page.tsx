@@ -169,13 +169,55 @@ export default function DailyCheckInFeaturePage() {
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.8 }}
-                                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-yellow-400 via-orange-400 to-rose-400 shadow-2xl"
+                                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
                             >
-                                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                                    <Sun className="w-32 h-32 animate-spin-slow" />
-                                </div>
-                                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                                    <span className="text-white font-bold text-xl drop-shadow-md">Ritual Preview</span>
+                                <div className="h-full flex flex-col">
+                                    <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <Sun className="w-4 h-4 text-orange-400" />
+                                            <span className="text-sm font-semibold text-white">Morning Check-In</span>
+                                        </div>
+                                        <span className="text-[11px] text-gray-500">Mon, Feb 3</span>
+                                    </div>
+                                    <div className="flex-1 px-5 py-4 space-y-4 overflow-hidden">
+                                        {/* Mood */}
+                                        <div>
+                                            <div className="text-[10px] text-gray-500 mb-2">How are you feeling?</div>
+                                            <div className="flex gap-3">
+                                                {[
+                                                    { emoji: "😔", label: "Low" },
+                                                    { emoji: "😐", label: "Okay" },
+                                                    { emoji: "😊", label: "Good", active: true },
+                                                    { emoji: "😄", label: "Great" },
+                                                ].map((m) => (
+                                                    <div key={m.label} className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg ${m.active ? 'bg-orange-500/20 border border-orange-500/40' : 'bg-gray-800/50'}`}>
+                                                        <span className="text-lg">{m.emoji}</span>
+                                                        <span className={`text-[9px] ${m.active ? 'text-orange-300' : 'text-gray-500'}`}>{m.label}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        {/* Energy & Priority */}
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div className="text-[10px] text-gray-500 mb-1.5">Energy level</div>
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map((i) => (
+                                                        <div key={i} className={`flex-1 h-2 rounded-full ${i <= 3 ? 'bg-orange-400' : 'bg-gray-700'}`} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] text-gray-500 mb-1.5">Today&apos;s priority</div>
+                                                <div className="text-[11px] text-gray-200">Finish tax documents</div>
+                                            </div>
+                                        </div>
+                                        {/* Gratitude */}
+                                        <div>
+                                            <div className="text-[10px] text-gray-500 mb-1.5">Grateful for...</div>
+                                            <div className="text-[11px] text-gray-300 bg-gray-800/50 rounded-lg px-3 py-2 italic">Beautiful weather this weekend with the kids</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </motion.div>
                         </div>

@@ -5,7 +5,7 @@
  * Shown after successful Polar checkout
  */
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
@@ -13,6 +13,14 @@ import { motion } from 'framer-motion';
 import { useValidatedSearchParams, PaymentSuccessParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 
 export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center"><Loader2 className="h-8 w-8 text-emerald-500 animate-spin" /></div>}>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
+
+function PaymentSuccessContent() {
   const router = useRouter();
   const { params } = useValidatedSearchParams(PaymentSuccessParamsSchema);
   const tier = params?.tier || 'pro';

@@ -1,6 +1,13 @@
-'use client';
-
 /* eslint-disable react/no-unescaped-entities */
+
+import type { Metadata } from 'next';
+
+export const revalidate = 86400; // ISR: regenerate every 24 hours
+
+export const metadata: Metadata = {
+  title: 'Privacy | Rowan',
+  description: 'Learn how Rowan protects your family data. Our privacy practices, data handling, and your rights explained.',
+};
 
 import Link from 'next/link';
 import Image from 'next/image';

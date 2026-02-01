@@ -169,13 +169,47 @@ export default function TasksFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500 via-cyan-500 to-blue-600 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <CheckSquare className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Tasks Preview</span>
+                <div className="h-full flex flex-col">
+                  {/* App header bar */}
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckSquare className="w-4 h-4 text-blue-400" />
+                      <span className="text-sm font-semibold text-white">Today&apos;s Tasks</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-gray-500">4 of 7 done</span>
+                      <div className="w-16 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                        <div className="w-[57%] h-full bg-blue-500 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Task rows */}
+                  <div className="flex-1 px-5 py-3 space-y-2.5 overflow-hidden">
+                    {[
+                      { text: "Pack school lunches", assignee: "S", color: "bg-pink-400", done: true, priority: "high" },
+                      { text: "Drop off dry cleaning", assignee: "M", color: "bg-blue-400", done: true, priority: "med" },
+                      { text: "Schedule vet appointment", assignee: "S", color: "bg-pink-400", done: true, priority: "high" },
+                      { text: "Take out recycling", assignee: "J", color: "bg-emerald-400", done: false, priority: "med" },
+                      { text: "Vacuum living room", assignee: "M", color: "bg-blue-400", done: false, priority: "low" },
+                      { text: "Review permission slip", assignee: "S", color: "bg-pink-400", done: true, priority: "high" },
+                      { text: "Fix leaky faucet", assignee: "M", color: "bg-blue-400", done: false, priority: "med" },
+                    ].map((t) => (
+                      <div key={t.text} className="flex items-center gap-3 py-1.5 px-3 rounded-lg bg-gray-800/50">
+                        <div className={`w-4 h-4 rounded flex-shrink-0 flex items-center justify-center ${t.done ? 'bg-blue-500' : 'border border-gray-600'}`}>
+                          {t.done && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                        <span className={`text-xs flex-1 ${t.done ? 'text-gray-500 line-through' : 'text-gray-200'}`}>{t.text}</span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${t.priority === 'high' ? 'bg-red-500/20 text-red-400' : t.priority === 'med' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-700 text-gray-400'}`}>
+                          {t.priority === 'high' ? 'High' : t.priority === 'med' ? 'Med' : 'Low'}
+                        </span>
+                        <div className={`w-5 h-5 rounded-full ${t.color} flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0`}>
+                          {t.assignee}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>

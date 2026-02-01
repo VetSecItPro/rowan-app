@@ -169,13 +169,41 @@ export default function BudgetFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-400 to-cyan-500 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <Wallet className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Budget Preview</span>
+                <div className="h-full flex flex-col">
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-4 h-4 text-emerald-400" />
+                      <span className="text-sm font-semibold text-white">February Budget</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-emerald-400 font-semibold">$2,340</div>
+                      <div className="text-[9px] text-gray-500">of $4,500 spent</div>
+                    </div>
+                  </div>
+                  <div className="flex-1 px-5 py-3 space-y-3 overflow-hidden">
+                    {[
+                      { name: "Groceries", spent: 420, budget: 600, color: "bg-emerald-500" },
+                      { name: "Dining out", spent: 180, budget: 250, color: "bg-teal-500" },
+                      { name: "Gas & transport", spent: 195, budget: 300, color: "bg-cyan-500" },
+                      { name: "Subscriptions", spent: 85, budget: 85, color: "bg-amber-500" },
+                      { name: "Kids activities", spent: 240, budget: 350, color: "bg-blue-500" },
+                    ].map((c) => (
+                      <div key={c.name}>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-[11px] text-gray-300">{c.name}</span>
+                          <span className="text-[10px] text-gray-500">${c.spent} / ${c.budget}</span>
+                        </div>
+                        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                          <div className={`h-full ${c.color} rounded-full transition-all`} style={{ width: `${Math.min((c.spent / c.budget) * 100, 100)}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                    <div className="pt-2 border-t border-gray-800">
+                      <div className="text-[10px] text-gray-500">Recent: <span className="text-gray-400">Costco $142.30</span> · <span className="text-gray-400">Shell gas $48.50</span> · <span className="text-gray-400">Netflix $15.99</span></div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </div>

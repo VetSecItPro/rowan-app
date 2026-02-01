@@ -169,13 +169,45 @@ export default function MessagingFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <MessageSquare className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Messages Preview</span>
+                <div className="h-full flex flex-col">
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-blue-400" />
+                      <span className="text-sm font-semibold text-white">Family Chat</span>
+                    </div>
+                    <div className="flex -space-x-1.5">
+                      {['bg-pink-400', 'bg-blue-400', 'bg-emerald-400', 'bg-purple-400'].map((c, i) => (
+                        <div key={i} className={`w-5 h-5 rounded-full ${c} border-2 border-gray-900 flex items-center justify-center text-[8px] font-bold text-white`}>
+                          {['S', 'M', 'J', 'E'][i]}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex-1 px-5 py-3 space-y-3 overflow-hidden">
+                    {[
+                      { sender: "Sarah", text: "Can someone pick up Jake from practice at 5?", color: "bg-pink-400", align: "left" as const, time: "3:42 PM" },
+                      { sender: "Mike", text: "I can grab him! Need anything from the store on the way back?", color: "bg-blue-400", align: "right" as const, time: "3:44 PM" },
+                      { sender: "Sarah", text: "Yes! We need milk and that cereal Emma likes", color: "bg-pink-400", align: "left" as const, time: "3:45 PM" },
+                      { sender: "Emma", text: "Honey Bunches of Oats!", color: "bg-purple-400", align: "left" as const, time: "3:46 PM" },
+                      { sender: "Mike", text: "Got it, see you all around 5:30", color: "bg-blue-400", align: "right" as const, time: "3:47 PM" },
+                    ].map((m) => (
+                      <div key={m.text} className={`flex ${m.align === 'right' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[75%] flex items-end gap-1.5 ${m.align === 'right' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`w-5 h-5 rounded-full ${m.color} flex-shrink-0 flex items-center justify-center text-[8px] font-bold text-white`}>
+                            {m.sender[0]}
+                          </div>
+                          <div>
+                            <div className={`rounded-2xl px-3 py-1.5 text-[11px] ${m.align === 'right' ? 'bg-blue-600/20 text-blue-100 rounded-br-sm' : 'bg-gray-800 text-gray-200 rounded-bl-sm'}`}>
+                              {m.text}
+                            </div>
+                            <div className={`text-[9px] text-gray-600 mt-0.5 ${m.align === 'right' ? 'text-right' : ''}`}>{m.time}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>

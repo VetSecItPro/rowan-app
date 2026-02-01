@@ -3,6 +3,9 @@ import { AppWithOnboarding } from "@/components/app/AppWithOnboarding";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { Header } from "@/components/layout/Header";
 
+// Force dynamic rendering for authenticated routes (auth context, real-time data)
+export const dynamic = 'force-dynamic';
+
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
     <AppWithOnboarding>

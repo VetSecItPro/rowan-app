@@ -169,13 +169,41 @@ export default function CalendarFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <Calendar className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Calendar Preview</span>
+                <div className="h-full flex flex-col">
+                  {/* Calendar header */}
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-emerald-400" />
+                      <span className="text-sm font-semibold text-white">February 2026</span>
+                    </div>
+                    <span className="text-[11px] text-gray-500">Week view</span>
+                  </div>
+                  {/* Week grid */}
+                  <div className="flex-1 px-4 py-3">
+                    <div className="grid grid-cols-5 gap-2 h-full">
+                      {[
+                        { day: "Mon 3", events: [{ text: "Soccer practice", time: "3:30 PM", color: "bg-blue-500/20 border-blue-500/40 text-blue-300" }, { text: "Groceries", time: "5:00 PM", color: "bg-emerald-500/20 border-emerald-500/40 text-emerald-300" }] },
+                        { day: "Tue 4", events: [{ text: "Parent-teacher", time: "10:00 AM", color: "bg-purple-500/20 border-purple-500/40 text-purple-300" }] },
+                        { day: "Wed 5", events: [{ text: "Dentist — Emma", time: "2:00 PM", color: "bg-pink-500/20 border-pink-500/40 text-pink-300" }, { text: "Piano lesson", time: "4:30 PM", color: "bg-indigo-500/20 border-indigo-500/40 text-indigo-300" }] },
+                        { day: "Thu 6", events: [{ text: "Date night", time: "7:00 PM", color: "bg-rose-500/20 border-rose-500/40 text-rose-300" }] },
+                        { day: "Fri 7", events: [{ text: "Movie night", time: "6:30 PM", color: "bg-amber-500/20 border-amber-500/40 text-amber-300" }, { text: "Jake sleepover", time: "7:00 PM", color: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300" }] },
+                      ].map((d) => (
+                        <div key={d.day} className="flex flex-col">
+                          <div className="text-[10px] text-gray-500 mb-2 text-center">{d.day}</div>
+                          <div className="space-y-1.5 flex-1">
+                            {d.events.map((e) => (
+                              <div key={e.text} className={`rounded-lg border px-2 py-1.5 ${e.color}`}>
+                                <div className="text-[10px] font-medium truncate">{e.text}</div>
+                                <div className="text-[9px] opacity-70">{e.time}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </div>

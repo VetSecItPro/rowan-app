@@ -169,13 +169,38 @@ export default function GoalsFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-violet-500 to-purple-600 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <Trophy className="w-32 h-32 animate-bounce-slow" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Goals Preview</span>
+                <div className="h-full flex flex-col">
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-4 h-4 text-violet-400" />
+                      <span className="text-sm font-semibold text-white">Family Goals</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Flame className="w-3.5 h-3.5 text-orange-400" />
+                      <span className="text-[11px] text-orange-400 font-medium">12 day streak</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 px-5 py-3 space-y-3 overflow-hidden">
+                    {[
+                      { name: "Hawaii vacation fund", current: 2400, target: 5000, color: "bg-violet-500", emoji: "🏝️", label: "$2,400 / $5,000" },
+                      { name: "Read 24 books this year", current: 7, target: 24, color: "bg-purple-500", emoji: "📚", label: "7 of 24 books" },
+                      { name: "Family 5K run", current: 6, target: 8, color: "bg-indigo-500", emoji: "🏃", label: "Week 6 of 8" },
+                      { name: "Learn to cook 12 new recipes", current: 4, target: 12, color: "bg-fuchsia-500", emoji: "👨‍🍳", label: "4 of 12 recipes" },
+                    ].map((g) => (
+                      <div key={g.name} className="rounded-lg bg-gray-800/50 p-2.5">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-sm">{g.emoji}</span>
+                          <span className="text-[11px] text-gray-200 font-medium flex-1">{g.name}</span>
+                          <span className="text-[10px] text-gray-500">{g.label}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                          <div className={`h-full ${g.color} rounded-full`} style={{ width: `${(g.current / g.target) * 100}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>

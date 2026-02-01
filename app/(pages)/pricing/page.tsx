@@ -22,14 +22,16 @@ export default function PricingPage() {
   const [period, setPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [foundingMemberSpots, setFoundingMemberSpots] = useState<number | null>(null);
+  const [foundingMemberSoldOut, setFoundingMemberSoldOut] = useState(false);
 
-  // Fetch founding member spots remaining
+  // Fetch founding member spots remaining — badge shows by default, hidden only if sold out
   useEffect(() => {
     fetch('/api/founding-members')
       .then(res => res.json())
-      .then(data => setFoundingMemberSpots(data.spotsRemaining))
-      .catch(() => setFoundingMemberSpots(1000)); // Default to 1000 on error
+      .then(data => {
+        if (data.spotsRemaining === 0) setFoundingMemberSoldOut(true);
+      })
+      .catch(() => { /* keep badge visible on error */ });
   }, []);
 
   const handlePeriodChange = (newPeriod: 'monthly' | 'annual') => {
@@ -169,7 +171,7 @@ export default function PricingPage() {
               popular={true}
               loading={loading === 'pro'}
               disabled={loading !== null}
-              showFoundingMember={foundingMemberSpots !== null && foundingMemberSpots > 0}
+              showFoundingMember={!foundingMemberSoldOut}
               onSelect={() => handleSelectPlan('pro')}
             />
 
@@ -194,7 +196,7 @@ export default function PricingPage() {
               cta="Upgrade to Family"
               loading={loading === 'family'}
               disabled={loading !== null}
-              showFoundingMember={foundingMemberSpots !== null && foundingMemberSpots > 0}
+              showFoundingMember={!foundingMemberSoldOut}
               onSelect={() => handleSelectPlan('family')}
             />
           </div>
