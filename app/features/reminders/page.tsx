@@ -169,13 +169,37 @@ export default function RemindersFeaturePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-pink-400 to-rose-500 shadow-2xl"
+                className="relative aspect-video rounded-3xl overflow-hidden bg-gray-900 border border-gray-700 shadow-2xl"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                  <Bell className="w-32 h-32 animate-pulse" />
-                </div>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <span className="text-white font-bold text-xl drop-shadow-md">Reminders Preview</span>
+                <div className="h-full flex flex-col">
+                  <div className="px-5 py-3 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-4 h-4 text-pink-400" />
+                      <span className="text-sm font-semibold text-white">Reminders</span>
+                    </div>
+                    <span className="text-[11px] text-gray-500">5 upcoming</span>
+                  </div>
+                  <div className="flex-1 px-5 py-3 space-y-2 overflow-hidden">
+                    {[
+                      { text: "Pick up prescription", time: "Today, 2:30 PM", icon: "💊", urgent: true, recurring: false },
+                      { text: "Call plumber about leak", time: "Today, 4:00 PM", icon: "🔧", urgent: true, recurring: false },
+                      { text: "Emma piano practice", time: "Tomorrow, 3:30 PM", icon: "🎹", urgent: false, recurring: true },
+                      { text: "Renew car insurance", time: "Feb 15", icon: "🚗", urgent: false, recurring: false },
+                      { text: "Water the plants", time: "Every Wed", icon: "🌱", urgent: false, recurring: true },
+                    ].map((r) => (
+                      <div key={r.text} className="flex items-center gap-3 py-2 px-3 rounded-lg bg-gray-800/50">
+                        <span className="text-base">{r.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs text-gray-200 truncate">{r.text}</div>
+                          <div className="text-[10px] text-gray-500 flex items-center gap-1.5">
+                            {r.time}
+                            {r.recurring && <Repeat className="w-2.5 h-2.5 text-pink-400" />}
+                          </div>
+                        </div>
+                        {r.urgent && <div className="w-1.5 h-1.5 rounded-full bg-pink-400 flex-shrink-0" />}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>

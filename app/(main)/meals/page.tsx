@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, X, CheckSquare } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
@@ -32,6 +33,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 import { showSuccess, showError } from '@/lib/utils/toast';
 import { toast } from 'sonner';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
+import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
 type CalendarViewMode = 'week' | '2weeks' | 'month';
@@ -151,14 +153,63 @@ CalendarDayCell.displayName = 'CalendarDayCell';
 
 export default function MealsPage() {
   const { currentSpace, user } = useAuthWithSpaces();
+  const queryClient = useQueryClient();
   const spaceId = currentSpace?.id;
-  const [meals, setMeals] = useState<Meal[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  // React Query: fetch meals + stats
+  const {
+    data: mealsData,
+    isLoading: mealsLoading,
+    refetch: refetchMeals,
+  } = useQuery({
+    queryKey: QUERY_KEYS.meals.all(spaceId || ''),
+    queryFn: async () => {
+      const [meals, stats] = await Promise.all([
+        mealsService.getMeals(spaceId!),
+        mealsService.getMealStats(spaceId!),
+      ]);
+      return { meals, stats };
+    },
+    enabled: !!spaceId && !!user,
+    ...QUERY_OPTIONS.features,
+  });
+
+  const meals = mealsData?.meals ?? [];
+  const stats = mealsData?.stats ?? { thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 };
+
+  // React Query: fetch recipes
+  const {
+    data: recipes = [],
+    refetch: refetchRecipes,
+  } = useQuery({
+    queryKey: QUERY_KEYS.meals.recipes(spaceId || ''),
+    queryFn: () => mealsService.getRecipes(spaceId!),
+    enabled: !!spaceId,
+    ...QUERY_OPTIONS.features,
+  });
+
+  const loading = mealsLoading;
+
+  // Invalidation helpers
+  const invalidateMeals = useCallback(() => {
+    if (!spaceId) return;
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.meals.all(spaceId) });
+  }, [spaceId, queryClient]);
+
+  const invalidateRecipes = useCallback(() => {
+    if (!spaceId) return;
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.meals.recipes(spaceId) });
+  }, [spaceId, queryClient]);
+
+  const invalidateAll = useCallback(() => {
+    invalidateMeals();
+    invalidateRecipes();
+  }, [invalidateMeals, invalidateRecipes]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [stats, setStats] = useState({ thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 });
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('week');
   const [pendingDeletions, setPendingDeletions] = useState<Map<string, { type: 'meal' | 'recipe', data: Meal | Recipe, timeoutId: NodeJS.Timeout }>>(new Map());
@@ -167,7 +218,6 @@ export default function MealsPage() {
   pendingDeletionsRef.current = pendingDeletions;
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [recipeModalInitialTab, setRecipeModalInitialTab] = useState<'manual' | 'ai' | 'discover'>('manual');
@@ -257,102 +307,28 @@ export default function MealsPage() {
     return mealsByDate.get(dateKey) || [];
   }, [mealsByDate]);
 
-  // Load meals callback
-  const loadMeals = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet - but keep loading state
-    if (!spaceId || !user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const [mealsData, statsData] = await Promise.all([
-        mealsService.getMeals(spaceId),
-        mealsService.getMealStats(spaceId),
-      ]);
-      setMeals(mealsData);
-      setStats(statsData);
-
-    } catch (error) {
-      logger.error('Failed to load meals:', error, { component: 'page', action: 'execution' });
-    } finally {
-      setLoading(false);
-    }
-  }, [spaceId, user]);
-
-  // Load recipes callback
-  const loadRecipes = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet - but still allow function to complete
-    if (!spaceId) {
-      return;
-    }
-
-    try {
-      const recipesData = await mealsService.getRecipes(spaceId);
-      setRecipes(recipesData);
-    } catch (error) {
-      logger.error('Failed to load recipes:', error, { component: 'page', action: 'execution' });
-    }
-  }, [spaceId]);
-
-  useEffect(() => {
-    loadMeals();
-    loadRecipes();
-  }, [loadMeals, loadRecipes]);
-
-  // Real-time subscriptions for collaborative editing
+  // Real-time subscriptions — invalidate React Query cache on changes
   useEffect(() => {
     if (!spaceId) return;
 
     const supabase = createClient();
 
-    // Subscribe to meal changes
-    const mealsChannel = mealsService.subscribeToMeals(spaceId, (payload) => {
-      logger.info('[Real-time] Meal change:', { component: 'page', data: { eventType: payload.eventType, payload: payload.new || payload.old } });
-
-      if (payload.eventType === 'INSERT' && payload.new) {
-        // Add new meal to state
-        setMeals(prev => {
-          // Check if meal already exists (avoid duplicates from optimistic updates)
-          if (prev.find(m => m.id === payload.new!.id)) return prev;
-          return [...prev, payload.new!];
-        });
-      } else if (payload.eventType === 'UPDATE' && payload.new) {
-        // Update existing meal in state
-        setMeals(prev => prev.map(m => m.id === payload.new!.id ? payload.new! : m));
-      } else if (payload.eventType === 'DELETE' && payload.old) {
-        // Remove meal from state
-        setMeals(prev => prev.filter(m => m.id !== payload.old!.id));
-      }
+    const mealsChannel = mealsService.subscribeToMeals(spaceId, () => {
+      invalidateMeals();
     });
 
-    // Subscribe to recipe changes
-    const recipesChannel = mealsService.subscribeToRecipes(spaceId, (payload) => {
-      logger.info('[Real-time] Recipe change:', { component: 'page', data: { eventType: payload.eventType, payload: payload.new || payload.old } });
-
-      if (payload.eventType === 'INSERT' && payload.new) {
-        setRecipes(prev => {
-          if (prev.find(r => r.id === payload.new!.id)) return prev;
-          return [...prev, payload.new!];
-        });
-      } else if (payload.eventType === 'UPDATE' && payload.new) {
-        setRecipes(prev => prev.map(r => r.id === payload.new!.id ? payload.new! : r));
-      } else if (payload.eventType === 'DELETE' && payload.old) {
-        setRecipes(prev => prev.filter(r => r.id !== payload.old!.id));
-      }
+    const recipesChannel = mealsService.subscribeToRecipes(spaceId, () => {
+      invalidateRecipes();
     });
 
-    // Cleanup on unmount
     return () => {
-      logger.info('[Real-time] Unsubscribing from channels', { component: 'page' });
       supabase.removeChannel(mealsChannel);
       supabase.removeChannel(recipesChannel);
 
-      // Clear all pending deletion timeouts using ref (avoids subscription recreation)
+      // Clear all pending deletion timeouts using ref
       pendingDeletionsRef.current.forEach(({ timeoutId }) => clearTimeout(timeoutId));
     };
-  }, [spaceId]); // OPTIMIZATION: Removed pendingDeletions from deps - use ref instead
+  }, [spaceId, invalidateMeals, invalidateRecipes]);
 
   // Memoized handlers
   const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
@@ -403,19 +379,25 @@ export default function MealsPage() {
         await mealsService.createMeal(mealData);
       }
 
-      loadMeals();
+      invalidateMeals();
       setEditingMeal(null);
     } catch (error) {
       logger.error('Failed to save meal:', error, { component: 'page', action: 'execution' });
     }
-  }, [editingMeal, loadMeals, spaceId, recipes]);
+  }, [editingMeal, invalidateMeals, spaceId, recipes]);
 
   const handleDeleteMeal = useCallback(async (mealId: string) => {
     const mealToDelete = meals.find(m => m.id === mealId);
     if (!mealToDelete) return;
 
-    // Optimistically remove from UI
-    setMeals(prev => prev.filter(m => m.id !== mealId));
+    const mealsKey = QUERY_KEYS.meals.all(spaceId || '');
+
+    // Optimistically remove from UI via query cache
+    const previousData = queryClient.getQueryData<{ meals: Meal[]; stats: typeof stats }>(mealsKey);
+    queryClient.setQueryData<{ meals: Meal[]; stats: typeof stats } | undefined>(
+      mealsKey,
+      (old) => old ? { ...old, meals: old.meals.filter(m => m.id !== mealId) } : old,
+    );
 
     // Schedule actual deletion after 5 seconds
     const timeoutId = setTimeout(async () => {
@@ -426,11 +408,12 @@ export default function MealsPage() {
           newMap.delete(mealId);
           return newMap;
         });
+        invalidateMeals();
       } catch (error) {
         logger.error('Failed to delete meal:', error, { component: 'page', action: 'execution' });
         showError('Failed to delete meal');
-        // Restore the meal if deletion failed
-        setMeals(prev => [...prev, mealToDelete]);
+        // Restore on failure
+        if (previousData) queryClient.setQueryData(mealsKey, previousData);
       }
     }, 5000);
 
@@ -443,20 +426,19 @@ export default function MealsPage() {
       action: {
         label: 'Undo',
         onClick: () => {
-          // Cancel the deletion
           clearTimeout(timeoutId);
           setPendingDeletions(prev => {
             const newMap = new Map(prev);
             newMap.delete(mealId);
             return newMap;
           });
-          // Restore the meal
-          setMeals(prev => [...prev, mealToDelete]);
+          // Restore the meal via query cache
+          if (previousData) queryClient.setQueryData(mealsKey, previousData);
           showSuccess('Meal restored!');
         }
       }
     });
-  }, [meals]);
+  }, [meals, spaceId, queryClient, stats, invalidateMeals]);
 
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
     // If space is not available, don't allow recipe creation
@@ -471,19 +453,25 @@ export default function MealsPage() {
       } else {
         await mealsService.createRecipe(recipeData);
       }
-      loadRecipes();
+      invalidateRecipes();
       setEditingRecipe(null);
     } catch (error) {
       logger.error('Failed to save recipe:', error, { component: 'page', action: 'execution' });
     }
-  }, [editingRecipe, loadRecipes, spaceId]);
+  }, [editingRecipe, invalidateRecipes, spaceId]);
 
   const handleDeleteRecipe = useCallback(async (recipeId: string) => {
     const recipeToDelete = recipes.find(r => r.id === recipeId);
     if (!recipeToDelete) return;
 
-    // Optimistically remove from UI
-    setRecipes(prev => prev.filter(r => r.id !== recipeId));
+    const recipesKey = QUERY_KEYS.meals.recipes(spaceId || '');
+
+    // Optimistically remove from UI via query cache
+    const previousRecipes = queryClient.getQueryData<Recipe[]>(recipesKey);
+    queryClient.setQueryData<Recipe[]>(
+      recipesKey,
+      (old) => (old || []).filter(r => r.id !== recipeId),
+    );
 
     // Schedule actual deletion after 5 seconds
     const timeoutId = setTimeout(async () => {
@@ -494,11 +482,12 @@ export default function MealsPage() {
           newMap.delete(recipeId);
           return newMap;
         });
+        invalidateRecipes();
       } catch (error) {
         logger.error('Failed to delete recipe:', error, { component: 'page', action: 'execution' });
         showError('Failed to delete recipe');
-        // Restore the recipe if deletion failed
-        setRecipes(prev => [...prev, recipeToDelete]);
+        // Restore on failure
+        if (previousRecipes) queryClient.setQueryData(recipesKey, previousRecipes);
       }
     }, 5000);
 
@@ -511,20 +500,19 @@ export default function MealsPage() {
       action: {
         label: 'Undo',
         onClick: () => {
-          // Cancel the deletion
           clearTimeout(timeoutId);
           setPendingDeletions(prev => {
             const newMap = new Map(prev);
             newMap.delete(recipeId);
             return newMap;
           });
-          // Restore the recipe
-          setRecipes(prev => [...prev, recipeToDelete]);
+          // Restore the recipe via query cache
+          if (previousRecipes) queryClient.setQueryData(recipesKey, previousRecipes);
           showSuccess('Recipe restored!');
         }
       }
     });
-  }, [recipes]);
+  }, [recipes, spaceId, queryClient, invalidateRecipes]);
 
   // Search handler
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -614,7 +602,7 @@ export default function MealsPage() {
       const savedRecipe = await mealsService.createRecipe(recipeData);
 
       // Reload recipes to get the new one
-      await loadRecipes();
+      await refetchRecipes();
 
       // Close recipe modal
       setIsRecipeModalOpen(false);
@@ -646,7 +634,7 @@ export default function MealsPage() {
       logger.error('Failed to save discovered recipe:', error, { component: 'page', action: 'execution' });
       showError('Failed to save recipe. Please try again.');
     }
-  }, [spaceId, loadRecipes]);
+  }, [spaceId, refetchRecipes]);
 
   // Stat card click handlers
   const handleThisWeekClick = useCallback(() => {
@@ -721,7 +709,7 @@ export default function MealsPage() {
           try {
             await Promise.all(mealIds.map(id => mealsService.deleteMeal(id)));
             showSuccess(`${mealIds.length} meal${mealIds.length > 1 ? 's' : ''} deleted successfully!`);
-            loadMeals();
+            invalidateMeals();
           } catch (error) {
             logger.error('Failed to delete meals:', error, { component: 'page', action: 'execution' });
             showError('Failed to delete some meals. Please try again.');
@@ -733,7 +721,7 @@ export default function MealsPage() {
         onClick: () => {}
       }
     });
-  }, [loadMeals]);
+  }, [invalidateMeals]);
 
   const handleBulkGenerateList = useCallback(async (mealIds: string[]) => {
     const selectedMeals = meals.filter(m => mealIds.includes(m.id));
@@ -803,8 +791,8 @@ export default function MealsPage() {
 
   // Pull-to-refresh handler
   const handlePullToRefresh = useCallback(async () => {
-    await Promise.all([loadMeals(), loadRecipes()]);
-  }, [loadMeals, loadRecipes]);
+    await Promise.all([refetchMeals(), refetchRecipes()]);
+  }, [refetchMeals, refetchRecipes]);
 
   const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
     if (!pendingMealData || !selectedRecipeForReview || !spaceId) return;
@@ -839,7 +827,7 @@ export default function MealsPage() {
       setIsIngredientReviewOpen(false);
       setPendingMealData(null);
       setSelectedRecipeForReview(null);
-      loadMeals();
+      invalidateMeals();
 
       // Show success notification with option to view
       showSuccess(`Shopping list "${listTitle}" created with ${selectedIngredients.length} ingredient${selectedIngredients.length > 1 ? 's' : ''}!`, {
@@ -850,7 +838,7 @@ export default function MealsPage() {
       logger.error('Failed to create meal with shopping list:', error, { component: 'page', action: 'execution' });
       showError('Failed to create shopping list. Please try again.');
     }
-  }, [pendingMealData, selectedRecipeForReview, spaceId, loadMeals]);
+  }, [pendingMealData, selectedRecipeForReview, spaceId, invalidateMeals]);
 
   return (
     <FeatureGateWrapper
@@ -1441,7 +1429,7 @@ export default function MealsPage() {
           onClose={() => setIsGenerateListOpen(false)}
           meals={meals}
           spaceId={spaceId}
-          onSuccess={() => loadMeals()}
+          onSuccess={() => invalidateMeals()}
         />
       )}
       </PullToRefresh>

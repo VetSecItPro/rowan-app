@@ -1,6 +1,13 @@
-'use client';
-
 /* eslint-disable react/no-unescaped-entities */
+
+import type { Metadata } from 'next';
+
+export const revalidate = 86400; // ISR: regenerate every 24 hours
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy | Rowan',
+  description: 'Rowan Privacy Policy. How we collect, use, and protect your personal information and family data.',
+};
 
 import { Shield, Eye, Download, Trash2, MapPin, Users, Lock } from 'lucide-react';
 

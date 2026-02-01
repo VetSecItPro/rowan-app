@@ -1,5 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
-'use client';
+
+import type { Metadata } from 'next';
+
+export const revalidate = 86400; // ISR: regenerate every 24 hours
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | Rowan',
+  description: 'Read the Rowan Terms of Service. Understand the rules and guidelines for using our family management platform.',
+};
 
 import Link from 'next/link';
 import Image from 'next/image';

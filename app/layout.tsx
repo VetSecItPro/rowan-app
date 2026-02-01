@@ -8,6 +8,7 @@ import { CookieConsent } from "@/components/gdpr/CookieConsent";
 import ClientErrorBoundary from "@/components/shared/ClientErrorBoundary";
 import { NetworkStatus } from "@/components/ui/NetworkStatus";
 import { Toaster } from 'sonner';
+import { AppQueryProvider } from '@/lib/providers/query-client-provider';
 
 // Optimized font loading with Next.js font module
 // Automatically self-hosted, preloaded, and optimized
@@ -29,9 +30,6 @@ const playfair = Playfair_Display({
   weight: ['400', '500', '600', '700', '800', '900'],
   style: ['normal', 'italic'],
 });
-
-// Force dynamic rendering for all pages since we use AuthProvider with React Context
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "Rowan - Your Life, Organized",
@@ -80,6 +78,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 text-white`} style={{ scrollbarGutter: 'stable' }}>
+        <AppQueryProvider>
         <DeviceProvider>
           <AuthProvider>
             <SpacesProvider>
@@ -107,6 +106,7 @@ export default function RootLayout({
             />
           </AuthProvider>
         </DeviceProvider>
+        </AppQueryProvider>
       </body>
     </html>
   );

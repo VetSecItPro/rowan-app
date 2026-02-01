@@ -106,7 +106,8 @@ export const shoppingService = {
       .from('shopping_lists')
       .select('*, items:shopping_items(*, assignee:users!shopping_items_assigned_to_fkey(id, name, email, avatar_url))')
       .eq('space_id', spaceId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(200);
 
     if (error) throw error;
     return data || [];

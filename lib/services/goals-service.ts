@@ -356,7 +356,8 @@ export const goalsService = {
       `)
       .eq('space_id', spaceId)
       .order('is_pinned', { ascending: false })
-      .order('priority_order', { ascending: true });
+      .order('priority_order', { ascending: true })
+      .limit(500);
 
     if (error) throw error;
 

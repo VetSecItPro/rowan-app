@@ -32,7 +32,7 @@ const nextConfig = {
   serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
   experimental: {
     // Re-enabled: hang was caused by duplicate node_modules folders, not this feature
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'date-fns', '@supabase/supabase-js', 'sonner'],
     // Disabled due to race condition causing 500 errors in dev
     // webpackBuildWorker: true,
   },

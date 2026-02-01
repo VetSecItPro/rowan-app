@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { useDevice } from '@/lib/contexts/DeviceContext';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
+import nextDynamic from 'next/dynamic';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -21,21 +22,23 @@ import { logger } from '@/lib/logger';
 import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
 import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalendarLegend';
 import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
-import { UnifiedItemPreviewModal } from '@/components/calendar/UnifiedItemPreviewModal';
 import { useUnifiedCalendar } from '@/lib/hooks/useUnifiedCalendar';
 import type { UnifiedCalendarItem } from '@/lib/types/unified-calendar-item';
 
-// Import components directly to fix clickability issues
-import { NewEventModal } from '@/components/calendar/NewEventModal';
-import { EventDetailModal } from '@/components/calendar/EventDetailModal';
-import { EventProposalModal } from '@/components/calendar/EventProposalModal';
-import { BulkEventManager } from '@/components/calendar/BulkEventManager';
+// Eagerly imported view components (rendered based on active view mode)
 import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
-import { TemplateLibrary } from '@/components/calendar/TemplateLibrary';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
 import { geolocationService } from '@/lib/services/geolocation-service';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+
+// Lazy-load modals and dialogs (only rendered when opened)
+const NewEventModal = nextDynamic(() => import('@/components/calendar/NewEventModal').then(m => ({ default: m.NewEventModal })), { ssr: false });
+const EventDetailModal = nextDynamic(() => import('@/components/calendar/EventDetailModal').then(m => ({ default: m.EventDetailModal })), { ssr: false });
+const EventProposalModal = nextDynamic(() => import('@/components/calendar/EventProposalModal').then(m => ({ default: m.EventProposalModal })), { ssr: false });
+const BulkEventManager = nextDynamic(() => import('@/components/calendar/BulkEventManager').then(m => ({ default: m.BulkEventManager })), { ssr: false });
+const TemplateLibrary = nextDynamic(() => import('@/components/calendar/TemplateLibrary').then(m => ({ default: m.TemplateLibrary })), { ssr: false });
+const UnifiedItemPreviewModal = nextDynamic(() => import('@/components/calendar/UnifiedItemPreviewModal').then(m => ({ default: m.UnifiedItemPreviewModal })), { ssr: false });
+const ConfirmDialog = nextDynamic(() => import('@/components/shared/ConfirmDialog').then(m => ({ default: m.ConfirmDialog })), { ssr: false });
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';

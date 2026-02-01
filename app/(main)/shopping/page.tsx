@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
@@ -27,11 +28,37 @@ import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/s
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
 import { calendarService } from '@/lib/services/calendar-service';
 import { remindersService } from '@/lib/services/reminders-service';
+import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 
 export default function ShoppingPage() {
   const { currentSpace, user } = useAuthWithSpaces();
-  const [lists, setLists] = useState<ShoppingList[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const spaceId = currentSpace?.id;
+
+  // React Query: fetch shopping lists with stale-while-revalidate
+  const {
+    data: lists = [],
+    isLoading: listsLoading,
+    refetch: refetchLists,
+  } = useQuery({
+    queryKey: QUERY_KEYS.shopping.lists(spaceId || ''),
+    queryFn: () => shoppingService.getLists(spaceId!),
+    enabled: !!spaceId && !!user,
+    ...QUERY_OPTIONS.features,
+  });
+
+  // React Query: fetch shopping stats
+  const {
+    data: stats = { totalLists: 0, activeLists: 0, itemsThisWeek: 0, completedLists: 0 },
+  } = useQuery({
+    queryKey: QUERY_KEYS.shopping.stats(spaceId || ''),
+    queryFn: () => shoppingService.getShoppingStats(spaceId!),
+    enabled: !!spaceId && !!user,
+    ...QUERY_OPTIONS.features,
+  });
+
+  const loading = listsLoading;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,13 +72,6 @@ export default function ShoppingPage() {
   const [showScheduleTripModal, setShowScheduleTripModal] = useState(false);
   const [listToSchedule, setListToSchedule] = useState<ShoppingList | null>(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, listId: '' });
-
-  const [stats, setStats] = useState({
-    totalLists: 0,
-    activeLists: 0,
-    itemsThisWeek: 0,
-    completedLists: 0,
-  });
 
   // Memoized filtered lists calculation
   const filteredLists = useMemo(() => {
@@ -91,52 +111,25 @@ export default function ShoppingPage() {
     return filtered;
   }, [lists, debouncedSearchQuery, statusFilter, timeFilter]);
 
-  // Memoized stats calculations
-  const memoizedStats = useMemo(() => stats, [stats]);
+  // Invalidate both lists and stats caches
+  const invalidateShopping = useCallback(() => {
+    if (!spaceId) return;
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopping.lists(spaceId) });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopping.stats(spaceId) });
+  }, [spaceId, queryClient]);
 
-  // Load lists function with stable reference for real-time subscription
-  const loadLists = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
-    if (!currentSpace || !user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const [listsData, statsData] = await Promise.all([
-        shoppingService.getLists(currentSpace.id),
-        shoppingService.getShoppingStats(currentSpace.id),
-      ]);
-      setLists(listsData);
-      setStats(statsData);
-
-    } catch (error) {
-      logger.error('Failed to load shopping lists:', error, { component: 'page', action: 'execution' });
-    } finally {
-      setLoading(false);
-    }
-  }, [currentSpace, user]);
-
+  // Real-time subscription — invalidates React Query cache on changes
   useEffect(() => {
-    loadLists();
-  }, [loadLists]);
+    if (!spaceId) return;
 
-  // Real-time subscription for shopping lists
-  useEffect(() => {
-    if (!currentSpace) return;
-
-    const channel = shoppingService.subscribeToLists(currentSpace.id, () => {
-      // Reload lists when any change occurs
-      loadLists();
+    const channel = shoppingService.subscribeToLists(spaceId, () => {
+      invalidateShopping();
     });
 
-    // Cleanup subscription on unmount
     return () => {
       channel.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace]);
+  }, [spaceId, invalidateShopping]);
 
   // Memoized callback for creating/updating lists
   const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => {
@@ -163,14 +156,14 @@ export default function ShoppingPage() {
             }
           }
         }
-        // Real-time subscription will handle the update
+        invalidateShopping();
       } else {
         // Extract items before creating the list
         const { items, ...listDataOnly } = listData;
 
-        // Optimistic update - add to UI immediately
+        // Optimistic update via query cache
         const optimisticList: ShoppingList = {
-          id: `temp-${Date.now()}`, // Temporary ID
+          id: `temp-${Date.now()}`,
           title: listDataOnly.title,
           status: listDataOnly.status || 'active',
           created_at: new Date().toISOString(),
@@ -179,11 +172,14 @@ export default function ShoppingPage() {
           description: listDataOnly.description || undefined,
           store_name: listDataOnly.store_name || undefined,
           budget: listDataOnly.budget || undefined,
-          created_by: user?.id || '', // Add required created_by field
+          created_by: user?.id || '',
           completed_at: undefined,
         };
 
-        setLists(prev => [optimisticList, ...prev]);
+        queryClient.setQueryData<ShoppingList[]>(
+          QUERY_KEYS.shopping.lists(spaceId || ''),
+          (old) => [optimisticList, ...(old || [])],
+        );
 
         try {
           const newList = await shoppingService.createList(listDataOnly);
@@ -204,10 +200,14 @@ export default function ShoppingPage() {
             }
           }
 
-          // Real-time subscription will replace the optimistic list with the real one
+          // Invalidate to replace optimistic data with real data
+          invalidateShopping();
         } catch (error) {
           // Revert optimistic update on error
-          setLists(prev => prev.filter(list => list.id !== optimisticList.id));
+          queryClient.setQueryData<ShoppingList[]>(
+            QUERY_KEYS.shopping.lists(spaceId || ''),
+            (old) => (old || []).filter(list => list.id !== optimisticList.id),
+          );
           throw error;
         }
       }
@@ -217,7 +217,7 @@ export default function ShoppingPage() {
       logger.error('Failed to save list:', error, { component: 'page', action: 'execution' });
       alert('Failed to save shopping list. Please try again.');
     }
-  }, [editingList, setLists, user]);
+  }, [editingList, user, spaceId, queryClient, invalidateShopping]);
 
   // Memoized callback for deleting lists
   const handleDeleteList = useCallback(async (listId: string) => {
@@ -234,18 +234,24 @@ export default function ShoppingPage() {
     const listId = confirmDialog.listId;
     setConfirmDialog({ isOpen: false, listId: '' });
 
-    // Optimistic update - remove from UI immediately
-    setLists(prevLists => prevLists.filter(list => list.id !== listId));
+    // Optimistic update via query cache
+    const previousLists = queryClient.getQueryData<ShoppingList[]>(QUERY_KEYS.shopping.lists(spaceId || ''));
+    queryClient.setQueryData<ShoppingList[]>(
+      QUERY_KEYS.shopping.lists(spaceId || ''),
+      (old) => (old || []).filter(list => list.id !== listId),
+    );
 
     try {
       await shoppingService.deleteList(listId);
-      // Success - already removed from UI
+      invalidateShopping();
     } catch (error) {
       logger.error('Failed to delete list:', error, { component: 'page', action: 'execution' });
-      // Revert on error - reload lists to restore deleted item
-      loadLists();
+      // Revert on error
+      if (previousLists) {
+        queryClient.setQueryData(QUERY_KEYS.shopping.lists(spaceId || ''), previousLists);
+      }
     }
-  }, [confirmDialog, loadLists]);
+  }, [confirmDialog, spaceId, queryClient, invalidateShopping]);
 
   // Memoized callback for completing lists
   const handleCompleteList = useCallback(async (listId: string) => {
@@ -256,39 +262,33 @@ export default function ShoppingPage() {
     }
 
     try {
-      // Optimistically update list status
-      setLists(prevLists =>
-        prevLists.map(list =>
+      // Optimistic update via query cache
+      queryClient.setQueryData<ShoppingList[]>(
+        QUERY_KEYS.shopping.lists(spaceId || ''),
+        (old) => (old || []).map(list =>
           list.id === listId ? { ...list, status: 'completed' as const } : list
-        )
+        ),
       );
 
-      // Optimistically update stats
-      setStats(prevStats => ({
-        ...prevStats,
-        activeLists: prevStats.activeLists - 1,
-        completedLists: prevStats.completedLists + 1,
-      }));
-
-      // Mark as completed in database (keep for history/productivity tracking)
       await shoppingService.updateList(listId, { status: 'completed' });
+      invalidateShopping();
     } catch (error) {
       logger.error('Failed to complete list:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      loadLists();
+      invalidateShopping();
     }
-  }, [loadLists]);
+  }, [spaceId, queryClient, invalidateShopping]);
 
   // Memoized callback for toggling items
   const handleToggleItem = useCallback(async (itemId: string, checked: boolean) => {
-    // Optimistic update
-    setLists(prevLists =>
-      prevLists.map(list => ({
+    // Optimistic update via query cache
+    queryClient.setQueryData<ShoppingList[]>(
+      QUERY_KEYS.shopping.lists(spaceId || ''),
+      (old) => (old || []).map(list => ({
         ...list,
         items: list.items?.map(item =>
           item.id === itemId ? { ...item, checked } : item
         )
-      }))
+      })),
     );
 
     try {
@@ -311,31 +311,30 @@ export default function ShoppingPage() {
       }
     } catch (error) {
       logger.error('Failed to toggle item:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      loadLists();
+      invalidateShopping();
     }
-  }, [lists, handleCompleteList, loadLists]);
+  }, [lists, handleCompleteList, spaceId, queryClient, invalidateShopping]);
 
   // Memoized callback for updating item quantity
   const handleUpdateQuantity = useCallback(async (itemId: string, newQuantity: number) => {
-    // Optimistic update
-    setLists(prevLists =>
-      prevLists.map(list => ({
+    // Optimistic update via query cache
+    queryClient.setQueryData<ShoppingList[]>(
+      QUERY_KEYS.shopping.lists(spaceId || ''),
+      (old) => (old || []).map(list => ({
         ...list,
         items: list.items?.map(item =>
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         )
-      }))
+      })),
     );
 
     try {
       await shoppingService.updateItem(itemId, { quantity: newQuantity });
     } catch (error) {
       logger.error('Failed to update quantity:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      loadLists();
+      invalidateShopping();
     }
-  }, [loadLists]);
+  }, [spaceId, queryClient, invalidateShopping]);
 
   // Memoized callback for editing lists
   const handleEditList = useCallback((list: ShoppingList) => {
@@ -367,15 +366,15 @@ export default function ShoppingPage() {
 
   // Handle template selection
   const handleSelectTemplate = useCallback(async (templateId: string) => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
     try {
-      await shoppingService.createListFromTemplate(templateId, currentSpace.id);
-      loadLists();
+      await shoppingService.createListFromTemplate(templateId, spaceId);
+      invalidateShopping();
     } catch (error) {
       logger.error('Failed to create list from template:', error, { component: 'page', action: 'execution' });
       throw error;
     }
-  }, [currentSpace, loadLists]);
+  }, [spaceId, invalidateShopping]);
 
   // Handle start fresh (open modal)
   const handleStartFresh = useCallback(() => {
@@ -611,7 +610,7 @@ export default function ShoppingPage() {
 
   // Handler for adding frequent items
   const handleAddFrequentItem = useCallback(async (itemName: string, category: string) => {
-    if (!currentSpace) return;
+    if (!spaceId) return;
 
     try {
       // Find the first active list or create a "Quick Add" list
@@ -620,7 +619,7 @@ export default function ShoppingPage() {
       if (!targetList) {
         // Create a new "Quick Add" list
         targetList = await shoppingService.createList({
-          space_id: currentSpace.id,
+          space_id: spaceId,
           title: 'Quick Add List',
           description: 'Items added from frequent suggestions',
         });
@@ -634,17 +633,16 @@ export default function ShoppingPage() {
         category,
       });
 
-      // Reload lists to show the update
-      await loadLists();
+      invalidateShopping();
     } catch (error) {
       logger.error('Failed to add frequent item:', error, { component: 'page', action: 'execution' });
     }
-  }, [currentSpace, lists, loadLists]);
+  }, [spaceId, lists, invalidateShopping]);
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
       <PageErrorBoundary>
-        <PullToRefresh onRefresh={loadLists}>
+        <PullToRefresh onRefresh={async () => { await refetchLists(); }}>
         <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -667,7 +665,7 @@ export default function ShoppingPage() {
           <CollapsibleStatsGrid
             icon={ShoppingCart}
             title="Shopping Stats"
-            summary={`${memoizedStats.activeLists} active • ${memoizedStats.itemsThisWeek} items`}
+            summary={`${stats.activeLists} active • ${stats.itemsThisWeek} items`}
             iconGradient="bg-emerald-500"
           >
             <button
@@ -679,8 +677,8 @@ export default function ShoppingPage() {
                 <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center"><Package className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.itemsThisWeek}</p>
-                {memoizedStats.itemsThisWeek > 0 && (
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.itemsThisWeek}</p>
+                {stats.itemsThisWeek > 0 && (
                   <div className="flex items-center gap-1 text-purple-400">
                     <Package className="w-3 h-3" />
                     <span className="text-xs font-medium">New items</span>
@@ -697,8 +695,8 @@ export default function ShoppingPage() {
                 <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center"><Clock className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.activeLists}</p>
-                {memoizedStats.activeLists > 0 && (
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.activeLists}</p>
+                {stats.activeLists > 0 && (
                   <div className="flex items-center gap-1 text-blue-400">
                     <Clock className="w-3 h-3" />
                     <span className="text-xs font-medium">In progress</span>
@@ -715,13 +713,13 @@ export default function ShoppingPage() {
                 <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center"><CheckCircle2 className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.completedLists}</p>
-                {memoizedStats.totalLists > 0 && (
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.completedLists}</p>
+                {stats.totalLists > 0 && (
                   <div className="flex items-center gap-1 text-green-400">
                     <TrendingUp className="w-3 h-3" />
                     <span className="text-xs font-medium">
                       {(() => {
-                        const percentage = Math.round((memoizedStats.completedLists / memoizedStats.totalLists) * 100);
+                        const percentage = Math.round((stats.completedLists / stats.totalLists) * 100);
                         if (percentage >= 67) return `${percentage}% 🎉`;
                         if (percentage >= 34) return `${percentage}%`;
                         return percentage > 0 ? `${percentage}%` : 'Start';
@@ -740,8 +738,8 @@ export default function ShoppingPage() {
                 <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center"><List className="w-5 h-5 text-white" /></div>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-2xl sm:text-3xl font-bold text-white">{memoizedStats.totalLists}</p>
-                {memoizedStats.totalLists > 0 && (
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stats.totalLists}</p>
+                {stats.totalLists > 0 && (
                   <div className="flex items-center gap-1 text-emerald-400">
                     <List className="w-3 h-3" />
                     <span className="text-xs font-medium">Overall</span>
