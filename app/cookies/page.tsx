@@ -1,4 +1,11 @@
-'use client';
+import type { Metadata } from 'next';
+
+export const revalidate = 86400; // ISR: regenerate every 24 hours
+
+export const metadata: Metadata = {
+  title: 'Cookie Policy | Rowan',
+  description: 'Rowan Cookie Policy. Learn about the cookies we use and how to manage your preferences.',
+};
 
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { CookieConsentBanner } from '@/components/cookies/CookieConsentBanner';

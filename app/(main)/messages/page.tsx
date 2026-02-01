@@ -4,24 +4,27 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import nextDynamic from 'next/dynamic';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Paperclip, TrendingUp, X, Users } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { MessageCard } from '@/components/messages/MessageCard';
-import { NewMessageModal } from '@/components/messages/NewMessageModal';
-import { DeleteMessageModal } from '@/components/messages/DeleteMessageModal';
 import { DeleteMessageMode } from '@/lib/services/messages-service';
 import { ThreadView } from '@/components/messages/ThreadView';
 import { TypingIndicator } from '@/components/messages/TypingIndicator';
-import { VoiceRecorder } from '@/components/messages/VoiceRecorder';
 import { PinnedMessages } from '@/components/messages/PinnedMessages';
 import { MentionInput } from '@/components/messages/MentionInput';
 import { ConversationSidebar } from '@/components/messages/ConversationSidebar';
-import { NewConversationModal } from '@/components/messages/NewConversationModal';
-import { ForwardMessageModal } from '@/components/messages/ForwardMessageModal';
 import { MessageNotificationBell } from '@/components/messages/MessageNotificationBell';
 import { SwipeableMessageCard } from '@/components/messages/SwipeableMessageCard';
+
+// Lazy-load modals and VoiceRecorder (only rendered when opened)
+const NewMessageModal = nextDynamic(() => import('@/components/messages/NewMessageModal').then(m => ({ default: m.NewMessageModal })), { ssr: false });
+const DeleteMessageModal = nextDynamic(() => import('@/components/messages/DeleteMessageModal').then(m => ({ default: m.DeleteMessageModal })), { ssr: false });
+const VoiceRecorder = nextDynamic(() => import('@/components/messages/VoiceRecorder').then(m => ({ default: m.VoiceRecorder })), { ssr: false });
+const NewConversationModal = nextDynamic(() => import('@/components/messages/NewConversationModal').then(m => ({ default: m.NewConversationModal })), { ssr: false });
+const ForwardMessageModal = nextDynamic(() => import('@/components/messages/ForwardMessageModal').then(m => ({ default: m.ForwardMessageModal })), { ssr: false });
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, TypingIndicator as TypingIndicatorType, Conversation, CreateConversationInput } from '@/lib/services/messages-service';

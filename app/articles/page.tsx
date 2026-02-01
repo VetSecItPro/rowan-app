@@ -13,11 +13,15 @@ export const metadata: Metadata = {
 }
 
 export default async function ArticlesPage() {
-  const articles = [...blogArticles].sort((a, b) => {
-    const dateA = a.publishedDate || '1970-01-01'
-    const dateB = b.publishedDate || '1970-01-01'
-    return dateB.localeCompare(dateA)
-  })
+  // Strip htmlContent before passing to client — prevents ~2K lines of HTML
+  // from being serialized into the client JS bundle for the listing page
+  const articles = [...blogArticles]
+    .sort((a, b) => {
+      const dateA = a.publishedDate || '1970-01-01'
+      const dateB = b.publishedDate || '1970-01-01'
+      return dateB.localeCompare(dateA)
+    })
+    .map(({ htmlContent: _, ...article }) => article)
 
   return <ArticlesPageClient articles={articles} />
 }

@@ -103,7 +103,8 @@ export const remindersService = {
         )
       `)
       .eq('space_id', spaceId)
-      .order('reminder_time', { ascending: true });
+      .order('reminder_time', { ascending: true })
+      .limit(500);
 
     if (error) throw error;
     const reminders = (data ?? []) as Reminder[];

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, Sparkles, ArrowRight, Users, Shield, Zap } from 'lucide-react';
@@ -8,6 +8,14 @@ import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
 export default function UpgradePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950" />}>
+      <UpgradePageContent />
+    </Suspense>
+  );
+}
+
+function UpgradePageContent() {
   const searchParams = useSearchParams();
   const emailParam = searchParams?.get('email');
   const hasTrackedRef = useRef(false);

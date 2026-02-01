@@ -1,19 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
-import { tasksService } from '@/lib/services/tasks-service';
-import { calendarService } from '@/lib/services/calendar-service';
-import { remindersService } from '@/lib/services/reminders-service';
-import { messagesService } from '@/lib/services/messages-service';
-import { shoppingService } from '@/lib/services/shopping-service';
-import { mealsService } from '@/lib/services/meals-service';
-import { choresService } from '@/lib/services/chores-service';
-import { projectsService } from '@/lib/services/budgets-service';
-import { projectsOnlyService } from '@/lib/services/projects-service';
-import { goalsService } from '@/lib/services/goals-service';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { Space } from '@/lib/types';
-import { isToday, isThisWeek, isPast, parseISO, startOfWeek } from 'date-fns';
-import { getCurrentDateString } from '@/lib/utils/date-utils';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface EnhancedDashboardStats {
@@ -223,320 +211,167 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
     const [loading, setLoading] = useState(true);
 
     const loadAllStats = useCallback(async () => {
-        // Don't load data if user doesn't have a space yet OR if auth is still loading
         if (!currentSpace || !user || authLoading) {
             if (!authLoading) setLoading(false);
             return;
         }
 
         try {
-            // Keep loading true while fetching
-            // setLoading(true); // Commented out to prevent flickering on reloads
+            const supabase = createClient();
 
-            // Fetch all data concurrently
-            const [
-                allTasks,
-                taskStats,
-                allEvents,
-                eventStats,
-                allReminders,
-                reminderStats,
-                allMessages,
-                messageStats,
-                shoppingLists,
-                shoppingStats,
-                meals,
-                mealStats,
-                allChores,
-                choreStats,
-                budgetStats,
-                allProjects,
-                projectStats,
-                allGoals,
-            ] = await Promise.all([
-                tasksService.getTasks(currentSpace.id),
-                tasksService.getTaskStats(currentSpace.id),
-                calendarService.getEvents(currentSpace.id),
-                calendarService.getEventStats(currentSpace.id),
-                remindersService.getReminders(currentSpace.id),
-                remindersService.getReminderStats(currentSpace.id),
-                messagesService.getMessages(currentSpace.id),
-                messagesService.getMessageStats(currentSpace.id),
-                shoppingService.getLists(currentSpace.id),
-                shoppingService.getShoppingStats(currentSpace.id),
-                mealsService.getMeals(currentSpace.id),
-                mealsService.getMealStats(currentSpace.id),
-                choresService.getChores(currentSpace.id),
-                choresService.getChoreStats(currentSpace.id, user.id),
-                projectsService.getBudgetStats(currentSpace.id),
-                projectsOnlyService.getProjects(currentSpace.id),
-                projectsOnlyService.getProjectStats(currentSpace.id),
-                goalsService.getGoals(currentSpace.id),
-            ]);
+            // Single RPC call replaces 18+ individual queries
+            const { data, error } = await supabase.rpc('get_dashboard_summary', {
+                p_space_id: currentSpace.id,
+                p_user_id: user.id,
+            });
 
-            const now = new Date();
-            const today = getCurrentDateString();
-            const weekStart = startOfWeek(now);
+            if (error) throw error;
+            if (!data) return;
 
-            // Calculate detailed task stats
-            const tasksDueToday = allTasks.filter(t => t.due_date === today && t.status !== 'completed').length;
-            const tasksOverdue = allTasks.filter(t =>
-                t.due_date && isPast(parseISO(t.due_date)) && !isToday(parseISO(t.due_date)) && t.status !== 'completed'
-            ).length;
-            // Trend: Tasks completed this week
-            const taskTrend = allTasks.filter(t =>
-                t.status === 'completed' && t.updated_at && parseISO(t.updated_at) >= weekStart
-            ).length;
-            const recentTasks = allTasks
-                .filter(t => t.status !== 'completed')
+            const d = data as Record<string, unknown>;
+            const tasks = d.tasks as Record<string, number> || {};
+            const chores = d.chores as Record<string, number> || {};
+            const events = d.events as Record<string, number> || {};
+            const reminders = d.reminders as Record<string, number> || {};
+            const msgs = d.messages as Record<string, number> || {};
+            const msgStats = d.messageStats as Record<string, number> || {};
+            const shop = d.shopping as Record<string, unknown> || {};
+            const shopItems = d.shoppingItems as Record<string, number> || {};
+            const meals = d.meals as Record<string, number> || {};
+            const budget = d.budget as Record<string, number> || {};
+            const expenses = d.expenses as Record<string, number> || {};
+            const projects = d.projects as Record<string, number> || {};
+            const goals = d.goals as Record<string, number> || {};
+
+            const recentTasks = (d.recentTasks as Array<{ id: string; title: string; due_date?: string; priority?: string }>) || [];
+            const recentChores = (d.recentChores as Array<{ id: string; title: string; due_date?: string }>) || [];
+            const nextEvent = d.nextEvent as { title: string; start_time: string } | null;
+            const nextReminder = d.nextReminder as { title: string; reminder_time: string } | null;
+            const lastMessage = d.lastMessage as { content: string; sender_id: string; created_at: string } | null;
+            const nextMealData = d.nextMeal as { meal_type?: string; scheduled_date: string; recipe_name?: string } | null;
+            const topGoal = d.topGoal as { title: string; progress: number } | null;
+
+            // Combine tasks + chores
+            const combinedTotal = (tasks.total || 0) + (chores.total || 0);
+            const combinedCompleted = (tasks.completed || 0) + (chores.completed || 0);
+            const combinedPending = (tasks.pending || 0) + (chores.pending || 0);
+            const combinedRecentItems = [...recentTasks, ...recentChores.map(c => ({ ...c, priority: undefined }))]
                 .sort((a, b) => {
                     if (!a.due_date) return 1;
                     if (!b.due_date) return -1;
-                    return parseISO(a.due_date).getTime() - parseISO(b.due_date).getTime();
-                })
-                .slice(0, 3)
-                .map(t => ({ id: t.id, title: t.title, due_date: t.due_date, priority: t.priority }));
-
-            // Calculate detailed chore stats (similar to tasks)
-            const choresDueToday = allChores.filter(c => c.due_date === today && c.status !== 'completed').length;
-            const choresOverdueCount = allChores.filter(c =>
-                c.due_date && isPast(parseISO(c.due_date)) && !isToday(parseISO(c.due_date)) && c.status !== 'completed'
-            ).length;
-            // Trend: Chores completed this week
-            const choreTrend = allChores.filter(c =>
-                c.status === 'completed' && c.updated_at && parseISO(c.updated_at) >= weekStart
-            ).length;
-            const recentChores = allChores
-                .filter(c => c.status !== 'completed')
-                .sort((a, b) => {
-                    if (!a.due_date) return 1;
-                    if (!b.due_date) return -1;
-                    return parseISO(a.due_date).getTime() - parseISO(b.due_date).getTime();
-                })
-                .slice(0, 3)
-                .map(c => ({ id: c.id, title: c.title, due_date: c.due_date, priority: undefined }));
-
-            // Calculate detailed event stats
-            const eventsToday = allEvents.filter(e => isToday(parseISO(e.start_time))).length;
-            const eventsThisWeek = allEvents.filter(e => isThisWeek(parseISO(e.start_time))).length;
-            const upcomingEvents = allEvents.filter(e => parseISO(e.start_time) > now).length;
-            const personalEvents = allEvents.filter(e => e.category === 'personal').length;
-            const nextEvent = allEvents
-                .filter(e => parseISO(e.start_time) > now)
-                .sort((a, b) => parseISO(a.start_time).getTime() - parseISO(b.start_time).getTime())[0];
-            // Trend: Events that occurred this week
-            const eventTrend = allEvents.filter(e => {
-                const startTime = parseISO(e.start_time);
-                return startTime >= weekStart && startTime <= now;
-            }).length;
-
-            // Calculate detailed reminder stats
-            const activeReminders = allReminders.filter(r => r.status === 'active').length;
-            const completedReminders = allReminders.filter(r => r.status === 'completed').length;
-            const overdueReminders = allReminders.filter(r =>
-                r.reminder_time && isPast(parseISO(r.reminder_time)) && r.status === 'active'
-            ).length;
-            const remindersDueToday = allReminders.filter(r =>
-                r.reminder_time && isToday(parseISO(r.reminder_time)) && r.status === 'active'
-            ).length;
-            const remindersByCategory = allReminders.reduce((acc, r) => {
-                const category = r.category || 'personal';
-                acc[category] = (acc[category] || 0) + 1;
-                return acc;
-            }, {} as Record<string, number>);
-            const nextDueReminder = allReminders
-                .filter(r => r.reminder_time && parseISO(r.reminder_time) > now && r.status === 'active')
-                .sort((a, b) => parseISO(a.reminder_time!).getTime() - parseISO(b.reminder_time!).getTime())[0];
-            // Trend: Reminders completed this week
-            const reminderTrend = allReminders.filter(r =>
-                r.status === 'completed' && r.updated_at && parseISO(r.updated_at) >= weekStart
-            ).length;
-
-            // Calculate detailed message stats
-            const messagesToday = allMessages.filter(m => isToday(parseISO(m.created_at))).length;
-            const lastMessage = allMessages.length > 0 ? allMessages[allMessages.length - 1] : null;
-            // Trend: Messages sent this week (keep as is - this makes sense)
-            const messageTrend = allMessages.filter(m => parseISO(m.created_at) >= weekStart).length;
-
-            // Calculate detailed shopping stats
-            let totalItems = 0;
-            let checkedToday = 0;
-            let uncheckedItems = 0;
-            let checkedThisWeek = 0;
-            for (const list of shoppingLists) {
-                const items = list.items || [];
-                totalItems += items.length;
-                uncheckedItems += items.filter(i => !i.checked).length;
-                checkedToday += items.filter(i =>
-                    i.checked && i.updated_at && isToday(parseISO(i.updated_at))
-                ).length;
-                checkedThisWeek += items.filter(i =>
-                    i.checked && i.updated_at && parseISO(i.updated_at) >= weekStart
-                ).length;
-            }
-            const activeLists = shoppingLists.filter(l => l.status === 'active').length;
-            // Trend: Items checked off this week
-            const shoppingTrend = checkedThisWeek;
-
-            // Calculate detailed meal stats
-            const mealsToday = meals.filter(m => m.scheduled_date && isToday(parseISO(m.scheduled_date))).length;
-            const nextMeal = meals
-                .filter(m => m.scheduled_date && parseISO(m.scheduled_date) > now)
-                .sort((a, b) => parseISO(a.scheduled_date).getTime() - parseISO(b.scheduled_date).getTime())[0];
-            // Trend: Meals completed this week (meals with past scheduled dates)
-            const mealTrend = meals.filter(m =>
-                m.scheduled_date && parseISO(m.scheduled_date) >= weekStart && parseISO(m.scheduled_date) <= now
-            ).length;
-
-            // Calculate detailed household stats
-            const choresAssignedToMe = allChores.filter(c => c.assigned_to === user.id).length;
-            const choresAssignedToPartner = allChores.filter(c => c.assigned_to && c.assigned_to !== user.id).length;
-            const choresOverdue = allChores.filter(c =>
-                c.due_date && isPast(parseISO(c.due_date)) && c.status !== 'completed'
-            ).length;
-            // Trend: Chores completed this week
-            const householdTrend = allChores.filter(c =>
-                c.status === 'completed' && c.updated_at && parseISO(c.updated_at) >= weekStart
-            ).length;
-
-            // Calculate detailed project stats
-            const allExpenses = await projectsService.getExpenses(currentSpace.id);
-            const totalExpenses = allExpenses.reduce((sum, e) => sum + e.amount, 0);
-            // Trend: Projects completed this week
-            const projectTrend = allProjects.filter(p =>
-                p.status === 'completed' && p.updated_at && parseISO(p.updated_at) >= weekStart
-            ).length;
-
-            // Calculate detailed goal stats
-            const activeGoals = allGoals.filter(g => g.status === 'active').length;
-            const completedGoals = allGoals.filter(g => g.status === 'completed').length;
-            const inProgressGoals = allGoals.filter(g => g.status === 'active').length; // 'active' goals are in progress
-            const topGoal = allGoals.length > 0
-                ? { title: allGoals[0].title, progress: allGoals[0].progress || 0 }
-                : null;
-            // Trend: Goals completed this week
-            const goalTrend = allGoals.filter(g =>
-                g.status === 'completed' && g.updated_at && parseISO(g.updated_at) >= weekStart
-            ).length;
-
-            // Combine tasks and chores stats with proper null checks
-            const choresCompleted = allChores.filter(c => c.status === 'completed').length;
-            const choresPending = allChores.filter(c => c.status === 'pending').length;
-            const combinedTotal = (taskStats?.total || 0) + (choreStats?.total || 0);
-            const combinedCompleted = (taskStats?.completed || 0) + choresCompleted;
-            const combinedPending = (taskStats?.pending || 0) + choresPending;
-            const combinedRecentItems = [...recentTasks, ...recentChores]
-                .sort((a, b) => {
-                    if (!a.due_date) return 1;
-                    if (!b.due_date) return -1;
-                    return parseISO(a.due_date).getTime() - parseISO(b.due_date).getTime();
+                    return a.due_date.localeCompare(b.due_date);
                 })
                 .slice(0, 3);
+
+            const monthlyBudget = budget.monthlyBudget || 0;
+            const spentThisMonth = expenses.spentThisMonth || 0;
 
             setStats({
                 tasks: {
                     total: combinedTotal,
                     pending: combinedPending,
-                    inProgress: taskStats?.inProgress || 0, // Only tasks have "in progress" status
+                    inProgress: tasks.inProgress || 0,
                     completed: combinedCompleted,
-                    dueToday: tasksDueToday + choresDueToday,
-                    overdue: tasksOverdue + choresOverdueCount,
-                    highPriority: (taskStats?.byPriority?.high || 0) + (taskStats?.byPriority?.urgent || 0),
-                    assignedToMe: allTasks.filter(t => t.assigned_to === user.id).length + allChores.filter(c => c.assigned_to === user.id).length,
+                    dueToday: (tasks.dueToday || 0) + (chores.dueToday || 0),
+                    overdue: (tasks.overdue || 0) + (chores.overdue || 0),
+                    highPriority: tasks.highPriority || 0,
+                    assignedToMe: (tasks.assignedToMe || 0) + (chores.assignedToMe || 0),
                     completionRate: combinedTotal > 0 ? Math.round((combinedCompleted / combinedTotal) * 100) : 0,
-                    trend: taskTrend + choreTrend,
+                    trend: (tasks.trend || 0) + (chores.trend || 0),
                     recentTasks: combinedRecentItems,
                 },
                 events: {
-                    total: eventStats.total,
-                    today: eventsToday,
-                    thisWeek: eventsThisWeek,
-                    upcoming: upcomingEvents,
-                    personal: personalEvents,
-                    shared: allEvents.length - personalEvents,
-                    nextEvent: nextEvent ? { title: nextEvent.title, start_time: nextEvent.start_time } : null,
+                    total: events.total || 0,
+                    today: events.today || 0,
+                    thisWeek: events.thisWeek || 0,
+                    upcoming: events.upcoming || 0,
+                    personal: events.personal || 0,
+                    shared: events.shared || 0,
+                    nextEvent,
                     categories: {},
-                    trend: eventTrend,
+                    trend: events.trend || 0,
                 },
                 reminders: {
-                    total: reminderStats.total,
-                    active: activeReminders,
-                    completed: completedReminders,
-                    overdue: overdueReminders,
-                    dueToday: remindersDueToday,
-                    byCategory: remindersByCategory,
-                    nextDue: nextDueReminder ? { title: nextDueReminder.title, reminder_time: nextDueReminder.reminder_time! } : null,
-                    trend: reminderTrend,
+                    total: reminders.total || 0,
+                    active: reminders.active || 0,
+                    completed: reminders.completed || 0,
+                    overdue: reminders.overdue || 0,
+                    dueToday: reminders.dueToday || 0,
+                    byCategory: {},
+                    nextDue: nextReminder,
+                    trend: reminders.trend || 0,
                 },
                 messages: {
-                    total: messageStats.total,
-                    unread: messageStats.unread,
-                    today: messagesToday,
-                    conversations: messageStats.conversations,
+                    total: msgs.total || 0,
+                    unread: msgStats.unread || 0,
+                    today: msgs.today || 0,
+                    conversations: msgStats.conversations || 0,
                     lastMessage: lastMessage ? {
                         content: lastMessage.content,
                         sender: lastMessage.sender_id === user.id ? 'You' : 'Partner',
                         created_at: lastMessage.created_at,
                     } : null,
                     mostActive: 'Personal chat',
-                    trend: messageTrend,
+                    trend: msgs.trend || 0,
                 },
                 shopping: {
-                    totalLists: shoppingStats.totalLists,
-                    activeLists,
-                    totalItems,
-                    checkedToday,
-                    uncheckedItems,
-                    urgentList: shoppingLists.length > 0 ? shoppingLists[0].title : null,
+                    totalLists: (shop.totalLists as number) || 0,
+                    activeLists: (shop.activeLists as number) || 0,
+                    totalItems: shopItems.totalItems || 0,
+                    checkedToday: shopItems.checkedToday || 0,
+                    uncheckedItems: shopItems.uncheckedItems || 0,
+                    urgentList: (shop.urgentList as string) || null,
                     estimatedBudget: 0,
-                    trend: shoppingTrend,
+                    trend: shopItems.checkedThisWeek || 0,
                 },
                 meals: {
-                    thisWeek: mealStats.thisWeek,
-                    savedRecipes: mealStats.savedRecipes,
-                    mealsToday,
+                    thisWeek: meals.thisWeek || 0,
+                    savedRecipes: (d.savedRecipes as number) || 0,
+                    mealsToday: meals.mealsToday || 0,
                     missingIngredients: 0,
-                    nextMeal: nextMeal ? { title: nextMeal.recipe?.name || nextMeal.meal_type || 'Meal', scheduled_date: nextMeal.scheduled_date, meal_type: nextMeal.meal_type } : null,
-                    favoriteCategory: 'Pasta',
+                    nextMeal: nextMealData ? {
+                        title: nextMealData.recipe_name || nextMealData.meal_type || 'Meal',
+                        scheduled_date: nextMealData.scheduled_date,
+                        meal_type: nextMealData.meal_type,
+                    } : null,
+                    favoriteCategory: '',
                     shoppingListGenerated: false,
-                    trend: mealTrend,
+                    trend: meals.trend || 0,
                 },
                 household: {
-                    totalChores: choreStats.total,
-                    completedThisWeek: choreStats.completedThisWeek,
-                    assignedToMe: choresAssignedToMe,
-                    assignedToPartner: choresAssignedToPartner,
-                    overdue: choresOverdue,
-                    monthlyBudget: budgetStats.monthlyBudget,
-                    spent: budgetStats.spentThisMonth,
-                    remaining: budgetStats.remaining,
-                    pendingBills: budgetStats.pendingBills,
+                    totalChores: chores.total || 0,
+                    completedThisWeek: chores.completedThisWeek || 0,
+                    assignedToMe: chores.assignedToMe || 0,
+                    assignedToPartner: chores.assignedToPartner || 0,
+                    overdue: chores.overdue || 0,
+                    monthlyBudget,
+                    spent: spentThisMonth,
+                    remaining: monthlyBudget - spentThisMonth,
+                    pendingBills: budget.pendingBills || 0,
                     nextBill: null,
-                    trend: householdTrend,
+                    trend: chores.trend || 0,
                 },
                 projects: {
-                    total: projectStats.total,
-                    planning: projectStats.planning,
-                    inProgress: projectStats.inProgress,
-                    completed: projectStats.completed,
-                    onHold: projectStats.onHold,
-                    totalBudget: projectStats.totalBudget,
-                    totalExpenses,
-                    trend: projectTrend,
+                    total: projects.total || 0,
+                    planning: projects.planning || 0,
+                    inProgress: projects.inProgress || 0,
+                    completed: projects.completed || 0,
+                    onHold: projects.onHold || 0,
+                    totalBudget: projects.totalBudget || 0,
+                    totalExpenses: projects.totalExpenses || 0,
+                    trend: projects.trend || 0,
                 },
                 goals: {
-                    total: allGoals.length,
-                    active: activeGoals,
-                    completed: completedGoals,
-                    inProgress: inProgressGoals,
+                    total: goals.total || 0,
+                    active: goals.active || 0,
+                    completed: goals.completed || 0,
+                    inProgress: goals.active || 0,
                     milestonesReached: 0,
                     totalMilestones: 0,
-                    overallProgress: allGoals.length > 0
-                        ? Math.round(allGoals.reduce((sum, g) => sum + (g.progress || 0), 0) / allGoals.length)
-                        : 0,
+                    overallProgress: goals.overallProgress || 0,
                     topGoal,
                     endingThisMonth: 0,
-                    trend: goalTrend,
+                    trend: goals.trend || 0,
                 },
             });
         } catch (error) {
@@ -553,12 +388,9 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
         const supabase = createClient();
         const channels: RealtimeChannel[] = [];
 
-        // Only subscribe if we have a space
-        // Channel names include space_id to ensure proper isolation when switching spaces
         if (currentSpace) {
             const spaceId = currentSpace.id;
 
-            // Tasks subscription
             const tasksChannel = supabase
                 .channel(`dashboard_tasks:${spaceId}`)
                 .on('postgres_changes', {
@@ -566,13 +398,10 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'tasks',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => {
-                    loadAllStats(); // Reload stats on any task change
-                })
+                }, () => { loadAllStats(); })
                 .subscribe();
             channels.push(tasksChannel);
 
-            // Events subscription
             const eventsChannel = supabase
                 .channel(`dashboard_events:${spaceId}`)
                 .on('postgres_changes', {
@@ -580,13 +409,10 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'calendar_events',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => {
-                    loadAllStats();
-                })
+                }, () => { loadAllStats(); })
                 .subscribe();
             channels.push(eventsChannel);
 
-            // Reminders subscription
             const remindersChannel = supabase
                 .channel(`dashboard_reminders:${spaceId}`)
                 .on('postgres_changes', {
@@ -594,45 +420,33 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'reminders',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => {
-                    loadAllStats();
-                })
+                }, () => { loadAllStats(); })
                 .subscribe();
             channels.push(remindersChannel);
 
-            // Messages subscription (optional - might be too frequent)
             const messagesChannel = supabase
                 .channel(`dashboard_messages:${spaceId}`)
                 .on('postgres_changes', {
-                    event: 'INSERT', // Only listen for new messages
+                    event: 'INSERT',
                     schema: 'public',
                     table: 'messages',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => {
-                    loadAllStats();
-                })
+                }, () => { loadAllStats(); })
                 .subscribe();
             channels.push(messagesChannel);
 
-            // Shopping items subscription
             const shoppingChannel = supabase
                 .channel(`dashboard_shopping:${spaceId}`)
                 .on('postgres_changes', {
                     event: '*',
                     schema: 'public',
                     table: 'shopping_items',
-                    // No direct space_id on items usually, but let's assume filtering works or we listen globally for the user's lists
-                    // Ideally: filter: `list_id=in.(${shoppingListIds})` but that's complex.
-                    // For now, simpler refresh triggers or just time-based.
-                }, () => {
-                    loadAllStats();
-                })
+                }, () => { loadAllStats(); })
                 .subscribe();
             channels.push(shoppingChannel);
         }
 
         return () => {
-            // Clean up subscriptions
             channels.forEach(channel => {
                 supabase.removeChannel(channel);
             });

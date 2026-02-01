@@ -103,10 +103,32 @@ export const QUERY_KEYS = {
     members: (spaceId: string) => ['spaces', 'members', spaceId] as const,
   },
 
-  // Feature-specific queries (for future use)
+  // Feature-specific queries
   tasks: {
     all: (spaceId: string) => ['tasks', 'all', spaceId] as const,
     byId: (taskId: string) => ['tasks', 'byId', taskId] as const,
+  },
+
+  calendar: {
+    events: (spaceId: string) => ['calendar', 'events', spaceId] as const,
+  },
+
+  reminders: {
+    all: (spaceId: string) => ['reminders', 'all', spaceId] as const,
+  },
+
+  messages: {
+    all: (spaceId: string) => ['messages', 'all', spaceId] as const,
+  },
+
+  shopping: {
+    lists: (spaceId: string) => ['shopping', 'lists', spaceId] as const,
+    stats: (spaceId: string) => ['shopping', 'stats', spaceId] as const,
+  },
+
+  meals: {
+    all: (spaceId: string) => ['meals', 'all', spaceId] as const,
+    recipes: (spaceId: string) => ['meals', 'recipes', spaceId] as const,
   },
 
   goals: {
@@ -114,8 +136,8 @@ export const QUERY_KEYS = {
     analytics: (spaceId: string) => ['goals', 'analytics', spaceId] as const,
   },
 
-  calendar: {
-    events: (spaceId: string) => ['calendar', 'events', spaceId] as const,
+  dashboard: {
+    stats: (spaceId: string) => ['dashboard', 'stats', spaceId] as const,
   },
 } as const;
 

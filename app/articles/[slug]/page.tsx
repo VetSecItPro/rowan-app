@@ -1,3 +1,5 @@
+export const revalidate = 3600 // ISR: regenerate every 1 hour
+
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ArticlePageClient from './ArticlePageClient'

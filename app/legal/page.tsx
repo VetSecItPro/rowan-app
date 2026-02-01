@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,6 +17,14 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function LegalPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <LegalPageContent />
+    </Suspense>
+  );
+}
+
+function LegalPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
