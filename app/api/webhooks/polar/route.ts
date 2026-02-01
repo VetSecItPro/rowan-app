@@ -179,18 +179,46 @@ export async function POST(request: NextRequest) {
 
         const plan = getPlanFromProductId(productId);
 
-        // Find user by Polar customer ID
-        const { data: subscription, error: findError } = await supabaseAdmin
-          .from('subscriptions')
-          .select('user_id, is_founding_member')
-          .eq('polar_customer_id', customerId)
-          .single();
+        // Find user by Polar customer ID (with retry for race condition)
+        // checkout.updated may not have written polar_customer_id yet
+        let subscription: { user_id: string; is_founding_member: boolean } | null = null;
 
-        if (findError || !subscription) {
-          logger.error(`No subscription found for Polar customer ${customerId}`, findError, {
-            component: 'PolarWebhook',
-          });
-          break;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const { data, error: findError } = await supabaseAdmin
+            .from('subscriptions')
+            .select('user_id, is_founding_member')
+            .eq('polar_customer_id', customerId)
+            .single();
+
+          if (data) {
+            subscription = data;
+            break;
+          }
+
+          if (attempt < 2) {
+            // Wait before retry (1s, then 2s)
+            await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+            logger.info(`Retrying customer lookup (attempt ${attempt + 2}/3)`, {
+              component: 'PolarWebhook',
+              customerId,
+            });
+          } else {
+            logger.error(`No subscription found for Polar customer ${customerId} after 3 attempts`, findError, {
+              component: 'PolarWebhook',
+            });
+            // Return 500 so Polar retries the webhook
+            return NextResponse.json(
+              { error: 'Customer not found - retry later' },
+              { status: 500 }
+            );
+          }
+        }
+
+        if (!subscription) {
+          return NextResponse.json(
+            { error: 'Customer not found' },
+            { status: 500 }
+          );
         }
 
         // Check if user is already a founding member
@@ -249,7 +277,11 @@ export async function POST(request: NextRequest) {
             component: 'PolarWebhook',
             userId: subscription.user_id,
           });
-          break;
+          // Return 500 so Polar retries the webhook
+          return NextResponse.json(
+            { error: 'Failed to activate subscription' },
+            { status: 500 }
+          );
         }
 
         // Get user info for email
