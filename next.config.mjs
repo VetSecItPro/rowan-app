@@ -196,6 +196,7 @@ const nextConfig = {
 
     return [
       {
+        // Security headers for all routes
         source: '/:path*',
         headers: [
           {
@@ -224,8 +225,15 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            value: 'camera=(), microphone=(), geolocation=(self)',
           },
+        ],
+      },
+      {
+        // No-cache for API routes and dynamic pages only
+        // Static assets (/_next/static/) use immutable hashes and are cached by Next.js automatically
+        source: '/api/:path*',
+        headers: [
           {
             key: 'Cache-Control',
             value: 'no-cache, no-store, must-revalidate',
