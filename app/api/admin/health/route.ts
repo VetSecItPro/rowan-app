@@ -92,7 +92,8 @@ export async function GET(req: NextRequest) {
               name: 'Database Connection',
               status: 'critical',
               value: 'Disconnected',
-              description: `Database error: ${error.message}`,
+              // SECURITY: Sanitized error — no DB internals exposed — FIX-054
+            description: 'Database connection error',
               lastChecked: now,
             };
           }
@@ -197,15 +198,12 @@ export async function GET(req: NextRequest) {
       // Error monitoring (using recent logs)
       (async (): Promise<HealthMetric> => {
         try {
-          // In a real implementation, this would check error logs or metrics
-          // For now, we'll simulate based on successful operations
-          const errorRate = Math.random() * 5; // Simulate 0-5% error rate
-
+          // SECURITY: Placeholder metrics — labeled as such — FIX-027
           return {
             name: 'Error Rate',
-            status: errorRate < 2 ? 'healthy' : errorRate < 5 ? 'warning' : 'critical',
-            value: `${errorRate.toFixed(2)}%`,
-            description: 'Application error rate over last hour',
+            status: 'healthy',
+            value: 'N/A (placeholder)',
+            description: 'Error rate monitoring not yet implemented — integrate with Sentry or Vercel Analytics',
             lastChecked: now,
           };
         } catch {
@@ -243,34 +241,35 @@ export async function GET(req: NextRequest) {
     const uptimeMinutes = Math.floor((process.uptime() % 3600) / 60);
     const uptime = `${uptimeHours}h ${uptimeMinutes}m`;
 
-    // Performance metrics for API endpoints
+    // SECURITY: Performance metrics are placeholders — labeled as such — FIX-027
+    // TODO: Integrate with Vercel Analytics API or Sentry performance data
     const performanceMetrics: PerformanceMetric[] = [
       {
         endpoint: '/api/subscriptions',
-        avgResponseTime: 120 + Math.floor(Math.random() * 100),
-        errorRate: Math.random() * 2,
-        requestCount: 1250 + Math.floor(Math.random() * 500),
+        avgResponseTime: 0,
+        errorRate: 0,
+        requestCount: 0,
         status: 'healthy',
       },
       {
         endpoint: '/api/launch/notify',
-        avgResponseTime: 95 + Math.floor(Math.random() * 50),
-        errorRate: Math.random() * 1,
-        requestCount: 890 + Math.floor(Math.random() * 300),
+        avgResponseTime: 0,
+        errorRate: 0,
+        requestCount: 0,
         status: 'healthy',
       },
       {
         endpoint: '/api/admin/dashboard',
-        avgResponseTime: 180 + Math.floor(Math.random() * 120),
-        errorRate: Math.random() * 3,
-        requestCount: 425 + Math.floor(Math.random() * 200),
+        avgResponseTime: 0,
+        errorRate: 0,
+        requestCount: 0,
         status: 'healthy',
       },
       {
         endpoint: '/api/admin/analytics',
-        avgResponseTime: 250 + Math.floor(Math.random() * 150),
-        errorRate: Math.random() * 2.5,
-        requestCount: 125 + Math.floor(Math.random() * 100),
+        avgResponseTime: 0,
+        errorRate: 0,
+        requestCount: 0,
         status: 'healthy',
       },
     ];

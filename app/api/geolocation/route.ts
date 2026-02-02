@@ -15,10 +15,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    // Get client IP address
+    // SECURITY: Use most-trusted IP source (Vercel header, then last x-forwarded-for) — FIX-028
+    const vercelIP = request.headers.get('x-vercel-forwarded-for');
     const forwarded = request.headers.get('x-forwarded-for');
     const realIP = request.headers.get('x-real-ip');
-    let clientIP = forwarded?.split(',')[0] || realIP || '';
+    let clientIP = vercelIP?.split(',')[0]?.trim() || forwarded?.split(',').pop()?.trim() || realIP || '';
 
     // Handle localhost and development - try to get real IP first
     if (!clientIP || clientIP === '::1' || clientIP === '127.0.0.1' || clientIP.includes('localhost')) {

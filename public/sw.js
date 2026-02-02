@@ -14,8 +14,7 @@ const STATIC_ASSETS = [
   '/',
   '/manifest.json',
   '/rowan-logo.png',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
+  '/rowan-logo-maskable.png',
   '/offline.html', // Fallback page for offline
 ];
 

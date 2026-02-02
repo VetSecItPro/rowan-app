@@ -4,7 +4,7 @@ import { exportAllUserData, getDataSubset } from '@/lib/services/data-export-ser
 import type { UserDataExport } from '@/lib/services/data-export-service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
@@ -22,9 +22,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // Rate limiting
+    // SECURITY: Expensive operation rate limit — FIX-007
     const ip = extractIP(request.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkExpensiveOperationRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }

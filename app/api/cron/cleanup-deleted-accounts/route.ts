@@ -4,6 +4,8 @@ import { send30DayWarningEmail, sendPermanentDeletionConfirmationEmail } from '@
 import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
 
 /**
  * Vercel Cron Job: Cleanup Deleted Accounts

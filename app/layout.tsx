@@ -32,6 +32,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://rowanapp.com'),
   title: "Rowan - Your Life, Organized",
   description: "Collaborative life management for couples and families",
   manifest: '/manifest.json',
@@ -57,7 +58,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: 'cover',
-  themeColor: '#111827',
+  themeColor: '#000000', // FE: Aligned with manifest.json — FIX-046
 };
 
 export default function RootLayout({
@@ -75,7 +76,6 @@ export default function RootLayout({
         {/* DNS prefetch for non-critical services */}
         <link rel="dns-prefetch" href="https://vercel.live" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 text-white`} style={{ scrollbarGutter: 'stable' }}>
         <AppQueryProvider>

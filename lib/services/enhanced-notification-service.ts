@@ -128,17 +128,26 @@ export const enhancedNotificationService = {
       errors: [],
     };
 
-    for (const userId of userIds) {
-      const supabase = createClient();
-      try {
-        // Get user details
-        const { data: user, error: userError } = await supabase
-          .from('users')
-          .select('id, email, name')
-          .eq('id', userId)
-          .single();
+    // PERF: Batch fetch all users instead of per-user queries — FIX-039
+    const supabase = createClient();
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, email, name')
+      .in('id', userIds);
 
-        if (userError || !user) {
+    if (usersError) {
+      results.errors.push(`Failed to fetch users: ${usersError.message}`);
+      return results;
+    }
+
+    interface UserRecord { id: string; email: string | null; name: string | null }
+    const usersMap = new Map<string, UserRecord>((users || []).map((u: UserRecord) => [u.id, u]));
+
+    for (const userId of userIds) {
+      try {
+        const user = usersMap.get(userId);
+
+        if (!user) {
           results.errors.push(`User ${userId} not found`);
           continue;
         }

@@ -21,6 +21,8 @@ import { logger } from '@/lib/logger';
 import type { SubscriptionTier, SubscriptionPeriod } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
 
 // Polar webhook event types
 interface PolarWebhookEvent {

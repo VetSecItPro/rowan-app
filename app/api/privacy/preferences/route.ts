@@ -279,10 +279,16 @@ async function updateExternalCookieConsent(cookieType: string, enabled: boolean)
 async function updateMarketingSubscription(userId: string, type: 'email' | 'sms', enabled: boolean) {
   try {
     // Get user profile for email/phone
+    // SECURITY: Use getUser() for server-side JWT verification — FIX-008
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    const accessToken = session?.access_token;
-    const authHeaders: HeadersInit = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    const { data: { user } } = await supabase.auth.getUser();
+    const authHeaders: HeadersInit = {};
+    if (user) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        authHeaders['Authorization'] = `Bearer ${session.access_token}`;
+      }
+    }
     const { data: profile } = await supabase
       .from('profiles')
       .select('email, phone_number')
@@ -342,10 +348,16 @@ async function updateThirdPartyAnalytics(userId: string, enabled: boolean) {
 
     // You could integrate with analytics services here
     // Example: await updateGoogleAnalyticsConsent(userId, enabled);
+    // SECURITY: Use getUser() for server-side JWT verification — FIX-008
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    const accessToken = session?.access_token;
-    const authHeaders: HeadersInit = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    const { data: { user } } = await supabase.auth.getUser();
+    const authHeaders: HeadersInit = {};
+    if (user) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        authHeaders['Authorization'] = `Bearer ${session.access_token}`;
+      }
+    }
 
     await fetch(`${getAppUrl()}/api/privacy/third-party-analytics`, {
       method: 'POST',

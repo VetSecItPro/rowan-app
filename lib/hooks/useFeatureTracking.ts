@@ -178,6 +178,15 @@ async function trackImmediate(event: TrackingEvent): Promise<void> {
   }
 }
 
+// PERF: Periodic flush prevents queue from growing unbounded — FIX-035
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    if (eventQueue.length > 0 && isAnalyticsConsented()) {
+      flushEvents();
+    }
+  }, 30000); // Flush every 30 seconds
+}
+
 // Flush on page unload (only fires if queue has events, which requires consent)
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {

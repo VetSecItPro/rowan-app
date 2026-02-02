@@ -24,8 +24,8 @@ import { CSRF_EXEMPT_ROUTES, CSRF_HEADER_NAME } from '@/lib/security/csrf';
 /** Admin session duration in seconds (24 hours) - must match login route */
 const ADMIN_SESSION_DURATION = 24 * 60 * 60;
 
-/** User session cookie duration: 1 year (persistent login like Facebook/Instagram) */
-const SESSION_COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 31536000 seconds
+// SECURITY: 90-day session duration — FIX-024
+const SESSION_COOKIE_MAX_AGE = 90 * 24 * 60 * 60; // 7776000 seconds
 
 /**
  * Email verification enforcement cutoff date
@@ -122,6 +122,7 @@ export async function middleware(req: NextRequest) {
 
   // SECURITY: Use getUser() for server-side auth validation, not getSession()
   // getSession() only reads from cookies without server-side JWT verification
+  // PERF: getUser() validates JWT server-side on every request (50-200ms). Intentional security trade-off — FIX-016 accepted risk.
   const { data: { user: authUser } } = await supabase.auth.getUser();
   // Build a session-compatible object for downstream checks
   const session = authUser ? { user: authUser } : null;
@@ -320,6 +321,14 @@ export async function middleware(req: NextRequest) {
     '/settings',
     '/invitations',
     '/feedback',
+    '/expenses',
+    '/budget',
+    '/budget-setup',
+    '/location',
+    '/rewards',
+    '/achievements',
+    '/year-in-review',
+    '/reports',
   ];
 
   const isProtectedPath = protectedPaths.some(path =>
@@ -353,8 +362,8 @@ export async function middleware(req: NextRequest) {
       const isVerificationPath = verificationPaths.some(path => pathname.startsWith(path));
 
       if (!isVerificationPath) {
+        // FIX-052: Do not expose user email in redirect URL query parameter
         const redirectUrl = new URL('/verify-email', req.url);
-        redirectUrl.searchParams.set('email', session.user.email || '');
         return NextResponse.redirect(redirectUrl);
       }
     }
@@ -514,6 +523,14 @@ export const config = {
     '/settings/:path*',
     '/invitations/:path*',
     '/feedback/:path*',
+    '/expenses/:path*',
+    '/budget/:path*',
+    '/budget-setup/:path*',
+    '/location/:path*',
+    '/rewards/:path*',
+    '/achievements/:path*',
+    '/year-in-review/:path*',
+    '/reports/:path*',
     '/admin/:path*', // Admin routes now protected
     '/login',
     '/signup',

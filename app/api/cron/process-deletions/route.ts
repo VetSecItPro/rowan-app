@@ -8,6 +8,9 @@ import { getAppUrl } from '@/lib/utils/app-url';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
+
 // This should be called by a cron job (Vercel Cron or external)
 export async function POST(request: NextRequest) {
   try {

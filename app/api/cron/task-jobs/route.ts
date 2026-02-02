@@ -5,6 +5,9 @@ import { runDailyCleanup, refreshMaterializedViews } from '@/lib/jobs/cleanup-jo
 import { processChoreRotations } from '@/lib/jobs/chore-rotation-job';
 import { logger } from '@/lib/logger';
 
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
+
 /**
  * Cron API Route for Task Background Jobs
  *
