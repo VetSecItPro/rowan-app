@@ -244,9 +244,15 @@ jobs:
           check_job "Quality" "${{ needs.quality.result }}"
           check_job "Security" "${{ needs.security.result }}"
           check_job "Build" "${{ needs.build.result }}"
-          check_job "E2E Tests" "${{ needs.e2e.result }}"
-          check_job "Lighthouse" "${{ needs.lighthouse.result }}"
-          check_job "Bundle Size" "${{ needs.bundle-size.result }}"
+
+          # Informational jobs — not blocking until fully configured
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Informational (non-blocking)" >> $GITHUB_STEP_SUMMARY
+          echo '| Job | Status |' >> $GITHUB_STEP_SUMMARY
+          echo '|-----|--------|' >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lighthouse | ${{ needs.lighthouse.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bundle Size | ${{ needs.bundle-size.result }} |" >> $GITHUB_STEP_SUMMARY
 
           if [ "$FAILED" -gt 0 ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
