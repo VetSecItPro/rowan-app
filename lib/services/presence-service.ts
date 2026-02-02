@@ -184,41 +184,52 @@ export async function isUserOnline(userId: string): Promise<boolean> {
 // =============================================
 
 /**
- * Initialize presence tracking for a user in a space
- * Call this when user enters the app or switches spaces
+ * Initialize presence tracking for a user in a space.
+ * Returns a cleanup function that MUST be called to avoid memory leaks.
+ * Prefer using the usePresence() hook in React components instead.
  */
-export async function initializePresence(spaceId: string): Promise<void> {
+export async function initializePresence(spaceId: string): Promise<() => void> {
   try {
-    // Mark user as online
     await updateUserPresence(spaceId, PresenceStatus.ONLINE);
 
-    // Set up periodic presence updates (every 2 minutes)
     const interval = setInterval(async () => {
       try {
         await updateUserPresence(spaceId, PresenceStatus.ONLINE);
       } catch (error) {
         logger.error('Presence update error:', error, { component: 'lib-presence-service', action: 'service_call' });
       }
-    }, 2 * 60 * 1000); // 2 minutes
+    }, 2 * 60 * 1000);
 
-    // Clean up on page unload
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', () => {
-        clearInterval(interval);
+    const handleBeforeUnload = () => {
+      clearInterval(interval);
+      markUserOffline(spaceId);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
         markUserOffline(spaceId);
-      });
+      } else {
+        updateUserPresence(spaceId, PresenceStatus.ONLINE);
+      }
+    };
 
-      // Also mark offline when tab becomes hidden
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          markUserOffline(spaceId);
-        } else {
-          updateUserPresence(spaceId, PresenceStatus.ONLINE);
-        }
-      });
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }
+
+    // Return cleanup function
+    return () => {
+      clearInterval(interval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
+      markUserOffline(spaceId);
+    };
   } catch (error) {
     logger.error('[presence-service] initializePresence error:', error, { component: 'lib-presence-service', action: 'service_call' });
+    return () => {}; // no-op cleanup
   }
 }
 

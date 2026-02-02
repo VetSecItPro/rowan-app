@@ -139,13 +139,15 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
     }
   };
 
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      persistQueryCache(queryClient);
+    }
+  };
+
   if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', handleUnload);
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        persistQueryCache(queryClient);
-      }
-    });
+    window.addEventListener('visibilitychange', handleVisibilityChange);
   }
 
   return () => {
@@ -153,6 +155,7 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
     if (saveTimer) clearTimeout(saveTimer);
     if (typeof window !== 'undefined') {
       window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
     }
   };
 }

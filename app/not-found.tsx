@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-600 via-gray-700 from-slate-800 to-slate-950">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-gray-700 to-slate-950">
       <div className="text-center p-8 bg-gray-900 rounded-2xl shadow-2xl max-w-md">
         <h1 className="text-6xl font-bold text-white mb-4">404</h1>
         <h2 className="text-2xl font-semibold text-gray-200 mb-4">

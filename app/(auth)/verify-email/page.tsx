@@ -24,15 +24,27 @@ function VerifyEmailContent() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const [verificationError, setVerificationError] = useState('');
+  const [email, setEmail] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get('email') || '';
   const token = searchParams.get('token');
 
   // Smooth fade-in animation on mount
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(timer);
+  }, []);
+
+  // FIX-052: Get email from authenticated session instead of URL query parameter
+  useEffect(() => {
+    async function fetchEmail() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setEmail(user.email);
+      }
+    }
+    fetchEmail();
   }, []);
 
   const verifyToken = useCallback(async (verificationToken: string) => {

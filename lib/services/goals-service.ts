@@ -784,17 +784,23 @@ export const goalsService = {
       progress: 0,
     });
 
-    // Create milestones from template
+    // PERF: Batch insert milestones instead of sequential creates — FIX-041
     if (template.milestones && template.milestones.length > 0) {
-      for (const milestoneTemplate of template.milestones) {
-        await this.createMilestone({
-          goal_id: goal.id,
-          title: milestoneTemplate.title,
-          description: milestoneTemplate.description,
-          type: milestoneTemplate.type,
-          target_value: milestoneTemplate.target_value,
-        });
-      }
+      const supabase = createClient();
+      const milestoneRows = template.milestones.map((milestoneTemplate) => ({
+        goal_id: goal.id,
+        title: milestoneTemplate.title,
+        description: milestoneTemplate.description,
+        type: milestoneTemplate.type,
+        target_value: milestoneTemplate.target_value,
+        completed: false,
+      }));
+
+      const { error: milestoneError } = await supabase
+        .from('goal_milestones')
+        .insert(milestoneRows);
+
+      if (milestoneError) throw milestoneError;
     }
 
     // Fetch complete goal with milestones

@@ -509,33 +509,44 @@ export async function getExpenseStatsByTag(
   startDate?: string,
   endDate?: string
 ): Promise<{ tag: Tag; total: number; count: number }[]> {
-  // Get all tags for the space
+  // PERF: Single query with join instead of N+1 — FIX-017
+  const supabase = createClient();
   const tags = await getTags(spaceId);
+  if (tags.length === 0) return [];
 
-  const results = [];
-  for (const tag of tags) {
-    // Get all expenses with this tag
-    const expenses = await getExpensesByTag(tag.id);
+  const tagIds = tags.map(t => t.id);
+
+  // Fetch all expense-tag associations for these tags in one query
+  const { data: expenseTags, error } = await supabase
+    .from('expense_tags')
+    .select('tag_id, expenses!inner(id, amount, date)')
+    .in('tag_id', tagIds);
+
+  if (error || !expenseTags) return [];
+
+  // Group by tag and aggregate
+  const tagMap = new Map(tags.map(t => [t.id, t]));
+  const statsMap = new Map<string, { total: number; count: number }>();
+
+  for (const et of expenseTags) {
+    const expense = et.expenses as unknown as { id: string; amount: number | string; date: string | null };
+    if (!expense) continue;
 
     // Filter by date if provided
-    let filteredExpenses = expenses;
-    if (startDate || endDate) {
-      filteredExpenses = expenses.filter((expense: Expense) => {
-        const expenseDate = expense.date;
-        if (!expenseDate) return false;
-        if (startDate && expenseDate < startDate) return false;
-        if (endDate && expenseDate > endDate) return false;
-        return true;
-      });
-    }
+    if (startDate && expense.date && expense.date < startDate) continue;
+    if (endDate && expense.date && expense.date > endDate) continue;
 
-    if (filteredExpenses.length > 0) {
-      const total = filteredExpenses.reduce((sum: number, exp: Expense) => sum + parseFloat(String(exp.amount)), 0);
-      results.push({
-        tag,
-        total,
-        count: filteredExpenses.length,
-      });
+    const existing = statsMap.get(et.tag_id) || { total: 0, count: 0 };
+    existing.total += parseFloat(String(expense.amount));
+    existing.count += 1;
+    statsMap.set(et.tag_id, existing);
+  }
+
+  const results = [];
+  for (const [tagId, stats] of statsMap) {
+    const tag = tagMap.get(tagId);
+    if (tag && stats.count > 0) {
+      results.push({ tag, total: stats.total, count: stats.count });
     }
   }
 

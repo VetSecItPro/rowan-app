@@ -110,7 +110,7 @@
     "leaflet": "^1.9.4",
     "lru-cache": "^11.2.5",
     "lucide-react": "^0.561.0",
-    "next": "15.4.10",
+    "next": "15.4.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^5.0.8",
@@ -144,5 +144,10 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4.0.0",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@babel/runtime": ">=7.26.10"
+    }
   }
 }

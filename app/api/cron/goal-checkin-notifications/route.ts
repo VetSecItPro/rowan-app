@@ -3,6 +3,8 @@ import { processGoalCheckInNotifications } from '@/lib/jobs/goal-checkin-notific
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
 
 /**
  * Cron job endpoint for processing goal check-in reminder notifications

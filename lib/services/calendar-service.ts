@@ -108,7 +108,7 @@ export const calendarService = {
 
     let query = supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('space_id', spaceId);
 
     // Exclude soft-deleted events by default
@@ -129,7 +129,7 @@ export const calendarService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error} = await supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -295,7 +295,7 @@ export const calendarService = {
 
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('space_id', spaceId)
       .not('deleted_at', 'is', null)
       .gte('deleted_at', thirtyDaysAgo.toISOString())
@@ -334,22 +334,22 @@ export const calendarService = {
         const [totalResult, todayResult, weekResult, monthResult] = await Promise.all([
           supabase
             .from('events')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('space_id', spaceId),
           supabase
             .from('events')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('space_id', spaceId)
             .gte('start_time', today.toISOString())
             .lt('start_time', tomorrow.toISOString()),
           supabase
             .from('events')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('space_id', spaceId)
             .gte('start_time', weekStart.toISOString()),
           supabase
             .from('events')
-            .select('*', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true })
             .eq('space_id', spaceId)
             .gte('start_time', monthStart.toISOString()),
         ]);
@@ -423,7 +423,7 @@ export const calendarService = {
     const supabase = createClient();
     let eventsQuery = supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('space_id', spaceId)
       .is('deleted_at', null);
 

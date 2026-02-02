@@ -1,31 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { supabaseAdmin } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 const ThirdPartyAnalyticsSchema = z.object({
   userId: z.string().uuid().optional(),
   enabled: z.boolean(),
 });
 
-async function resolveRequestUser(req: NextRequest) {
-  const authHeader = req.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '').trim();
-    const { data, error } = await supabaseAdmin.auth.getUser(token);
-    if (!error && data?.user) {
-      return data.user;
-    }
-  }
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
-}
-
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting
+    const ip = extractIP(req.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const parsed = ThirdPartyAnalyticsSchema.safeParse(body);
     if (!parsed.success) {
@@ -35,8 +31,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await resolveRequestUser(req);
-    if (!user) {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
@@ -51,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('user_privacy_preferences')
       .upsert(
         {

@@ -14,6 +14,9 @@ export {
   type OfflineQueueContextValue,
 } from '../hooks/useOfflineQueue';
 
+// Mutation Queue Manager
+export { MutationQueueManager, type QueuedMutation } from '../queue/mutation-queue-manager';
+
 // Prefetching
 export {
   usePrefetchOnHover,

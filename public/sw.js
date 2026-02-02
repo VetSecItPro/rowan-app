@@ -14,8 +14,7 @@ const STATIC_ASSETS = [
   '/',
   '/manifest.json',
   '/rowan-logo.png',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
+  '/rowan-logo-maskable.png',
   '/offline.html', // Fallback page for offline
 ];
 
@@ -252,6 +251,8 @@ async function staleWhileRevalidate(request) {
     })
     .catch((error) => {
       console.error('[Service Worker] Stale-while-revalidate fetch failed:', error);
+      // Return a fallback response so we never resolve to undefined
+      return cachedResponse || new Response('Service unavailable', { status: 503 });
     });
 
   // Return cached response immediately, or wait for network
@@ -470,13 +471,18 @@ async function handleOfflineQueueSync(queue, source) {
   const results = [];
   for (const action of queue) {
     try {
-      const response = await fetch(action.endpoint, {
+      const response = await fetch(action.url || action.endpoint, {
         method: action.method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(action.data),
+        headers: action.headers || { 'Content-Type': 'application/json' },
+        body: action.body !== undefined ? action.body : JSON.stringify(action.data),
+        credentials: 'include',
       });
+
+      if (!response.ok && response.status === 401) {
+        // Auth expired — don't retry, mark as failed
+        results.push({ id: action.id, success: false, status: 401, error: 'Auth expired' });
+        continue;
+      }
 
       results.push({
         id: action.id,
@@ -583,11 +589,16 @@ async function syncOfflineQueueFromStorage() {
 
     for (const action of queueData.queue) {
       try {
-        await fetch(action.endpoint, {
+        const response = await fetch(action.url || action.endpoint, {
           method: action.method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(action.data),
+          headers: action.headers || { 'Content-Type': 'application/json' },
+          body: action.body !== undefined ? action.body : JSON.stringify(action.data),
+          credentials: 'include',
         });
+
+        if (!response.ok) {
+          console.warn('[Service Worker] Background sync response not ok:', action.id, response.status);
+        }
       } catch (error) {
         console.error('[Service Worker] Background sync failed for action:', action.id, error);
       }

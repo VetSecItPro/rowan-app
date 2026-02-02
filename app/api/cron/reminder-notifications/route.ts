@@ -3,6 +3,8 @@ import { processReminderNotifications } from '@/lib/jobs/reminder-notifications-
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
 
 /**
  * Cron job endpoint for processing reminder notifications

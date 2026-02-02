@@ -226,7 +226,7 @@ export function Modal({
           ${isOpen ? 'opacity-100' : 'opacity-0'}
         `}
         onClick={onClose}
-        aria-label="Close modal"
+        aria-hidden="true"
       />
 
       {/* Modal Container - Bottom sheet on mobile, centered on desktop */}

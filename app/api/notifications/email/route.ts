@@ -86,7 +86,19 @@ export async function POST(req: NextRequest) {
     }
 
     const { type, recipient, subject, data } = parsed.data;
-    const html = typeof data?.html === 'string' ? data.html : undefined;
+    // Sanitize HTML to prevent phishing/XSS via email injection
+    let html = typeof data?.html === 'string' ? data.html : undefined;
+    if (html) {
+      // Strip dangerous tags: scripts, forms, iframes, objects, embeds
+      html = html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<form\b[^>]*>[\s\S]*?<\/form>/gi, '')
+        .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '')
+        .replace(/<object\b[^>]*>[\s\S]*?<\/object>/gi, '')
+        .replace(/<embed\b[^>]*\/?>/gi, '')
+        .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+        .replace(/on\w+\s*=\s*\S+/gi, '');
+    }
     const text = typeof data?.text === 'string' ? data.text : undefined;
 
     if (!html && !text) {

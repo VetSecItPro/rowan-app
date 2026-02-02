@@ -239,7 +239,8 @@ function detectDuplicates(patterns: RecurringExpensePattern[]): DuplicateGroup[]
   grouped.forEach((groupPatterns) => {
     if (groupPatterns.length > 1) {
       // Calculate similarity (simplified - real implementation would use more sophisticated matching)
-      const similarity = 75 + Math.random() * 20; // Mock: 75-95% similarity
+      // SECURITY: Deterministic similarity based on pattern count — FIX-025 (replaced Math.random mock)
+      const similarity = Math.min(95, 75 + groupPatterns.length * 5);
       const totalCost = groupPatterns.reduce((sum, p) => sum + p.average_amount, 0);
 
       groups.push({

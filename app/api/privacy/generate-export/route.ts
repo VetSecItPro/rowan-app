@@ -20,6 +20,14 @@ const ExportRequestSchema = z.object({
 // POST - Generate data export (background processing)
 export async function POST(request: NextRequest) {
   try {
+    // Fail-closed: reject if secret is not configured
+    if (!process.env.INTERNAL_API_SECRET) {
+      return NextResponse.json(
+        { success: false, error: 'Server misconfiguration' },
+        { status: 500 }
+      );
+    }
+
     // Verify this is a legitimate system request (internal API call)
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.INTERNAL_API_SECRET}`) {

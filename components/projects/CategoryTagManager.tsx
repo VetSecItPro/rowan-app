@@ -11,8 +11,27 @@ import {
   Check,
   X,
   DollarSign,
+  Home,
+  ShoppingCart,
+  Briefcase,
+  Heart,
+  Star,
+  Zap,
+  Coffee,
+  Book,
+  Music,
+  Camera,
+  Globe,
+  Layers,
+  type LucideIcon,
 } from 'lucide-react';
-import * as Icons from 'lucide-react';
+
+// Icon lookup map for dynamic icon selection (avoids importing entire library)
+const iconMap: Record<string, LucideIcon> = {
+  Tags, FolderOpen, Plus, Edit2, Trash2, Check, X, DollarSign,
+  Home, ShoppingCart, Briefcase, Heart, Star, Zap, Coffee, Book,
+  Music, Camera, Globe, Layers,
+};
 import {
   type CustomCategory,
   type Tag,
@@ -219,14 +238,13 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
     setTagColor('#8b5cf6');
   };
 
-  // Get icon component
+  // Get icon component from lookup map (avoids importing entire lucide-react library)
   const getIconComponent = (iconName: string): React.ComponentType<{ className?: string }> => {
-    const iconKey = iconName as keyof typeof Icons;
-    const IconComponent = Icons[iconKey];
-    if (IconComponent && typeof IconComponent === 'function') {
+    const IconComponent = iconMap[iconName];
+    if (IconComponent) {
       return IconComponent as React.ComponentType<{ className?: string }>;
     }
-    return Icons.FolderOpen;
+    return FolderOpen;
   };
 
   if (isLoading) {

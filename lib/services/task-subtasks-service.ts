@@ -131,18 +131,15 @@ export const taskSubtasksService = {
   async reorderSubtasks(subtaskIds: string[]): Promise<void> {
     const supabase = createClient();
     try {
-      // Update sort_order for each subtask
-      const updates = subtaskIds.map((id, index) => ({
-        id,
-        sort_order: index,
-      }));
-
-      for (const update of updates) {
-        await supabase
-          .from('subtasks')
-          .update({ sort_order: update.sort_order })
-          .eq('id', update.id);
-      }
+      // PERF: Parallel sort_order updates instead of sequential — FIX-040
+      await Promise.all(
+        subtaskIds.map((id, index) =>
+          supabase
+            .from('subtasks')
+            .update({ sort_order: index })
+            .eq('id', id)
+        )
+      );
     } catch (error) {
       logger.error('Error reordering subtasks:', error, { component: 'lib-task-subtasks-service', action: 'service_call' });
       throw error;
