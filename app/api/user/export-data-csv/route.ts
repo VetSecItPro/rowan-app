@@ -9,7 +9,7 @@ import {
   exportShoppingListsToCsv,
   exportMessagesToCsv,
 } from '@/lib/services/data-export-service';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 
 export const dynamic = 'force-dynamic';
@@ -27,9 +27,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // Rate limiting
+    // SECURITY: Expensive operation rate limit — FIX-007
     const ip = extractIP(request.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkExpensiveOperationRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }

@@ -7,6 +7,9 @@ import { calendarSyncService } from '@/lib/services/calendar';
 import { logger } from '@/lib/logger';
 import type { CalendarProvider } from '@/lib/types/calendar-integration';
 
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
+
 /**
  * Cron API Route for Calendar Sync
  *

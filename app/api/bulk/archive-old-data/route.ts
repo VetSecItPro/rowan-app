@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import {
@@ -8,6 +9,16 @@ import {
 } from '@/lib/services/bulk-operations-service';
 import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
+
+const ArchiveRequestSchema = z.object({
+  partnership_id: z.string().uuid().optional(),
+  space_id: z.string().uuid().optional(),
+  data_type: z.enum(['expenses', 'tasks', 'calendar_events']),
+  older_than_date: z.string().regex(/^\d{4}-\d{2}-\d{2}/, 'Must be a valid date string (YYYY-MM-DD)'),
+}).refine(
+  (data) => data.space_id || data.partnership_id,
+  { message: 'space_id or partnership_id is required' }
+);
 
 /**
  * Archive Old Data API Endpoint
@@ -42,17 +53,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get request body
+    // Validate request body
     const body = await request.json();
-    const { partnership_id, space_id, data_type, older_than_date } = body;
-    const spaceId = space_id || partnership_id;
-
-    if (!spaceId || !data_type || !older_than_date) {
+    const parsed = ArchiveRequestSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'space_id, data type, and older_than_date are required' },
+        { error: 'Invalid request body', details: parsed.error.flatten() },
         { status: 400 }
       );
     }
+
+    const { partnership_id, space_id, data_type, older_than_date } = parsed.data;
+    const spaceId = (space_id || partnership_id)!;
 
     // Verify user has access to this space
     const { data: membership } = await supabase
@@ -66,7 +78,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
-    // Perform archiving based on data type
+    // Perform archiving based on data type (enum validated by Zod)
     let result;
     switch (data_type) {
       case 'expenses':
@@ -78,8 +90,6 @@ export async function POST(request: NextRequest) {
       case 'calendar_events':
         result = await archiveOldCalendarEvents(spaceId, older_than_date, supabase);
         break;
-      default:
-        return NextResponse.json({ error: 'Invalid data type' }, { status: 400 });
     }
 
     if (!result.success) {

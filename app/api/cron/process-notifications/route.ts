@@ -12,6 +12,8 @@ import {
 } from '@/lib/services/email-service';
 
 export const dynamic = 'force-dynamic';
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
 
 // This endpoint should be called by a cron job (e.g., Vercel Cron, or external service)
 // Authorization should be via a secret token

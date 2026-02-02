@@ -32,13 +32,16 @@ function reminderPassesFilters(reminder: Reminder, filters?: UseRemindersRealtim
   );
 }
 
-// Debounce helper for state updates
-function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): T {
+// Debounce helper for state updates with cancel support
+type DebouncedFn<T extends (...args: unknown[]) => void> = T & { cancel: () => void };
+function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): DebouncedFn<T> {
   let timeoutId: NodeJS.Timeout;
-  return ((...args: Parameters<T>) => {
+  const debounced = ((...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
-  }) as T;
+  }) as DebouncedFn<T>;
+  debounced.cancel = () => clearTimeout(timeoutId);
+  return debounced;
 }
 
 export function useRemindersRealtime({
@@ -60,6 +63,9 @@ export function useRemindersRealtime({
     deletes: string[];
   }>({ inserts: [], updates: [], deletes: [] });
 
+  // Ref to hold the loadReminders function so refreshReminders can call it
+  const loadDataRef = useRef<(() => Promise<void>) | null>(null);
+
   // Memoized filters to prevent unnecessary re-renders
   const memoizedFilters = useMemo(() => filters, [filters]);
 
@@ -67,7 +73,7 @@ export function useRemindersRealtime({
   const reminderFilter = useCallback((reminder: Reminder) => reminderPassesFilters(reminder, memoizedFilters), [memoizedFilters]);
 
   // Debounced batch update function - use useRef to avoid recreation
-  const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
+  const debouncedBatchUpdateRef = useRef<DebouncedFn<() => void> | null>(null);
 
   if (!debouncedBatchUpdateRef.current) {
     debouncedBatchUpdateRef.current = debounce(() => {
@@ -168,14 +174,11 @@ export function useRemindersRealtime({
     }
 
     async function loadReminders() {
+      // Store ref so refreshReminders can call this
+      loadDataRef.current = loadReminders;
+      // Clear timeout state on fresh load attempt (e.g., manual refresh after timeout)
+      setTimeoutReached(false);
       try {
-        // If timeout already reached, skip loading and use empty state
-        if (timeoutReached) {
-          logger.warn('[useRemindersRealtime] Timeout reached - skipping data load', { component: 'hook-useRemindersRealtime' });
-          setReminders([]);
-          setLoading(false);
-          return;
-        }
 
         // Verify access before loading with timeout protection
         const hasAccess = await verifyAccess();
@@ -338,7 +341,7 @@ export function useRemindersRealtime({
       }
     }, 15 * 60 * 1000); // 15 minutes
 
-    // Cleanup subscription and interval on unmount
+    // Cleanup subscription, interval, and debounce timer on unmount
     return () => {
       if (channel) {
         supabase.removeChannel(channel);
@@ -346,7 +349,7 @@ export function useRemindersRealtime({
       if (accessCheckInterval) {
         clearInterval(accessCheckInterval);
       }
-      // Clear any pending debounced updates
+      debouncedBatchUpdateRef.current?.cancel();
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally limited dependencies to avoid infinite re-subscribe loops
@@ -354,8 +357,7 @@ export function useRemindersRealtime({
 
   function refreshReminders() {
     setLoading(true);
-    // Trigger re-fetch by updating a dependency
-    // The useEffect will handle the actual fetch
+    loadDataRef.current?.();
   }
 
   return {

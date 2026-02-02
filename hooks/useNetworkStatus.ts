@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   getNetworkStatus,
   watchNetworkStatus,
@@ -122,18 +122,21 @@ export function useIsOnline(): boolean {
 }
 
 /**
- * Hook that returns true when transitioning from offline to online
+ * Hook that fires callback when transitioning from offline to online.
+ * Uses useRef to stabilize the callback so callers don't need to memoize.
  */
 export function useOnReconnect(callback: () => void): void {
   const { isOnline } = useNetworkStatus();
-  const [wasOffline, setWasOffline] = useState(false);
+  const wasOfflineRef = useRef(false);
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
 
   useEffect(() => {
     if (!isOnline) {
-      setWasOffline(true);
-    } else if (wasOffline && isOnline) {
-      callback();
-      setWasOffline(false);
+      wasOfflineRef.current = true;
+    } else if (wasOfflineRef.current) {
+      callbackRef.current();
+      wasOfflineRef.current = false;
     }
-  }, [isOnline, wasOffline, callback]);
+  }, [isOnline]);
 }

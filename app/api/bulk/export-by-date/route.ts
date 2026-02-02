@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { bulkExportByDateRange } from '@/lib/services/bulk-operations-service';
 import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+
+const ExportQuerySchema = z.object({
+  type: z.enum(['expenses', 'tasks', 'calendar_events', 'messages', 'reminders']),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}/, 'Must be YYYY-MM-DD format'),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}/, 'Must be YYYY-MM-DD format'),
+  format: z.enum(['json', 'csv']).default('json'),
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -40,19 +48,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get query parameters
+    // Validate query parameters
     const { searchParams } = new URL(request.url);
-    const dataType = searchParams.get('type') as 'expenses' | 'tasks' | 'calendar_events' | 'messages' | 'reminders';
-    const startDate = searchParams.get('start_date');
-    const endDate = searchParams.get('end_date');
-    const format = searchParams.get('format') || 'json'; // json or csv
+    const parsed = ExportQuerySchema.safeParse({
+      type: searchParams.get('type'),
+      start_date: searchParams.get('start_date'),
+      end_date: searchParams.get('end_date'),
+      format: searchParams.get('format') || 'json',
+    });
 
-    if (!dataType || !startDate || !endDate) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Data type, start date, and end date are required' },
+        { error: 'Invalid query parameters', details: parsed.error.flatten() },
         { status: 400 }
       );
     }
+
+    const { type: dataType, start_date: startDate, end_date: endDate, format } = parsed.data;
 
     // Export data
     const result = await bulkExportByDateRange(user.id, dataType, startDate, endDate, supabase);

@@ -78,7 +78,7 @@ export function BillsList({
 
     const supabase = createClient();
     const channel = supabase
-      .channel('bills-changes')
+      .channel(`bills-changes-${spaceId}`)
       .on(
         'postgres_changes',
         {

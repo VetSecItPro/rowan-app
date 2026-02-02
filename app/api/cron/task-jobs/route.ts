@@ -5,6 +5,9 @@ import { runDailyCleanup, refreshMaterializedViews } from '@/lib/jobs/cleanup-jo
 import { processChoreRotations } from '@/lib/jobs/chore-rotation-job';
 import { logger } from '@/lib/logger';
 
+// PERF: Prevent serverless timeout — FIX-015
+export const maxDuration = 60;
+
 /**
  * Cron API Route for Task Background Jobs
  *
@@ -74,6 +77,7 @@ export async function GET(request: Request) {
     }
   } catch (error) {
     logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
-    return NextResponse.json({ error: 'Job failed', details: error }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Job failed', details: message }, { status: 500 });
   }
 }
