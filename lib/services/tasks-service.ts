@@ -188,7 +188,7 @@ export const tasksService = {
       // Get total count
       let countQuery = supabase
         .from('tasks')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('space_id', spaceId);
 
       // Apply same filters for count
@@ -251,7 +251,7 @@ export const tasksService = {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, title, description, status, priority, category, due_date, assigned_to, created_by, sort_order, created_at, updated_at, space_id, completed_at, estimated_hours, quick_note, tags, calendar_sync')
         .eq('id', id)
         .single();
 
@@ -663,7 +663,7 @@ export const tasksService = {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, title, description, status, priority, category, due_date, assigned_to, created_by, sort_order, created_at, updated_at, space_id, completed_at, estimated_hours, quick_note, tags, calendar_sync')
         .eq('space_id', spaceId)
         .gte('due_date', startDate)
         .lte('due_date', endDate)
@@ -698,7 +698,7 @@ export const tasksService = {
 
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, title, description, status, priority, category, due_date, assigned_to, created_by, sort_order, created_at, updated_at, space_id, completed_at, estimated_hours, quick_note, tags, calendar_sync')
         .eq('space_id', spaceId)
         .lt('due_date', today)
         .neq('status', 'completed')

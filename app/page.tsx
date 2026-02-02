@@ -49,7 +49,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between py-8 gap-4">
             <div className="flex items-center gap-3 text-gray-400">
-              <span>Rowan © 2025</span>
+              <span>Rowan © {new Date().getFullYear()}</span>
               <span className="text-gray-600">•</span>
               <span className="text-sm">Veteran Owned Business</span>
             </div>

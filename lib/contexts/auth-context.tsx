@@ -7,7 +7,6 @@ import { queryClient } from '@/lib/react-query/query-client';
 import {
   restoreQueryCache,
   restoreFromBackup,
-  setupCachePersistence,
 } from '@/lib/react-query/offline-persistence';
 import {
   useAuth as useAuthQuery,
@@ -85,11 +84,7 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
     };
 
     restoreCache();
-
-    // Set up automatic cache persistence
-    const cleanup = setupCachePersistence(queryClient);
-
-    return cleanup;
+    // Note: setupCachePersistence is called in query-client-provider.tsx — not duplicated here
   }, []);
 
   // Set up real-time auth state change listener

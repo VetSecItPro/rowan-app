@@ -54,11 +54,12 @@ const nextConfig = {
   // Image optimization settings (optimized for high-DPI mobile displays)
   // SECURITY: Restricted to trusted image hosts to prevent SSRF attacks
   images: {
+    // SECURITY: Restricted to specific project hostname — FIX-057
     remotePatterns: [
       // Supabase Storage (avatars, attachments)
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: 'mhqpjprmpvigmwcghpzx.supabase.co',
       },
       // Gravatar for default avatars
       {
@@ -74,11 +75,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
-      // Apple profile pictures (OAuth)
-      {
-        protocol: 'https',
-        hostname: '*.apple.com',
-      },
       // Placeholder images (picsum)
       {
         protocol: 'https',
@@ -92,7 +88,8 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    // PERF: 1-day cache for optimized images — FIX-058
+    minimumCacheTTL: 86400,
     // SECURITY: SVG disabled - SVGs can contain executable scripts
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -122,94 +119,20 @@ const nextConfig = {
       ];
     }
 
-    // Production CSP policy
-    //
-    // SECURITY NOTE: 'unsafe-inline' and 'unsafe-eval' are required due to Next.js framework limitations:
-    // - 'unsafe-inline': Required for Next.js hydration scripts and inline styles (CSS-in-JS)
-    // - 'unsafe-eval': Required for some bundled libraries and webpack runtime
-    //
-    // FUTURE IMPROVEMENT: Next.js 13.4+ supports experimental nonce-based CSP via:
-    // - experimental.appDocumentPreloading in next.config.js
-    // - Using generateNonce() in middleware and passing to Script components
-    // See: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
-    //
-    // Priority: Medium - Implement when Next.js nonce support stabilizes
-    const scriptSources = [
-      "'self'",
-      "'unsafe-inline'",
-      "'unsafe-eval'",
-      "https://vercel.live",
-      "https://va.vercel-scripts.com",
-      "https://vitals.vercel-insights.com",
-      "https://cdn.vercel-insights.com",
-      "https://www.googletagmanager.com",
-      "https://www.google-analytics.com",
-      "https://cdnjs.cloudflare.com",
-      "https://static.cloudflareinsights.com",
-      "https://unpkg.com",
-      "https://cdn.jsdelivr.net",
-      // Browser extension support for users
-      "chrome-extension:",
-      "safari-extension:",
-      "moz-extension:",
-      "ms-browser-extension:",
-      // Additional sources to prevent errors
-      "data:",
-      "blob:",
-      "'wasm-unsafe-eval'"
-    ].join(' ');
-
-    const styleSources = [
-      "'self'",
-      "'unsafe-inline'",
-      "https://fonts.googleapis.com",
-      "https://cdnjs.cloudflare.com",
-      "https://unpkg.com",
-      "https://cdn.jsdelivr.net",
-      // Browser extension support for users
-      "chrome-extension:",
-      "safari-extension:",
-      "moz-extension:",
-      "ms-browser-extension:",
-      // Additional sources to prevent errors
-      "data:",
-      "blob:"
-    ].join(' ');
-
-    const cspPolicy = [
-      "default-src 'self'",
-      `script-src ${scriptSources}`,
-      `style-src ${styleSources}`,
-      "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
-      "img-src 'self' data: https: blob:",
-      "connect-src 'self' https: wss: data:",
-      "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com",
-      "frame-ancestors 'self'",
-      "worker-src 'self' blob:",
-      "child-src 'self' blob:",
-      "manifest-src 'self'",
-      "media-src 'self' blob: data: https:",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'"
-    ].join('; ');
-
+    // SECURITY: CSP consolidated to middleware.ts — FIX-026
+    // Production security headers (non-CSP only; CSP is set by middleware)
     return [
       {
         // Security headers for all routes
         source: '/:path*',
         headers: [
           {
-            key: 'Content-Security-Policy',
-            value: cspPolicy,
-          },
-          {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            value: 'DENY',
           },
           {
             key: 'X-XSS-Protection',

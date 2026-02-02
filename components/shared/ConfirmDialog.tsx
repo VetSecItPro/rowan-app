@@ -1,7 +1,17 @@
 'use client';
 
+import { useEffect, useRef, useCallback } from 'react';
 import { AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react';
 import { SecondaryButton, CTAButton } from '@/components/ui/EnhancedButton';
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -26,31 +36,90 @@ export function ConfirmDialog({
   variant = 'warning',
   confirmLoading = false,
 }: ConfirmDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
+  const getFocusableElements = useCallback(() => {
+    if (!dialogRef.current) return [];
+    return Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter((el) => {
+      const style = window.getComputedStyle(el);
+      return style.display !== 'none' && style.visibility !== 'hidden';
+    });
+  }, []);
+
+  // FIX-043: Focus trap + Escape key + auto-focus
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previouslyFocusedRef.current = document.activeElement as HTMLElement;
+
+    // Auto-focus first focusable element (Cancel button)
+    requestAnimationFrame(() => {
+      const elements = getFocusableElements();
+      if (elements.length > 0) elements[0].focus();
+    });
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const elements = getFocusableElements();
+      if (elements.length === 0) return;
+
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      const active = document.activeElement as HTMLElement;
+
+      if (e.shiftKey) {
+        if (active === first || !dialogRef.current?.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last || !dialogRef.current?.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocusedRef.current) {
+        requestAnimationFrame(() => previouslyFocusedRef.current?.focus());
+      }
+    };
+  }, [isOpen, onClose, getFocusableElements]);
+
   if (!isOpen) return null;
 
   const variantStyles = {
     danger: {
       icon: XCircle,
       iconColor: 'text-red-500',
-      confirmBg: 'bg-red-600 bg-red-600 hover:bg-red-700',
+      confirmBg: 'bg-red-600 hover:bg-red-700',
       borderColor: 'border-red-800',
     },
     warning: {
       icon: AlertTriangle,
       iconColor: 'text-amber-500',
-      confirmBg: 'bg-amber-600 bg-amber-600 hover:bg-amber-700',
+      confirmBg: 'bg-amber-600 hover:bg-amber-700',
       borderColor: 'border-amber-800',
     },
     info: {
       icon: Info,
       iconColor: 'text-blue-500',
-      confirmBg: 'bg-blue-600 bg-blue-600 hover:bg-blue-700',
+      confirmBg: 'bg-blue-600 hover:bg-blue-700',
       borderColor: 'border-blue-800',
     },
     success: {
       icon: CheckCircle,
       iconColor: 'text-green-500',
-      confirmBg: 'bg-green-600 bg-green-600 hover:bg-green-700',
+      confirmBg: 'bg-green-600 hover:bg-green-700',
       borderColor: 'border-green-800',
     },
   };
@@ -66,8 +135,10 @@ export function ConfirmDialog({
         aria-hidden="true"
       />
       <div
+        ref={dialogRef}
         className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
         role="alertdialog"
+        aria-modal="true"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >

@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('user_id', userId)
       .eq('status', 'completed')
-      .like('file_url', `%${file}`)
+      .like('file_url', `%${file.replace(/%/g, '\\%').replace(/_/g, '\\_')}`)
       .single();
 
     if (exportError || !exportRequest) {

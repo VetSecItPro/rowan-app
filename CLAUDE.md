@@ -6,13 +6,20 @@
 
 ---
 
-## Project Status (Jan 2026)
+## Project Status (Feb 2026)
 
 ### What Rowan Is
 Family/household management app - tasks, chores, meals, budgets, goals, calendar, shopping lists, rewards system. Multi-space architecture (one family = one space).
 
+### Launch Strategy
+- **Phase 1 (NOW)**: Launch as **PWA + web app** — production-ready, audited, deployed on Vercel
+- **Phase 2 (Post-launch)**: Native mobile app via Capacitor (iOS/Android) — developer accounts pending
+- Marketing and paid user acquisition starts immediately with the web app
+- Native app development continues in parallel after launch
+
 ### Completed ✅
 - **Core Features**: All household management features functional
+- **Production Audited**: Security, performance, payments, and infrastructure audited (Feb 1, 2026)
 - **Dark Mode Only**: Entire codebase cleaned (5,600+ patterns removed) - NO light mode
 - **Native Mobile Ready**: Capacitor 8.x with 36 plugins for iOS/Android
 - **Location Tracking**: Family location sharing with geofences, privacy controls
@@ -88,10 +95,10 @@ Native bridges: `lib/native/` (capacitor, push-notifications, geolocation, barco
 2. Test push notifications end-to-end on both platforms
 3. Submit to App Store and Google Play
 
-### Future Enhancements (Code Ready When Needed)
-- Mutation queue integration with React Query (Phase 5)
-- Request optimization for 2G/3G (Phase 6)
-- Apple Watch / Android widgets (requires Swift/Kotlin)
+### Post-Launch Enhancements (Infrastructure Ready)
+- **Mutation queue integration** (Phase 5) — offline write queuing, auto-sync on reconnect. Foundation exists: `useOfflineQueue.ts`, SW background sync, React Query `offlineFirst`. Needs: wiring mutations to auto-queue, optimistic updates, conflict resolution. Works for both PWA and native.
+- **Request optimization for 2G/3G** (Phase 6) — adaptive payloads, dynamic timeouts, request batching on slow connections. Foundation exists: `lib/native/network.ts` quality detection, `shouldDefer` flag. Needs: middleware to apply quality-aware timeouts and payload reduction. Mostly benefits native mobile users.
+- Apple Watch / Android widgets (requires Swift/Kotlin, post-native-launch)
 
 ### Architecture Notes
 - **Capacitor**: Loads from Vercel URL (`server.url` in config) - instant updates without App Store

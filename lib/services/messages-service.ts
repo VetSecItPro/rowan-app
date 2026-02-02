@@ -132,7 +132,7 @@ export const messagesService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('conversations')
-      .select('*')
+      .select('id, space_id, title, conversation_type, last_message_preview, last_message_at, is_archived, avatar_url, description, participants, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('updated_at', { ascending: false });
 
@@ -144,7 +144,7 @@ export const messagesService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select('id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users')
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true });
 
@@ -171,7 +171,7 @@ export const messagesService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select('id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users')
       .eq('id', id)
       .single();
 
@@ -422,7 +422,7 @@ export const messagesService = {
     // Return the updated message
     const { data: updatedMessage, error: refetchError } = await supabase
       .from('messages')
-      .select('*')
+      .select('id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users')
       .eq('id', id)
       .single();
 
@@ -624,7 +624,7 @@ export const messagesService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('message_reactions')
-      .select('*')
+      .select('id, message_id, user_id, emoji, created_at')
       .eq('message_id', messageId);
 
     if (error) throw error;
@@ -725,7 +725,7 @@ export const messagesService = {
 
     let query = supabase
       .from('typing_indicators')
-      .select('*')
+      .select('id, conversation_id, user_id, last_typed_at, created_at')
       .eq('conversation_id', conversationId)
       .gte('last_typed_at', tenSecondsAgo);
 
@@ -1028,7 +1028,7 @@ export const messagesService = {
 
     const { data, error } = await supabase
       .from('conversations')
-      .select('*')
+      .select('id, space_id, title, conversation_type, last_message_preview, last_message_at, is_archived, avatar_url, description, participants, created_at, updated_at')
       .eq('id', conversationId)
       .single();
 

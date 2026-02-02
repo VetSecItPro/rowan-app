@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import ArticlePageClient from './ArticlePageClient'
 import { blogArticles } from '@/lib/data/blog-articles'
 import type { BlogArticle } from '@/lib/data/blog-articles'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 // Build lookup from blog articles data
 const fallbackArticles: Record<string, BlogArticle> = Object.fromEntries(
@@ -50,8 +51,12 @@ export default async function ArticlePage({ params }: PageProps) {
     .filter(a => a.slug !== slug)
     .slice(0, 4)
 
-  const renderedContent = article.htmlContent
-    ? <div dangerouslySetInnerHTML={{ __html: article.htmlContent }} />
+  const sanitizedHtml = article.htmlContent
+    ? await sanitizeHtml(article.htmlContent)
+    : null
+
+  const renderedContent = sanitizedHtml
+    ? <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
     : null
 
   return (

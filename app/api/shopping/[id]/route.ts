@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { shoppingService } from '@/lib/services/shopping-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
@@ -7,6 +8,15 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+
+const ShoppingListUpdateSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(1000).optional(),
+  color: z.string().max(50).optional(),
+  icon: z.string().max(50).optional(),
+  is_shared: z.boolean().optional(),
+  sort_order: z.number().int().optional(),
+}).strict();
 
 /**
  * GET /api/shopping/[id]
@@ -147,11 +157,18 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
-    // Parse request body
-    const updates = await req.json();
+    // Parse and validate request body
+    const body = await req.json();
+    const parsed = ShoppingListUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid update data', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
 
     // Update list using service
-    const updatedList = await shoppingService.updateList(params.id, updates, supabase);
+    const updatedList = await shoppingService.updateList(params.id, parsed.data, supabase);
 
     return NextResponse.json({
       success: true,

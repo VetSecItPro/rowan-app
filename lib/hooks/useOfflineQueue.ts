@@ -1,13 +1,17 @@
 /**
  * Offline Action Queue Hook
  *
- * Queues mutations when offline and automatically syncs when connection is restored.
- * Uses localStorage for persistence across sessions.
+ * Thin React wrapper over MutationQueueManager singleton.
+ * Provides reactive state updates and backward-compatible API.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import { MutationQueueManager, type QueuedMutation } from '@/lib/queue/mutation-queue-manager';
 
+/**
+ * Legacy interface kept for backward compatibility with NetworkStatus.tsx
+ * and any consumers importing QueuedAction.
+ */
 export interface QueuedAction {
   id: string;
   type: string;
@@ -19,50 +23,58 @@ export interface QueuedAction {
   maxRetries: number;
 }
 
-interface OfflineQueueState {
-  queue: QueuedAction[];
-  isProcessing: boolean;
-  lastSyncAttempt: number | null;
-  failedActions: QueuedAction[];
+/**
+ * Convert QueuedMutation (new format) to QueuedAction (legacy format)
+ */
+function toQueuedAction(m: QueuedMutation): QueuedAction {
+  let data: unknown;
+  try {
+    data = m.body ? JSON.parse(m.body) : undefined;
+  } catch {
+    data = m.body;
+  }
+
+  return {
+    id: m.id,
+    type: m.method,
+    endpoint: m.url,
+    method: m.method,
+    data,
+    timestamp: m.timestamp,
+    retryCount: m.retryCount,
+    maxRetries: m.maxRetries,
+  };
 }
 
-const STORAGE_KEY = 'rowan-offline-queue';
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 2000;
-
 /**
- * Hook for managing offline action queue
+ * Hook for managing offline action queue.
+ * Returns the same shape as before for full backward compatibility.
  */
 export function useOfflineQueue() {
-  const [state, setState] = useState<OfflineQueueState>({
-    queue: [],
-    isProcessing: false,
-    lastSyncAttempt: null,
-    failedActions: [],
-  });
-  const [isOnline, setIsOnline] = useState(true);
-  const processingRef = useRef(false);
+  const manager = MutationQueueManager.getInstance();
+  const initial = manager.getState();
 
-  // Initialize from localStorage
+  const [queue, setQueue] = useState(initial.queue);
+  const [failedActions, setFailedActions] = useState(initial.failedActions);
+  const [isProcessing, setIsProcessing] = useState(initial.isProcessing);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  // Subscribe to manager state changes
+  useEffect(() => {
+    const unsubscribe = manager.subscribe((state) => {
+      setQueue(state.queue);
+      setFailedActions(state.failedActions);
+      setIsProcessing(state.isProcessing);
+    });
+
+    return unsubscribe;
+  }, [manager]);
+
+  // Track online/offline status
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    setIsOnline(navigator.onLine);
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setState(prev => ({
-          ...prev,
-          queue: parsed.queue || [],
-          failedActions: parsed.failedActions || [],
-        }));
-      } catch {
-        // Invalid storage, reset
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
 
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -76,156 +88,39 @@ export function useOfflineQueue() {
     };
   }, []);
 
-  // Persist queue to localStorage
+  // Auto-process queue when coming online
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      queue: state.queue,
-      failedActions: state.failedActions,
-    }));
-  }, [state.queue, state.failedActions]);
-
-  // Process queue when online
-  const processQueue = useCallback(async () => {
-    if (!isOnline || state.queue.length === 0 || processingRef.current) {
-      return;
+    if (isOnline && queue.length > 0) {
+      manager.processQueue();
     }
+  }, [isOnline, queue.length, manager]);
 
-    processingRef.current = true;
-    setState(prev => ({ ...prev, isProcessing: true, lastSyncAttempt: Date.now() }));
+  const enqueue = useCallback(
+    (type: string, endpoint: string, method: QueuedAction['method'], data: unknown): string => {
+      const body = data !== undefined ? JSON.stringify(data) : undefined;
+      return manager.enqueue(endpoint, method, { 'Content-Type': 'application/json' }, body);
+    },
+    [manager]
+  );
 
-    const newQueue = [...state.queue];
-    const newFailedActions = [...state.failedActions];
+  const dequeue = useCallback((id: string) => manager.dequeue(id), [manager]);
+  const retryFailed = useCallback((id: string) => manager.retryFailed(id), [manager]);
+  const clearFailed = useCallback(() => manager.clearFailed(), [manager]);
+  const clearQueue = useCallback(() => manager.clearQueue(), [manager]);
+  const processQueue = useCallback(() => manager.processQueue(), [manager]);
 
-    for (let i = 0; i < newQueue.length; i++) {
-      const action = newQueue[i];
-
-      try {
-        const fetchFn = action.endpoint.startsWith('/')
-          ? csrfFetch
-          : fetch;
-        const response = await fetchFn(action.endpoint, {
-          method: action.method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(action.data),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        // Remove from queue on success
-        newQueue.splice(i, 1);
-        i--;
-      } catch {
-        // Increment retry count
-        action.retryCount++;
-
-        if (action.retryCount >= action.maxRetries) {
-          // Move to failed actions
-          newQueue.splice(i, 1);
-          newFailedActions.push(action);
-          i--;
-        } else {
-          // Wait before next retry
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-        }
-      }
-    }
-
-    setState(prev => ({
-      ...prev,
-      queue: newQueue,
-      failedActions: newFailedActions,
-      isProcessing: false,
-    }));
-
-    processingRef.current = false;
-  }, [isOnline, state.queue, state.failedActions]);
-
-  // Auto-process when coming online
-  useEffect(() => {
-    if (isOnline && state.queue.length > 0) {
-      processQueue();
-    }
-  }, [isOnline, processQueue, state.queue.length]);
-
-  // Add action to queue
-  const enqueue = useCallback((
-    type: string,
-    endpoint: string,
-    method: QueuedAction['method'],
-    data: unknown
-  ): string => {
-    const id = crypto.randomUUID();
-
-    const action: QueuedAction = {
-      id,
-      type,
-      endpoint,
-      method,
-      data,
-      timestamp: Date.now(),
-      retryCount: 0,
-      maxRetries: MAX_RETRIES,
-    };
-
-    setState(prev => ({
-      ...prev,
-      queue: [...prev.queue, action],
-    }));
-
-    // If online, process immediately
-    if (isOnline) {
-      setTimeout(processQueue, 100);
-    }
-
-    return id;
-  }, [isOnline, processQueue]);
-
-  // Remove action from queue
-  const dequeue = useCallback((id: string) => {
-    setState(prev => ({
-      ...prev,
-      queue: prev.queue.filter(a => a.id !== id),
-    }));
-  }, []);
-
-  // Retry failed action
-  const retryFailed = useCallback((id: string) => {
-    setState(prev => {
-      const failed = prev.failedActions.find(a => a.id === id);
-      if (!failed) return prev;
-
-      return {
-        ...prev,
-        queue: [...prev.queue, { ...failed, retryCount: 0 }],
-        failedActions: prev.failedActions.filter(a => a.id !== id),
-      };
-    });
-  }, []);
-
-  // Clear all failed actions
-  const clearFailed = useCallback(() => {
-    setState(prev => ({ ...prev, failedActions: [] }));
-  }, []);
-
-  // Clear entire queue
-  const clearQueue = useCallback(() => {
-    setState(prev => ({ ...prev, queue: [], failedActions: [] }));
-  }, []);
+  // Convert to legacy format for backward compat
+  const legacyQueue = queue.map(toQueuedAction);
+  const legacyFailed = failedActions.map(toQueuedAction);
 
   return {
-    queue: state.queue,
-    failedActions: state.failedActions,
-    isProcessing: state.isProcessing,
-    lastSyncAttempt: state.lastSyncAttempt,
+    queue: legacyQueue,
+    failedActions: legacyFailed,
+    isProcessing,
+    lastSyncAttempt: null as number | null,
     isOnline,
-    pendingCount: state.queue.length,
-    failedCount: state.failedActions.length,
+    pendingCount: queue.length,
+    failedCount: failedActions.length,
     enqueue,
     dequeue,
     retryFailed,
@@ -238,8 +133,6 @@ export function useOfflineQueue() {
 /**
  * Context for global offline queue access
  */
-import { createContext, useContext } from 'react';
-
 export interface OfflineQueueContextValue {
   pendingCount: number;
   failedCount: number;
