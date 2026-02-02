@@ -10,7 +10,7 @@ concurrency:
 
 env:
   NODE_VERSION: '22'
-  PNPM_VERSION: '9'
+  PNPM_VERSION: '10'
   NODE_OPTIONS: '--max_old_space_size=8192'
   # Placeholder env vars for build
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
