@@ -94,7 +94,6 @@ export async function GET(request: NextRequest) {
       },
       confidence: detection.confidence,
       detectedAt: new Date().toISOString(),
-      ip: clientIP
     };
 
     return NextResponse.json(weatherLocation);

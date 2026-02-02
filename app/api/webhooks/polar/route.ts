@@ -176,37 +176,73 @@ export async function POST(request: NextRequest) {
         const productId = eventData.productId as string;
         const currentPeriodStart = eventData.currentPeriodStart as string | undefined;
         const currentPeriodEnd = eventData.currentPeriodEnd as string | undefined;
+        const subMetadata = eventData.metadata as Record<string, string> | undefined;
 
         const plan = getPlanFromProductId(productId);
 
-        // Find user by Polar customer ID (with retry for race condition)
-        // checkout.updated may not have written polar_customer_id yet
+        // Find user by Polar customer ID, with fallback to metadata userId.
+        // checkout.updated writes polar_customer_id, but subscription.created
+        // can fire before that write completes (race condition). The fallback
+        // resolves the user directly from checkout metadata, eliminating the race.
         let subscription: { user_id: string; is_founding_member: boolean } | null = null;
 
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const { data, error: findError } = await supabaseAdmin
+        // Attempt 1: Look up by polar_customer_id (fast path — works when checkout.updated already ran)
+        const { data: byCustomerId } = await supabaseAdmin
+          .from('subscriptions')
+          .select('user_id, is_founding_member')
+          .eq('polar_customer_id', customerId)
+          .single();
+
+        if (byCustomerId) {
+          subscription = byCustomerId;
+        }
+
+        // Attempt 2: Fallback to metadata userId (eliminates the race entirely)
+        if (!subscription && subMetadata?.userId) {
+          const { data: byUserId } = await supabaseAdmin
+            .from('subscriptions')
+            .select('user_id, is_founding_member')
+            .eq('user_id', subMetadata.userId)
+            .single();
+
+          if (byUserId) {
+            subscription = byUserId;
+
+            // Backfill the polar_customer_id so future lookups work via the fast path
+            await supabaseAdmin
+              .from('subscriptions')
+              .update({
+                polar_customer_id: customerId,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('user_id', byUserId.user_id);
+
+            logger.info('Resolved subscription via metadata userId fallback', {
+              component: 'PolarWebhook',
+              userId: byUserId.user_id,
+              customerId,
+            });
+          }
+        }
+
+        // Attempt 3: One retry with delay (handles edge cases where both lookups miss)
+        if (!subscription) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+
+          const { data: retryData, error: retryError } = await supabaseAdmin
             .from('subscriptions')
             .select('user_id, is_founding_member')
             .eq('polar_customer_id', customerId)
             .single();
 
-          if (data) {
-            subscription = data;
-            break;
-          }
-
-          if (attempt < 2) {
-            // Wait before retry (1s, then 2s)
-            await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
-            logger.info(`Retrying customer lookup (attempt ${attempt + 2}/3)`, {
+          if (retryData) {
+            subscription = retryData;
+          } else {
+            logger.error(`No subscription found for Polar customer ${customerId}`, retryError, {
               component: 'PolarWebhook',
               customerId,
+              metadataUserId: subMetadata?.userId,
             });
-          } else {
-            logger.error(`No subscription found for Polar customer ${customerId} after 3 attempts`, findError, {
-              component: 'PolarWebhook',
-            });
-            // Return 500 so Polar retries the webhook
             return NextResponse.json(
               { error: 'Customer not found - retry later' },
               { status: 500 }
@@ -214,11 +250,24 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        if (!subscription) {
-          return NextResponse.json(
-            { error: 'Customer not found' },
-            { status: 500 }
-          );
+        // Idempotency guard: if subscription is already active with this polar_subscription_id,
+        // this webhook was already processed (Polar retry or duplicate delivery). Skip to avoid
+        // double-claiming founding member spots and sending duplicate welcome emails.
+        {
+          const { data: existing } = await supabaseAdmin
+            .from('subscriptions')
+            .select('polar_subscription_id, status')
+            .eq('user_id', subscription.user_id)
+            .single();
+
+          if (existing?.polar_subscription_id === subscriptionId && existing?.status === 'active') {
+            logger.info('Subscription event already processed (idempotency guard)', {
+              component: 'PolarWebhook',
+              userId: subscription.user_id,
+              subscriptionId,
+            });
+            break;
+          }
         }
 
         // Check if user is already a founding member

@@ -74,6 +74,7 @@ export async function GET(request: Request) {
     }
   } catch (error) {
     logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
-    return NextResponse.json({ error: 'Job failed', details: error }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Job failed', details: message }, { status: 500 });
   }
 }

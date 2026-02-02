@@ -63,7 +63,10 @@ export function MessageNotificationBell({
     fetchUnreadCount();
   }, [fetchUnreadCount]);
 
-  // Real-time subscription - listen for any message changes and refetch
+  // Real-time subscription - listen for message changes and refetch
+  // Note: messages table has no direct space_id column (goes through conversations),
+  // so we can't filter server-side in postgres_changes. The fetchUnreadCount query
+  // properly filters by conversations.space_id, so incorrect data is never shown.
   useEffect(() => {
     const channel = supabase
       .channel(`messages_unread_count_${spaceId}`)
@@ -75,7 +78,6 @@ export function MessageNotificationBell({
           table: 'messages',
         },
         () => {
-          // Refresh unread count when any message is updated (e.g., marked as read)
           fetchUnreadCount();
         }
       )
@@ -87,7 +89,6 @@ export function MessageNotificationBell({
           table: 'messages',
         },
         () => {
-          // Refresh when new messages arrive
           fetchUnreadCount();
         }
       )

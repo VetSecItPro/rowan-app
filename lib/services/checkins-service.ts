@@ -52,7 +52,7 @@ export const checkInsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('daily_checkins')
-      .select('*')
+      .select('id, user_id, space_id, date, mood, energy_level, note, highlights, challenges, gratitude, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('date', { ascending: false })
       .order('created_at', { ascending: false })
@@ -71,7 +71,7 @@ export const checkInsService = {
 
     const { data, error } = await supabase
       .from('daily_checkins')
-      .select('*')
+      .select('id, user_id, space_id, date, mood, energy_level, note, highlights, challenges, gratitude, created_at, updated_at')
       .eq('space_id', spaceId)
       .eq('user_id', userId)
       .eq('date', today)
@@ -88,7 +88,7 @@ export const checkInsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('daily_checkins')
-      .select('*')
+      .select('id, user_id, space_id, date, mood, energy_level, note, highlights, challenges, gratitude, created_at, updated_at')
       .eq('space_id', spaceId)
       .eq('user_id', userId)
       .order('date', { ascending: false })
@@ -109,7 +109,7 @@ export const checkInsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('daily_checkins')
-      .select('*')
+      .select('id, user_id, space_id, date, mood, energy_level, note, highlights, challenges, gratitude, created_at, updated_at')
       .eq('space_id', spaceId)
       .gte('date', format(startDate, 'yyyy-MM-dd'))
       .lte('date', format(endDate, 'yyyy-MM-dd'))
@@ -191,7 +191,7 @@ export const checkInsService = {
     // Get all check-ins for the user
     const { data: allCheckIns, error } = await supabase
       .from('daily_checkins')
-      .select('*')
+      .select('id, user_id, space_id, date, mood, energy_level, note, highlights, challenges, gratitude, created_at, updated_at')
       .eq('space_id', spaceId)
       .eq('user_id', userId)
       .order('date', { ascending: false });

@@ -24,6 +24,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { getCookiePreferences } from '@/lib/utils/cookies';
 
 // Feature names must match the API validation
 export type FeatureName =
@@ -132,7 +133,14 @@ function scheduleFlush(): void {
   }, FLUSH_INTERVAL);
 }
 
+function isAnalyticsConsented(): boolean {
+  if (typeof window === 'undefined') return false;
+  return getCookiePreferences().analytics === true;
+}
+
 function queueEvent(event: TrackingEvent): void {
+  if (!isAnalyticsConsented()) return;
+
   eventQueue.push({
     ...event,
     sessionId: getSessionId(),
@@ -152,6 +160,8 @@ function queueEvent(event: TrackingEvent): void {
 
 // Track immediately for important events (without batching)
 async function trackImmediate(event: TrackingEvent): Promise<void> {
+  if (!isAnalyticsConsented()) return;
+
   try {
     await csrfFetch('/api/analytics/track', {
       method: 'POST',
@@ -168,19 +178,17 @@ async function trackImmediate(event: TrackingEvent): Promise<void> {
   }
 }
 
-// Flush on page unload
+// Flush on page unload (only fires if queue has events, which requires consent)
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
-    if (eventQueue.length > 0) {
-      // Use sendBeacon for reliable delivery on page close
+    if (eventQueue.length > 0 && isAnalyticsConsented()) {
       const data = JSON.stringify({ events: eventQueue });
       navigator.sendBeacon('/api/analytics/track', data);
     }
   });
 
-  // Also flush on visibility change (tab hidden)
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && eventQueue.length > 0) {
+    if (document.visibilityState === 'hidden' && eventQueue.length > 0 && isAnalyticsConsented()) {
       const data = JSON.stringify({ events: eventQueue });
       navigator.sendBeacon('/api/analytics/track', data);
       eventQueue.length = 0;

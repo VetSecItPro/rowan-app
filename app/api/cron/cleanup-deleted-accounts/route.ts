@@ -190,13 +190,41 @@ async function permanentlyDeleteExpiredAccounts() {
 
     for (const account of expiredAccounts) {
       try {
+        // Re-verify deletion record still exists (user may have cancelled between query and execution)
+        const { data: stillPending } = await supabase
+          .from('deleted_accounts')
+          .select('user_id')
+          .eq('user_id', account.user_id)
+          .maybeSingle();
+
+        if (!stillPending) {
+          // User cancelled deletion — skip
+          continue;
+        }
+
         // Log permanent deletion
         await accountDeletionService.logDeletionAction(account.user_id, 'permanent', {
           timestamp: now.toISOString(),
           partnership_ids: account.partnership_ids || [],
         }, supabase);
 
-        // Delete from auth (this cascades to profiles via foreign key)
+        // Explicitly delete personal data tables that may not cascade from auth.users
+        // (FK constraints use SET NULL for user_id references, not CASCADE)
+        await Promise.allSettled([
+          supabase.from('push_tokens').delete().eq('user_id', account.user_id),
+          supabase.from('daily_checkins').delete().eq('user_id', account.user_id),
+          supabase.from('user_locations').delete().eq('user_id', account.user_id),
+          supabase.from('location_sharing_settings').delete().eq('user_id', account.user_id),
+          supabase.from('geofence_events').delete().eq('user_id', account.user_id),
+          supabase.from('user_privacy_preferences').delete().eq('user_id', account.user_id),
+          supabase.from('privacy_preference_history').delete().eq('user_id', account.user_id),
+          supabase.from('data_export_requests').delete().eq('user_id', account.user_id),
+          supabase.from('account_deletion_requests').delete().eq('user_id', account.user_id),
+          supabase.from('space_members').delete().eq('user_id', account.user_id),
+          supabase.from('users').delete().eq('id', account.user_id),
+        ]);
+
+        // Delete from auth (this cascades remaining FK references to SET NULL)
         await supabase.auth.admin.deleteUser(account.user_id);
 
         // Remove from deleted_accounts table

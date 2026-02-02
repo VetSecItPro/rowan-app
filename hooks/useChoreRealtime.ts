@@ -39,13 +39,16 @@ function chorePassesFilters(chore: Chore, filters?: UseChoreRealtimeOptions['fil
   );
 }
 
-// Debounce helper for batched state updates
-function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): T {
+// Debounce helper for batched state updates with cancel support
+type DebouncedFn<T extends (...args: unknown[]) => void> = T & { cancel: () => void };
+function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): DebouncedFn<T> {
   let timeoutId: NodeJS.Timeout;
-  return ((...args: Parameters<T>) => {
+  const debounced = ((...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
-  }) as T;
+  }) as DebouncedFn<T>;
+  debounced.cancel = () => clearTimeout(timeoutId);
+  return debounced;
 }
 
 export function useChoreRealtime({
@@ -66,6 +69,9 @@ export function useChoreRealtime({
   const callbacksRef = useRef({ onChoreAdded, onChoreUpdated, onChoreDeleted });
   callbacksRef.current = { onChoreAdded, onChoreUpdated, onChoreDeleted };
 
+  // Ref to hold the loadChores function so refreshChores can call it
+  const loadDataRef = useRef<(() => Promise<void>) | null>(null);
+
   // Performance optimizations: batch updates queue
   const updateQueueRef = useRef<{
     inserts: Chore[];
@@ -74,7 +80,7 @@ export function useChoreRealtime({
   }>({ inserts: [], updates: [], deletes: [] });
 
   // Debounced batch update function - use useRef to avoid recreation
-  const debouncedBatchUpdateRef = useRef<(() => void) | null>(null);
+  const debouncedBatchUpdateRef = useRef<DebouncedFn<() => void> | null>(null);
 
   if (!debouncedBatchUpdateRef.current) {
     debouncedBatchUpdateRef.current = debounce(() => {
@@ -155,6 +161,8 @@ export function useChoreRealtime({
     }
 
     async function loadChores() {
+      // Store ref so refreshChores can call this
+      loadDataRef.current = loadChores;
       try {
         // Verify access before loading
         const hasAccess = await verifyAccess();
@@ -282,7 +290,7 @@ export function useChoreRealtime({
       }
     }, 15 * 60 * 1000); // 15 minutes
 
-    // Cleanup subscription and interval on unmount
+    // Cleanup subscription, interval, and debounce timer on unmount
     return () => {
       if (channel) {
         supabase.removeChannel(channel);
@@ -290,15 +298,14 @@ export function useChoreRealtime({
       if (accessCheckInterval) {
         clearInterval(accessCheckInterval);
       }
-      // Clear any pending batched updates
+      debouncedBatchUpdateRef.current?.cancel();
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
   }, [spaceId]); // Only spaceId triggers teardown/rebuild
 
   function refreshChores() {
     setLoading(true);
-    // Trigger re-fetch by updating a dependency
-    // The useEffect will handle the actual fetch
+    loadDataRef.current?.();
   }
 
   return {

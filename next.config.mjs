@@ -154,7 +154,6 @@ const nextConfig = {
       "moz-extension:",
       "ms-browser-extension:",
       // Additional sources to prevent errors
-      "data:",
       "blob:",
       "'wasm-unsafe-eval'"
     ].join(' ');
@@ -176,15 +175,50 @@ const nextConfig = {
       "blob:"
     ].join(' ');
 
+    const connectSources = [
+      "'self'",
+      // Supabase (REST API + Realtime WebSocket)
+      "https://*.supabase.co",
+      "wss://*.supabase.co",
+      // Sentry error reporting (client SDK)
+      "https://*.ingest.sentry.io",
+      // Vercel (analytics, insights, live preview)
+      "https://vercel.live",
+      "https://vitals.vercel-insights.com",
+      "https://va.vercel-scripts.com",
+      "https://cdn.vercel-insights.com",
+      // Google Analytics / GTM (behind cookie consent)
+      "https://www.googletagmanager.com",
+      "https://www.google-analytics.com",
+      // Cloudflare Insights
+      "https://static.cloudflareinsights.com",
+      // Polar payments
+      "https://api.polar.sh",
+      // IP geolocation (CCPA compliance)
+      "https://ipapi.co",
+      "https://api.ipgeolocation.io",
+      // External APIs (recipes, weather, AI)
+      "https://api.edamam.com",
+      "https://www.themealdb.com",
+      "https://api.spoonacular.com",
+      "https://api.open-meteo.com",
+      "https://api.gemini.google.com",
+      "https://www.googleapis.com",
+      // Push notifications
+      "https://exp.host",
+      // Data URIs
+      "data:",
+    ].join(' ');
+
     const cspPolicy = [
       "default-src 'self'",
       `script-src ${scriptSources}`,
       `style-src ${styleSources}`,
       "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https: wss: data:",
+      `connect-src ${connectSources}`,
       "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://www.google.com",
-      "frame-ancestors 'self'",
+      "frame-ancestors 'none'",
       "worker-src 'self' blob:",
       "child-src 'self' blob:",
       "manifest-src 'self'",
@@ -209,7 +243,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            value: 'DENY',
           },
           {
             key: 'X-XSS-Protection',

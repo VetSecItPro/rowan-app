@@ -120,7 +120,11 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  // SECURITY: Use getUser() for server-side auth validation, not getSession()
+  // getSession() only reads from cookies without server-side JWT verification
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  // Build a session-compatible object for downstream checks
+  const session = authUser ? { user: authUser } : null;
 
   // Admin routes - Single Sign-On (no separate admin login)
   // Handle both page routes (/admin/*) and API routes (/api/admin/*)
@@ -418,7 +422,17 @@ export async function middleware(req: NextRequest) {
         const csrfCookie = req.cookies.get('__csrf_token')?.value;
         const csrfHeader = req.headers.get(CSRF_HEADER_NAME);
 
-        if (!csrfCookie || !csrfHeader || csrfCookie !== csrfHeader) {
+        // Timing-safe comparison to prevent brute-forcing CSRF tokens
+        const csrfMatch = csrfCookie && csrfHeader && csrfCookie.length === csrfHeader.length &&
+          (() => {
+            const encoder = new TextEncoder();
+            const a = encoder.encode(csrfCookie);
+            const b = encoder.encode(csrfHeader);
+            let result = 0;
+            for (let i = 0; i < a.length; i++) { result |= a[i] ^ b[i]; }
+            return result === 0;
+          })();
+        if (!csrfCookie || !csrfHeader || !csrfMatch) {
           return NextResponse.json(
             { error: 'CSRF validation failed' },
             { status: 403 }
@@ -449,7 +463,7 @@ export async function middleware(req: NextRequest) {
       "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
       "img-src 'self' data: https: blob:; " +
       "font-src 'self' data: https:; " +
-      "connect-src 'self' https: wss: data: https://*.supabase.co wss://*.supabase.co https://vercel.live https://api.gemini.google.com https://*.ingest.sentry.io https://*.upstash.io https://www.themealdb.com https://api.spoonacular.com https://api.edamam.com https://api.polar.sh;" +
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://vercel.live https://vitals.vercel-insights.com https://va.vercel-scripts.com https://cdn.vercel-insights.com https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://api.polar.sh https://ipapi.co https://api.ipgeolocation.io https://api.edamam.com https://www.themealdb.com https://api.spoonacular.com https://api.open-meteo.com https://api.gemini.google.com https://www.googleapis.com https://exp.host data:;" +
       "frame-ancestors 'none'; " +
       "frame-src 'self' https://vercel.live;" +
       "base-uri 'self'; " +
