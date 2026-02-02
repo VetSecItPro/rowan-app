@@ -1,146 +1,86 @@
 {
-  "auditDate": "2026-01-22T00:00:00.000Z",
+  "auditDate": "2026-02-01T23:50:00.000Z",
   "project": "rowan-app",
+  "remediationDate": "2026-02-02T07:15:00.000Z",
   "summary": {
-    "critical": 0,
-    "high": 0,
-    "medium": 3,
-    "low": 2,
-    "info": 3,
-    "autoFixed": 4
+    "total": 66,
+    "fixed": 37,
+    "deferred": 17,
+    "acceptedRisk": 8,
+    "requiresDashboard": 4
   },
-  "autoFixed": [
-    {
-      "id": "FIX-001",
-      "description": "jsPDF updated to v4.0.0 - vulnerability resolved",
-      "fixedDate": "2026-01-22"
-    },
-    {
-      "id": "FIX-002",
-      "description": "Tables active_chat_prompt and active_summarizer_prompt verified as non-existent in database - no fix required",
-      "fixedDate": "2026-01-22"
-    },
-    {
-      "id": "FIX-003",
-      "description": "Tables active_chat_prompt and active_summarizer_prompt verified as non-existent in database - no fix required",
-      "fixedDate": "2026-01-22"
-    },
-    {
-      "id": "FIX-009",
-      "description": "Reviewed Math.random() usage - all instances are for non-security-sensitive purposes (sampling, mock data, jitter)",
-      "fixedDate": "2026-01-22"
-    }
+  "fixed": [
+    { "id": "FIX-001", "description": "Next.js upgraded 15.4.10 → 15.4.11 (CVE-2026-23864)" },
+    { "id": "FIX-003", "description": "Revoked anon API access to spatial_ref_sys; SELECT-only for authenticated" },
+    { "id": "FIX-004", "description": "get_dashboard_summary already had search_path=public (verified)" },
+    { "id": "FIX-007", "description": "Export routes switched to checkExpensiveOperationRateLimit" },
+    { "id": "FIX-008", "description": "getSession() → getUser() in privacy/preferences helper functions" },
+    { "id": "FIX-015", "description": "maxDuration=60 added to all 8 cron routes + webhook route" },
+    { "id": "FIX-017", "description": "N+1 in getTagSpendingAnalysis → single batch query" },
+    { "id": "FIX-018", "description": "Created app/robots.ts" },
+    { "id": "FIX-019", "description": "Added metadataBase to root layout" },
+    { "id": "FIX-020", "description": "SW icon references updated to match actual files" },
+    { "id": "FIX-021", "description": "8 missing routes added to protectedPaths + matcher config" },
+    { "id": "FIX-022", "description": "@babel/runtime >= 7.26.10 override in pnpm.overrides" },
+    { "id": "FIX-024", "description": "Session cookie reduced 365d → 90d" },
+    { "id": "FIX-025", "description": "Math.random() mock → deterministic similarity calc" },
+    { "id": "FIX-026", "description": "CSP consolidated to middleware; removed duplicate from next.config" },
+    { "id": "FIX-027", "description": "Admin health mock data labeled as placeholder" },
+    { "id": "FIX-028", "description": "Geolocation IP extraction uses x-vercel-forwarded-for first" },
+    { "id": "FIX-035", "description": "useFeatureTracking periodic flush timer added" },
+    { "id": "FIX-039", "description": "N+1 in enhanced-notification-service → batch fetch" },
+    { "id": "FIX-040", "description": "Sequential subtask reorder → Promise.all" },
+    { "id": "FIX-041", "description": "Sequential milestone creation → single batch insert" },
+    { "id": "FIX-042", "description": "Created app/opengraph-image.tsx" },
+    { "id": "FIX-043", "description": "ConfirmDialog: added focus trap, Escape key, aria-modal, auto-focus" },
+    { "id": "FIX-044", "description": "Not-found page malformed CSS gradient fixed" },
+    { "id": "FIX-045", "description": "global-error.tsx: added lang, dark class, dark styling" },
+    { "id": "FIX-046", "description": "theme_color aligned to #000000 in layout viewport" },
+    { "id": "FIX-047", "description": "Manifest: removed non-existent screenshots, fixed icon sizes, removed missing shortcut icons" },
+    { "id": "FIX-048", "description": "Removed GTM dns-prefetch (GTM not used)" },
+    { "id": "FIX-052", "description": "User email removed from verify-email redirect URL; fetched from session" },
+    { "id": "FIX-054", "description": "Admin health: sanitized DB error message" },
+    { "id": "FIX-057", "description": "Image remotePatterns: wildcard → specific Supabase hostname" },
+    { "id": "FIX-058", "description": "Image minimumCacheTTL 60s → 86400s (1 day)" },
+    { "id": "FIX-060", "description": "Modal backdrop: aria-label → aria-hidden" },
+    { "id": "FIX-061", "description": "ConfirmDialog duplicate CSS classes removed" },
+    { "id": "FIX-062", "description": "Created year-in-review loading.tsx" },
+    { "id": "FIX-063", "description": "Manifest icon sizes corrected to match actual file dimensions" },
+    { "id": "FIX-064", "description": "Copyright year → dynamic new Date().getFullYear()" }
   ],
-  "findings": [
-    {
-      "id": "FIX-004",
-      "category": "auth_config",
-      "severity": "medium",
-      "title": "OTP Expiry Time Too Long",
-      "file": "Supabase Auth Configuration",
-      "line": null,
-      "code": "OTP expiry > 1 hour",
-      "description": "The email provider OTP expiry is set to more than 1 hour, increasing risk of OTP interception attacks.",
-      "remediation": "Set OTP expiry to less than 1 hour in Supabase Dashboard > Authentication > Email",
-      "status": "requires_dashboard_change"
-    },
-    {
-      "id": "FIX-005",
-      "category": "auth_config",
-      "severity": "medium",
-      "title": "Leaked Password Protection Disabled",
-      "file": "Supabase Auth Configuration",
-      "line": null,
-      "code": "Leaked password protection: disabled",
-      "description": "Supabase Auth leaked password protection is disabled. Enable to prevent use of compromised passwords.",
-      "remediation": "Enable in Supabase Dashboard > Authentication > Password Security",
-      "status": "requires_dashboard_change"
-    },
-    {
-      "id": "FIX-006",
-      "category": "database",
-      "severity": "medium",
-      "title": "PostgreSQL Security Patches Available",
-      "file": "Supabase Infrastructure",
-      "line": null,
-      "code": "supabase-postgres-17.4.1.041",
-      "description": "Current PostgreSQL version has outstanding security patches available.",
-      "remediation": "Upgrade via Supabase Dashboard: https://supabase.com/docs/guides/platform/upgrading",
-      "status": "requires_dashboard_change"
-    },
-    {
-      "id": "FIX-011",
-      "category": "environment",
-      "severity": "low",
-      "title": ".env.local File Present",
-      "file": ".env.local",
-      "line": null,
-      "code": ".env.local exists",
-      "description": "A .env.local file is present. Verified: properly gitignored via .env*.local pattern.",
-      "remediation": "No action needed - file is properly ignored",
-      "status": "verified_ok"
-    },
-    {
-      "id": "FIX-012",
-      "category": "security_headers",
-      "severity": "low",
-      "title": "Security Headers Disabled in Development",
-      "file": "next.config.mjs:104",
-      "line": 104,
-      "code": "return [] in development",
-      "description": "All security headers disabled in development mode.",
-      "remediation": "Acceptable for development - headers are enabled in production",
-      "status": "acceptable_risk"
-    },
-    {
-      "id": "FIX-013",
-      "category": "security_headers",
-      "severity": "info",
-      "title": "CSP Uses unsafe-inline and unsafe-eval",
-      "file": "next.config.mjs:120",
-      "line": 120,
-      "code": "script-src unsafe-inline unsafe-eval",
-      "description": "CSP includes unsafe-inline and unsafe-eval (documented as necessary for Next.js).",
-      "remediation": "Consider nonce-based CSP when Next.js support stabilizes",
-      "status": "acceptable_risk"
-    },
-    {
-      "id": "FIX-014",
-      "category": "api_security",
-      "severity": "info",
-      "title": "Service Role Key Usage in Server Code",
-      "file": "Multiple server files",
-      "line": null,
-      "code": "SUPABASE_SERVICE_ROLE_KEY usage",
-      "description": "Service role key used in server-side code. Acceptable for admin operations.",
-      "remediation": "Audit usage to ensure service role operations are properly protected",
-      "status": "acceptable_risk"
-    },
-    {
-      "id": "FIX-015",
-      "category": "logging",
-      "severity": "info",
-      "title": "Console.log Statements in Production Code",
-      "file": "lib/, components/",
-      "line": null,
-      "code": "Console statements",
-      "description": "Console statements found. Production builds strip these via compiler config.",
-      "remediation": "Acceptable - Next.js compiler removes console.log in production",
-      "status": "acceptable_risk"
-    }
+  "acceptedRisk": [
+    { "id": "FIX-006", "reason": "CSP unsafe-inline/eval required by Next.js framework; nonce-based CSP not yet stable" },
+    { "id": "FIX-011", "reason": "PostGIS in public schema; moving to extensions schema is post-launch" },
+    { "id": "FIX-016", "reason": "getUser() on every request is intentional security trade-off (50-200ms)" },
+    { "id": "FIX-050", "reason": "HTML sanitization fallback regex is defense-in-depth; DOMPurify is primary" },
+    { "id": "FIX-051", "reason": "Rate limiter fails open by design to prevent DoS of own service" },
+    { "id": "FIX-053", "reason": "Smoke test credentials are for local testing only (.env.local)" },
+    { "id": "FIX-065", "reason": "Table horizontal scroll is expected for data-dense tables on mobile" },
+    { "id": "FIX-066", "reason": "aria-live on 2 key components covers primary notification scenarios" }
   ],
-  "recommendations": {
-    "immediate": [],
-    "shortTerm": [
-      "Enable leaked password protection in Supabase Dashboard",
-      "Reduce OTP expiry to < 1 hour in Supabase Dashboard",
-      "Apply PostgreSQL security patches via Supabase Dashboard"
-    ],
-    "resolved": [
-      "jsPDF vulnerability - updated to v4.0.0",
-      "Math.random() usage reviewed - all non-security-sensitive",
-      ".env.local properly gitignored",
-      "active_chat_prompt and active_summarizer_prompt RLS policies - tables verified as non-existent in database"
-    ]
-  }
+  "requiresDashboard": [
+    { "id": "FIX-002", "action": "Remove duplicate ADMIN_SESSION_SECRET from .env.local line 84" },
+    { "id": "FIX-005", "action": "Upgrade Next.js to >= 15.5.10 when available (Image Optimizer OOM CVE)" },
+    { "id": "FIX-009", "action": "Add NOT NULL to space_id on 12 core tables (requires data verification)" },
+    { "id": "FIX-010", "action": "Rewrite 472 RLS policies to use (SELECT auth.uid())" }
+  ],
+  "deferred": [
+    { "id": "FIX-012", "reason": "Bundle size optimization — requires dynamic import refactoring (post-launch)" },
+    { "id": "FIX-013", "reason": "Shared chunk analysis — run ANALYZE=true build post-launch" },
+    { "id": "FIX-014", "reason": "280 select('*') — ongoing incremental effort per CLAUDE.md" },
+    { "id": "FIX-023", "reason": "84 API routes missing Zod — systematic effort, prioritize auth routes first" },
+    { "id": "FIX-029", "reason": "34 text columns missing CHECK constraints — DB migration batch" },
+    { "id": "FIX-030", "reason": "Consolidate duplicate UPDATE policies on messages table" },
+    { "id": "FIX-031", "reason": "33 tables missing updated_at trigger — create generic trigger" },
+    { "id": "FIX-032", "reason": "Duplicate/overlapping tables — audit and merge post-launch" },
+    { "id": "FIX-033", "reason": "395 unused indexes — drop after launch metrics stabilize" },
+    { "id": "FIX-034", "reason": "Middleware 129kB — audit imports post-launch" },
+    { "id": "FIX-036", "reason": "60+ select('*') without pagination — covered by FIX-014 ongoing effort" },
+    { "id": "FIX-037", "reason": "Sequential cron processing — optimize with Promise.allSettled post-launch" },
+    { "id": "FIX-038", "reason": "React.memo — add to list item components as needed based on profiling" },
+    { "id": "FIX-049", "reason": "Privacy page URL consolidation — coordinate with SEO/marketing" },
+    { "id": "FIX-055", "reason": "founding_member_counter readable by anon — low risk, non-sensitive" },
+    { "id": "FIX-056", "reason": "created_at nullable — covered by FIX-029 DB constraint batch" },
+    { "id": "FIX-059", "reason": "Feature pages missing metadata exports — add incrementally" }
+  ]
 }
