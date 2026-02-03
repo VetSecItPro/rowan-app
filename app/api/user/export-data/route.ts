@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'Content-Disposition': `attachment; filename="rowan-data-export-${new Date().toISOString().split('T')[0]}.json"`,
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
       },
     });
 

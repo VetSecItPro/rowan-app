@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processReminderNotifications } from '@/lib/jobs/reminder-notifications-job';
 import { logger } from '@/lib/logger';
+import { verifyCronSecret } from '@/lib/security/verify-secret';
 
 export const dynamic = 'force-dynamic';
 // PERF: Prevent serverless timeout — FIX-015
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (authHeader !== `Bearer ${expectedSecret}`) {
+    if (!verifyCronSecret(authHeader, expectedSecret)) {
       logger.warn('Unauthorized cron request attempt', {
         component: 'ReminderNotificationsCron',
         action: 'verify_auth',
@@ -82,10 +83,7 @@ export async function GET(request: NextRequest) {
       action: 'execute',
     });
     return NextResponse.json(
-      {
-        error: 'Job execution failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

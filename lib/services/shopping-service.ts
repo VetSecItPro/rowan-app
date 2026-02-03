@@ -398,15 +398,22 @@ export const shoppingService = {
       description: template.description,
     });
 
-    // Add items
+    // Batch insert all template items at once (FIX-036: eliminates N+1)
     const items = typeof template.items === 'string' ? JSON.parse(template.items) : template.items;
-    for (const item of items) {
-      await this.createItem({
+    if (items && items.length > 0) {
+      const itemRows = items.map((item: TemplateItemInput) => ({
         list_id: list.id,
         name: item.name,
         quantity: item.quantity || 1,
-        category: item.category,
-      });
+        category: item.category || getCategoryForItem(item.name),
+        checked: false,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('shopping_items')
+        .insert(itemRows);
+
+      if (itemsError) throw itemsError;
     }
 
     return list;

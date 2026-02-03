@@ -14,6 +14,32 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'Rowan',
+            applicationCategory: 'LifestyleApplication',
+            operatingSystem: 'Web, iOS, Android',
+            description:
+              'Family and household management app for tasks, meals, budgets, goals, calendar, and more.',
+            url: 'https://rowanapp.com',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Rowan',
+              url: 'https://rowanapp.com',
+            },
+          }),
+        }}
+      />
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
       {/* Animated mesh gradient background */}
       <div className="fixed inset-0 -z-10">
@@ -68,5 +94,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

@@ -733,6 +733,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                         disabled={syncing === connection.id || connection.sync_status === 'syncing'}
                         className="p-2 text-gray-400 hover:text-purple-400 hover:bg-purple-900/20 rounded-lg transition-colors disabled:opacity-50"
                         title="Sync now"
+                        aria-label="Sync now"
                       >
                         <RefreshCw
                           className={`h-5 w-5 ${
@@ -749,6 +750,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                         disabled={disconnecting === connection.id}
                         className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                         title="Disconnect"
+                        aria-label="Disconnect"
                       >
                         {disconnecting === connection.id ? (
                           <Loader2 className="h-5 w-5 animate-spin" />

@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { calendarSyncService } from '@/lib/services/calendar';
 import { logger } from '@/lib/logger';
+import { verifyCronSecret } from '@/lib/security/verify-secret';
 import type { CalendarProvider } from '@/lib/types/calendar-integration';
 
 // PERF: Prevent serverless timeout — FIX-015
@@ -39,8 +40,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
   }
 
-  // Auth check for cron job
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  // Auth check for cron job (timing-safe comparison)
+  if (!verifyCronSecret(authHeader, process.env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -83,7 +84,7 @@ export async function GET(request: Request) {
     if (queryError) {
       logger.error('Failed to fetch connections', queryError instanceof Error ? queryError : new Error(String(queryError)), { component: 'cron-route', action: 'fetch-connections' });
       return NextResponse.json(
-        { error: 'Failed to fetch connections', details: queryError.message },
+        { error: 'Failed to fetch connections' },
         { status: 500 }
       );
     }
@@ -180,10 +181,7 @@ export async function GET(request: Request) {
   } catch (error) {
     logger.error('Calendar sync cron fatal error', error instanceof Error ? error : new Error(String(error)), { component: 'cron-route', action: 'fatal-error' });
     return NextResponse.json(
-      {
-        error: 'Calendar sync cron failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

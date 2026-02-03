@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 import { getAppUrl } from '@/lib/utils/app-url';
+import { verifyCronSecret } from '@/lib/security/verify-secret';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -22,9 +23,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify this is a legitimate cron request
+    // Verify this is a legitimate cron request (timing-safe comparison)
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!verifyCronSecret(authHeader, process.env.CRON_SECRET)) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }

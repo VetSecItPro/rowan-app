@@ -599,14 +599,19 @@ export async function checkAndAwardBadges(
 
     const newlyEarned: UserBadge[] = [];
 
-    for (const badge of allBadges) {
-      // Skip if already earned
-      if (earnedBadgeIds.has(badge.id)) continue;
+    // Filter to only unearned badges
+    const unearnedBadges = allBadges.filter(badge => !earnedBadgeIds.has(badge.id));
 
-      // Calculate progress
-      const progress = await calculateBadgeProgressForBadge(userId, spaceId, badge);
+    // Calculate all badge progress in parallel (FIX-018: eliminates N+1)
+    const progressResults = await Promise.all(
+      unearnedBadges.map(async (badge) => ({
+        badge,
+        progress: await calculateBadgeProgressForBadge(userId, spaceId, badge),
+      }))
+    );
 
-      // Award if requirement met
+    // Award earned badges sequentially (writes should not race)
+    for (const { badge, progress } of progressResults) {
       if (progress.percentage >= 100) {
         const awarded = await awardBadge(userId, spaceId, badge.id);
         if (awarded) {
