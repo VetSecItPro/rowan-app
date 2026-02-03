@@ -9,7 +9,7 @@ test.describe('Authenticated Checkout Flow', () => {
   test('should redirect to Polar checkout when clicking Pro plan', async ({ page }) => {
     // Get test credentials from environment
     const email = process.env.SMOKE_TEST_EMAIL || 'smoke.test@rowan-test.app';
-    const password = process.env.SMOKE_TEST_PASSWORD || '***';
+    const password = process.env.SMOKE_TEST_PASSWORD || '';
 
     console.log('Step 1: Navigate to login page');
     await page.goto('/login');

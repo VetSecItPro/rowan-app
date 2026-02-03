@@ -70,7 +70,7 @@ export default function RootLayout({
     <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
       <head>
         {/* Resource hints for faster connections - preconnect to critical third-party services */}
-        <link rel="preconnect" href="https://SUPABASE_PROJECT_REF.supabase.co" />
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* DNS prefetch for non-critical services */}
