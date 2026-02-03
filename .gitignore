@@ -55,6 +55,17 @@ GoogleService-Info.plist
 .security-audit.json
 .security-reports/
 .claude/audits/
+docs/analysis/AUDIT_SUMMARY.md
+docs/archive/SECURITY_AUDIT_CONTINUATION_REPORT.md
+docs/archive/SECURITY_AUDIT_REPORT.md
+docs/archive/mobile-optimization-audit-2025-10-14.md
+docs/archive/optimization-audit-30dec.md
+docs/archive/security-audit-2025-10-14.md
+docs/archive/security-audit-dec16-api-flags.md
+docs/archive/security-audit-dec16-report.md
+docs/security-audit/
+docs/security-code-review-plan-1Dec.md
+docs/security/MONETIZATION_SECURITY.md
 
 # Claude Code project config (contains project identifiers)
 .mcp.json
