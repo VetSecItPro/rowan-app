@@ -103,7 +103,7 @@ Priority order for next session:
 ## 🔧 Tools & Resources Created
 
 ### Enhancement Classes (globals.css)
-Location: `.//app/globals.css`
+Location: `app/globals.css`
 Lines: 2539-2703
 
 Key features:
