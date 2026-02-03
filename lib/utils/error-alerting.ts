@@ -46,7 +46,7 @@ export interface AlertEvent {
 
 const DEFAULT_CONFIG: AlertConfig = {
   enabled: process.env.NODE_ENV === 'production',
-  emailRecipients: ['admin@example.com'],
+  emailRecipients: [process.env.ADMIN_ALERT_EMAIL || 'admin@example.com'],
   thresholds: {
     paymentFailureRate: 10, // Alert if >10% payments fail
     webhookErrorCount: 5, // Alert after 5 webhook errors

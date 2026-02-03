@@ -35,7 +35,7 @@ USING (
   AND EXISTS (
     SELECT 1 FROM auth.users
     WHERE auth.users.id = auth.uid()
-    AND auth.users.email = 'admin@example.com'
+    AND auth.users.email = current_setting('app.admin_email', true)
   )
 );
 
@@ -47,6 +47,6 @@ USING (
   AND EXISTS (
     SELECT 1 FROM auth.users
     WHERE auth.users.id = auth.uid()
-    AND auth.users.email = 'admin@example.com'
+    AND auth.users.email = current_setting('app.admin_email', true)
   )
 );
