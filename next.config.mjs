@@ -11,6 +11,7 @@ const supabaseHostname = supabaseUrl ? new URL(supabaseUrl).hostname : '';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
   // FIX: Explicitly set workspace root to prevent lockfile confusion
   outputFileTracingRoot: __dirname,
 
