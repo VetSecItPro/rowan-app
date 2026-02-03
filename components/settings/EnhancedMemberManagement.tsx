@@ -130,6 +130,7 @@ export function EnhancedMemberManagement({
             onClick={refreshPresence}
             className="p-1 hover:bg-gray-800/50 rounded transition-colors"
             title="Refresh presence data"
+            aria-label="Refresh presence data"
           >
             <RefreshCw className="w-4 h-4 text-gray-400" />
           </button>

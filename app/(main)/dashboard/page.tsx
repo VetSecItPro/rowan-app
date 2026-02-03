@@ -4,15 +4,13 @@
 export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import nextDynamic from 'next/dynamic';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
 import { reactionsService, type CheckInReaction } from '@/lib/services/reactions-service';
-import { WeeklyInsights } from '@/components/checkins/WeeklyInsights';
-import { CheckInSuccess } from '@/components/checkins/CheckInSuccess';
 import { Tooltip } from '@/components/shared/Tooltip';
 import { createClient } from '@/lib/supabase/client';
-import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import { useDashboardStats } from '@/lib/hooks/useDashboardStats';
@@ -43,8 +41,6 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { CompactTimeAwareWelcome } from '@/components/ui/TimeAwareWelcomeBox';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
-import { CountdownWidget } from '@/components/calendar/CountdownWidget';
-import { PointsDisplay, LeaderboardWidget } from '@/components/rewards';
 import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -52,6 +48,37 @@ import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { format } from 'date-fns';
 import { formatDate, formatTimestamp, getCurrentDateString } from '@/lib/utils/date-utils';
 import { usePrefetchAllData } from '@/lib/hooks/usePrefetchData';
+
+// Lazy-load heavy below-the-fold components to reduce First Load JS (FIX-034)
+const ActivityFeed = nextDynamic(
+  () => import('@/components/dashboard/ActivityFeed').then(mod => ({ default: mod.ActivityFeed })),
+  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" /> }
+);
+
+const CountdownWidget = nextDynamic(
+  () => import('@/components/calendar/CountdownWidget').then(mod => ({ default: mod.CountdownWidget })),
+  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-48" /> }
+);
+
+const WeeklyInsights = nextDynamic(
+  () => import('@/components/checkins/WeeklyInsights').then(mod => ({ default: mod.WeeklyInsights })),
+  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-32" /> }
+);
+
+const CheckInSuccess = nextDynamic(
+  () => import('@/components/checkins/CheckInSuccess').then(mod => ({ default: mod.CheckInSuccess })),
+  { ssr: false }
+);
+
+const PointsDisplay = nextDynamic(
+  () => import('@/components/rewards').then(mod => ({ default: mod.PointsDisplay })),
+  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-48" /> }
+);
+
+const LeaderboardWidget = nextDynamic(
+  () => import('@/components/rewards').then(mod => ({ default: mod.LeaderboardWidget })),
+  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-48" /> }
+);
 
 
 const scaleIn = {

@@ -7,6 +7,22 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+/** Zod schema for location update request body */
+const LocationUpdateRequestSchema = z.object({
+  space_id: z.string().uuid(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  accuracy: z.number().positive().optional(),
+  altitude: z.number().optional(),
+  altitude_accuracy: z.number().positive().optional(),
+  speed: z.number().min(0).optional(),
+  heading: z.number().min(0).max(360).optional(),
+  battery_level: z.number().min(0).max(1).optional(),
+  is_charging: z.boolean().optional(),
+  recorded_at: z.string().datetime().optional(),
+}).strict();
 
 /**
  * POST /api/location/update
@@ -38,16 +54,18 @@ export async function POST(req: NextRequest) {
 
     setSentryUser(user);
 
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const { space_id, ...locationData } = body;
+    const parseResult = LocationUpdateRequestSchema.safeParse(body);
 
-    if (!space_id) {
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'space_id is required' },
+        { error: 'Invalid request body', details: parseResult.error.issues.map(i => i.message) },
         { status: 400 }
       );
     }
+
+    const { space_id, ...locationData } = parseResult.data;
 
     // Verify user has access to this space
     try {

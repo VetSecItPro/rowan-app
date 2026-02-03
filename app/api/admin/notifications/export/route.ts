@@ -92,6 +92,9 @@ export async function POST(req: NextRequest) {
       query = query.in('id', ids);
     }
 
+    // Cap max export size to prevent unbounded queries (FIX-017)
+    query = query.limit(50000);
+
     const { data: notifications, error } = await query;
 
     if (error) {

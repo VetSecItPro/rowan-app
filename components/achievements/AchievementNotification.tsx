@@ -90,6 +90,7 @@ export function AchievementNotification({
             <button
               onClick={onClose}
               className="absolute top-0 right-0 -mt-1 -mr-1 w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+              aria-label="Close"
             >
               <X className="w-3 h-3 text-gray-400" />
             </button>

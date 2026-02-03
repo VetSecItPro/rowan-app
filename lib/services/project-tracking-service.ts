@@ -605,18 +605,15 @@ export async function getProjectPhotosByType(
 export async function reorderPhotos(photoIds: string[]): Promise<void> {
   const supabase = createClient();
 
-  // Update display_order for each photo
-  const updates = photoIds.map((photoId, index) => ({
-    id: photoId,
-    display_order: index,
-  }));
-
-  for (const update of updates) {
-    await supabase
-      .from('project_photos')
-      .update({ display_order: update.display_order })
-      .eq('id', update.id);
-  }
+  // Update all photo display_orders in parallel (FIX-019: eliminates N+1)
+  await Promise.all(
+    photoIds.map((id, index) =>
+      supabase
+        .from('project_photos')
+        .update({ display_order: index })
+        .eq('id', id)
+    )
+  );
 }
 
 // ==================== STATISTICS ====================

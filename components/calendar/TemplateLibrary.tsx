@@ -98,6 +98,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
           <button
             onClick={onClose}
             className="p-2 hover:bg-purple-700 rounded-lg transition-colors"
+            aria-label="Close"
           >
             <X className="w-6 h-6 text-white" />
           </button>
@@ -217,6 +218,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
                             onClick={(e) => handleDeleteTemplate(template.id, e)}
                             className="opacity-0 group-hover:opacity-100 p-2 hover:bg-red-900/30 rounded-lg transition-all"
                             title="Delete template"
+                            aria-label="Delete template"
                           >
                             <Trash2 className="w-4 h-4 text-red-400" />
                           </button>

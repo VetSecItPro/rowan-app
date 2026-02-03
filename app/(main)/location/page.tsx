@@ -19,6 +19,7 @@ import {
   Home,
   RefreshCw,
 } from 'lucide-react';
+import nextDynamic from 'next/dynamic';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -26,11 +27,26 @@ import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useFamilyLocation } from '@/hooks/useFamilyLocation';
-import { FamilyMapView } from '@/components/location/FamilyMapView';
-import { LocationSettings } from '@/components/location/LocationSettings';
 import { isNative } from '@/lib/native';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { cn } from '@/lib/utils';
+
+// Lazy-load heavy map/location components to reduce First Load JS (FIX-016)
+const FamilyMapView = nextDynamic(
+  () => import('@/components/location/FamilyMapView').then(mod => ({ default: mod.FamilyMapView })),
+  {
+    loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-96" />,
+    ssr: false,
+  }
+);
+
+const LocationSettings = nextDynamic(
+  () => import('@/components/location/LocationSettings').then(mod => ({ default: mod.LocationSettings })),
+  {
+    loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" />,
+    ssr: false,
+  }
+);
 
 type ViewMode = 'map' | 'settings';
 

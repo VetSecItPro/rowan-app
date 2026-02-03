@@ -4,6 +4,7 @@ import { processTaskReminders } from '@/lib/jobs/task-reminders-job';
 import { runDailyCleanup, refreshMaterializedViews } from '@/lib/jobs/cleanup-jobs';
 import { processChoreRotations } from '@/lib/jobs/chore-rotation-job';
 import { logger } from '@/lib/logger';
+import { verifyCronSecret } from '@/lib/security/verify-secret';
 
 // PERF: Prevent serverless timeout — FIX-015
 export const maxDuration = 60;
@@ -33,8 +34,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
   }
 
-  // Verify cron secret to prevent unauthorized access
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  // Verify cron secret to prevent unauthorized access (timing-safe comparison)
+  if (!verifyCronSecret(authHeader, process.env.CRON_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -77,7 +78,6 @@ export async function GET(request: Request) {
     }
   } catch (error) {
     logger.error('Cron job error:', error, { component: 'api-route', action: 'api_request' });
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: 'Job failed', details: message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

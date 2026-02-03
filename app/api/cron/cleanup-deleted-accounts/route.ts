@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { accountDeletionService } from '@/lib/services/account-deletion-service';
 import { send30DayWarningEmail, sendPermanentDeletionConfirmationEmail } from '@/lib/services/email-notification-service';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { verifyCronSecret } from '@/lib/security/verify-secret';
 
 export const dynamic = 'force-dynamic';
 // PERF: Prevent serverless timeout — FIX-015
@@ -60,7 +61,7 @@ export async function GET(request: Request) {
       );
     }
 
-    if (authHeader !== `Bearer ${cronSecret}`) {
+    if (!verifyCronSecret(authHeader, cronSecret)) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
