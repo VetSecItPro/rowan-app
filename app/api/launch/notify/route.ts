@@ -4,6 +4,13 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+/** Zod schema for launch notification subscription */
+const LaunchNotifySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100).trim(),
+  email: z.string().email('Please enter a valid email address').max(255).transform(v => v.trim().toLowerCase()),
+}).strict();
 
 /**
  * POST /api/launch/notify
@@ -22,30 +29,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { name, email } = body;
+    const parseResult = LaunchNotifySchema.safeParse(body);
 
-    // Validate required fields
-    if (!name || !email) {
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]?.message || 'Invalid request';
       return NextResponse.json(
-        { error: 'Name and email are required' },
+        { error: firstError },
         { status: 400 }
       );
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Please enter a valid email address' },
-        { status: 400 }
-      );
-    }
-
-    // Sanitize inputs
-    const sanitizedName = name.trim().slice(0, 100); // Limit name length
-    const sanitizedEmail = email.trim().toLowerCase().slice(0, 255); // Normalize email
+    const sanitizedName = parseResult.data.name;
+    const sanitizedEmail = parseResult.data.email;
 
     // Create Supabase client with service role for public access
     const supabase = await createClient();

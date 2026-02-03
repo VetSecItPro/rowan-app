@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { notificationQueueService } from '@/lib/services/notification-queue-service';
 import { logger } from '@/lib/logger';
+import { verifyCronSecret } from '@/lib/security/verify-secret';
 import {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,
@@ -26,9 +27,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    // Verify cron secret to prevent unauthorized access
+    // Verify cron secret to prevent unauthorized access (timing-safe comparison)
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!verifyCronSecret(authHeader, process.env.CRON_SECRET)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

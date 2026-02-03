@@ -289,9 +289,10 @@ export const choresService = {
    */
   async bulkUpdateChoreOrder(updates: Array<{id: string; sort_order: number}>): Promise<void> {
     try {
-      for (const update of updates) {
-        await this.updateChoreOrder(update.id, update.sort_order);
-      }
+      // Update all chore sort orders in parallel (FIX-020: eliminates N+1)
+      await Promise.all(
+        updates.map(update => this.updateChoreOrder(update.id, update.sort_order))
+      );
     } catch (error) {
       logger.error('Error in bulkUpdateChoreOrder:', error, { component: 'lib-chores-service', action: 'service_call' });
       throw error;

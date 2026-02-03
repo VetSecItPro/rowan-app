@@ -210,6 +210,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="rowan-data-export-${new Date().toISOString().split('T')[0]}.pdf"`,
+        'Cache-Control': 'no-store, no-cache, must-revalidate, private',
       },
     });
   } catch (error) {

@@ -77,6 +77,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
           onClick={handlePrevMonth}
           className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
           title="Previous month"
+          aria-label="Previous month"
         >
           <ChevronLeft className="w-4 h-4 text-gray-400" />
         </button>
@@ -89,6 +90,7 @@ export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendar
           onClick={handleNextMonth}
           className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
           title="Next month"
+          aria-label="Next month"
         >
           <ChevronRight className="w-4 h-4 text-gray-400" />
         </button>
