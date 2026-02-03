@@ -50,3 +50,25 @@ supabase/.temp
 # Firebase config files (contain API keys)
 google-services.json
 GoogleService-Info.plist
+
+# Security audit reports (contain vulnerability details)
+.security-audit.json
+.security-reports/
+.claude/audits/
+
+# Claude Code project config (contains project identifiers)
+.mcp.json
+
+# Root-level audit documents
+Claude-finalaudit-1feb.md
+rowan-sec-audit-jan26.md
+mobile-optimization-audit-2025-10-14.md
+security-audit-2025-10-14.md
+
+# Migration files with hardcoded credentials (removed from history)
+supabase/migrations/20241122000003_create_admin_account.sql
+supabase/migrations/20241122000004_create_admin_simple.sql
+supabase/migrations/20241122000005_admin_bulletproof.sql
+
+# Sensitive planning docs
+docs/planning/admin-launch-plan.md
