@@ -67,8 +67,9 @@ docs/security-audit/
 docs/security-code-review-plan-1Dec.md
 docs/security/MONETIZATION_SECURITY.md
 
-# Claude Code project config (contains project identifiers)
+# Claude Code (project config, skills, audits — strictly local)
 .mcp.json
+.claude/
 
 # Root-level audit documents
 Claude-finalaudit-1feb.md
@@ -83,3 +84,21 @@ supabase/migrations/20241122000005_admin_bulletproof.sql
 
 # Sensitive planning docs
 docs/planning/admin-launch-plan.md
+docs/planning/MONETIZATION_IMPLEMENTATION_TODO.md
+docs/planning/rowan-marketing-campaign.md
+docs/planning/marketing_plan.md
+docs/rowan-marketing-strategy-jan26.md
+docs/status/SENTRY_COMPLETE_SETUP.md
+docs/status/betatester-info.md
+docs/architecture/RUN_MIGRATIONS.md
+
+# Deployment docs (list infrastructure secrets)
+.github/DEPLOYMENT.md
+
+# Scripts with test credentials
+scripts/seed-test-users.mjs
+scripts/create-smoke-test-user.mjs
+scripts/database/
+
+# Testing guides with passwords
+docs/guides/AUTH_TESTING_GUIDE.md

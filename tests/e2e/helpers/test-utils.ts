@@ -6,26 +6,27 @@
 
 import { Page, expect } from '@playwright/test';
 
-// Test user credentials (these should be test accounts in Supabase)
+// Test user credentials — passwords from env vars (never hardcode for public repos)
+const testPassword = process.env.E2E_TEST_PASSWORD || '';
 export const TEST_USERS = {
   smoke: {
     email: process.env.SMOKE_TEST_EMAIL || 'smoke.test@rowan-test.app',
-    password: process.env.SMOKE_TEST_PASSWORD || '***',
+    password: process.env.SMOKE_TEST_PASSWORD || testPassword,
     tier: 'pro' as const,
   },
   free: {
     email: 'test-free@rowan-test.app',
-    password: '***',
+    password: testPassword,
     tier: 'free' as const,
   },
   pro: {
     email: 'test-pro@rowan-test.app',
-    password: '***',
+    password: testPassword,
     tier: 'pro' as const,
   },
   family: {
     email: 'test-family@rowan-test.app',
-    password: '***',
+    password: testPassword,
     tier: 'family' as const,
   },
 };

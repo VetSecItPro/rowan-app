@@ -135,7 +135,7 @@ CREATE INDEX IF NOT EXISTS idx_admin_users_role ON admin_users(role);
 CREATE INDEX IF NOT EXISTS idx_admin_users_last_login ON admin_users(last_login);
 
 -- Add comments for documentation
-COMMENT ON TABLE admin_users IS 'Secure admin users for admin-dashboard dashboard access';
+COMMENT ON TABLE admin_users IS 'Secure admin users for admin dashboard access';
 COMMENT ON COLUMN admin_users.email IS 'Admin email address (unique) - currently admin@example.com';
 COMMENT ON COLUMN admin_users.role IS 'Admin role: admin, super_admin, or viewer';
 COMMENT ON COLUMN admin_users.permissions IS 'JSON object defining specific permissions and access levels';

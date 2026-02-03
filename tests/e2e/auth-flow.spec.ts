@@ -68,7 +68,7 @@ test.describe('Auth Flow Tests', () => {
     const passwordInput = page.locator('input[type="password"], input[name="password"]').first();
 
     await emailInput.fill('playwright-test@example.com');
-    await passwordInput.fill('***');
+    await passwordInput.fill(process.env.E2E_TEST_PASSWORD || '');
 
     // Check for name field
     const nameInput = page.locator('input[name="name"], input[placeholder*="name" i]').first();

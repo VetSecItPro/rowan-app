@@ -5,6 +5,10 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Extract Supabase hostname from env for image remote patterns
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseHostname = supabaseUrl ? new URL(supabaseUrl).hostname : '';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // FIX: Explicitly set workspace root to prevent lockfile confusion
@@ -59,7 +63,7 @@ const nextConfig = {
       // Supabase Storage (avatars, attachments)
       {
         protocol: 'https',
-        hostname: 'SUPABASE_PROJECT_REF.supabase.co',
+        hostname: supabaseHostname,
       },
       // Gravatar for default avatars
       {
