@@ -339,7 +339,22 @@ type MilestoneUpdatePayload = {
   completed_at?: string | null;
 };
 
+/**
+ * Goals Service
+ *
+ * Comprehensive service for managing goals, milestones, check-ins, and goal-related
+ * collaboration features. Supports templates, activity feeds, comments, and mentions.
+ *
+ * @module goalsService
+ */
 export const goalsService = {
+  /**
+   * Retrieves all goals for a space with milestones and assignee data.
+   * @param spaceId - The space ID to fetch goals from
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns Array of goals sorted by pinned status and priority order
+   * @throws Error if the database query fails
+   */
   async getGoals(spaceId: string, supabaseClient?: SupabaseClient): Promise<Goal[]> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -370,6 +385,13 @@ export const goalsService = {
     return mappedData;
   },
 
+  /**
+   * Retrieves a single goal by ID with milestones and assignee data.
+   * @param id - The goal ID
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The goal or null if not found
+   * @throws Error if the database query fails
+   */
   async getGoalById(id: string, supabaseClient?: SupabaseClient): Promise<Goal | null> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -400,6 +422,14 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Creates a new goal in a space.
+   * Invalidates goal stats cache on success.
+   * @param input - Goal creation data including space_id and title
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The newly created goal
+   * @throws Error if the database insert fails
+   */
   async createGoal(input: CreateGoalInput, supabaseClient?: SupabaseClient): Promise<Goal> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -422,6 +452,16 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Updates a goal with the provided changes.
+   * Automatically sets completed_at and progress when status changes to 'completed'.
+   * Triggers badge checks and notifications on completion.
+   * @param id - The goal ID to update
+   * @param updates - Partial goal data to apply
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The updated goal
+   * @throws Error if the database update fails
+   */
   async updateGoal(id: string, updates: Partial<CreateGoalInput>, supabaseClient?: SupabaseClient): Promise<Goal> {
     const supabase = getSupabaseClient(supabaseClient);
     const finalUpdates: GoalUpdatePayload = { ...updates };
@@ -493,6 +533,12 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Permanently deletes a goal and its associated data.
+   * @param id - The goal ID to delete
+   * @param supabaseClient - Optional Supabase client instance
+   * @throws Error if the database delete fails
+   */
   async deleteGoal(id: string, supabaseClient?: SupabaseClient): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
@@ -503,6 +549,12 @@ export const goalsService = {
     if (error) throw error;
   },
 
+  /**
+   * Creates a new milestone for a goal.
+   * @param input - Milestone creation data including goal_id, title, and type
+   * @returns The newly created milestone
+   * @throws Error if the database insert fails
+   */
   async createMilestone(input: CreateMilestoneInput): Promise<Milestone> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -518,6 +570,13 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Updates a milestone with the provided changes.
+   * @param id - The milestone ID to update
+   * @param updates - Partial milestone data to apply
+   * @returns The updated milestone
+   * @throws Error if the database update fails
+   */
   async updateMilestone(id: string, updates: Partial<CreateMilestoneInput>): Promise<Milestone> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -531,6 +590,15 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Toggles a milestone's completion status.
+   * Sets or clears completed_at timestamp accordingly.
+   * Triggers badge checks and notifications on completion.
+   * @param id - The milestone ID to toggle
+   * @param completed - Whether the milestone is completed
+   * @returns The updated milestone
+   * @throws Error if the database update fails
+   */
   async toggleMilestone(id: string, completed: boolean): Promise<Milestone> {
     const supabase = createClient();
     const finalUpdates: MilestoneUpdatePayload = { completed };
@@ -599,6 +667,11 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Permanently deletes a milestone.
+   * @param id - The milestone ID to delete
+   * @throws Error if the database delete fails
+   */
   async deleteMilestone(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
@@ -609,6 +682,11 @@ export const goalsService = {
     if (error) throw error;
   },
 
+  /**
+   * Retrieves all milestones across all goals in a space.
+   * @param spaceId - The space ID
+   * @returns Array of milestones sorted by creation date descending
+   */
   async getAllMilestones(spaceId: string): Promise<Milestone[]> {
     const goals = await this.getGoals(spaceId);
     const allMilestones: Milestone[] = [];
@@ -624,6 +702,22 @@ export const goalsService = {
     );
   },
 
+  /**
+   * Retrieves aggregated goal statistics for a space.
+   * Results are cached for 5 minutes.
+   *
+   * Stats calculation:
+   * - active: Goals with status='active' (regardless of progress)
+   * - completed: Completed goals + completed milestones (both count as achievements)
+   * - inProgress: Active goals where 0 < progress < 100
+   * - milestonesReached: Count of milestones with completed=true
+   *
+   * The "completed" stat includes milestones because completing a milestone
+   * is a meaningful achievement worth celebrating, not just completing entire goals.
+   *
+   * @param spaceId - The space ID
+   * @returns Statistics including active, completed, in-progress counts and milestones reached
+   */
   async getGoalStats(spaceId: string): Promise<GoalStats> {
     const cacheKey = cacheKeys.goalStats(spaceId);
 
@@ -632,6 +726,7 @@ export const goalsService = {
       async () => {
         const goals = await this.getGoals(spaceId);
 
+        // Count completed milestones across all goals
         let completedMilestones = 0;
         goals.forEach(goal => {
           if (goal.milestones) {
@@ -639,6 +734,7 @@ export const goalsService = {
           }
         });
 
+        // Total "completed" achievements = finished goals + finished milestones
         const completedGoals = goals.filter(g => g.status === 'completed').length;
         const totalCompleted = completedGoals + completedMilestones;
 
@@ -654,6 +750,13 @@ export const goalsService = {
   },
 
   // Collaboration methods
+
+  /**
+   * Retrieves all collaborators for a goal.
+   * @param goalId - The goal ID
+   * @returns Array of collaborators sorted by creation date descending
+   * @throws Error if the database query fails
+   */
   async getGoalCollaborators(goalId: string): Promise<GoalCollaborator[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -666,6 +769,12 @@ export const goalsService = {
     return data || [];
   },
 
+  /**
+   * Adds a collaborator to a goal.
+   * @param input - Collaborator data including goal_id, user_id, and role
+   * @returns The created collaborator record
+   * @throws Error if user is not authenticated or database insert fails
+   */
   async addCollaborator(input: AddCollaboratorInput): Promise<GoalCollaborator> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -685,6 +794,13 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Updates a collaborator's role on a goal.
+   * @param collaboratorId - The collaborator record ID
+   * @param role - The new role ('contributor' or 'viewer')
+   * @returns The updated collaborator record
+   * @throws Error if the database update fails
+   */
   async updateCollaboratorRole(collaboratorId: string, role: 'contributor' | 'viewer'): Promise<GoalCollaborator> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -698,6 +814,11 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Removes a collaborator from a goal.
+   * @param collaboratorId - The collaborator record ID to remove
+   * @throws Error if the database delete fails
+   */
   async removeCollaborator(collaboratorId: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
@@ -708,6 +829,13 @@ export const goalsService = {
     if (error) throw error;
   },
 
+  /**
+   * Toggles a goal's visibility between private and shared.
+   * @param goalId - The goal ID
+   * @param visibility - The new visibility setting
+   * @returns The updated goal
+   * @throws Error if the database update fails
+   */
   async toggleGoalVisibility(goalId: string, visibility: 'private' | 'shared'): Promise<Goal> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -722,6 +850,13 @@ export const goalsService = {
   },
 
   // Template methods
+
+  /**
+   * Retrieves goal templates, optionally filtered by category.
+   * @param category - Optional category filter
+   * @returns Array of templates sorted by usage count descending
+   * @throws Error if the database query fails
+   */
   async getGoalTemplates(category?: string): Promise<GoalTemplate[]> {
     const supabase = createClient();
     let query = supabase
@@ -739,6 +874,12 @@ export const goalsService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a goal template by ID with its milestone templates.
+   * @param id - The template ID
+   * @returns The template or null if not found
+   * @throws Error if the database query fails
+   */
   async getGoalTemplateById(id: string): Promise<GoalTemplate | null> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -751,6 +892,15 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Creates a goal from a template with optional customizations.
+   * Automatically creates milestones from the template's milestone templates.
+   * @param spaceId - The space ID to create the goal in
+   * @param templateId - The template ID to use
+   * @param customizations - Optional overrides for title, description, target_date, visibility
+   * @returns The created goal with milestones
+   * @throws Error if template not found or database operations fail
+   */
   async createGoalFromTemplate(
     spaceId: string,
     templateId: string,
@@ -807,6 +957,11 @@ export const goalsService = {
     return await this.getGoalById(goal.id) || goal;
   },
 
+  /**
+   * Retrieves all template categories with counts and icons.
+   * @returns Array of category objects with name, count, and icon
+   * @throws Error if the database query fails
+   */
   async getTemplateCategories(): Promise<Array<{ category: string; count: number; icon: string }>> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -834,6 +989,14 @@ export const goalsService = {
   },
 
   // Priority and ordering methods
+
+  /**
+   * Updates a goal's priority level.
+   * @param goalId - The goal ID
+   * @param priority - The new priority ('none', 'p1', 'p2', 'p3', 'p4')
+   * @returns The updated goal
+   * @throws Error if the database update fails
+   */
   async updateGoalPriority(goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4'): Promise<Goal> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -847,6 +1010,14 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Toggles a goal's pinned status.
+   * Pinned goals appear at the top of the list.
+   * @param goalId - The goal ID
+   * @param isPinned - Whether the goal should be pinned
+   * @returns The updated goal
+   * @throws Error if the database update fails
+   */
   async toggleGoalPin(goalId: string, isPinned: boolean): Promise<Goal> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -860,6 +1031,11 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Reorders goals by updating their priority_order based on array position.
+   * @param spaceId - The space ID
+   * @param goalIds - Array of goal IDs in the desired order
+   */
   async reorderGoals(spaceId: string, goalIds: string[]): Promise<void> {
     const supabase = createClient();
 
@@ -879,6 +1055,15 @@ export const goalsService = {
   },
 
   // Check-in system methods
+
+  /**
+   * Creates a check-in for a goal to track progress and mood.
+   * Supports photos, voice notes, and optional scheduled check-ins.
+   * Triggers badge checks after creation.
+   * @param input - Check-in data including goal_id, progress_percentage, and mood
+   * @returns The created check-in record
+   * @throws Error if user is not authenticated or database insert fails
+   */
   async createCheckIn(input: CreateCheckInInput): Promise<GoalCheckIn> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -920,6 +1105,12 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Retrieves all check-ins for a goal.
+   * @param goalId - The goal ID
+   * @returns Array of check-ins sorted by creation date descending
+   * @throws Error if the database query fails
+   */
   async getGoalCheckIns(goalId: string): Promise<GoalCheckIn[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -932,6 +1123,12 @@ export const goalsService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single check-in by ID.
+   * @param id - The check-in ID
+   * @returns The check-in or null if not found
+   * @throws Error if the database query fails
+   */
   async getCheckInById(id: string): Promise<GoalCheckIn | null> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -944,6 +1141,12 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Retrieves all photos for a check-in.
+   * @param checkInId - The check-in ID
+   * @returns Array of photos sorted by order_index ascending
+   * @throws Error if the database query fails
+   */
   async getCheckInPhotos(checkInId: string): Promise<GoalCheckInPhoto[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -956,6 +1159,12 @@ export const goalsService = {
     return data || [];
   },
 
+  /**
+   * Uploads photos for a check-in to storage.
+   * @param checkInId - The check-in ID to attach photos to
+   * @param photos - Array of File objects to upload
+   * @returns Array of created photo records
+   */
   async uploadCheckInPhotos(checkInId: string, photos: File[]): Promise<GoalCheckInPhoto[]> {
     const supabase = createClient();
     const uploadedPhotos: GoalCheckInPhoto[] = [];
@@ -1002,6 +1211,13 @@ export const goalsService = {
     return uploadedPhotos;
   },
 
+  /**
+   * Updates a check-in with the provided changes.
+   * @param id - The check-in ID to update
+   * @param updates - Partial check-in data to apply
+   * @returns The updated check-in
+   * @throws Error if the database update fails
+   */
   async updateCheckIn(id: string, updates: Partial<CreateCheckInInput>): Promise<GoalCheckIn> {
     const supabase = createClient();
 
@@ -1020,6 +1236,11 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Permanently deletes a check-in.
+   * @param id - The check-in ID to delete
+   * @throws Error if the database delete fails
+   */
   async deleteCheckIn(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
@@ -1031,6 +1252,14 @@ export const goalsService = {
   },
 
   // Check-in settings methods
+
+  /**
+   * Retrieves check-in settings for a goal and user.
+   * @param goalId - The goal ID
+   * @param userId - Optional user ID (defaults to current authenticated user)
+   * @returns The settings or null if not configured
+   * @throws Error if user is not authenticated or database query fails
+   */
   async getCheckInSettings(goalId: string, userId?: string): Promise<GoalCheckInSettings | null> {
     const supabase = createClient();
     let query = supabase
@@ -1052,6 +1281,13 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Updates or creates check-in settings for a goal.
+   * Creates default settings if none exist.
+   * @param input - Settings data including goal_id and optional frequency, reminders, etc.
+   * @returns The updated or created settings
+   * @throws Error if user is not authenticated or database operation fails
+   */
   async updateCheckInSettings(input: UpdateCheckInSettingsInput): Promise<GoalCheckInSettings> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -1092,37 +1328,59 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Retrieves upcoming check-ins across all active goals in a space.
+   * Calculates next due dates based on each goal's check-in settings.
+   *
+   * Next due date calculation by frequency:
+   * - daily: Tomorrow
+   * - weekly: Next occurrence of day_of_week (if today, use next week)
+   * - biweekly: 14 days from now (simplified)
+   * - monthly: Next occurrence of day_of_month (if past, next month)
+   *
+   * The weekly calculation uses modular arithmetic to find days until target:
+   *   daysUntil = (targetDay - currentDay + 7) % 7
+   *   If result is 0 (today is the target day), add 7 to get next week
+   *
+   * @param spaceId - The space ID
+   * @returns Array of upcoming check-ins sorted by next due date ascending
+   * @throws Error if user is not authenticated
+   */
   async getUpcomingCheckIns(spaceId: string): Promise<Array<{ goal: Goal; settings: GoalCheckInSettings; nextDue: Date }>> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) throw new Error('User not authenticated');
 
-    // Get all goals and their check-in settings
     const goals = await this.getGoals(spaceId);
     const upcomingCheckIns: Array<{ goal: Goal; settings: GoalCheckInSettings; nextDue: Date }> = [];
 
     for (const goal of goals) {
+      // Only active goals need check-ins
       if (goal.status !== 'active') continue;
 
       const settings = await this.getCheckInSettings(goal.id, user.id);
       if (!settings || !settings.enable_reminders) continue;
 
-      // Calculate next due date based on frequency
       const now = new Date();
       let nextDue: Date;
 
       switch (settings.frequency) {
         case 'daily':
+          // Simple: always tomorrow
           nextDue = new Date(now);
           nextDue.setDate(now.getDate() + 1);
           break;
         case 'weekly':
+          // Find next occurrence of target day (0=Sun, 6=Sat)
           nextDue = new Date(now);
+          // Modular arithmetic: days until target day
           const daysUntilTarget = (settings.day_of_week! - now.getDay() + 7) % 7;
+          // If 0, target is today - schedule for next week instead
           nextDue.setDate(now.getDate() + (daysUntilTarget === 0 ? 7 : daysUntilTarget));
           break;
         case 'biweekly':
+          // Simplified: 14 days from now (doesn't track which week we're on)
           nextDue = new Date(now);
           nextDue.setDate(now.getDate() + 14);
           break;
@@ -1153,6 +1411,14 @@ export const goalsService = {
   },
 
   // Activity Feed methods
+
+  /**
+   * Retrieves the activity feed for a space with user, goal, milestone, and check-in data.
+   * @param spaceId - The space ID
+   * @param limit - Maximum number of activities to return (default: 20)
+   * @param offset - Number of activities to skip for pagination (default: 0)
+   * @returns Array of activities sorted by creation date descending
+   */
   async getActivityFeed(spaceId: string, limit = 20, offset = 0): Promise<GoalActivity[]> {
     const supabase = createClient();
 
@@ -1185,6 +1451,14 @@ export const goalsService = {
     }
   },
 
+  /**
+   * Retrieves the activity feed for a specific goal.
+   * @param goalId - The goal ID
+   * @param limit - Maximum number of activities to return (default: 20)
+   * @param offset - Number of activities to skip for pagination (default: 0)
+   * @returns Array of activities sorted by creation date descending
+   * @throws Error if the database query fails
+   */
   async getGoalActivityFeed(goalId: string, limit = 20, offset = 0): Promise<GoalActivity[]> {
     const supabase = createClient();
 
@@ -1205,6 +1479,12 @@ export const goalsService = {
     return data || [];
   },
 
+  /**
+   * Creates an activity entry for the goal activity feed.
+   * @param input - Activity data including space_id, activity_type, and title
+   * @returns The created activity record
+   * @throws Error if user is not authenticated or database insert fails
+   */
   async createActivity(input: CreateActivityInput): Promise<GoalActivity> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -1225,6 +1505,13 @@ export const goalsService = {
   },
 
   // Comments methods
+
+  /**
+   * Retrieves all comments for a goal, including replies and user reactions.
+   * @param goalId - The goal ID
+   * @returns Array of top-level comments with nested replies, sorted by creation date ascending
+   * @throws Error if the database query fails
+   */
   async getGoalComments(goalId: string): Promise<GoalComment[]> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -1274,6 +1561,13 @@ export const goalsService = {
     return comments;
   },
 
+  /**
+   * Creates a comment on a goal.
+   * Processes @mentions and creates an activity entry.
+   * @param input - Comment data including goal_id, content, and optional parent_comment_id
+   * @returns The created comment with user data
+   * @throws Error if user is not authenticated or database insert fails
+   */
   async createComment(input: CreateCommentInput): Promise<GoalComment> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -1319,6 +1613,14 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Updates a comment's content.
+   * Sets is_edited flag and edited_at timestamp. Reprocesses @mentions.
+   * @param commentId - The comment ID to update
+   * @param content - The new content
+   * @returns The updated comment with user data
+   * @throws Error if the database update fails
+   */
   async updateComment(commentId: string, content: string): Promise<GoalComment> {
     const supabase = createClient();
 
@@ -1344,6 +1646,11 @@ export const goalsService = {
     return data;
   },
 
+  /**
+   * Permanently deletes a comment.
+   * @param commentId - The comment ID to delete
+   * @throws Error if the database delete fails
+   */
   async deleteComment(commentId: string): Promise<void> {
     const supabase = createClient();
 
@@ -1355,6 +1662,13 @@ export const goalsService = {
     if (error) throw error;
   },
 
+  /**
+   * Toggles a reaction on a comment (adds if not present, removes if present).
+   * Only one reaction per user per comment is allowed.
+   * @param commentId - The comment ID
+   * @param emoji - The emoji to toggle
+   * @throws Error if user is not authenticated or database operation fails
+   */
   async toggleCommentReaction(commentId: string, emoji: string): Promise<void> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -1398,6 +1712,12 @@ export const goalsService = {
     }
   },
 
+  /**
+   * Processes @mentions in comment content and creates mention records.
+   * Extracts usernames from @username patterns and links to user records.
+   * @param commentId - The comment ID containing mentions
+   * @param content - The comment content to parse for mentions
+   */
   async processMentions(commentId: string, content: string): Promise<void> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -1445,6 +1765,12 @@ export const goalsService = {
     }
   },
 
+  /**
+   * Retrieves all mentions for a user across all goals.
+   * @param userId - Optional user ID (defaults to current authenticated user)
+   * @returns Array of mentions with comment and mentioning user data
+   * @throws Error if user is not authenticated or database query fails
+   */
   async getUserMentions(userId?: string): Promise<GoalMention[]> {
     const supabase = createClient();
     let targetUserId = userId;
@@ -1475,6 +1801,11 @@ export const goalsService = {
     return data || [];
   },
 
+  /**
+   * Marks a mention as read.
+   * @param mentionId - The mention ID to mark as read
+   * @throws Error if the database update fails
+   */
   async markMentionAsRead(mentionId: string): Promise<void> {
     const supabase = createClient();
 

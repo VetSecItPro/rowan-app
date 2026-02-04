@@ -73,8 +73,18 @@ export interface CreateBudgetInput {
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
+/**
+ * Service for managing budgets and expenses within a household space.
+ * Provides CRUD operations for expenses, budget management, and real-time subscriptions.
+ */
 export const projectsService = {
-  // Expenses
+  /**
+   * Retrieves all expenses for a given space, ordered by due date.
+   * @param spaceId - The unique identifier of the space
+   * @param supabaseClient - Optional Supabase client instance for server-side usage
+   * @returns Array of expense records
+   * @throws Error if the database query fails
+   */
   async getExpenses(spaceId: string, supabaseClient?: SupabaseClient): Promise<Expense[]> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -87,6 +97,13 @@ export const projectsService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single expense by its unique identifier.
+   * @param id - The expense ID
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The expense record or null if not found
+   * @throws Error if the database query fails
+   */
   async getExpenseById(id: string, supabaseClient?: SupabaseClient): Promise<Expense | null> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -99,6 +116,14 @@ export const projectsService = {
     return data;
   },
 
+  /**
+   * Creates a new expense record in the database.
+   * Defaults status to 'pending' and recurring to false if not specified.
+   * @param input - The expense creation data
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The newly created expense record
+   * @throws Error if the insert operation fails
+   */
   async createExpense(input: CreateExpenseInput, supabaseClient?: SupabaseClient): Promise<Expense> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -115,6 +140,16 @@ export const projectsService = {
     return data;
   },
 
+  /**
+   * Updates an existing expense record.
+   * Automatically sets paid_at timestamp when status changes to 'paid',
+   * and clears it when status changes to any other value.
+   * @param id - The expense ID to update
+   * @param updates - Partial expense data to update
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The updated expense record
+   * @throws Error if the update operation fails
+   */
   async updateExpense(id: string, updates: Partial<CreateExpenseInput>, supabaseClient?: SupabaseClient): Promise<Expense> {
     const supabase = getSupabaseClient(supabaseClient);
     const finalUpdates: Partial<Omit<CreateExpenseInput, 'paid_at'>> & { paid_at?: string | null } = { ...updates };
@@ -138,6 +173,12 @@ export const projectsService = {
     return data;
   },
 
+  /**
+   * Permanently deletes an expense record.
+   * @param id - The expense ID to delete
+   * @param supabaseClient - Optional Supabase client instance
+   * @throws Error if the delete operation fails
+   */
   async deleteExpense(id: string, supabaseClient?: SupabaseClient): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
@@ -148,7 +189,13 @@ export const projectsService = {
     if (error) throw error;
   },
 
-  // Budget
+  /**
+   * Retrieves the budget configuration for a space.
+   * Returns null for invalid space IDs or if no budget exists.
+   * @param spaceId - The space ID
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The budget record or null if not found
+   */
   async getBudget(spaceId: string, supabaseClient?: SupabaseClient): Promise<Budget | null> {
     // Return null if spaceId is invalid
     if (!spaceId || spaceId === 'undefined' || spaceId === 'null') {
@@ -174,6 +221,15 @@ export const projectsService = {
     }
   },
 
+  /**
+   * Creates or updates the budget for a space.
+   * If a budget already exists, updates it; otherwise creates a new one.
+   * @param input - The budget configuration data
+   * @param userId - The ID of the user setting the budget
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The created or updated budget record
+   * @throws Error if the upsert operation fails
+   */
   async setBudget(input: CreateBudgetInput, userId: string, supabaseClient?: SupabaseClient): Promise<Budget> {
     const supabase = getSupabaseClient(supabaseClient);
     // Check if budget exists
@@ -209,6 +265,24 @@ export const projectsService = {
     }
   },
 
+  /**
+   * Calculates budget statistics for the current month.
+   * Includes monthly budget, spending totals, remaining balance, and pending bills count.
+   * Returns default values (all zeros) if an error occurs.
+   *
+   * Calculation approach:
+   * - Filter expenses to current month (based on created_at, not due_date)
+   * - Include both 'paid' and 'pending' in spent calculation (committed money)
+   * - Remaining = budget - spent (can be negative if over budget)
+   * - Pending bills count includes all pending regardless of month
+   *
+   * Why include pending in spent? Pending expenses represent committed money.
+   * Users should see their true remaining budget including unpaid bills.
+   *
+   * @param spaceId - The space ID
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns Budget statistics for the current month
+   */
   async getBudgetStats(spaceId: string, supabaseClient?: SupabaseClient): Promise<BudgetStats> {
     try {
       const supabase = getSupabaseClient(supabaseClient);
@@ -220,11 +294,12 @@ export const projectsService = {
       const now = new Date();
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
+      // Filter to current month only
       const thisMonthExpenses = expenses.filter(e =>
         new Date(e.created_at) >= monthStart
       );
 
-      // Include both paid and pending expenses in spent calculation
+      // Include both paid and pending - pending is committed money
       const spentThisMonth = thisMonthExpenses
         .filter(e => e.status === 'paid' || e.status === 'pending')
         .reduce((sum, e) => sum + e.amount, 0);
@@ -234,12 +309,12 @@ export const projectsService = {
       return {
         monthlyBudget,
         spentThisMonth,
-        remaining: monthlyBudget - spentThisMonth,
+        remaining: monthlyBudget - spentThisMonth, // Can be negative if over budget
         pendingBills: expenses.filter(e => e.status === 'pending').length,
       };
     } catch (error) {
       logger.error('getBudgetStats error:', error, { component: 'lib-budgets-service', action: 'service_call' });
-      // Return default values if there's an error
+      // Return safe defaults on error to prevent UI crashes
       return {
         monthlyBudget: 0,
         spentThisMonth: 0,

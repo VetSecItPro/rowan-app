@@ -5,6 +5,10 @@ import { logger } from '@/lib/logger';
  * Subtasks Service
  *
  * Manages subtasks for breaking down complex tasks into smaller steps.
+ * Provides CRUD operations for subtasks with automatic completion tracking
+ * and sort order management.
+ *
+ * @module taskSubtasksService
  */
 
 export interface Subtask {
@@ -41,7 +45,10 @@ export interface CreateSubtaskInput {
 
 export const taskSubtasksService = {
   /**
-   * Get all subtasks for a parent task
+   * Retrieves all subtasks for a parent task.
+   * @param parentTaskId - The ID of the parent task
+   * @returns Array of subtasks sorted by sort_order ascending
+   * @throws Error if the database query fails
    */
   async getSubtasks(parentTaskId: string): Promise<Subtask[]> {
     const supabase = createClient();
@@ -61,7 +68,10 @@ export const taskSubtasksService = {
   },
 
   /**
-   * Create a new subtask
+   * Creates a new subtask under a parent task.
+   * @param input - Subtask creation data including parent_task_id and title
+   * @returns The newly created subtask
+   * @throws Error if the database insert fails
    */
   async createSubtask(input: CreateSubtaskInput): Promise<Subtask> {
     const supabase = createClient();
@@ -81,7 +91,12 @@ export const taskSubtasksService = {
   },
 
   /**
-   * Update a subtask
+   * Updates a subtask with the provided changes.
+   * Automatically sets completed_at timestamp when status changes to 'completed'.
+   * @param subtaskId - The ID of the subtask to update
+   * @param updates - Partial subtask data to apply
+   * @returns The updated subtask
+   * @throws Error if the database update fails
    */
   async updateSubtask(subtaskId: string, updates: Partial<CreateSubtaskInput>): Promise<Subtask> {
     const supabase = createClient();
@@ -108,7 +123,9 @@ export const taskSubtasksService = {
   },
 
   /**
-   * Delete a subtask
+   * Permanently deletes a subtask.
+   * @param subtaskId - The ID of the subtask to delete
+   * @throws Error if the database delete fails
    */
   async deleteSubtask(subtaskId: string): Promise<void> {
     const supabase = createClient();
@@ -126,7 +143,10 @@ export const taskSubtasksService = {
   },
 
   /**
-   * Reorder subtasks
+   * Reorders subtasks by updating their sort_order based on array position.
+   * Uses parallel updates for better performance.
+   * @param subtaskIds - Array of subtask IDs in the desired order
+   * @throws Error if any database update fails
    */
   async reorderSubtasks(subtaskIds: string[]): Promise<void> {
     const supabase = createClient();
@@ -147,7 +167,9 @@ export const taskSubtasksService = {
   },
 
   /**
-   * Get subtask completion percentage for a parent task
+   * Calculates the completion percentage for a parent task's subtasks.
+   * @param parentTaskId - The ID of the parent task
+   * @returns Percentage (0-100) of completed subtasks, or 0 if no subtasks exist
    */
   async getCompletionPercentage(parentTaskId: string): Promise<number> {
     const subtasks = await this.getSubtasks(parentTaskId);

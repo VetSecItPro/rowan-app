@@ -1,6 +1,14 @@
 /**
  * Storage Service
- * Handles file uploads, deletions, and URL generation for Supabase Storage
+ *
+ * Server-side service for managing file uploads and storage in Supabase Storage.
+ * Provides file validation, upload/delete operations, and storage quota management.
+ *
+ * Features:
+ * - MIME type and file size validation per bucket
+ * - Unique file path generation to prevent collisions
+ * - Avatar and recipe image specialized handlers
+ * - Storage quota tracking and warning system
  */
 
 import { createClient } from '@/lib/supabase/server';
@@ -8,7 +16,7 @@ import * as Sentry from '@sentry/nextjs';
 import { logger } from '@/lib/logger';
 
 /**
- * Allowed MIME types for different buckets
+ * Allowed MIME types for each storage bucket.
  */
 const ALLOWED_MIME_TYPES = {
   avatars: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
@@ -16,7 +24,7 @@ const ALLOWED_MIME_TYPES = {
 };
 
 /**
- * File size limits (in bytes)
+ * Maximum file size limits per bucket in bytes.
  */
 const FILE_SIZE_LIMITS = {
   avatars: 5 * 1024 * 1024, // 5MB
@@ -25,20 +33,38 @@ const FILE_SIZE_LIMITS = {
 
 type BucketName = 'avatars' | 'recipes';
 
+/**
+ * Result of a file upload operation.
+ */
 export interface UploadResult {
+  /** Whether the upload was successful */
   success: boolean;
+  /** Public URL of the uploaded file (if successful) */
   url?: string;
+  /** Storage path of the uploaded file (if successful) */
   path?: string;
-  error?: string;
-}
-
-export interface DeleteResult {
-  success: boolean;
+  /** Error message (if failed) */
   error?: string;
 }
 
 /**
- * Validate file before upload
+ * Result of a file deletion operation.
+ */
+export interface DeleteResult {
+  /** Whether the deletion was successful */
+  success: boolean;
+  /** Error message (if failed) */
+  error?: string;
+}
+
+/**
+ * Validates a file against bucket-specific constraints.
+ *
+ * Checks file size against limits and verifies MIME type is allowed.
+ *
+ * @param file - The file to validate
+ * @param bucket - The target bucket name
+ * @returns Validation result with valid flag and optional error message
  */
 function validateFile(
   file: File,
@@ -66,7 +92,13 @@ function validateFile(
 }
 
 /**
- * Generate a unique file path
+ * Generates a unique file path for storage.
+ *
+ * Uses timestamp and UUID to prevent collisions while organizing files by user.
+ *
+ * @param userId - The user ID for folder organization
+ * @param fileName - The original file name (used for extension)
+ * @returns A unique storage path in format: userId/timestamp-uuid.extension
  */
 function generateFilePath(userId: string, fileName: string): string {
   const timestamp = Date.now();
@@ -76,11 +108,15 @@ function generateFilePath(userId: string, fileName: string): string {
 }
 
 /**
- * Upload a file to a storage bucket
- * @param bucket - The storage bucket name
+ * Uploads a file to a Supabase storage bucket.
+ *
+ * Validates the file against bucket constraints before uploading. Files are
+ * organized into user-specific folders with unique names to prevent collisions.
+ *
+ * @param bucket - The target storage bucket name ('avatars' or 'recipes')
  * @param file - The file to upload
- * @param userId - The user ID (for folder organization)
- * @returns Upload result with URL and path
+ * @param userId - The user ID for folder organization
+ * @returns Upload result containing the public URL and storage path if successful
  */
 export async function uploadFile(
   bucket: BucketName,
@@ -142,10 +178,11 @@ export async function uploadFile(
 }
 
 /**
- * Delete a file from a storage bucket
+ * Deletes a file from a Supabase storage bucket.
+ *
  * @param bucket - The storage bucket name
- * @param filePath - The path to the file in the bucket
- * @returns Delete result
+ * @param filePath - The path to the file within the bucket
+ * @returns Delete result indicating success or failure
  */
 export async function deleteFile(
   bucket: BucketName,
@@ -178,10 +215,11 @@ export async function deleteFile(
 }
 
 /**
- * Get a public URL for a file
+ * Gets the public URL for a file in storage.
+ *
  * @param bucket - The storage bucket name
- * @param filePath - The path to the file in the bucket
- * @returns Public URL
+ * @param filePath - The path to the file within the bucket
+ * @returns The publicly accessible URL for the file
  */
 export async function getPublicUrl(bucket: BucketName, filePath: string): Promise<string> {
   const supabase = await createClient();
@@ -190,10 +228,15 @@ export async function getPublicUrl(bucket: BucketName, filePath: string): Promis
 }
 
 /**
- * Upload avatar image and update user profile
- * @param file - The avatar image file
+ * Uploads an avatar image and updates the user's profile.
+ *
+ * Handles the complete avatar update flow: uploads the new image, updates
+ * the user profile with the new URL, and deletes the old avatar if one existed.
+ * Only deletes old avatars that belong to the same user for security.
+ *
+ * @param file - The avatar image file to upload
  * @param userId - The user ID
- * @returns Upload result with URL
+ * @returns Upload result containing the new avatar URL if successful
  */
 export async function uploadAvatar(
   file: File,
@@ -257,10 +300,11 @@ export async function uploadAvatar(
 }
 
 /**
- * Upload recipe image
- * @param file - The recipe image file
- * @param userId - The user ID
- * @returns Upload result with URL
+ * Uploads a recipe image to storage.
+ *
+ * @param file - The recipe image file to upload
+ * @param userId - The user ID for folder organization
+ * @returns Upload result containing the image URL if successful
  */
 export async function uploadRecipeImage(
   file: File,
@@ -292,7 +336,7 @@ import { FEATURE_LIMITS } from '../config/feature-limits';
 import type { SubscriptionTier } from '../types';
 
 /**
- * Storage usage information for a space
+ * Storage usage metrics for a space.
  */
 export interface StorageUsage {
   spaceId: string;
@@ -304,7 +348,7 @@ export interface StorageUsage {
 }
 
 /**
- * Storage quota check result
+ * Result of a storage quota check operation.
  */
 export interface QuotaCheckResult {
   allowed: boolean;
@@ -315,12 +359,18 @@ export interface QuotaCheckResult {
 }
 
 /**
- * Warning type thresholds
+ * Storage warning threshold types.
  */
 export type WarningType = '80_percent' | '90_percent' | '100_percent';
 
 /**
- * Get storage usage for a space
+ * Retrieves current storage usage for a space.
+ *
+ * If no usage record exists, triggers a calculation to create one.
+ * Returns total bytes used, file count, limit, and percentage used.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @returns Result containing storage usage metrics or an error message
  */
 export async function getSpaceStorageUsage(
   spaceId: string
@@ -384,7 +434,13 @@ export async function getSpaceStorageUsage(
 }
 
 /**
- * Check if a file upload is within quota limits
+ * Checks if a file upload would exceed the space's storage quota.
+ *
+ * Call this before uploading to prevent quota exceeded errors.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param fileSizeBytes - The size of the file to be uploaded in bytes
+ * @returns Result indicating if upload is allowed, with quota details
  */
 export async function checkStorageQuota(
   spaceId: string,
@@ -432,7 +488,14 @@ export async function checkStorageQuota(
 }
 
 /**
- * Check if storage warning should be shown to user
+ * Determines if a storage warning should be displayed to the user.
+ *
+ * Checks storage usage against thresholds (80%, 90%, 100%) and returns
+ * warning details if the threshold is reached and not previously dismissed.
+ *
+ * @param userId - The unique identifier of the user
+ * @param spaceId - The unique identifier of the space
+ * @returns Result indicating if warning should show, with type and message if applicable
  */
 export async function shouldShowStorageWarning(
   userId: string,
@@ -509,7 +572,14 @@ export async function shouldShowStorageWarning(
 }
 
 /**
- * Dismiss a storage warning for a user
+ * Records that a user has dismissed a storage warning.
+ *
+ * Prevents the same warning level from being shown again until usage changes.
+ *
+ * @param userId - The unique identifier of the user
+ * @param spaceId - The unique identifier of the space
+ * @param warningType - The warning threshold type being dismissed
+ * @returns Result indicating success or failure
  */
 export async function dismissStorageWarning(
   userId: string,
@@ -555,7 +625,13 @@ export async function dismissStorageWarning(
 }
 
 /**
- * Recalculate storage usage for a space (call after file upload/deletion)
+ * Recalculates storage usage for a space.
+ *
+ * Call this after file uploads or deletions to ensure accurate quota tracking.
+ * Triggers a database function to scan and sum all file sizes.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @returns Result containing updated storage usage metrics or an error message
  */
 export async function recalculateStorageUsage(
   spaceId: string
@@ -588,7 +664,10 @@ export async function recalculateStorageUsage(
 }
 
 /**
- * Get storage limit for a subscription tier in bytes
+ * Gets the storage limit in bytes for a subscription tier.
+ *
+ * @param tier - The subscription tier ('free', 'pro', 'family')
+ * @returns Storage limit in bytes
  */
 export function getStorageLimitBytes(tier: SubscriptionTier): number {
   const limitGB = FEATURE_LIMITS[tier]?.storageGB || 0.5; // Default to free tier
@@ -601,7 +680,11 @@ export function getStorageLimitBytes(tier: SubscriptionTier): number {
 export { formatBytes } from '@/lib/utils/format';
 
 /**
- * Generate warning message based on type
+ * Generates a user-friendly warning message based on storage usage threshold.
+ *
+ * @param warningType - The warning threshold type
+ * @param percentageUsed - The actual percentage of storage used
+ * @returns Human-readable warning message
  */
 function generateWarningMessage(warningType: WarningType, percentageUsed: number): string {
   const rounded = Math.round(percentageUsed);
@@ -619,7 +702,11 @@ function generateWarningMessage(warningType: WarningType, percentageUsed: number
 }
 
 /**
- * Map database usage record to StorageUsage interface
+ * Maps a database usage record to the StorageUsage interface.
+ *
+ * @param usage - The raw database record
+ * @param spaceId - The space ID
+ * @returns Normalized StorageUsage object with calculated percentage
  */
 function mapUsageToStorageUsage(usage: { total_bytes?: number; file_count?: number; last_calculated_at?: string }, spaceId: string): StorageUsage {
   // Get tier and calculate limit

@@ -85,6 +85,7 @@ supabase/migrations/20241122000005_admin_bulletproof.sql
 # Sensitive planning docs
 docs/planning/admin-launch-plan.md
 docs/planning/MONETIZATION_IMPLEMENTATION_TODO.md
+docs/planning/monetization_plan.md
 docs/planning/rowan-marketing-campaign.md
 docs/planning/marketing_plan.md
 docs/rowan-marketing-strategy-jan26.md
@@ -102,3 +103,6 @@ scripts/database/
 
 # Testing guides with passwords
 docs/guides/AUTH_TESTING_GUIDE.md
+
+# Marketing docs (local reference only)
+rowan-subreddits.md

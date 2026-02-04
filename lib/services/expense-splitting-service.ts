@@ -113,7 +113,10 @@ type OwnershipStats = Record<string, { ownership: OwnershipType; total: number; 
 // ==================== EXPENSE SPLITS ====================
 
 /**
- * Gets all splits for an expense
+ * Retrieves all split records for a given expense.
+ * @param expenseId - The unique identifier of the expense
+ * @returns Array of expense split records showing how the expense is divided
+ * @throws Error if the database query fails
  */
 export async function getExpenseSplits(expenseId: string): Promise<ExpenseSplit[]> {
   const supabase = createClient();
@@ -128,7 +131,12 @@ export async function getExpenseSplits(expenseId: string): Promise<ExpenseSplit[
 }
 
 /**
- * Gets all expenses that a user owes money on
+ * Retrieves all unsettled expenses where the user owes money.
+ * Filters to expenses where the user is not the payer and status is not settled.
+ * @param userId - The user ID to check owed expenses for
+ * @param spaceId - Optional space ID to filter results to a specific space
+ * @returns Array of expense splits with associated expense data
+ * @throws Error if the database query fails
  */
 export async function getUserOwedExpenses(
   userId: string,
@@ -158,7 +166,11 @@ export async function getUserOwedExpenses(
 }
 
 /**
- * Updates ownership and split settings for an expense
+ * Updates ownership and split configuration for an expense.
+ * Automatically triggers split recalculation unless is_split is explicitly set to false.
+ * @param expenseId - The expense ID to update
+ * @param updates - Split configuration updates (ownership, split type, percentages, amounts)
+ * @throws Error if the update operation fails
  */
 export async function updateExpenseSplit(
   expenseId: string,
@@ -177,7 +189,10 @@ export async function updateExpenseSplit(
 }
 
 /**
- * Manually trigger split recalculation
+ * Triggers recalculation of expense splits via database function.
+ * Useful after manual edits or configuration changes.
+ * @param expenseId - The expense ID to recalculate splits for
+ * @throws Error if the RPC call fails
  */
 export async function recalculateExpenseSplits(expenseId: string): Promise<void> {
   const supabase = createClient();
@@ -190,7 +205,12 @@ export async function recalculateExpenseSplits(expenseId: string): Promise<void>
 }
 
 /**
- * Marks a split as paid/settled
+ * Records a payment toward a split, updating status accordingly.
+ * Supports partial payments. Updates status to 'settled' when fully paid,
+ * 'partially-paid' for partial amounts, or remains 'pending' if no payment made.
+ * @param splitId - The split record ID
+ * @param amount - Optional specific payment amount; defaults to full amount owed
+ * @throws Error if the split is not found or update fails
  */
 export async function settleExpenseSplit(splitId: string, amount?: number): Promise<void> {
   const supabase = createClient();
@@ -229,7 +249,11 @@ export async function settleExpenseSplit(splitId: string, amount?: number): Prom
 // ==================== SETTLEMENTS ====================
 
 /**
- * Creates a new settlement (payment between partners)
+ * Creates a settlement record representing a payment between partners.
+ * Optionally marks associated expense splits as settled when expense_ids are provided.
+ * @param input - Settlement details including payer, payee, amount, and optional linked expenses
+ * @returns The created settlement record
+ * @throws Error if the insert operation fails
  */
 export async function createSettlement(input: CreateSettlementInput): Promise<Settlement> {
   const supabase = createClient();
@@ -283,7 +307,11 @@ async function markExpenseSplitsSettled(expenseIds: string[], userId: string): P
 }
 
 /**
- * Gets all settlements for a space
+ * Retrieves settlement history for a space, ordered by most recent first.
+ * @param spaceId - The space ID
+ * @param limit - Maximum number of records to return (default: 50)
+ * @returns Array of settlement records
+ * @throws Error if the database query fails
  */
 export async function getSettlements(spaceId: string, limit = 50): Promise<Settlement[]> {
   const supabase = createClient();
@@ -300,7 +328,13 @@ export async function getSettlements(spaceId: string, limit = 50): Promise<Settl
 }
 
 /**
- * Gets settlements between two specific users
+ * Retrieves all settlements between two specific users in a space.
+ * Includes settlements in both directions (user1 to user2 and user2 to user1).
+ * @param spaceId - The space ID
+ * @param user1Id - First user's ID
+ * @param user2Id - Second user's ID
+ * @returns Array of settlement records between the two users
+ * @throws Error if the database query fails
  */
 export async function getSettlementsBetweenUsers(
   spaceId: string,
@@ -322,7 +356,10 @@ export async function getSettlementsBetweenUsers(
 }
 
 /**
- * Deletes a settlement
+ * Permanently deletes a settlement record.
+ * Note: Does not automatically reverse associated expense split status changes.
+ * @param settlementId - The settlement ID to delete
+ * @throws Error if the delete operation fails
  */
 export async function deleteSettlement(settlementId: string): Promise<void> {
   const supabase = createClient();
@@ -335,7 +372,11 @@ export async function deleteSettlement(settlementId: string): Promise<void> {
 // ==================== PARTNERSHIP BALANCES ====================
 
 /**
- * Gets current balance between partners in a space
+ * Retrieves the current balance record between partners in a space.
+ * The balance indicates who owes whom and income information for split calculations.
+ * @param spaceId - The space ID
+ * @returns Partnership balance record or null if not configured
+ * @throws Error if the database query fails (except for "no rows" which returns null)
  */
 export async function getPartnershipBalance(spaceId: string): Promise<PartnershipBalance | null> {
   const supabase = createClient();
@@ -351,7 +392,14 @@ export async function getPartnershipBalance(spaceId: string): Promise<Partnershi
 }
 
 /**
- * Updates income information for income-based splitting
+ * Updates income information for both partners to enable income-based expense splitting.
+ * Creates or updates the partnership balance record.
+ * @param spaceId - The space ID
+ * @param user1Id - First partner's user ID
+ * @param user1Income - First partner's income amount
+ * @param user2Id - Second partner's user ID
+ * @param user2Income - Second partner's income amount
+ * @throws Error if the upsert operation fails
  */
 export async function updateIncomes(
   spaceId: string,
@@ -389,7 +437,23 @@ export async function updateIncomes(
 }
 
 /**
- * Calculates running balance from all unsettled splits
+ * Calculates the current running balance for all users from unsettled expense splits.
+ * Returns net balance per user (positive = owed to them, negative = they owe).
+ *
+ * Algorithm:
+ * 1. Fetch all expense splits that aren't settled yet
+ * 2. For each split, track two values per user:
+ *    - owed: money this user owes others (they didn't pay)
+ *    - owedToThem: money others owe this user (they paid)
+ * 3. Net balance = owedToThem - owed
+ *    - Positive = others owe you money
+ *    - Negative = you owe others money
+ *
+ * Edge case: Partial payments handled by subtracting amount_paid from amount_owed.
+ *
+ * @param spaceId - The space ID
+ * @returns Array of balance summaries per user
+ * @throws Error if the database query fails
  */
 export async function calculateCurrentBalance(spaceId: string): Promise<BalanceSummary[]> {
   const supabase = createClient();
@@ -403,7 +467,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
 
   if (error) throw error;
 
-  // Group by user
+  // Group by user, accumulating what they owe vs what's owed to them
   const balanceMap: Record<
     string,
     { email?: string; owed: number; owedToThem: number }
@@ -420,6 +484,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
       };
     }
 
+    // Only count the remaining unpaid portion
     const amountRemaining = split.amount_owed - split.amount_paid;
 
     if (split.is_payer) {
@@ -431,7 +496,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
     }
   }
 
-  // Convert to array
+  // Convert to array with rounded values (avoid floating point errors in money)
   return Object.entries(balanceMap).map(([userId, data]) => ({
     user_id: userId,
     user_email: data.email,
@@ -442,7 +507,11 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
 }
 
 /**
- * Gets settlement summary between users
+ * Retrieves aggregated settlement statistics between user pairs.
+ * Includes total amounts, counts, and date ranges from the settlement_summary view.
+ * @param spaceId - The space ID
+ * @returns Array of settlement summaries per user pair
+ * @throws Error if the database query fails
  */
 export async function getSettlementSummary(spaceId: string): Promise<SettlementSummary[]> {
   const supabase = createClient();
@@ -459,7 +528,20 @@ export async function getSettlementSummary(spaceId: string): Promise<SettlementS
 // ==================== FAIRNESS CALCULATIONS ====================
 
 /**
- * Calculates fair split based on income ratio
+ * Calculates expense split amounts based on income ratio.
+ * Higher earner pays proportionally more. Falls back to 50/50 if no income data.
+ *
+ * Algorithm: Each user's share = (their income / total income) * expense amount
+ * Example: User1 earns $6000, User2 earns $4000, expense is $100
+ *   - User1 pays: (6000/10000) * 100 = $60 (60%)
+ *   - User2 pays: (4000/10000) * 100 = $40 (40%)
+ *
+ * Edge case: If both incomes are 0, falls back to 50/50 split.
+ *
+ * @param totalAmount - The total expense amount to split
+ * @param user1Income - First user's income
+ * @param user2Income - Second user's income
+ * @returns Split amounts and percentages for each user
  */
 export function calculateIncomeBasedSplit(
   totalAmount: number,
@@ -468,8 +550,8 @@ export function calculateIncomeBasedSplit(
 ): { user1Amount: number; user2Amount: number; user1Percentage: number; user2Percentage: number } {
   const totalIncome = user1Income + user2Income;
 
+  // Edge case: no income data available, use equal split
   if (totalIncome === 0) {
-    // Fallback to equal split if no income data
     return {
       user1Amount: totalAmount / 2,
       user2Amount: totalAmount / 2,
@@ -478,10 +560,12 @@ export function calculateIncomeBasedSplit(
     };
   }
 
+  // Calculate percentage of total income for each user
   const user1Percentage = (user1Income / totalIncome) * 100;
   const user2Percentage = (user2Income / totalIncome) * 100;
 
   return {
+    // Round to cents to avoid floating point precision issues
     user1Amount: Math.round(((totalAmount * user1Income) / totalIncome) * 100) / 100,
     user2Amount: Math.round(((totalAmount * user2Income) / totalIncome) * 100) / 100,
     user1Percentage: Math.round(user1Percentage * 100) / 100,
@@ -490,7 +574,12 @@ export function calculateIncomeBasedSplit(
 }
 
 /**
- * Suggests fair split type based on expense category
+ * Suggests an appropriate split type based on expense category and amount.
+ * Shared household expenses use income-based splitting for large amounts.
+ * Personal categories default to equal split (typically marked as non-split).
+ * @param category - The expense category name
+ * @param amount - The expense amount
+ * @returns Recommended split type
  */
 export function suggestSplitType(category: string, amount: number): SplitType {
   const sharedCategories = [
@@ -529,7 +618,13 @@ export function suggestSplitType(category: string, amount: number): SplitType {
 // ==================== REPORTING ====================
 
 /**
- * Gets expense breakdown by ownership type
+ * Retrieves expense totals grouped by ownership type (shared, yours, theirs).
+ * Optionally filtered by date range.
+ * @param spaceId - The space ID
+ * @param startDate - Optional start date filter (YYYY-MM-DD)
+ * @param endDate - Optional end date filter (YYYY-MM-DD)
+ * @returns Array of ownership statistics with totals and counts
+ * @throws Error if the database query fails
  */
 export async function getExpensesByOwnership(
   spaceId: string,
@@ -563,7 +658,11 @@ export async function getExpensesByOwnership(
 }
 
 /**
- * Gets split expense statistics
+ * Retrieves aggregate statistics for split expenses in a space.
+ * Includes total amount split, count of split expenses, and unsettled amounts.
+ * @param spaceId - The space ID
+ * @returns Statistics object with totals and counts
+ * @throws Error if the database query fails
  */
 export async function getSplitExpenseStats(
   spaceId: string
@@ -609,7 +708,12 @@ export async function getSplitExpenseStats(
 }
 
 /**
- * Gets monthly settlement trends
+ * Retrieves settlement totals grouped by month for trend analysis.
+ * Returns data for the specified number of past months.
+ * @param spaceId - The space ID
+ * @param months - Number of months of history to retrieve (default: 6)
+ * @returns Array of monthly totals with counts, sorted chronologically
+ * @throws Error if the database query fails
  */
 export async function getMonthlySettlementTrends(
   spaceId: string,

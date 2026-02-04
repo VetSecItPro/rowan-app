@@ -1,5 +1,15 @@
 import { createClient } from '@/lib/supabase/client';
 
+/**
+ * Goal Contributions Service
+ *
+ * Manages financial goal contributions, tracking who contributed what amount
+ * and when. Provides statistics, contributor summaries, and trend analysis
+ * for financial goals.
+ *
+ * @module goalContributionsService
+ */
+
 // ==================== TYPES ====================
 
 export interface GoalContribution {
@@ -89,7 +99,10 @@ export interface ContributorSummary {
 // ==================== GOAL CONTRIBUTIONS ====================
 
 /**
- * Gets all contributions for a goal
+ * Retrieves all contributions for a goal.
+ * @param goalId - The goal ID to fetch contributions for
+ * @returns Array of contributions sorted by date descending
+ * @throws Error if the database query fails
  */
 export async function getGoalContributions(goalId: string): Promise<GoalContribution[]> {
   const supabase = createClient();
@@ -105,7 +118,10 @@ export async function getGoalContributions(goalId: string): Promise<GoalContribu
 }
 
 /**
- * Gets a single contribution by ID
+ * Retrieves a single contribution by ID.
+ * @param contributionId - The contribution ID
+ * @returns The contribution or null if not found
+ * @throws Error if the database query fails
  */
 export async function getGoalContribution(contributionId: string): Promise<GoalContribution | null> {
   const supabase = createClient();
@@ -121,7 +137,10 @@ export async function getGoalContribution(contributionId: string): Promise<GoalC
 }
 
 /**
- * Creates a new goal contribution
+ * Creates a new contribution to a goal.
+ * @param input - Contribution data including goal_id, user_id, amount, and created_by
+ * @returns The newly created contribution
+ * @throws Error if the database insert fails
  */
 export async function createGoalContribution(
   input: CreateGoalContributionInput
@@ -150,7 +169,11 @@ export async function createGoalContribution(
 }
 
 /**
- * Updates a goal contribution
+ * Updates a contribution with the provided changes.
+ * @param contributionId - The contribution ID to update
+ * @param updates - Partial contribution data to apply
+ * @returns The updated contribution
+ * @throws Error if the database update fails
  */
 export async function updateGoalContribution(
   contributionId: string,
@@ -170,7 +193,9 @@ export async function updateGoalContribution(
 }
 
 /**
- * Deletes a goal contribution
+ * Permanently deletes a contribution.
+ * @param contributionId - The contribution ID to delete
+ * @throws Error if the database delete fails
  */
 export async function deleteGoalContribution(contributionId: string): Promise<void> {
   const supabase = createClient();
@@ -181,7 +206,11 @@ export async function deleteGoalContribution(contributionId: string): Promise<vo
 }
 
 /**
- * Gets all contributions by a specific user
+ * Retrieves all contributions made by a specific user.
+ * @param userId - The user ID to filter by
+ * @param goalId - Optional goal ID to further filter results
+ * @returns Array of contributions sorted by date descending
+ * @throws Error if the database query fails
  */
 export async function getUserContributions(
   userId: string,
@@ -208,7 +237,10 @@ export async function getUserContributions(
 // ==================== FINANCIAL GOALS ====================
 
 /**
- * Creates a new financial goal
+ * Creates a new financial goal with target amount tracking.
+ * @param input - Financial goal data including space_id, title, target_amount, and created_by
+ * @returns The newly created financial goal
+ * @throws Error if the database insert fails
  */
 export async function createFinancialGoal(input: CreateFinancialGoalInput): Promise<FinancialGoal> {
   const supabase = createClient();
@@ -238,7 +270,10 @@ export async function createFinancialGoal(input: CreateFinancialGoalInput): Prom
 }
 
 /**
- * Gets all financial goals for a space
+ * Retrieves all financial goals for a space.
+ * @param spaceId - The space ID
+ * @returns Array of financial goals sorted by creation date descending
+ * @throws Error if the database query fails
  */
 export async function getFinancialGoals(spaceId: string): Promise<FinancialGoal[]> {
   const supabase = createClient();
@@ -255,7 +290,10 @@ export async function getFinancialGoals(spaceId: string): Promise<FinancialGoal[
 }
 
 /**
- * Gets a single financial goal by ID
+ * Retrieves a single financial goal by ID.
+ * @param goalId - The goal ID
+ * @returns The financial goal or null if not found
+ * @throws Error if the database query fails
  */
 export async function getFinancialGoal(goalId: string): Promise<FinancialGoal | null> {
   const supabase = createClient();
@@ -272,7 +310,11 @@ export async function getFinancialGoal(goalId: string): Promise<FinancialGoal | 
 }
 
 /**
- * Updates a financial goal
+ * Updates a financial goal with the provided changes.
+ * @param goalId - The goal ID to update
+ * @param updates - Partial financial goal data to apply
+ * @returns The updated financial goal
+ * @throws Error if the database update fails
  */
 export async function updateFinancialGoal(
   goalId: string,
@@ -294,7 +336,10 @@ export async function updateFinancialGoal(
 // ==================== STATISTICS & REPORTING ====================
 
 /**
- * Gets contribution statistics for a goal
+ * Retrieves aggregated contribution statistics for a goal.
+ * @param goalId - The goal ID
+ * @returns Statistics including contribution count, total amount, and completion percentage
+ * @throws Error if the database query fails
  */
 export async function getGoalContributionStats(goalId: string): Promise<GoalContributionStats | null> {
   const supabase = createClient();
@@ -310,7 +355,10 @@ export async function getGoalContributionStats(goalId: string): Promise<GoalCont
 }
 
 /**
- * Gets contributor breakdown for a goal
+ * Retrieves a breakdown of contributors for a goal.
+ * @param goalId - The goal ID
+ * @returns Array of contributor summaries sorted by total contributed descending
+ * @throws Error if the database query fails
  */
 export async function getGoalContributors(goalId: string): Promise<ContributorSummary[]> {
   const supabase = createClient();
@@ -374,7 +422,11 @@ export async function getGoalContributors(goalId: string): Promise<ContributorSu
 }
 
 /**
- * Calculates projected completion date for a goal
+ * Calculates the projected completion date for a goal based on contribution rate.
+ * Uses a database RPC function for the calculation.
+ * @param goalId - The goal ID
+ * @returns Projected completion date as ISO string, or null if not calculable
+ * @throws Error if the database RPC call fails
  */
 export async function calculateProjectedCompletionDate(goalId: string): Promise<string | null> {
   const supabase = createClient();
@@ -388,7 +440,11 @@ export async function calculateProjectedCompletionDate(goalId: string): Promise<
 }
 
 /**
- * Gets goals nearing their target
+ * Retrieves financial goals that are close to reaching their target.
+ * @param spaceId - The space ID
+ * @param threshold - Minimum progress percentage to include (default: 90)
+ * @returns Array of goals with progress >= threshold and < 100, sorted by progress descending
+ * @throws Error if the database query fails
  */
 export async function getGoalsNearingTarget(
   spaceId: string,
@@ -410,7 +466,10 @@ export async function getGoalsNearingTarget(
 }
 
 /**
- * Gets goals behind schedule
+ * Retrieves financial goals that are past their target date but not complete.
+ * @param spaceId - The space ID
+ * @returns Array of overdue goals sorted by target date ascending
+ * @throws Error if the database query fails
  */
 export async function getGoalsBehindSchedule(spaceId: string): Promise<FinancialGoal[]> {
   const supabase = createClient();
@@ -432,7 +491,11 @@ export async function getGoalsBehindSchedule(spaceId: string): Promise<Financial
 }
 
 /**
- * Gets recent contributions across all goals in a space
+ * Retrieves recent contributions across all financial goals in a space.
+ * @param spaceId - The space ID
+ * @param limit - Maximum number of contributions to return (default: 10)
+ * @returns Array of contributions with goal title and user email, sorted by date descending
+ * @throws Error if the database query fails
  */
 export async function getRecentContributions(
   spaceId: string,
@@ -457,7 +520,11 @@ export async function getRecentContributions(
 }
 
 /**
- * Gets monthly contribution trends for a goal
+ * Retrieves monthly contribution trends for a goal over a specified period.
+ * @param goalId - The goal ID
+ * @param months - Number of months to include (default: 6)
+ * @returns Array of monthly totals and counts sorted chronologically
+ * @throws Error if the database query fails
  */
 export async function getMonthlyContributionTrends(
   goalId: string,

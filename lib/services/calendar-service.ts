@@ -102,7 +102,23 @@ export interface CreateTemplateInput {
   default_recurrence?: EventRecurrenceConfig;
 }
 
+/**
+ * Calendar Service
+ *
+ * Manages calendar events with full CRUD operations, soft deletion with 30-day
+ * retention, templates, recurring event support, and event statistics.
+ *
+ * @module calendarService
+ */
 export const calendarService = {
+  /**
+   * Retrieves all events for a space.
+   * @param spaceId - The space ID to fetch events from
+   * @param includeDeleted - Whether to include soft-deleted events (default: false)
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns Array of events sorted by start_time ascending
+   * @throws Error if the database query fails
+   */
   async getEvents(spaceId: string, includeDeleted = false, supabaseClient?: SupabaseClient): Promise<CalendarEvent[]> {
     const supabase = getSupabaseClient(supabaseClient);
 
@@ -125,6 +141,13 @@ export const calendarService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single event by ID.
+   * @param id - The event ID
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The event or null if not found
+   * @throws Error if the database query fails
+   */
   async getEventById(id: string, supabaseClient?: SupabaseClient): Promise<CalendarEvent | null> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error} = await supabase
@@ -137,6 +160,13 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Creates a new calendar event.
+   * @param input - Event creation data including space_id, title, and start_time
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The newly created event
+   * @throws Error if the database insert fails
+   */
   async createEvent(input: CreateEventInput, supabaseClient?: SupabaseClient): Promise<CalendarEvent> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -149,6 +179,14 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Updates an event with the provided changes.
+   * @param id - The event ID to update
+   * @param updates - Partial event data to apply
+   * @param supabaseClient - Optional Supabase client instance
+   * @returns The updated event
+   * @throws Error if the database update fails
+   */
   async updateEvent(id: string, updates: Partial<CreateEventInput>, supabaseClient?: SupabaseClient): Promise<CalendarEvent> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -162,6 +200,13 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Deletes an event (soft delete by default with 30-day retention).
+   * @param id - The event ID to delete
+   * @param permanent - If true, permanently deletes the event (default: false)
+   * @param supabaseClient - Optional Supabase client instance
+   * @throws Error if the database operation fails
+   */
   async deleteEvent(id: string, permanent = false, supabaseClient?: SupabaseClient): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
 
@@ -226,7 +271,11 @@ export const calendarService = {
   },
 
   /**
-   * Delete all events from a specific source (e.g., imported from Google Calendar)
+   * Deletes all events from a specific source (e.g., imported from Google Calendar).
+   * @param spaceId - The space ID
+   * @param source - The event_type/source to filter by
+   * @param permanent - If true, permanently deletes events (default: false)
+   * @returns Object with deleted count and any errors encountered
    */
   async deleteEventsBySource(spaceId: string, source: string, permanent = false): Promise<{ deleted: number; errors: string[] }> {
     const supabase = createClient();
@@ -252,7 +301,9 @@ export const calendarService = {
   },
 
   /**
-   * Permanently delete all soft-deleted events (admin function)
+   * Permanently deletes all soft-deleted events in a space (admin function).
+   * @param spaceId - The space ID
+   * @returns Object with deleted count and any errors encountered
    */
   async purgeDeletedEvents(spaceId: string): Promise<{ deleted: number; errors: string[] }> {
     const supabase = createClient();
@@ -272,6 +323,12 @@ export const calendarService = {
     return { deleted: count || 0, errors };
   },
 
+  /**
+   * Restores a soft-deleted event.
+   * @param id - The event ID to restore
+   * @returns The restored event
+   * @throws Error if the database update fails
+   */
   async restoreEvent(id: string): Promise<CalendarEvent> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -288,6 +345,12 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Retrieves soft-deleted events within the 30-day retention period.
+   * @param spaceId - The space ID
+   * @returns Array of deleted events sorted by deletion date descending
+   * @throws Error if the database query fails
+   */
   async getDeletedEvents(spaceId: string): Promise<CalendarEvent[]> {
     const supabase = createClient();
     const thirtyDaysAgo = new Date();
@@ -305,6 +368,13 @@ export const calendarService = {
     return data || [];
   },
 
+  /**
+   * Updates an event's status.
+   * @param id - The event ID
+   * @param status - The new status ('not-started', 'in-progress', 'completed')
+   * @returns The updated event
+   * @throws Error if the database update fails
+   */
   async updateEventStatus(id: string, status: 'not-started' | 'in-progress' | 'completed'): Promise<CalendarEvent> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -318,6 +388,12 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Retrieves event statistics for a space.
+   * Results are cached for 1 minute.
+   * @param spaceId - The space ID
+   * @returns Statistics including total, today, this week, and this month counts
+   */
   async getEventStats(spaceId: string): Promise<EventStats> {
     return cacheAside(
       cacheKeys.calendarStats(spaceId),
@@ -365,6 +441,13 @@ export const calendarService = {
     );
   },
 
+  /**
+   * Duplicates an event, creating a copy with "(Copy)" appended to the title.
+   * @param id - The event ID to duplicate
+   * @param newStartTime - Optional new start time (defaults to +7 days)
+   * @returns The newly created duplicate event
+   * @throws Error if original event not found or database operation fails
+   */
   async duplicateEvent(id: string, newStartTime?: string): Promise<CalendarEvent> {
     const supabase = createClient();
 
@@ -406,6 +489,13 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Updates an event's custom color.
+   * @param id - The event ID
+   * @param customColor - The hex color code
+   * @returns The updated event
+   * @throws Error if the database update fails
+   */
   async updateEventColor(id: string, customColor: string): Promise<CalendarEvent> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -419,6 +509,13 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Searches events by title, description, or location.
+   * @param spaceId - The space ID
+   * @param query - The search query
+   * @returns Array of matching events sorted by start_time ascending
+   * @throws Error if the database query fails
+   */
   async searchEvents(spaceId: string, query: string): Promise<CalendarEvent[]> {
     const supabase = createClient();
     let eventsQuery = supabase
@@ -444,6 +541,12 @@ export const calendarService = {
   // EVENT TEMPLATES
   // ==========================================
 
+  /**
+   * Retrieves event templates for a space, including system templates.
+   * @param spaceId - The space ID
+   * @returns Array of templates sorted by system templates first, then by usage count
+   * @throws Error if the database query fails
+   */
   async getTemplates(spaceId: string): Promise<EventTemplate[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -458,6 +561,12 @@ export const calendarService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single template by ID.
+   * @param id - The template ID
+   * @returns The template or null if not found
+   * @throws Error if the database query fails
+   */
   async getTemplateById(id: string): Promise<EventTemplate | null> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -470,6 +579,12 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Creates a new event template.
+   * @param input - Template creation data including space_id, name, and category
+   * @returns The newly created template
+   * @throws Error if user is not authenticated or database insert fails
+   */
   async createTemplate(input: CreateTemplateInput): Promise<EventTemplate> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -491,6 +606,13 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Updates a template with the provided changes.
+   * @param id - The template ID to update
+   * @param updates - Partial template data to apply
+   * @returns The updated template
+   * @throws Error if the database update fails
+   */
   async updateTemplate(id: string, updates: Partial<CreateTemplateInput>): Promise<EventTemplate> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -504,6 +626,11 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Permanently deletes a template.
+   * @param id - The template ID to delete
+   * @throws Error if the database delete fails
+   */
   async deleteTemplate(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
@@ -514,6 +641,12 @@ export const calendarService = {
     if (error) throw error;
   },
 
+  /**
+   * Increments a template's usage count and updates last_used_at.
+   * @param templateId - The template ID
+   * @returns The updated template
+   * @throws Error if the database operation fails
+   */
   async useTemplate(templateId: string): Promise<EventTemplate> {
     const supabase = createClient();
 
@@ -541,6 +674,13 @@ export const calendarService = {
     return data;
   },
 
+  /**
+   * Creates an event from a template with a specified start time.
+   * @param template - The template to use
+   * @param startTime - The start time for the new event
+   * @param overrides - Optional property overrides
+   * @returns The newly created event
+   */
   async createEventFromTemplate(
     template: EventTemplate,
     startTime: string,
@@ -572,6 +712,12 @@ export const calendarService = {
     return this.createEvent(eventInput);
   },
 
+  /**
+   * Ensures system templates exist for a space.
+   * Creates default templates (Date Night, Doctor Appointment, etc.) if none exist.
+   * @param spaceId - The space ID
+   * @throws Error if user is not authenticated or database operation fails
+   */
   async ensureSystemTemplates(spaceId: string): Promise<void> {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();

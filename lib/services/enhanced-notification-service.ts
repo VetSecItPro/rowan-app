@@ -4,6 +4,9 @@ import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 // Removed notification-preferences-service and digest-service dependencies - using direct notification system
 
+/**
+ * Payload structure for creating notifications.
+ */
 export interface NotificationPayload {
   type: 'task' | 'event' | 'message' | 'goal' | 'shopping' | 'expense' | 'reminder';
   title: string;
@@ -12,6 +15,9 @@ export interface NotificationPayload {
   metadata?: Record<string, unknown>;
 }
 
+/**
+ * Result of a batch notification operation, tracking delivery across channels.
+ */
 export interface NotificationResult {
   inApp: number;
   email: number;
@@ -19,12 +25,18 @@ export interface NotificationResult {
   errors: string[];
 }
 
+/**
+ * Space member information for notification targeting.
+ */
 interface SpaceMember {
   user_id: string;
   email: string;
   name: string;
 }
 
+/**
+ * Database row structure for space member queries.
+ */
 interface SpaceMemberRow {
   user_id: string;
   users: {
@@ -34,12 +46,21 @@ interface SpaceMemberRow {
 }
 
 /**
- * Enhanced notification service that handles all notification types
- * Client-safe implementation using API routes for email functionality
+ * Enhanced Notification Service
+ *
+ * Provides multi-channel notification delivery (in-app, email, push) for various
+ * application events. This service coordinates notification sending across channels
+ * while respecting user preferences. Currently configured for digest-only delivery
+ * with individual notifications disabled.
+ *
+ * Client-safe implementation that delegates email sending to API routes.
  */
 export const enhancedNotificationService = {
   /**
-   * Get all members of a space for notifications
+   * Retrieves all members of a space for notification targeting.
+   *
+   * @param spaceId - The unique identifier of the space
+   * @returns Array of space members with their user_id, email, and name
    */
   async getSpaceMembers(spaceId: string): Promise<SpaceMember[]> {
     const supabase = createClient();
@@ -70,7 +91,16 @@ export const enhancedNotificationService = {
   },
 
   /**
-   * Send email notification via API route (client-safe)
+   * Sends an email notification via the API route.
+   *
+   * This method is safe to call from client-side code as it delegates
+   * the actual email sending to a server-side API route.
+   *
+   * @param type - The notification type identifier for template selection
+   * @param recipient - The recipient's email address
+   * @param subject - The email subject line
+   * @param data - Template data to populate the email content
+   * @returns An object indicating success or failure with an optional error message
    */
   async sendEmailNotification(
     type: string,
@@ -104,7 +134,15 @@ export const enhancedNotificationService = {
   },
 
   /**
-   * Send goal achievement notifications
+   * Sends goal achievement notifications to specified users.
+   *
+   * Supports multiple achievement types including goal completion, milestone
+   * reaching, and streak achievements. Batch fetches user data for efficiency.
+   * Currently configured for in-app notifications only (email/push disabled).
+   *
+   * @param userIds - Array of user IDs to notify
+   * @param data - Achievement details including type, goal info, and context
+   * @returns Result object with counts of successful deliveries per channel and any errors
    */
   async sendGoalAchievementNotification(
     userIds: string[],
@@ -223,7 +261,15 @@ export const enhancedNotificationService = {
   },
 
   /**
-   * Send task assignment notifications
+   * Sends task assignment notifications to specified users.
+   *
+   * Notifies users when they are assigned a new task. Includes task details,
+   * priority level, and optional due date. Currently configured for in-app
+   * notifications only (email/push disabled).
+   *
+   * @param userIds - Array of user IDs to notify (typically the assignee)
+   * @param data - Task details including title, assigner, priority, and context
+   * @returns Result object with counts of successful deliveries per channel and any errors
    */
   async sendTaskAssignmentNotification(
     userIds: string[],
@@ -323,7 +369,15 @@ export const enhancedNotificationService = {
   },
 
   /**
-   * Send event reminder notifications
+   * Sends event reminder notifications to specified users.
+   *
+   * Notifies users about upcoming calendar events at configurable reminder
+   * intervals. Includes event details, timing, and optional location.
+   * Currently configured for in-app notifications only (email/push disabled).
+   *
+   * @param userIds - Array of user IDs to notify
+   * @param data - Event details including title, times, location, and reminder interval
+   * @returns Result object with counts of successful deliveries per channel and any errors
    */
   async sendEventReminderNotification(
     userIds: string[],
@@ -429,7 +483,15 @@ export const enhancedNotificationService = {
   },
 
   /**
-   * Send new message notifications
+   * Sends new message notifications to specified users.
+   *
+   * Notifies users about new messages in conversations. Supports both direct
+   * messages and group conversations. Includes sender info and message preview.
+   * Currently configured for in-app notifications only (email/push disabled).
+   *
+   * @param userIds - Array of user IDs to notify (conversation participants)
+   * @param data - Message details including sender, preview, and conversation context
+   * @returns Result object with counts of successful deliveries per channel and any errors
    */
   async sendNewMessageNotification(
     userIds: string[],

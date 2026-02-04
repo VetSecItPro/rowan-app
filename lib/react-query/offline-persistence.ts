@@ -3,6 +3,16 @@
  *
  * Persists React Query cache to IndexedDB for offline support.
  * Cache survives app close and page refresh.
+ *
+ * Architecture:
+ * - Primary storage: IndexedDB (async, large capacity, survives refresh)
+ * - Backup storage: localStorage (sync write on unload, limited to 5MB)
+ *
+ * The backup exists because IndexedDB is async and can't be used in
+ * beforeunload handlers. localStorage provides a sync fallback for
+ * saving cache state during page close.
+ *
+ * Cache TTL: 24 hours (MAX_AGE). Stale cache is discarded on restore.
  */
 
 import { QueryClient } from '@tanstack/react-query';
@@ -98,13 +108,22 @@ export async function clearPersistedCache(): Promise<void> {
 }
 
 /**
- * Setup automatic cache persistence
- * Saves cache on window unload and periodically
+ * Setup automatic cache persistence with multiple save strategies.
+ *
+ * Save triggers:
+ * 1. Periodic (30s debounced): Saves to IndexedDB when cache changes
+ * 2. Visibility change: Saves to IndexedDB when tab is hidden (user switches tabs)
+ * 3. Page unload: Saves to localStorage (sync) as IndexedDB is async and unreliable in unload
+ *
+ * Why localStorage backup?
+ * IndexedDB operations are async and can be interrupted during page close.
+ * localStorage.setItem is synchronous and completes before the page closes.
+ * The backup has a shorter TTL (5 min vs 24h) and is deleted after successful restore.
  */
 export function setupCachePersistence(queryClient: QueryClient): () => void {
   let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // Save every 30 seconds if there are changes
+  // Debounced save - batches rapid cache changes into single writes
   const scheduleSave = () => {
     if (saveTimer) return;
     saveTimer = setTimeout(() => {
@@ -118,11 +137,9 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
     scheduleSave();
   });
 
-  // Save on page unload
+  // Sync backup to localStorage on unload (IndexedDB is async and unreliable here)
   const handleUnload = () => {
-    // Save synchronously to localStorage as backup (IndexedDB not available in unload)
     if (typeof navigator !== 'undefined') {
-      // Can't use IndexedDB in unload, save synchronously to localStorage as backup
       try {
         const state = queryClient.getQueryCache().getAll().map((query) => ({
           queryKey: query.queryKey,
@@ -134,11 +151,12 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
           clientState: state,
         }));
       } catch {
-        // Ignore localStorage errors
+        // localStorage full or unavailable - best effort only
       }
     }
   };
 
+  // Save when user switches away from tab
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'hidden') {
       persistQueryCache(queryClient);
