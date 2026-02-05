@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { HeroSection } from '@/components/home/HeroSection';
 import { FeatureGrid } from '@/components/home/FeatureGrid';
@@ -11,6 +10,7 @@ import { ComparisonSection } from '@/components/home/ComparisonSection';
 import { PricingPreviewSection } from '@/components/home/PricingPreviewSection';
 import { InstallSection } from '@/components/home/InstallSection';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
+import { Footer } from '@/components/layout/Footer';
 
 export default function HomePage() {
   const router = useRouter();
@@ -77,28 +77,7 @@ export default function HomePage() {
       <ScrollToTop />
 
       {/* Footer */}
-      <footer className="relative bg-gradient-to-b from-transparent to-gray-900/50 border-t border-gray-800/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between py-8 gap-4">
-            <div className="flex items-center gap-3 text-gray-400">
-              <span>Rowan © {new Date().getFullYear()}</span>
-              <span className="text-gray-600">•</span>
-              <span className="text-sm">Veteran Owned Business</span>
-            </div>
-            <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link href="/security" className="text-gray-400 hover:text-white transition-colors">
-                Security
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
     </>
   );

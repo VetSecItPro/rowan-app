@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
 
 interface ModalProps {
@@ -197,8 +198,6 @@ export function Modal({
     setHasTriggeredHaptic(false);
   };
 
-  if (!isOpen) return null;
-
   const maxWidthClasses = {
     sm: 'sm:max-w-sm',
     md: 'sm:max-w-md',
@@ -212,130 +211,149 @@ export function Modal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Backdrop */}
-      <div
-        className={`
-          absolute inset-0 bg-black/70 backdrop-blur-sm
-          transition-opacity duration-300
-          ${isOpen ? 'opacity-100' : 'opacity-0'}
-        `}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal Container - Bottom sheet on mobile, centered on desktop */}
-      <div
-        ref={modalRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        className={`
-          relative w-full
-          bg-gray-800
-          border-t border-x sm:border border-gray-700/50
-          rounded-t-2xl sm:rounded-xl
-          max-h-[92vh] sm:max-h-[90vh]
-          overflow-hidden
-          overscroll-contain
-          shadow-2xl
-          flex flex-col
-          transition-all duration-300 ease-out
-          ${maxWidthClasses[maxWidth]}
-          ${isOpen
-            ? 'translate-y-0 sm:translate-y-0 sm:scale-100 opacity-100'
-            : 'translate-y-full sm:translate-y-4 sm:scale-95 opacity-0'
-          }
-          ${isDragging ? '!transition-none' : ''}
-        `}
-        style={{
-          transform: isDragging ? `translateY(${transform}px)` : undefined,
-          opacity: isDragging ? Math.max(0.5, 1 - dragProgress * 0.5) : undefined,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
+    <AnimatePresence>
+      {isOpen && (
         <div
-          ref={headerRef}
-          className={`
-            flex-shrink-0
-            ${headerGradient || 'bg-gray-800/80 backdrop-blur-md'}
-            border-b border-gray-700/50
-            px-4 sm:px-6
-            pt-3 pb-3 sm:py-4
-            cursor-grab active:cursor-grabbing sm:cursor-default
-          `}
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-          {/* Swipe Indicator - Mobile Only */}
-          <div
-            className={`
-              absolute top-2 left-1/2 -translate-x-1/2
-              h-1 rounded-full
-              transition-all duration-200
-              sm:hidden
-              ${shouldDismiss ? 'bg-green-500' : isDragging ? 'bg-gray-400' : 'bg-gray-600'}
-            `}
-            style={{
-              width: isDragging ? '48px' : '36px',
-              opacity: isDragging ? 1 : 0.6,
-            }}
+          {/* Backdrop — fade in/out */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={onClose}
+            aria-hidden="true"
           />
 
-          <div className="flex items-center justify-between mt-1 sm:mt-0">
-            <div className="pr-10">
-              <h2
-                id="modal-title"
-                className={`text-base sm:text-xl font-semibold sm:font-bold ${headerGradient ? 'text-white' : 'text-white'}`}
-              >
-                {title}
-              </h2>
-              {subtitle && (
-                <p className={`text-sm mt-0.5 ${headerGradient ? 'text-white/80' : 'text-gray-400'}`}>
-                  {subtitle}
-                </p>
-              )}
+          {/* Modal Container — slide up on mobile, scale in on desktop */}
+          {/* Mobile: slide from bottom with spring physics */}
+          {/* Desktop (sm+): scale + opacity from center */}
+          <motion.div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            // Mobile-first: slide up from bottom
+            initial={{
+              y: '100%',
+              opacity: 1,
+            }}
+            animate={{
+              y: isDragging ? transform : 0,
+              opacity: isDragging ? Math.max(0.5, 1 - dragProgress * 0.5) : 1,
+            }}
+            exit={{
+              y: '100%',
+              opacity: 0,
+              transition: { duration: 0.2, ease: 'easeIn' },
+            }}
+            transition={
+              isDragging
+                ? { duration: 0 } // Instant response while dragging
+                : {
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30,
+                  }
+            }
+            className={`
+              relative w-full
+              bg-gray-800
+              border-t border-x sm:border border-gray-700/50
+              rounded-t-2xl sm:rounded-xl
+              max-h-[92vh] sm:max-h-[90vh]
+              overflow-hidden
+              overscroll-contain
+              shadow-2xl
+              flex flex-col
+              ${maxWidthClasses[maxWidth]}
+            `}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              ref={headerRef}
+              className={`
+                flex-shrink-0
+                ${headerGradient || 'bg-gray-800/80 backdrop-blur-md'}
+                border-b border-gray-700/50
+                px-4 sm:px-6
+                pt-3 pb-3 sm:py-4
+                cursor-grab active:cursor-grabbing sm:cursor-default
+              `}
+            >
+              {/* Swipe Indicator - Mobile Only */}
+              <div
+                className={`
+                  absolute top-2 left-1/2 -translate-x-1/2
+                  h-1 rounded-full
+                  transition-all duration-200
+                  sm:hidden
+                  ${shouldDismiss ? 'bg-green-500' : isDragging ? 'bg-gray-400' : 'bg-gray-600'}
+                `}
+                style={{
+                  width: isDragging ? '48px' : '36px',
+                  opacity: isDragging ? 1 : 0.6,
+                }}
+              />
+
+              <div className="flex items-center justify-between mt-1 sm:mt-0">
+                <div className="pr-10">
+                  <h2
+                    id="modal-title"
+                    className={`text-base sm:text-xl font-semibold sm:font-bold ${headerGradient ? 'text-white' : 'text-white'}`}
+                  >
+                    {title}
+                  </h2>
+                  {subtitle && (
+                    <p className={`text-sm mt-0.5 ${headerGradient ? 'text-white/80' : 'text-gray-400'}`}>
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+
+                {/* Close Button */}
+                {!hideCloseButton && (
+                  <button
+                    onClick={onClose}
+                    className={`
+                      absolute top-2.5 right-3 sm:top-3.5 sm:right-4
+                      w-10 h-10 sm:w-9 sm:h-9
+                      flex items-center justify-center
+                      rounded-full
+                      ${headerGradient ? 'hover:bg-white/20 text-white' : 'hover:bg-gray-700 text-gray-400'}
+                      transition-all
+                      focus:outline-none
+                      focus:ring-2 focus:ring-white/30
+                      active:scale-95
+                    `}
+                    aria-label="Close modal"
+                  >
+                    <X className="w-5 h-5 sm:w-4 sm:h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Close Button */}
-            {!hideCloseButton && (
-              <button
-                onClick={onClose}
-                className={`
-                  absolute top-2.5 right-3 sm:top-3.5 sm:right-4
-                  w-10 h-10 sm:w-9 sm:h-9
-                  flex items-center justify-center
-                  rounded-full
-                  ${headerGradient ? 'hover:bg-white/20 text-white' : 'hover:bg-gray-700 text-gray-400'}
-                  transition-all
-                  focus:outline-none
-                  focus:ring-2 focus:ring-white/30
-                  active:scale-95
-                `}
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5 sm:w-4 sm:h-4" />
-              </button>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 overscroll-contain">
+              {children}
+            </div>
+
+            {/* Footer - Sticky on mobile */}
+            {footer && (
+              <div className="flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/90 backdrop-blur-md pb-safe-4 sm:pb-4">
+                {footer}
+              </div>
             )}
-          </div>
+          </motion.div>
         </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 overscroll-contain">
-          {children}
-        </div>
-
-        {/* Footer - Sticky on mobile */}
-        {footer && (
-          <div className="flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/90 backdrop-blur-md pb-safe-4 sm:pb-4">
-            {footer}
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

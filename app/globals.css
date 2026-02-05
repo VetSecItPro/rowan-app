@@ -2135,6 +2135,16 @@ select:focus,
     animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
+  /* Shimmer skeleton sweep — used by Skeleton component */
+  @keyframes skeleton-shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
   /* ===== MAGICAL TIME-AWARE WELCOME BOX ANIMATIONS ===== */
 
   /* Flying Birds Animation (Morning) */

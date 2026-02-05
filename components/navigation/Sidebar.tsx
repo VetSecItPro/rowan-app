@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, memo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
 import { useAdmin } from '@/hooks/useAdmin';
@@ -14,6 +15,27 @@ import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from 
 const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
 const HOVER_DELAY = 200; // ms delay before hover expand
 const HOVER_COLLAPSE_DELAY = 300; // ms delay before hover collapse
+
+// Static color map for hover glow effects — maps gradient class to glow color
+const GRADIENT_GLOW_MAP: Record<string, string> = {
+  'bg-gradient-tasks': 'rgba(59, 130, 246, 0.15)',        // blue
+  'bg-gradient-calendar': 'rgba(168, 85, 247, 0.15)',     // purple
+  'bg-gradient-reminders': 'rgba(236, 72, 153, 0.15)',    // pink
+  'bg-gradient-messages': 'rgba(34, 197, 94, 0.15)',      // green
+  'bg-gradient-shopping': 'rgba(16, 185, 129, 0.15)',     // emerald
+  'bg-gradient-meals': 'rgba(249, 115, 22, 0.15)',        // orange
+  'bg-gradient-projects': 'rgba(245, 158, 11, 0.15)',     // amber
+  'bg-gradient-goals': 'rgba(99, 102, 241, 0.15)',        // indigo
+  'bg-gradient-location': 'rgba(6, 182, 212, 0.15)',      // cyan
+  'bg-gradient-to-r from-amber-500 to-orange-500': 'rgba(245, 158, 11, 0.15)',    // rewards (amber)
+  'bg-gradient-to-r from-pink-500 to-purple-500': 'rgba(236, 72, 153, 0.15)',     // check-in (pink)
+  'bg-gradient-to-r from-yellow-500 to-amber-500': 'rgba(234, 179, 8, 0.15)',     // year-in-review (yellow)
+  'bg-gradient-to-r from-orange-500 to-amber-500': 'rgba(249, 115, 22, 0.15)',    // admin (orange)
+};
+
+function getGlowColor(gradient: string): string {
+  return GRADIENT_GLOW_MAP[gradient] || 'rgba(255, 255, 255, 0.08)';
+}
 
 // Memoized nav item for performance with aggressive prefetching
 const NavItemComponent = memo(function NavItemComponent({
@@ -28,25 +50,46 @@ const NavItemComponent = memo(function NavItemComponent({
   onPrefetch: (href: string) => void;
 }) {
   const Icon = item.icon;
+  const [isHovered, setIsHovered] = useState(false);
+  const glowColor = useMemo(() => getGlowColor(item.gradient), [item.gradient]);
 
   // Prefetch on mouse enter for instant navigation
   const handleMouseEnter = useCallback(() => {
     onPrefetch(item.href);
+    setIsHovered(true);
   }, [item.href, onPrefetch]);
 
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
+
   return (
-    <li onMouseEnter={handleMouseEnter}>
+    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <Link
         href={item.href}
         prefetch={true}
-        className={`group relative flex items-center py-3 rounded-lg transition-all duration-200 ${
+        className={`group relative flex items-center py-3 rounded-lg transition-colors duration-200 ${
           isExpanded ? 'gap-3 px-2.5' : 'justify-center px-2'
         } ${
           isActive
             ? 'bg-gradient-to-r from-blue-900/20 to-indigo-900/10 shadow-sm border border-blue-800/30'
-            : 'hover:bg-gray-800/50 hover:shadow-sm border border-transparent'
+            : 'border border-transparent'
         }`}
       >
+        {/* Hover glow overlay — subtle colored background matching feature */}
+        <AnimatePresence>
+          {isHovered && !isActive && (
+            <motion.div
+              className="absolute inset-0 rounded-lg pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              style={{ backgroundColor: glowColor }}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Icon with refined gradient background and shadow */}
         {/* Responsive: md-lg (tablet) = smaller, xl (desktop 1280px+) = full size */}
         <div
@@ -94,9 +137,17 @@ const NavItemComponent = memo(function NavItemComponent({
           </div>
         )}
 
-        {/* Active indicator bar - refined */}
+        {/* Active indicator bar — animated pill that slides between items */}
         {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-600 via-indigo-600 to-purple-600 rounded-r-full shadow-lg" />
+          <motion.div
+            layoutId="sidebar-active-indicator"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-600 via-indigo-600 to-purple-600 rounded-r-full shadow-lg"
+            transition={{
+              type: 'spring',
+              stiffness: 350,
+              damping: 30,
+            }}
+          />
         )}
       </Link>
     </li>
@@ -176,11 +227,11 @@ export function Sidebar() {
 
     if (saved !== null) {
       // Use saved preference
-       
+
       setIsExpanded(saved === 'true');
     } else {
       // First time user - start collapsed, hover to expand
-       
+
       setIsExpanded(false);
       localStorage.setItem(SIDEBAR_STORAGE_KEY, 'false');
     }
