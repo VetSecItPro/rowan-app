@@ -101,8 +101,22 @@ export const recurringEventsService = {
   },
 
   /**
-   * Generate recurring event instances for a date range
-   * This is the core logic that creates virtual event occurrences
+   * Generate recurring event instances for a date range.
+   * This is the core algorithm that creates virtual event occurrences.
+   *
+   * Algorithm:
+   * 1. Parse recurrence pattern (try JSON first, fall back to simple format)
+   * 2. Start from event's original date, walk forward in time
+   * 3. For each date, check if it matches the pattern (daily/weekly/monthly/yearly)
+   * 4. Skip dates that are exceptions (user deleted single occurrence)
+   * 5. Create virtual instances with synthetic IDs (masterId-index)
+   * 6. Stop when hitting maxOccurrences, end_count, or end_date
+   *
+   * Virtual IDs: We don't store every occurrence in DB. Instead, generate
+   * them on-the-fly. Virtual ID format: `{masterId}-{occurrenceIndex}`
+   *
+   * Time preservation: Original event's time-of-day is preserved for each occurrence.
+   * Duration is calculated once and applied to each instance.
    */
   generateOccurrences(
     masterEvent: CalendarEvent,
@@ -114,14 +128,11 @@ export const recurringEventsService = {
       return [];
     }
 
-    // Parse the recurrence pattern
+    // Parse the recurrence pattern (supports both JSON and simple string formats)
     let pattern: EnhancedRecurrencePattern | null;
-
-    // Try to parse as JSON first (enhanced format)
     try {
       pattern = JSON.parse(masterEvent.recurrence_pattern);
     } catch {
-      // Fall back to simple pattern parsing
       pattern = this.parseSimplePattern(masterEvent.recurrence_pattern);
     }
 
@@ -132,26 +143,26 @@ export const recurringEventsService = {
     let currentDate = new Date(eventStart);
     let occurrenceIndex = 0;
 
-    // Calculate duration for end_time adjustment
+    // Pre-calculate duration so each occurrence has correct end time
     const duration = masterEvent.end_time
       ? new Date(masterEvent.end_time).getTime() - eventStart.getTime()
       : 0;
 
+    // Walk through dates until we hit a stopping condition
     while (occurrences.length < maxOccurrences && currentDate <= endDate) {
-      // Check if this occurrence should be generated
       if (this.shouldGenerateOccurrence(currentDate, pattern, eventStart)) {
-        // Check if within our date range and not an exception
+        // Only include occurrences within the requested date range
         if (currentDate >= startDate) {
           const occurrenceDate = currentDate.toISOString().split('T')[0];
 
+          // Skip if this date is in the exceptions list (deleted occurrence)
           if (!pattern.exceptions?.includes(occurrenceDate)) {
-            // Create occurrence start time (preserve time of day)
+            // Preserve time-of-day from original event
             const occurrenceStart = new Date(currentDate);
             occurrenceStart.setHours(eventStart.getHours());
             occurrenceStart.setMinutes(eventStart.getMinutes());
             occurrenceStart.setSeconds(eventStart.getSeconds());
 
-            // Create occurrence end time if original event has end time
             let occurrenceEnd: string | undefined;
             if (duration > 0) {
               occurrenceEnd = new Date(occurrenceStart.getTime() + duration).toISOString();
@@ -159,7 +170,7 @@ export const recurringEventsService = {
 
             const occurrence: RecurringEventInstance = {
               ...masterEvent,
-              id: `${masterEvent.id}-${occurrenceIndex}`, // Virtual ID
+              id: `${masterEvent.id}-${occurrenceIndex}`, // Virtual ID for this occurrence
               series_id: masterEvent.id,
               occurrence_date: occurrenceDate,
               occurrence_index: occurrenceIndex,
@@ -174,19 +185,20 @@ export const recurringEventsService = {
 
         occurrenceIndex++;
 
-        // Check end conditions
+        // Stop if we've generated the specified number of occurrences
         if (pattern.end_count && occurrenceIndex >= pattern.end_count) {
           break;
         }
 
+        // Stop if we've passed the end date for the recurrence
         if (pattern.end_date && currentDate >= new Date(pattern.end_date)) {
           break;
         }
       }
 
-      // Calculate next date
+      // Move to next candidate date
       currentDate = this.calculateNextDate(currentDate, pattern);
-      if (!currentDate) break; // No more occurrences
+      if (!currentDate) break;
     }
 
     return occurrences;

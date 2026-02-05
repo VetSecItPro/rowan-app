@@ -46,7 +46,14 @@ export interface SpendingInsights {
 // =====================================================
 
 /**
- * Get spending trends over time
+ * Retrieves spending totals grouped by time period for trend analysis.
+ * Supports monthly, quarterly, and yearly aggregations.
+ * Fills in missing periods with zero values for continuous charting.
+ * @param spaceId - The space ID
+ * @param timeRange - Aggregation period: 'monthly', 'quarterly', or 'yearly' (default: 'monthly')
+ * @param periodsCount - Number of periods to retrieve (default: 6)
+ * @returns Array of spending trends with period labels and totals
+ * @throws Error if the database query fails
  */
 export async function getSpendingTrends(
   spaceId: string,
@@ -130,7 +137,14 @@ export async function getSpendingTrends(
 }
 
 /**
- * Get spending by category
+ * Retrieves expense totals grouped by category for a date range.
+ * Includes percentage of total spending and transaction counts.
+ * Results sorted by total amount descending.
+ * @param spaceId - The space ID
+ * @param startDate - Start of date range (default: start of current month)
+ * @param endDate - End of date range (default: end of current month)
+ * @returns Array of category spending with totals, percentages, and counts
+ * @throws Error if the database query fails
  */
 export async function getCategorySpending(
   spaceId: string,
@@ -180,7 +194,14 @@ export async function getCategorySpending(
 }
 
 /**
- * Get budget variances for current period
+ * Calculates variance between budgeted and actual spending per category.
+ * Returns status indicators: 'under' (>10% remaining), 'over' (exceeded), 'on_track'.
+ * Results sorted by absolute variance descending.
+ * @param spaceId - The space ID
+ * @param startDate - Start of date range (default: start of current month)
+ * @param endDate - End of date range (default: end of current month)
+ * @returns Array of budget variances with amounts, percentages, and status
+ * @throws Error if the database query fails
  */
 export async function getBudgetVariances(
   spaceId: string,
@@ -234,7 +255,12 @@ export async function getBudgetVariances(
 }
 
 /**
- * Get comprehensive spending insights
+ * Generates a comprehensive spending insights dashboard for the current month.
+ * Combines trends, category breakdown, and budget variances in a single call.
+ * @param spaceId - The space ID
+ * @param timeRange - Time range for trend data (default: 'monthly')
+ * @returns Complete insights object with current period stats, trends, top categories, and variances
+ * @throws Error if any underlying query fails
  */
 export async function getSpendingInsights(
   spaceId: string,
@@ -272,7 +298,11 @@ export async function getSpendingInsights(
 }
 
 /**
- * Get month-over-month comparison
+ * Compares spending between current and previous month.
+ * Returns absolute change and percentage change for quick trend assessment.
+ * @param spaceId - The space ID
+ * @returns Comparison object with current/previous totals and change metrics
+ * @throws Error if the database query fails
  */
 export async function getMonthOverMonthComparison(
   spaceId: string

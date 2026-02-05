@@ -75,7 +75,20 @@ export interface MealStats {
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
+/**
+ * Meals Service
+ *
+ * Manages meal planning and recipe library with real-time collaboration support.
+ * Provides CRUD operations for meals and recipes, plus statistics for dashboard widgets.
+ */
 export const mealsService = {
+  /**
+   * Retrieves all meals for a space with associated recipes and assignees.
+   * @param spaceId - The space identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns Array of meals sorted by scheduled date
+   * @throws Error if database query fails
+   */
   async getMeals(spaceId: string, supabaseClient?: SupabaseClient): Promise<Meal[]> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -88,6 +101,13 @@ export const mealsService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single meal by ID with recipe and assignee details.
+   * @param id - The meal identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The meal or null if not found
+   * @throws Error if database query fails
+   */
   async getMealById(id: string, supabaseClient?: SupabaseClient): Promise<Meal | null> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error} = await supabase
@@ -100,6 +120,13 @@ export const mealsService = {
     return data;
   },
 
+  /**
+   * Creates a new meal entry.
+   * @param input - Meal creation data including space_id, meal_type, and scheduled_date
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The newly created meal
+   * @throws Error if user is not authenticated or database insert fails
+   */
   async createMeal(input: CreateMealInput, supabaseClient?: SupabaseClient): Promise<Meal> {
     const supabase = getSupabaseClient(supabaseClient);
 
@@ -120,6 +147,14 @@ export const mealsService = {
     return data;
   },
 
+  /**
+   * Updates an existing meal.
+   * @param id - The meal identifier
+   * @param updates - Partial meal data to update
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The updated meal
+   * @throws Error if database update fails
+   */
   async updateMeal(id: string, updates: Partial<CreateMealInput>, supabaseClient?: SupabaseClient): Promise<Meal> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -133,6 +168,12 @@ export const mealsService = {
     return data;
   },
 
+  /**
+   * Deletes a meal entry.
+   * @param id - The meal identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @throws Error if database delete fails
+   */
   async deleteMeal(id: string, supabaseClient?: SupabaseClient): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
@@ -143,6 +184,12 @@ export const mealsService = {
     if (error) throw error;
   },
 
+  /**
+   * Retrieves all recipes for a space.
+   * @param spaceId - The space identifier
+   * @returns Array of recipes sorted alphabetically by name
+   * @throws Error if database query fails
+   */
   async getRecipes(spaceId: string): Promise<Recipe[]> {
     const supabase = createClient();
     const { data, error} = await supabase
@@ -155,6 +202,12 @@ export const mealsService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single recipe by ID.
+   * @param id - The recipe identifier
+   * @returns The recipe or null if not found
+   * @throws Error if database query fails
+   */
   async getRecipeById(id: string): Promise<Recipe | null> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -167,6 +220,12 @@ export const mealsService = {
     return data;
   },
 
+  /**
+   * Creates a new recipe.
+   * @param input - Recipe creation data including name and ingredients
+   * @returns The newly created recipe
+   * @throws Error if database insert fails
+   */
   async createRecipe(input: CreateRecipeInput): Promise<Recipe> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -179,6 +238,13 @@ export const mealsService = {
     return data;
   },
 
+  /**
+   * Updates an existing recipe.
+   * @param id - The recipe identifier
+   * @param updates - Partial recipe data to update
+   * @returns The updated recipe
+   * @throws Error if database update fails
+   */
   async updateRecipe(id: string, updates: Partial<CreateRecipeInput>): Promise<Recipe> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -192,6 +258,11 @@ export const mealsService = {
     return data;
   },
 
+  /**
+   * Deletes a recipe.
+   * @param id - The recipe identifier
+   * @throws Error if database delete fails
+   */
   async deleteRecipe(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
@@ -202,6 +273,11 @@ export const mealsService = {
     if (error) throw error;
   },
 
+  /**
+   * Retrieves meal planning statistics for a space.
+   * @param spaceId - The space identifier
+   * @returns Statistics including meals this week, next week, saved recipes, and shopping items
+   */
   async getMealStats(spaceId: string): Promise<MealStats> {
     const meals = await this.getMeals(spaceId);
     const recipes = await this.getRecipes(spaceId);

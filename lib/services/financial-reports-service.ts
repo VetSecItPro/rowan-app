@@ -178,10 +178,21 @@ export interface CreateScheduleInput {
   include_pdf?: boolean;
 }
 
+/**
+ * Service for generating, managing, and sharing financial reports.
+ * Supports multiple report types, chart generation, PDF export, and scheduled reports.
+ */
 class FinancialReportsService {
   private supabase = createClient();
 
-  // Report Templates Management
+  /**
+   * Retrieves available report templates for a space.
+   * Includes both system templates and custom templates created for the space.
+   * @param spaceId - Optional space ID to include space-specific templates
+   * @param category - Optional category filter (budget, expenses, goals, trends, summary)
+   * @returns Array of active report templates
+   * @throws Error if the database query fails
+   */
   async getReportTemplates(spaceId?: string, category?: string): Promise<ReportTemplate[]> {
     let query = this.supabase
       .from('report_templates')
@@ -206,6 +217,12 @@ class FinancialReportsService {
     return data || [];
   }
 
+  /**
+   * Retrieves a single report template by ID.
+   * @param id - The template ID
+   * @returns The template record or null if not found
+   * @throws Error if the database query fails (except for "not found")
+   */
   async getReportTemplate(id: string): Promise<ReportTemplate | null> {
     const { data, error } = await this.supabase
       .from('report_templates')
@@ -220,6 +237,14 @@ class FinancialReportsService {
     return data;
   }
 
+  /**
+   * Creates a custom report template for a space.
+   * Custom templates are marked as non-system and belong to the creating user.
+   * @param userId - The ID of the user creating the template
+   * @param input - Template configuration including name, category, and report settings
+   * @returns The newly created template record
+   * @throws Error if the insert operation fails
+   */
   async createReportTemplate(
     userId: string,
     input: CreateTemplateInput
@@ -238,7 +263,15 @@ class FinancialReportsService {
     return data;
   }
 
-  // Report Generation
+  /**
+   * Generates a financial report based on a template and date range.
+   * Fetches data, generates charts, calculates statistics, and stores the result.
+   * Creates a failed report record if generation fails for debugging purposes.
+   * @param userId - The ID of the user generating the report
+   * @param input - Report parameters including template, space, and date range
+   * @returns The generated report with data, charts, and statistics
+   * @throws Error if template not found or data fetch fails
+   */
   async generateReport(userId: string, input: CreateReportInput): Promise<GeneratedReport> {
     const startTime = Date.now();
 
@@ -557,7 +590,14 @@ class FinancialReportsService {
     return stats;
   }
 
-  // Report Management
+  /**
+   * Retrieves previously generated reports for a space.
+   * Ordered by most recently generated first.
+   * @param spaceId - The space ID
+   * @param limit - Maximum number of reports to return (default: 50)
+   * @returns Array of generated report records
+   * @throws Error if the database query fails
+   */
   async getGeneratedReports(spaceId: string, limit = 50): Promise<GeneratedReport[]> {
     const { data, error } = await this.supabase
       .from('generated_reports')
@@ -570,6 +610,12 @@ class FinancialReportsService {
     return data || [];
   }
 
+  /**
+   * Retrieves a single generated report and increments its view count.
+   * @param id - The report ID
+   * @returns The report record with full data or null if not found
+   * @throws Error if the database query fails (except for "not found")
+   */
   async getGeneratedReport(id: string): Promise<GeneratedReport | null> {
     const { data, error } = await this.supabase
       .from('generated_reports')
@@ -595,6 +641,12 @@ class FinancialReportsService {
     return data;
   }
 
+  /**
+   * Deletes a generated report. Only the user who generated it can delete it.
+   * @param id - The report ID
+   * @param userId - The user ID (must match the report generator)
+   * @throws Error if the delete operation fails
+   */
   async deleteGeneratedReport(id: string, userId: string): Promise<void> {
     const { error } = await this.supabase
       .from('generated_reports')
@@ -605,7 +657,13 @@ class FinancialReportsService {
     if (error) throw error;
   }
 
-  // Report Sharing
+  /**
+   * Creates a shareable link for a report with a time-limited token.
+   * @param reportId - The report ID to share
+   * @param expiresInHours - Token validity period in hours (default: 168 / 7 days)
+   * @returns The generated share token
+   * @throws Error if the update operation fails
+   */
   async shareReport(reportId: string, expiresInHours = 168): Promise<string> { // Default 7 days
     const shareToken = await this.generateShareToken();
     const sharedUntil = new Date();
@@ -624,6 +682,14 @@ class FinancialReportsService {
     return shareToken;
   }
 
+  /**
+   * Retrieves a report using a share token (for unauthenticated access).
+   * Returns null if token is invalid, report not shared, or share has expired.
+   * Increments view count on successful access.
+   * @param shareToken - The share token from the report URL
+   * @returns The report record or null if access denied
+   * @throws Error if the database query fails (except for "not found")
+   */
   async getSharedReport(shareToken: string): Promise<GeneratedReport | null> {
     const { data, error } = await this.supabase
       .from('generated_reports')
@@ -655,7 +721,16 @@ class FinancialReportsService {
     return data;
   }
 
-  // Favorites Management
+  /**
+   * Adds a report or template to user's favorites for quick access.
+   * @param userId - The user ID
+   * @param reportId - Optional generated report ID
+   * @param templateId - Optional template ID
+   * @param name - Optional custom name for the favorite
+   * @param notes - Optional notes
+   * @returns The created favorite record
+   * @throws Error if the insert operation fails
+   */
   async addToFavorites(
     userId: string,
     reportId?: string,
@@ -679,6 +754,13 @@ class FinancialReportsService {
     return data;
   }
 
+  /**
+   * Retrieves all favorited reports and templates for a user.
+   * Includes full report and template data for each favorite.
+   * @param userId - The user ID
+   * @returns Array of favorite records with associated data
+   * @throws Error if the database query fails
+   */
   async getFavorites(userId: string): Promise<ReportFavorite[]> {
     const { data, error } = await this.supabase
       .from('report_favorites')
@@ -694,6 +776,12 @@ class FinancialReportsService {
     return data || [];
   }
 
+  /**
+   * Removes a favorite from the user's list.
+   * @param userId - The user ID (must own the favorite)
+   * @param favoriteId - The favorite record ID
+   * @throws Error if the delete operation fails
+   */
   async removeFromFavorites(userId: string, favoriteId: string): Promise<void> {
     const { error } = await this.supabase
       .from('report_favorites')
@@ -713,7 +801,11 @@ class FinancialReportsService {
     return data;
   }
 
-  // Date range helpers
+  /**
+   * Returns predefined date range presets for report generation.
+   * Includes current month, last month, quarter, year, and rolling periods.
+   * @returns Object with named date range presets, each containing start and end dates
+   */
   getDateRangePresets() {
     const now = new Date();
     const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -749,7 +841,13 @@ class FinancialReportsService {
     };
   }
 
-  // Missing methods
+  /**
+   * Downloads a report as PDF.
+   * Note: PDF generation integration is pending implementation.
+   * @param reportId - The report ID
+   * @returns PDF blob data
+   * @throws Error - Not yet implemented
+   */
   async downloadReportPDF(reportId: string): Promise<Blob> {
     // This would integrate with the PDF generation service
     const report = await this.getGeneratedReport(reportId);
@@ -759,6 +857,12 @@ class FinancialReportsService {
     throw new Error('PDF download not implemented yet');
   }
 
+  /**
+   * Constructs the full shareable URL for a shared report.
+   * @param reportId - The report ID
+   * @returns Full URL with share token
+   * @throws Error if report is not shared or doesn't exist
+   */
   async getReportShareUrl(reportId: string): Promise<string> {
     const report = await this.getGeneratedReport(reportId);
     if (!report || !report.is_shared || !report.share_token) {
@@ -770,6 +874,11 @@ class FinancialReportsService {
     return `${baseUrl}/reports/shared/${report.share_token}`;
   }
 
+  /**
+   * Manually increments the view count for a report.
+   * @param reportId - The report ID
+   * @throws Error if report not found or update fails
+   */
   async updateReportViews(reportId: string): Promise<void> {
     const report = await this.getGeneratedReport(reportId);
     if (!report) throw new Error('Report not found');
@@ -785,6 +894,13 @@ class FinancialReportsService {
     if (error) throw error;
   }
 
+  /**
+   * Toggles a report's favorite status for a user.
+   * Adds to favorites if not favorited, removes if already favorited.
+   * @param reportId - The report ID
+   * @param userId - The user ID
+   * @returns True if now favorited, false if removed from favorites
+   */
   async toggleReportFavorite(reportId: string, userId: string): Promise<boolean> {
     // Check if already favorited
     const { data: existing } = await this.supabase

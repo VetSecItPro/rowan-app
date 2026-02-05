@@ -176,17 +176,35 @@ export class MutationQueueManager {
 
   // --- Internal ---
 
+  /**
+   * Process queued mutations when coming back online.
+   *
+   * Algorithm:
+   * 1. Discard stale mutations (>24h old) - they're likely outdated
+   * 2. Process queue in FIFO order (preserves user intent order)
+   * 3. For each mutation:
+   *    - Refresh CSRF token (may have expired while offline)
+   *    - Replay the HTTP request
+   *    - On success: remove from queue, invalidate React Query cache
+   *    - On 409 Conflict: move to failed (server state changed, user must resolve)
+   *    - On other errors: retry with exponential backoff + jitter
+   *
+   * Backoff formula: min(1000 * 2^retryCount, 30000) + random(0-1000)ms
+   * This prevents thundering herd when many tabs come online simultaneously.
+   *
+   * Max 5 retries per mutation, then it moves to failedActions for manual retry.
+   */
   private async doProcessQueue(): Promise<void> {
-    // Discard stale mutations before processing
+    // Discard mutations older than 24h - they're likely stale
     this.discardStale();
 
-    // Process in order; items may be removed during iteration
+    // Process in FIFO order; index management handles removals during iteration
     let i = 0;
     while (i < this.state.queue.length) {
       const mutation = this.state.queue[i];
 
       try {
-        // Re-fetch CSRF token for each replayed request
+        // CSRF token may have expired while offline - refresh it
         const freshHeaders = await this.refreshCsrfHeader(mutation.headers);
 
         const response = await fetch(mutation.url, {
@@ -197,34 +215,34 @@ export class MutationQueueManager {
         });
 
         if (response.ok) {
-          // Success — remove from queue and invalidate relevant cache
+          // Success - remove from queue and refresh UI data
           this.state.queue.splice(i, 1);
           this.invalidateQueriesForEndpoint(mutation.url);
-          // Don't increment i — next item shifts into current index
+          // Don't increment i - next item shifted into current index
           continue;
         }
 
         if (response.status === 409) {
-          // Conflict — server state changed, move to failed so user can see what was lost
+          // Conflict - server state changed while offline
+          // Move to failed so user can see what action was lost
           const conflicted = this.state.queue.splice(i, 1)[0];
           this.state.failedActions.push({ ...conflicted, retryCount: conflicted.maxRetries });
           continue;
         }
 
-        // Other server errors — treat as failure
+        // Other server errors - treat as transient failure
         throw new Error(`HTTP ${response.status}`);
       } catch {
         mutation.retryCount++;
 
         if (mutation.retryCount >= mutation.maxRetries) {
-          // Move to failed
+          // Max retries exceeded - move to failed for manual intervention
           this.state.queue.splice(i, 1);
           this.state.failedActions.push(mutation);
-          // Don't increment i
           continue;
         }
 
-        // Exponential backoff with jitter before next retry
+        // Exponential backoff with jitter to prevent thundering herd
         const delay = Math.min(1000 * 2 ** mutation.retryCount, 30000) + Math.random() * 1000;
         await new Promise((r) => setTimeout(r, delay));
         i++;

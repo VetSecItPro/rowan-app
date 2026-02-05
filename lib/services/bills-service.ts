@@ -87,7 +87,10 @@ export interface BillStats {
 // =====================================================
 
 /**
- * Get all bills for a space
+ * Retrieves all bills for a space, ordered by due date.
+ * @param spaceId - The space ID
+ * @returns Array of bill records
+ * @throws Error if the database query fails
  */
 export async function getBills(spaceId: string): Promise<Bill[]> {
   const supabase = createClient();
@@ -102,7 +105,10 @@ export async function getBills(spaceId: string): Promise<Bill[]> {
 }
 
 /**
- * Get a single bill by ID
+ * Retrieves a single bill by its unique identifier.
+ * @param billId - The bill ID
+ * @returns The bill record or null if not found
+ * @throws Error if the database query fails
  */
 export async function getBillById(billId: string): Promise<Bill | null> {
   const supabase = createClient();
@@ -117,7 +123,11 @@ export async function getBillById(billId: string): Promise<Bill | null> {
 }
 
 /**
- * Get bills by status
+ * Retrieves bills filtered by their status.
+ * @param spaceId - The space ID
+ * @param status - Bill status filter: 'scheduled', 'paid', 'overdue', or 'cancelled'
+ * @returns Array of bills matching the status
+ * @throws Error if the database query fails
  */
 export async function getBillsByStatus(
   spaceId: string,
@@ -136,7 +146,11 @@ export async function getBillsByStatus(
 }
 
 /**
- * Get upcoming bills (due within next 30 days)
+ * Retrieves scheduled bills due within the next 30 days.
+ * Useful for bill reminders and cash flow planning.
+ * @param spaceId - The space ID
+ * @returns Array of upcoming bills ordered by due date
+ * @throws Error if the database query fails
  */
 export async function getUpcomingBills(spaceId: string): Promise<Bill[]> {
   const supabase = createClient();
@@ -159,7 +173,13 @@ export async function getUpcomingBills(spaceId: string): Promise<Bill[]> {
 }
 
 /**
- * Create a new bill with automatic reminder and calendar event creation
+ * Creates a new bill with automatic reminder and calendar event creation.
+ * Optionally creates a linked reminder (default: 3 days before due date)
+ * and a calendar event for the due date.
+ * @param input - Bill creation data including name, amount, due date, and optional settings
+ * @param userId - The ID of the user creating the bill
+ * @returns The created bill record with linked reminder and event IDs
+ * @throws Error if the bill insert fails
  */
 export async function createBill(
   input: CreateBillInput,
@@ -249,7 +269,12 @@ export async function createBill(
 }
 
 /**
- * Update a bill
+ * Updates an existing bill record.
+ * Note: Does not automatically update linked reminders or calendar events.
+ * @param billId - The bill ID to update
+ * @param updates - Partial bill data to update
+ * @returns The updated bill record
+ * @throws Error if the update operation fails
  */
 export async function updateBill(
   billId: string,
@@ -268,7 +293,10 @@ export async function updateBill(
 }
 
 /**
- * Delete a bill
+ * Permanently deletes a bill record.
+ * Note: Linked reminders and calendar events should be cleaned up separately.
+ * @param billId - The bill ID to delete
+ * @throws Error if the delete operation fails
  */
 export async function deleteBill(billId: string): Promise<void> {
   const supabase = createClient();
@@ -278,8 +306,14 @@ export async function deleteBill(billId: string): Promise<void> {
 }
 
 /**
- * Mark bill as paid and optionally create expense record
- * Also completes linked reminders and calendar events
+ * Marks a bill as paid and handles all related updates.
+ * Optionally creates an expense record for the payment.
+ * Completes linked reminders and calendar events.
+ * For recurring bills, automatically creates the next bill instance.
+ * @param billId - The bill ID to mark as paid
+ * @param createExpense - Whether to create an expense record (default: true)
+ * @returns The updated bill and optional expense record
+ * @throws Error if bill not found or update fails
  */
 export async function markBillAsPaid(
   billId: string,
@@ -374,7 +408,10 @@ export async function markBillAsPaid(
 }
 
 /**
- * Get bill statistics for a space
+ * Calculates bill statistics for a space.
+ * Includes counts by status, upcoming bills this month, and total amount due.
+ * @param spaceId - The space ID
+ * @returns Statistics object with bill counts and totals
  */
 export async function getBillStats(spaceId: string): Promise<BillStats> {
   const bills = await getBills(spaceId);
@@ -405,7 +442,8 @@ export async function getBillStats(spaceId: string): Promise<BillStats> {
 }
 
 /**
- * Mark overdue bills (should be called periodically)
+ * Updates status to 'overdue' for scheduled bills past their due date.
+ * Intended to be called periodically by a cron job.
  */
 export async function markOverdueBills(): Promise<void> {
   const supabase = createClient();

@@ -64,7 +64,15 @@ export interface ExportResult {
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 /**
- * Export all user data in GDPR-compliant format
+ * Exports all user data in GDPR-compliant JSON format.
+ *
+ * Retrieves data from all user-related tables including profile, partnerships,
+ * expenses, budgets, goals, tasks, events, messages, shopping lists, meals, and recipes.
+ * Implements GDPR Article 20 (Right to Data Portability) and Article 15 (Right of Access).
+ *
+ * @param userId - The unique identifier of the user whose data to export
+ * @param supabaseClient - Optional Supabase client instance (uses default client if not provided)
+ * @returns Result object containing the exported data or an error message
  */
 export async function exportAllUserData(userId: string, supabaseClient?: SupabaseClient): Promise<ExportResult> {
   try {
@@ -232,7 +240,13 @@ export async function exportAllUserData(userId: string, supabaseClient?: Supabas
  */
 
 /**
- * Helper: Escape CSV field values
+ * Escapes a value for safe inclusion in a CSV field.
+ *
+ * Handles special characters (commas, quotes, newlines) by wrapping in quotes
+ * and escaping internal quotes.
+ *
+ * @param value - The value to escape
+ * @returns The escaped string safe for CSV inclusion
  */
 function escapeCsvField(value: unknown): string {
   if (value === null || value === undefined) return '';
@@ -248,7 +262,14 @@ function escapeCsvField(value: unknown): string {
 }
 
 /**
- * Helper: Convert JSON array to CSV string
+ * Converts an array of JSON objects to CSV format.
+ *
+ * Automatically detects all unique keys across objects for column headers.
+ * Nested objects and arrays are serialized to JSON strings.
+ *
+ * @param data - Array of objects to convert
+ * @param includeHeaders - Whether to include a header row (default: true)
+ * @returns CSV-formatted string
  */
 function jsonToCsv(data: ExportRecord[], includeHeaders: boolean = true): string {
   if (!data || data.length === 0) {
@@ -291,7 +312,11 @@ function jsonToCsv(data: ExportRecord[], includeHeaders: boolean = true): string
 }
 
 /**
- * Export expenses to CSV format
+ * Exports user expenses to CSV format.
+ *
+ * @param userId - The unique identifier of the user
+ * @param supabaseClient - Optional Supabase client instance
+ * @returns CSV-formatted string of expenses, or empty string if no data
  */
 export async function exportExpensesToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
   const { data } = await exportAllUserData(userId, supabaseClient);
@@ -304,7 +329,11 @@ export async function exportExpensesToCsv(userId: string, supabaseClient?: Supab
 }
 
 /**
- * Export tasks to CSV format
+ * Exports user tasks to CSV format.
+ *
+ * @param userId - The unique identifier of the user
+ * @param supabaseClient - Optional Supabase client instance
+ * @returns CSV-formatted string of tasks, or empty string if no data
  */
 export async function exportTasksToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
   const { data } = await exportAllUserData(userId, supabaseClient);
@@ -317,7 +346,11 @@ export async function exportTasksToCsv(userId: string, supabaseClient?: Supabase
 }
 
 /**
- * Export calendar events to CSV format
+ * Exports user calendar events to CSV format.
+ *
+ * @param userId - The unique identifier of the user
+ * @param supabaseClient - Optional Supabase client instance
+ * @returns CSV-formatted string of events, or empty string if no data
  */
 export async function exportEventsToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
   const { data } = await exportAllUserData(userId, supabaseClient);
@@ -330,7 +363,11 @@ export async function exportEventsToCsv(userId: string, supabaseClient?: Supabas
 }
 
 /**
- * Export shopping lists to CSV format
+ * Exports user shopping lists to CSV format.
+ *
+ * @param userId - The unique identifier of the user
+ * @param supabaseClient - Optional Supabase client instance
+ * @returns CSV-formatted string of shopping lists, or empty string if no data
  */
 export async function exportShoppingListsToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
   const { data } = await exportAllUserData(userId, supabaseClient);
@@ -343,7 +380,11 @@ export async function exportShoppingListsToCsv(userId: string, supabaseClient?: 
 }
 
 /**
- * Export messages to CSV format
+ * Exports user messages to CSV format.
+ *
+ * @param userId - The unique identifier of the user
+ * @param supabaseClient - Optional Supabase client instance
+ * @returns CSV-formatted string of messages, or empty string if no data
  */
 export async function exportMessagesToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<string> {
   const { data } = await exportAllUserData(userId, supabaseClient);
@@ -356,8 +397,14 @@ export async function exportMessagesToCsv(userId: string, supabaseClient?: Supab
 }
 
 /**
- * Export ALL data to multiple CSV files (returns a ZIP-ready structure)
- * Returns object with filename -> CSV content mapping
+ * Exports all user data to multiple CSV files.
+ *
+ * Returns a filename-to-content mapping suitable for creating a ZIP archive.
+ * Each data type is exported to a separate CSV file for easy spreadsheet import.
+ *
+ * @param userId - The unique identifier of the user
+ * @param supabaseClient - Optional Supabase client instance
+ * @returns Object mapping filenames to CSV content strings
  */
 export async function exportAllDataToCsv(userId: string, supabaseClient?: SupabaseClient): Promise<Record<string, string>> {
   const { data } = await exportAllUserData(userId, supabaseClient);
@@ -421,7 +468,13 @@ export interface PdfExportOptions {
 }
 
 /**
- * Get data subset based on data type selection
+ * Extracts a specific subset of data from a full export based on data type.
+ *
+ * Used by PDF export to generate focused reports for specific data categories.
+ *
+ * @param data - The full user data export object
+ * @param dataType - The type of data to extract (e.g., 'expenses', 'tasks', 'goals')
+ * @returns Object containing the display title and filtered data array
  */
 export function getDataSubset(data: UserDataExport, dataType: string): { title: string; data: ExportRecord[] } {
   const dataMap: Record<string, { title: string; key: keyof UserDataExport }> = {

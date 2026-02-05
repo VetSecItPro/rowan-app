@@ -127,7 +127,19 @@ export interface MessageStats {
   conversations: number;
 }
 
+/**
+ * Messages Service
+ *
+ * Comprehensive messaging system with conversations, threads, reactions, and real-time updates.
+ * Supports direct messages, group chats, message pinning, typing indicators, and soft deletion.
+ */
 export const messagesService = {
+  /**
+   * Retrieves all conversations for a space.
+   * @param spaceId - The space identifier
+   * @returns Array of conversations sorted by most recently updated
+   * @throws Error if database query fails
+   */
   async getConversations(spaceId: string): Promise<Conversation[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -140,6 +152,13 @@ export const messagesService = {
     return data || [];
   },
 
+  /**
+   * Retrieves all messages for a conversation.
+   * @param conversationId - The conversation identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns Array of messages sorted by creation time (oldest first)
+   * @throws Error if database query fails
+   */
   async getMessages(conversationId: string, supabaseClient?: SupabaseClient): Promise<Message[]> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -152,6 +171,12 @@ export const messagesService = {
     return data || [];
   },
 
+  /**
+   * Retrieves messages with their attachment data for a conversation.
+   * @param conversationId - The conversation identifier
+   * @returns Array of messages with attachment metadata
+   * @throws Error if database query fails
+   */
   async getMessagesWithAttachments(conversationId: string): Promise<MessageWithAttachments[]> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -167,6 +192,13 @@ export const messagesService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single message by ID.
+   * @param id - The message identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The message or null if not found
+   * @throws Error if database query fails
+   */
   async getMessageById(id: string, supabaseClient?: SupabaseClient): Promise<Message | null> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -179,6 +211,14 @@ export const messagesService = {
     return data;
   },
 
+  /**
+   * Creates a new message in a conversation.
+   * Sanitizes content and attachments, updates conversation timestamp, and sends notifications.
+   * @param input - Message creation data including conversation_id and content
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The newly created message
+   * @throws Error if content is empty or database insert fails
+   */
   async createMessage(input: CreateMessageInput, supabaseClient?: SupabaseClient): Promise<Message> {
     const supabase = getSupabaseClient(supabaseClient);
     const sanitizedContent = sanitizePlainText(input.content);
@@ -271,6 +311,15 @@ export const messagesService = {
     return data;
   },
 
+  /**
+   * Updates an existing message.
+   * Sanitizes content and attachments. Only the sender can edit message content.
+   * @param id - The message identifier
+   * @param updates - Partial message data to update
+   * @param options - Optional write options including userId for ownership verification
+   * @returns The updated message
+   * @throws Error if unauthorized or database update fails
+   */
   async updateMessage(
     id: string,
     updates: Partial<CreateMessageInput>,
@@ -399,6 +448,12 @@ export const messagesService = {
     if (error) throw error;
   },
 
+  /**
+   * Marks a single message as read.
+   * Delegates to markConversationAsRead for consistency.
+   * @param id - The message identifier
+   * @returns The updated message or null if not found
+   */
   async markAsRead(id: string): Promise<Message | null> {
     // Mark a single message as read (for individual message marking if needed)
     // This delegates to markConversationAsRead for consistency
@@ -434,6 +489,12 @@ export const messagesService = {
     return updatedMessage;
   },
 
+  /**
+   * Marks all messages in a conversation as read for the current user.
+   * @param conversationId - The conversation identifier
+   * @returns Number of messages marked as read
+   * @throws Error if API request fails
+   */
   async markConversationAsRead(conversationId: string): Promise<number> {
     // Use API route to bypass RLS
     const response = await csrfFetch('/api/messages/mark-conversation-read', {
@@ -454,6 +515,13 @@ export const messagesService = {
     return result.markedCount || 0;
   },
 
+  /**
+   * Retrieves messaging statistics for a space.
+   * @param spaceId - The space identifier
+   * @param userId - Optional user ID for unread count calculation
+   * @returns Statistics including messages this week, unread count, and conversation count
+   * @throws Error if database query fails
+   */
   async getMessageStats(spaceId: string, userId?: string): Promise<MessageStats> {
     const supabase = createClient();
 
@@ -501,6 +569,13 @@ export const messagesService = {
     };
   },
 
+  /**
+   * Searches messages by content within a space.
+   * @param spaceId - The space identifier
+   * @param query - Search query string
+   * @returns Array of matching messages (max 50)
+   * @throws Error if database query fails
+   */
   async searchMessages(spaceId: string, query: string): Promise<Message[]> {
     const supabase = createClient();
     const { data, error} = await supabase
@@ -516,7 +591,10 @@ export const messagesService = {
   },
 
   /**
-   * Get thread replies for a parent message (with attachments)
+   * Retrieves thread replies for a parent message with attachments.
+   * @param parentMessageId - The parent message identifier
+   * @returns Array of reply messages with attachment metadata
+   * @throws Error if database query fails
    */
   async getThreadReplies(parentMessageId: string): Promise<MessageWithAttachments[]> {
     const supabase = createClient();
@@ -535,7 +613,10 @@ export const messagesService = {
   },
 
   /**
-   * Get messages with thread information (top-level messages only, no replies)
+   * Retrieves top-level messages with thread reply counts (excludes replies).
+   * @param conversationId - The conversation identifier
+   * @returns Array of messages with reply count metadata
+   * @throws Error if database query fails
    */
   async getMessagesWithThreads(conversationId: string): Promise<MessageWithReplies[]> {
     const supabase = createClient();
@@ -559,7 +640,10 @@ export const messagesService = {
   },
 
   /**
-   * Create a reply to a parent message
+   * Creates a threaded reply to a parent message.
+   * @param input - Reply creation data including parent_message_id
+   * @returns The newly created reply message
+   * @throws Error if database insert fails
    */
   async createReply(input: CreateMessageInput & { parent_message_id: string }): Promise<Message> {
     const supabase = createClient();
@@ -584,7 +668,12 @@ export const messagesService = {
   },
 
   /**
-   * Add a reaction to a message
+   * Adds a reaction to a message.
+   * @param messageId - The message identifier
+   * @param userId - The user adding the reaction
+   * @param emoji - The emoji reaction
+   * @returns The created reaction record
+   * @throws Error if database insert fails
    */
   async addReaction(messageId: string, userId: string, emoji: string): Promise<MessageReaction> {
     const supabase = createClient();
@@ -603,7 +692,11 @@ export const messagesService = {
   },
 
   /**
-   * Remove a reaction from a message
+   * Removes a reaction from a message.
+   * @param messageId - The message identifier
+   * @param userId - The user removing the reaction
+   * @param emoji - The emoji reaction to remove
+   * @throws Error if database delete fails
    */
   async removeReaction(messageId: string, userId: string, emoji: string): Promise<void> {
     const supabase = createClient();
@@ -618,7 +711,11 @@ export const messagesService = {
   },
 
   /**
-   * Get reaction summary for a message
+   * Retrieves reaction summary for a message grouped by emoji.
+   * @param messageId - The message identifier
+   * @param currentUserId - Optional user ID to flag their reactions
+   * @returns Array of reaction summaries with counts and user lists
+   * @throws Error if database query fails
    */
   async getMessageReactions(messageId: string, currentUserId?: string): Promise<MessageReactionSummary[]> {
     const supabase = createClient();
@@ -654,7 +751,11 @@ export const messagesService = {
   },
 
   /**
-   * Toggle a reaction (add if not present, remove if present)
+   * Toggles a reaction on a message (adds if not present, removes if present).
+   * @param messageId - The message identifier
+   * @param userId - The user toggling the reaction
+   * @param emoji - The emoji reaction
+   * @returns 'added' or 'removed' indicating the action taken
    */
   async toggleReaction(messageId: string, userId: string, emoji: string): Promise<'added' | 'removed'> {
     const supabase = createClient();
@@ -680,7 +781,10 @@ export const messagesService = {
   },
 
   /**
-   * Update typing indicator (upsert)
+   * Updates or creates a typing indicator for a user in a conversation.
+   * @param conversationId - The conversation identifier
+   * @param userId - The user who is typing
+   * @throws Error if database upsert fails
    */
   async updateTypingIndicator(conversationId: string, userId: string): Promise<void> {
     const supabase = createClient();
@@ -701,7 +805,10 @@ export const messagesService = {
   },
 
   /**
-   * Remove typing indicator
+   * Removes a typing indicator when user stops typing.
+   * @param conversationId - The conversation identifier
+   * @param userId - The user who stopped typing
+   * @throws Error if database delete fails
    */
   async removeTypingIndicator(conversationId: string, userId: string): Promise<void> {
     const supabase = createClient();
@@ -715,7 +822,11 @@ export const messagesService = {
   },
 
   /**
-   * Get active typing users (excluding current user)
+   * Retrieves active typing indicators (last 10 seconds), excluding current user.
+   * @param conversationId - The conversation identifier
+   * @param currentUserId - Optional user ID to exclude from results
+   * @returns Array of active typing indicators
+   * @throws Error if database query fails
    */
   async getTypingUsers(conversationId: string, currentUserId?: string): Promise<TypingIndicator[]> {
     const supabase = createClient();
@@ -741,7 +852,10 @@ export const messagesService = {
   },
 
   /**
-   * Subscribe to real-time message updates for a conversation
+   * Subscribes to real-time message updates for a conversation.
+   * @param conversationId - The conversation identifier
+   * @param callbacks - Object with onInsert, onUpdate, and onDelete handlers
+   * @returns RealtimeChannel for unsubscription
    */
   subscribeToMessages(
     conversationId: string,
@@ -799,7 +913,10 @@ export const messagesService = {
   },
 
   /**
-   * Subscribe to conversation updates
+   * Subscribes to real-time updates for a single conversation.
+   * @param conversationId - The conversation identifier
+   * @param onUpdate - Callback function called when conversation is updated
+   * @returns RealtimeChannel for unsubscription
    */
   subscribeToConversation(
     conversationId: string,
@@ -827,7 +944,8 @@ export const messagesService = {
   },
 
   /**
-   * Unsubscribe from channel (cleanup)
+   * Unsubscribes from a real-time channel (cleanup).
+   * @param channel - The RealtimeChannel to unsubscribe from
    */
   unsubscribe(channel: RealtimeChannel): void {
     const supabase = createClient();
@@ -839,7 +957,11 @@ export const messagesService = {
   // =====================================================
 
   /**
-   * Pin a message to the top of the conversation
+   * Pins a message to the top of the conversation.
+   * @param messageId - The message identifier
+   * @param userId - The user pinning the message
+   * @returns The updated message with pinned status
+   * @throws Error if database update fails
    */
   async pinMessage(messageId: string, userId: string): Promise<Message> {
     const supabase = createClient();
@@ -863,7 +985,10 @@ export const messagesService = {
   },
 
   /**
-   * Unpin a message
+   * Unpins a message from the conversation.
+   * @param messageId - The message identifier
+   * @returns The updated message with unpinned status
+   * @throws Error if database update fails
    */
   async unpinMessage(messageId: string): Promise<Message> {
     const supabase = createClient();
@@ -888,7 +1013,10 @@ export const messagesService = {
   },
 
   /**
-   * Get all pinned messages for a conversation
+   * Retrieves all pinned messages for a conversation.
+   * @param conversationId - The conversation identifier
+   * @returns Array of pinned messages with attachment metadata
+   * @throws Error if database query fails
    */
   async getPinnedMessages(conversationId: string): Promise<MessageWithAttachments[]> {
     const supabase = createClient();
@@ -912,7 +1040,11 @@ export const messagesService = {
   },
 
   /**
-   * Toggle pin status of a message
+   * Toggles the pin status of a message.
+   * @param messageId - The message identifier
+   * @param userId - The user toggling the pin
+   * @returns The updated message with new pin status
+   * @throws Error if database operation fails
    */
   async togglePin(messageId: string, userId: string): Promise<Message> {
     const supabase = createClient();
@@ -988,7 +1120,10 @@ export const messagesService = {
   },
 
   /**
-   * Create a new conversation
+   * Creates a new conversation.
+   * @param input - Conversation creation data including space_id and optional title
+   * @returns The newly created conversation
+   * @throws Error if database insert fails
    */
   async createConversation(input: CreateConversationInput): Promise<Conversation> {
     const supabase = createClient();
@@ -1021,7 +1156,9 @@ export const messagesService = {
   },
 
   /**
-   * Get a single conversation by ID
+   * Retrieves a single conversation by ID.
+   * @param conversationId - The conversation identifier
+   * @returns The conversation or null if not found
    */
   async getConversation(conversationId: string): Promise<Conversation | null> {
     const supabase = createClient();
@@ -1041,7 +1178,11 @@ export const messagesService = {
   },
 
   /**
-   * Update conversation metadata
+   * Updates conversation metadata (title, description, avatar, etc.).
+   * @param conversationId - The conversation identifier
+   * @param updates - Partial conversation data to update
+   * @returns The updated conversation
+   * @throws Error if database update fails
    */
   async updateConversation(
     conversationId: string,
@@ -1068,7 +1209,10 @@ export const messagesService = {
   },
 
   /**
-   * Archive a conversation
+   * Archives a conversation (hides from main list but preserves messages).
+   * @param conversationId - The conversation identifier
+   * @returns The archived conversation
+   * @throws Error if database update fails
    */
   async archiveConversation(conversationId: string): Promise<Conversation> {
     const supabase = createClient();
@@ -1092,7 +1236,10 @@ export const messagesService = {
   },
 
   /**
-   * Unarchive a conversation
+   * Restores an archived conversation to the main list.
+   * @param conversationId - The conversation identifier
+   * @returns The unarchived conversation
+   * @throws Error if database update fails
    */
   async unarchiveConversation(conversationId: string): Promise<Conversation> {
     const supabase = createClient();
@@ -1116,7 +1263,9 @@ export const messagesService = {
   },
 
   /**
-   * Delete a conversation and all its messages
+   * Permanently deletes a conversation and all its messages.
+   * @param conversationId - The conversation identifier
+   * @throws Error if database delete fails
    */
   async deleteConversation(conversationId: string): Promise<void> {
     const supabase = createClient();
@@ -1133,7 +1282,10 @@ export const messagesService = {
   },
 
   /**
-   * Subscribe to conversation list changes
+   * Subscribes to real-time conversation list changes for a space.
+   * @param spaceId - The space identifier
+   * @param callbacks - Object with onInsert, onUpdate, and onDelete handlers
+   * @returns RealtimeChannel for unsubscription
    */
   subscribeToConversations(
     spaceId: string,

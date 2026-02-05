@@ -99,7 +99,20 @@ interface ShoppingItemFromDB {
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
+/**
+ * Shopping Service
+ *
+ * Manages shopping lists and items with real-time collaboration support.
+ * Provides CRUD operations for lists, items, templates, and frequent item suggestions.
+ */
 export const shoppingService = {
+  /**
+   * Retrieves all shopping lists for a space with their items.
+   * @param spaceId - The space identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns Array of shopping lists with nested items and assignee details
+   * @throws Error if database query fails
+   */
   async getLists(spaceId: string, supabaseClient?: SupabaseClient): Promise<ShoppingList[]> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -113,6 +126,13 @@ export const shoppingService = {
     return data || [];
   },
 
+  /**
+   * Retrieves a single shopping list by ID with all items.
+   * @param id - The shopping list identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The shopping list with items, or null if not found
+   * @throws Error if database query fails
+   */
   async getListById(id: string, supabaseClient?: SupabaseClient): Promise<ShoppingList | null> {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
@@ -125,6 +145,13 @@ export const shoppingService = {
     return data;
   },
 
+  /**
+   * Creates a new shopping list.
+   * @param input - List creation data including space_id, title, and optional fields
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The newly created shopping list
+   * @throws Error if database insert fails
+   */
   async createList(input: CreateListWithItemsInput, supabaseClient?: SupabaseClient): Promise<ShoppingList> {
     const supabase = getSupabaseClient(supabaseClient);
     // Remove items field if it exists (items are created separately)
@@ -144,6 +171,15 @@ export const shoppingService = {
     return data;
   },
 
+  /**
+   * Updates an existing shopping list.
+   * Automatically manages completed_at timestamp based on status changes.
+   * @param id - The shopping list identifier
+   * @param updates - Partial list data to update
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The updated shopping list
+   * @throws Error if database update fails
+   */
   async updateList(id: string, updates: UpdateListInput, supabaseClient?: SupabaseClient): Promise<ShoppingList> {
     const supabase = getSupabaseClient(supabaseClient);
     // Remove items field if it exists (items are managed separately)
@@ -170,6 +206,12 @@ export const shoppingService = {
     return data;
   },
 
+  /**
+   * Deletes a shopping list and all associated items.
+   * @param id - The shopping list identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @throws Error if database delete fails
+   */
   async deleteList(id: string, supabaseClient?: SupabaseClient): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
     const { error } = await supabase
@@ -180,6 +222,12 @@ export const shoppingService = {
     if (error) throw error;
   },
 
+  /**
+   * Creates a new shopping item with auto-categorization.
+   * @param input - Item creation data including list_id and name
+   * @returns The newly created shopping item
+   * @throws Error if database insert fails
+   */
   async createItem(input: CreateItemInput): Promise<ShoppingItem> {
     const supabase = createClient();
 
@@ -201,6 +249,13 @@ export const shoppingService = {
     return data;
   },
 
+  /**
+   * Updates an existing shopping item.
+   * @param id - The shopping item identifier
+   * @param updates - Partial item data to update
+   * @returns The updated shopping item
+   * @throws Error if database update fails
+   */
   async updateItem(id: string, updates: Partial<CreateItemInput>): Promise<ShoppingItem> {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -214,10 +269,21 @@ export const shoppingService = {
     return data;
   },
 
+  /**
+   * Toggles the checked status of a shopping item.
+   * @param id - The shopping item identifier
+   * @param checked - The new checked state
+   * @returns The updated shopping item
+   */
   async toggleItem(id: string, checked: boolean): Promise<ShoppingItem> {
     return this.updateItem(id, { checked } as Partial<CreateItemInput>);
   },
 
+  /**
+   * Deletes a shopping item.
+   * @param id - The shopping item identifier
+   * @throws Error if database delete fails
+   */
   async deleteItem(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
@@ -228,6 +294,11 @@ export const shoppingService = {
     if (error) throw error;
   },
 
+  /**
+   * Retrieves shopping statistics for a space.
+   * @param spaceId - The space identifier
+   * @returns Statistics including total lists, active lists, items this week, and completed lists
+   */
   async getShoppingStats(spaceId: string): Promise<ShoppingStats> {
     const lists = await this.getLists(spaceId);
     const now = new Date();
@@ -250,7 +321,12 @@ export const shoppingService = {
     };
   },
 
-  // Real-time subscription for shopping lists
+  /**
+   * Subscribes to real-time shopping list changes for a space.
+   * @param spaceId - The space identifier
+   * @param callback - Function called when lists change (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel for unsubscription
+   */
   subscribeToLists(spaceId: string, callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void): RealtimeChannel {
     const supabase = createClient();
 
@@ -271,7 +347,12 @@ export const shoppingService = {
     return channel;
   },
 
-  // Real-time subscription for shopping items
+  /**
+   * Subscribes to real-time shopping item changes for a list.
+   * @param listId - The shopping list identifier
+   * @param callback - Function called when items change (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel for unsubscription
+   */
   subscribeToItems(listId: string, callback: (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => void): RealtimeChannel {
     const supabase = createClient();
 
@@ -292,7 +373,14 @@ export const shoppingService = {
     return channel;
   },
 
-  // Get frequently purchased items
+  /**
+   * Retrieves frequently purchased items from the last 30 days.
+   * Used for quick-add suggestions in the shopping UI.
+   * @param spaceId - The space identifier
+   * @param limit - Maximum number of items to return (default: 20)
+   * @returns Array of items with name, purchase count, and category
+   * @throws Error if database query fails
+   */
   async getFrequentItems(spaceId: string, limit = 20): Promise<{ name: string; count: number; category: string }[]> {
     const supabase = createClient();
 
@@ -339,7 +427,12 @@ export const shoppingService = {
     return frequentItems;
   },
 
-  // Template management
+  /**
+   * Retrieves all shopping templates for a space.
+   * @param spaceId - The space identifier
+   * @returns Array of shopping templates
+   * @throws Error if database query fails
+   */
   async getTemplates(spaceId: string) {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -352,6 +445,15 @@ export const shoppingService = {
     return data || [];
   },
 
+  /**
+   * Creates a new shopping template for reusable lists.
+   * @param spaceId - The space identifier
+   * @param name - Template name
+   * @param description - Template description
+   * @param items - Array of template items
+   * @returns The newly created template
+   * @throws Error if database insert fails
+   */
   async createTemplate(spaceId: string, name: string, description: string, items: TemplateItemInput[]) {
     const supabase = createClient();
     const { data, error } = await supabase
@@ -369,6 +471,11 @@ export const shoppingService = {
     return data;
   },
 
+  /**
+   * Deletes a shopping template.
+   * @param id - The template identifier
+   * @throws Error if database delete fails
+   */
   async deleteTemplate(id: string) {
     const supabase = createClient();
     const { error } = await supabase
@@ -379,6 +486,14 @@ export const shoppingService = {
     if (error) throw error;
   },
 
+  /**
+   * Creates a new shopping list from a template.
+   * Copies the template name, description, and all items to a new active list.
+   * @param templateId - The template identifier
+   * @param spaceId - The space identifier
+   * @returns The newly created shopping list
+   * @throws Error if template not found or database operation fails
+   */
   async createListFromTemplate(templateId: string, spaceId: string) {
     const supabase = createClient();
 
