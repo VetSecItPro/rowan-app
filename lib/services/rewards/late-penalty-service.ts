@@ -153,7 +153,28 @@ export async function updateSpacePenaltySettings(
 // ============================================================================
 
 /**
- * Calculate penalty for a chore based on completion timing
+ * Calculate penalty for a chore based on completion timing.
+ *
+ * Algorithm:
+ * 1. Add grace period to due date (default 2 hours) - late = after grace deadline
+ * 2. Calculate days late (rounded up from milliseconds)
+ * 3. Apply penalty formula based on settings:
+ *
+ *    Progressive mode (default):
+ *      penalty = base * multiplier^(daysLate - 1)
+ *      Example: base=5, multiplier=1.5, 3 days late
+ *        Day 1: 5 * 1.5^0 = 5 points
+ *        Day 2: 5 * 1.5^1 = 7.5 points
+ *        Day 3: 5 * 1.5^2 = 11.25 points
+ *      This encourages completing chores sooner.
+ *
+ *    Flat mode:
+ *      penalty = base * daysLate
+ *      Example: base=5, 3 days late = 15 points
+ *
+ * 4. Cap at max_penalty_per_chore (default 50) to prevent runaway penalties
+ *
+ * Chore-specific overrides take precedence over space settings.
  */
 export function calculatePenalty(
   dueDate: Date,
@@ -164,13 +185,14 @@ export function calculatePenalty(
     gracePeriodHours?: number;
   }
 ): PenaltyCalculation {
+  // Use chore-specific settings if provided, otherwise use space defaults
   const gracePeriodHours = choreOverrides?.gracePeriodHours ?? settings.default_grace_period_hours;
   const basePenalty = choreOverrides?.penaltyPoints ?? settings.default_penalty_points;
 
-  // Calculate deadline with grace period
+  // Grace period extends the deadline - not late until after this
   const graceDeadline = new Date(dueDate.getTime() + gracePeriodHours * 60 * 60 * 1000);
 
-  // Not late if completed before grace deadline
+  // Completed within grace period - no penalty
   if (completionDate <= graceDeadline) {
     return {
       isLate: false,
@@ -181,21 +203,22 @@ export function calculatePenalty(
     };
   }
 
-  // Calculate days late (rounded up)
+  // Calculate days late (always round up - 1 hour late = 1 day penalty)
   const msLate = completionDate.getTime() - graceDeadline.getTime();
   const daysLate = Math.ceil(msLate / (24 * 60 * 60 * 1000));
 
-  // Calculate penalty points
   let penaltyPoints: number;
 
   if (settings.progressive_penalty) {
-    // Progressive: base * multiplier^(days-1), capped
+    // Progressive: exponential growth encourages completing sooner
+    // Formula: base * multiplier^(days-1), then cap
     penaltyPoints = Math.min(
       Math.ceil(basePenalty * Math.pow(settings.penalty_multiplier_per_day, daysLate - 1)),
       settings.max_penalty_per_chore
     );
   } else {
-    // Flat: base * days, capped
+    // Flat: linear growth, simpler to understand
+    // Formula: base * days, then cap
     penaltyPoints = Math.min(basePenalty * daysLate, settings.max_penalty_per_chore);
   }
 

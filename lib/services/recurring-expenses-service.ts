@@ -104,37 +104,50 @@ export async function analyzeRecurringPatterns(spaceId: string): Promise<Recurri
 }
 
 /**
- * Core pattern detection algorithm
+ * Core pattern detection algorithm for recurring expenses.
+ *
+ * Algorithm:
+ * 1. Group expenses by merchant (or category if no merchant name)
+ * 2. For each group with 3+ expenses, calculate intervals between consecutive dates
+ * 3. Match average interval to known frequencies (daily, weekly, monthly, etc.)
+ * 4. Calculate confidence score based on:
+ *    - Interval consistency (how regular are the payments)
+ *    - Amount consistency (how similar are the amounts)
+ *    - Occurrence count (more data = higher confidence)
+ *
+ * Minimum 3 occurrences required to detect a pattern (avoids false positives).
+ * Patterns must fall within frequency tolerance (e.g., monthly = 30 days +/- 3).
  */
 function detectPatterns(expenses: ExpenseForAnalysis[]): PatternCandidate[] {
   const patterns: PatternCandidate[] = [];
 
-  // Group expenses by merchant (or category if no merchant)
+  // Group by merchant name (more precise) or category (fallback)
   const groupedExpenses = groupExpenses(expenses);
 
   for (const [, expenseGroup] of Object.entries(groupedExpenses)) {
-    if (expenseGroup.length < 3) continue; // Need at least 3 occurrences
+    // Require at least 3 occurrences to establish a pattern
+    if (expenseGroup.length < 3) continue;
 
-    // Sort by date
+    // Sort chronologically to calculate intervals
     expenseGroup.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Calculate intervals between consecutive expenses
+    // Calculate days between each consecutive expense
     const intervals: number[] = [];
     for (let i = 1; i < expenseGroup.length; i++) {
       const days = daysBetween(expenseGroup[i - 1].date, expenseGroup[i].date);
       intervals.push(days);
     }
 
-    // Detect frequency based on interval patterns
+    // Try to match interval pattern to a known frequency
     const frequency = detectFrequency(intervals);
-    if (!frequency) continue;
+    if (!frequency) continue; // No matching frequency found
 
-    // Calculate amount statistics
+    // Calculate amount statistics for confidence scoring
     const amounts = expenseGroup.map((e) => e.amount);
     const avgAmount = amounts.reduce((sum, amt) => sum + amt, 0) / amounts.length;
     const variance = calculateVariance(amounts, avgAmount);
 
-    // Calculate confidence score
+    // Compute confidence score (0-100) based on regularity
     const confidence = calculateConfidence(intervals, frequency, variance, expenseGroup.length);
 
     patterns.push({
@@ -195,7 +208,22 @@ function detectFrequency(intervals: number[]): RecurrenceFrequency | null {
 }
 
 /**
- * Calculates confidence score (0-100)
+ * Calculates confidence score (0-100) for a detected recurring pattern.
+ *
+ * Scoring breakdown (max 100 points):
+ * - Interval consistency: 40 points max
+ *   - Deduct 2 points per day deviation from expected frequency
+ *   - Example: Monthly (30 days) with actual intervals of 28, 31, 29 = low deviation = high score
+ *
+ * - Amount consistency: 30 points max
+ *   - Deduct 1 point per dollar of standard deviation
+ *   - Low variance (same amount each time) = subscription-like = high score
+ *
+ * - Occurrence count: 30 points max
+ *   - 5 points per occurrence (6+ occurrences = max 30 points)
+ *   - More history = more confident it's truly recurring
+ *
+ * Patterns scoring below 60 are not saved (set in analyzeRecurringPatterns).
  */
 function calculateConfidence(
   intervals: number[],
@@ -203,23 +231,22 @@ function calculateConfidence(
   amountVariance: number,
   occurrenceCount: number
 ): number {
-  let confidence = 100;
-
-  // Factor 1: Interval consistency (40 points)
+  // Factor 1: Interval consistency (40 points max)
+  // How close are actual intervals to expected frequency?
   const expectedDays = FREQUENCY_INTERVALS[frequency].days;
   const intervalDeviations = intervals.map((i) => Math.abs(i - expectedDays));
   const avgDeviation = intervalDeviations.reduce((sum, d) => sum + d, 0) / intervalDeviations.length;
   const intervalScore = Math.max(0, 40 - avgDeviation * 2);
-  confidence = intervalScore;
 
-  // Factor 2: Amount consistency (30 points)
+  // Factor 2: Amount consistency (30 points max)
+  // Lower variance = more like a subscription = higher confidence
   const amountScore = Math.max(0, 30 - amountVariance);
-  confidence += amountScore;
 
-  // Factor 3: Number of occurrences (30 points)
+  // Factor 3: Number of occurrences (30 points max)
+  // More data points = more confidence it's truly recurring
   const occurrenceScore = Math.min(30, occurrenceCount * 5);
-  confidence += occurrenceScore;
 
+  const confidence = intervalScore + amountScore + occurrenceScore;
   return Math.round(Math.min(100, confidence));
 }
 

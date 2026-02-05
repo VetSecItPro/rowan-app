@@ -52,21 +52,17 @@ const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClien
 /**
  * Chores Service
  *
- * Service for managing household chores with full CRUD operations and real-time subscriptions.
- *
- * Features:
- * - Full CRUD operations (Create, Read, Update, Delete)
- * - Frequency-based chore tracking
- * - Real-time subscriptions
- * - User assignment support
+ * Manages household chores with full CRUD operations, real-time subscriptions, and rewards integration.
+ * Supports frequency-based tracking, user assignments, drag-and-drop ordering, and point-based rewards.
  */
 export const choresService = {
   /**
-   * Get all chores for a space with optional filtering
-   *
-   * @param spaceId - The space ID to fetch chores from
-   * @param options - Optional query options for filtering
-   * @returns Promise<Chore[]> - Array of chores
+   * Retrieves all chores for a space with optional filtering.
+   * @param spaceId - The space identifier
+   * @param options - Optional query options for filtering by status, frequency, user, or search
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns Array of chores sorted by sort_order then created_at
+   * @throws Error if database query fails
    */
   async getChores(spaceId: string, options?: ChoreQueryOptions, supabaseClient?: SupabaseClient): Promise<Chore[]> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -120,10 +116,10 @@ export const choresService = {
   },
 
   /**
-   * Get a single chore by ID
-   *
-   * @param id - Chore ID
-   * @returns Promise<Chore | null> - Chore or null if not found
+   * Retrieves a single chore by ID.
+   * @param id - The chore identifier
+   * @returns The chore or null if not found
+   * @throws Error if database query fails
    */
   async getChoreById(id: string): Promise<Chore | null> {
     const supabase = createClient();
@@ -149,10 +145,11 @@ export const choresService = {
   },
 
   /**
-   * Create a new chore
-   *
-   * @param data - Chore creation data
-   * @returns Promise<Chore> - Created chore
+   * Creates a new chore.
+   * @param data - Chore creation data including title, frequency, and space_id
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The newly created chore
+   * @throws Error if database insert fails
    */
   async createChore(data: CreateChoreInput, supabaseClient?: SupabaseClient): Promise<Chore> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -176,12 +173,11 @@ export const choresService = {
   },
 
   /**
-   * Update a chore
-   * Automatically sets completed_at timestamp when status is changed to 'completed'
-   *
-   * @param id - Chore ID
+   * Updates a chore. Automatically manages completed_at timestamp based on status.
+   * @param id - The chore identifier
    * @param updates - Partial chore data to update
-   * @returns Promise<Chore> - Updated chore
+   * @returns The updated chore
+   * @throws Error if database update fails
    */
   async updateChore(id: string, updates: UpdateChoreInput): Promise<Chore> {
     const supabase = createClient();
@@ -218,10 +214,9 @@ export const choresService = {
   },
 
   /**
-   * Delete a chore
-   *
-   * @param id - Chore ID
-   * @returns Promise<void>
+   * Deletes a chore.
+   * @param id - The chore identifier
+   * @throws Error if database delete fails
    */
   async deleteChore(id: string): Promise<void> {
     const supabase = createClient();
@@ -241,11 +236,11 @@ export const choresService = {
   },
 
   /**
-   * Update chore sort order for drag and drop
-   *
-   * @param id - Chore ID
+   * Updates chore sort order for drag and drop reordering.
+   * @param id - The chore identifier
    * @param newSortOrder - New sort order position
-   * @returns Promise<Chore> - Updated chore
+   * @returns The updated chore
+   * @throws Error if database update fails
    */
   async updateChoreOrder(id: string, newSortOrder: number): Promise<Chore> {
     const supabase = createClient();
@@ -282,10 +277,9 @@ export const choresService = {
   },
 
   /**
-   * Bulk update chore sort orders for drag and drop
-   *
+   * Bulk updates chore sort orders for drag and drop reordering.
    * @param updates - Array of {id, sort_order} objects
-   * @returns Promise<void>
+   * @throws Error if any update fails
    */
   async bulkUpdateChoreOrder(updates: Array<{id: string; sort_order: number}>): Promise<void> {
     try {
@@ -300,11 +294,11 @@ export const choresService = {
   },
 
   /**
-   * Get chores assigned to a specific user
-   *
-   * @param spaceId - Space ID
-   * @param userId - User ID
-   * @returns Promise<Chore[]> - Chores assigned to user
+   * Retrieves chores assigned to a specific user.
+   * @param spaceId - The space identifier
+   * @param userId - The user identifier
+   * @returns Array of chores assigned to the user
+   * @throws Error if database query fails
    */
   async getChoresByUser(spaceId: string, userId: string): Promise<Chore[]> {
     const supabase = createClient();
@@ -328,11 +322,11 @@ export const choresService = {
   },
 
   /**
-   * Get chores by frequency
-   *
-   * @param spaceId - Space ID
-   * @param frequency - Frequency filter (daily, weekly, monthly, once)
-   * @returns Promise<Chore[]> - Chores with specified frequency
+   * Retrieves chores filtered by frequency.
+   * @param spaceId - The space identifier
+   * @param frequency - Frequency filter (daily, weekly, biweekly, monthly, once)
+   * @returns Array of chores with the specified frequency
+   * @throws Error if database query fails
    */
   async getChoresByFrequency(spaceId: string, frequency: string): Promise<Chore[]> {
     const supabase = createClient();
@@ -356,11 +350,10 @@ export const choresService = {
   },
 
   /**
-   * Subscribe to real-time chore changes for a space
-   *
-   * @param spaceId - Space ID to subscribe to
-   * @param callback - Callback function called when chores change
-   * @returns RealtimeChannel - Channel object with unsubscribe method
+   * Subscribes to real-time chore changes for a space.
+   * @param spaceId - The space identifier
+   * @param callback - Function called when chores change (INSERT/UPDATE/DELETE)
+   * @returns RealtimeChannel for unsubscription
    */
   subscribeToChores(
     spaceId: string,
@@ -393,11 +386,10 @@ export const choresService = {
   },
 
   /**
-   * Get chore statistics for a space
-   *
-   * @param spaceId - Space ID
-   * @param currentUserId - Current user ID
-   * @returns Promise<ChoreStats> - Chore statistics
+   * Retrieves chore statistics for a space.
+   * @param spaceId - The space identifier
+   * @param currentUserId - Current user's ID for ownership calculations
+   * @returns Statistics including total, completed this week, my chores, and partner chores
    */
   async getChoreStats(spaceId: string, currentUserId: string): Promise<ChoreStats> {
     const chores = await this.getChores(spaceId);
@@ -417,11 +409,11 @@ export const choresService = {
   },
 
   /**
-   * Complete a chore and award points
-   *
-   * @param choreId - Chore ID to complete
+   * Completes a chore and awards points with streak tracking.
+   * @param choreId - The chore identifier
    * @param userId - User who completed the chore
-   * @returns Promise with updated chore and reward info
+   * @returns Object with updated chore, points awarded, streak bonus, and transaction
+   * @throws Error if chore not found or already completed
    */
   async completeChoreWithRewards(
     choreId: string,
@@ -485,11 +477,9 @@ export const choresService = {
   },
 
   /**
-   * Uncomplete a chore (revert to pending)
-   * Note: This does NOT refund points - points are earned when completing
-   *
-   * @param choreId - Chore ID to uncomplete
-   * @returns Promise<Chore> - Updated chore
+   * Reverts a completed chore to pending status. Does not refund points.
+   * @param choreId - The chore identifier
+   * @returns The updated chore with pending status
    */
   async uncompleteChore(choreId: string): Promise<Chore> {
     return this.updateChore(choreId, {
@@ -499,11 +489,10 @@ export const choresService = {
   },
 
   /**
-   * Complete a chore via API with full rewards and late penalty support
-   * This is the preferred method as it handles server-side penalty calculations
-   *
-   * @param choreId - Chore ID to complete
-   * @returns Promise with chore, rewards, and penalty info
+   * Completes a chore via API with full rewards and late penalty support.
+   * Preferred method as it handles server-side penalty calculations.
+   * @param choreId - The chore identifier
+   * @returns Object with success flag, chore, rewards, penalty info, and net points
    */
   async completeChoreViaAPI(
     choreId: string

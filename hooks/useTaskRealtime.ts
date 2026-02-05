@@ -48,7 +48,10 @@ function taskPassesFilters(task: Task, filters?: UseTaskRealtimeOptions['filters
   );
 }
 
-// Debounce helper for state updates with cancel support
+/**
+ * Debounce helper with cancel support for batched state updates.
+ * Used to batch rapid real-time updates into single React state changes.
+ */
 type DebouncedFn<T extends (...args: unknown[]) => void> = T & { cancel: () => void };
 function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number): DebouncedFn<T> {
   let timeoutId: NodeJS.Timeout;
@@ -81,14 +84,24 @@ export function useTaskRealtime({
   // Ref to hold the loadTasks function so refreshTasks can call it
   const loadDataRef = useRef<(() => Promise<void>) | null>(null);
 
-  // Performance optimizations
+  /**
+   * Batched real-time update queue.
+   *
+   * Problem: Supabase real-time can fire many events in rapid succession (e.g., bulk
+   * drag-drop reorder sends N updates). Without batching, each event triggers a
+   * separate React state update, causing UI flicker and performance issues.
+   *
+   * Solution: Queue incoming changes by type (insert/update/delete) and apply
+   * them together after a 50ms debounce window. This batches rapid-fire events
+   * into a single state update.
+   */
   const updateQueueRef = useRef<{
     inserts: Task[];
     updates: Task[];
     deletes: string[];
   }>({ inserts: [], updates: [], deletes: [] });
 
-  // Debounced batch update function - use useRef to avoid recreation
+  // Debounced batch processor - persisted in ref to avoid recreation
   const debouncedBatchUpdateRef = useRef<DebouncedFn<() => void> | null>(null);
 
   if (!debouncedBatchUpdateRef.current) {
@@ -101,32 +114,32 @@ export function useTaskRealtime({
       setTasks(prev => {
         let result = [...prev];
 
-        // Process deletes first
+        // Order matters: delete first to avoid updating tasks about to be removed
         if (queue.deletes.length > 0) {
           const deleteSet = new Set(queue.deletes);
           result = result.filter(task => !deleteSet.has(task.id));
         }
 
-        // Process updates
+        // Apply updates using Map for O(1) lookup
         if (queue.updates.length > 0) {
           const updateMap = new Map(queue.updates.map(task => [task.id, task]));
           result = result.map(task => updateMap.get(task.id) || task);
         }
 
-        // Process inserts
+        // Add new tasks, filtering duplicates (might already exist from optimistic update)
         if (queue.inserts.length > 0) {
           const existingIds = new Set(result.map(task => task.id));
           const newTasks = queue.inserts.filter(task => !existingIds.has(task.id));
           result = [...result, ...newTasks];
         }
 
-        // Sort once at the end (provide defaults for undefined sort_order)
+        // Single sort at the end instead of sorting after each operation
         return result.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
       });
 
-      // Clear the queue
+      // Clear queue after processing
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
-    }, 50); // 50ms debounce for smooth updates
+    }, 50); // 50ms batching window - balances responsiveness vs performance
   }
 
   const debouncedBatchUpdate = debouncedBatchUpdateRef.current;

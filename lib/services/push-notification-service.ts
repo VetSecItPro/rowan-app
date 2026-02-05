@@ -1,8 +1,13 @@
 /**
  * Push Notification Service
  *
- * Server-side service for managing push notifications.
- * Handles token storage, notification sending, and delivery tracking.
+ * Server-side service for managing push notifications across iOS, Android, and web platforms.
+ * Handles device token registration, notification delivery via FCM or Expo, and token lifecycle
+ * management including automatic deactivation of invalid tokens.
+ *
+ * Supported providers:
+ * - Firebase Cloud Messaging (FCM v1 API) - requires FIREBASE_SERVICE_ACCOUNT env var
+ * - Expo Push Notifications - requires EXPO_ACCESS_TOKEN env var
  */
 
 import { createClient } from '@/lib/supabase/server';
@@ -13,6 +18,9 @@ import { logger } from '@/lib/logger';
 // Types
 // ============================================================================
 
+/**
+ * Represents a registered push notification token for a user's device.
+ */
 export interface PushToken {
   id: string;
   user_id: string;
@@ -26,23 +34,42 @@ export interface PushToken {
   updated_at: string;
 }
 
+/**
+ * Payload structure for push notification content and behavior.
+ */
 export interface NotificationPayload {
+  /** The notification title displayed to the user */
   title: string;
+  /** The notification body text */
   body: string;
+  /** Custom data payload passed to the app when notification is tapped */
   data?: Record<string, string>;
+  /** Badge count to display on app icon (iOS) */
   badge?: number;
+  /** Sound file name or 'default' */
   sound?: string;
+  /** URL of an image to display with the notification */
   image?: string;
-  // Action URL when notification is tapped
+  /** Deep link URL when notification is tapped */
   actionUrl?: string;
 }
 
+/**
+ * Result of sending a notification to a single device token.
+ */
 export interface NotificationResult {
+  /** Whether the notification was sent successfully */
   success: boolean;
+  /** The database ID of the push token that was targeted */
   tokenId: string;
+  /** Error message if the send failed */
   error?: string;
 }
 
+/**
+ * Notification type categories used for routing to appropriate Android channels
+ * and for analytics tracking.
+ */
 export type NotificationType =
   | 'location_arrival'
   | 'location_departure'
@@ -100,7 +127,16 @@ const sendNotificationSchema = z.object({
 // ============================================================================
 
 /**
- * Register or update a push notification token
+ * Registers or updates a push notification token for a user's device.
+ *
+ * If the token already exists for this user, updates its metadata. Otherwise,
+ * creates a new token record. Tokens are associated with both the user and
+ * their current space for proper notification targeting.
+ *
+ * @param userId - The unique identifier of the user
+ * @param spaceId - The unique identifier of the user's current space
+ * @param input - Token registration data including the token string, platform, and device name
+ * @returns An object with success status and the token ID if successful
  */
 export async function registerPushToken(
   userId: string,
@@ -167,7 +203,14 @@ export async function registerPushToken(
 }
 
 /**
- * Unregister a push token (e.g., on logout)
+ * Unregisters a push token by marking it as inactive.
+ *
+ * Call this when a user logs out to stop sending notifications to their device.
+ * The token record is kept for auditing but marked inactive.
+ *
+ * @param userId - The unique identifier of the user
+ * @param token - The push token string to deactivate
+ * @returns An object indicating success or failure
  */
 export async function unregisterPushToken(
   userId: string,
@@ -193,7 +236,13 @@ export async function unregisterPushToken(
 }
 
 /**
- * Deactivate all tokens for a user (e.g., on account deletion)
+ * Deactivates all push tokens for a user.
+ *
+ * Use this during account deletion or when a user revokes notification permissions.
+ * All active tokens are marked inactive in a single operation.
+ *
+ * @param userId - The unique identifier of the user
+ * @returns An object with success status and the count of deactivated tokens
  */
 export async function deactivateAllTokens(
   userId: string
@@ -218,7 +267,14 @@ export async function deactivateAllTokens(
 }
 
 /**
- * Get active tokens for users in a space
+ * Retrieves all active push tokens for specified users within a space.
+ *
+ * Used to gather device tokens before sending notifications. Only returns
+ * tokens that are marked as active and belong to the specified space.
+ *
+ * @param userIds - Array of user IDs to fetch tokens for
+ * @param spaceId - The space ID to filter tokens by
+ * @returns Array of active push token records
  */
 export async function getActiveTokensForUsers(
   userIds: string[],
@@ -248,15 +304,18 @@ export async function getActiveTokensForUsers(
 // ============================================================================
 
 /**
- * Send push notification to specific users
+ * Sends push notifications to specific users in a space.
  *
- * NOTE: This function requires a push notification provider to be configured.
- * Currently supports:
- * - Firebase Cloud Messaging (FCM v1 API) - set FIREBASE_SERVICE_ACCOUNT env var
- *   (JSON string of the Firebase service account key file)
- * - Expo Push - set EXPO_ACCESS_TOKEN env var (if using Expo)
+ * Fetches active tokens for the target users and sends the notification to each
+ * device. Automatically handles token validation, updating last_used timestamps
+ * for successful sends, and deactivating invalid tokens.
  *
- * The actual sending is abstracted to allow easy provider switching.
+ * Requires a push notification provider to be configured:
+ * - Firebase Cloud Messaging: Set FIREBASE_SERVICE_ACCOUNT env var
+ * - Expo Push: Set EXPO_ACCESS_TOKEN env var
+ *
+ * @param input - Validated input containing userIds, spaceId, notification payload, and type
+ * @returns An object with overall success status and per-token delivery results
  */
 export async function sendPushNotification(
   input: z.infer<typeof sendNotificationSchema>
@@ -323,7 +382,16 @@ export async function sendPushNotification(
 }
 
 /**
- * Send notification to all members of a space (except sender)
+ * Sends a push notification to all members of a space.
+ *
+ * Fetches all space members and sends the notification to each, optionally
+ * excluding a specific user (typically the action initiator).
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param excludeUserId - Optional user ID to exclude from notifications (e.g., the sender)
+ * @param notification - The notification payload to send
+ * @param type - The notification type for channel routing
+ * @returns An object with success status and count of notifications sent
  */
 export async function notifySpaceMembers(
   spaceId: string,
@@ -638,7 +706,14 @@ async function deactivateToken(tokenId: string): Promise<void> {
 // ============================================================================
 
 /**
- * Notify user of location arrival
+ * Notifies space members when a family member arrives at a location.
+ *
+ * Sends notifications to all space members except the person who arrived.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param userId - The user ID of the person who arrived (excluded from notifications)
+ * @param userName - The display name of the person who arrived
+ * @param placeName - The name of the location (e.g., "Home", "School")
  */
 export async function notifyLocationArrival(
   spaceId: string,
@@ -660,7 +735,14 @@ export async function notifyLocationArrival(
 }
 
 /**
- * Notify user of location departure
+ * Notifies space members when a family member leaves a location.
+ *
+ * Sends notifications to all space members except the person who left.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param userId - The user ID of the person who left (excluded from notifications)
+ * @param userName - The display name of the person who left
+ * @param placeName - The name of the location (e.g., "Home", "Work")
  */
 export async function notifyLocationDeparture(
   spaceId: string,
@@ -682,7 +764,12 @@ export async function notifyLocationDeparture(
 }
 
 /**
- * Notify user of task assignment
+ * Notifies a user when they are assigned a task.
+ *
+ * @param spaceId - The unique identifier of the space containing the task
+ * @param assignedToUserId - The user ID of the person assigned to the task
+ * @param taskTitle - The title of the assigned task
+ * @param assignedByName - The display name of the person who assigned the task
  */
 export async function notifyTaskAssigned(
   spaceId: string,
@@ -704,7 +791,11 @@ export async function notifyTaskAssigned(
 }
 
 /**
- * Notify user of overdue task
+ * Notifies a user that their task is overdue.
+ *
+ * @param spaceId - The unique identifier of the space containing the task
+ * @param userId - The user ID of the task assignee
+ * @param taskTitle - The title of the overdue task
  */
 export async function notifyTaskOverdue(
   spaceId: string,
@@ -725,7 +816,14 @@ export async function notifyTaskOverdue(
 }
 
 /**
- * Notify user of new message
+ * Notifies users of a new message in a conversation.
+ *
+ * Truncates message previews longer than 100 characters for cleaner display.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param recipientUserIds - Array of user IDs to notify (conversation participants minus sender)
+ * @param senderName - The display name of the message sender
+ * @param messagePreview - A preview of the message content
  */
 export async function notifyNewMessage(
   spaceId: string,
@@ -747,7 +845,14 @@ export async function notifyNewMessage(
 }
 
 /**
- * Notify user of event reminder
+ * Notifies users of an upcoming calendar event.
+ *
+ * Formats the time until the event appropriately (minutes or hours).
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param userIds - Array of user IDs to notify (event participants)
+ * @param eventTitle - The title of the upcoming event
+ * @param minutesUntil - Minutes until the event starts
  */
 export async function notifyEventReminder(
   spaceId: string,
@@ -773,7 +878,12 @@ export async function notifyEventReminder(
 }
 
 /**
- * Notify user of goal milestone
+ * Notifies users when a goal reaches a milestone.
+ *
+ * @param spaceId - The unique identifier of the space
+ * @param userIds - Array of user IDs to notify (goal participants)
+ * @param goalTitle - The title of the goal
+ * @param percentComplete - The current completion percentage of the goal
  */
 export async function notifyGoalMilestone(
   spaceId: string,

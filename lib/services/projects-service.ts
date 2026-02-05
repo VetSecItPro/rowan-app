@@ -43,11 +43,17 @@ function cleanProjectInput(input: Partial<CreateProjectInput>): Record<string, u
 
 /**
  * Projects Service
- * Handles all project CRUD operations and stats
+ *
+ * Manages household projects with status tracking, budgets, and timelines.
+ * Provides CRUD operations and dashboard statistics.
  */
 export const projectsOnlyService = {
   /**
-   * Get all projects for a space
+   * Retrieves all projects for a space.
+   * @param spaceId - The space identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns Array of projects sorted by creation date (newest first)
+   * @throws Error if database query fails
    */
   async getProjects(spaceId: string, supabaseClient?: SupabaseClient): Promise<Project[]> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -62,7 +68,11 @@ export const projectsOnlyService = {
   },
 
   /**
-   * Get a single project by ID
+   * Retrieves a single project by ID.
+   * @param id - The project identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The project or null if not found
+   * @throws Error if database query fails
    */
   async getProjectById(id: string, supabaseClient?: SupabaseClient): Promise<Project | null> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -77,7 +87,11 @@ export const projectsOnlyService = {
   },
 
   /**
-   * Create a new project
+   * Creates a new project with optional budget and timeline.
+   * @param input - Project creation data including name and optional dates/budget
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The newly created project
+   * @throws Error if database insert fails
    */
   async createProject(input: CreateProjectInput, supabaseClient?: SupabaseClient): Promise<Project> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -97,7 +111,12 @@ export const projectsOnlyService = {
   },
 
   /**
-   * Update an existing project
+   * Updates an existing project.
+   * @param id - The project identifier
+   * @param updates - Partial project data to update
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @returns The updated project
+   * @throws Error if database update fails
    */
   async updateProject(id: string, updates: Partial<CreateProjectInput>, supabaseClient?: SupabaseClient): Promise<Project> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -118,7 +137,10 @@ export const projectsOnlyService = {
   },
 
   /**
-   * Delete a project
+   * Deletes a project.
+   * @param id - The project identifier
+   * @param supabaseClient - Optional Supabase client for server-side usage
+   * @throws Error if database delete fails
    */
   async deleteProject(id: string, supabaseClient?: SupabaseClient): Promise<void> {
     const supabase = getSupabaseClient(supabaseClient);
@@ -131,7 +153,9 @@ export const projectsOnlyService = {
   },
 
   /**
-   * Get project statistics for dashboard
+   * Retrieves project statistics for dashboard display.
+   * @param spaceId - The space identifier
+   * @returns Statistics including counts by status and total budget
    */
   async getProjectStats(spaceId: string): Promise<ProjectStats> {
     try {

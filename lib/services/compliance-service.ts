@@ -55,7 +55,13 @@ export interface ComplianceEvent {
 }
 
 /**
- * Get user's privacy preferences
+ * Retrieves the user's privacy preferences.
+ *
+ * Fetches stored preferences for data collection, sharing, and communication settings
+ * as configured by the user in their privacy settings.
+ *
+ * @param userId - The unique identifier of the user
+ * @returns Result object containing privacy preferences or an error message
  */
 export async function getPrivacyPreferences(userId: string): Promise<{
   success: boolean;
@@ -82,7 +88,14 @@ export async function getPrivacyPreferences(userId: string): Promise<{
 }
 
 /**
- * Update user's privacy preferences
+ * Updates the user's privacy preferences.
+ *
+ * Persists the updated preferences and logs a compliance event for audit purposes.
+ * Implements GDPR Article 7 (Conditions for Consent) by tracking preference changes.
+ *
+ * @param userId - The unique identifier of the user
+ * @param preferences - Partial preferences object with fields to update
+ * @returns Result object indicating success or failure
  */
 export async function updatePrivacyPreferences(
   userId: string,
@@ -121,7 +134,12 @@ export async function updatePrivacyPreferences(
 }
 
 /**
- * Get user's CCPA Do Not Sell preference
+ * Retrieves the user's CCPA "Do Not Sell My Personal Information" preference.
+ *
+ * Implements CCPA compliance by tracking the user's opt-out status for data sales.
+ *
+ * @param userId - The unique identifier of the user
+ * @returns Result object containing CCPA preference or an error message
  */
 export async function getCCPAPreference(userId: string): Promise<{
   success: boolean;
@@ -148,7 +166,13 @@ export async function getCCPAPreference(userId: string): Promise<{
 }
 
 /**
- * Update user's CCPA Do Not Sell preference
+ * Updates the user's CCPA "Do Not Sell My Personal Information" preference.
+ *
+ * Records the opt-in or opt-out status with timestamp for compliance auditing.
+ *
+ * @param userId - The unique identifier of the user
+ * @param doNotSell - True to opt out of data sales, false to opt in
+ * @returns Result object indicating success or failure
  */
 export async function updateCCPAPreference(
   userId: string,
@@ -181,7 +205,13 @@ export async function updateCCPAPreference(
 }
 
 /**
- * Get user's data processing agreements
+ * Retrieves all data processing agreements for a user.
+ *
+ * Returns the history of consent records including agreement type, version,
+ * legal basis, and consent status. Implements GDPR Article 28 requirements.
+ *
+ * @param userId - The unique identifier of the user
+ * @returns Result object containing array of agreements or an error message
  */
 export async function getDataProcessingAgreements(userId: string): Promise<{
   success: boolean;
@@ -213,7 +243,18 @@ export async function getDataProcessingAgreements(userId: string): Promise<{
 }
 
 /**
- * Record user consent for data processing
+ * Records user consent for a specific data processing agreement.
+ *
+ * Creates a timestamped consent record with full audit trail including legal basis,
+ * processing purposes, data categories, and retention period. Implements GDPR
+ * Article 6 (Legal Basis for Processing) and Article 7 (Conditions for Consent).
+ *
+ * @param userId - The unique identifier of the user
+ * @param agreementType - The type of agreement (e.g., 'terms_of_service', 'marketing')
+ * @param agreementVersion - The version identifier of the agreement document
+ * @param legalBasis - The legal basis for processing (e.g., 'consent', 'contract')
+ * @param options - Optional additional consent details
+ * @returns Result object indicating success or failure
  */
 export async function recordConsent(
   userId: string,
@@ -267,7 +308,13 @@ export async function recordConsent(
 }
 
 /**
- * Log a compliance event
+ * Logs a compliance-related event for audit purposes.
+ *
+ * Records privacy and compliance events with categorization for GDPR, CCPA,
+ * or general privacy activities. Used for maintaining audit trails.
+ *
+ * @param event - The compliance event to log (id and created_at are auto-generated)
+ * @returns Result object indicating success or failure
  */
 export async function logComplianceEvent(
   event: Omit<ComplianceEvent, 'id' | 'created_at'>
@@ -299,7 +346,14 @@ export async function logComplianceEvent(
 }
 
 /**
- * Get user's compliance events
+ * Retrieves compliance events for a user.
+ *
+ * Returns the history of compliance-related activities, optionally filtered
+ * by category and limited to a specific number of records.
+ *
+ * @param userId - The unique identifier of the user
+ * @param options - Optional filters for limit and category
+ * @returns Result object containing array of compliance events or an error message
  */
 export async function getComplianceEvents(
   userId: string,

@@ -1,3 +1,18 @@
+/**
+ * Email Service
+ *
+ * Server-side service for sending transactional emails via Resend.
+ * Provides typed functions for each email category with React Email templates.
+ *
+ * Features:
+ * - React Email templates for consistent, responsive emails
+ * - Automatic retry with exponential backoff for transient failures
+ * - Batch sending with parallel processing for high throughput
+ * - Email tagging for analytics and deliverability tracking
+ *
+ * Requires RESEND_API_KEY environment variable to be configured.
+ */
+
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import { logger } from '@/lib/logger';
@@ -24,8 +39,15 @@ const FROM_EMAIL = 'Rowan <notifications@rowanapp.com>';
 const REPLY_TO_EMAIL = 'support@rowanapp.com';
 
 /**
- * OPTIMIZATION: Retry helper with exponential backoff
- * Retries failed email sends with delays: 1s, 2s, 4s
+ * Executes a function with automatic retry on failure using exponential backoff.
+ *
+ * Does not retry on authentication or validation errors. Default delays: 1s, 2s, 4s.
+ *
+ * @param fn - The async function to execute with retry
+ * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param baseDelayMs - Base delay in milliseconds before first retry (default: 1000)
+ * @returns The result of the function if successful
+ * @throws The last error encountered after all retries are exhausted
  */
 async function withRetry<T>(
   fn: () => Promise<T>,
@@ -61,10 +83,19 @@ async function withRetry<T>(
   throw lastError;
 }
 
-// Email service types
+// ============================================================================
+// Email Service Types
+// ============================================================================
+
+/**
+ * Result of an email send operation.
+ */
 export interface EmailResult {
+  /** Whether the email was sent successfully */
   success: boolean;
+  /** The Resend message ID for tracking (if successful) */
   messageId?: string;
+  /** Error message (if failed) */
   error?: string;
 }
 
@@ -281,7 +312,13 @@ export interface AIDailyDigestData {
 
 
 /**
- * Send a task assignment email notification
+ * Sends a task assignment notification email.
+ *
+ * Notifies a user when they are assigned a new task, including task details,
+ * priority level, and optional due date.
+ *
+ * @param data - Task assignment details including recipient, task info, and space context
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise<EmailResult> {
   try {
@@ -317,7 +354,12 @@ export async function sendTaskAssignmentEmail(data: TaskAssignmentData): Promise
 }
 
 /**
- * Send an event reminder email notification
+ * Sends an event reminder notification email.
+ *
+ * Notifies a user about an upcoming calendar event at the specified reminder interval.
+ *
+ * @param data - Event details including title, time, location, and reminder type
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendEventReminderEmail(data: EventReminderData): Promise<EmailResult> {
   try {
@@ -353,7 +395,12 @@ export async function sendEventReminderEmail(data: EventReminderData): Promise<E
 }
 
 /**
- * Send a new message email notification
+ * Sends a new message notification email.
+ *
+ * Notifies a user when they receive a new message in a conversation.
+ *
+ * @param data - Message details including sender, content preview, and conversation context
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailResult> {
   try {
@@ -388,7 +435,12 @@ export async function sendNewMessageEmail(data: NewMessageData): Promise<EmailRe
 }
 
 /**
- * Send a shopping list email notification
+ * Sends a shopping list notification email.
+ *
+ * Notifies a user about shopping list activity (shared, updated, or completed).
+ *
+ * @param data - Shopping list details including items, action type, and space context
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendShoppingListEmail(data: ShoppingListData): Promise<EmailResult> {
   try {
@@ -430,7 +482,12 @@ export async function sendShoppingListEmail(data: ShoppingListData): Promise<Ema
 }
 
 /**
- * Send a meal reminder email notification
+ * Sends a meal reminder notification email.
+ *
+ * Notifies a user about meal preparation, cooking, or planning reminders.
+ *
+ * @param data - Meal details including name, type, time, and optional ingredients
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendMealReminderEmail(data: MealReminderData): Promise<EmailResult> {
   try {
@@ -473,7 +530,12 @@ export async function sendMealReminderEmail(data: MealReminderData): Promise<Ema
 }
 
 /**
- * Send a general reminder email notification
+ * Sends a general reminder notification email.
+ *
+ * Notifies a user about personal, shared, recurring, or important reminders.
+ *
+ * @param data - Reminder details including title, type, priority, and due date
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendGeneralReminderEmail(data: GeneralReminderData): Promise<EmailResult> {
   try {
@@ -510,8 +572,13 @@ export async function sendGeneralReminderEmail(data: GeneralReminderData): Promi
 }
 
 /**
- * Send a space invitation email notification
- * OPTIMIZED: Uses retry mechanism for better delivery reliability
+ * Sends a space invitation email to invite a user to join a family space.
+ *
+ * Uses retry mechanism with exponential backoff for improved delivery reliability.
+ * Includes the inviter's name, space name, and a time-limited invitation link.
+ *
+ * @param data - Invitation details including recipient email, inviter, and invitation URL
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promise<EmailResult> {
   try {
@@ -590,7 +657,10 @@ export async function sendSpaceInvitationEmail(data: SpaceInvitationData): Promi
 }
 
 /**
- * Send a password reset email
+ * Sends a password reset email with a secure reset link.
+ *
+ * @param data - Reset details including user email, reset URL, and optional context
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendPasswordResetEmail(data: PasswordResetData): Promise<EmailResult> {
   try {
@@ -626,7 +696,10 @@ export async function sendPasswordResetEmail(data: PasswordResetData): Promise<E
 }
 
 /**
- * Send a magic link email
+ * Sends a magic link email for passwordless authentication.
+ *
+ * @param data - Login details including user email and magic link URL
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResult> {
   try {
@@ -662,7 +735,10 @@ export async function sendMagicLinkEmail(data: MagicLinkData): Promise<EmailResu
 }
 
 /**
- * Send an email verification email
+ * Sends an email verification email for new account signup.
+ *
+ * @param data - Verification details including user email and verification URL
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendEmailVerificationEmail(data: EmailVerificationData): Promise<EmailResult> {
   try {
@@ -698,7 +774,12 @@ export async function sendEmailVerificationEmail(data: EmailVerificationData): P
 }
 
 /**
- * Send an email change verification email
+ * Sends a verification email when a user requests to change their email address.
+ *
+ * The email is sent to the new email address for verification.
+ *
+ * @param data - Change details including current email, new email, and verification URL
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendEmailChangeEmail(data: EmailChangeData): Promise<EmailResult> {
   try {
@@ -739,7 +820,12 @@ export async function sendEmailChangeEmail(data: EmailChangeData): Promise<Email
 }
 
 /**
- * Send a daily digest email
+ * Sends a daily digest email summarizing the user's upcoming day.
+ *
+ * Includes events, tasks due, overdue tasks, meals, and reminders.
+ *
+ * @param data - Digest content including all daily activities grouped by type
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendDailyDigestEmail(data: DailyDigestData): Promise<EmailResult> {
   try {
@@ -786,7 +872,13 @@ export async function sendDailyDigestEmail(data: DailyDigestData): Promise<Email
 }
 
 /**
- * Send an AI-enhanced daily digest email
+ * Sends an AI-enhanced daily digest email with personalized narrative content.
+ *
+ * Similar to the standard daily digest but includes AI-generated introduction
+ * and closing messages for a more engaging user experience.
+ *
+ * @param data - Digest content with AI-generated narrative intro and closing
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<EmailResult> {
   try {
@@ -840,8 +932,14 @@ export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<E
 
 
 /**
- * Send a single email based on type
- * Note: Using 'any' for data to match the batch API signature - type safety is enforced at call site
+ * Sends a single email based on the specified type.
+ *
+ * Internal helper function used by batch sending. Routes to the appropriate
+ * typed email function based on the type parameter.
+ *
+ * @param type - The email type identifier
+ * @param data - The email data (type safety enforced at call site)
+ * @returns Result object indicating success or failure
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
@@ -874,9 +972,13 @@ async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
 }
 
 /**
- * Send multiple emails in batch with parallel processing
- * PERFORMANCE: Processes emails in parallel batches of 10 instead of sequential
- * This reduces 100 emails from ~10s to ~1s
+ * Sends multiple emails in parallel batches for high throughput.
+ *
+ * Processes emails in batches of 10 to balance throughput and rate limiting.
+ * Significantly faster than sequential processing (100 emails: ~1s vs ~10s).
+ *
+ * @param emails - Array of email objects with type and data
+ * @returns Summary with success/failed counts and individual results
  */
 export async function sendBatchEmails(emails: Array<{
   type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation' | 'password-reset' | 'magic-link' | 'email-verification' | 'email-change';
@@ -918,7 +1020,11 @@ export async function sendBatchEmails(emails: Array<{
 }
 
 /**
- * Verify email configuration and connectivity
+ * Verifies that the email service is properly configured and operational.
+ *
+ * Sends a test email to validate API key configuration and connectivity.
+ *
+ * @returns Result object indicating whether the service is operational
  */
 export async function verifyEmailService(): Promise<EmailResult> {
   try {
@@ -981,7 +1087,13 @@ export interface SubscriptionCancelledData {
 }
 
 /**
- * Send a subscription welcome email after successful payment
+ * Sends a welcome email after a user subscribes to a paid plan.
+ *
+ * Confirms the subscription tier and billing period, and provides a link
+ * to the dashboard.
+ *
+ * @param data - Subscription details including tier, period, and dashboard URL
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData): Promise<EmailResult> {
   try {
@@ -1019,7 +1131,13 @@ export async function sendSubscriptionWelcomeEmail(data: SubscriptionWelcomeData
 }
 
 /**
- * Send a payment failed email when subscription payment fails
+ * Sends a payment failed notification email.
+ *
+ * Notifies the user that their subscription payment could not be processed,
+ * includes retry attempt count, and provides a link to update payment method.
+ *
+ * @param data - Payment failure details including attempt count and grace period
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<EmailResult> {
   try {
@@ -1056,7 +1174,13 @@ export async function sendPaymentFailedEmail(data: PaymentFailedData): Promise<E
 }
 
 /**
- * Send a subscription cancelled confirmation email
+ * Sends a subscription cancellation confirmation email.
+ *
+ * Confirms the cancellation, indicates when access will end, and provides
+ * a link to resubscribe.
+ *
+ * @param data - Cancellation details including tier, access end date, and resubscribe URL
+ * @returns Result object indicating success or failure with optional message ID
  */
 export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelledData): Promise<EmailResult> {
   try {

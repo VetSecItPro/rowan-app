@@ -237,6 +237,20 @@ function calculateMilestonesByWeek(goals: GoalRecord[], startDate: Date, endDate
   });
 }
 
+/**
+ * Calculates check-in streaks for goal tracking.
+ *
+ * Algorithm:
+ * 1. Deduplicate dates (multiple check-ins per day count as one)
+ * 2. Walk through sorted dates, counting consecutive days (daysDiff === 1)
+ * 3. When a gap is found, compare tempStreak to longestStreak and reset
+ * 4. Current streak is only counted if most recent check-in was today or yesterday
+ *
+ * Edge cases:
+ * - Multiple check-ins on same day: deduplicated via Set
+ * - Streak broken today: currentStreak = 0 even if longestStreak > 0
+ * - Single check-in: tempStreak starts at 1, not 0
+ */
 function calculateStreaks(checkIns: CheckInRecord[]): { currentStreak: number; longestStreak: number } {
   if (checkIns.length === 0) return { currentStreak: 0, longestStreak: 0 };
 
@@ -248,7 +262,7 @@ function calculateStreaks(checkIns: CheckInRecord[]): { currentStreak: number; l
     return new Date(aDate).getTime() - new Date(bDate).getTime();
   });
 
-  // Group by date (multiple check-ins per day count as one)
+  // Deduplicate: multiple check-ins per day count as one active day
   const uniqueDates = Array.from(new Set(
     sortedCheckIns
       .map(c => c.check_in_date || c.created_at)
@@ -260,33 +274,37 @@ function calculateStreaks(checkIns: CheckInRecord[]): { currentStreak: number; l
 
   let currentStreak = 0;
   let longestStreak = 0;
-  let tempStreak = 1;
+  let tempStreak = 1; // Start at 1 because first date counts as day 1
 
-  // Calculate streaks
+  // Walk through dates looking for consecutive days
   for (let i = 1; i < uniqueDates.length; i++) {
     const prevDate = new Date(uniqueDates[i - 1]);
     const currDate = new Date(uniqueDates[i]);
     const daysDiff = Math.ceil((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysDiff === 1) {
+      // Consecutive day, extend streak
       tempStreak++;
     } else {
+      // Gap found, save longest and reset
       longestStreak = Math.max(longestStreak, tempStreak);
       tempStreak = 1;
     }
   }
 
+  // Don't forget to check final streak
   longestStreak = Math.max(longestStreak, tempStreak);
 
-  // Calculate current streak (from most recent date)
+  // Current streak only counts if user checked in today or yesterday
   const today = new Date();
   const lastCheckInDate = new Date(uniqueDates[uniqueDates.length - 1]);
   const daysSinceLastCheckIn = Math.ceil((today.getTime() - lastCheckInDate.getTime()) / (1000 * 60 * 60 * 24));
 
   if (daysSinceLastCheckIn <= 1) {
-    // Current streak is active
+    // Streak is still active (checked in today or yesterday)
     currentStreak = tempStreak;
   }
+  // Otherwise currentStreak stays 0 (streak is broken)
 
   return { currentStreak, longestStreak };
 }

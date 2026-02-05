@@ -3,12 +3,18 @@ import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import { getAppUrl } from '@/lib/utils/app-url';
 
+/**
+ * User information required for sending notifications.
+ */
 interface User {
   id: string;
   email: string | undefined;
   name?: string;
 }
 
+/**
+ * User preferences for notification delivery channels and timing.
+ */
 interface NotificationPreferences {
   email_enabled: boolean;
   email_reminders: boolean;
@@ -32,11 +38,17 @@ interface NotificationPreferences {
 
 /**
  * Notification Service
- * Handles all notification delivery (email and push)
+ *
+ * Client-side service for sending notifications via email and push channels.
+ * Respects user preferences including quiet hours, channel preferences, and
+ * category-specific settings. All email sending is delegated to API routes.
  */
 export const notificationService = {
   /**
-   * Get user's notification preferences
+   * Retrieves the notification preferences for a user.
+   *
+   * @param userId - The unique identifier of the user
+   * @returns The user's notification preferences, or null if not found
    */
   async getPreferences(userId: string): Promise<NotificationPreferences | null> {
     const supabase = createClient();
@@ -55,7 +67,13 @@ export const notificationService = {
   },
 
   /**
-   * Check if user is in quiet hours
+   * Checks if the current time falls within the user's configured quiet hours.
+   *
+   * Quiet hours are evaluated in the user's local timezone. Supports overnight
+   * quiet hours (e.g., 22:00 to 08:00).
+   *
+   * @param userId - The unique identifier of the user
+   * @returns True if currently within quiet hours, false otherwise
    */
   async isInQuietHours(userId: string): Promise<boolean> {
     const prefs = await this.getPreferences(userId);
@@ -87,7 +105,16 @@ export const notificationService = {
   },
 
   /**
-   * Check if notification should be sent based on preferences
+   * Determines whether a notification should be sent based on user preferences.
+   *
+   * Checks the user's preferences for the specified category and delivery type,
+   * as well as quiet hours. Returns false if notifications are disabled globally,
+   * for the specific category, or if currently in quiet hours.
+   *
+   * @param userId - The unique identifier of the user
+   * @param category - The notification category (reminder, task, shopping, meal, event, message)
+   * @param type - The delivery channel (email or push)
+   * @returns True if the notification should be sent, false otherwise
    */
   async shouldSendNotification(
     userId: string,
@@ -145,7 +172,17 @@ export const notificationService = {
   },
 
   /**
-   * Log notification to database
+   * Logs a notification delivery attempt to the database for tracking and debugging.
+   *
+   * Only executes in browser environments. Records the delivery channel, category,
+   * status, and any error messages for failed deliveries.
+   *
+   * @param userId - The unique identifier of the recipient
+   * @param type - The delivery channel (email or push)
+   * @param category - The notification category
+   * @param subject - The notification subject or title
+   * @param status - The delivery status (sent, failed, or bounced)
+   * @param errorMessage - Optional error message for failed deliveries
    */
   async logNotification(
     userId: string,
@@ -183,7 +220,15 @@ export const notificationService = {
   },
 
   /**
-   * Send email using API route (client-safe)
+   * Sends an email via the notifications API route.
+   *
+   * This method is safe to call from both client and server contexts.
+   * The actual email delivery is handled by the API route.
+   *
+   * @param to - The recipient email address
+   * @param subject - The email subject line
+   * @param html - The HTML content of the email
+   * @returns An object indicating success or failure with an optional error message
    */
   async sendEmail(
     to: string,
@@ -218,7 +263,15 @@ export const notificationService = {
   },
 
   /**
-   * Send task assignment email
+   * Sends a task assignment notification email to a user.
+   *
+   * Respects user notification preferences before sending. The email includes
+   * the task title, space name, and who assigned the task.
+   *
+   * @param user - The recipient user object containing id, email, and optional name
+   * @param taskTitle - The title of the assigned task
+   * @param spaceName - The name of the space containing the task
+   * @param assignedBy - The name of the person who assigned the task
    */
   async sendTaskAssignmentEmail(
     user: User,
@@ -277,7 +330,16 @@ export const notificationService = {
   },
 
   /**
-   * Send shopping list ready email
+   * Sends a notification email when a shopping list is ready.
+   *
+   * Respects user notification preferences before sending. The email includes
+   * the list title, item count, and a link to view the list.
+   *
+   * @param user - The recipient user object containing id, email, and optional name
+   * @param listTitle - The title of the shopping list
+   * @param listId - The unique identifier of the shopping list
+   * @param itemCount - The number of items in the list
+   * @param spaceName - The name of the space containing the list
    */
   async sendShoppingListEmail(
     user: User,
@@ -337,7 +399,15 @@ export const notificationService = {
   },
 
   /**
-   * Send reminder email
+   * Sends a reminder notification email to a user.
+   *
+   * Respects user notification preferences before sending. The email includes
+   * the reminder title, scheduled time, and space name.
+   *
+   * @param user - The recipient user object containing id, email, and optional name
+   * @param reminderTitle - The title of the reminder
+   * @param reminderTime - The formatted time string for the reminder
+   * @param spaceName - The name of the space containing the reminder
    */
   async sendReminderEmail(
     user: User,
@@ -396,7 +466,15 @@ export const notificationService = {
   },
 
   /**
-   * Send event reminder email
+   * Sends an event reminder notification email to a user.
+   *
+   * Respects user notification preferences before sending. The email includes
+   * the event title, scheduled time, and a link to the calendar.
+   *
+   * @param user - The recipient user object containing id, email, and optional name
+   * @param eventTitle - The title of the upcoming event
+   * @param eventTime - The formatted time string for the event
+   * @param spaceName - The name of the space containing the event
    */
   async sendEventReminderEmail(
     user: User,
@@ -455,7 +533,15 @@ export const notificationService = {
   },
 
   /**
-   * Send meal prep reminder email
+   * Sends a meal preparation reminder email to a user.
+   *
+   * Respects user notification preferences before sending. The email includes
+   * the meal name, scheduled time, and a link to view the recipe.
+   *
+   * @param user - The recipient user object containing id, email, and optional name
+   * @param mealName - The name of the meal to prepare
+   * @param mealTime - The formatted time string for when the meal is scheduled
+   * @param spaceName - The name of the space containing the meal plan
    */
   async sendMealReminderEmail(
     user: User,
