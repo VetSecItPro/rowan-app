@@ -73,7 +73,7 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
@@ -90,7 +90,7 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, margin: '-50px' }}
+          viewport={{ once: true, margin: '-50px' }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
         >
           {tiers.map((tier) => (
@@ -155,7 +155,7 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-center mt-10"
         >

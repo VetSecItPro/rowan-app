@@ -215,7 +215,7 @@ function MarkDoneStep() {
       {/* Another completed reminder */}
       <div className="px-3 py-2.5 rounded-lg bg-gray-800/60">
         <div className="flex items-center gap-3">
-          <div className="w-4.5 h-4.5 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+          <div className="w-[18px] h-[18px] rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
             <Check className="w-2.5 h-2.5 text-green-400" strokeWidth={3} />
           </div>
           <span className="text-sm text-gray-500 line-through">Call insurance company</span>

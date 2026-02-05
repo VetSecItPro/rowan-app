@@ -30,7 +30,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight text-white mb-6"
         >
@@ -41,7 +41,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-lg sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto"
         >
@@ -52,7 +52,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <button
@@ -68,7 +68,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-5 text-sm text-gray-500"
         >
@@ -79,7 +79,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-12 mb-10"
         >
@@ -100,7 +100,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: false }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.5 }}
           className="max-w-lg mx-auto"
         >

@@ -9,17 +9,17 @@ function CreateTaskStep() {
     <div className="space-y-3">
       {/* Existing tasks */}
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60">
-        <div className="w-4.5 h-4.5 rounded-full border-2 border-gray-600 flex-shrink-0" />
+        <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-600 flex-shrink-0" />
         <span className="text-sm text-gray-400">Grocery shopping</span>
       </div>
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60">
-        <div className="w-4.5 h-4.5 rounded-full border-2 border-gray-600 flex-shrink-0" />
+        <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-600 flex-shrink-0" />
         <span className="text-sm text-gray-400">Schedule dentist appointment</span>
       </div>
 
       {/* New task being typed */}
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 border border-cyan-500/40 ring-1 ring-cyan-500/20">
-        <Plus className="w-4.5 h-4.5 text-cyan-400 flex-shrink-0" />
+        <Plus className="w-[18px] h-[18px] text-cyan-400 flex-shrink-0" />
         <div className="flex-1">
           <motion.span
             className="text-sm text-white"
@@ -46,7 +46,7 @@ function SetPriorityStep() {
       {/* Task with priority being set */}
       <div className="px-3 py-3 rounded-lg bg-gray-800 border border-cyan-500/30">
         <div className="flex items-center gap-3">
-          <Circle className="w-4.5 h-4.5 text-cyan-400 flex-shrink-0" />
+          <Circle className="w-[18px] h-[18px] text-cyan-400 flex-shrink-0" />
           <span className="text-sm text-white flex-1">Buy birthday present for Mom</span>
           <motion.span
             className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30"
@@ -79,7 +79,7 @@ function SetPriorityStep() {
 
       {/* Other tasks dimmed */}
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/40 opacity-50">
-        <div className="w-4.5 h-4.5 rounded-full border-2 border-gray-600 flex-shrink-0" />
+        <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-600 flex-shrink-0" />
         <span className="text-sm text-gray-500">Grocery shopping</span>
       </div>
     </div>
@@ -92,7 +92,7 @@ function AssignMemberStep() {
       {/* Task with member being assigned */}
       <div className="px-3 py-3 rounded-lg bg-gray-800 border border-cyan-500/30">
         <div className="flex items-center gap-3">
-          <Circle className="w-4.5 h-4.5 text-cyan-400 flex-shrink-0" />
+          <Circle className="w-[18px] h-[18px] text-cyan-400 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <span className="text-sm text-white block">Buy birthday present for Mom</span>
             <span className="text-xs text-red-400 mt-0.5 block">High priority</span>
@@ -173,11 +173,11 @@ function CompleteTaskStep() {
 
       {/* Remaining tasks */}
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60">
-        <div className="w-4.5 h-4.5 rounded-full border-2 border-gray-600 flex-shrink-0" />
+        <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-600 flex-shrink-0" />
         <span className="text-sm text-gray-400">Grocery shopping</span>
       </div>
       <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60">
-        <div className="w-4.5 h-4.5 rounded-full border-2 border-gray-600 flex-shrink-0" />
+        <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-600 flex-shrink-0" />
         <span className="text-sm text-gray-400">Schedule dentist appointment</span>
       </div>
     </div>

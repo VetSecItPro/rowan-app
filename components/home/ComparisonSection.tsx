@@ -20,9 +20,9 @@ import {
 const scatteredApps = [
   { label: 'Calendar app', icon: Calendar, x: '8%', y: '12%', rotate: -6, size: 'w-14 h-14 sm:w-16 sm:h-16' },
   { label: 'Todo app', icon: CheckSquare, x: '55%', y: '6%', rotate: 8, size: 'w-12 h-12 sm:w-14 sm:h-14' },
-  { label: 'Budget spreadsheet', icon: DollarSign, x: '30%', y: '42%', rotate: -3, size: 'w-16 h-16 sm:w-18 sm:h-18' },
-  { label: 'Recipe bookmarks', icon: BookOpen, x: '65%', y: '48%', rotate: 12, size: 'w-11 h-11 sm:w-13 sm:h-13' },
-  { label: 'Family group chat', icon: MessageCircle, x: '18%', y: '72%', rotate: -9, size: 'w-13 h-13 sm:w-15 sm:h-15' },
+  { label: 'Budget spreadsheet', icon: DollarSign, x: '30%', y: '42%', rotate: -3, size: 'w-16 h-16 sm:w-[72px] sm:h-[72px]' },
+  { label: 'Recipe bookmarks', icon: BookOpen, x: '65%', y: '48%', rotate: 12, size: 'w-11 h-11 sm:w-[52px] sm:h-[52px]' },
+  { label: 'Family group chat', icon: MessageCircle, x: '18%', y: '72%', rotate: -9, size: 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px]' },
 ];
 
 const rowanFeatures = [

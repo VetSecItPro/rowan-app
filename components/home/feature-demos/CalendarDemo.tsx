@@ -120,7 +120,7 @@ function AddEventStep() {
           <Plus className="w-3.5 h-3.5 text-purple-400" />
           <span className="text-sm text-white font-medium">Soccer Practice</span>
         </div>
-        <div className="flex items-center gap-4 ml-5.5">
+        <div className="flex items-center gap-4 ml-[22px]">
           <div className="flex items-center gap-1.5">
             <Clock className="w-3 h-3 text-gray-500" />
             <span className="text-xs text-gray-400">Wed, 4:00 PM</span>
@@ -158,7 +158,7 @@ function WhoBusyStep() {
 
       {/* Events with different family members */}
       <motion.div
-        className="px-3 py-2.5 rounded-lg bg-purple-500/10 border-l-3 border-purple-400 flex items-center gap-3"
+        className="px-3 py-2.5 rounded-lg bg-purple-500/10 border-l-[3px] border-purple-400 flex items-center gap-3"
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
@@ -173,7 +173,7 @@ function WhoBusyStep() {
       </motion.div>
 
       <motion.div
-        className="px-3 py-2.5 rounded-lg bg-blue-500/10 border-l-3 border-blue-400 flex items-center gap-3"
+        className="px-3 py-2.5 rounded-lg bg-blue-500/10 border-l-[3px] border-blue-400 flex items-center gap-3"
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -188,7 +188,7 @@ function WhoBusyStep() {
       </motion.div>
 
       <motion.div
-        className="px-3 py-2.5 rounded-lg bg-emerald-500/10 border-l-3 border-emerald-400 flex items-center gap-3"
+        className="px-3 py-2.5 rounded-lg bg-emerald-500/10 border-l-[3px] border-emerald-400 flex items-center gap-3"
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}

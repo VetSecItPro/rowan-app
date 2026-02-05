@@ -36,12 +36,22 @@ export function MagneticButton({
 
     const { x, y } = position;
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick?.();
+        }
+    };
+
     return (
         <motion.div
             ref={ref}
+            role="button"
+            tabIndex={0}
             onMouseMove={handleMouseMove}
             onMouseLeave={reset}
             onClick={onClick}
+            onKeyDown={handleKeyDown}
             animate={{ x, y }}
             transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
             className={`inline-block cursor-pointer ${className}`}
