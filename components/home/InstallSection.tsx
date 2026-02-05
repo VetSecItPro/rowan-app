@@ -1,137 +1,190 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Download, Smartphone, Monitor, Share, Plus, Zap, Shield, Bell } from 'lucide-react';
-import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Smartphone, Tablet, Laptop, ChevronDown, Share, Plus } from 'lucide-react';
 
-export function InstallSection() {
-    const { isInstalled, isIOS, isAndroid, canPrompt, promptInstall } = usePWAInstall();
+interface InstallSectionProps {
+  onSignupClick: () => void;
+}
 
-    if (isInstalled) {
-        return null;
-    }
+const devices = [
+  { icon: Smartphone, label: 'Phone' },
+  { icon: Tablet, label: 'Tablet' },
+  { icon: Laptop, label: 'Desktop' },
+];
 
-    return (
-        <section className="relative py-8 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false }}
-                    transition={{ duration: 0.5 }}
-                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600/10 via-cyan-600/10 from-blue-500/20 to-teal-500/20 backdrop-blur-xl border border-blue-400/30 p-4 sm:p-5"
-                >
-                    {/* Header */}
-                    <div className="text-center mb-4">
-                        <div className="inline-flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/20 flex items-center justify-center">
-                                <Download className="w-4 h-4 text-white" />
-                            </div>
-                            <h3 className="text-lg font-display font-bold text-white">
-                                Install Rowan
-                            </h3>
-                        </div>
-                        <p className="text-xs text-gray-400">
-                            Add to your home screen for the best experience
-                        </p>
+export function InstallSection({ onSignupClick }: InstallSectionProps) {
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+
+  return (
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Background Radial Glow */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/8 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[400px] h-[400px] bg-cyan-500/6 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-3xl mx-auto text-center">
+        {/* Main Headline */}
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.6 }}
+          className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight text-white mb-6"
+        >
+          Ready to simplify your household?
+        </motion.h2>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-lg sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto"
+        >
+          Join families who are finally getting organized — with one app for everything.
+        </motion.p>
+
+        {/* Primary CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <button
+            onClick={onSignupClick}
+            className="px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl font-bold text-lg transition-all shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.03] active:scale-[0.98]"
+            aria-label="Get started with a free trial"
+          >
+            Get Started Free
+          </button>
+        </motion.div>
+
+        {/* Trust Text */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-5 text-sm text-gray-500"
+        >
+          No credit card required &middot; 14-day free trial &middot; Cancel anytime
+        </motion.p>
+
+        {/* Device Icons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-12 mb-10"
+        >
+          <p className="text-sm text-gray-500 mb-4">Available on all devices</p>
+          <div className="flex items-center justify-center gap-8">
+            {devices.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex flex-col items-center gap-2">
+                <div className="w-12 h-12 rounded-xl bg-gray-800/60 border border-gray-700/50 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-gray-400" />
+                </div>
+                <span className="text-xs text-gray-500">{label}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* PWA Install Accordion */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="max-w-lg mx-auto"
+        >
+          <button
+            onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-gray-800/40 border border-gray-700/40 hover:bg-gray-800/60 transition-colors text-left"
+            aria-expanded={isAccordionOpen}
+            aria-controls="pwa-install-content"
+          >
+            <span className="text-sm text-gray-400">
+              Install as an app on your device
+            </span>
+            <ChevronDown
+              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                isAccordionOpen ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          <AnimatePresence>
+            {isAccordionOpen && (
+              <motion.div
+                id="pwa-install-content"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 px-1">
+                  {/* iOS */}
+                  <div className="rounded-xl bg-gray-800/30 border border-gray-700/30 p-4 text-left">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Smartphone className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-white">iPhone / iPad</span>
                     </div>
+                    <ol className="space-y-1.5 text-xs text-gray-400">
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-blue-400 font-semibold">1.</span>
+                        Open in Safari
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-blue-400 font-semibold">2.</span>
+                        Tap
+                        <Share className="inline w-3 h-3 text-blue-400" />
+                        Share
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-blue-400 font-semibold">3.</span>
+                        Tap
+                        <Plus className="inline w-3 h-3 text-blue-400" />
+                        Add to Home Screen
+                      </li>
+                    </ol>
+                  </div>
 
-                    {/* Install Button (when browser supports it) */}
-                    {canPrompt ? (
-                        <div className="flex justify-center">
-                            <button
-                                onClick={promptInstall}
-                                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold text-sm transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center gap-2"
-                            >
-                                <Download className="w-4 h-4" />
-                                Install App
-                            </button>
-                        </div>
-                    ) : (
-                        /* Platform-specific install cards */
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            {/* iOS Card */}
-                            <div className={`relative p-3 rounded-xl transition-all ${isIOS ? 'bg-blue-500/20 ring-2 ring-blue-500/50' : 'bg-gray-800/50'}`}>
-                                {isIOS && (
-                                    <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">
-                                        Your Device
-                                    </span>
-                                )}
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Smartphone className="w-4 h-4 text-gray-400" />
-                                    <span className="text-xs font-semibold text-white">iOS</span>
-                                </div>
-                                <ol className="text-[11px] text-gray-400 space-y-1">
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">1.</span> Tap <Share className="inline w-3 h-3 text-blue-500" /> Share
-                                    </li>
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">2.</span> <Plus className="inline w-3 h-3 text-blue-500" /> Add to Home Screen
-                                    </li>
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">3.</span> Tap Add
-                                    </li>
-                                </ol>
-                            </div>
-
-                            {/* Android Card */}
-                            <div className={`relative p-3 rounded-xl transition-all ${isAndroid ? 'bg-blue-500/20 ring-2 ring-blue-500/50' : 'bg-gray-800/50'}`}>
-                                {isAndroid && (
-                                    <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">
-                                        Your Device
-                                    </span>
-                                )}
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Smartphone className="w-4 h-4 text-gray-400" />
-                                    <span className="text-xs font-semibold text-white">Android</span>
-                                </div>
-                                <ol className="text-[11px] text-gray-400 space-y-1">
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">1.</span> Open in Chrome
-                                    </li>
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">2.</span> Tap menu (⋮)
-                                    </li>
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">3.</span> Add to Home screen
-                                    </li>
-                                </ol>
-                            </div>
-
-                            {/* Desktop Card */}
-                            <div className={`relative p-3 rounded-xl transition-all ${!isIOS && !isAndroid ? 'bg-blue-500/20 ring-2 ring-blue-500/50' : 'bg-gray-800/50'}`}>
-                                {!isIOS && !isAndroid && (
-                                    <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">
-                                        Your Device
-                                    </span>
-                                )}
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Monitor className="w-4 h-4 text-gray-400" />
-                                    <span className="text-xs font-semibold text-white">Desktop</span>
-                                </div>
-                                <ol className="text-[11px] text-gray-400 space-y-1">
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">1.</span> Use Chrome or Edge
-                                    </li>
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">2.</span> Click <Download className="inline w-3 h-3 text-blue-500" /> in URL bar
-                                    </li>
-                                    <li className="flex items-center gap-1">
-                                        <span className="text-blue-500 font-bold">3.</span> Click Install
-                                    </li>
-                                </ol>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Benefits */}
-                    <div className="flex items-center justify-center gap-4 sm:gap-6 mt-3 text-[10px] sm:text-xs text-gray-400">
-                        <span className="flex items-center gap-1"><Zap className="w-3 h-3 text-blue-500" /> Lightning fast</span>
-                        <span className="flex items-center gap-1"><Shield className="w-3 h-3 text-blue-500" /> Works offline</span>
-                        <span className="flex items-center gap-1"><Bell className="w-3 h-3 text-blue-500" /> Push notifications</span>
+                  {/* Android */}
+                  <div className="rounded-xl bg-gray-800/30 border border-gray-700/30 p-4 text-left">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Smartphone className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-white">Android</span>
                     </div>
-                </motion.div>
-            </div>
-        </section>
-    );
+                    <ol className="space-y-1.5 text-xs text-gray-400">
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-blue-400 font-semibold">1.</span>
+                        Open in Chrome
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-blue-400 font-semibold">2.</span>
+                        Tap menu
+                        <span className="text-blue-400">(&#8942;)</span>
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="text-blue-400 font-semibold">3.</span>
+                        Tap Install App
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </section>
+  );
 }

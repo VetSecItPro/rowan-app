@@ -6,7 +6,9 @@ import { PublicHeader } from '@/components/layout/PublicHeader';
 import { HeroSection } from '@/components/home/HeroSection';
 import { FeatureGrid } from '@/components/home/FeatureGrid';
 import { PainPointsSection } from '@/components/home/PainPointsSection';
+import { SocialProofSection } from '@/components/home/SocialProofSection';
 import { ComparisonSection } from '@/components/home/ComparisonSection';
+import { PricingPreviewSection } from '@/components/home/PricingPreviewSection';
 import { InstallSection } from '@/components/home/InstallSection';
 import { ScrollToTop } from '@/components/ui/scroll-to-top';
 
@@ -62,9 +64,13 @@ export default function HomePage() {
 
         <FeatureGrid />
 
+        <SocialProofSection />
+
         <ComparisonSection />
 
-        <InstallSection />
+        <PricingPreviewSection onSignupClick={() => router.push('/signup')} />
+
+        <InstallSection onSignupClick={() => router.push('/signup')} />
       </main>
 
       {/* Scroll to top button */}
