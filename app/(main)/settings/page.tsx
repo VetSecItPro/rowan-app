@@ -30,6 +30,7 @@ import { CalendarConnections } from '@/components/calendar/CalendarConnections';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { useNumericLimit } from '@/lib/hooks/useFeatureGate';
 import { createClient } from '@/lib/supabase/client';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
   User,
@@ -72,7 +73,8 @@ import {
   Link2,
   CreditCard,
   Gift,
-  Search
+  Search,
+  CheckCircle2
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'subscription' | 'security' | 'notifications' | 'privacy-data' | 'data-management' | 'integrations' | 'documentation' | 'analytics';
@@ -348,6 +350,7 @@ export default function SettingsPage() {
     email: user?.email || ''
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
   // Update profile data when user data changes
   useEffect(() => {
@@ -528,8 +531,9 @@ export default function SettingsPage() {
         throw new Error(data.error || 'Failed to update profile');
       }
 
-      // Success - show feedback
-      alert('Profile updated successfully!');
+      // Success - show animated confirmation
+      setShowSaveSuccess(true);
+      setTimeout(() => setShowSaveSuccess(false), 2200);
 
       // Refresh the auth context to get updated user data
       await refreshProfile();
@@ -1004,14 +1008,21 @@ export default function SettingsPage() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`btn-touch flex-shrink-0 lg:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all active:scale-95 ${
-                          isActive
-                            ? 'bg-purple-600 text-white shadow-lg hover:bg-purple-700 hover:shadow-xl'
-                            : 'text-gray-300 hover:bg-gray-700 hover:shadow-md hover:scale-105'
-                        }`}
+                        className="btn-touch relative flex-shrink-0 lg:w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-colors active:scale-95"
                       >
-                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="text-xs sm:text-sm font-medium whitespace-nowrap">{tab.name}</span>
+                        {isActive && (
+                          <motion.div
+                            layoutId="settings-tab-indicator"
+                            className="absolute inset-0 bg-purple-600 rounded-lg sm:rounded-xl shadow-lg"
+                            transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                          />
+                        )}
+                        <span className={`relative z-10 flex items-center gap-2 sm:gap-3 ${
+                          isActive ? 'text-white' : 'text-gray-300 hover:text-white'
+                        }`}>
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <span className="text-xs sm:text-sm font-medium whitespace-nowrap">{tab.name}</span>
+                        </span>
                       </button>
                     );
                   })}
@@ -1022,12 +1033,25 @@ export default function SettingsPage() {
             {/* Content Area */}
             <div className="lg:col-span-3">
               <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
+                <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                >
                 {/* Profile Tab */}
                 {activeTab === 'profile' && (
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Profile & Spaces</h2>
-                      <p className="text-sm sm:text-base text-gray-400">Update your personal information and manage your spaces</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-purple-900/40 flex items-center justify-center flex-shrink-0">
+                        <User className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Profile & Spaces</h2>
+                        <p className="text-sm sm:text-base text-gray-400">Update your personal information and manage your spaces</p>
+                      </div>
                     </div>
 
                     {/* Avatar Upload */}
@@ -1483,23 +1507,59 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={handleSaveProfile}
-                      disabled={isSavingProfile}
-                      className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg sm:rounded-xl hover:bg-purple-700 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSavingProfile ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={handleSaveProfile}
+                        disabled={isSavingProfile || showSaveSuccess}
+                        className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg sm:rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          showSaveSuccess ? 'bg-green-600' : 'bg-purple-600 hover:bg-purple-700'
+                        }`}
+                      >
+                        <AnimatePresence mode="wait">
+                          {isSavingProfile ? (
+                            <motion.span
+                              key="saving"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="flex items-center gap-2"
+                            >
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              Saving...
+                            </motion.span>
+                          ) : showSaveSuccess ? (
+                            <motion.span
+                              key="success"
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.8 }}
+                              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                              className="flex items-center gap-2"
+                            >
+                              <motion.div
+                                initial={{ scale: 0, rotate: -90 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 15, delay: 0.1 }}
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </motion.div>
+                              Saved!
+                            </motion.span>
+                          ) : (
+                            <motion.span
+                              key="default"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="flex items-center gap-2"
+                            >
+                              <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              Save Changes
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -1509,9 +1569,14 @@ export default function SettingsPage() {
                 {/* Security Tab */}
                 {activeTab === 'security' && (
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Security Settings</h2>
-                      <p className="text-sm sm:text-base text-gray-400">Manage your password and authentication methods</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-purple-900/40 flex items-center justify-center flex-shrink-0">
+                        <Shield className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Security Settings</h2>
+                        <p className="text-sm sm:text-base text-gray-400">Manage your password and authentication methods</p>
+                      </div>
                     </div>
 
                     {/* Password Reset */}
@@ -1662,9 +1727,14 @@ export default function SettingsPage() {
                 {/* Analytics Tab */}
                 {activeTab === 'analytics' && (
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Analytics & Insights</h2>
-                      <p className="text-sm sm:text-base text-gray-400">View your productivity trends and completion rates across all features</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-purple-900/40 flex items-center justify-center flex-shrink-0">
+                        <BarChart3 className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Analytics & Insights</h2>
+                        <p className="text-sm sm:text-base text-gray-400">View your productivity trends and completion rates across all features</p>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -1876,9 +1946,14 @@ export default function SettingsPage() {
                 {/* Feature Manuals Tab - Direct Feature Cards */}
                 {activeTab === 'documentation' && (
                   <div className="space-y-6 sm:space-y-8">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Feature Manuals</h2>
-                      <p className="text-sm sm:text-base text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-purple-900/40 flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Feature Manuals</h2>
+                        <p className="text-sm sm:text-base text-gray-400">Choose a feature to learn about. Comprehensive guides for all Rowan features.</p>
+                      </div>
                     </div>
 
                     {/* Search Bar */}
@@ -1967,6 +2042,8 @@ export default function SettingsPage() {
                   </div>
                 )}
 
+                </motion.div>
+                </AnimatePresence>
               </div>
             </div>
           </div>

@@ -11,14 +11,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: BASE_URL,
       lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 1,
+      changeFrequency: 'daily',
+      priority: 1.0,
     },
     {
       url: `${BASE_URL}/pricing`,
       lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.9,
+      changeFrequency: 'weekly',
+      priority: 0.8,
     },
     {
       url: `${BASE_URL}/signup`,
@@ -36,83 +36,55 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${BASE_URL}/articles`,
       lastModified: now,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.6,
     },
     {
-      url: `${BASE_URL}/features/tasks`,
+      url: `${BASE_URL}/security`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/calendar`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/reminders`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/messages`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/shopping`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/meals`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/goals`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/budget`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/features/daily-check-in`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.5,
     },
     {
       url: `${BASE_URL}/privacy-policy`,
       lastModified: now,
-      changeFrequency: 'yearly',
+      changeFrequency: 'monthly',
       priority: 0.3,
     },
     {
       url: `${BASE_URL}/terms`,
       lastModified: now,
-      changeFrequency: 'yearly',
+      changeFrequency: 'monthly',
       priority: 0.3,
     },
   ]
 
+  // Feature pages
+  const featureSlugs = [
+    'tasks',
+    'calendar',
+    'reminders',
+    'messages',
+    'shopping',
+    'meals',
+    'budget',
+    'goals',
+    'daily-check-in',
+  ]
+
+  const featurePages: MetadataRoute.Sitemap = featureSlugs.map((slug) => ({
+    url: `${BASE_URL}/features/${slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
   // Blog article pages
-  const articlePages: MetadataRoute.Sitemap = blogArticles.map(article => ({
+  const articlePages: MetadataRoute.Sitemap = blogArticles.map((article) => ({
     url: `${BASE_URL}/articles/${article.slug}`,
     lastModified: new Date(article.publishedDate + 'T00:00:00'),
     changeFrequency: 'monthly' as const,
     priority: 0.6,
   }))
 
-  return [...staticPages, ...articlePages]
+  return [...staticPages, ...featurePages, ...articlePages]
 }
