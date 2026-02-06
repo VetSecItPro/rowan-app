@@ -10,6 +10,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+export const maxDuration = 60;
+
 // Query parameter validation schema for GET endpoint
 const GetQueryParamsSchema = z.object({
   connection_id: z.string().uuid(),

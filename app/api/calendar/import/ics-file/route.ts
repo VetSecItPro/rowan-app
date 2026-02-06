@@ -8,6 +8,9 @@ import { z } from 'zod';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 
+export const maxDuration = 60;
+
+
 // Validation schema for ICS file import
 const ICSFileImportSchema = z.object({
   space_id: z.string().uuid('Invalid space ID'),

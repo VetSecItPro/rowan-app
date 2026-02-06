@@ -57,11 +57,13 @@ export const projectsOnlyService = {
    */
   async getProjects(spaceId: string, supabaseClient?: SupabaseClient): Promise<Project[]> {
     const supabase = getSupabaseClient(supabaseClient);
+    // FIX-308: Add limit to prevent unbounded query
     const { data, error } = await supabase
       .from('projects')
       .select('*')
       .eq('space_id', spaceId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) throw error;
     return data || [];

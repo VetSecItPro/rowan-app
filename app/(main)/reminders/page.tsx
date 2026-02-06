@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, X } from 'lucide-react';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
@@ -50,6 +51,7 @@ export default function RemindersPage(): React.JSX.Element {
     loading: realtimeLoading,
     error: realtimeError,
     setReminders,
+    refreshReminders,
   } = useRemindersRealtime({
     spaceId: currentSpace?.id || '',
     filters: memoizedFilters,
@@ -146,6 +148,11 @@ export default function RemindersPage(): React.JSX.Element {
 
     return { total, active, completed, overdue };
   }, [reminders]);
+
+  // Pull-to-refresh handler
+  const handleRefresh = useCallback(async () => {
+    refreshReminders();
+  }, [refreshReminders]);
 
   // Paginated reminders for performance with large lists
   const paginatedReminders = useMemo(() => {
@@ -342,9 +349,25 @@ export default function RemindersPage(): React.JSX.Element {
     return reminders.filter((r) => selectedReminderIds.has(r.id));
   }, [reminders, selectedReminderIds]);
 
+  // Helper to check if any filters are active
+  const hasActiveFilters = searchQuery !== '' ||
+    statusFilter !== 'all' ||
+    categoryFilter !== 'all' ||
+    priorityFilter !== 'all' ||
+    assignmentFilter !== 'all';
+
+  const handleClearAllFilters = useCallback(() => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setCategoryFilter('all');
+    setPriorityFilter('all');
+    setAssignmentFilter('all');
+  }, []);
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Reminders' }]}>
       <PageErrorBoundary>
+        <PullToRefresh onRefresh={handleRefresh}>
         <div className="p-2 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
           {/* Error State */}
@@ -538,9 +561,51 @@ export default function RemindersPage(): React.JSX.Element {
                 </div>
 
                 {/* Category & Priority Filters - Hidden on mobile */}
+                {/* Mobile Category & Priority Filters - Dropdowns */}
+                <div className="sm:hidden space-y-3">
+                  {/* Category Dropdown */}
+                  <div className="w-full">
+                    <label htmlFor="category-filter-mobile" className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 block">
+                      Category
+                    </label>
+                    <select
+                      id="category-filter-mobile"
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value as 'all' | 'bills' | 'health' | 'work' | 'personal' | 'household')}
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white appearance-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="all">All Categories</option>
+                      <option value="bills">💰 Bills</option>
+                      <option value="health">❤️ Health</option>
+                      <option value="work">💼 Work</option>
+                      <option value="personal">✨ Personal</option>
+                      <option value="household">🏠 Household</option>
+                    </select>
+                  </div>
+
+                  {/* Priority Dropdown */}
+                  <div className="w-full">
+                    <label htmlFor="priority-filter-mobile" className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 block">
+                      Priority
+                    </label>
+                    <select
+                      id="priority-filter-mobile"
+                      value={priorityFilter}
+                      onChange={(e) => setPriorityFilter(e.target.value as 'all' | 'low' | 'medium' | 'high' | 'urgent')}
+                      className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white appearance-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="all">All Priorities</option>
+                      <option value="urgent">🔴 Urgent</option>
+                      <option value="high">🟠 High</option>
+                      <option value="medium">🟡 Medium</option>
+                      <option value="low">⚪ Low</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div className="hidden sm:flex sm:flex-row sm:items-end sm:justify-between gap-3">
                   {/* Category Filter Pills */}
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5" role="group" aria-label="Category filter">
                     <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                       Category
                     </label>
@@ -609,7 +674,7 @@ export default function RemindersPage(): React.JSX.Element {
                   </div>
 
                   {/* Priority Filter Pills */}
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5" role="group" aria-label="Priority filter">
                     <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                       Priority
                     </label>
@@ -756,11 +821,18 @@ export default function RemindersPage(): React.JSX.Element {
                 <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-400 text-lg mb-2">No reminders found</p>
                 <p className="text-gray-500 mb-6">
-                  {searchQuery || statusFilter !== 'all'
+                  {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all' || priorityFilter !== 'all' || assignmentFilter !== 'all'
                     ? 'Try adjusting your filters'
                     : 'Create your first reminder to get started!'}
                 </p>
-                {!searchQuery && statusFilter === 'all' && (
+                {hasActiveFilters ? (
+                  <button
+                    onClick={handleClearAllFilters}
+                    className="mt-4 px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                ) : (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                     <CTAButton
                       onClick={handleOpenModal}
@@ -820,6 +892,8 @@ export default function RemindersPage(): React.JSX.Element {
           </div>
         </div>
       </div>
+      </PullToRefresh>
+      </PageErrorBoundary>
 
       {/* New/Edit Reminder Modal */}
       {currentSpace ? (
@@ -850,7 +924,6 @@ export default function RemindersPage(): React.JSX.Element {
           </div>
         )
       )}
-      </PageErrorBoundary>
 
       {/* Bulk Actions Toolbar */}
       {currentSpace && (

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { LRUCache } from 'lru-cache';
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
@@ -178,8 +179,11 @@ export function parseUserAgent(userAgent: string): DeviceInfo {
   };
 }
 
-// Simple in-memory cache for geolocation results (5 minute TTL)
-const locationCache = new Map<string, { data: LocationInfo; expires: number }>();
+// LRU cache for geolocation results (5 minute TTL, max 1000 entries)
+const locationCache = new LRUCache<string, LocationInfo>({
+  max: 1000,
+  ttl: 5 * 60 * 1000, // 5 minutes
+});
 
 /**
  * Get location information from IP address using ipapi.co
@@ -217,9 +221,9 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
 
   // Check cache first
   const cached = locationCache.get(ip);
-  if (cached && cached.expires > Date.now()) {
+  if (cached) {
     logger.info('getLocationFromIP: returning cached result for IP:', { component: 'lib-session-tracking-service', data: ip });
-    return cached.data;
+    return cached;
   }
 
   try {
@@ -246,11 +250,8 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
       longitude: data.longitude || null,
     };
 
-    // Cache the result for 5 minutes
-    locationCache.set(ip, {
-      data: locationData,
-      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
-    });
+    // Cache the result (LRU handles TTL automatically)
+    locationCache.set(ip, locationData);
 
     logger.info('getLocationFromIP: parsed location data:', { component: 'lib-session-tracking-service', data: locationData });
     return locationData;
@@ -267,10 +268,7 @@ export async function getLocationFromIP(ip: string): Promise<LocationInfo> {
     };
 
     // Cache error results for 1 minute to prevent repeated failures
-    locationCache.set(ip, {
-      data: errorData,
-      expires: Date.now() + 1 * 60 * 1000, // 1 minute
-    });
+    locationCache.set(ip, errorData);
 
     return errorData;
   }

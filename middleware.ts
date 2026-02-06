@@ -455,20 +455,15 @@ export async function middleware(req: NextRequest) {
   if (process.env.NODE_ENV !== 'development') {
     // Add security headers with strengthened CSP for production only
     //
-    // SECURITY NOTE: 'unsafe-inline' and 'unsafe-eval' are required due to Next.js framework limitations:
-    // - 'unsafe-inline': Required for Next.js hydration scripts and inline styles (CSS-in-JS)
-    // - 'unsafe-eval': Required for some bundled libraries and webpack runtime
+    // SECURITY NOTE: 'unsafe-inline' is required for Next.js hydration scripts and inline styles.
+    // 'unsafe-eval' was removed (2026-02-05 audit FIX-104) — not needed with Next.js 15.5+ on Vercel.
     //
-    // FUTURE IMPROVEMENT: Next.js 13.4+ supports experimental nonce-based CSP via:
-    // - experimental.appDocumentPreloading in next.config.js
-    // - Using generateNonce() in middleware and passing to Script components
+    // FUTURE IMPROVEMENT: Implement nonce-based CSP to also remove 'unsafe-inline'.
     // See: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
-    //
-    // Priority: Medium - Implement when Next.js nonce support stabilizes
     response.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com;" +
+      "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://vercel.live https://static.cloudflareinsights.com;" +
       "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
       "img-src 'self' data: https: blob:; " +
       "font-src 'self' data: https:; " +

@@ -7,6 +7,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 
+export const maxDuration = 60;
+
+
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
 
 // SECURITY: Input size limits to prevent abuse and excessive API costs
