@@ -1,179 +1,261 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Smartphone, X, Share, Plus } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Download } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
+/** localStorage key used to track when the user last dismissed the banner */
+const DISMISS_KEY = 'pwa-install-dismissed';
+
+/** Number of milliseconds in 7 days */
+const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Delay before showing the banner after page load (ms) */
+const SHOW_DELAY_MS = 30_000;
+
+/**
+ * Extends the global BeforeInstallPromptEvent type used by Chromium browsers.
+ * This event is fired when the browser determines the site meets PWA
+ * installability criteria.
+ */
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
-  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
   prompt(): Promise<void>;
 }
 
-const VISIT_COUNT_KEY = 'pwa_visit_count';
-const DISMISSED_KEY = 'pwa_install_dismissed';
-const DISMISSED_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-const INSTALLED_KEY = 'pwa_installed';
-const AUTO_DISMISS_MS = 10_000;
-const SHOW_AFTER_VISITS = 3;
-
-function isIOS(): boolean {
+/**
+ * Detects whether the current browser is Safari on iOS (not Chrome or Firefox
+ * on iOS, which use their own install flows).
+ */
+function isIOSSafari(): boolean {
   if (typeof navigator === 'undefined') return false;
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad/.test(ua);
+  const isChromeIOS = /CriOS/.test(ua);
+  const isFirefoxIOS = /FxiOS/.test(ua);
+  return isIOS && !isChromeIOS && !isFirefoxIOS;
 }
 
+/**
+ * Detects whether the user is on a mobile device (phone or tablet).
+ */
+function isMobileDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+}
+
+/**
+ * Checks whether the app is already running in standalone (installed) mode.
+ */
 function isStandalone(): boolean {
   if (typeof window === 'undefined') return false;
+  const matchesStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  const navigatorStandalone = (navigator as unknown as { standalone?: boolean }).standalone;
+  return matchesStandalone || navigatorStandalone === true;
+}
+
+/**
+ * Checks whether the user dismissed the banner within the cooldown period.
+ */
+function isDismissedRecently(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const dismissed = localStorage.getItem(DISMISS_KEY);
+    if (!dismissed) return false;
+    const timestamp = parseInt(dismissed, 10);
+    if (isNaN(timestamp)) return false;
+    return Date.now() - timestamp < COOLDOWN_MS;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Inline SVG share icon matching iOS Safari's share button appearance.
+ * Used in the iOS-specific install instructions.
+ */
+function ShareIcon() {
   return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    ('standalone' in navigator && (navigator as { standalone?: boolean }).standalone === true)
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="inline-block align-text-bottom mx-0.5 text-blue-400"
+      aria-hidden="true"
+    >
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+      <polyline points="16 6 12 2 8 6" />
+      <line x1="12" y1="2" x2="12" y2="15" />
+    </svg>
   );
 }
 
+/**
+ * Smart PWA install banner that adapts to the user's platform.
+ *
+ * - On Chrome/Edge/Android: intercepts `beforeinstallprompt` and triggers the
+ *   native install dialog when the user taps "Install".
+ * - On iOS Safari: shows instructions to use the Share menu and "Add to Home
+ *   Screen" since there is no programmatic install API.
+ * - Hides automatically if the app is already installed (standalone mode).
+ * - Respects a 7-day cooldown after the user dismisses the banner.
+ * - Waits 30 seconds after page load before appearing to avoid disrupting
+ *   first-time visitors.
+ */
 export default function PWAInstallPrompt() {
   const [visible, setVisible] = useState(false);
-  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const dismiss = useCallback(() => {
-    setVisible(false);
-    localStorage.setItem(DISMISSED_KEY, Date.now().toString());
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
+    setAnimateIn(false);
+    // Wait for the slide-out animation to complete before unmounting
+    setTimeout(() => setVisible(false), 300);
+    try {
+      localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    } catch {
+      // localStorage may be unavailable in private browsing
+    }
+  }, []);
+
+  const handleInstall = useCallback(async () => {
+    const event = deferredPromptRef.current;
+    if (!event) return;
+
+    await event.prompt();
+    const { outcome } = await event.userChoice;
+
+    if (outcome === 'accepted') {
+      deferredPromptRef.current = null;
+      setAnimateIn(false);
+      setTimeout(() => setVisible(false), 300);
     }
   }, []);
 
   useEffect(() => {
-    // Already installed as PWA
-    if (isStandalone()) return;
-    if (localStorage.getItem(INSTALLED_KEY) === 'true') return;
+    // Don't show if already installed or recently dismissed
+    if (isStandalone() || isDismissedRecently()) return;
 
-    // Check if dismissed recently
-    const dismissedAt = localStorage.getItem(DISMISSED_KEY);
-    if (dismissedAt) {
-      const elapsed = Date.now() - parseInt(dismissedAt, 10);
-      if (elapsed < DISMISSED_DURATION_MS) return;
-      localStorage.removeItem(DISMISSED_KEY);
-    }
+    const ios = isIOSSafari();
+    const mobile = isMobileDevice();
+    setIsIOS(ios);
+    setIsMobile(mobile);
 
-    // Increment visit count
-    const visitCount = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0', 10) + 1;
-    localStorage.setItem(VISIT_COUNT_KEY, visitCount.toString());
+    let showTimer: ReturnType<typeof setTimeout> | undefined;
+    let mounted = true;
 
-    if (visitCount < SHOW_AFTER_VISITS) return;
-
-    // iOS Safari fallback - no beforeinstallprompt event
-    if (isIOS()) {
-      setShowIOSInstructions(true);
-      setVisible(true);
-      timerRef.current = setTimeout(dismiss, AUTO_DISMISS_MS);
-      return;
-    }
-
-    // Listen for the native install prompt
-    const handler = (e: Event) => {
+    const onBeforeInstallPrompt = (e: Event) => {
+      // Prevent the browser's default mini-infobar
       e.preventDefault();
       deferredPromptRef.current = e as BeforeInstallPromptEvent;
-      setVisible(true);
-      timerRef.current = setTimeout(dismiss, AUTO_DISMISS_MS);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    // Listen for Chromium's install prompt event
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+
+    // Show the banner after the configured delay
+    showTimer = setTimeout(() => {
+      if (!mounted) return;
+      // On non-iOS, only show if we captured a beforeinstallprompt OR it's iOS
+      if (ios || deferredPromptRef.current) {
+        setVisible(true);
+        // Trigger the slide-in animation on the next frame
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (mounted) setAnimateIn(true);
+          });
+        });
+      }
+    }, SHOW_DELAY_MS);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-      if (timerRef.current) clearTimeout(timerRef.current);
+      mounted = false;
+      if (showTimer) clearTimeout(showTimer);
+      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     };
-  }, [dismiss]);
+  }, []);
 
-  const handleInstall = async () => {
-    if (deferredPromptRef.current) {
-      await deferredPromptRef.current.prompt();
-      const choice = await deferredPromptRef.current.userChoice;
-      if (choice.outcome === 'accepted') {
-        localStorage.setItem(INSTALLED_KEY, 'true');
-      }
-      deferredPromptRef.current = null;
-    }
-    setVisible(false);
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
+  if (!visible) return null;
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={{ y: 200, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 200, opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md"
-        >
-          <div className="relative overflow-hidden rounded-2xl border border-gray-700/50 bg-gray-800/95 p-5 shadow-2xl backdrop-blur-xl">
-            {/* Accent gradient bar */}
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+    <div
+      className={cn(
+        'fixed bottom-[72px] sm:bottom-0 left-0 right-0 z-50',
+        'bg-gray-900/95 backdrop-blur-xl',
+        'border-t border-gray-700/50',
+        'transition-all duration-300 ease-out',
+        animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+      )}
+      role="banner"
+      aria-label="Install Rowan app"
+    >
+      <div className="max-w-3xl mx-auto px-4 py-3">
+        <div className="flex items-center gap-3">
+          {/* App icon */}
+          <Image
+            src="/rowan-logo.png"
+            alt="Rowan app icon"
+            width={40}
+            height={40}
+            sizes="40px"
+            className="rounded-lg flex-shrink-0"
+          />
 
-            {/* Close button */}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white">
+              Add Rowan to your {isMobile ? 'home screen' : 'desktop'}
+            </p>
+            {isIOS ? (
+              <p className="text-xs text-gray-400 mt-0.5">
+                Tap <ShareIcon /> then &ldquo;Add to Home Screen&rdquo;
+              </p>
+            ) : (
+              <p className="text-xs text-gray-400 mt-0.5">
+                Installs locally — no app store, works offline
+              </p>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={dismiss}
-              className="absolute right-3 top-3 rounded-full p-1.5 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+              className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors"
               aria-label="Dismiss install prompt"
             >
-              <X className="h-4 w-4" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex gap-4">
-              {/* App icon preview */}
-              <div className="flex-shrink-0">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
-                  <Smartphone className="h-7 w-7 text-white" />
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 pr-4">
-                <h3 className="text-lg font-semibold text-white">Install Rowan</h3>
-                <p className="mt-1 text-sm leading-relaxed text-gray-400">
-                  Get the full app experience &mdash; faster loading, offline access, and home screen shortcut.
-                </p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="mt-4 flex items-center gap-3">
-              {showIOSInstructions ? (
-                <div className="flex flex-1 items-center gap-2 rounded-lg bg-gray-700/50 px-3 py-2.5 text-sm text-gray-300">
-                  <span className="inline-flex items-center gap-1">
-                    Tap <Share className="inline h-4 w-4 text-blue-400" /> Share
-                  </span>
-                  <span className="text-gray-500">&rarr;</span>
-                  <span className="inline-flex items-center gap-1">
-                    <Plus className="inline h-4 w-4 text-blue-400" /> Add to Home Screen
-                  </span>
-                </div>
-              ) : (
-                <button
-                  onClick={handleInstall}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-blue-500/40 active:scale-[0.98]"
-                >
-                  Install
-                </button>
-              )}
-              <button
-                onClick={dismiss}
-                className="px-3 py-2.5 text-sm text-gray-500 transition-colors hover:text-gray-300"
+            {isIOS ? (
+              <Link
+                href="/install"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors"
               >
-                Not now
+                How to Install
+              </Link>
+            ) : (
+              <button
+                onClick={handleInstall}
+                className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Install
               </button>
-            </div>
+            )}
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,93 +1,54 @@
 import Link from 'next/link';
-import { Award } from 'lucide-react';
+import Image from 'next/image';
 
-const productLinks = [
+const allLinks = [
   { label: 'Features', href: '/features/tasks' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Security', href: '/security' },
-];
-
-const resourceLinks = [
   { label: 'Articles', href: '/articles' },
-  { label: 'Help', href: 'mailto:support@rowanapp.com' },
-];
-
-const legalLinks = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
 ];
 
-function FooterLinkColumn({
-  heading,
-  links,
-}: {
-  heading: string;
-  links: { label: string; href: string }[];
-}) {
-  return (
-    <div>
-      <h3 className="text-sm font-semibold text-white tracking-wide uppercase mb-4">
-        {heading}
-      </h3>
-      <ul className="space-y-3">
-        {links.map((link) => (
-          <li key={link.href}>
-            {link.href.startsWith('mailto:') ? (
-              <a
-                href={link.href}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                href={link.href}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                {link.label}
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 export function Footer() {
   return (
-    <footer className="relative bg-gradient-to-b from-transparent to-gray-900/50 border-t border-gray-800/50 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Main grid: brand full-width on mobile, then 2x2 for link columns */}
-        <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-          {/* Brand column - full width on mobile */}
-          <div className="col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-block">
-              <span className="text-xl font-bold text-white tracking-tight">
-                Rowan
-              </span>
-            </Link>
-            <p className="mt-3 text-sm text-gray-400 leading-relaxed">
-              Your household, finally in sync.
-            </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-gray-800/60 border border-gray-700/40 px-3 py-1.5">
-              <Award className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-medium text-gray-300">
-                Veteran Owned &amp; Operated
-              </span>
-            </div>
-          </div>
+    <footer className="border-t border-gray-800/50 bg-gray-900/80 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Brand with logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/rowan-logo.png"
+              alt="Rowan Logo"
+              width={24}
+              height={24}
+              className="w-6 h-6"
+            />
+            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Rowan
+            </span>
+          </Link>
 
-          {/* Link columns - 2x2 grid on mobile, 3 cols on desktop */}
-          <FooterLinkColumn heading="Product" links={productLinks} />
-          <FooterLinkColumn heading="Resources" links={resourceLinks} />
-          <FooterLinkColumn heading="Legal" links={legalLinks} />
-        </div>
+          {/* Links in one line separated by dots */}
+          <nav className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-sm text-gray-400">
+            {allLinks.map((link, index) => (
+              <span key={link.href} className="flex items-center">
+                <Link
+                  href={link.href}
+                  className="hover:text-white transition-colors"
+                >
+                  {link.label}
+                </Link>
+                {index < allLinks.length - 1 && (
+                  <span className="mx-2 text-gray-600">·</span>
+                )}
+              </span>
+            ))}
+          </nav>
 
-        {/* Bottom bar */}
-        <div className="mt-12 border-t border-gray-800/50 pt-8">
-          <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Rowan. All rights reserved.
+          {/* Copyright */}
+          <p className="text-xs text-gray-500">
+            &copy; {new Date().getFullYear()} Rowan
           </p>
         </div>
       </div>
