@@ -23,8 +23,8 @@ function SetGoal() {
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
         className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30"
       >
@@ -40,8 +40,8 @@ function SetGoal() {
 
         <div className="space-y-2.5">
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
           >
@@ -50,8 +50,8 @@ function SetGoal() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.65 }}
             className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
           >
@@ -63,8 +63,8 @@ function SetGoal() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
             className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
           >
@@ -142,8 +142,8 @@ function TrackProgress() {
 
       {/* Encouragement message */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.4 }}
         className="flex items-center gap-2.5 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20"
       >
@@ -215,8 +215,8 @@ function BuildStreaks() {
           {contributions.map((entry, index) => (
             <motion.div
               key={entry.day}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 0.5 + index * 0.08, duration: 0.2 }}
               className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-800/40"
             >
@@ -290,8 +290,8 @@ function CelebrateMilestones() {
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
           className="text-lg font-bold text-white mb-1"
         >
@@ -334,8 +334,8 @@ function CelebrateMilestones() {
 
       {/* Next milestone */}
       <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
         className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-800/40 border border-gray-700/30"
       >
@@ -348,10 +348,10 @@ function CelebrateMilestones() {
 
 // --- Steps Configuration ---
 const steps: DemoStep[] = [
-  { label: 'Set a goal', content: <SetGoal />, duration: 3000 },
-  { label: 'Track progress', content: <TrackProgress />, duration: 3000 },
-  { label: 'Build streaks', content: <BuildStreaks />, duration: 3000 },
-  { label: 'Celebrate milestones', content: <CelebrateMilestones />, duration: 3000 },
+  { label: 'Set a goal', content: <SetGoal /> },
+  { label: 'Track progress', content: <TrackProgress /> },
+  { label: 'Build streaks', content: <BuildStreaks /> },
+  { label: 'Celebrate milestones', content: <CelebrateMilestones /> },
 ];
 
 export function GoalsDemo({ className = '' }: { className?: string }) {

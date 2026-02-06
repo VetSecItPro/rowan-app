@@ -27,8 +27,8 @@ function WeekViewStep() {
         <div className="space-y-1">
           <motion.div
             className="rounded px-1 py-1.5 bg-purple-500/20 border-l-2 border-purple-400"
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.1 }}
           >
             <span className="text-[9px] text-purple-300 leading-tight block">Team mtg</span>
@@ -40,8 +40,8 @@ function WeekViewStep() {
         <div className="space-y-1">
           <motion.div
             className="rounded px-1 py-1.5 bg-blue-500/20 border-l-2 border-blue-400"
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <span className="text-[9px] text-blue-300 leading-tight block">Piano</span>
@@ -56,8 +56,8 @@ function WeekViewStep() {
         <div className="space-y-1">
           <motion.div
             className="rounded px-1 py-1.5 bg-emerald-500/20 border-l-2 border-emerald-400"
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
           >
             <span className="text-[9px] text-emerald-300 leading-tight block">Dinner</span>
@@ -72,8 +72,8 @@ function WeekViewStep() {
         <div className="space-y-1">
           <motion.div
             className="rounded px-1 py-1.5 bg-amber-500/20 border-l-2 border-amber-400"
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.4 }}
           >
             <span className="text-[9px] text-amber-300 leading-tight block">Park day</span>
@@ -112,8 +112,8 @@ function AddEventStep() {
       {/* New event being added */}
       <motion.div
         className="px-3 py-3 rounded-lg bg-gray-800 border border-purple-500/40 ring-1 ring-purple-500/20"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.15 }}
       >
         <div className="flex items-center gap-2 mb-2">
@@ -159,8 +159,8 @@ function WhoBusyStep() {
       {/* Events with different family members */}
       <motion.div
         className="px-3 py-2.5 rounded-lg bg-purple-500/10 border-l-[3px] border-purple-400 flex items-center gap-3"
-        initial={{ opacity: 0, x: -8 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <div className="w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center flex-shrink-0">
@@ -174,8 +174,8 @@ function WhoBusyStep() {
 
       <motion.div
         className="px-3 py-2.5 rounded-lg bg-blue-500/10 border-l-[3px] border-blue-400 flex items-center gap-3"
-        initial={{ opacity: 0, x: -8 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
         <div className="w-6 h-6 rounded-full bg-blue-500/30 flex items-center justify-center flex-shrink-0">
@@ -189,8 +189,8 @@ function WhoBusyStep() {
 
       <motion.div
         className="px-3 py-2.5 rounded-lg bg-emerald-500/10 border-l-[3px] border-emerald-400 flex items-center gap-3"
-        initial={{ opacity: 0, x: -8 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <div className="w-6 h-6 rounded-full bg-emerald-500/30 flex items-center justify-center flex-shrink-0">
@@ -218,8 +218,8 @@ function DayViewStep() {
         {/* 9 AM */}
         <motion.div
           className="relative pl-4 pb-4"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <div className="absolute -left-1.5 top-0.5 w-3 h-3 rounded-full bg-indigo-500 border-2 border-gray-900" />
@@ -233,8 +233,8 @@ function DayViewStep() {
         {/* 12 PM */}
         <motion.div
           className="relative pl-4 pb-4"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.25 }}
         >
           <div className="absolute -left-1.5 top-0.5 w-3 h-3 rounded-full bg-amber-500 border-2 border-gray-900" />
@@ -248,8 +248,8 @@ function DayViewStep() {
         {/* 6 PM */}
         <motion.div
           className="relative pl-4 pb-1"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.4 }}
         >
           <div className="absolute -left-1.5 top-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-gray-900" />
@@ -265,10 +265,10 @@ function DayViewStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Your week at a glance', content: <WeekViewStep />, duration: 3000 },
-  { label: 'Add an event', content: <AddEventStep />, duration: 3000 },
-  { label: "See who's busy", content: <WhoBusyStep />, duration: 3000 },
-  { label: 'Day view details', content: <DayViewStep />, duration: 3000 },
+  { label: 'Your week at a glance', content: <WeekViewStep /> },
+  { label: 'Add an event', content: <AddEventStep /> },
+  { label: "See who's busy", content: <WhoBusyStep /> },
+  { label: 'Day view details', content: <DayViewStep /> },
 ];
 
 export function CalendarDemo({ className = '' }: { className?: string }) {

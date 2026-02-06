@@ -32,8 +32,8 @@ function SetReminderStep() {
       {/* Time picker */}
       <motion.div
         className="px-3 py-3 rounded-lg bg-gray-800/80 border border-gray-700"
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
         <div className="flex items-center justify-between">
@@ -75,8 +75,8 @@ function ChooseWhenStep() {
       {/* Day selector */}
       <motion.div
         className="space-y-2"
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <span className="text-xs text-gray-500 px-1">When?</span>
@@ -122,8 +122,8 @@ function GetNotifiedStep() {
       {/* Notification simulation */}
       <motion.div
         className="px-4 py-3.5 rounded-xl bg-gray-800 border border-rose-500/30 shadow-lg shadow-rose-500/5"
-        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
       >
         <div className="flex items-start gap-3">
@@ -157,8 +157,8 @@ function GetNotifiedStep() {
       {/* Action buttons */}
       <motion.div
         className="flex gap-2 px-1"
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.5 }}
       >
         <div className="flex-1 py-2 rounded-lg bg-rose-500/15 border border-rose-500/25 text-center">
@@ -204,8 +204,8 @@ function MarkDoneStep() {
         </div>
         <motion.div
           className="mt-2 ml-8"
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
           <span className="text-xs font-medium text-green-400">Completed at 4:47 PM</span>
@@ -246,10 +246,10 @@ function MarkDoneStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Set a reminder', content: <SetReminderStep />, duration: 3000 },
-  { label: 'Choose when', content: <ChooseWhenStep />, duration: 3000 },
-  { label: 'Get notified', content: <GetNotifiedStep />, duration: 3000 },
-  { label: 'Mark it done', content: <MarkDoneStep />, duration: 3000 },
+  { label: 'Set a reminder', content: <SetReminderStep /> },
+  { label: 'Choose when', content: <ChooseWhenStep /> },
+  { label: 'Get notified', content: <GetNotifiedStep /> },
+  { label: 'Mark it done', content: <MarkDoneStep /> },
 ];
 
 export function RemindersDemo({ className = '' }: { className?: string }) {

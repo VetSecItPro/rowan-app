@@ -62,8 +62,8 @@ function SetPriorityStep() {
       {/* Priority selector */}
       <motion.div
         className="flex gap-2 px-3"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <div className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-700/60 text-gray-500 border border-gray-700">
@@ -111,8 +111,8 @@ function AssignMemberStep() {
       {/* Family member selector */}
       <motion.div
         className="flex gap-3 px-3 justify-center"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.15 }}
       >
         <div className="flex flex-col items-center gap-1.5">
@@ -162,8 +162,8 @@ function CompleteTaskStep() {
         </div>
         <motion.div
           className="mt-2 flex items-center gap-1.5 ml-8"
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
           <span className="text-xs font-medium text-green-400">Done!</span>
@@ -185,10 +185,10 @@ function CompleteTaskStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Create a task', content: <CreateTaskStep />, duration: 3000 },
-  { label: 'Set priority', content: <SetPriorityStep />, duration: 3000 },
-  { label: 'Assign family member', content: <AssignMemberStep />, duration: 3000 },
-  { label: 'Complete with satisfaction', content: <CompleteTaskStep />, duration: 3000 },
+  { label: 'Create a task', content: <CreateTaskStep /> },
+  { label: 'Set priority', content: <SetPriorityStep /> },
+  { label: 'Assign family member', content: <AssignMemberStep /> },
+  { label: 'Complete with satisfaction', content: <CompleteTaskStep /> },
 ];
 
 export function TasksDemo({ className = '' }: { className?: string }) {

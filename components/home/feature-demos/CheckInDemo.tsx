@@ -19,8 +19,8 @@ function MoodSelectorStep() {
       <div className="text-center">
         <motion.p
           className="text-lg font-medium text-white"
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
           How are you today?
@@ -34,8 +34,8 @@ function MoodSelectorStep() {
           <motion.div
             key={mood.label}
             className="flex flex-col items-center gap-1.5"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: index * 0.08 }}
           >
             <div className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-lg cursor-pointer hover:border-gray-600 transition-colors">
@@ -77,8 +77,8 @@ function ShareMoodStep() {
       {/* Energy slider */}
       <motion.div
         className="px-3 py-3 rounded-lg bg-gray-800/60"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <div className="flex items-center justify-between mb-2">
@@ -128,8 +128,8 @@ function DailyPrioritiesStep() {
         <motion.div
           key={item.text}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
-          initial={{ opacity: 0, x: -8 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: item.delay }}
         >
           <div className="w-5 h-5 rounded bg-rose-500/20 flex items-center justify-center flex-shrink-0">
@@ -207,8 +207,8 @@ function FamilyWellnessStep() {
         <motion.div
           key={member.name}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60"
-          initial={{ opacity: 0, x: -12 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: member.delay }}
         >
           {/* Avatar */}
@@ -245,10 +245,10 @@ function FamilyWellnessStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'How are you today?', content: <MoodSelectorStep />, duration: 3000 },
-  { label: 'Share your mood', content: <ShareMoodStep />, duration: 3000 },
-  { label: 'Set daily priorities', content: <DailyPrioritiesStep />, duration: 3000 },
-  { label: 'Family wellness', content: <FamilyWellnessStep />, duration: 3000 },
+  { label: 'How are you today?', content: <MoodSelectorStep /> },
+  { label: 'Share your mood', content: <ShareMoodStep /> },
+  { label: 'Set daily priorities', content: <DailyPrioritiesStep /> },
+  { label: 'Family wellness', content: <FamilyWellnessStep /> },
 ];
 
 export function CheckInDemo({ className = '' }: { className?: string }) {
