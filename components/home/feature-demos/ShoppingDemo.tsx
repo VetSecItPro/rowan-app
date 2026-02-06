@@ -8,8 +8,8 @@ function CreateListStep() {
   return (
     <div className="space-y-3">
       <motion.div
-        initial={{ opacity: 0, y: -5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
         className="flex items-center gap-2.5 mb-4"
       >
@@ -24,8 +24,8 @@ function CreateListStep() {
 
       {/* Empty add-item input */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.3 }}
         className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-800/60 border border-gray-700/50 border-dashed"
       >
@@ -70,8 +70,8 @@ function AddItemsStep() {
         {items.map((item, index) => (
           <motion.div
             key={item.name}
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.2 + index * 0.15, duration: 0.3 }}
             className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-800/60 border border-gray-700/50"
           >
@@ -120,8 +120,8 @@ function ShopTogetherStep() {
         {items.map((item, index) => (
           <motion.div
             key={item.name}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.15 + index * 0.1, duration: 0.3 }}
             className={`flex items-center gap-3 p-2.5 rounded-xl border ${
               item.checked
@@ -195,8 +195,8 @@ function TrackSpendingStep() {
 
       {/* Total */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.6, duration: 0.4 }}
         className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
       >
@@ -218,10 +218,10 @@ function TrackSpendingStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Create a list', content: <CreateListStep />, duration: 3000 },
-  { label: 'Add items quickly', content: <AddItemsStep />, duration: 3000 },
-  { label: 'Shop together', content: <ShopTogetherStep />, duration: 3000 },
-  { label: 'Track spending', content: <TrackSpendingStep />, duration: 3000 },
+  { label: 'Create a list', content: <CreateListStep /> },
+  { label: 'Add items quickly', content: <AddItemsStep /> },
+  { label: 'Shop together', content: <ShopTogetherStep /> },
+  { label: 'Track spending', content: <TrackSpendingStep /> },
 ];
 
 export function ShoppingDemo({ className = '' }: { className?: string }) {
