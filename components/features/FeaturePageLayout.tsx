@@ -162,6 +162,8 @@ export interface FeaturePageLayoutProps {
   demoComponent?: React.ReactNode;
   ctaText?: string;
   onSignupClick: () => void;
+  /** Optional RelatedFeatures section to render before Footer */
+  relatedFeaturesSection?: React.ReactNode;
 }
 
 // ---------------------------------------------------------------------------
@@ -185,6 +187,7 @@ export function FeaturePageLayout({
   demoComponent,
   ctaText = 'Try Free for 14 Days',
   onSignupClick,
+  relatedFeaturesSection,
 }: FeaturePageLayoutProps) {
   const primary = resolveColor(colorScheme.primary);
   const benefitColors = [
@@ -264,13 +267,13 @@ export function FeaturePageLayout({
               >
                 <MagneticButton className="group" onClick={onSignupClick}>
                   <div
-                    className={`px-8 py-4 text-white rounded-full font-semibold text-base transition-all shadow-xl ${primary.shadow} flex items-center justify-center gap-2`}
+                    className={`px-6 py-3 text-white rounded-full font-semibold text-sm transition-all shadow-xl ${primary.shadow} flex items-center justify-center gap-2`}
                     style={{
                       backgroundImage: `linear-gradient(to right, ${primary.hex}, ${primary.hexSecondary})`,
                     }}
                   >
                     {ctaText}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </MagneticButton>
 
@@ -278,7 +281,7 @@ export function FeaturePageLayout({
                   strength={15}
                   onClick={() => (window.location.href = '/pricing')}
                 >
-                  <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  <div className="px-6 py-3 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-sm transition-all shadow-lg text-center">
                     View Pricing
                   </div>
                 </MagneticButton>
@@ -346,29 +349,29 @@ export function FeaturePageLayout({
         </section>
 
         {/* ----------------------------------------------------------------
-            4. DETAIL BULLETS
+            4. DETAIL BULLETS (centered)
         ---------------------------------------------------------------- */}
         <section className="py-20 bg-gray-800/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="max-w-2xl"
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl mx-auto text-center"
             >
               <h2 className="text-4xl font-bold text-white mb-8">
                 {featureName}, Simplified
               </h2>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {detailBullets.map((bullet, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.08, duration: 0.5 }}
-                    className="flex items-center gap-4"
+                    transition={{ delay: i * 0.08, duration: 0.4 }}
+                    className="flex items-center justify-center gap-3"
                   >
                     <div
                       className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${primary.checkBg}`}
@@ -406,13 +409,13 @@ export function FeaturePageLayout({
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <MagneticButton className="group" onClick={onSignupClick}>
                   <div
-                    className={`px-8 py-4 text-white rounded-full font-semibold text-base transition-all shadow-xl ${primary.shadow} flex items-center justify-center gap-2`}
+                    className={`px-6 py-3 text-white rounded-full font-semibold text-sm transition-all shadow-xl ${primary.shadow} flex items-center justify-center gap-2`}
                     style={{
                       backgroundImage: `linear-gradient(to right, ${primary.hex}, ${primary.hexSecondary})`,
                     }}
                   >
                     {ctaText}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </MagneticButton>
 
@@ -420,7 +423,7 @@ export function FeaturePageLayout({
                   strength={15}
                   onClick={() => (window.location.href = '/pricing')}
                 >
-                  <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg text-center">
+                  <div className="px-6 py-3 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-sm transition-all shadow-lg text-center">
                     View Pricing
                   </div>
                 </MagneticButton>
@@ -429,6 +432,9 @@ export function FeaturePageLayout({
           </div>
         </section>
       </main>
+
+      {/* Related Features section (above footer) */}
+      {relatedFeaturesSection}
 
       <Footer />
     </div>
