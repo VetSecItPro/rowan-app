@@ -112,14 +112,14 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mt-2"
                     >
                         <MagneticButton className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={onSignupClick}>
-                            <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold text-base transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
+                            <div className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full font-semibold text-sm transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
                                 Try Free for 14 Days
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </MagneticButton>
 
                         <MagneticButton strength={15} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={handleSeeFeaturesClick}>
-                            <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-xl font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
+                            <div className="px-6 py-3 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-sm transition-all shadow-lg hover:shadow-xl text-center">
                                 See How It Works
                             </div>
                         </MagneticButton>

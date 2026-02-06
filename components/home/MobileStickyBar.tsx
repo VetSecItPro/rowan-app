@@ -34,13 +34,13 @@ export function MobileStickyBar() {
             <div className="flex items-center gap-3 max-w-lg mx-auto">
               <Link
                 href="/signup"
-                className="flex-1 text-center py-3 px-6 rounded-xl font-semibold text-sm bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+                className="flex-1 text-center py-2.5 px-5 rounded-full font-semibold text-sm bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
               >
                 Start Free
               </Link>
               <Link
                 href="/login"
-                className="py-3 px-5 rounded-xl font-medium text-sm text-gray-200 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
+                className="py-2.5 px-4 rounded-full font-medium text-sm text-gray-200 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950"
               >
                 Sign In
               </Link>
