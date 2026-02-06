@@ -1,8 +1,144 @@
-export function Skeleton({ className = '' }: { className?: string }) {
+'use client';
+
+import { CSSProperties, useMemo } from 'react';
+
+// ─── Shimmer Skeleton ────────────────────────────────────────────────
+// Replaces basic animate-pulse with a gradient sweep effect.
+// Base: gray-800, highlight sweep: gray-700, 1.5s infinite ease-in-out
+
+const shimmerStyle: CSSProperties = {
+  backgroundImage:
+    'linear-gradient(90deg, rgb(31 41 55) 0%, rgb(55 65 81) 40%, rgb(55 65 81) 60%, rgb(31 41 55) 100%)',
+  backgroundSize: '200% 100%',
+  animation: 'skeleton-shimmer 1.5s ease-in-out infinite',
+};
+
+interface SkeletonProps {
+  className?: string;
+  variant?: 'text' | 'circular' | 'rectangular';
+  width?: string | number;
+  height?: string | number;
+}
+
+export function Skeleton({
+  className = '',
+  variant = 'rectangular',
+  width,
+  height,
+}: SkeletonProps) {
+  const variantClass = useMemo(() => {
+    switch (variant) {
+      case 'circular':
+        return 'rounded-full';
+      case 'text':
+        return 'rounded';
+      case 'rectangular':
+      default:
+        return 'rounded';
+    }
+  }, [variant]);
+
+  const inlineStyle: CSSProperties = {
+    ...shimmerStyle,
+    ...(width !== undefined ? { width: typeof width === 'number' ? `${width}px` : width } : {}),
+    ...(height !== undefined ? { height: typeof height === 'number' ? `${height}px` : height } : {}),
+  };
+
   return (
-    <div className={`animate-pulse bg-gray-700 rounded ${className}`} />
+    <div
+      className={`${variantClass} ${className}`}
+      style={inlineStyle}
+      aria-hidden="true"
+    />
   );
 }
+
+// ─── Skeleton Text ───────────────────────────────────────────────────
+// Multiple lines of varying widths for text placeholder
+
+interface SkeletonTextProps {
+  lines?: number;
+  className?: string;
+}
+
+export function SkeletonText({ lines = 3, className = '' }: SkeletonTextProps) {
+  // Consistent widths that look natural
+  const lineWidths = ['100%', '92%', '76%', '88%', '64%', '80%', '72%', '96%'];
+
+  return (
+    <div className={`space-y-2.5 ${className}`}>
+      {Array.from({ length: lines }).map((_, i) => (
+        <Skeleton
+          key={i}
+          variant="text"
+          className="h-4"
+          width={lineWidths[i % lineWidths.length]}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─── Skeleton Card ───────────────────────────────────────────────────
+// Card-shaped placeholder with image area and text lines
+
+interface SkeletonCardProps {
+  className?: string;
+  /** Show image area at the top */
+  withImage?: boolean;
+  /** Number of text lines below image */
+  lines?: number;
+}
+
+export function SkeletonCard({
+  className = '',
+  withImage = true,
+  lines = 3,
+}: SkeletonCardProps) {
+  return (
+    <div
+      className={`bg-gray-800 border border-gray-700 rounded-xl overflow-hidden ${className}`}
+    >
+      {withImage && <Skeleton className="w-full h-40" />}
+      <div className="p-4 space-y-3">
+        <Skeleton className="h-5 w-3/4" />
+        {Array.from({ length: lines }).map((_, i) => (
+          <Skeleton
+            key={i}
+            className="h-4"
+            width={i === lines - 1 ? '60%' : '100%'}
+          />
+        ))}
+        <div className="flex gap-2 pt-1">
+          <Skeleton className="h-6 w-16 rounded-full" />
+          <Skeleton className="h-6 w-20 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Skeleton Avatar ─────────────────────────────────────────────────
+// Circular with configurable size
+
+interface SkeletonAvatarProps {
+  /** Size in pixels (default 40) */
+  size?: number;
+  className?: string;
+}
+
+export function SkeletonAvatar({ size = 40, className = '' }: SkeletonAvatarProps) {
+  return (
+    <Skeleton
+      variant="circular"
+      width={size}
+      height={size}
+      className={`flex-shrink-0 ${className}`}
+    />
+  );
+}
+
+// ─── Feature-specific skeletons (preserved from original) ────────────
 
 export function MealCardSkeleton() {
   return (

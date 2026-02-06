@@ -8,6 +8,9 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 
+export const maxDuration = 60;
+
+
 /**
  * GET /api/year-in-review
  * Generate comprehensive year in review data for a user's space

@@ -105,12 +105,12 @@
     "ical.js": "^2.2.1",
     "idb-keyval": "^6.2.2",
     "isomorphic-dompurify": "^2.33.0",
-    "jspdf": "^4.0.0",
+    "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.2",
     "leaflet": "^1.9.4",
     "lru-cache": "^11.2.5",
     "lucide-react": "^0.561.0",
-    "next": "15.4.11",
+    "next": "15.5.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^5.0.8",
@@ -147,7 +147,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@babel/runtime": ">=7.26.10"
+      "@babel/runtime": ">=7.26.10",
+      "@isaacs/brace-expansion": ">=5.0.1"
     }
   }
 }

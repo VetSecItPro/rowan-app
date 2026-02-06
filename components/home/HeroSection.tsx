@@ -1,46 +1,46 @@
 'use client';
 
-import { Compass, ArrowRight } from 'lucide-react';
+import { ArrowRight, Shield, Award, EyeOff, WifiOff } from 'lucide-react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
-import { SpotlightCard } from '@/components/ui/spotlight-card';
-import { Users, Zap, Shield, Compass as CompassIcon } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// FIX-301: Lazy-load HeroDemoAnimation to reduce initial bundle size
+const HeroDemoAnimation = dynamic(
+  () => import('@/components/home/HeroDemoAnimation'),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-[400px] bg-gray-800/50 rounded-3xl animate-pulse" />
+  }
+);
 
 interface HeroSectionProps {
     onSignupClick: () => void;
     onPricingClick: () => void;
 }
 
-const benefits = [
-    {
-        icon: Users,
-        title: "Built for Households",
-        description: "Everything you need in one place.",
-        gradient: "from-blue-500 to-indigo-500"
-    },
-    {
-        icon: Zap,
-        title: "Real-Time Sync",
-        description: "Everything syncs instantly across all devices for seamless coordination",
-        gradient: "from-green-500 to-emerald-500"
-    },
+const trustSignals = [
     {
         icon: Shield,
-        title: "Private & Secure",
-        description: "Enterprise-grade security protects your family's data",
-        gradient: "from-purple-500 to-violet-500"
+        label: "Encrypted & Secure"
     },
     {
-        icon: CompassIcon,
-        title: "Beautifully Simple",
-        description: "Intuitive design that makes managing life feel effortless",
-        gradient: "from-orange-500 to-amber-500"
+        icon: Award,
+        label: "Veteran Owned"
+    },
+    {
+        icon: EyeOff,
+        label: "No Ads, Ever"
+    },
+    {
+        icon: WifiOff,
+        label: "Works Offline"
     }
 ];
 
-export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps) {
+export function HeroSection({ onSignupClick }: HeroSectionProps) {
     const heroRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: heroRef,
@@ -50,146 +50,109 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
     const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
     const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
+    const handleSeeFeaturesClick = () => {
+        const featuresSection = document.getElementById('features');
+        if (featuresSection) {
+            featuresSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <section ref={heroRef} className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     style={{ opacity, scale }}
-                    className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center"
+                    className="max-w-4xl mx-auto text-center space-y-8"
                 >
-                    {/* Left Section - 60% (3/5 columns) */}
-                    <div className="lg:col-span-3 space-y-8">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 from-blue-500/20 to-cyan-500/20 border border-blue-500/30"
-                        >
-                            <Compass className="w-4 h-4 text-blue-400" />
-                            <span className="text-sm font-medium text-blue-400">
-                                Your Life Management Hub
-                            </span>
-                        </motion.div>
-
-                        {/* Logo and Brand Name */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.1 }}
-                            className="flex items-center gap-6"
-                        >
-                            <Image
-                                src="/rowan-logo.png"
-                                alt="Rowan Logo"
-                                width={96}
-                                height={96}
-                                className="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-2xl"
-                                priority
-                            />
-                            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-extrabold tracking-tight bg-gradient-to-r from-blue-600 from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                                Rowan
-                            </h1>
-                        </motion.div>
-
-                        <motion.h2
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight"
-                        >
-                            <span className="text-white">Your Life, </span>
-                            <span className="bg-gradient-to-r from-blue-600 via-cyan-600 from-blue-400 to-teal-400 bg-clip-text text-transparent animate-gradient">
-                                Organized
-                            </span>
-                        </motion.h2>
-
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="text-xl sm:text-2xl text-gray-300 leading-relaxed font-serif italic"
-                        >
-                            Rowan brings tasks, schedules, lists, meals, budgets, and goals into one elegant workspace, so your family stays aligned without constant reminders.
-                        </motion.p>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.4 }}
-                            className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 w-full sm:w-auto mt-2"
-                        >
-                            <MagneticButton className="group" onClick={onSignupClick}>
-                                <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full font-semibold text-base transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
-                                    Get Started Free
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </MagneticButton>
-
-                            <MagneticButton strength={15} onClick={onPricingClick}>
-                                <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-full font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
-                                    See Pricing
-                                </div>
-                            </MagneticButton>
-                        </motion.div>
-                    </div>
-
-                    {/* Right Section - 40% (2/5 columns) - Benefits Grid */}
                     <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.5 }}
-                        className="lg:col-span-2"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="flex items-center justify-center gap-6"
                     >
-                        <div className="grid grid-cols-2 gap-4">
-                            {benefits.map((benefit, index) => {
-                                // Map gradients to specific icon colors
-                                const iconColorMap: Record<string, string> = {
-                                    'from-blue-500 to-indigo-500': 'text-blue-400',
-                                    'from-green-500 to-emerald-500': 'text-green-400',
-                                    'from-purple-500 to-violet-500': 'text-purple-400',
-                                    'from-orange-500 to-amber-500': 'text-orange-400'
-                                };
+                        <Image
+                            src="/rowan-logo.png"
+                            alt="Rowan Logo"
+                            width={96}
+                            height={96}
+                            className="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-2xl"
+                            priority
+                            placeholder="empty"
+                        />
+                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                            Rowan
+                        </h1>
+                    </motion.div>
 
-                                return (
-                                    <motion.div
-                                        key={benefit.title}
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                                        className="group"
-                                    >
-                                        <SpotlightCard className="h-full hover:scale-105 transition-all duration-300 hover:shadow-xl rounded-2xl">
-                                            <div className="p-6">
-                                                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} p-0.5 mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                                    <div className="w-full h-full rounded-xl bg-gray-900 flex items-center justify-center">
-                                                        <benefit.icon className={`w-6 h-6 ${iconColorMap[benefit.gradient]}`} />
-                                                    </div>
-                                                </div>
-                                                <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">
-                                                    {benefit.title}
-                                                </h3>
-                                                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed font-serif italic">
-                                                    {benefit.description}
-                                                </p>
-                                            </div>
-                                        </SpotlightCard>
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight text-white"
+                    >
+                        Stop Managing Your Family in{' '}
+                        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                            5 Different Apps
+                        </span>
+                    </motion.h2>
 
-                        {/* Veteran-Owned Business Badge */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 1.1 }}
-                            className="flex items-center justify-center gap-2 mt-6"
-                        >
-                            <Shield className="w-5 h-5 text-blue-400" />
-                            <span className="text-sm font-semibold text-gray-300">
-                                Veteran-Owned Business
-                            </span>
-                        </motion.div>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="text-xl sm:text-2xl text-gray-400 leading-relaxed max-w-3xl mx-auto"
+                    >
+                        Rowan brings tasks, calendars, budgets, meals, and more into one beautiful app — so your household actually stays in sync.
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mt-2"
+                    >
+                        <MagneticButton className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={onSignupClick}>
+                            <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold text-base transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
+                                Try Free for 14 Days
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                        </MagneticButton>
+
+                        <MagneticButton strength={15} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={handleSeeFeaturesClick}>
+                            <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-xl font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
+                                See How It Works
+                            </div>
+                        </MagneticButton>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="flex flex-wrap items-center justify-center gap-6 pt-4"
+                    >
+                        {trustSignals.map((signal, index) => (
+                            <motion.div
+                                key={signal.label}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
+                                className="flex items-center gap-2"
+                            >
+                                <signal.icon className="w-4 h-4 text-gray-400" />
+                                <span className="text-sm text-gray-400">
+                                    {signal.label}
+                                </span>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                        className="pt-12"
+                    >
                     </motion.div>
                 </motion.div>
             </div>

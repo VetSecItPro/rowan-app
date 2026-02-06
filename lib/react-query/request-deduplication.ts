@@ -26,6 +26,7 @@ class RequestThrottler {
   private pendingRequests = new Map<string, Promise<unknown>>();
   private throttledActions = new Map<string, number>();
   private readonly THROTTLE_DELAY = 300; // 300ms throttle
+  private readonly MAX_THROTTLED_ACTIONS = 500; // FIX-307: Prevent unbounded memory growth
 
   /**
    * Throttles rapid successive calls to the same action
@@ -33,6 +34,14 @@ class RequestThrottler {
   async throttle<T>(key: string, action: () => Promise<T>): Promise<T> {
     const now = Date.now();
     const lastCall = this.throttledActions.get(key);
+
+    // FIX-307: Limit throttledActions Map size to prevent memory leak
+    if (this.throttledActions.size > this.MAX_THROTTLED_ACTIONS) {
+      const firstKey = this.throttledActions.keys().next().value;
+      if (firstKey !== undefined) {
+        this.throttledActions.delete(firstKey);
+      }
+    }
 
     // If we called this recently, wait for the throttle period
     if (lastCall && now - lastCall < this.THROTTLE_DELAY) {

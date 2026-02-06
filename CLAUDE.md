@@ -111,6 +111,16 @@ const COLORS = { tasks: 'blue', calendar: 'purple', reminders: 'pink', messages:
 ### isomorphic-dompurify / jsdom
 `isomorphic-dompurify` depends on `jsdom` which uses `fs.readFileSync` to load `default-stylesheet.css`. If webpack bundles it, the build fails with `ENOENT: default-stylesheet.css`. Fix: `serverExternalPackages: ['isomorphic-dompurify', 'jsdom']` in `next.config.mjs`.
 
+## Security Audit Workflow
+
+When running `/sec-audit` or any security audit:
+
+1. **Report Location**: Save audit reports to `docs/security-audit/` (gitignored). Name format: `audit-YYYY-MM-DD.md`
+2. **Fix Tracking**: Each finding gets a FIX-XXX ID. When fixing issues, update the audit document in-place — mark each finding's status (FIXED, DEFERRED, N/A) with a brief note of what was done
+3. **Post-Fix Verification**: After all fixes, re-run TypeScript check and build. Note verification results at the bottom of the audit document
+4. **History**: Never delete audit reports. Each audit is a snapshot in time. Past audits provide context for recurring patterns
+5. **Scope**: Audit reports cover 4 domains — Security, Database, Performance, Frontend/UX. Each finding has a severity (CRITICAL, HIGH, MEDIUM, LOW)
+
 ## Common Mistakes
 - No committing to main → Feature branches only
 - No direct Supabase in components → Service layer

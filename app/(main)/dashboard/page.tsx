@@ -39,7 +39,7 @@ import {
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
-import { CompactTimeAwareWelcome } from '@/components/ui/TimeAwareWelcomeBox';
+import { WelcomeWidget } from '@/components/dashboard/WelcomeWidget';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
 import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
@@ -367,19 +367,6 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  // Greeting function - Memoized
-  // Night: 9PM-5AM, Morning: 5AM-12PM, Afternoon: 12PM-5PM, Evening: 5PM-9PM
-  const greetingText = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour >= 21 || hour < 5) return 'Good night';
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  }, []);
-
-  // Memoize current date string
-  const currentDate = useMemo(() => formatDate(getCurrentDateString(), 'EEEE, MMMM d, yyyy'), []);
-
   // Show loading state while checking authentication
   if (authLoading || !user) {
     return (
@@ -405,12 +392,8 @@ export default function DashboardPage() {
         <PullToRefresh onRefresh={refreshStats}>
           <div className="min-h-screen p-4 sm:p-6 md:p-8">
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
-              {/* Compact Time-Aware Welcome Header */}
-              <CompactTimeAwareWelcome
-                greetingText={greetingText}
-                userName={user?.name ?? undefined}
-                currentDate={currentDate}
-              />
+              {/* Time-Aware Welcome Widget */}
+              <WelcomeWidget userName={user?.name ?? undefined} />
 
               {/* Trial Status Banner - Shows trial countdown or upgrade prompt */}
               <TrialStatusBanner />
