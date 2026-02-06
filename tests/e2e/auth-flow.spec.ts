@@ -7,15 +7,15 @@ test.describe('Auth Flow Tests', () => {
   test('Homepage loads without beta gate', async ({ page }) => {
     await page.goto(BASE_URL);
 
-    // Should show "Get Started Free" CTA (not "Sign up for beta")
-    await expect(page.getByText('Get Started Free')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText('See Pricing')).toBeVisible();
+    // Should show "Try Free for 14 Days" CTA (not "Sign up for beta")
+    await expect(page.getByText('Try Free for 14 Days')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('See How It Works')).toBeVisible();
 
     // Should NOT have any beta gate modal
     const betaModal = page.locator('text=Sign up for beta');
     await expect(betaModal).not.toBeVisible();
 
-    console.log('✓ Homepage loads clean — no beta gate, shows "Get Started Free"');
+    console.log('✓ Homepage loads clean — no beta gate, shows "Try Free for 14 Days"');
   });
 
   test('Signup page renders correctly', async ({ page }) => {
@@ -199,14 +199,14 @@ test.describe('Auth Flow Tests', () => {
     console.log('✓ Pricing page loads — shows plans, no beta gate');
   });
 
-  test('"Get Started Free" button navigates to signup', async ({ page }) => {
+  test('"Try Free for 14 Days" button navigates to signup', async ({ page }) => {
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle');
 
-    // The "Get Started Free" text is inside a MagneticButton (Framer Motion motion.div).
+    // The "Try Free for 14 Days" text is inside a MagneticButton (Framer Motion motion.div).
     // Verify the CTA exists, then use JavaScript to trigger the navigation directly
     // since Playwright clicks don't reliably trigger React event handlers on motion.div elements.
-    const ctaButton = page.getByText('Get Started Free').first();
+    const ctaButton = page.getByText('Try Free for 14 Days').first();
     await expect(ctaButton).toBeVisible({ timeout: 15000 });
 
     // Click the parent motion.div which has the onClick handler
@@ -220,6 +220,6 @@ test.describe('Auth Flow Tests', () => {
 
     expect(page.url()).toContain('/signup');
 
-    console.log('✓ "Get Started Free" navigates to /signup');
+    console.log('✓ "Try Free for 14 Days" navigates to /signup');
   });
 });
