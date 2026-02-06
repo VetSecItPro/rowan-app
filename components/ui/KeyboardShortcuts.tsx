@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Keyboard } from 'lucide-react';
 
-/**
- * Keyboard shortcut definition.
- */
 interface Shortcut {
   keys: string[];
   description: string;
@@ -46,21 +43,28 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
   },
 ];
 
-/**
- * KeyboardShortcuts
- *
- * Self-contained overlay that renders when the user presses the `?` key.
- * No props required -- it registers its own global keydown listener.
- *
- * - Closes on Escape or clicking the backdrop.
- * - Animated entrance / exit via framer-motion.
- * - Two-column grid on desktop, single column on mobile.
- */
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
 export function KeyboardShortcuts() {
   const [isOpen, setIsOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
+  const getFocusableElements = useCallback(() => {
+    if (!dialogRef.current) return [];
+    return Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+      .filter(el => {
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      });
+  }, []);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    // Ignore when typing in inputs, textareas, or contenteditable
     const target = e.target as HTMLElement;
     if (
       target.tagName === 'INPUT' ||
@@ -87,11 +91,50 @@ export function KeyboardShortcuts() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previouslyFocusedRef.current = document.activeElement as HTMLElement;
+
+    requestAnimationFrame(() => {
+      const elements = getFocusableElements();
+      if (elements.length > 0) elements[0].focus();
+    });
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const elements = getFocusableElements();
+      if (elements.length === 0) return;
+
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleTab);
+    return () => {
+      document.removeEventListener('keydown', handleTab);
+      if (previouslyFocusedRef.current) {
+        requestAnimationFrame(() => previouslyFocusedRef.current?.focus());
+      }
+    };
+  }, [isOpen, getFocusableElements]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -102,8 +145,8 @@ export function KeyboardShortcuts() {
             aria-hidden="true"
           />
 
-          {/* Dialog */}
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Keyboard shortcuts"
@@ -113,7 +156,6 @@ export function KeyboardShortcuts() {
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
             className="relative w-full max-w-xl bg-gray-800 border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-700/50">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-purple-900/40 flex items-center justify-center">
@@ -130,7 +172,6 @@ export function KeyboardShortcuts() {
               </button>
             </div>
 
-            {/* Content */}
             <div className="px-5 sm:px-6 py-5 max-h-[70vh] overflow-y-auto overscroll-contain">
               <div className="space-y-6">
                 {SHORTCUT_GROUPS.map((group) => (
@@ -165,7 +206,6 @@ export function KeyboardShortcuts() {
               </div>
             </div>
 
-            {/* Footer hint */}
             <div className="px-5 sm:px-6 py-3 border-t border-gray-700/50 bg-gray-800/80">
               <p className="text-xs text-gray-500 text-center">
                 Press <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-medium text-gray-400 bg-gray-900 border border-gray-600 rounded">?</kbd> to toggle this panel

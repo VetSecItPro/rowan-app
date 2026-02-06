@@ -5,6 +5,16 @@ import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
+import dynamic from 'next/dynamic';
+
+// FIX-301: Lazy-load HeroDemoAnimation to reduce initial bundle size
+const HeroDemoAnimation = dynamic(
+  () => import('@/components/home/HeroDemoAnimation'),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-[400px] bg-gray-800/50 rounded-3xl animate-pulse" />
+  }
+);
 
 interface HeroSectionProps {
     onSignupClick: () => void;
@@ -54,7 +64,6 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                     style={{ opacity, scale }}
                     className="max-w-4xl mx-auto text-center space-y-8"
                 >
-                    {/* Logo and Brand Name */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -68,13 +77,13 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                             height={96}
                             className="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-2xl"
                             priority
+                            placeholder="empty"
                         />
                         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-display font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
                             Rowan
                         </h1>
                     </motion.div>
 
-                    {/* Pain-Point Headline */}
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -87,7 +96,6 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         </span>
                     </motion.h2>
 
-                    {/* Clear Value Proposition */}
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -97,28 +105,26 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         Rowan brings tasks, calendars, budgets, meals, and more into one beautiful app — so your household actually stays in sync.
                     </motion.p>
 
-                    {/* CTAs */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.3 }}
                         className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mt-2"
                     >
-                        <MagneticButton className="group" onClick={onSignupClick}>
+                        <MagneticButton className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={onSignupClick}>
                             <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold text-base transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
                                 Try Free for 14 Days
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </div>
                         </MagneticButton>
 
-                        <MagneticButton strength={15} onClick={handleSeeFeaturesClick}>
+                        <MagneticButton strength={15} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={handleSeeFeaturesClick}>
                             <div className="px-8 py-4 bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 rounded-xl font-semibold text-base transition-all shadow-lg hover:shadow-xl text-center">
                                 See How It Works
                             </div>
                         </MagneticButton>
                     </motion.div>
 
-                    {/* Trust Signals - Horizontal Row */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -141,14 +147,12 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         ))}
                     </motion.div>
 
-                    {/* Placeholder for HeroDemoAnimation */}
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.6 }}
                         className="pt-12"
                     >
-                        {/* HeroDemoAnimation will be inserted here */}
                     </motion.div>
                 </motion.div>
             </div>

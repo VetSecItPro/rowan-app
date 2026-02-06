@@ -1,8 +1,8 @@
 'use client';
 
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
-import { Check, Sparkles } from 'lucide-react';
+import { Check, Sparkles, Pause } from 'lucide-react';
 
 interface Task {
     id: string;
@@ -23,10 +23,10 @@ interface FamilyMember {
     mood: string;
 }
 
-// Animation frames for the demo loop
 type Frame = 'tasks' | 'task-complete' | 'calendar' | 'shopping' | 'budget' | 'family';
 
 export default function HeroDemoAnimation() {
+    const prefersReducedMotion = useReducedMotion();
     const [currentFrame, setCurrentFrame] = useState<Frame>('tasks');
     const [isPaused, setIsPaused] = useState(false);
     const [tasks, setTasks] = useState<Task[]>([
@@ -44,9 +44,10 @@ export default function HeroDemoAnimation() {
     const [showConfetti, setShowConfetti] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
     const isInView = useInView(containerRef, { once: false, margin: '0px' });
 
-    // Animation sequence timing
     useEffect(() => {
         if (!isInView || isPaused) return;
 
@@ -58,25 +59,27 @@ export default function HeroDemoAnimation() {
             const frame = frames[currentIndex];
             setCurrentFrame(frame);
 
-            // Handle frame-specific logic
             if (frame === 'task-complete') {
-                // Mark first task as complete
-                setTimeout(() => {
+                const t1 = setTimeout(() => {
                     setTasks(prev => prev.map((t, i) => i === 0 ? { ...t, done: true } : t));
-                    setShowConfetti(true);
+                    if (!prefersReducedMotion) {
+                        setShowConfetti(true);
+                        const t2 = setTimeout(() => setShowConfetti(false), 2000);
+                        timeoutsRef.current.push(t2);
+                    }
                     setShowPoints(true);
-                    setTimeout(() => setShowPoints(false), 1500);
-                    setTimeout(() => setShowConfetti(false), 2000);
+                    const t3 = setTimeout(() => setShowPoints(false), 1500);
+                    timeoutsRef.current.push(t3);
                 }, 500);
+                timeoutsRef.current.push(t1);
             } else if (frame === 'shopping') {
-                // Mark first shopping item as complete
-                setTimeout(() => {
+                const t1 = setTimeout(() => {
                     setShoppingItems(prev => prev.map((item, i) => i === 0 ? { ...item, done: true } : item));
                 }, 800);
+                timeoutsRef.current.push(t1);
             } else if (frame === 'budget') {
-                // Animate budget bar
                 setBudgetProgress(0);
-                setTimeout(() => {
+                const t1 = setTimeout(() => {
                     let progress = 0;
                     const interval = setInterval(() => {
                         progress += 5;
@@ -84,14 +87,13 @@ export default function HeroDemoAnimation() {
                         if (progress >= 65) clearInterval(interval);
                     }, 50);
                 }, 300);
+                timeoutsRef.current.push(t1);
             } else if (frame === 'tasks') {
-                // Reset for loop
                 setTasks(prev => prev.map(t => ({ ...t, done: false })));
                 setShoppingItems(prev => prev.map(item => ({ ...item, done: false })));
                 setBudgetProgress(0);
             }
 
-            // Timing for each frame
             const durations: Record<Frame, number> = {
                 tasks: 3000,
                 'task-complete': 3000,
@@ -105,51 +107,101 @@ export default function HeroDemoAnimation() {
                 currentIndex = (currentIndex + 1) % frames.length;
                 advanceFrame();
             }, durations[frame]);
+            timeoutsRef.current.push(frameTimer);
         };
 
         advanceFrame();
 
         return () => {
             clearTimeout(frameTimer);
+            timeoutsRef.current.forEach(clearTimeout);
+            timeoutsRef.current = [];
         };
-    }, [isInView, isPaused]);
+    }, [isInView, isPaused, prefersReducedMotion]);
+
+    useEffect(() => {
+        return () => {
+            if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+        };
+    }, []);
 
     const handleMouseEnter = () => setIsPaused(true);
     const handleMouseLeave = () => setIsPaused(false);
+
+    const handleTouchStart = () => {
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+        setIsPaused(true);
+    };
+
+    const handleTouchEnd = () => {
+        resumeTimerRef.current = setTimeout(() => setIsPaused(false), 5000);
+    };
+
+    const frameTransition = prefersReducedMotion
+        ? { duration: 0.01 }
+        : { duration: 0.5 };
+
+    const frameInitial = prefersReducedMotion
+        ? { opacity: 0 }
+        : { opacity: 0, x: -20 };
+
+    const frameAnimate = prefersReducedMotion
+        ? { opacity: 1 }
+        : { opacity: 1, x: 0 };
+
+    const frameExit = prefersReducedMotion
+        ? { opacity: 0 }
+        : { opacity: 0, x: 20 };
 
     return (
         <div
             ref={containerRef}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             className="w-full max-w-[500px] mx-auto"
         >
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                 transition={{ duration: 0.6 }}
                 className="relative rounded-3xl bg-gray-900 border border-gray-800 shadow-2xl shadow-blue-500/10 overflow-hidden md:[transform:perspective(1000px)_rotateY(-2deg)_rotateX(1deg)]"
             >
-                {/* Container content */}
+                <AnimatePresence>
+                    {isPaused && (
+                        <>
+                            <div aria-live="polite" className="sr-only">Animation paused</div>
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center z-10"
+                            >
+                                <Pause className="w-4 h-4 text-white" />
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
+
                 <div className="p-6 min-h-[400px] md:min-h-[400px] relative">
                     <AnimatePresence mode="wait">
-                        {/* Frame 1: Tasks Dashboard */}
                         {currentFrame === 'tasks' && (
                             <motion.div
                                 key="tasks"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.5 }}
+                                initial={frameInitial}
+                                animate={frameAnimate}
+                                exit={frameExit}
+                                transition={frameTransition}
                             >
                                 <h3 className="text-xl font-bold text-white mb-6">Today at a Glance</h3>
                                 <div className="space-y-3">
                                     {tasks.map((task, index) => (
                                         <motion.div
                                             key={task.id}
-                                            initial={{ opacity: 0, y: 10 }}
+                                            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.15, duration: 0.4 }}
+                                            transition={{ delay: prefersReducedMotion ? 0 : index * 0.15, duration: 0.4 }}
                                             className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/60 border border-gray-700/50"
                                         >
                                             <div
@@ -177,14 +229,13 @@ export default function HeroDemoAnimation() {
                             </motion.div>
                         )}
 
-                        {/* Frame 2: Task Complete with Confetti */}
                         {currentFrame === 'task-complete' && (
                             <motion.div
                                 key="task-complete"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                transition={{ duration: 0.5 }}
+                                transition={frameTransition}
                                 className="relative"
                             >
                                 <h3 className="text-xl font-bold text-white mb-6">Today at a Glance</h3>
@@ -195,7 +246,7 @@ export default function HeroDemoAnimation() {
                                             className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/60 border border-gray-700/50 relative"
                                         >
                                             <motion.div
-                                                animate={task.done ? { scale: [1, 1.2, 1] } : {}}
+                                                animate={!prefersReducedMotion && task.done ? { scale: [1, 1.2, 1] } : {}}
                                                 transition={{ duration: 0.3 }}
                                                 className={`w-5 h-5 rounded flex-shrink-0 flex items-center justify-center ${
                                                     task.done ? 'bg-blue-500' : 'border-2 border-gray-600'
@@ -203,9 +254,9 @@ export default function HeroDemoAnimation() {
                                             >
                                                 {task.done && (
                                                     <motion.div
-                                                        initial={{ scale: 0 }}
+                                                        initial={{ scale: prefersReducedMotion ? 1 : 0 }}
                                                         animate={{ scale: 1 }}
-                                                        transition={{ duration: 0.2 }}
+                                                        transition={{ duration: prefersReducedMotion ? 0.01 : 0.2 }}
                                                     >
                                                         <Check className="w-3.5 h-3.5 text-white" />
                                                     </motion.div>
@@ -227,14 +278,13 @@ export default function HeroDemoAnimation() {
                                     ))}
                                 </div>
 
-                                {/* Points Badge */}
                                 <AnimatePresence>
                                     {showPoints && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: 0, scale: 0.8 }}
+                                            initial={{ opacity: 0, y: prefersReducedMotion ? -40 : 0, scale: prefersReducedMotion ? 1 : 0.8 }}
                                             animate={{ opacity: 1, y: -40, scale: 1 }}
-                                            exit={{ opacity: 0, y: -60 }}
-                                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                                            exit={{ opacity: 0, y: prefersReducedMotion ? -40 : -60 }}
+                                            transition={{ duration: prefersReducedMotion ? 0.01 : 0.8, ease: 'easeOut' }}
                                             className="absolute top-20 left-1/2 -translate-x-1/2 px-4 py-2 bg-blue-500 text-white rounded-full font-bold text-sm shadow-lg"
                                         >
                                             +15 pts
@@ -242,57 +292,57 @@ export default function HeroDemoAnimation() {
                                     )}
                                 </AnimatePresence>
 
-                                {/* Confetti Effect */}
-                                <AnimatePresence>
-                                    {showConfetti && (
-                                        <>
-                                            {[...Array(12)].map((_, i) => (
-                                                <motion.div
-                                                    key={i}
-                                                    initial={{
-                                                        opacity: 1,
-                                                        x: '50%',
-                                                        y: '20%',
-                                                        scale: 0,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 0,
-                                                        x: `${50 + (Math.random() - 0.5) * 100}%`,
-                                                        y: `${20 + (Math.random() - 0.5) * 100}%`,
-                                                        scale: 1,
-                                                        rotate: Math.random() * 360,
-                                                    }}
-                                                    exit={{ opacity: 0 }}
-                                                    transition={{
-                                                        duration: 1.5,
-                                                        delay: i * 0.05,
-                                                        ease: 'easeOut',
-                                                    }}
-                                                    className="absolute pointer-events-none"
-                                                >
-                                                    <Sparkles
-                                                        className={`w-3 h-3 ${
-                                                            ['text-blue-400', 'text-cyan-400', 'text-purple-400', 'text-pink-400'][
-                                                                i % 4
-                                                            ]
-                                                        }`}
-                                                    />
-                                                </motion.div>
-                                            ))}
-                                        </>
-                                    )}
-                                </AnimatePresence>
+                                {!prefersReducedMotion && (
+                                    <AnimatePresence>
+                                        {showConfetti && (
+                                            <>
+                                                {[...Array(12)].map((_, i) => (
+                                                    <motion.div
+                                                        key={i}
+                                                        initial={{
+                                                            opacity: 1,
+                                                            x: '50%',
+                                                            y: '20%',
+                                                            scale: 0,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 0,
+                                                            x: `${50 + (Math.random() - 0.5) * 100}%`,
+                                                            y: `${20 + (Math.random() - 0.5) * 100}%`,
+                                                            scale: 1,
+                                                            rotate: Math.random() * 360,
+                                                        }}
+                                                        exit={{ opacity: 0 }}
+                                                        transition={{
+                                                            duration: 1.5,
+                                                            delay: i * 0.05,
+                                                            ease: 'easeOut',
+                                                        }}
+                                                        className="absolute pointer-events-none"
+                                                    >
+                                                        <Sparkles
+                                                            className={`w-3 h-3 ${
+                                                                ['text-blue-400', 'text-cyan-400', 'text-purple-400', 'text-pink-400'][
+                                                                    i % 4
+                                                                ]
+                                                            }`}
+                                                        />
+                                                    </motion.div>
+                                                ))}
+                                            </>
+                                        )}
+                                    </AnimatePresence>
+                                )}
                             </motion.div>
                         )}
 
-                        {/* Frame 3: Calendar View */}
                         {currentFrame === 'calendar' && (
                             <motion.div
                                 key="calendar"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.5 }}
+                                initial={frameInitial}
+                                animate={frameAnimate}
+                                exit={frameExit}
+                                transition={frameTransition}
                             >
                                 <h3 className="text-xl font-bold text-white mb-6">This Week</h3>
                                 <div className="flex gap-2 mb-6">
@@ -308,9 +358,9 @@ export default function HeroDemoAnimation() {
                                     ))}
                                 </div>
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
+                                    initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5, duration: 0.5 }}
+                                    transition={{ delay: prefersReducedMotion ? 0 : 0.5, duration: prefersReducedMotion ? 0.01 : 0.5 }}
                                     className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30"
                                 >
                                     <div className="flex items-start gap-3">
@@ -324,14 +374,13 @@ export default function HeroDemoAnimation() {
                             </motion.div>
                         )}
 
-                        {/* Frame 4: Shopping List */}
                         {currentFrame === 'shopping' && (
                             <motion.div
                                 key="shopping"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.5 }}
+                                initial={frameInitial}
+                                animate={frameAnimate}
+                                exit={frameExit}
+                                transition={frameTransition}
                             >
                                 <h3 className="text-xl font-bold text-white mb-2">Grocery Run</h3>
                                 <p className="text-sm text-gray-400 mb-6">3 items</p>
@@ -339,13 +388,13 @@ export default function HeroDemoAnimation() {
                                     {shoppingItems.map((item, index) => (
                                         <motion.div
                                             key={item.text}
-                                            initial={{ opacity: 0, x: -10 }}
+                                            initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -10 }}
                                             animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.1, duration: 0.3 }}
+                                            transition={{ delay: prefersReducedMotion ? 0 : index * 0.1, duration: prefersReducedMotion ? 0.01 : 0.3 }}
                                             className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/60 border border-gray-700/50"
                                         >
                                             <motion.div
-                                                animate={item.done ? { scale: [1, 1.2, 1] } : {}}
+                                                animate={!prefersReducedMotion && item.done ? { scale: [1, 1.2, 1] } : {}}
                                                 transition={{ duration: 0.3 }}
                                                 className={`w-5 h-5 rounded flex-shrink-0 flex items-center justify-center ${
                                                     item.done ? 'bg-emerald-500' : 'border-2 border-gray-600'
@@ -353,9 +402,9 @@ export default function HeroDemoAnimation() {
                                             >
                                                 {item.done && (
                                                     <motion.div
-                                                        initial={{ scale: 0 }}
+                                                        initial={{ scale: prefersReducedMotion ? 1 : 0 }}
                                                         animate={{ scale: 1 }}
-                                                        transition={{ duration: 0.2 }}
+                                                        transition={{ duration: prefersReducedMotion ? 0.01 : 0.2 }}
                                                     >
                                                         <Check className="w-3.5 h-3.5 text-white" />
                                                     </motion.div>
@@ -374,7 +423,7 @@ export default function HeroDemoAnimation() {
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.8, duration: 0.3 }}
+                                    transition={{ delay: prefersReducedMotion ? 0 : 0.8, duration: prefersReducedMotion ? 0.01 : 0.3 }}
                                     className="mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30"
                                 >
                                     <div className="flex justify-between items-center">
@@ -385,14 +434,13 @@ export default function HeroDemoAnimation() {
                             </motion.div>
                         )}
 
-                        {/* Frame 5: Budget View */}
                         {currentFrame === 'budget' && (
                             <motion.div
                                 key="budget"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.5 }}
+                                initial={frameInitial}
+                                animate={frameAnimate}
+                                exit={frameExit}
+                                transition={frameTransition}
                             >
                                 <h3 className="text-xl font-bold text-white mb-2">Monthly Budget</h3>
                                 <p className="text-sm text-gray-400 mb-6">February 2026</p>
@@ -414,9 +462,9 @@ export default function HeroDemoAnimation() {
                                         </div>
                                     </div>
                                     <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
+                                        initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.5, duration: 0.4 }}
+                                        transition={{ delay: prefersReducedMotion ? 0 : 0.5, duration: prefersReducedMotion ? 0.01 : 0.4 }}
                                         className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30"
                                     >
                                         <div className="flex justify-between items-center">
@@ -430,14 +478,13 @@ export default function HeroDemoAnimation() {
                             </motion.div>
                         )}
 
-                        {/* Frame 6: Family Overview */}
                         {currentFrame === 'family' && (
                             <motion.div
                                 key="family"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                transition={{ duration: 0.5 }}
+                                initial={frameInitial}
+                                animate={frameAnimate}
+                                exit={frameExit}
+                                transition={frameTransition}
                             >
                                 <h3 className="text-xl font-bold text-white mb-6">Family Status</h3>
                                 <div className="flex justify-center gap-4 mb-8">
@@ -448,9 +495,9 @@ export default function HeroDemoAnimation() {
                                     ] as FamilyMember[]).map((member, index) => (
                                         <motion.div
                                             key={member.initial}
-                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.5 }}
                                             animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: index * 0.15, duration: 0.4 }}
+                                            transition={{ delay: prefersReducedMotion ? 0 : index * 0.15, duration: prefersReducedMotion ? 0.01 : 0.4 }}
                                             className="relative"
                                         >
                                             <div
@@ -463,9 +510,9 @@ export default function HeroDemoAnimation() {
                                     ))}
                                 </div>
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
+                                    initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.6, duration: 0.5 }}
+                                    transition={{ delay: prefersReducedMotion ? 0 : 0.6, duration: prefersReducedMotion ? 0.01 : 0.5 }}
                                     className="text-center p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30"
                                 >
                                     <div className="text-3xl mb-2">✨</div>
@@ -477,20 +524,33 @@ export default function HeroDemoAnimation() {
                     </AnimatePresence>
                 </div>
 
-                {/* Progress indicator dots */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                    {(['tasks', 'task-complete', 'calendar', 'shopping', 'budget', 'family'] as Frame[]).map((frame) => (
-                        <div
-                            key={frame}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                currentFrame === frame ? 'bg-blue-500 w-6' : 'bg-gray-700'
-                            }`}
-                        />
-                    ))}
+                    {(['tasks', 'task-complete', 'calendar', 'shopping', 'budget', 'family'] as Frame[]).map((frame) => {
+                        const frameLabels: Record<Frame, string> = {
+                            'tasks': 'View task list overview',
+                            'task-complete': 'View task completion',
+                            'calendar': 'View calendar events',
+                            'shopping': 'View shopping list',
+                            'budget': 'View budget tracking',
+                            'family': 'View family status'
+                        };
+
+                        return (
+                            <button
+                                key={frame}
+                                onClick={() => {
+                                    setCurrentFrame(frame);
+                                    setIsPaused(true);
+                                }}
+                                aria-label={frameLabels[frame]}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
+                                    currentFrame === frame ? 'bg-blue-500 w-6' : 'bg-gray-700'
+                                }`}
+                            />
+                        );
+                    })}
                 </div>
             </motion.div>
-
-            {/* 3D perspective is applied via inline style; on mobile we use a className override */}
         </div>
     );
 }

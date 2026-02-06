@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Shield,
   Award,
@@ -63,34 +63,35 @@ const productStats = [
   },
 ];
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-};
-
 export function SocialProofSection() {
+  const prefersReducedMotion = useReducedMotion();
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: prefersReducedMotion ? 0.01 : 0.5 },
+    },
+  };
+
   return (
     <section className="relative py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Headline */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: prefersReducedMotion ? 0.01 : 0.6 }}
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-white mb-4">
@@ -104,12 +105,12 @@ export function SocialProofSection() {
           </p>
         </motion.div>
 
-        {/* Trust Badges Row */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
+          variants={prefersReducedMotion ? undefined : containerVariants}
+          initial={prefersReducedMotion ? { opacity: 0 } : "hidden"}
+          whileInView={prefersReducedMotion ? { opacity: 1 } : "visible"}
           viewport={{ once: true, margin: '-60px' }}
+          transition={prefersReducedMotion ? { duration: 0.01 } : undefined}
           className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-16"
         >
           {trustBadges.map((badge) => {
@@ -117,7 +118,7 @@ export function SocialProofSection() {
             return (
               <motion.div
                 key={badge.label}
-                variants={itemVariants}
+                variants={prefersReducedMotion ? undefined : itemVariants}
                 className="group relative rounded-xl bg-gray-800/50 border border-gray-700/50 p-5 text-center hover:border-gray-600/50 transition-colors"
               >
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gray-700/50 mb-3 group-hover:bg-gray-700 transition-colors">
@@ -132,12 +133,12 @@ export function SocialProofSection() {
           })}
         </motion.div>
 
-        {/* Product Stats Grid */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
+          variants={prefersReducedMotion ? undefined : containerVariants}
+          initial={prefersReducedMotion ? { opacity: 0 } : "hidden"}
+          whileInView={prefersReducedMotion ? { opacity: 1 } : "visible"}
           viewport={{ once: true, margin: '-60px' }}
+          transition={prefersReducedMotion ? { duration: 0.01 } : undefined}
           className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-16"
         >
           {productStats.map((stat) => {
@@ -145,10 +146,9 @@ export function SocialProofSection() {
             return (
               <motion.div
                 key={stat.value}
-                variants={itemVariants}
+                variants={prefersReducedMotion ? undefined : itemVariants}
                 className="relative rounded-xl bg-gray-800/30 border border-gray-700/30 p-6 text-center"
               >
-                {/* Gradient icon */}
                 <div
                   className={`inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br ${stat.gradient} p-0.5 mb-4`}
                 >
@@ -167,12 +167,11 @@ export function SocialProofSection() {
           })}
         </motion.div>
 
-        {/* Future Testimonials Placeholder */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: prefersReducedMotion ? 0.01 : 0.8, delay: prefersReducedMotion ? 0 : 0.3 }}
           className="flex items-center justify-center gap-3 py-6 border-t border-gray-800/50"
         >
           <MessageSquare className="w-4 h-4 text-gray-600" />

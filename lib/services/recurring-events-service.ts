@@ -335,6 +335,7 @@ export const recurringEventsService = {
     const supabase = createClient();
 
     // Get all events (including recurring masters)
+    // FIX-308: Add limit to prevent unbounded query
     let query = supabase
       .from('events')
       .select('*')
@@ -344,7 +345,9 @@ export const recurringEventsService = {
       query = query.is('deleted_at', null);
     }
 
-    const { data: events, error } = await query.order('start_time', { ascending: true });
+    const { data: events, error } = await query
+      .order('start_time', { ascending: true })
+      .limit(1000);
 
     if (error) throw error;
 

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { PublicHeader } from '@/components/layout/PublicHeader';
+import { PublicHeaderLite } from '@/components/layout/PublicHeaderLite';
 import { HeroSection } from '@/components/home/HeroSection';
 import { MobileStickyBar } from '@/components/home/MobileStickyBar';
 
@@ -20,6 +20,7 @@ export default function HomePage() {
 
   return (
     <>
+      {/* SECURITY: JSON-LD structured data uses static literals only. Never inject dynamic/user data here. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -46,17 +47,14 @@ export default function HomePage() {
         }}
       />
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated mesh gradient background */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950/20 to-cyan-950/20" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-xl sm:blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-xl sm:blur-3xl animate-pulse delay-1000" />
       </div>
 
-      {/* Header */}
-      <PublicHeader animated />
+      <PublicHeaderLite animated />
 
-      {/* Main Content Components */}
       <main className="relative">
         <HeroSection
           onSignupClick={() => router.push('/signup')}
@@ -76,13 +74,10 @@ export default function HomePage() {
         <InstallSection onSignupClick={() => router.push('/signup')} />
       </main>
 
-      {/* Scroll to top button */}
       <ScrollToTop />
 
-      {/* Mobile sticky CTA bar */}
       <MobileStickyBar />
 
-      {/* Footer */}
       <Footer />
     </div>
     </>

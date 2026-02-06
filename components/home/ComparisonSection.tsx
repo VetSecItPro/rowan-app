@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Calendar,
   CheckSquare,
@@ -39,15 +39,16 @@ const rowanFeatures = [
 ];
 
 export function ComparisonSection() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <section className="relative py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: prefersReducedMotion ? 0.01 : 0.6 }}
           className="text-center mb-14"
         >
           <h2 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-white mb-4">
@@ -61,31 +62,27 @@ export function ComparisonSection() {
           </p>
         </motion.div>
 
-        {/* Before/After Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4 items-stretch relative">
-          {/* Arrow connector (desktop only) */}
           <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
+              initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.5 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              transition={{ duration: prefersReducedMotion ? 0.01 : 0.5, delay: prefersReducedMotion ? 0 : 0.6 }}
               className="w-12 h-12 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center shadow-xl"
             >
               <ArrowRight className="w-5 h-5 text-white" />
             </motion.div>
           </div>
 
-          {/* LEFT: Without Rowan */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: prefersReducedMotion ? 0.01 : 0.6, delay: prefersReducedMotion ? 0 : 0.1 }}
             className="relative"
           >
             <div className="rounded-2xl bg-gray-800/40 border border-red-500/20 p-6 sm:p-8 h-full transform rotate-[-0.5deg] hover:rotate-0 transition-transform duration-500">
-              {/* Header */}
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-3 h-3 rounded-full bg-red-500/80" />
                 <h3 className="text-lg font-bold text-gray-300">
@@ -93,21 +90,20 @@ export function ComparisonSection() {
                 </h3>
               </div>
 
-              {/* Scattered app icons */}
               <div className="relative h-64 sm:h-72">
                 {scatteredApps.map((app, index) => {
                   const Icon = app.icon;
                   return (
                     <motion.div
                       key={app.label}
-                      initial={{ opacity: 0, scale: 0 }}
+                      initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
                       transition={{
-                        duration: 0.4,
-                        delay: 0.3 + index * 0.1,
-                        type: 'spring',
-                        stiffness: 200,
+                        duration: prefersReducedMotion ? 0.01 : 0.4,
+                        delay: prefersReducedMotion ? 0 : 0.3 + index * 0.1,
+                        type: prefersReducedMotion ? undefined : 'spring',
+                        stiffness: prefersReducedMotion ? undefined : 200,
                       }}
                       className="absolute"
                       style={{
@@ -126,46 +122,48 @@ export function ComparisonSection() {
                   );
                 })}
 
-                {/* Connecting chaos lines */}
                 <svg
                   className="absolute inset-0 w-full h-full pointer-events-none"
                   viewBox="0 0 400 300"
                   fill="none"
                 >
-                  <motion.path
-                    d="M 60 50 Q 150 120 260 40"
-                    stroke="rgba(239,68,68,0.15)"
-                    strokeWidth="1"
-                    strokeDasharray="4 4"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.8 }}
-                  />
-                  <motion.path
-                    d="M 150 140 Q 200 200 100 240"
-                    stroke="rgba(239,68,68,0.15)"
-                    strokeWidth="1"
-                    strokeDasharray="4 4"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.9 }}
-                  />
-                  <motion.path
-                    d="M 280 160 Q 200 100 80 200"
-                    stroke="rgba(239,68,68,0.15)"
-                    strokeWidth="1"
-                    strokeDasharray="4 4"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 1.0 }}
-                  />
+                  {!prefersReducedMotion && (
+                    <>
+                      <motion.path
+                        d="M 60 50 Q 150 120 260 40"
+                        stroke="rgba(239,68,68,0.15)"
+                        strokeWidth="1"
+                        strokeDasharray="4 4"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.8 }}
+                      />
+                      <motion.path
+                        d="M 150 140 Q 200 200 100 240"
+                        stroke="rgba(239,68,68,0.15)"
+                        strokeWidth="1"
+                        strokeDasharray="4 4"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 0.9 }}
+                      />
+                      <motion.path
+                        d="M 280 160 Q 200 100 80 200"
+                        stroke="rgba(239,68,68,0.15)"
+                        strokeWidth="1"
+                        strokeDasharray="4 4"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, delay: 1.0 }}
+                      />
+                    </>
+                  )}
                 </svg>
               </div>
 
-              {/* Bottom label */}
               <div className="mt-4 flex items-center justify-center gap-2">
                 <span className="text-2xl" role="img" aria-label="Overwhelmed face">
                   😵
@@ -177,49 +175,42 @@ export function ComparisonSection() {
             </div>
           </motion.div>
 
-          {/* Mobile arrow */}
           <div className="flex md:hidden items-center justify-center -my-2">
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.4 }}
+              transition={{ duration: prefersReducedMotion ? 0.01 : 0.4, delay: prefersReducedMotion ? 0 : 0.4 }}
               className="w-10 h-10 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center rotate-90"
             >
               <ArrowRight className="w-4 h-4 text-white" />
             </motion.div>
           </div>
 
-          {/* RIGHT: With Rowan */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: prefersReducedMotion ? 0.01 : 0.6, delay: prefersReducedMotion ? 0 : 0.3 }}
             className="relative"
           >
             <div className="rounded-2xl bg-gray-800/40 border border-cyan-500/20 p-6 sm:p-8 h-full relative overflow-hidden">
-              {/* Subtle glow */}
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
-              {/* Header */}
               <div className="relative flex items-center gap-3 mb-6">
                 <div className="w-3 h-3 rounded-full bg-cyan-500/80" />
                 <h3 className="text-lg font-bold text-white">With Rowan</h3>
               </div>
 
-              {/* Clean organized grid */}
               <div className="relative h-64 sm:h-72 flex flex-col items-center justify-center">
-                {/* Dashboard mockup */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
+                  transition={{ duration: prefersReducedMotion ? 0.01 : 0.5, delay: prefersReducedMotion ? 0 : 0.5 }}
                   className="w-full max-w-xs"
                 >
-                  {/* Mini dashboard header */}
                   <div className="rounded-t-xl bg-gray-900/80 border border-gray-700/50 border-b-0 px-4 py-2.5 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-cyan-500" />
                     <span className="text-xs font-semibold text-gray-300">
@@ -227,7 +218,6 @@ export function ComparisonSection() {
                     </span>
                   </div>
 
-                  {/* Feature icon grid */}
                   <div className="rounded-b-xl bg-gray-900/60 border border-gray-700/50 border-t-0 p-4">
                     <div className="grid grid-cols-5 gap-3">
                       {rowanFeatures.map((feature, index) => {
@@ -235,14 +225,14 @@ export function ComparisonSection() {
                         return (
                           <motion.div
                             key={index}
-                            initial={{ opacity: 0, scale: 0 }}
+                            initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{
-                              duration: 0.3,
-                              delay: 0.7 + index * 0.05,
-                              type: 'spring',
-                              stiffness: 300,
+                              duration: prefersReducedMotion ? 0.01 : 0.3,
+                              delay: prefersReducedMotion ? 0 : 0.7 + index * 0.05,
+                              type: prefersReducedMotion ? undefined : 'spring',
+                              stiffness: prefersReducedMotion ? undefined : 300,
                             }}
                             className="flex items-center justify-center"
                           >
@@ -257,7 +247,6 @@ export function ComparisonSection() {
                 </motion.div>
               </div>
 
-              {/* Bottom label */}
               <div className="relative mt-4 flex items-center justify-center gap-2">
                 <span className="text-2xl" role="img" aria-label="Relieved face">
                   😌
@@ -270,12 +259,11 @@ export function ComparisonSection() {
           </motion.div>
         </div>
 
-        {/* Bottom tagline */}
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.6 }}
+          transition={{ duration: prefersReducedMotion ? 0.01 : 0.6, delay: prefersReducedMotion ? 0 : 0.6 }}
           className="text-center mt-10 text-gray-400 font-serif italic"
         >
           Why manage five apps when one does it all?

@@ -35,7 +35,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL('https://rowanapp.com'),
   title: "Rowan - Your Life, Organized",
-  description: "Collaborative life management for couples and families",
+  description: "Collaborative life management for couples and families. Tasks, meals, budgets, goals, calendar, and more.",
   manifest: '/manifest.json',
   appleWebApp: {
     statusBarStyle: 'default',
@@ -50,6 +50,21 @@ export const metadata: Metadata = {
   icons: {
     icon: '/rowan-logo.png',
     apple: '/rowan-logo.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://rowanapp.com',
+    title: 'Rowan - Your Life, Organized',
+    description: 'Collaborative life management for couples and families. Tasks, meals, budgets, goals, calendar, and more.',
+    siteName: 'Rowan',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Rowan App' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Rowan - Your Life, Organized',
+    description: 'Collaborative life management for couples and families',
+    images: ['/og-image.png'],
   },
 };
 

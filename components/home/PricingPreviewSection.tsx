@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
@@ -56,25 +56,26 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] as const },
-  },
-};
-
 export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: prefersReducedMotion ? 0.01 : 0.5, ease: [0.25, 0.4, 0.25, 1] as const },
+    },
+  };
+
   return (
     <section className="relative py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Section Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: prefersReducedMotion ? 0.01 : 0.6 }}
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-white mb-4">
@@ -85,25 +86,24 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
           </p>
         </motion.div>
 
-        {/* Pricing Cards */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
+          variants={prefersReducedMotion ? undefined : containerVariants}
+          initial={prefersReducedMotion ? { opacity: 0 } : "hidden"}
+          whileInView={prefersReducedMotion ? { opacity: 1 } : "visible"}
           viewport={{ once: true, margin: '-50px' }}
+          transition={prefersReducedMotion ? { duration: 0.01 } : undefined}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
         >
           {tiers.map((tier) => (
             <motion.div
               key={tier.name}
-              variants={cardVariants}
+              variants={prefersReducedMotion ? undefined : cardVariants}
               className={`relative rounded-2xl border p-6 sm:p-8 flex flex-col ${
                 tier.popular
                   ? 'border-blue-500/40 bg-blue-950/20 shadow-lg shadow-blue-500/5'
                   : 'border-gray-700/50 bg-gray-800/30'
               }`}
             >
-              {/* Popular Badge */}
               {tier.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-1 text-xs font-semibold text-white shadow-md">
@@ -113,19 +113,16 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
                 </div>
               )}
 
-              {/* Tier Header */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-white mb-1">{tier.name}</h3>
                 <p className="text-sm text-gray-400">{tier.description}</p>
               </div>
 
-              {/* Price */}
               <div className="mb-6">
                 <span className="text-4xl font-bold text-white">{tier.price}</span>
                 <span className="text-gray-400 ml-1">{tier.period}</span>
               </div>
 
-              {/* Features */}
               <ul className="space-y-3 mb-8 flex-1">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
@@ -135,10 +132,9 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
                 ))}
               </ul>
 
-              {/* CTA Button */}
               <button
                 onClick={onSignupClick}
-                className={`w-full py-3 px-6 rounded-xl font-semibold text-sm transition-all ${
+                className={`w-full py-3 px-6 rounded-xl font-semibold text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
                   tier.popular
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02]'
                     : 'bg-gray-700/50 hover:bg-gray-700 text-white hover:scale-[1.02]'
@@ -151,17 +147,16 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
           ))}
         </motion.div>
 
-        {/* Link to full pricing page */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: prefersReducedMotion ? 0.01 : 0.5, delay: prefersReducedMotion ? 0 : 0.4 }}
           className="text-center mt-10"
         >
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium"
+            className="inline-flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
           >
             See full pricing details
             <span aria-hidden="true">&rarr;</span>

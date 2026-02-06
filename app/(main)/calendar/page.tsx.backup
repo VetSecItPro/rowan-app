@@ -1286,69 +1286,53 @@ export default function CalendarPage() {
                   </button>
                 </div>
 
-                {/* Status Filter - Available for all views except proposal */}
+                {/* Status Filter - Available for all views except proposal, hidden on mobile */}
                 {viewMode !== 'proposal' && (
-                  <>
-                    {/* Mobile: dropdown filter */}
-                    <div className="sm:hidden">
-                      <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as 'all' | 'not-started' | 'in-progress' | 'completed')}
-                        className="bg-gray-700 text-gray-200 text-xs rounded px-2 py-1.5 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  <div className="hidden sm:flex items-center gap-2">
+                    <span className="text-xs font-medium text-gray-400">Filter:</span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setStatusFilter('all')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'all'
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                        }`}
                       >
-                        <option value="all">All Status</option>
-                        <option value="not-started">Pending</option>
-                        <option value="in-progress">Active</option>
-                        <option value="completed">Done</option>
-                      </select>
+                        All
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('not-started')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'not-started'
+                            ? 'bg-red-500 text-white'
+                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                        }`}
+                      >
+                        Pending
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('in-progress')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'in-progress'
+                            ? 'bg-amber-500 text-white'
+                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                        }`}
+                      >
+                        Active
+                      </button>
+                      <button
+                        onClick={() => setStatusFilter('completed')}
+                        className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                          statusFilter === 'completed'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                        }`}
+                      >
+                        Done
+                      </button>
                     </div>
-                    {/* Desktop: button row filter */}
-                    <div className="hidden sm:flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-400">Filter:</span>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => setStatusFilter('all')}
-                          className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
-                            statusFilter === 'all'
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                          }`}
-                        >
-                          All
-                        </button>
-                        <button
-                          onClick={() => setStatusFilter('not-started')}
-                          className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
-                            statusFilter === 'not-started'
-                              ? 'bg-red-500 text-white'
-                              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                          }`}
-                        >
-                          Pending
-                        </button>
-                        <button
-                          onClick={() => setStatusFilter('in-progress')}
-                          className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
-                            statusFilter === 'in-progress'
-                              ? 'bg-amber-500 text-white'
-                              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                          }`}
-                        >
-                          Active
-                        </button>
-                        <button
-                          onClick={() => setStatusFilter('completed')}
-                          className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
-                            statusFilter === 'completed'
-                              ? 'bg-green-500 text-white'
-                              : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                          }`}
-                        >
-                          Done
-                        </button>
-                      </div>
-                    </div>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

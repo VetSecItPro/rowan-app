@@ -158,6 +158,26 @@ const nextConfig = {
         ],
       },
       {
+        // FIX-311: Cache-Control for read-only weather API (1 hour, stale-while-revalidate 24h)
+        source: '/api/weather/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // FIX-311: Cache-Control for read-only geographic API (24 hours - rarely changes)
+        source: '/api/geographic/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400',
+          },
+        ],
+      },
+      {
         // No-cache for API routes and dynamic pages only
         // Static assets (/_next/static/) use immutable hashes and are cached by Next.js automatically
         source: '/api/:path*',

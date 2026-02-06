@@ -3,18 +3,22 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AlertTriangle, Info } from 'lucide-react';
 import { weatherService, WeatherForecast, WeatherAlert } from '@/lib/services/weather-service';
+import { LRUCache } from 'lru-cache';
 
-// Global cache to persist across component re-mounts
-const weatherCache = new Map<string, {
+// FIX-312: Replace Map with LRUCache to prevent unbounded memory growth
+const weatherCache = new LRUCache<string, {
   data: WeatherForecast;
   alert: WeatherAlert | null;
   timestamp: number;
-}>();
+}>({
+  max: 50,
+  ttl: 30 * 60 * 1000, // 30 minutes TTL
+});
 
 // In-flight request tracker to prevent duplicate concurrent fetches
 const inFlightRequests = new Map<string, Promise<WeatherForecast | null>>();
 
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes (LRU handles TTL, but keep for backwards compat)
 
 interface WeatherBadgeProps {
   eventTime: string;
@@ -35,7 +39,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
     const now = Date.now();
     const cached = weatherCache.get(cacheKey);
 
-    // Check if we have valid cached data
+    // Check if we have valid cached data (LRU handles expiry, but we double-check)
     if (cached && (now - cached.timestamp) < CACHE_DURATION) {
       setWeather(cached.data);
       setAlert(cached.alert);
@@ -81,7 +85,7 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
       if (forecast) {
         const weatherAlert = weatherService.shouldWarnAboutWeather(forecast, location);
 
-        // Update cache
+        // Update cache (LRU automatically handles eviction and TTL)
         weatherCache.set(cacheKey, {
           data: forecast,
           alert: weatherAlert,
