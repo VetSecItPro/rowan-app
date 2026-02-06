@@ -77,8 +77,8 @@ function TrackExpenses() {
 
       {/* New expense being added */}
       <motion.div
-        initial={{ opacity: 0, y: 15, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.3 }}
         className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30"
       >
@@ -113,8 +113,8 @@ function TrackExpenses() {
         ].map((expense, index) => (
           <motion.div
             key={expense.name}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.8 + index * 0.15 }}
             className="flex items-center justify-between p-2.5 rounded-xl bg-gray-800/60 border border-gray-700/50"
           >
@@ -165,8 +165,8 @@ function CategoryBreakdown() {
       {categories.map((cat, index) => (
         <motion.div
           key={cat.name}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: index * 0.15, duration: 0.3 }}
           className="space-y-1.5"
         >
@@ -228,8 +228,8 @@ function BillReminders() {
       {bills.map((bill, index) => (
         <motion.div
           key={bill.name}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: index * 0.2, duration: 0.4 }}
           className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/60 border border-gray-700/50"
         >
@@ -264,10 +264,10 @@ function BillReminders() {
 
 // --- Steps Configuration ---
 const steps: DemoStep[] = [
-  { label: 'Monthly overview', content: <MonthlyOverview />, duration: 3000 },
-  { label: 'Track expenses', content: <TrackExpenses />, duration: 3000 },
-  { label: 'Category breakdown', content: <CategoryBreakdown />, duration: 3000 },
-  { label: 'Bill reminders', content: <BillReminders />, duration: 3000 },
+  { label: 'Monthly overview', content: <MonthlyOverview /> },
+  { label: 'Track expenses', content: <TrackExpenses /> },
+  { label: 'Category breakdown', content: <CategoryBreakdown /> },
+  { label: 'Bill reminders', content: <BillReminders /> },
 ];
 
 export function BudgetDemo({ className = '' }: { className?: string }) {

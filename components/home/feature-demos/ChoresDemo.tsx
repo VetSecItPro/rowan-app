@@ -143,8 +143,8 @@ function EarnPointsStep() {
       {/* Points summary */}
       <motion.div
         className="px-4 py-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.5 }}
       >
         <div className="flex items-center justify-between">
@@ -191,8 +191,8 @@ function LeaderboardStep() {
         <motion.div
           key={entry.name}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800/60"
-          initial={{ opacity: 0, x: -12 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: entry.delay }}
         >
           {/* Rank icon */}
@@ -235,10 +235,10 @@ function LeaderboardStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Assign chores', content: <AssignChoresStep />, duration: 3000 },
-  { label: 'Track due dates', content: <TrackDueDatesStep />, duration: 3000 },
-  { label: 'Earn points', content: <EarnPointsStep />, duration: 3000 },
-  { label: 'Family leaderboard', content: <LeaderboardStep />, duration: 3000 },
+  { label: 'Assign chores', content: <AssignChoresStep /> },
+  { label: 'Track due dates', content: <TrackDueDatesStep /> },
+  { label: 'Earn points', content: <EarnPointsStep /> },
+  { label: 'Family leaderboard', content: <LeaderboardStep /> },
 ];
 
 export function ChoresDemo({ className = '' }: { className?: string }) {

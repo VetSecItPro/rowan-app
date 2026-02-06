@@ -23,8 +23,8 @@ function PlanWeekStep() {
         {days.map((day, index) => (
           <motion.div
             key={day}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.2 + index * 0.06, duration: 0.3 }}
             className="text-center"
           >
@@ -75,8 +75,8 @@ function AddRecipesStep() {
         {days.map((item, index) => (
           <motion.div
             key={item.day}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.15 + index * 0.06, duration: 0.3 }}
             className="text-center"
           >
@@ -101,8 +101,8 @@ function AddRecipesStep() {
 
       {/* Quick meal list below */}
       <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 0.3 }}
         className="space-y-1.5 pt-1"
       >
@@ -131,8 +131,8 @@ function SeeDetailsStep() {
     <div className="space-y-3">
       {/* Recipe card header */}
       <motion.div
-        initial={{ opacity: 0, y: -5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
         className="flex items-center gap-2.5"
       >
@@ -164,8 +164,8 @@ function SeeDetailsStep() {
 
       {/* Ingredients */}
       <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.6, duration: 0.3 }}
       >
         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-2">Ingredients</p>
@@ -173,8 +173,8 @@ function SeeDetailsStep() {
           {ingredients.map((ingredient, index) => (
             <motion.div
               key={ingredient}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 0.7 + index * 0.08, duration: 0.25 }}
               className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-800/40"
             >
@@ -205,8 +205,8 @@ function AutoShoppingListStep() {
 
       {/* Generate button */}
       <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
         className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30 cursor-default"
       >
@@ -230,8 +230,8 @@ function AutoShoppingListStep() {
 
       {/* Mini shopping list */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.6, duration: 0.4 }}
         className="rounded-xl bg-emerald-500/5 border border-emerald-500/15 p-2.5"
       >
@@ -245,8 +245,8 @@ function AutoShoppingListStep() {
           {shoppingItems.map((item, index) => (
             <motion.div
               key={item}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 0.8 + index * 0.1, duration: 0.25 }}
               className="flex items-center gap-2 px-2 py-1 rounded-md bg-gray-800/30"
             >
@@ -276,10 +276,10 @@ function Plus({ className }: { className?: string }) {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Plan your week', content: <PlanWeekStep />, duration: 3000 },
-  { label: 'Add recipes', content: <AddRecipesStep />, duration: 3000 },
-  { label: 'See the details', content: <SeeDetailsStep />, duration: 3000 },
-  { label: 'Auto shopping list', content: <AutoShoppingListStep />, duration: 3000 },
+  { label: 'Plan your week', content: <PlanWeekStep /> },
+  { label: 'Add recipes', content: <AddRecipesStep /> },
+  { label: 'See the details', content: <SeeDetailsStep /> },
+  { label: 'Auto shopping list', content: <AutoShoppingListStep /> },
 ];
 
 export function MealsDemo({ className = '' }: { className?: string }) {

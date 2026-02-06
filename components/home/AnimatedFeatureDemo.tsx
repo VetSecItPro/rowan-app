@@ -37,7 +37,7 @@ export function AnimatedFeatureDemo({
   const isInView = useInView(containerRef, { margin: "-100px" });
 
   const currentStep = steps[currentStepIndex];
-  const stepDuration = currentStep?.duration || 3000;
+  const stepDuration = currentStep?.duration || 6000;
 
   const clearCurrentInterval = () => {
     if (intervalRef.current) {
@@ -109,9 +109,9 @@ export function AnimatedFeatureDemo({
           <AnimatePresence mode="wait">
             <motion.p
               key={currentStepIndex}
-              initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: prefersReducedMotion ? 0 : 5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: prefersReducedMotion ? 0.01 : 0.2 }}
               className="text-xs text-gray-500"
             >
@@ -120,13 +120,13 @@ export function AnimatedFeatureDemo({
           </AnimatePresence>
         </div>
 
-        <div className="relative min-h-[200px] flex items-center justify-center">
+        <div className="relative h-[320px] flex items-start justify-center overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStepIndex}
-              initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -10 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: prefersReducedMotion ? 0.01 : 0.3 }}
               className="w-full"
             >

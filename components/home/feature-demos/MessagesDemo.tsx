@@ -23,8 +23,8 @@ function FamilyChatStep() {
           D
         </motion.div>
         <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.3 }}
         >
           <p className="text-xs text-gray-500 mb-1">Dad</p>
@@ -37,8 +37,8 @@ function FamilyChatStep() {
 
       {/* Empty input area */}
       <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.7, duration: 0.3 }}
         className="mt-4 flex items-center gap-2 p-2.5 rounded-xl bg-gray-800/60 border border-gray-700/50"
       >
@@ -77,8 +77,8 @@ function QuickRepliesStep() {
 
       {/* Mom's reply - right aligned */}
       <motion.div
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.3 }}
         className="flex items-start gap-2.5 justify-end"
       >
@@ -169,8 +169,8 @@ function ReactToMessagesStep() {
 
       {/* Reaction picker hint */}
       <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 1.0, duration: 0.3 }}
         className="flex justify-center"
       >
@@ -196,10 +196,9 @@ function PinImportantStep() {
 
       {/* Pinned message banner */}
       <motion.div
-        initial={{ opacity: 0, y: -10, height: 0 }}
-        animate={{ opacity: 1, y: 0, height: 'auto' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
-        className="overflow-hidden"
       >
         <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20">
           <Pin className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
@@ -246,10 +245,10 @@ function PinImportantStep() {
 }
 
 const steps: DemoStep[] = [
-  { label: 'Family chat', content: <FamilyChatStep />, duration: 3000 },
-  { label: 'Quick replies', content: <QuickRepliesStep />, duration: 3000 },
-  { label: 'React to messages', content: <ReactToMessagesStep />, duration: 3000 },
-  { label: 'Pin important info', content: <PinImportantStep />, duration: 3000 },
+  { label: 'Family chat', content: <FamilyChatStep /> },
+  { label: 'Quick replies', content: <QuickRepliesStep /> },
+  { label: 'React to messages', content: <ReactToMessagesStep /> },
+  { label: 'Pin important info', content: <PinImportantStep /> },
 ];
 
 export function MessagesDemo({ className = '' }: { className?: string }) {
