@@ -3,292 +3,269 @@
 import { motion } from 'framer-motion';
 import {
   Target,
-  Plane,
-  Calendar,
+  Check,
+  Clock,
   TrendingUp,
-  Flame,
-  Star,
-  Sparkles,
-  Plus,
+  Plane,
+  BookOpen,
+  Dumbbell,
 } from 'lucide-react';
 import { AnimatedFeatureDemo, DemoStep } from '../AnimatedFeatureDemo';
 
-// --- Step 1: Set a Goal ---
-function SetGoal() {
+/* Goal status colors matching real GoalCard.tsx */
+const STATUS = {
+  completed: { bg: 'bg-green-900/30', text: 'text-green-300', checkbox: 'bg-green-500 border-green-500' },
+  active: { bg: 'bg-blue-900/30', text: 'text-blue-300', checkbox: 'bg-amber-500 border-amber-500' },
+  'not-started': { bg: 'bg-gray-900/30', text: 'text-gray-300', checkbox: 'border-gray-600 bg-transparent' },
+};
+
+/* Progress bar colors matching real GoalCard.tsx */
+function getProgressColor(pct: number) {
+  if (pct === 0) return 'from-gray-300 to-gray-400';
+  if (pct <= 25) return 'from-blue-300 to-blue-400';
+  if (pct <= 50) return 'from-blue-400 to-blue-500';
+  if (pct <= 75) return 'from-blue-500 to-green-400';
+  if (pct < 100) return 'from-green-400 to-green-500';
+  return 'from-green-500 to-green-600';
+}
+
+/* ── Step 1: Goal list (real GoalCard.tsx card pattern) ───────────── */
+function GoalListStep() {
+  const goals = [
+    { name: 'Family Vacation Fund', icon: Plane, progress: 35, status: 'active' as const, assignee: 'Family' },
+    { name: 'Read 20 Books', icon: BookOpen, progress: 60, status: 'active' as const, assignee: 'Mom' },
+    { name: 'Run a 5K', icon: Dumbbell, progress: 100, status: 'completed' as const, assignee: 'Dad' },
+  ];
+
+  return (
+    <div className="space-y-2.5">
+      {goals.map((goal, i) => {
+        const st = goal.status === 'completed' ? STATUS.completed : STATUS.active;
+        return (
+          <motion.div
+            key={goal.name}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.12, duration: 0.3 }}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-3.5"
+          >
+            <div className="flex items-center gap-2.5 mb-2.5">
+              {/* 3-state checkbox (real GoalCard pattern) */}
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${st.checkbox}`}>
+                {goal.status === 'completed' && <Check className="w-3 h-3 text-white" />}
+                {goal.status === 'active' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-semibold ${goal.status === 'completed' ? 'text-white line-through opacity-60' : 'text-white'}`}>
+                  {goal.name}
+                </p>
+              </div>
+              <goal.icon className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+            </div>
+
+            {/* Progress bar (real h-3 pattern) */}
+            <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden mb-2">
+              <motion.div
+                initial={{ width: '0%' }}
+                animate={{ width: `${goal.progress}%` }}
+                transition={{ duration: 1, ease: 'easeOut', delay: 0.3 + i * 0.12 }}
+                className={`h-full bg-gradient-to-r ${getProgressColor(goal.progress)} rounded-full`}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              {/* Status badge */}
+              <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${st.bg} ${st.text}`}>
+                {goal.status === 'completed' ? 'Completed' : `${goal.progress}%`}
+              </span>
+              {/* Assignee pill (real pattern: bg-indigo-900/30) */}
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-indigo-900/30 rounded-full">
+                <span className="text-[10px] text-indigo-300">{goal.assignee}</span>
+              </span>
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Step 2: Track progress (detail view) ─────────────────────────── */
+function TrackProgressStep() {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <Target className="w-4 h-4 text-indigo-400" />
-        <h4 className="text-sm font-semibold text-white">New Goal</h4>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30"
-      >
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
             <Plane className="w-5 h-5 text-indigo-400" />
           </div>
           <div>
             <h4 className="text-sm font-semibold text-white">Family Vacation Fund</h4>
-            <p className="text-[10px] text-gray-500">Savings goal</p>
+            <span className="px-2 py-0.5 text-[10px] font-medium rounded-full bg-blue-900/30 text-blue-300">Active</span>
           </div>
         </div>
 
-        <div className="space-y-2.5">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
-          >
-            <span className="text-xs text-gray-400">Target amount</span>
-            <span className="text-sm font-bold text-indigo-400">$5,000</span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.65 }}
-            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
-          >
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-3 h-3 text-gray-500" />
-              <span className="text-xs text-gray-400">Target date</span>
-            </div>
-            <span className="text-xs font-medium text-gray-300">Aug 15, 2026</span>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50"
-          >
-            <span className="text-xs text-gray-400">Weekly target</span>
-            <span className="text-xs font-medium text-gray-300">~$180/week</span>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1.0 }}
-        className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-indigo-500/20 border border-indigo-500/30"
-      >
-        <Plus className="w-3.5 h-3.5 text-indigo-400" />
-        <span className="text-xs font-medium text-indigo-300">Goal created</span>
-      </motion.div>
-    </div>
-  );
-}
-
-// --- Step 2: Track Progress ---
-function TrackProgress() {
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <TrendingUp className="w-4 h-4 text-indigo-400" />
-        <h4 className="text-sm font-semibold text-white">Family Vacation Fund</h4>
-      </div>
-
-      <div className="p-4 rounded-xl bg-gray-800/60 border border-gray-700/50 space-y-3">
-        {/* Amount display */}
-        <div className="flex items-end justify-between">
+        {/* Big amount display */}
+        <div className="flex items-end justify-between mb-3">
           <div>
             <p className="text-[10px] text-gray-500 mb-0.5">Saved so far</p>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
               className="text-2xl font-bold text-white"
             >
               $1,750
             </motion.p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-gray-500 mb-0.5">Goal</p>
+            <p className="text-[10px] text-gray-500">Goal</p>
             <p className="text-sm font-medium text-gray-400">$5,000</p>
           </div>
         </div>
 
-        {/* Progress bar */}
+        {/* Progress bar (real h-3 with gradient) */}
+        <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+          <motion.div
+            initial={{ width: '0%' }}
+            animate={{ width: '35%' }}
+            transition={{ duration: 1.5, ease: 'easeOut', delay: 0.4 }}
+            className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full shadow-sm"
+          />
+        </div>
+        <div className="flex justify-between mt-1.5">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="text-xs font-medium text-indigo-400"
+          >
+            35%
+          </motion.span>
+          <span className="text-[10px] text-gray-500">$3,250 to go</span>
+        </div>
+      </div>
+
+      {/* Encouragement */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.0, duration: 0.3 }}
+        className="flex items-center gap-2.5 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20"
+      >
+        <TrendingUp className="w-4 h-4 text-indigo-400 flex-shrink-0" />
         <div>
-          <div className="h-3 bg-gray-700/60 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: '0%' }}
-              animate={{ width: '35%' }}
-              transition={{ duration: 1.5, ease: 'easeOut', delay: 0.4 }}
-              className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full"
-            />
-          </div>
-          <div className="flex justify-between mt-1.5">
+          <p className="text-xs font-medium text-indigo-300">Ahead of schedule</p>
+          <p className="text-[10px] text-gray-500">+2 weeks ahead of target</p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── Step 3: Add contribution ─────────────────────────────────────── */
+function AddContributionStep() {
+  return (
+    <div className="space-y-3">
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+        <div className="flex items-center gap-2.5 mb-3">
+          <Plane className="w-4 h-4 text-indigo-400" />
+          <h4 className="text-sm font-semibold text-white">Family Vacation Fund</h4>
+        </div>
+
+        {/* New contribution highlight */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.4, type: 'spring', stiffness: 300 }}
+          className="p-3 rounded-lg bg-green-900/10 border border-green-500/30 mb-3"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400">New contribution</span>
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
-              className="text-xs font-medium text-indigo-400"
+              transition={{ delay: 0.5 }}
+              className="text-lg font-bold text-green-400"
             >
-              35%
+              +$200
             </motion.span>
-            <span className="text-[10px] text-gray-500">$3,250 to go</span>
           </div>
-        </div>
-      </div>
-
-      {/* Encouragement message */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.4 }}
-        className="flex items-center gap-2.5 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20"
-      >
-        <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-          <TrendingUp className="w-4 h-4 text-indigo-400" />
-        </div>
-        <div>
-          <p className="text-xs font-medium text-indigo-300">Keep going!</p>
-          <p className="text-[10px] text-gray-500">You&apos;re ahead of schedule by 2 weeks</p>
-        </div>
-      </motion.div>
-
-      {/* Recent contribution */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.8 }}
-        className="flex items-center justify-between p-2.5 rounded-lg bg-gray-800/40 border border-gray-700/30"
-      >
-        <span className="text-[10px] text-gray-500">Last contribution</span>
-        <span className="text-xs font-medium text-emerald-400">+$200 on Feb 2</span>
-      </motion.div>
-    </div>
-  );
-}
-
-// --- Step 3: Build Streaks ---
-function BuildStreaks() {
-  const contributions = [
-    { day: 'Mon', amount: '+$50' },
-    { day: 'Tue', amount: '+$25' },
-    { day: 'Wed', amount: '+$75' },
-    { day: 'Thu', amount: '+$30' },
-    { day: 'Fri', amount: '+$50' },
-    { day: 'Sat', amount: '+$100' },
-    { day: 'Sun', amount: '+$40' },
-  ];
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <Flame className="w-4 h-4 text-orange-400" />
-        <h4 className="text-sm font-semibold text-white">Contribution Streak</h4>
-      </div>
-
-      {/* Streak counter */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="flex items-center justify-center gap-3 p-4 rounded-xl bg-gradient-to-br from-orange-500/15 to-amber-500/10 border border-orange-500/30"
-      >
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Flame className="w-8 h-8 text-orange-400" />
         </motion.div>
-        <div>
-          <p className="text-2xl font-bold text-white">7-day streak</p>
-          <p className="text-xs text-orange-300">Personal best!</p>
-        </div>
-      </motion.div>
 
-      {/* Weekly contributions */}
-      <div>
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">This week</p>
-        <div className="space-y-1.5">
-          {contributions.map((entry, index) => (
-            <motion.div
-              key={entry.day}
+        {/* Updated progress */}
+        <div className="flex items-end justify-between mb-2">
+          <div>
+            <p className="text-[10px] text-gray-500">Updated total</p>
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 + index * 0.08, duration: 0.2 }}
-              className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-800/40"
+              transition={{ delay: 0.7 }}
+              className="text-xl font-bold text-white"
             >
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                <span className="text-[10px] text-gray-400 w-7">{entry.day}</span>
-              </div>
-              <span className="text-[10px] font-medium text-emerald-400">{entry.amount}</span>
-            </motion.div>
-          ))}
+              $1,950
+            </motion.p>
+          </div>
+          <span className="text-xs text-gray-500">of $5,000</span>
+        </div>
+
+        <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: '35%' }}
+            animate={{ width: '39%' }}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.8 }}
+            className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full"
+          />
+        </div>
+        <div className="flex justify-between mt-1">
+          <span className="text-xs font-medium text-indigo-400">39%</span>
+          <span className="text-[10px] text-gray-500">$3,050 to go</span>
         </div>
       </div>
 
+      {/* Recent contributions */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.3 }}
-        className="flex justify-between items-center pt-2 border-t border-gray-800"
+        transition={{ delay: 1.0 }}
+        className="space-y-1.5"
       >
-        <span className="text-xs text-gray-500">Weekly total</span>
-        <span className="text-sm font-bold text-white">$370</span>
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Recent</p>
+        {[
+          { amount: '+$200', date: 'Today', by: 'Dad' },
+          { amount: '+$150', date: 'Feb 2', by: 'Mom' },
+        ].map((c, i) => (
+          <div key={i} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-800/40">
+            <div className="flex items-center gap-2">
+              <Clock className="w-3 h-3 text-gray-500" />
+              <span className="text-[10px] text-gray-400">{c.date}</span>
+              <span className="text-[10px] text-indigo-300 px-1.5 py-0.5 bg-indigo-900/30 rounded-full">{c.by}</span>
+            </div>
+            <span className="text-xs font-medium text-green-400">{c.amount}</span>
+          </div>
+        ))}
       </motion.div>
     </div>
   );
 }
 
-// --- Step 4: Celebrate Milestones ---
-function CelebrateMilestones() {
+/* ── Step 4: Milestone reached ────────────────────────────────────── */
+function MilestoneStep() {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <Star className="w-4 h-4 text-indigo-400" />
-        <h4 className="text-sm font-semibold text-white">Milestone Reached!</h4>
-      </div>
-
-      {/* Celebration card */}
+      {/* Milestone card (inspired by GoalCard completed state) */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="relative p-5 rounded-xl bg-gradient-to-br from-indigo-500/15 to-purple-500/10 border border-indigo-500/30 text-center overflow-hidden"
+        transition={{ delay: 0.2, duration: 0.4, type: 'spring', stiffness: 300 }}
+        className="bg-gray-900 border border-indigo-500/30 rounded-xl p-4 text-center"
       >
-        {/* Sparkle particles */}
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{
-              opacity: [0, 1, 0],
-              scale: [0, 1, 0.5],
-              y: [0, -20 - i * 5],
-              x: [(i % 2 === 0 ? -1 : 1) * (10 + i * 8)],
-            }}
-            transition={{
-              duration: 2,
-              delay: 0.5 + i * 0.15,
-              repeat: Infinity,
-              repeatDelay: 1,
-            }}
-            className="absolute top-1/2 left-1/2"
-          >
-            <Sparkles className="w-3 h-3 text-indigo-400" />
-          </motion.div>
-        ))}
-
         <motion.div
           animate={{ rotate: [0, 10, -10, 0] }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Star className="w-10 h-10 text-amber-400 mx-auto mb-2" />
+          <Target className="w-10 h-10 text-indigo-400 mx-auto mb-2" />
         </motion.div>
-
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -307,20 +284,19 @@ function CelebrateMilestones() {
         </motion.p>
       </motion.div>
 
-      {/* Progress bar at 35% */}
-      <div className="p-3 rounded-xl bg-gray-800/60 border border-gray-700/50">
+      {/* Progress with milestone markers */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-3.5">
         <div className="flex justify-between items-center mb-2">
           <span className="text-xs font-medium text-gray-300">$1,750 of $5,000</span>
           <span className="text-xs font-medium text-indigo-400">35%</span>
         </div>
-        <div className="h-2.5 bg-gray-700/60 rounded-full overflow-hidden relative">
+        <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden relative">
           <motion.div
             initial={{ width: '25%' }}
             animate={{ width: '35%' }}
-            transition={{ duration: 1, ease: 'easeOut', delay: 0.4 }}
-            className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full"
+            transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+            className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full"
           />
-          {/* 25% milestone marker */}
           <div className="absolute top-0 left-1/4 w-0.5 h-full bg-white/30" />
         </div>
         <div className="flex justify-between mt-1">
@@ -336,7 +312,7 @@ function CelebrateMilestones() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
+        transition={{ delay: 1.0 }}
         className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-800/40 border border-gray-700/30"
       >
         <Target className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
@@ -346,12 +322,11 @@ function CelebrateMilestones() {
   );
 }
 
-// --- Steps Configuration ---
 const steps: DemoStep[] = [
-  { label: 'Set a goal', content: <SetGoal /> },
-  { label: 'Track progress', content: <TrackProgress /> },
-  { label: 'Build streaks', content: <BuildStreaks /> },
-  { label: 'Celebrate milestones', content: <CelebrateMilestones /> },
+  { label: 'Your goals', content: <GoalListStep /> },
+  { label: 'Track progress', content: <TrackProgressStep /> },
+  { label: 'Add contribution', content: <AddContributionStep /> },
+  { label: 'Hit milestones', content: <MilestoneStep /> },
 ];
 
 export function GoalsDemo({ className = '' }: { className?: string }) {

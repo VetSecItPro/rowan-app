@@ -85,7 +85,7 @@ When you discover a bug, search for all instances of the same pattern across the
 
 **NEVER commit directly to main. Always use feature branches.**
 
-> **Quick:** Use `/gh-feat` to auto-push, create branch, run CI, and monitor until green.
+> **Quick:** Use `/gh-ship` to commit, push, create PR, run CI, and monitor until green.
 
 ### Workflow
 1. `git checkout -b feature/description` → `git push -u origin feature/description`
@@ -113,7 +113,7 @@ const COLORS = { tasks: 'blue', calendar: 'purple', reminders: 'pink', messages:
 
 ## Security Audit Workflow
 
-When running `/sec-audit` or any security audit:
+Use `/sec-ship` for the full security pipeline (audit, fix, validate, report).
 
 1. **Report Location**: Save audit reports to `docs/security-audit/` (gitignored). Name format: `audit-YYYY-MM-DD.md`
 2. **Fix Tracking**: Each finding gets a FIX-XXX ID. When fixing issues, update the audit document in-place — mark each finding's status (FIXED, DEFERRED, N/A) with a brief note of what was done

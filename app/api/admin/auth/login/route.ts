@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkAuthRateLimit } from '@/lib/ratelimit';
 import * as Sentry from '@sentry/nextjs';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { createClient as createStandaloneClient } from '@supabase/supabase-js';
+
+const AdminLoginSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required'),
+});
 
 const ADMIN_SESSION_DURATION = 24 * 60 * 60; // 24 hours in seconds
 
@@ -17,7 +23,7 @@ export async function POST(req: NextRequest) {
   try {
     // Enhanced rate limiting for admin login attempts
     const ip = extractIP(req.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
+    const { success: rateLimitSuccess } = await checkAuthRateLimit(ip);
 
     if (!rateLimitSuccess) {
       return NextResponse.json(
@@ -26,19 +32,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await req.json();
-    const { email, password } = body;
-
-    // Validate required fields
-    if (!email || !password) {
+    const parsed = AdminLoginSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Normalize email
+    const { email, password } = parsed.data;
     const normalizedEmail = email.trim().toLowerCase();
 
     // Create a standalone auth client (not cookie-based, can authenticate directly)

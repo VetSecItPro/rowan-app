@@ -60,48 +60,49 @@ export function PublicHeader({ animated = false }: PublicHeaderProps) {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-medium transition-colors ${
-                isActiveLink(link.href)
-                  ? 'text-white'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop Nav + CTAs grouped right */}
+        <div className="hidden md:flex items-center gap-6">
+          <nav className="flex items-center gap-6">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors ${
+                  isActiveLink(link.href)
+                    ? 'text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-        {/* Desktop CTAs */}
-        <div className="hidden md:flex items-center gap-3">
-          {user ? (
-            <Link
-              href="/dashboard"
-              className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <>
+          <div className="flex items-center gap-3">
+            {user ? (
               <Link
-                href="/login"
-                className="px-5 py-2 text-gray-300 hover:text-white text-sm font-medium transition-colors"
+                href="/dashboard"
+                className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
               >
-                Login
+                Dashboard
               </Link>
-              <Link
-                href="/signup"
-                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-5 py-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white text-sm font-medium rounded-full transition-all"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Mobile menu toggle */}

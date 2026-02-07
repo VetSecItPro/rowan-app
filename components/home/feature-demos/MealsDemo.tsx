@@ -1,122 +1,169 @@
 'use client';
 
-import { AnimatedFeatureDemo, DemoStep } from '../AnimatedFeatureDemo';
 import { motion } from 'framer-motion';
-import { UtensilsCrossed, Clock, ShoppingCart, ChevronRight } from 'lucide-react';
+import { Sunrise, Sun, Moon, Cookie, UtensilsCrossed, Clock, ShoppingCart, ChevronRight } from 'lucide-react';
+import { AnimatedFeatureDemo, DemoStep } from '../AnimatedFeatureDemo';
 
-function PlanWeekStep() {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+/* Meal type config matching real WeekCalendarView.tsx */
+const MEAL_TYPE = {
+  breakfast: { icon: Sunrise, color: 'text-orange-400', bg: 'bg-orange-500/15', border: 'border-orange-500/30', bar: 'border-l-orange-400', square: 'bg-yellow-500' },
+  lunch:     { icon: Sun,     color: 'text-yellow-400', bg: 'bg-yellow-500/15', border: 'border-yellow-500/30', bar: 'border-l-yellow-400', square: 'bg-green-500' },
+  dinner:    { icon: Moon,    color: 'text-indigo-400', bg: 'bg-indigo-500/15', border: 'border-indigo-500/30', bar: 'border-l-indigo-400', square: 'bg-blue-500' },
+  snack:     { icon: Cookie,  color: 'text-amber-400',  bg: 'bg-amber-500/15',  border: 'border-amber-500/30',  bar: 'border-l-amber-400',  square: 'bg-purple-500' },
+};
+
+type MealKey = keyof typeof MEAL_TYPE;
+
+/* ── Step 1: Week calendar view (matches real WeekCalendarView) ──── */
+function WeekCalendarStep() {
+  const days: { day: string; date: number; isToday: boolean; meals: { name: string; type: MealKey }[] }[] = [
+    { day: 'Mon', date: 10, isToday: false, meals: [{ name: 'Oatmeal', type: 'breakfast' }, { name: 'Stir-fry', type: 'dinner' }] },
+    { day: 'Tue', date: 11, isToday: false, meals: [{ name: 'Tacos', type: 'dinner' }] },
+    { day: 'Wed', date: 12, isToday: true, meals: [{ name: 'Smoothie', type: 'breakfast' }, { name: 'Salad', type: 'lunch' }, { name: 'Pasta', type: 'dinner' }] },
+    { day: 'Thu', date: 13, isToday: false, meals: [{ name: 'Soup', type: 'lunch' }] },
+    { day: 'Fri', date: 14, isToday: false, meals: [] },
+    { day: 'Sat', date: 15, isToday: false, meals: [{ name: 'Pancakes', type: 'breakfast' }, { name: 'BBQ', type: 'dinner' }] },
+    { day: 'Sun', date: 16, isToday: false, meals: [{ name: 'Brunch', type: 'lunch' }] },
+  ];
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">
-          <UtensilsCrossed className="w-4 h-4 text-orange-400" />
-        </div>
-        <div>
-          <h4 className="text-sm font-semibold text-white">Meal Plan</h4>
-          <p className="text-xs text-gray-500">This week</p>
-        </div>
-      </div>
+    <div className="grid grid-cols-7 gap-1.5">
+      {days.map((d, dayIdx) => (
+        <motion.div
+          key={d.day}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25, delay: dayIdx * 0.05 }}
+          className={`min-h-[200px] rounded-lg border-2 p-1.5 ${
+            d.isToday
+              ? 'border-orange-500 bg-orange-900/10'
+              : 'border-gray-700/50 bg-gray-800/30'
+          }`}
+        >
+          {/* Day header */}
+          <div className="text-center mb-1.5">
+            <span className="text-[9px] text-gray-500 uppercase block">{d.day}</span>
+            <span className={`text-xs font-medium ${d.isToday ? 'text-orange-300' : 'text-gray-400'}`}>
+              {d.date}
+            </span>
+            {d.isToday && (
+              <div className="mt-0.5">
+                <span className="text-[7px] px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 font-medium">
+                  Today
+                </span>
+              </div>
+            )}
+          </div>
 
-      <div className="grid grid-cols-7 gap-1.5">
-        {days.map((day, index) => (
-          <motion.div
-            key={day}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 + index * 0.06, duration: 0.3 }}
-            className="text-center"
-          >
-            <p className="text-[10px] text-gray-500 mb-1.5">{day}</p>
-            <div className="aspect-square rounded-lg bg-gray-800/60 border border-gray-700/50 border-dashed flex items-center justify-center">
-              <Plus className="w-3 h-3 text-gray-700" />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.4 }}
-        className="text-center text-xs text-gray-600 pt-2"
-      >
-        Tap a day to add a meal
-      </motion.p>
+          {/* Meal items with border-l-4 (matches real pattern) */}
+          <div className="space-y-1">
+            {d.meals.map((meal, mealIdx) => {
+              const mt = MEAL_TYPE[meal.type];
+              const Icon = mt.icon;
+              return (
+                <motion.div
+                  key={meal.name}
+                  initial={{ opacity: 0, x: -4 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.2, delay: 0.2 + dayIdx * 0.05 + mealIdx * 0.08 }}
+                  className={`rounded px-1 py-1 border-l-[3px] ${mt.bar} ${mt.bg}`}
+                >
+                  <div className="flex items-center gap-1">
+                    <Icon className={`w-2.5 h-2.5 ${mt.color} flex-shrink-0`} />
+                    <span className="text-[8px] text-gray-300 leading-tight truncate">{meal.name}</span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      ))}
     </div>
   );
 }
 
-function AddRecipesStep() {
-  const days = [
-    { day: 'Mon', meal: 'Chicken Stir-Fry', color: 'bg-orange-500/15 border-orange-500/30 text-orange-300' },
-    { day: 'Tue', meal: null, color: '' },
-    { day: 'Wed', meal: 'Taco Tuesday', color: 'bg-amber-500/15 border-amber-500/30 text-amber-300' },
-    { day: 'Thu', meal: 'Pasta Bake', color: 'bg-orange-500/15 border-orange-500/30 text-orange-300' },
-    { day: 'Fri', meal: null, color: '' },
-    { day: 'Sat', meal: null, color: '' },
-    { day: 'Sun', meal: null, color: '' },
-  ];
-
+/* ── Step 2: Add a meal (real MealCard pattern) ──────────────────── */
+function AddMealStep() {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">
-          <UtensilsCrossed className="w-4 h-4 text-orange-400" />
-        </div>
-        <div>
-          <h4 className="text-sm font-semibold text-white">Meal Plan</h4>
-          <p className="text-xs text-gray-500">3 meals planned</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-7 gap-1.5">
-        {days.map((item, index) => (
+      {/* Meal card being added (matches real MealCard.tsx) */}
+      <motion.div
+        className="bg-gray-800 border border-gray-700 rounded-xl p-4"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.15 }}
+      >
+        <div className="flex items-start gap-3">
+          {/* Meal type icon square (real pattern) */}
           <motion.div
-            key={item.day}
+            className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.3, type: 'spring', stiffness: 300 }}
+          >
+            <UtensilsCrossed className="w-5 h-5 text-white" />
+          </motion.div>
+
+          <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-semibold text-white">Chicken Stir-Fry</h4>
+            <p className="text-xs text-gray-400 capitalize mt-0.5">dinner &bull; Wednesday</p>
+          </div>
+
+          {/* Assignee pill (real pattern) */}
+          <motion.div
+            className="px-2 py-0.5 bg-orange-900/30 rounded-full flex items-center gap-1.5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.15 + index * 0.06, duration: 0.3 }}
-            className="text-center"
+            transition={{ duration: 0.3, delay: 0.5 }}
           >
-            <p className="text-[10px] text-gray-500 mb-1.5">{item.day}</p>
-            {item.meal ? (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.4 + index * 0.1, type: 'spring', stiffness: 300 }}
-                className={`aspect-square rounded-lg border flex items-center justify-center p-0.5 ${item.color}`}
-              >
-                <span className="text-[8px] leading-tight text-center font-medium line-clamp-2">
-                  {item.meal.split(' ')[0]}
-                </span>
-              </motion.div>
-            ) : (
-              <div className="aspect-square rounded-lg bg-gray-800/60 border border-gray-700/50 border-dashed" />
-            )}
+            <div className="w-4 h-4 rounded-full bg-blue-500/30 flex items-center justify-center">
+              <span className="text-[8px] font-semibold text-blue-300">S</span>
+            </div>
+            <span className="text-[10px] text-orange-300">Sarah</span>
           </motion.div>
-        ))}
-      </div>
+        </div>
+      </motion.div>
 
-      {/* Quick meal list below */}
+      {/* Meal type selector with real icons */}
+      <motion.div
+        className="flex gap-2 justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
+        {(['breakfast', 'lunch', 'dinner', 'snack'] as const).map((type) => {
+          const mt = MEAL_TYPE[type];
+          const Icon = mt.icon;
+          const active = type === 'dinner';
+          return (
+            <div
+              key={type}
+              className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-lg ${
+                active
+                  ? `${mt.bg} border ${mt.border}`
+                  : 'bg-gray-800/60 border border-gray-700/50'
+              }`}
+            >
+              <Icon className={`w-4 h-4 ${active ? mt.color : 'text-gray-500'}`} />
+              <span className={`text-[9px] capitalize font-medium ${active ? mt.color : 'text-gray-500'}`}>
+                {type}
+              </span>
+            </div>
+          );
+        })}
+      </motion.div>
+
+      {/* Quick meal list */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 0.3 }}
-        className="space-y-1.5 pt-1"
+        transition={{ delay: 0.6, duration: 0.3 }}
+        className="space-y-1.5"
       >
-        {[
-          { day: 'Mon', meal: 'Chicken Stir-Fry' },
-          { day: 'Wed', meal: 'Taco Tuesday' },
-          { day: 'Thu', meal: 'Pasta Bake' },
-        ].map((item) => (
-          <div
-            key={item.day}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-800/40"
-          >
-            <span className="text-[10px] text-gray-500 w-7">{item.day}</span>
-            <span className="text-xs text-gray-300">{item.meal}</span>
+        {['Mon - Oatmeal', 'Wed - Chicken Stir-Fry', 'Sat - BBQ Ribs'].map((item) => (
+          <div key={item} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-800/40">
+            <UtensilsCrossed className="w-3 h-3 text-gray-600" />
+            <span className="text-xs text-gray-400">{item}</span>
           </div>
         ))}
       </motion.div>
@@ -124,41 +171,39 @@ function AddRecipesStep() {
   );
 }
 
-function SeeDetailsStep() {
+/* ── Step 3: Recipe details ──────────────────────────────────────── */
+function RecipeDetailsStep() {
   const ingredients = ['Chicken breast', 'Soy sauce', 'Bell peppers', 'Rice', 'Garlic & ginger'];
 
   return (
     <div className="space-y-3">
-      {/* Recipe card header */}
+      {/* Recipe header (MealCard-style) */}
       <motion.div
+        className="bg-gray-800 border border-gray-700 rounded-xl p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-        className="flex items-center gap-2.5"
+        transition={{ delay: 0.15, duration: 0.3 }}
       >
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-amber-500/30 border border-orange-500/20 flex items-center justify-center">
-          <UtensilsCrossed className="w-5 h-5 text-orange-400" />
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0">
+            <UtensilsCrossed className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-white">Chicken Stir-Fry</h4>
+            <p className="text-xs text-gray-400 capitalize mt-0.5">dinner &bull; Wednesday</p>
+          </div>
         </div>
-        <div className="flex-1">
-          <h4 className="text-sm font-semibold text-white">Chicken Stir-Fry</h4>
-          <p className="text-xs text-gray-500">Monday dinner</p>
-        </div>
-      </motion.div>
 
-      {/* Meta info */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.3 }}
-        className="flex gap-3"
-      >
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-800/60 border border-gray-700/50">
-          <Clock className="w-3.5 h-3.5 text-orange-400" />
-          <span className="text-xs text-gray-300">25 min</span>
-        </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-800/60 border border-gray-700/50">
-          <span className="text-xs text-gray-500">Serves</span>
-          <span className="text-xs text-gray-300 font-medium">4</span>
+        {/* Meta info */}
+        <div className="flex gap-3 mt-3">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-700/40">
+            <Clock className="w-3.5 h-3.5 text-orange-400" />
+            <span className="text-xs text-gray-300">25 min</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-700/40">
+            <span className="text-xs text-gray-500">Serves</span>
+            <span className="text-xs text-gray-300 font-medium">4</span>
+          </div>
         </div>
       </motion.div>
 
@@ -166,20 +211,20 @@ function SeeDetailsStep() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.3 }}
+        transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-2">Ingredients</p>
-        <div className="space-y-1.5">
-          {ingredients.map((ingredient, index) => (
+        <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide mb-2">Ingredients</p>
+        <div className="space-y-1">
+          {ingredients.map((item, i) => (
             <motion.div
-              key={ingredient}
+              key={item}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 + index * 0.08, duration: 0.25 }}
+              transition={{ delay: 0.5 + i * 0.08, duration: 0.2 }}
               className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gray-800/40"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-orange-400/60 flex-shrink-0" />
-              <span className="text-xs text-gray-300">{ingredient}</span>
+              <span className="text-xs text-gray-300">{item}</span>
             </motion.div>
           ))}
         </div>
@@ -188,18 +233,20 @@ function SeeDetailsStep() {
   );
 }
 
+/* ── Step 4: Auto shopping list ──────────────────────────────────── */
 function AutoShoppingListStep() {
-  const shoppingItems = ['Chicken breast x2', 'Soy sauce', 'Bell peppers x3', 'Rice 2 lbs', 'Garlic'];
+  const items = ['Chicken breast x2', 'Soy sauce', 'Bell peppers x3', 'Rice 2 lbs', 'Garlic'];
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2.5 mb-2">
+      {/* Meal plan summary header */}
+      <div className="flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">
           <UtensilsCrossed className="w-4 h-4 text-orange-400" />
         </div>
         <div>
           <h4 className="text-sm font-semibold text-white">Meal Plan</h4>
-          <p className="text-xs text-gray-500">3 meals this week</p>
+          <p className="text-xs text-gray-500">5 meals this week</p>
         </div>
       </div>
 
@@ -208,18 +255,18 @@ function AutoShoppingListStep() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
-        className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30 cursor-default"
+        className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30"
       >
         <ShoppingCart className="w-4 h-4 text-orange-400" />
         <span className="text-sm text-orange-300 font-medium">Generate Shopping List</span>
         <ChevronRight className="w-3.5 h-3.5 text-orange-400" />
       </motion.div>
 
-      {/* Arrow indicator */}
+      {/* Arrow */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 0.3 }}
+        transition={{ delay: 0.45, duration: 0.3 }}
         className="flex justify-center"
       >
         <div className="flex flex-col items-center gap-0.5">
@@ -228,11 +275,11 @@ function AutoShoppingListStep() {
         </div>
       </motion.div>
 
-      {/* Mini shopping list */}
+      {/* Shopping list */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.4 }}
+        transition={{ delay: 0.55, duration: 0.4 }}
         className="rounded-xl bg-emerald-500/5 border border-emerald-500/15 p-2.5"
       >
         <div className="flex items-center gap-1.5 mb-2">
@@ -242,12 +289,12 @@ function AutoShoppingListStep() {
           </span>
         </div>
         <div className="space-y-1">
-          {shoppingItems.map((item, index) => (
+          {items.map((item, i) => (
             <motion.div
               key={item}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 + index * 0.1, duration: 0.25 }}
+              transition={{ delay: 0.7 + i * 0.08, duration: 0.2 }}
               className="flex items-center gap-2 px-2 py-1 rounded-md bg-gray-800/30"
             >
               <div className="w-3.5 h-3.5 rounded border border-gray-600 flex-shrink-0" />
@@ -260,25 +307,10 @@ function AutoShoppingListStep() {
   );
 }
 
-// Inline Plus icon to avoid importing from lucide for a tiny use
-function Plus({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m7-7H5" />
-    </svg>
-  );
-}
-
 const steps: DemoStep[] = [
-  { label: 'Plan your week', content: <PlanWeekStep /> },
-  { label: 'Add recipes', content: <AddRecipesStep /> },
-  { label: 'See the details', content: <SeeDetailsStep /> },
+  { label: 'Your meal week', content: <WeekCalendarStep /> },
+  { label: 'Add a meal', content: <AddMealStep /> },
+  { label: 'See the details', content: <RecipeDetailsStep /> },
   { label: 'Auto shopping list', content: <AutoShoppingListStep /> },
 ];
 

@@ -4,7 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkSensitiveOperationRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { Resend } from 'resend';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
 import { logger } from '@/lib/logger';
@@ -43,8 +44,8 @@ export async function POST(request: NextRequest) {
     const userId = user.id;
 
     // Rate limiting - more restrictive for deletion requests
-    const identifier = `deletion-request-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkSensitiveOperationRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Too many deletion requests. Please try again later.' },
@@ -162,8 +163,8 @@ export async function DELETE(request: NextRequest) {
     const userId = user.id;
 
     // Rate limiting
-    const identifier = `deletion-cancel-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkSensitiveOperationRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

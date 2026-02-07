@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
+import { checkSensitiveOperationRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -29,6 +31,16 @@ async function resolveRequestUser(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 3 requests per 24 hours per IP (sensitive operation)
+    const ip = extractIP(req.headers);
+    const { success: rateLimitOk } = await checkSensitiveOperationRateLimit(ip);
+    if (!rateLimitOk) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const parsed = DeletionCancelledSchema.safeParse(body);
     if (!parsed.success) {
@@ -99,7 +111,7 @@ export async function POST(req: NextRequest) {
     if (sendError) {
       logger.error('Deletion cancelled email send failed', sendError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
-        { success: false, error: sendError.message || 'Email send failed' },
+        { success: false, error: 'Email delivery failed. Please try again later.' },
         { status: 502 }
       );
     }

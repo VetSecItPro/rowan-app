@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Shield, Award, EyeOff, WifiOff } from 'lucide-react';
+import { ArrowRight, Shield, RefreshCw, EyeOff, WifiOff } from 'lucide-react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
@@ -27,8 +27,8 @@ const trustSignals = [
         label: "Encrypted & Secure"
     },
     {
-        icon: Award,
-        label: "Veteran Owned"
+        icon: RefreshCw,
+        label: "Real-Time Sync"
     },
     {
         icon: EyeOff,
@@ -58,7 +58,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
     };
 
     return (
-        <section ref={heroRef} className="relative pt-20 pb-32 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <section ref={heroRef} className="relative pt-20 pb-4 px-4 sm:px-6 lg:px-8 overflow-hidden">
             <div className="max-w-7xl mx-auto">
                 <motion.div
                     style={{ opacity, scale }}
@@ -90,9 +90,9 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight text-white"
                     >
-                        Stop Managing Your Family in{' '}
+                        Your Life.{' '}
                         <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                            5 Different Apps
+                            Organized.
                         </span>
                     </motion.h2>
 
@@ -102,7 +102,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="text-xl sm:text-2xl text-gray-400 leading-relaxed max-w-3xl mx-auto"
                     >
-                        Rowan brings tasks, calendars, budgets, meals, and more into one beautiful app — so your household actually stays in sync.
+                        Rowan brings tasks, calendars, budgets, meals, and more into one beautiful app so your household actually stays in sync.
                     </motion.p>
 
                     <motion.div
@@ -147,13 +147,6 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         ))}
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.6 }}
-                        className="pt-12"
-                    >
-                    </motion.div>
                 </motion.div>
             </div>
         </section>
