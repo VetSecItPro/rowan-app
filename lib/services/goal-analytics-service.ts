@@ -425,8 +425,10 @@ export async function getGoalQuickStats(spaceId: string): Promise<{
       }
     });
 
-    // Calculate this week's progress (simplified)
-    const thisWeekProgress = Math.round(Math.random() * 100); // TODO: Implement actual calculation
+    // This week's progress: percentage of milestones completed across active goals
+    const thisWeekProgress = totalMilestones > 0
+      ? Math.round((completedMilestones / totalMilestones) * 100)
+      : 0;
 
     return {
       totalGoals,

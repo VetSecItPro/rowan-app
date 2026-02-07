@@ -700,7 +700,7 @@ export default function GoalsPage() {
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
-        <PullToRefresh onRefresh={loadData} enabled={!loading}>
+        <PullToRefresh onRefresh={loadData} disabled={loading}>
           <div className="p-4 sm:p-8">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}

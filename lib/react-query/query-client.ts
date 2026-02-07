@@ -410,16 +410,6 @@ export const intelligentInvalidation = {
 } as const;
 
 /**
- * Legacy invalidation utilities (for backward compatibility)
- * @deprecated Use intelligentInvalidation instead
- */
-export const invalidateQueries = {
-  auth: () => intelligentInvalidation.auth(),
-  spaces: () => intelligentInvalidation.spaces(),
-  userSpace: (userId: string) => intelligentInvalidation.userData(userId),
-} as const;
-
-/**
  * Development helpers
  */
 export const queryClientDevtools = {

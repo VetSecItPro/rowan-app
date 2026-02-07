@@ -19,7 +19,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decryptSessionData, validateSessionData, encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger-edge';
-import { CSRF_EXEMPT_ROUTES, CSRF_HEADER_NAME } from '@/lib/security/csrf';
+import { CSRF_EXEMPT_ROUTES, CSRF_HEADER_NAME, generateCsrfToken } from '@/lib/security/csrf';
 
 /** Admin session duration in seconds (24 hours) - must match login route */
 const ADMIN_SESSION_DURATION = 24 * 60 * 60;
@@ -469,6 +469,17 @@ export async function middleware(req: NextRequest) {
             { status: 403 }
           );
         }
+
+        // SECURITY FIX (VULN-CSRF-001): Rotate CSRF token after each state-changing request.
+        // Reduces the exploitation window from 24 hours to a single request.
+        const newCsrfToken = generateCsrfToken();
+        response.cookies.set('__csrf_token', newCsrfToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 60 * 60 * 24, // 24 hours
+        });
       }
     }
   }

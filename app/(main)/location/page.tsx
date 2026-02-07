@@ -97,7 +97,7 @@ export default function LocationPage() {
     >
       <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Family Location' }]}>
         <PageErrorBoundary>
-          <PullToRefresh onRefresh={handleRefresh} enabled={!isLoading}>
+          <PullToRefresh onRefresh={handleRefresh} disabled={isLoading}>
             <div className="p-4 sm:p-8">
               <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
