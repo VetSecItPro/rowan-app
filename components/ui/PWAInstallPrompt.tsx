@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Download } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
 
 /** localStorage key used to track when the user last dismissed the banner */
 const DISMISS_KEY = 'pwa-install-dismissed';
@@ -12,24 +11,12 @@ const DISMISS_KEY = 'pwa-install-dismissed';
 /** Number of milliseconds in 7 days */
 const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Delay before showing the banner after page load (ms) */
-const SHOW_DELAY_MS = 30_000;
-
-/**
- * Extends the global BeforeInstallPromptEvent type used by Chromium browsers.
- * This event is fired when the browser determines the site meets PWA
- * installability criteria.
- */
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
   prompt(): Promise<void>;
 }
 
-/**
- * Detects whether the current browser is Safari on iOS (not Chrome or Firefox
- * on iOS, which use their own install flows).
- */
 function isIOSSafari(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
@@ -39,18 +26,12 @@ function isIOSSafari(): boolean {
   return isIOS && !isChromeIOS && !isFirefoxIOS;
 }
 
-/**
- * Detects whether the user is on a mobile device (phone or tablet).
- */
 function isMobileDevice(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
   return /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 }
 
-/**
- * Checks whether the app is already running in standalone (installed) mode.
- */
 function isStandalone(): boolean {
   if (typeof window === 'undefined') return false;
   const matchesStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -58,9 +39,6 @@ function isStandalone(): boolean {
   return matchesStandalone || navigatorStandalone === true;
 }
 
-/**
- * Checks whether the user dismissed the banner within the cooldown period.
- */
 function isDismissedRecently(): boolean {
   if (typeof window === 'undefined') return true;
   try {
@@ -74,10 +52,6 @@ function isDismissedRecently(): boolean {
   }
 }
 
-/**
- * Inline SVG share icon matching iOS Safari's share button appearance.
- * Used in the iOS-specific install instructions.
- */
 function ShareIcon() {
   return (
     <svg
@@ -100,28 +74,18 @@ function ShareIcon() {
 }
 
 /**
- * Smart PWA install banner that adapts to the user's platform.
- *
- * - On Chrome/Edge/Android: intercepts `beforeinstallprompt` and triggers the
- *   native install dialog when the user taps "Install".
- * - On iOS Safari: shows instructions to use the Share menu and "Add to Home
- *   Screen" since there is no programmatic install API.
- * - Hides automatically if the app is already installed (standalone mode).
- * - Respects a 7-day cooldown after the user dismisses the banner.
- * - Waits 30 seconds after page load before appearing to avoid disrupting
- *   first-time visitors.
+ * Smart PWA install banner — shows immediately (no delay), adapts to platform.
+ * Uses sticky positioning so it doesn't cover the footer.
+ * Respects 7-day dismiss cooldown and hides if already installed.
  */
 export default function PWAInstallPrompt() {
   const [visible, setVisible] = useState(false);
-  const [animateIn, setAnimateIn] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   const dismiss = useCallback(() => {
-    setAnimateIn(false);
-    // Wait for the slide-out animation to complete before unmounting
-    setTimeout(() => setVisible(false), 300);
+    setVisible(false);
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
     } catch {
@@ -138,13 +102,11 @@ export default function PWAInstallPrompt() {
 
     if (outcome === 'accepted') {
       deferredPromptRef.current = null;
-      setAnimateIn(false);
-      setTimeout(() => setVisible(false), 300);
+      setVisible(false);
     }
   }, []);
 
   useEffect(() => {
-    // Don't show if already installed or recently dismissed
     if (isStandalone() || isDismissedRecently()) return;
 
     const ios = isIOSSafari();
@@ -152,36 +114,17 @@ export default function PWAInstallPrompt() {
     setIsIOS(ios);
     setIsMobile(mobile);
 
-    let showTimer: ReturnType<typeof setTimeout> | undefined;
-    let mounted = true;
-
     const onBeforeInstallPrompt = (e: Event) => {
-      // Prevent the browser's default mini-infobar
       e.preventDefault();
       deferredPromptRef.current = e as BeforeInstallPromptEvent;
     };
 
-    // Listen for Chromium's install prompt event
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
 
-    // Show the banner after the configured delay
-    showTimer = setTimeout(() => {
-      if (!mounted) return;
-      // On non-iOS, only show if we captured a beforeinstallprompt OR it's iOS
-      if (ios || deferredPromptRef.current) {
-        setVisible(true);
-        // Trigger the slide-in animation on the next frame
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (mounted) setAnimateIn(true);
-          });
-        });
-      }
-    }, SHOW_DELAY_MS);
+    // Show immediately — no delay
+    setVisible(true);
 
     return () => {
-      mounted = false;
-      if (showTimer) clearTimeout(showTimer);
       window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
     };
   }, []);
@@ -190,19 +133,12 @@ export default function PWAInstallPrompt() {
 
   return (
     <div
-      className={cn(
-        'fixed bottom-[72px] sm:bottom-0 left-0 right-0 z-50',
-        'bg-gray-900/95 backdrop-blur-xl',
-        'border-t border-gray-700/50',
-        'transition-all duration-300 ease-out',
-        animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-      )}
+      className="sticky bottom-0 z-40 bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/50"
       role="banner"
       aria-label="Install Rowan app"
     >
       <div className="max-w-3xl mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
-          {/* App icon */}
           <Image
             src="/rowan-logo.png"
             alt="Rowan app icon"
@@ -227,7 +163,6 @@ export default function PWAInstallPrompt() {
             )}
           </div>
 
-          {/* Action buttons */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={dismiss}

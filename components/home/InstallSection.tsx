@@ -19,7 +19,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
   return (
-    <section className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative pt-8 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/8 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 w-[400px] h-[400px] bg-cyan-500/6 rounded-full blur-3xl" />

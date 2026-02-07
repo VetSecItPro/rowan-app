@@ -60,6 +60,28 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // SECURITY: Request body size limits for API routes (API-009)
+  // Reject oversized payloads early before any processing
+  if (
+    pathname.startsWith('/api/') &&
+    ['POST', 'PUT', 'PATCH'].includes(req.method)
+  ) {
+    const contentLength = req.headers.get('content-length');
+    if (contentLength) {
+      const bytes = parseInt(contentLength, 10);
+      const isLargeUploadRoute =
+        pathname.startsWith('/api/upload/') ||
+        pathname.startsWith('/api/calendar/import/');
+      const maxBytes = isLargeUploadRoute ? 10 * 1024 * 1024 : 1024 * 1024; // 10MB or 1MB
+      if (!Number.isNaN(bytes) && bytes > maxBytes) {
+        return NextResponse.json(
+          { error: 'Request body too large' },
+          { status: 413 }
+        );
+      }
+    }
+  }
+
   let response = NextResponse.next({
     request: {
       headers: req.headers,

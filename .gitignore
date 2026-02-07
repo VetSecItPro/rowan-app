@@ -54,6 +54,7 @@ GoogleService-Info.plist
 # Security audit reports (contain vulnerability details)
 .security-audit.json
 .security-reports/
+.compliance/
 .claude/audits/
 docs/analysis/AUDIT_SUMMARY.md
 docs/archive/SECURITY_AUDIT_CONTINUATION_REPORT.md
@@ -111,3 +112,9 @@ rowan-subreddits.md
 
 # MDMP planning documents (session artifacts)
 .mdmp/
+
+# Smoke test reports (session artifacts)
+.smoketest-reports/
+
+# Red team reports (contain vulnerability details + exploit PoCs)
+.redteam-reports/
