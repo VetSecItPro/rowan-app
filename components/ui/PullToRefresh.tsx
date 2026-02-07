@@ -8,8 +8,6 @@ interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
   children: ReactNode;
   disabled?: boolean;
-  /** @deprecated Use `disabled` instead. `enabled={false}` is equivalent to `disabled={true}`. */
-  enabled?: boolean;
 }
 
 const PULL_THRESHOLD = 60;
@@ -31,10 +29,8 @@ export function PullToRefresh({
   onRefresh,
   children,
   disabled = false,
-  enabled,
 }: PullToRefreshProps) {
-  // Support both `disabled` and legacy `enabled` prop
-  const isDisabled = disabled || (enabled !== undefined && !enabled);
+  const isDisabled = disabled;
 
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);

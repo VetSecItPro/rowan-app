@@ -118,3 +118,4 @@ rowan-subreddits.md
 
 # Red team reports (contain vulnerability details + exploit PoCs)
 .redteam-reports/
+.cleancode/

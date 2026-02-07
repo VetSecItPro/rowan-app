@@ -849,12 +849,10 @@ class FinancialReportsService {
    * @throws Error - Not yet implemented
    */
   async downloadReportPDF(reportId: string): Promise<Blob> {
-    // This would integrate with the PDF generation service
     const report = await this.getGeneratedReport(reportId);
     if (!report) throw new Error('Report not found');
 
-    // For now, return a placeholder - this should integrate with pdf-generation-service
-    throw new Error('PDF download not implemented yet');
+    throw new Error('PDF export is coming soon. Report data is available in the viewer.');
   }
 
   /**
