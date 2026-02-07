@@ -411,17 +411,6 @@ export default function SettingsPage() {
   const [sessionToRevoke, setSessionToRevoke] = useState<string | null>(null);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
 
-
-  // Privacy toggles state - DISABLED: Replaced with new privacy system
-  // const [privacySettings, setPrivacySettings] = useState({
-  //   profileVisibility: true,
-  //   activityStatus: true,
-  //   readReceipts: true,
-  //   analytics: true,
-  // });
-  // const [isLoadingPrivacy, setIsLoadingPrivacy] = useState(true);
-  // const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
-
   const validateProfileImage = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
       // Check file type
@@ -703,72 +692,6 @@ export default function SettingsPage() {
     setIsDeletingAccount(false);
     setShowDeleteAccountModal(false);
   };
-
-
-
-  // OLD PRIVACY FUNCTIONS - DISABLED: Replaced with new privacy system
-  // Load privacy settings from API
-  // const loadPrivacySettings = async () => {
-  //   try {
-  //     setIsLoadingPrivacy(true);
-  //     const response = await fetch('/api/user/privacy-settings');
-  //     const result = await response.json();
-
-  //     if (result.success) {
-  //       setPrivacySettings(result.data);
-  //     } else {
-  //       logger.error('Failed to load privacy settings:', undefined, { component: 'page', action: 'execution', details: result.error });
-  //     }
-  //   } catch (error) {
-  //     logger.error('Error loading privacy settings:', error, { component: 'page', action: 'execution' });
-  //   } finally {
-  //     setIsLoadingPrivacy(false);
-  //   }
-  // };
-
-  // // Save privacy settings to API
-  // const savePrivacySetting = async (key: string, value: boolean) => {
-  //   try {
-  //     setIsSavingPrivacy(true);
-  //     const response = await fetch('/api/user/privacy-settings', {
-  //       method: 'PATCH',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ [key]: value }),
-  //     });
-
-  //     const result = await response.json();
-
-  //     if (!result.success) {
-  //       // Revert the change if it failed
-  //       setPrivacySettings(prev => ({ ...prev, [key]: !value }));
-  //       logger.error('Failed to save privacy setting:', undefined, { component: 'page', action: 'execution', details: result.error });
-  //     }
-  //   } catch (error) {
-  //     // Revert the change if it failed
-  //     setPrivacySettings(prev => ({ ...prev, [key]: !value }));
-  //     logger.error('Error saving privacy setting:', error, { component: 'page', action: 'execution' });
-  //   } finally {
-  //     setIsSavingPrivacy(false);
-  //   }
-  // };
-
-  // const handlePrivacyToggle = (key: string) => {
-  //   const newValue = !privacySettings[key as keyof typeof privacySettings];
-
-  //   // Optimistically update the UI
-  //   setPrivacySettings(prev => ({ ...prev, [key]: newValue }));
-
-  //   // Save to API
-  //   savePrivacySetting(key, newValue);
-  // };
-
-  // // Load privacy settings on mount
-  // useEffect(() => {
-  //   loadPrivacySettings();
-  // }, []);
-
 
   const fetchSpaceMembers = useCallback(async () => {
     if (!spaceId) return;

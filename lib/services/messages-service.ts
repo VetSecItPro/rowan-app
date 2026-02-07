@@ -435,20 +435,6 @@ export const messagesService = {
   },
 
   /**
-   * Hard delete a message (admin only or for cleanup)
-   * @deprecated Use deleteMessage with mode parameter instead
-   */
-  async hardDeleteMessage(id: string): Promise<void> {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('messages')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  },
-
-  /**
    * Marks a single message as read.
    * Delegates to markConversationAsRead for consistency.
    * @param id - The message identifier

@@ -82,6 +82,30 @@ export async function GET(req: NextRequest) {
 
     const { conversation_id: conversationId } = validationResult.data;
 
+    // SECURITY FIX (VULN-IDOR-001): Verify space access before returning messages.
+    // Look up the conversation's space_id and check that the caller is a member.
+    const { data: conversation, error: convError } = await supabase
+      .from('conversations')
+      .select('space_id')
+      .eq('id', conversationId)
+      .single();
+
+    if (convError || !conversation) {
+      return NextResponse.json(
+        { error: 'Conversation not found' },
+        { status: 404 }
+      );
+    }
+
+    try {
+      await verifySpaceAccess(user.id, conversation.space_id);
+    } catch {
+      return NextResponse.json(
+        { error: 'You do not have access to this space' },
+        { status: 403 }
+      );
+    }
+
     // Get messages from service
     const messages = await messagesService.getMessages(conversationId, supabase);
 
