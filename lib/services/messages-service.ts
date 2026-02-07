@@ -385,27 +385,13 @@ export const messagesService = {
       if (!options?.userId) {
         throw new Error('User ID is required to delete a message for yourself');
       }
-      // Delete for me only - add user to deleted_for_users array
-      // First get current deleted_for_users
-      const { data: message, error: fetchError } = await supabase
-        .from('messages')
-        .select('deleted_for_users')
-        .eq('id', id)
-        .single();
+      // Atomically append user to deleted_for_users via RPC (prevents race condition)
+      const { error: rpcError } = await supabase.rpc('soft_delete_message_for_user', {
+        p_message_id: id,
+        p_user_id: options.userId,
+      });
 
-      if (fetchError) throw fetchError;
-
-      const currentDeletedUsers = message?.deleted_for_users || [];
-      if (!currentDeletedUsers.includes(options.userId)) {
-        const { error } = await supabase
-          .from('messages')
-          .update({
-            deleted_for_users: [...currentDeletedUsers, options.userId]
-          })
-          .eq('id', id);
-
-        if (error) throw error;
-      }
+      if (rpcError) throw rpcError;
     } else {
       if (options?.userId) {
         const { data: existingMessage, error: fetchError } = await supabase
