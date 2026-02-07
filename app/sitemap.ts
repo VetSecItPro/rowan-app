@@ -58,26 +58,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // Feature pages
-  const featureSlugs = [
-    'tasks',
-    'calendar',
-    'reminders',
-    'messages',
-    'shopping',
-    'meals',
-    'budget',
-    'goals',
-    'daily-check-in',
-  ]
-
-  const featurePages: MetadataRoute.Sitemap = featureSlugs.map((slug) => ({
-    url: `${BASE_URL}/features/${slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }))
-
   // Blog article pages
   const articlePages: MetadataRoute.Sitemap = blogArticles.map((article) => ({
     url: `${BASE_URL}/articles/${article.slug}`,
@@ -86,5 +66,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...featurePages, ...articlePages]
+  return [...staticPages, ...articlePages]
 }

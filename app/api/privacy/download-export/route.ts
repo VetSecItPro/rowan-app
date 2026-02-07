@@ -7,7 +7,8 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // GET - Download export file
 export async function GET(request: NextRequest) {
@@ -49,8 +50,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Rate limiting
-    const identifier = `download-export-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

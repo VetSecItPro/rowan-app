@@ -5,7 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
@@ -49,8 +50,8 @@ export async function POST(request: NextRequest) {
     const userId = user.id;
 
     // Rate limiting - allow max 3 exports per day
-    const identifier = `data-export-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Too many export requests. Please try again later.' },

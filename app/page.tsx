@@ -8,10 +8,8 @@ import { MobileStickyBar } from '@/components/home/MobileStickyBar';
 
 const PainPointsSection = dynamic(() => import('@/components/home/PainPointsSection').then(m => ({ default: m.PainPointsSection })), { ssr: false });
 const FeatureGrid = dynamic(() => import('@/components/home/FeatureGrid').then(m => ({ default: m.FeatureGrid })), { ssr: false });
-const SocialProofSection = dynamic(() => import('@/components/home/SocialProofSection').then(m => ({ default: m.SocialProofSection })), { ssr: false });
 const ComparisonSection = dynamic(() => import('@/components/home/ComparisonSection').then(m => ({ default: m.ComparisonSection })), { ssr: false });
-const PricingPreviewSection = dynamic(() => import('@/components/home/PricingPreviewSection').then(m => ({ default: m.PricingPreviewSection })), { ssr: false });
-const InstallSection = dynamic(() => import('@/components/home/InstallSection').then(m => ({ default: m.InstallSection })), { ssr: false });
+const PWAInstallPrompt = dynamic(() => import('@/components/ui/PWAInstallPrompt'), { ssr: false });
 const Footer = dynamic(() => import('@/components/layout/Footer').then(m => ({ default: m.Footer })), { ssr: false });
 const ScrollToTop = dynamic(() => import('@/components/ui/scroll-to-top').then(m => ({ default: m.ScrollToTop })), { ssr: false });
 
@@ -65,18 +63,15 @@ export default function HomePage() {
 
         <FeatureGrid />
 
-        <SocialProofSection />
-
         <ComparisonSection />
 
-        <PricingPreviewSection onSignupClick={() => router.push('/signup')} />
-
-        <InstallSection onSignupClick={() => router.push('/signup')} />
       </main>
 
       <ScrollToTop />
 
       <MobileStickyBar />
+
+      <PWAInstallPrompt />
 
       <Footer />
     </div>

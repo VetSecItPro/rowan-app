@@ -4,7 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
 
@@ -25,7 +26,7 @@ const PrivacyPreferenceUpdateSchema = z.object({
 });
 
 // GET - Fetch user's privacy preferences
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
 
@@ -41,8 +42,8 @@ export async function GET() {
     const userId = user.id;
 
     // Rate limiting
-    const identifier = `privacy-get-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },
@@ -125,8 +126,8 @@ export async function PATCH(request: NextRequest) {
     const userId = user.id;
 
     // Rate limiting
-    const identifier = `privacy-update-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

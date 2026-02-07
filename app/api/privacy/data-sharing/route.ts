@@ -4,7 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
-import { ratelimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 // Validation schema
 const DataSharingRequestSchema = z.object({
@@ -29,8 +30,8 @@ export async function POST(request: NextRequest) {
     const userId = user.id;
 
     // Rate limiting
-    const identifier = `data-sharing-${userId}`;
-    const { success: rateLimitSuccess } = await ratelimit?.limit(identifier) ?? { success: true };
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
     if (!rateLimitSuccess) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

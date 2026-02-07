@@ -4,6 +4,8 @@ import { Resend } from 'resend';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -61,6 +63,16 @@ async function canNotifyUser(callerId: string, recipientId: string): Promise<boo
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 10 requests per 10 seconds per IP
+    const ip = extractIP(req.headers);
+    const { success: rateLimitOk } = await checkGeneralRateLimit(ip);
+    if (!rateLimitOk) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     if (!resend) {
       return NextResponse.json(
         { success: false, error: 'Email service not configured' },
@@ -145,7 +157,7 @@ export async function POST(req: NextRequest) {
     if (sendError) {
       logger.error('Resend email send failed', sendError, { component: 'api-route', action: 'api_request' });
       return NextResponse.json(
-        { success: false, error: sendError.message || 'Email send failed' },
+        { success: false, error: 'Email delivery failed. Please try again later.' },
         { status: 502 }
       );
     }
