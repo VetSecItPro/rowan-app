@@ -98,104 +98,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       throw updateError;
     }
 
-    // Award base points
+    // Award base points atomically via RPC (prevents race condition on concurrent completions)
     const basePoints = (chore as Chore & { point_value?: number }).point_value ?? 10;
     let pointsAwarded = 0;
     let streakBonus = 0;
     let newStreak = 0;
 
     try {
-      // Get or create user's reward_points record
-      const { data: existingPoints, error: pointsQueryError } = await supabase
-        .from('reward_points')
-        .select('id, points, current_streak')
-        .eq('user_id', user.id)
-        .eq('space_id', chore.space_id)
-        .single();
+      const { data: rewardResult, error: rewardError } = await supabase.rpc(
+        'complete_chore_award_points',
+        {
+          p_user_id: user.id,
+          p_space_id: chore.space_id,
+          p_chore_id: choreId,
+          p_chore_title: chore.title,
+          p_base_points: basePoints,
+          p_completion_date: completionDateISO,
+        }
+      );
 
-      if (pointsQueryError && pointsQueryError.code !== 'PGRST116') {
-        throw pointsQueryError;
-      }
+      if (rewardError) throw rewardError;
 
-      const currentPoints = existingPoints?.points ?? 0;
-      const currentStreak = existingPoints?.current_streak ?? 0;
-
-      // Check if this extends a streak (completed within 24 hours of previous completion)
-      const { data: lastCompletion } = await supabase
-        .from('point_transactions')
-        .select('created_at')
-        .eq('user_id', user.id)
-        .eq('space_id', chore.space_id)
-        .eq('source_type', 'chore')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      const isStreakExtension = lastCompletion
-        ? (completionDate.getTime() - new Date(lastCompletion.created_at).getTime()) < 24 * 60 * 60 * 1000
-        : false;
-
-      newStreak = isStreakExtension ? currentStreak + 1 : 1;
-
-      // Calculate streak bonus (5 points for every 5 days)
-      if (newStreak > 0 && newStreak % 5 === 0) {
-        streakBonus = 5;
-      }
-
-      pointsAwarded = basePoints + streakBonus;
-      const newPointsTotal = currentPoints + pointsAwarded;
-
-      if (existingPoints) {
-        // Update existing record
-        await supabase
-          .from('reward_points')
-          .update({
-            points: newPointsTotal,
-            current_streak: newStreak,
-            updated_at: completionDateISO,
-          })
-          .eq('id', existingPoints.id);
-      } else {
-        // Create new record
-        await supabase
-          .from('reward_points')
-          .insert({
-            user_id: user.id,
-            space_id: chore.space_id,
-            points: pointsAwarded,
-            current_streak: newStreak,
-          });
-      }
-
-      // Record the transaction
-      await supabase
-        .from('point_transactions')
-        .insert({
-          user_id: user.id,
-          space_id: chore.space_id,
-          source_type: 'chore',
-          source_id: choreId,
-          points: basePoints,
-          reason: `Completed chore: ${chore.title}`,
-          metadata: { chore_title: chore.title },
-        });
-
-      // Record streak bonus separately if applicable
-      if (streakBonus > 0) {
-        await supabase
-          .from('point_transactions')
-          .insert({
-            user_id: user.id,
-            space_id: chore.space_id,
-            source_type: 'streak_bonus',
-            source_id: choreId,
-            points: streakBonus,
-            reason: `${newStreak}-day streak bonus!`,
-            metadata: { streak_count: newStreak },
-          });
-      }
-    } catch (rewardError) {
-      logger.error('Failed to award points', rewardError instanceof Error ? rewardError : undefined, {
+      pointsAwarded = rewardResult?.points_awarded ?? basePoints;
+      streakBonus = rewardResult?.streak_bonus ?? 0;
+      newStreak = rewardResult?.new_streak ?? 1;
+    } catch (rpcError) {
+      logger.error('Failed to award points', rpcError instanceof Error ? rpcError : undefined, {
         choreId,
         userId: user.id,
       });
