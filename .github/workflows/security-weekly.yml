@@ -17,6 +17,9 @@ jobs:
   dependency-audit:
     name: Dependency Audit
     runs-on: ubuntu-latest
+    outputs:
+      critical: ${{ steps.audit.outputs.critical }}
+      high: ${{ steps.audit.outputs.high }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
