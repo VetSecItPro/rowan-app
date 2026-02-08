@@ -8,6 +8,11 @@ on:
 env:
   NODE_VERSION: '22'
 
+permissions:
+  contents: read
+  security-events: write # For SARIF upload
+  issues: write # For auto-creating security issues
+
 jobs:
   dependency-audit:
     name: Dependency Audit
@@ -22,35 +27,101 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Full audit
+        id: audit
         run: |
-          echo "## Dependency Audit" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Dependency Audit" >> $GITHUB_STEP_SUMMARY
+
+          # Run audit and capture results
           pnpm audit --json > audit-results.json 2>/dev/null || true
-          CRITICAL=$(jq '.advisories | to_entries | map(select(.value.severity == "critical")) | length' audit-results.json 2>/dev/null || echo "0")
-          HIGH=$(jq '.advisories | to_entries | map(select(.value.severity == "high")) | length' audit-results.json 2>/dev/null || echo "0")
-          echo "Critical: $CRITICAL, High: $HIGH" >> $GITHUB_STEP_SUMMARY
+
+          # Parse results
+          CRITICAL=$(jq '[.advisories // {} | to_entries[] | select(.value.severity == "critical")] | length' audit-results.json 2>/dev/null || echo "0")
+          HIGH=$(jq '[.advisories // {} | to_entries[] | select(.value.severity == "high")] | length' audit-results.json 2>/dev/null || echo "0")
+          MODERATE=$(jq '[.advisories // {} | to_entries[] | select(.value.severity == "moderate")] | length' audit-results.json 2>/dev/null || echo "0")
+          LOW=$(jq '[.advisories // {} | to_entries[] | select(.value.severity == "low")] | length' audit-results.json 2>/dev/null || echo "0")
+
+          # Output summary
+          echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔴 Critical | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🟠 High | $HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🟡 Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🟢 Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Set outputs for later use
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+
+          # Only fail on CRITICAL vulnerabilities
           if [ "$CRITICAL" -gt 0 ]; then
             echo "::error::$CRITICAL critical vulnerabilities found"
+            echo "### ⚠️ Action Required: $CRITICAL critical vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`pnpm audit\` locally to see details and \`pnpm audit fix\` to attempt automatic fixes." >> $GITHUB_STEP_SUMMARY
+            exit 1
           fi
 
       - name: Check outdated packages
         run: |
-          echo "## Outdated Packages" >> $GITHUB_STEP_SUMMARY
-          pnpm outdated --format json 2>/dev/null | jq -r 'to_entries[] | "- \(.key): \(.value.current) → \(.value.latest)"' >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "All packages up to date" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Outdated Packages" >> $GITHUB_STEP_SUMMARY
+          pnpm outdated --format json 2>/dev/null | jq -r 'to_entries[] | "- **\(.key)**: \(.value.current) → \(.value.latest)"' >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "_All packages up to date_" >> $GITHUB_STEP_SUMMARY
 
   semgrep-deep:
     name: Semgrep Deep Scan
     runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
 
       - name: Semgrep SAST (extended rules)
-        uses: returntocorp/semgrep-action@v1
+        id: semgrep
+        run: |
+          semgrep scan \
+            --config=p/owasp-top-ten \
+            --config=p/nextjs \
+            --config=p/react \
+            --config=p/typescript \
+            --config=.semgrep.yml \
+            --sarif \
+            --output=semgrep.sarif \
+            --error \
+            --severity=ERROR \
+            --severity=WARNING \
+            --max-target-bytes=5MB \
+            || true
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          config: >-
-            p/owasp-top-ten
-            p/nextjs
-            p/react
-            p/typescript
+          sarif_file: semgrep.sarif
+        continue-on-error: true
+
+      - name: Parse Semgrep results
+        run: |
+          echo "## 🔒 Semgrep Security Scan" >> $GITHUB_STEP_SUMMARY
+
+          # Count findings by severity
+          CRITICAL=$(jq '[.runs[].results[] | select(.level == "error")] | length' semgrep.sarif 2>/dev/null || echo "0")
+          WARNING=$(jq '[.runs[].results[] | select(.level == "warning")] | length' semgrep.sarif 2>/dev/null || echo "0")
+
+          echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔴 Error | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🟡 Warning | $WARNING |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "$CRITICAL" -gt 0 ]; then
+            echo "### ⚠️ Security Issues Found" >> $GITHUB_STEP_SUMMARY
+            echo "Check the [Security tab](https://github.com/${{ github.repository }}/security/code-scanning) for detailed findings." >> $GITHUB_STEP_SUMMARY
+
+            # List top 5 critical findings
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "#### Top Critical Findings:" >> $GITHUB_STEP_SUMMARY
+            jq -r '.runs[].results[] | select(.level == "error") | "- **\(.ruleId)**: \(.message.text) (\(.locations[0].physicalLocation.artifactLocation.uri):\(.locations[0].physicalLocation.region.startLine))"' semgrep.sarif 2>/dev/null | head -5 >> $GITHUB_STEP_SUMMARY || echo "_No details available_" >> $GITHUB_STEP_SUMMARY
+
+            exit 1
+          fi
 
   license-check:
     name: License Check
@@ -67,16 +138,18 @@ jobs:
       - name: Check licenses
         run: |
           npx license-checker --production --excludePrivatePackages --json > licenses.json 2>/dev/null || true
-          echo "## License Report" >> $GITHUB_STEP_SUMMARY
+          echo "## ⚖️ License Compliance" >> $GITHUB_STEP_SUMMARY
 
           BANNED='GPL-3.0|AGPL|SSPL|BSL|EUPL'
-          FLAGGED=$(jq -r 'to_entries[] | select(.value.licenses | test("'"$BANNED"'")) | "\(.key): \(.value.licenses)"' licenses.json 2>/dev/null || true)
+          FLAGGED=$(jq -r 'to_entries[] | select(.value.licenses | test("'"$BANNED"'")) | "- **\(.key)**: \(.value.licenses)"' licenses.json 2>/dev/null || true)
 
           if [ -n "$FLAGGED" ]; then
-            echo "::warning::Potentially problematic licenses found:"
+            echo "### ⚠️ Potentially Problematic Licenses" >> $GITHUB_STEP_SUMMARY
             echo "$FLAGGED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Review these dependencies - they may require legal review or replacement." >> $GITHUB_STEP_SUMMARY
           else
-            echo "All dependencies use approved licenses." >> $GITHUB_STEP_SUMMARY
+            echo "✅ All dependencies use approved licenses." >> $GITHUB_STEP_SUMMARY
           fi
 
   summary:
@@ -85,11 +158,21 @@ jobs:
     needs: [dependency-audit, semgrep-deep, license-check]
     if: always()
     steps:
-      - name: Summary
+      - name: Generate summary
         run: |
-          echo "## Weekly Security Scan Summary" >> $GITHUB_STEP_SUMMARY
-          echo '| Check | Status |' >> $GITHUB_STEP_SUMMARY
-          echo '|-------|--------|' >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Semgrep SAST | ${{ needs.semgrep-deep.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| License Check | ${{ needs.license-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "# 🛡️ Weekly Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Audit | ${{ needs.dependency-audit.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Semgrep SAST | ${{ needs.semgrep-deep.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result == 'success' && '✅ Pass' || '❌ Fail' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.dependency-audit.result }}" != "success" ] || [ "${{ needs.semgrep-deep.result }}" != "success" ]; then
+            echo "### 🚨 Action Required" >> $GITHUB_STEP_SUMMARY
+            echo "Security issues were found. Please review the findings above and address critical issues promptly." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ All Checks Passed" >> $GITHUB_STEP_SUMMARY
+            echo "No critical security issues detected this week." >> $GITHUB_STEP_SUMMARY
+          fi
