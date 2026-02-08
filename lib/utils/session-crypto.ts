@@ -141,7 +141,7 @@ export function decryptSessionData(encryptedData: string): object {
     // Get the appropriate key for this version
     const key = getEncryptionKeyByVersion(version);
 
-    const decipher = createDecipheriv('aes-256-gcm', key, iv) as ReturnType<typeof createDecipheriv> & { setAuthTag: (tag: Buffer) => void };
+    const decipher = createDecipheriv('aes-256-gcm', key, iv, { authTagLength: 16 }) as ReturnType<typeof createDecipheriv> & { setAuthTag: (tag: Buffer) => void };
     decipher.setAuthTag(authTag);
 
     const decrypted = Buffer.concat([
