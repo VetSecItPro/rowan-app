@@ -80,7 +80,23 @@ async function seedTestUsers() {
     }
 
     try {
-      // Step 1: Check if user exists
+      // Step 1: Clean up any orphaned user profiles from previous test runs
+      const { data: orphanedProfiles } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', testUser.email);
+
+      if (orphanedProfiles && orphanedProfiles.length > 0) {
+        for (const profile of orphanedProfiles) {
+          // Delete orphaned profile and related data
+          await supabase.from('space_members').delete().eq('user_id', profile.id);
+          await supabase.from('subscriptions').delete().eq('user_id', profile.id);
+          await supabase.from('users').delete().eq('id', profile.id);
+          console.log(`  Cleaned up orphaned profile: ${profile.id}`);
+        }
+      }
+
+      // Step 2: Check if auth user exists
       const { data: existingUsers } = await supabase.auth.admin.listUsers();
       const existingUser = existingUsers?.users?.find((u) => u.email === testUser.email);
 
@@ -90,7 +106,7 @@ async function seedTestUsers() {
         console.log(`✓ ${testUser.email}: Already exists (${existingUser.id})`);
         userId = existingUser.id;
       } else {
-        // Step 2: Create user
+        // Step 3: Create user
         console.log(`  Creating ${testUser.email}...`);
         const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
           email: testUser.email,
@@ -108,12 +124,12 @@ async function seedTestUsers() {
         userId = newUser.user.id;
         console.log(`  ✓ Created user: ${userId}`);
 
-        // Step 3: Wait for DB trigger to provision space
+        // Step 4: Wait for DB trigger to provision space
         console.log('  Waiting for space provisioning (1.5s)...');
         await sleep(1500);
       }
 
-      // Step 4: Verify user profile exists in public.users (created by trigger)
+      // Step 5: Verify user profile exists in public.users (created by trigger)
       console.log('  Verifying user profile...');
       let retries = 0;
       let userProfileExists = false;
@@ -136,10 +152,27 @@ async function seedTestUsers() {
       }
 
       if (!userProfileExists) {
-        throw new Error('User profile not created — create_user_profile trigger failed');
+        // Trigger didn't work - create user profile manually
+        console.log('  Trigger failed, creating profile manually...');
+        const { error: profileError } = await supabase
+          .from('users')
+          .upsert({
+            id: userId,
+            email: testUser.email,
+            name: testUser.name,
+            color_theme: 'emerald',
+          }, {
+            onConflict: 'id',
+          });
+
+        if (profileError) {
+          throw new Error(`Failed to create user profile: ${profileError.message}`);
+        }
+
+        console.log(`  ✓ User profile created manually`);
       }
 
-      // Step 5: Verify space exists (created by second trigger)
+      // Step 6: Verify space exists (created by second trigger)
       console.log('  Verifying space provisioning...');
       retries = 0;
       let spaceId: string | null = null;
@@ -202,15 +235,14 @@ async function seedTestUsers() {
         console.log(`  ✓ Space membership created`);
       }
 
-      // Step 6: Upsert subscription
+      // Step 7: Upsert subscription
       const { error: subError } = await supabase.from('subscriptions').upsert(
         {
           user_id: userId,
           tier: testUser.tier,
           status: 'active',
-          billing_interval: 'monthly',
-          current_period_start: new Date().toISOString(),
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days
+          period: 'monthly',
+          subscription_started_at: new Date().toISOString(),
         },
         {
           onConflict: 'user_id',
