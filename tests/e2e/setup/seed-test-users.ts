@@ -162,28 +162,44 @@ async function seedTestUsers() {
       }
 
       if (!spaceId) {
-        // Try to fix orphaned user using the built-in function
-        console.log('  Space not auto-provisioned, attempting manual fix...');
-        const { data: fixResult, error: fixError } = await supabase.rpc('fix_orphaned_users');
+        // Triggers didn't work - create space manually using service_role
+        console.log('  Space not auto-provisioned, creating manually...');
 
-        if (fixError) {
-          throw new Error(`Space provisioning failed and manual fix failed: ${fixError.message}`);
-        }
+        const spaceName = `${testUser.name}'s Space`;
 
-        // Verify space was created
-        const { data: spaceMember } = await supabase
-          .from('space_members')
-          .select('space_id')
-          .eq('user_id', userId)
-          .limit(1)
+        // Create space
+        const { data: newSpace, error: spaceError } = await supabase
+          .from('spaces')
+          .insert({
+            name: spaceName,
+            is_personal: true,
+            auto_created: true,
+            user_id: userId,
+          })
+          .select('id')
           .single();
 
-        if (!spaceMember?.space_id) {
-          throw new Error('Space provisioning failed even after manual fix');
+        if (spaceError || !newSpace) {
+          throw new Error(`Failed to create space: ${spaceError?.message || 'Unknown error'}`);
         }
 
-        spaceId = spaceMember.space_id;
-        console.log(`  ✓ Space fixed manually: ${spaceId}`);
+        spaceId = newSpace.id;
+        console.log(`  ✓ Space created: ${spaceId}`);
+
+        // Add space membership
+        const { error: memberError } = await supabase
+          .from('space_members')
+          .insert({
+            space_id: spaceId,
+            user_id: userId,
+            role: 'owner',
+          });
+
+        if (memberError) {
+          throw new Error(`Failed to create space membership: ${memberError.message}`);
+        }
+
+        console.log(`  ✓ Space membership created`);
       }
 
       // Step 6: Upsert subscription
