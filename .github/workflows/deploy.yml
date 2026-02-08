@@ -82,10 +82,25 @@ jobs:
       - name: Deploy to production
         id: deploy
         run: |
-          OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null)
-          URL=$(echo "$OUTPUT" | grep -oE 'https://[^ ]+' | tail -1)
-          echo "url=$URL" >> $GITHUB_OUTPUT
-          echo "Deployed to: $URL"
+          set +e  # Don't exit on error, we'll check explicitly
+          OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>&1)
+          EXIT_CODE=$?
+          set -e
+
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::Vercel deployment failed with exit code $EXIT_CODE"
+            echo "$OUTPUT"
+            exit $EXIT_CODE
+          fi
+
+          URL=$(echo "$OUTPUT" | grep -oE 'https://[^ ]+' | tail -1 || echo "")
+          if [ -z "$URL" ]; then
+            echo "::warning::Could not extract deployment URL from output"
+            echo "$OUTPUT"
+          else
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "Deployed to: $URL"
+          fi
 
       - name: Deployment summary
         if: always()
