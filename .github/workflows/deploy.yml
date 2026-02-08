@@ -1,4 +1,4 @@
-name: Deploy Production
+name: Database Migrations
 
 on:
   push:
@@ -7,16 +7,11 @@ on:
 
 concurrency:
   group: deploy-production
-  cancel-in-progress: false # NEVER cancel in-progress deploys
-
-env:
-  NODE_VERSION: '22'
-  NODE_OPTIONS: '--max_old_space_size=8192'
+  cancel-in-progress: false # NEVER cancel in-progress migrations
 
 jobs:
-  # ─── Check and apply database migrations ───
   migrations:
-    name: Database Migrations
+    name: Apply Database Migrations
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,76 +47,19 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
-  # ─── Deploy to Vercel ───
-  deploy:
-    name: Deploy to Vercel Production
-    runs-on: ubuntu-latest
-    needs: migrations
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Install Vercel CLI
-        run: pnpm add -g vercel@latest
-
-      - name: Pull Vercel environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to production
-        id: deploy
-        run: |
-          set +e  # Don't exit on error, we'll check explicitly
-          OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>&1)
-          EXIT_CODE=$?
-          set -e
-
-          # Try to extract URL even if CLI errored (Vercel may have succeeded via retries)
-          URL=$(echo "$OUTPUT" | grep -oE 'https://[^ ]+' | tail -1 || echo "")
-
-          if [ $EXIT_CODE -ne 0 ]; then
-            if [ -n "$URL" ]; then
-              echo "::warning::Vercel CLI reported error but deployment may have succeeded"
-              echo "$OUTPUT"
-              echo "Deployment URL found: $URL"
-              echo "url=$URL" >> $GITHUB_OUTPUT
-              echo "Deployed to: $URL (with warnings)"
-              # Success despite CLI error - Vercel's internal retry worked
-              exit 0
-            else
-              echo "::error::Vercel deployment failed with exit code $EXIT_CODE"
-              echo "$OUTPUT"
-              exit $EXIT_CODE
-            fi
-          fi
-
-          if [ -z "$URL" ]; then
-            echo "::warning::Could not extract deployment URL from output"
-            echo "$OUTPUT"
-          else
-            echo "url=$URL" >> $GITHUB_OUTPUT
-            echo "Deployed to: $URL"
-          fi
-
-      - name: Deployment summary
+      - name: Migration summary
         if: always()
         run: |
-          echo "## Deployment" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" = "success" ]; then
-            echo "**Status:** Deployed successfully" >> $GITHUB_STEP_SUMMARY
-            echo "**URL:** ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "## Database Migrations" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check.outputs.has_migrations }}" = "true" ]; then
+            if [ "${{ job.status }}" = "success" ]; then
+              echo "**Status:** ✅ Migrations applied successfully" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "**Status:** ❌ Migration failed" >> $GITHUB_STEP_SUMMARY
+              echo "Check logs above for details." >> $GITHUB_STEP_SUMMARY
+            fi
           else
-            echo "**Status:** Deployment failed" >> $GITHUB_STEP_SUMMARY
-            echo "Check logs above for details." >> $GITHUB_STEP_SUMMARY
+            echo "**Status:** ℹ️ No new migrations detected" >> $GITHUB_STEP_SUMMARY
           fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** Vercel deployments are handled automatically by Vercel GitHub App" >> $GITHUB_STEP_SUMMARY
