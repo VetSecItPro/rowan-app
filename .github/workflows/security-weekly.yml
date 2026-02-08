@@ -17,6 +17,9 @@ jobs:
   dependency-audit:
     name: Dependency Audit
     runs-on: ubuntu-latest
+    outputs:
+      critical: ${{ steps.audit.outputs.critical }}
+      high: ${{ steps.audit.outputs.high }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -93,7 +96,7 @@ jobs:
     name: Create Summary Issue
     runs-on: ubuntu-latest
     needs: [dependency-audit]
-    if: needs.dependency-audit.outputs.critical > 0 || needs.dependency-audit.outputs.high > 0
+    if: fromJSON(needs.dependency-audit.outputs.critical) > 0 || fromJSON(needs.dependency-audit.outputs.high) > 0
     steps:
       - uses: actions/github-script@v7
         with:

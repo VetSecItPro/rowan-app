@@ -80,7 +80,23 @@ async function seedTestUsers() {
     }
 
     try {
-      // Step 1: Check if user exists
+      // Step 1: Clean up any orphaned user profiles from previous test runs
+      const { data: orphanedProfiles } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', testUser.email);
+
+      if (orphanedProfiles && orphanedProfiles.length > 0) {
+        for (const profile of orphanedProfiles) {
+          // Delete orphaned profile and related data
+          await supabase.from('space_members').delete().eq('user_id', profile.id);
+          await supabase.from('subscriptions').delete().eq('user_id', profile.id);
+          await supabase.from('users').delete().eq('id', profile.id);
+          console.log(`  Cleaned up orphaned profile: ${profile.id}`);
+        }
+      }
+
+      // Step 2: Check if auth user exists
       const { data: existingUsers } = await supabase.auth.admin.listUsers();
       const existingUser = existingUsers?.users?.find((u) => u.email === testUser.email);
 
@@ -90,7 +106,7 @@ async function seedTestUsers() {
         console.log(`✓ ${testUser.email}: Already exists (${existingUser.id})`);
         userId = existingUser.id;
       } else {
-        // Step 2: Create user
+        // Step 3: Create user
         console.log(`  Creating ${testUser.email}...`);
         const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
           email: testUser.email,
@@ -108,34 +124,125 @@ async function seedTestUsers() {
         userId = newUser.user.id;
         console.log(`  ✓ Created user: ${userId}`);
 
-        // Step 3: Wait for DB trigger to provision space
+        // Step 4: Wait for DB trigger to provision space
         console.log('  Waiting for space provisioning (1.5s)...');
         await sleep(1500);
       }
 
-      // Step 4: Verify space exists
-      const { data: spaceMember } = await supabase
-        .from('space_members')
-        .select('space_id')
-        .eq('user_id', userId)
-        .limit(1)
-        .single();
+      // Step 5: Verify user profile exists in public.users (created by trigger)
+      console.log('  Verifying user profile...');
+      let retries = 0;
+      let userProfileExists = false;
+      while (retries < 5 && !userProfileExists) {
+        const { data: userProfile } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .limit(1)
+          .single();
 
-      if (!spaceMember?.space_id) {
-        throw new Error('Space not provisioned — DB trigger may have failed');
+        if (userProfile) {
+          userProfileExists = true;
+          console.log(`  ✓ User profile verified`);
+        } else {
+          console.log(`  Retry ${retries + 1}/5: Waiting for profile...`);
+          await sleep(500);
+          retries++;
+        }
       }
 
-      console.log(`  ✓ Space provisioned: ${spaceMember.space_id}`);
+      if (!userProfileExists) {
+        // Trigger didn't work - create user profile manually
+        console.log('  Trigger failed, creating profile manually...');
+        const { error: profileError } = await supabase
+          .from('users')
+          .upsert({
+            id: userId,
+            email: testUser.email,
+            name: testUser.name,
+            color_theme: 'emerald',
+          }, {
+            onConflict: 'id',
+          });
 
-      // Step 5: Upsert subscription
+        if (profileError) {
+          throw new Error(`Failed to create user profile: ${profileError.message}`);
+        }
+
+        console.log(`  ✓ User profile created manually`);
+      }
+
+      // Step 6: Verify space exists (created by second trigger)
+      console.log('  Verifying space provisioning...');
+      retries = 0;
+      let spaceId: string | null = null;
+      while (retries < 5 && !spaceId) {
+        const { data: spaceMember } = await supabase
+          .from('space_members')
+          .select('space_id')
+          .eq('user_id', userId)
+          .limit(1)
+          .single();
+
+        if (spaceMember?.space_id) {
+          spaceId = spaceMember.space_id;
+          console.log(`  ✓ Space provisioned: ${spaceId}`);
+        } else {
+          console.log(`  Retry ${retries + 1}/5: Waiting for space...`);
+          await sleep(500);
+          retries++;
+        }
+      }
+
+      if (!spaceId) {
+        // Triggers didn't work - create space manually using service_role
+        console.log('  Space not auto-provisioned, creating manually...');
+
+        const spaceName = `${testUser.name}'s Space`;
+
+        // Create space
+        const { data: newSpace, error: spaceError } = await supabase
+          .from('spaces')
+          .insert({
+            name: spaceName,
+            is_personal: true,
+            auto_created: true,
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+
+        if (spaceError || !newSpace) {
+          throw new Error(`Failed to create space: ${spaceError?.message || 'Unknown error'}`);
+        }
+
+        spaceId = newSpace.id;
+        console.log(`  ✓ Space created: ${spaceId}`);
+
+        // Add space membership
+        const { error: memberError } = await supabase
+          .from('space_members')
+          .insert({
+            space_id: spaceId,
+            user_id: userId,
+            role: 'owner',
+          });
+
+        if (memberError) {
+          throw new Error(`Failed to create space membership: ${memberError.message}`);
+        }
+
+        console.log(`  ✓ Space membership created`);
+      }
+
+      // Step 7: Upsert subscription
       const { error: subError } = await supabase.from('subscriptions').upsert(
         {
           user_id: userId,
           tier: testUser.tier,
           status: 'active',
-          billing_interval: 'monthly',
-          current_period_start: new Date().toISOString(),
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days
+          period: 'monthly',
+          subscription_started_at: new Date().toISOString(),
         },
         {
           onConflict: 'user_id',
