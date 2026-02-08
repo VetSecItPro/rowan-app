@@ -149,7 +149,7 @@ export function usePushNotifications(
           token: pushToken.token,
           platform: pushToken.platform,
           spaceId,
-          deviceName: getDeviceName(),
+          deviceName: await getDeviceName(),
         }),
       });
 
@@ -293,10 +293,10 @@ export function usePushNotifications(
 /**
  * Get a friendly device name
  */
-function getDeviceName(): string {
+async function getDeviceName(): Promise<string> {
   if (typeof window === 'undefined') return 'Unknown';
 
-  const { Capacitor } = require('@capacitor/core');
+  const { Capacitor } = await import('@capacitor/core');
   const platform = Capacitor.getPlatform();
 
   if (platform === 'ios') {

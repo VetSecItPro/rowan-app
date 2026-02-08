@@ -17,8 +17,8 @@ async function getCalendarPlugin(): Promise<CalendarPlugin | null> {
   if (!isNative) return null;
 
   if (!CapacitorCalendar) {
-    const module = await import('@ebarooni/capacitor-calendar');
-    CapacitorCalendar = module.CapacitorCalendar;
+    const calendarModule = await import('@ebarooni/capacitor-calendar');
+    CapacitorCalendar = calendarModule.CapacitorCalendar;
   }
   return CapacitorCalendar;
 }

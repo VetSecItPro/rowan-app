@@ -18,8 +18,8 @@ async function getNetworkPlugin(): Promise<NetworkPlugin | null> {
   if (!isNative) return null;
 
   if (!NetworkPlugin) {
-    const module = await import('@capacitor/network');
-    NetworkPlugin = module.Network;
+    const networkModule = await import('@capacitor/network');
+    NetworkPlugin = networkModule.Network;
   }
   return NetworkPlugin;
 }
