@@ -125,3 +125,32 @@ rowan-subreddits.md
 
 # Database audit reports
 .db-reports/
+
+# Admin dashboard audit reports
+.admin-dashboard/
+
+# ============================================
+# ALL INTERNAL DOCUMENTATION - KEEP PRIVATE
+# ============================================
+# Strategic docs, internal plans, and markdown files stay local.
+# Public repos should not expose competitive intelligence.
+
+# Core internal docs
+CLAUDE.md
+ARCHITECTURE.md
+
+# All documentation (strategic, architecture, planning)
+docs/
+
+# Test and audit reports
+.test-reports/
+
+# All markdown files (notes, plans, strategy, optimization)
+*.md
+
+# EXCEPTIONS: Public-facing files we DO commit
+!README.md
+!.github/pull_request_template.md
+
+# CI/CD documentation
+docs/CI-CD-SETUP.md
