@@ -142,21 +142,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to provide API documentation
+// Security: Return 405 for GET — do not expose API documentation
 export async function GET() {
-  return NextResponse.json({
-    message: 'Password Reset API',
-    method: 'POST',
-    description: 'Request a password reset link for an email address',
-    requestBody: {
-      email: 'string (required) - User email address'
-    },
-    rateLimit: '5 requests per hour per IP address',
-    security: [
-      'Rate limiting prevents brute force attacks',
-      'User enumeration protection (always returns success)',
-      'Secure token generation with 1-hour expiration',
-      'Custom branded email templates'
-    ]
-  });
+  return new NextResponse(null, { status: 405 });
 }

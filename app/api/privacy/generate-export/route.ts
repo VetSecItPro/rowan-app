@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
+import { timingSafeEqual } from 'crypto';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -29,8 +30,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify this is a legitimate system request (internal API call)
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.INTERNAL_API_SECRET}`) {
+    // Security: Use timing-safe comparison to prevent side-channel attacks
+    const authHeader = request.headers.get('authorization') ?? '';
+    const expectedHeader = `Bearer ${process.env.INTERNAL_API_SECRET}`;
+    const authValid =
+      authHeader.length === expectedHeader.length &&
+      timingSafeEqual(Buffer.from(authHeader), Buffer.from(expectedHeader));
+    if (!authValid) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }

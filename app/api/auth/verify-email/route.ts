@@ -17,6 +17,16 @@ const VerifyEmailSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limit to prevent token brute-force
+    const ip = extractIP(request.headers);
+    const { success: rateLimitSuccess } = await checkAuthRateLimit(ip);
+    if (!rateLimitSuccess) {
+      return NextResponse.json(
+        { valid: false, error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
 

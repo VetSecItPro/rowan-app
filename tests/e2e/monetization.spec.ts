@@ -15,8 +15,6 @@
 
 import { test, expect } from '@playwright/test';
 import {
-  loginAsUser,
-  logout,
   goToPricingPage,
   togglePricingPeriod,
   isUpgradeModalVisible,
@@ -26,14 +24,14 @@ import {
 } from './helpers/test-utils';
 
 test.describe('Monetization Features', () => {
-  test.describe('Feature Gating', () => {
+  test.describe('Feature Gating — Free User', () => {
+    // Use pre-authenticated free user session
+    test.use({ storageState: 'tests/e2e/.auth/free.json' });
+
     /**
      * Test 1: Free user hits task limit → sees upgrade modal
      */
     test('free user sees upgrade modal when hitting task limit', async ({ page }) => {
-      test.skip(true, 'Requires test user setup in Supabase');
-
-      await loginAsUser(page, 'free');
 
       // Try to create multiple tasks to hit the limit
       for (let i = 0; i < 26; i++) {
@@ -56,17 +54,12 @@ test.describe('Monetization Features', () => {
         // If we created more than 25 tasks without limit, test should fail
         expect(i).toBeLessThan(25);
       }
-
-      await logout(page);
     });
 
     /**
      * Test 2: Free user tries to access Pro features → blocked
      */
     test('free user cannot access Pro features', async ({ page }) => {
-      test.skip(true, 'Requires test user setup in Supabase');
-
-      await loginAsUser(page, 'free');
 
       // Test blocked features
       const blockedFeatures = ['meals', 'goals', 'household'];
@@ -74,17 +67,17 @@ test.describe('Monetization Features', () => {
       for (const feature of blockedFeatures) {
         await verifyFeatureAccess(page, feature, false);
       }
-
-      await logout(page);
     });
+  });
+
+  test.describe('Feature Gating — Pro User', () => {
+    // Use pre-authenticated pro user session
+    test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
     /**
      * Test 5: Pro user accesses all features
      */
     test('pro user can access all features', async ({ page }) => {
-      test.skip(true, 'Requires test user setup in Supabase');
-
-      await loginAsUser(page, 'pro');
 
       // Test all features are accessible
       const allFeatures = ['meals', 'goals', 'household', 'calendar'];
@@ -92,8 +85,6 @@ test.describe('Monetization Features', () => {
       for (const feature of allFeatures) {
         await verifyFeatureAccess(page, feature, true);
       }
-
-      await logout(page);
     });
   });
 
@@ -141,14 +132,14 @@ test.describe('Monetization Features', () => {
     });
   });
 
-  test.describe('Checkout Flow', () => {
+  test.describe('Checkout Flow — Free User', () => {
+    // Use pre-authenticated free user session
+    test.use({ storageState: 'tests/e2e/.auth/free.json' });
+
     /**
      * Test 4: User upgrades to Pro → payment success flow
      */
     test('checkout redirects to Polar', async ({ page }) => {
-      test.skip(true, 'Requires authenticated user and Polar test mode');
-
-      await loginAsUser(page, 'free');
       await goToPricingPage(page);
 
       // Click upgrade button for Pro tier
@@ -160,7 +151,10 @@ test.describe('Monetization Features', () => {
         page.locator('text=/checkout|payment|polar/i')
       ).toBeVisible({ timeout: 10000 });
     });
+  });
 
+  test.describe('Checkout Flow — Unauthenticated', () => {
+    // No storage state — tests unauthenticated flows
     test('payment success page shows confirmation', async ({ page }) => {
       // Navigate directly to success page (simulating return from Polar)
       await page.goto('/payment/success?tier=pro');
@@ -189,14 +183,14 @@ test.describe('Monetization Features', () => {
     });
   });
 
-  test.describe('Subscription Management', () => {
+  test.describe('Subscription Management — Pro User', () => {
+    // Use pre-authenticated pro user session
+    test.use({ storageState: 'tests/e2e/.auth/pro.json' });
+
     /**
      * Test 6: Pro user cancels subscription
      */
     test('subscription settings page loads correctly', async ({ page }) => {
-      test.skip(true, 'Requires authenticated Pro user');
-
-      await loginAsUser(page, 'pro');
 
       // Navigate to subscription settings
       await page.goto('/settings?tab=subscription');
@@ -210,14 +204,9 @@ test.describe('Monetization Features', () => {
 
       // Should have cancel option
       await expect(page.locator('button:has-text("Cancel"), a:has-text("Cancel Subscription")')).toBeVisible();
-
-      await logout(page);
     });
 
     test('cancel subscription flow shows confirmation', async ({ page }) => {
-      test.skip(true, 'Requires authenticated Pro user');
-
-      await loginAsUser(page, 'pro');
 
       await page.goto('/settings?tab=subscription');
 
@@ -233,8 +222,6 @@ test.describe('Monetization Features', () => {
 
       // Should have confirm and keep options
       await expect(page.locator('button:has-text("Confirm Cancel"), button:has-text("Keep")')).toBeVisible();
-
-      await logout(page);
     });
   });
 
@@ -263,11 +250,11 @@ test.describe('Monetization Features', () => {
     });
   });
 
-  test.describe('Upgrade Modals', () => {
-    test('upgrade modal is accessible and dismissible', async ({ page }) => {
-      test.skip(true, 'Requires trigger for upgrade modal');
+  test.describe('Upgrade Modals — Free User', () => {
+    // Use pre-authenticated free user session
+    test.use({ storageState: 'tests/e2e/.auth/free.json' });
 
-      await loginAsUser(page, 'free');
+    test('upgrade modal is accessible and dismissible', async ({ page }) => {
 
       // Navigate to a blocked feature to trigger modal
       await page.goto('/meals');
@@ -285,8 +272,6 @@ test.describe('Monetization Features', () => {
         await page.keyboard.press('Escape');
         await expect(modal).not.toBeVisible();
       }
-
-      await logout(page);
     });
   });
 });

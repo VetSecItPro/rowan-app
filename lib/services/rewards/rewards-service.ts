@@ -244,6 +244,8 @@ export const rewardsService = {
 
   /**
    * Redeem a reward
+   * Uses atomic RPC to prevent TOCTOU race condition where concurrent
+   * redemptions could both pass the balance check and double-spend points.
    */
   async redeemReward(
     userId: string,
@@ -252,72 +254,36 @@ export const rewardsService = {
   ): Promise<RewardRedemption> {
     const supabase = createClient();
 
-    // Get the reward
-    const reward = await this.getReward(rewardId);
-    if (!reward) {
-      throw new Error('Reward not found');
+    // Atomic redemption: checks balance, creates redemption, deducts points in one transaction
+    const { data: result, error: rpcError } = await supabase.rpc('redeem_reward', {
+      p_user_id: userId,
+      p_space_id: spaceId,
+      p_reward_id: rewardId,
+    });
+
+    if (rpcError) {
+      throw new Error(`Failed to redeem reward: ${rpcError.message}`);
     }
 
-    if (!reward.is_active) {
-      throw new Error('This reward is no longer available');
+    const rpcResult = result as { success: boolean; error?: string; redemption_id?: string };
+
+    if (!rpcResult.success) {
+      throw new Error(rpcResult.error || 'Failed to redeem reward');
     }
 
-    // Check user has enough points
-    const balance = await pointsService.getPointsBalance(userId, spaceId);
-    if (balance < reward.cost_points) {
-      throw new Error(`Not enough points. You need ${reward.cost_points} but have ${balance}`);
-    }
-
-    // Check weekly redemption limit
-    if (reward.max_redemptions_per_week) {
-      const weekStart = new Date();
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-      weekStart.setHours(0, 0, 0, 0);
-
-      const { count } = await supabase
-        .from('reward_redemptions')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('reward_id', rewardId)
-        .gte('created_at', weekStart.toISOString())
-        .neq('status', 'cancelled')
-        .neq('status', 'denied');
-
-      if (count && count >= reward.max_redemptions_per_week) {
-        throw new Error(
-          `You've already redeemed this ${reward.max_redemptions_per_week} time(s) this week`
-        );
-      }
-    }
-
-    // Create redemption record
-    const { data: redemption, error: redemptionError } = await supabase
+    // Fetch the full redemption record with reward details for the UI
+    const { data: redemption, error: fetchError } = await supabase
       .from('reward_redemptions')
-      .insert({
-        user_id: userId,
-        space_id: spaceId,
-        reward_id: rewardId,
-        points_spent: reward.cost_points,
-        status: 'pending',
-      })
       .select(`
         *,
         reward:rewards_catalog(*)
       `)
+      .eq('id', rpcResult.redemption_id)
       .single();
 
-    if (redemptionError) {
-      throw new Error(`Failed to create redemption: ${redemptionError.message}`);
+    if (fetchError || !redemption) {
+      throw new Error('Redemption created but failed to fetch details');
     }
-
-    // Deduct points
-    await pointsService.spendPoints(
-      userId,
-      spaceId,
-      redemption.id,
-      reward.cost_points,
-      reward.name
-    );
 
     return redemption as RewardRedemption;
   },

@@ -52,7 +52,7 @@ export async function getPolarClient(): Promise<PolarClient | null> {
     }) as unknown as PolarClient;
     return _polarClient;
   } catch {
-    console.warn("@polar-sh/sdk not installed. Run: npm install @polar-sh/sdk");
+    // SDK not installed — optional dependency
     return null;
   }
 }

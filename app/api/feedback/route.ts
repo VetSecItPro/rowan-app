@@ -6,6 +6,17 @@ import { FeedbackType } from '@/lib/types';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// Zod schema for feedback submission
+const feedbackSchema = z.object({
+  feedback_type: z.nativeEnum(FeedbackType).optional(),
+  feature_name: z.string().max(200).optional(),
+  page_url: z.string().url().max(2000).optional(),
+  description: z.string().min(10, 'Description must be at least 10 characters').max(5000),
+  space_id: z.string().uuid().optional(),
+  browser_info: z.string().max(5000).optional(),
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,49 +82,49 @@ export async function POST(request: NextRequest) {
 
     // Parse form data
     const formData = await request.formData();
-
-    const feedbackTypeRaw = formData.get('feedback_type') as string | null;
-    const featureName = formData.get('feature_name') as string | null;
-    const pageUrl = formData.get('page_url') as string | null;
-    const description = formData.get('description') as string;
-    const spaceId = formData.get('space_id') as string | null;
     const screenshot = formData.get('screenshot') as File | null;
-    const browserInfoRaw = formData.get('browser_info') as string | null;
 
-    // Validate required fields
-    if (!description || description.trim().length < 10) {
+    // Validate with Zod schema
+    const rawData = {
+      feedback_type: formData.get('feedback_type') as string | undefined || undefined,
+      feature_name: formData.get('feature_name') as string | undefined || undefined,
+      page_url: formData.get('page_url') as string | undefined || undefined,
+      description: formData.get('description') as string,
+      space_id: formData.get('space_id') as string | undefined || undefined,
+      browser_info: formData.get('browser_info') as string | undefined || undefined,
+    };
+
+    const parsed = feedbackSchema.safeParse(rawData);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message || 'Invalid input';
       return NextResponse.json(
-        { success: false, error: 'Description must be at least 10 characters' },
+        { success: false, error: firstError },
         { status: 400 }
       );
     }
 
-    // Parse browser info
+    const validated = parsed.data;
+
+    // Parse browser info from validated string
     let browserInfo: Record<string, unknown> | undefined;
-    if (browserInfoRaw) {
+    if (validated.browser_info) {
       try {
-        browserInfo = JSON.parse(browserInfoRaw);
+        browserInfo = JSON.parse(validated.browser_info);
       } catch (e) {
         logger.error('Failed to parse browser info:', e, { component: 'api-route', action: 'api_request' });
       }
     }
 
-    // Convert feedback type
-    let feedbackType: FeedbackType | undefined;
-    if (feedbackTypeRaw && Object.values(FeedbackType).includes(feedbackTypeRaw as FeedbackType)) {
-      feedbackType = feedbackTypeRaw as FeedbackType;
-    }
-
     // Sanitize user input to prevent XSS attacks
-    const sanitizedDescription = sanitizePlainText(description);
-    const sanitizedFeatureName = featureName ? sanitizePlainText(featureName) : undefined;
-    const sanitizedPageUrl = pageUrl ? sanitizeUrl(pageUrl) : undefined;
+    const sanitizedDescription = sanitizePlainText(validated.description);
+    const sanitizedFeatureName = validated.feature_name ? sanitizePlainText(validated.feature_name) : undefined;
+    const sanitizedPageUrl = validated.page_url ? sanitizeUrl(validated.page_url) : undefined;
 
     // Submit feedback using service
     const result = await feedbackService.submitFeedback({
       user_id: user.id,
-      space_id: spaceId || undefined,
-      feedback_type: feedbackType,
+      space_id: validated.space_id,
+      feedback_type: validated.feedback_type,
       feature_name: sanitizedFeatureName,
       page_url: sanitizedPageUrl,
       description: sanitizedDescription,
