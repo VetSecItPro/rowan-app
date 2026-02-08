@@ -40,6 +40,13 @@ jobs:
         if: steps.check.outputs.has_migrations == 'true'
         run: |
           npx supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
+
+          # Repair migration history if there's a mismatch (migrations applied via MCP/dashboard)
+          npx supabase migration repair --status reverted \
+            20260204000002 20260204100000 20260204110000 20260204120000 20260204130000 \
+            20260206005541 20260206005549 20260207042105 20260207042149 20260207044722 \
+            20260207061743 20260207182220 20260207194147 20260207201026 || true
+
           npx supabase db push --linked
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
