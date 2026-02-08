@@ -113,21 +113,80 @@ async function seedTestUsers() {
         await sleep(1500);
       }
 
-      // Step 4: Verify space exists
-      const { data: spaceMember } = await supabase
-        .from('space_members')
-        .select('space_id')
-        .eq('user_id', userId)
-        .limit(1)
-        .single();
+      // Step 4: Verify user profile exists in public.users (created by trigger)
+      console.log('  Verifying user profile...');
+      let retries = 0;
+      let userProfileExists = false;
+      while (retries < 5 && !userProfileExists) {
+        const { data: userProfile } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .limit(1)
+          .single();
 
-      if (!spaceMember?.space_id) {
-        throw new Error('Space not provisioned — DB trigger may have failed');
+        if (userProfile) {
+          userProfileExists = true;
+          console.log(`  ✓ User profile verified`);
+        } else {
+          console.log(`  Retry ${retries + 1}/5: Waiting for profile...`);
+          await sleep(500);
+          retries++;
+        }
       }
 
-      console.log(`  ✓ Space provisioned: ${spaceMember.space_id}`);
+      if (!userProfileExists) {
+        throw new Error('User profile not created — create_user_profile trigger failed');
+      }
 
-      // Step 5: Upsert subscription
+      // Step 5: Verify space exists (created by second trigger)
+      console.log('  Verifying space provisioning...');
+      retries = 0;
+      let spaceId: string | null = null;
+      while (retries < 5 && !spaceId) {
+        const { data: spaceMember } = await supabase
+          .from('space_members')
+          .select('space_id')
+          .eq('user_id', userId)
+          .limit(1)
+          .single();
+
+        if (spaceMember?.space_id) {
+          spaceId = spaceMember.space_id;
+          console.log(`  ✓ Space provisioned: ${spaceId}`);
+        } else {
+          console.log(`  Retry ${retries + 1}/5: Waiting for space...`);
+          await sleep(500);
+          retries++;
+        }
+      }
+
+      if (!spaceId) {
+        // Try to fix orphaned user using the built-in function
+        console.log('  Space not auto-provisioned, attempting manual fix...');
+        const { data: fixResult, error: fixError } = await supabase.rpc('fix_orphaned_users');
+
+        if (fixError) {
+          throw new Error(`Space provisioning failed and manual fix failed: ${fixError.message}`);
+        }
+
+        // Verify space was created
+        const { data: spaceMember } = await supabase
+          .from('space_members')
+          .select('space_id')
+          .eq('user_id', userId)
+          .limit(1)
+          .single();
+
+        if (!spaceMember?.space_id) {
+          throw new Error('Space provisioning failed even after manual fix');
+        }
+
+        spaceId = spaceMember.space_id;
+        console.log(`  ✓ Space fixed manually: ${spaceId}`);
+      }
+
+      // Step 6: Upsert subscription
       const { error: subError } = await supabase.from('subscriptions').upsert(
         {
           user_id: userId,

@@ -1,0 +1,46 @@
+# Semgrep configuration for Rowan
+# This file customizes security scanning rules
+
+rules:
+  # Custom rule: Detect missing space_id filter in Supabase queries
+  - id: supabase-missing-space-id-filter
+    pattern-either:
+      - pattern: |
+          supabase.from($TABLE).select(...)
+      - pattern: |
+          supabase.from($TABLE).insert(...)
+      - pattern: |
+          supabase.from($TABLE).update(...)
+      - pattern: |
+          supabase.from($TABLE).delete()
+    message: |
+      Supabase query detected. Ensure space_id filtering is applied for multi-tenant isolation.
+      All queries MUST filter by space_id unless accessing global tables (profiles, spaces, etc.)
+    severity: WARNING
+    languages: [typescript, javascript]
+    metadata:
+      category: security
+      owasp: "A01:2021 - Broken Access Control"
+      cwe: "CWE-284: Improper Access Control"
+
+  # Custom rule: Detect service_role key usage in client code
+  - id: supabase-service-role-client-usage
+    pattern-either:
+      - pattern: process.env.SUPABASE_SERVICE_ROLE_KEY
+      - pattern: SUPABASE_SERVICE_ROLE_KEY
+    paths:
+      include:
+        - app/**
+        - components/**
+        - lib/contexts/**
+        - hooks/**
+    message: |
+      CRITICAL: service_role key detected in client-side code!
+      Service role keys bypass RLS and must NEVER be used in client code.
+      Use anon key (NEXT_PUBLIC_SUPABASE_ANON_KEY) for client-side operations.
+    severity: ERROR
+    languages: [typescript, javascript]
+    metadata:
+      category: security
+      owasp: "A01:2021 - Broken Access Control"
+      cwe: "CWE-798: Use of Hard-coded Credentials"
