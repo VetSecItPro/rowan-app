@@ -286,6 +286,6 @@ async function sendInstantNotification(userId: string, notification: Notificatio
     }
   } catch (error) {
     logger.error('Error sending instant notification:', error, { component: 'api-route', action: 'api_request' });
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    return { success: false, error: 'Failed to send notification' };
   }
 }

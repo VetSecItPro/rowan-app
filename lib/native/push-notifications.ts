@@ -43,7 +43,6 @@ export function isPushAvailable(): boolean {
  */
 export async function requestPushPermissions(): Promise<boolean> {
   if (!isPushAvailable()) {
-    console.warn('Push notifications not available on this platform');
     return false;
   }
 
@@ -68,7 +67,6 @@ export async function registerForPush(): Promise<PushNotificationToken | null> {
 
   const hasPermission = await requestPushPermissions();
   if (!hasPermission) {
-    console.warn('Push notification permission not granted');
     return null;
   }
 

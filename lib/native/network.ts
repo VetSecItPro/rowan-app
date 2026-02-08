@@ -70,8 +70,8 @@ export async function getNetworkStatus(): Promise<NetworkStatus> {
         connectionType: status.connectionType as ConnectionType,
         quality: getQualityFromType(status.connectionType as ConnectionType, status.connected),
       };
-    } catch (error) {
-      console.warn('Failed to get network status from Capacitor:', error);
+    } catch {
+      // Capacitor plugin unavailable — fall through to web fallback
     }
   }
 
@@ -122,8 +122,8 @@ export async function watchNetworkStatus(
       return () => {
         handle.remove();
       };
-    } catch (error) {
-      console.warn('Failed to watch network status:', error);
+    } catch {
+      // Capacitor listener unavailable — fall through to web fallback
     }
   }
 

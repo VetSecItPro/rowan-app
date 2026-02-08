@@ -37,7 +37,6 @@ export function sendToServiceWorker(message: {
 }): Promise<MessageEvent | null> {
   return new Promise((resolve) => {
     if (!navigator.serviceWorker?.controller) {
-      console.warn('No service worker controller available');
       resolve(null);
       return;
     }
@@ -114,8 +113,7 @@ export async function requestBackgroundSync(): Promise<boolean> {
       // @ts-expect-error - BackgroundSync API types not fully supported
       await registration.sync.register('offline-queue-sync');
       return true;
-    } catch (error) {
-      console.warn('Background sync registration failed:', error);
+    } catch {
       return false;
     }
   }

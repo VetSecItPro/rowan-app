@@ -395,15 +395,8 @@ export class MutationQueueManager {
           failedActions: this.state.failedActions,
         })
       );
-    } catch (error) {
-      // localStorage full or unavailable — warn so developers can diagnose
-      const isQuota =
-        error instanceof DOMException &&
-        (error.code === 22 || error.code === 1014 || error.name === 'QuotaExceededError');
-      console.warn(
-        `[MutationQueue] Failed to persist queue${isQuota ? ' (storage quota exceeded)' : ''}:`,
-        error
-      );
+    } catch {
+      // localStorage full or unavailable — queue will be rebuilt from network on next load
     }
   }
 

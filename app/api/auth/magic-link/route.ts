@@ -143,23 +143,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to provide API documentation
+// Security: Return 405 for GET — do not expose API documentation
 export async function GET() {
-  return NextResponse.json({
-    message: 'Magic Link Authentication API',
-    method: 'POST',
-    description: 'Request a magic link for passwordless sign-in',
-    requestBody: {
-      email: 'string (required) - User email address'
-    },
-    rateLimit: '5 requests per hour per IP address',
-    tokenExpiry: '15 minutes',
-    security: [
-      'Rate limiting prevents abuse',
-      'User enumeration protection (always returns success)',
-      'Secure token generation with short expiration',
-      'Single-use tokens',
-      'Custom branded email templates'
-    ]
-  });
+  return new NextResponse(null, { status: 405 });
 }

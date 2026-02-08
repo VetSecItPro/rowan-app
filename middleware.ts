@@ -501,6 +501,7 @@ export async function middleware(req: NextRequest) {
       "img-src 'self' data: https: blob:; " +
       "font-src 'self' data: https:; " +
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://vercel.live https://vitals.vercel-insights.com https://va.vercel-scripts.com https://cdn.vercel-insights.com https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://api.polar.sh https://ipapi.co https://api.ipgeolocation.io https://api.edamam.com https://www.themealdb.com https://api.spoonacular.com https://api.open-meteo.com https://api.gemini.google.com https://www.googleapis.com https://exp.host data:;" +
+      "worker-src 'self' blob:;" +
       "frame-ancestors 'none'; " +
       "frame-src 'self' https://vercel.live;" +
       "base-uri 'self'; " +
@@ -524,7 +525,7 @@ export async function middleware(req: NextRequest) {
 
     response.headers.set(
       'Permissions-Policy',
-      'camera=(), microphone=(), geolocation=(self)'
+      'camera=(), microphone=(self), geolocation=(self)'
     );
 
     response.headers.set(

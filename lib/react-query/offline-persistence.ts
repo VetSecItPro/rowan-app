@@ -47,7 +47,7 @@ export async function persistQueryCache(queryClient: QueryClient): Promise<void>
 
     await set(CACHE_KEY, cache);
   } catch (error) {
-    console.warn('[Offline] Failed to persist query cache:', error);
+    // Persistence failure is non-critical — cache will be rebuilt on next load
   }
 }
 
@@ -91,7 +91,7 @@ export async function restoreQueryCache(queryClient: QueryClient): Promise<boole
 
     return true;
   } catch (error) {
-    console.warn('[Offline] Failed to restore query cache:', error);
+    // Restore failure is non-critical — cache will be rebuilt from network
     return false;
   }
 }
@@ -103,7 +103,7 @@ export async function clearPersistedCache(): Promise<void> {
   try {
     await del(CACHE_KEY);
   } catch (error) {
-    console.warn('[Offline] Failed to clear persisted cache:', error);
+    // Clear failure is non-critical — stale cache expires via TTL
   }
 }
 

@@ -1,27 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { loginAsUser, TEST_USERS } from './helpers/test-utils';
+import { TEST_USERS } from './helpers/test-utils';
 
 const SMOKE_USER = TEST_USERS.smoke;
-
-async function setBetaBypassCookie(page: import('@playwright/test').Page) {
-  const betaCookieValue = JSON.stringify({
-    email: SMOKE_USER.email,
-    isValid: true,
-    expiresAt: Date.now() + 60 * 60 * 1000,
-  });
-
-  await page.context().addCookies([
-    {
-      name: 'beta-validation',
-      value: betaCookieValue,
-      domain: 'localhost',
-      path: '/',
-      httpOnly: true,
-      secure: false,
-      sameSite: 'Lax',
-    },
-  ]);
-}
 
 async function getCsrfToken(page: import('@playwright/test').Page): Promise<string> {
   const response = await page.request.get('/api/csrf/token');
@@ -40,14 +20,10 @@ async function getPrimarySpaceId(page: import('@playwright/test').Page): Promise
 }
 
 test.describe('Smoke Flow', () => {
-  // TODO: Fix smoke test - requires test user setup in Supabase and proper test fixtures
-  // This test was added but never worked in CI. Needs investigation for:
-  // 1. Test user credentials and space setup
-  // 2. Authentication flow in CI environment
-  // 3. Timing issues with page loads after API updates
-  test.skip('login and core flows work end-to-end', async ({ page }) => {
-    await setBetaBypassCookie(page);
-    await loginAsUser(page, 'smoke');
+  // Use pre-authenticated smoke user session
+  test.use({ storageState: 'tests/e2e/.auth/smoke.json' });
+
+  test('login and core flows work end-to-end', async ({ page }) => {
 
     const csrfToken = await getCsrfToken(page);
     const spaceId = await getPrimarySpaceId(page);

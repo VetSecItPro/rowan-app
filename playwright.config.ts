@@ -49,8 +49,20 @@ export default defineConfig({
   // Global timeout for each test
   timeout: 60000,
 
-  // Configure projects - Chrome only for now
+  // Configure projects
   projects: [
+    // Auth setup — runs first, seeds users + saves storage state
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+      teardown: 'teardown',
+    },
+    // Auth teardown — runs last, deletes test users + storage state
+    {
+      name: 'teardown',
+      testMatch: /auth\.teardown\.ts/,
+    },
+    // Desktop Chrome — depends on setup
     {
       name: 'chromium',
       use: {
@@ -60,13 +72,16 @@ export default defineConfig({
           slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
         },
       },
+      dependencies: ['setup'],
     },
+    // Mobile Chrome — depends on setup
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
         headless: true,
       },
+      dependencies: ['setup'],
     },
   ],
 

@@ -91,7 +91,6 @@ export async function checkCalendarPermission(): Promise<CalendarPermissionStatu
 export async function addEventToCalendar(event: CalendarEvent): Promise<string | null> {
   const plugin = await getCalendarPlugin();
   if (!plugin) {
-    console.warn('Calendar not available on this platform');
     return null;
   }
 
