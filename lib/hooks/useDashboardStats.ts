@@ -219,13 +219,23 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
         try {
             const supabase = createClient();
 
-            // Single RPC call replaces 18+ individual queries
+            // TODO: Create migration for get_dashboard_summary RPC function
+            // For now, gracefully handle missing RPC (production hotfix)
             const { data, error } = await supabase.rpc('get_dashboard_summary', {
                 p_space_id: currentSpace.id,
                 p_user_id: user.id,
             });
 
-            if (error) throw error;
+            if (error) {
+                // RPC doesn't exist in production yet — log and use default stats
+                logger.error('RPC get_dashboard_summary not found (expected during migration)', error, {
+                    component: 'useDashboardStats',
+                    action: 'rpc_call',
+                    errorCode: error.code,
+                });
+                setStats(initialStats);
+                return;
+            }
             if (!data) return;
 
             const d = data as Record<string, unknown>;
