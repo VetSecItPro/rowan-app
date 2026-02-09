@@ -72,6 +72,21 @@ setup.describe('Auth Setup', () => {
         text: 'Sign In',
       });
 
+      // DEBUG: Log current URL before waiting for redirect
+      const currentUrl = page.url();
+      console.log(`  Current URL after login submit: ${currentUrl}`);
+
+      // Wait a moment for any immediate redirects to start
+      await page.waitForTimeout(2000);
+      const urlAfterWait = page.url();
+      console.log(`  URL after 2s wait: ${urlAfterWait}`);
+
+      // DEBUG: Check for any error messages on page
+      const errorText = await page.locator('text=/error|fail|invalid|incorrect/i').first().textContent().catch(() => null);
+      if (errorText) {
+        console.log(`  ⚠️ Found error message: ${errorText}`);
+      }
+
       // Wait for redirect to dashboard
       await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 15000 });
 
