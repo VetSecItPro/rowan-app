@@ -201,38 +201,93 @@ async function seedTestUsers() {
       if (!userProfileExists) {
         // Trigger didn't work - create user profile manually
         console.log('  Trigger failed, creating profile manually...');
-        const { error: profileError } = await supabase
-          .from('users')
-          .upsert({
-            id: userId,
-            email: testUser.email,
-            name: testUser.name,
-            color_theme: 'emerald',
-          }, {
-            onConflict: 'email',  // Handle email conflicts (trigger race condition)
-          });
 
-        // Ignore duplicate key errors - they mean the trigger succeeded while we were checking
-        if (profileError && !profileError.message.includes('duplicate key')) {
-          throw new Error(`Failed to create user profile: ${profileError.message}`);
-        }
-
-        if (profileError) {
-          console.log('  ℹ️  Profile already exists (trigger race condition)');
-        } else {
-          console.log(`  ✓ User profile created manually`);
-        }
-
-        // Always verify the profile exists now
-        await sleep(500);
-        const { data: verifiedProfile } = await supabase
+        // Check one more time if profile was created by trigger (race condition)
+        const { data: raceCheckProfile } = await supabase
           .from('users')
           .select('id')
           .eq('id', userId)
           .limit(1)
           .single();
 
+        if (raceCheckProfile) {
+          console.log('  ℹ️  Profile appeared during race check (trigger succeeded)');
+        } else {
+          // Check if trigger created a profile with wrong ID (by email)
+          const { data: emailProfile } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', testUser.email)
+            .limit(1)
+            .single();
+
+          if (emailProfile && emailProfile.id !== userId) {
+            console.log(`  ℹ️  Trigger created profile with wrong ID (${emailProfile.id}), deleting it...`);
+            // Delete the wrongly-created profile (and its dependencies)
+            const { data: wrongSpaces } = await supabase
+              .from('spaces')
+              .select('id')
+              .eq('user_id', emailProfile.id);
+
+            if (wrongSpaces) {
+              for (const space of wrongSpaces) {
+                await supabase.from('space_members').delete().eq('space_id', space.id);
+                await supabase.from('spaces').delete().eq('id', space.id);
+              }
+            }
+
+            await supabase.from('space_members').delete().eq('user_id', emailProfile.id);
+            await supabase.from('subscriptions').delete().eq('user_id', emailProfile.id);
+            await supabase.from('users').delete().eq('id', emailProfile.id);
+            console.log(`  ✓ Deleted wrong profile`);
+          }
+
+          // Now insert the correct profile with auth user's ID
+          const { error: profileError } = await supabase
+            .from('users')
+            .insert({
+              id: userId,
+              email: testUser.email,
+              name: testUser.name,
+              color_theme: 'emerald',
+            });
+
+          if (profileError) {
+            throw new Error(`Failed to create user profile: ${profileError.message}`);
+          }
+
+          console.log(`  ✓ User profile created manually`);
+        }
+
+        // Always verify the profile exists now
+        await sleep(500);
+        const { data: verifiedProfile, error: verifyError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .limit(1)
+          .single();
+
         if (!verifiedProfile) {
+          console.error(`  ❌ Verification failed for userId: ${userId}`);
+          console.error(`  Verify error:`, verifyError);
+
+          // Try one more time with email lookup
+          const { data: emailProfile } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', testUser.email)
+            .limit(1)
+            .single();
+
+          if (emailProfile) {
+            console.error(`  Found profile by email with ID: ${emailProfile.id}`);
+            console.error(`  Expected ID: ${userId}`);
+            console.error(`  This is a mismatch - trigger created profile with wrong ID`);
+          } else {
+            console.error(`  No profile found by email either`);
+          }
+
           throw new Error('Failed to verify user profile after creation attempt');
         }
 
