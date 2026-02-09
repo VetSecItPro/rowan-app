@@ -23,6 +23,8 @@ interface ModalProps {
   footer?: React.ReactNode;
   /** Hide the close button (useful when footer has cancel button) */
   hideCloseButton?: boolean;
+  /** Optional testid prefix for E2E testing (e.g., "add-task-modal") */
+  testId?: string;
 }
 
 // Focus trap constants
@@ -52,6 +54,7 @@ export function Modal({
   autoFocus = true,
   footer,
   hideCloseButton = false,
+  testId = 'modal',
 }: ModalProps) {
   // Refs
   const modalRef = useRef<HTMLDivElement>(null);
@@ -215,6 +218,7 @@ export function Modal({
       {isOpen && (
         <div
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
+          data-testid={`${testId}-overlay`}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -228,6 +232,7 @@ export function Modal({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden="true"
+            data-testid={`${testId}-backdrop`}
           />
 
           {/* Modal Container — slide up on mobile, scale in on desktop */}
@@ -238,6 +243,7 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
+            data-testid={`${testId}-content`}
             // Mobile-first: slide up from bottom
             initial={{
               y: '100%',
@@ -321,6 +327,7 @@ export function Modal({
                 {!hideCloseButton && (
                   <button
                     onClick={onClose}
+                    data-testid={`${testId}-close-button`}
                     className={`
                       absolute top-2.5 right-3 sm:top-3.5 sm:right-4
                       w-10 h-10 sm:w-9 sm:h-9

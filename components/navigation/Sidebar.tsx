@@ -68,6 +68,7 @@ const NavItemComponent = memo(function NavItemComponent({
       <Link
         href={item.href}
         prefetch={true}
+        data-testid={`nav${item.href.replace(/\//g, '-')}-link`}
         className={`group relative flex items-center py-3 rounded-lg transition-colors duration-200 ${
           isExpanded ? 'gap-3 px-2.5' : 'justify-center px-2'
         } ${
