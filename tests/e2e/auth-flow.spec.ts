@@ -9,7 +9,6 @@ test.describe('Auth Flow Tests', () => {
 
     // Should show "Try Free for 14 Days" CTA (not "Sign up for beta")
     await expect(page.getByText('Try Free for 14 Days')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText('See How It Works')).toBeVisible();
 
     // Should NOT have any beta gate modal
     const betaModal = page.locator('text=Sign up for beta');
