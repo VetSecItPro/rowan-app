@@ -173,16 +173,21 @@ async function seedTestUsers() {
             name: testUser.name,
             color_theme: 'emerald',
           }, {
-            onConflict: 'id',
+            onConflict: 'email',  // Handle email conflicts (trigger race condition)
           });
 
-        if (profileError) {
+        // Ignore duplicate key errors - they mean the trigger succeeded while we were checking
+        if (profileError && !profileError.message.includes('duplicate key')) {
           throw new Error(`Failed to create user profile: ${profileError.message}`);
         }
 
-        console.log(`  ✓ User profile created manually`);
+        if (profileError) {
+          console.log('  ℹ️  Profile already exists (trigger race condition)');
+        } else {
+          console.log(`  ✓ User profile created manually`);
+        }
 
-        // Verify the profile was actually created
+        // Always verify the profile exists now
         await sleep(500);
         const { data: verifiedProfile } = await supabase
           .from('users')
@@ -192,10 +197,10 @@ async function seedTestUsers() {
           .single();
 
         if (!verifiedProfile) {
-          throw new Error('Failed to verify user profile after manual creation');
+          throw new Error('Failed to verify user profile after creation attempt');
         }
 
-        console.log(`  ✓ User profile verified after manual creation`);
+        console.log(`  ✓ User profile verified`);
       }
 
       // Step 6: Verify space exists (created by second trigger)
