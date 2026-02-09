@@ -67,9 +67,9 @@ setup.describe('Auth Setup', () => {
       // Wait for redirect to dashboard
       await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 15000 });
 
-      // Verify we're authenticated by checking for user-specific UI elements
+      // Verify we're authenticated by checking for user menu
       await expect(
-        page.locator('[data-testid="user-menu"], button:has-text("Account"), nav')
+        page.locator('[data-testid="user-menu"]').first()
       ).toBeVisible({ timeout: 5000 });
 
       console.log(`  ✓ Authenticated as ${userType}`);
