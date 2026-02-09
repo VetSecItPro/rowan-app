@@ -93,6 +93,7 @@ export function PricingCard({
 
       {/* CTA Button */}
       <button
+        data-testid={`upgrade-${tier}-button`}
         onClick={onSelect}
         disabled={loading || disabled}
         className={`mb-6 w-full rounded-full px-6 py-3 text-base font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${

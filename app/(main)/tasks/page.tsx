@@ -595,6 +595,7 @@ export default function TasksPage() {
 
               {/* Pill-shaped action buttons */}
               <button
+                data-testid="add-task-button"
                 onClick={() => handleOpenModal('task')}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
               >
