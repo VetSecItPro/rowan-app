@@ -14,6 +14,8 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface TestUser {
   email: string;
@@ -54,10 +56,44 @@ async function sleep(ms: number): Promise<void> {
 }
 
 async function seedTestUsers() {
+  // File-based lock to prevent parallel seeding from multiple workers/jobs
+  const lockFile = path.join(process.cwd(), '.test-seeding.lock');
+  const lockTimeout = 60000; // 60 seconds max wait
+  const lockStart = Date.now();
+
+  // Wait for lock to be released
+  while (fs.existsSync(lockFile)) {
+    if (Date.now() - lockStart > lockTimeout) {
+      console.log('⏰ Lock timeout - proceeding anyway (previous run may have crashed)');
+      try {
+        fs.unlinkSync(lockFile);
+      } catch (e) {
+        // Ignore errors
+      }
+      break;
+    }
+    console.log('⏳ Waiting for another seeding process to complete...');
+    await sleep(2000);
+  }
+
+  // Create lock file
+  try {
+    fs.writeFileSync(lockFile, Date.now().toString());
+  } catch (e) {
+    // If we can't create lock, proceed anyway (file system issue)
+    console.log('⚠️  Could not create lock file, proceeding anyway');
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {
+    // Remove lock before exiting
+    try {
+      fs.unlinkSync(lockFile);
+    } catch (e) {
+      // Ignore
+    }
     console.error('❌ Missing required environment variables:');
     console.error('   - NEXT_PUBLIC_SUPABASE_URL');
     console.error('   - SUPABASE_SERVICE_ROLE_KEY');
@@ -304,9 +340,23 @@ async function seedTestUsers() {
   }
 
   console.log('✅ All E2E test users seeded successfully');
+
+  // Remove lock file on success
+  try {
+    fs.unlinkSync(lockFile);
+  } catch (e) {
+    // Ignore errors
+  }
 }
 
 seedTestUsers().catch((error) => {
+  // Remove lock file on error
+  const lockFile = path.join(process.cwd(), '.test-seeding.lock');
+  try {
+    fs.unlinkSync(lockFile);
+  } catch (e) {
+    // Ignore errors
+  }
   console.error('Fatal error:', error);
   process.exit(1);
 });

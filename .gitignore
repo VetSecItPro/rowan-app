@@ -159,3 +159,4 @@ docs/
 
 # CI/CD documentation
 docs/CI-CD-SETUP.md
+.test-seeding.lock
