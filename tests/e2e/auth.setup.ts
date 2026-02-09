@@ -78,7 +78,9 @@ setup.describe('Auth Setup', () => {
       await page.waitForTimeout(2000);
 
       // Wait for redirect to dashboard
-      await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 15000 });
+      // Timeout increased to 25s for CI: 3rd/4th login attempts (pro/family) consistently take 19-22s
+      // due to resource constraints, rate limiting, or connection pool exhaustion in CI environment
+      await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 25000 });
 
       // Wait for page to load completely
       await page.waitForLoadState('networkidle');
