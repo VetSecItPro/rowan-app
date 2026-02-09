@@ -341,9 +341,6 @@ async function seedTestUsers() {
           throw new Error(`User profile not found for userId ${userId} before space creation`);
         }
 
-        console.log(`  DEBUG: About to create space with user_id=${userId}`);
-        console.log(`  DEBUG: Profile check returned:`, finalProfileCheck);
-
         const spaceName = `${testUser.name}'s Space`;
 
         // Create space
@@ -358,25 +355,8 @@ async function seedTestUsers() {
           .select('id')
           .single();
 
-        if (spaceError) {
-          console.error(`  DEBUG: Space creation error details:`, JSON.stringify(spaceError, null, 2));
-          console.error(`  DEBUG: Attempting to insert with user_id=${userId}`);
-
-          // Try to fetch the user profile one more time to see if it exists
-          const { data: debugProfile, error: debugError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', userId)
-            .single();
-
-          console.error(`  DEBUG: Profile fetch result:`, debugProfile);
-          console.error(`  DEBUG: Profile fetch error:`, debugError);
-
-          throw new Error(`Failed to create space: ${spaceError.message || 'Unknown error'}`);
-        }
-
-        if (!newSpace) {
-          throw new Error(`Failed to create space: No data returned`);
+        if (spaceError || !newSpace) {
+          throw new Error(`Failed to create space: ${spaceError?.message || 'Unknown error'}`);
         }
 
         spaceId = newSpace.id;
