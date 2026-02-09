@@ -175,7 +175,7 @@ function VerifyEmailChangeContent() {
         <p className="text-center text-sm text-gray-400 mt-8">
           Need help?{' '}
           <a
-            href="mailto:support@rowan.app"
+            href="mailto:contact@steelmotionllc.com"
             className="text-emerald-400 hover:underline"
           >
             Contact support

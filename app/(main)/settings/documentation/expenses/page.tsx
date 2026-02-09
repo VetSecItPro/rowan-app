@@ -4,6 +4,7 @@
 import Link from 'next/link';
 
 import { Receipt, Camera, Scan, DollarSign, TrendingUp, PieChart, Calendar, Clock, AlertCircle, FileText, ArrowLeft } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;

@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { Check, Sparkles, ArrowRight, Users, Shield, Zap } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 export default function UpgradePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950" />}>
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
       <UpgradePageContent />
     </Suspense>
   );
@@ -42,7 +44,9 @@ function UpgradePageContent() {
   }, [emailParam]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
+    <div className="min-h-screen bg-black flex flex-col">
+      <PublicHeader />
+      <div className="flex-1">
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto px-4 py-16">
         {/* Badge */}
@@ -194,11 +198,13 @@ function UpgradePageContent() {
         {/* Support Link */}
         <p className="text-center text-sm text-gray-400 mt-12">
           Questions?{' '}
-          <a href="mailto:support@rowan.app" className="text-blue-400 hover:underline">
+          <a href="mailto:contact@steelmotionllc.com" className="text-blue-400 hover:underline">
             Contact Support
           </a>
         </p>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

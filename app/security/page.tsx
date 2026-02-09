@@ -12,36 +12,15 @@ export const metadata: Metadata = {
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Shield, Lock, Eye, Database, AlertTriangle, CheckCircle } from 'lucide-react';
-import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
+import { PublicHeader } from '@/components/layout/PublicHeader';
+import { Footer } from '@/components/layout/Footer';
 
 export default function SecurityPage() {
   return (
     <div className="min-h-screen bg-black">
-      {/* Header */}
-      <header className="bg-black border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            {/* Logo and Brand - Clickable */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <Image
-                src="/rowan-logo.png"
-                alt="Rowan Logo"
-                width={32}
-                height={32}
-                className="w-8 h-8 transition-transform group-hover:scale-110"
-              />
-              <span className="text-2xl font-semibold gradient-text">Rowan</span>
-            </Link>
+      <PublicHeader />
 
-            {/* Menu */}
-            <div className="flex items-center gap-4">
-              <HamburgerMenu />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="bg-gradient-to-b from-black via-purple-900/30 to-purple-900/30">
+      <div className="bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
             href="/"
@@ -278,7 +257,7 @@ export default function SecurityPage() {
               We appreciate responsible disclosure of security vulnerabilities. If you discover a security issue:
             </p>
             <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-              <li>Email us at <a href="mailto:security@rowan.app" className="text-purple-400 hover:underline">security@rowan.app</a></li>
+              <li>Email us at <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a></li>
               <li>Include detailed information about the vulnerability</li>
               <li>Give us reasonable time to address the issue before public disclosure</li>
               <li>Eligible reports may receive recognition and rewards</li>
@@ -286,7 +265,7 @@ export default function SecurityPage() {
 
             <div className="mt-6 p-4 bg-purple-900/20 border border-purple-800 rounded-lg">
               <p className="text-gray-300">
-                <strong>Note:</strong> For non-security support issues, please contact <a href="mailto:support@rowan.app" className="text-purple-400 hover:underline">support@rowan.app</a>
+                <strong>Note:</strong> For non-security support issues, please contact <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>
               </p>
             </div>
           </section>
@@ -294,13 +273,11 @@ export default function SecurityPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-white mb-4">Questions?</h2>
             <p className="text-gray-300 mb-4">
-              Have questions about our security practices? We're happy to provide more information:
+              Have questions about our security practices? Contact us at{' '}
+              <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">
+                contact@steelmotionllc.com
+              </a>
             </p>
-            <ul className="list-none text-gray-300 space-y-2">
-              <li>Security inquiries: <a href="mailto:security@rowan.app" className="text-purple-400 hover:underline">security@rowan.app</a></li>
-              <li>General support: <a href="mailto:support@rowan.app" className="text-purple-400 hover:underline">support@rowan.app</a></li>
-              <li>Privacy questions: <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a></li>
-            </ul>
           </section>
 
           <section className="mb-8" id="acknowledgments">
@@ -314,7 +291,7 @@ export default function SecurityPage() {
               </p>
             </div>
             <p className="text-gray-300 mt-4 text-sm">
-              To be included in this hall of fame, please responsibly disclose security vulnerabilities to <a href="mailto:security@rowan.app" className="text-purple-400 hover:underline">security@rowan.app</a>.
+              To be included in this hall of fame, please responsibly disclose security vulnerabilities to <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
             </p>
           </section>
 
@@ -346,6 +323,7 @@ export default function SecurityPage() {
         </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

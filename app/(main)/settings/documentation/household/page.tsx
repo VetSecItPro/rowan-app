@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { Home, CheckSquare, DollarSign, Calendar, TrendingUp, AlertCircle, Receipt, Target, Clock, Users, ArrowLeft } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;

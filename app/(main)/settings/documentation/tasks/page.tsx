@@ -16,6 +16,7 @@ import {
   Lightbulb,
   Zap,
 } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;
@@ -457,6 +458,7 @@ export default function TasksDocumentationPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -99,7 +99,7 @@ export const MagicLinkEmail = ({
               </Text>
               <Text style={securityWarning}>
                 If you didn&apos;t request this sign-in link, please ignore this email or{' '}
-                <Link href="mailto:support@rowanapp.com" style={link}>
+                <Link href="mailto:contact@steelmotionllc.com" style={link}>
                   contact our support team
                 </Link>{' '}
                 if you&apos;re concerned about your account security.
@@ -127,8 +127,8 @@ export const MagicLinkEmail = ({
             <Hr style={footerHr} />
             <Text style={footerLegal}>
               This email was sent to {userEmail}. Questions? Reach us at{' '}
-              <Link href="mailto:support@rowanapp.com" style={link}>
-                support@rowanapp.com
+              <Link href="mailto:contact@steelmotionllc.com" style={link}>
+                contact@steelmotionllc.com
               </Link>
             </Text>
           </Section>

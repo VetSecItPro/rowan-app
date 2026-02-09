@@ -117,8 +117,8 @@ export const EmailVerificationEmail = ({
             <Hr style={footerHr} />
             <Text style={footerLegal}>
               This email was sent to {userEmail}. Need help getting started? Contact us at{' '}
-              <Link href="mailto:support@rowanapp.com" style={link}>
-                support@rowanapp.com
+              <Link href="mailto:contact@steelmotionllc.com" style={link}>
+                contact@steelmotionllc.com
               </Link>
             </Text>
           </Section>

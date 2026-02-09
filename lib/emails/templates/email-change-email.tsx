@@ -108,8 +108,8 @@ export const EmailChangeEmail = ({
             <Text style={footerLegal}>
               This email was sent to {newEmail} to verify your email change request.
               Need help? Contact us at{' '}
-              <Link href="mailto:support@rowanapp.com" style={link}>
-                support@rowanapp.com
+              <Link href="mailto:contact@steelmotionllc.com" style={link}>
+                contact@steelmotionllc.com
               </Link>
             </Text>
           </Section>

@@ -105,8 +105,8 @@ export const PasswordResetEmail = ({
             <Hr style={footerHr} />
             <Text style={footerLegal}>
               This email was sent to {userEmail}. If you have questions, contact us at{' '}
-              <Link href="mailto:support@rowanapp.com" style={link}>
-                support@rowanapp.com
+              <Link href="mailto:contact@steelmotionllc.com" style={link}>
+                contact@steelmotionllc.com
               </Link>
             </Text>
           </Section>

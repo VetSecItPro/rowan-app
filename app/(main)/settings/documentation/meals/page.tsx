@@ -4,6 +4,7 @@
 import Link from 'next/link';
 
 import { type LucideIcon, ArrowLeft, UtensilsCrossed, BookOpen, Play, Eye, Plus, ChefHat, Globe, Sparkles, ShoppingBag, Keyboard, Clock, Lightbulb, LayoutGrid } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart, Receipt, FolderOpen, CreditCard, Gift, Search, X } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 // Search keywords map for natural language search
 const documentationSearchKeywords: Record<string, string[]> = {
