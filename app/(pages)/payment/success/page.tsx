@@ -123,6 +123,7 @@ function PaymentSuccessContent() {
 
         {/* Title */}
         <motion.h1
+          data-testid="payment-success-title"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -135,6 +136,7 @@ function PaymentSuccessContent() {
 
         {/* Subtitle */}
         <motion.p
+          data-testid="payment-success-subtitle"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -198,6 +200,7 @@ function PaymentSuccessContent() {
           className="space-y-3"
         >
           <Link
+            data-testid="payment-success-dashboard-link"
             href="/dashboard"
             className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-white font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md"
           >
