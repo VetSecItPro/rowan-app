@@ -227,7 +227,7 @@ export function SubscriptionSettings() {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-bold text-white">
+                <h3 data-testid="subscription-plan-name" className="text-xl font-bold text-white">
                   {currentTierDetails.name} Plan
                 </h3>
                 {isInTrial && (
