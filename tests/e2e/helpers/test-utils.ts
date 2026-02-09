@@ -153,7 +153,12 @@ export async function verifyFeatureAccess(
   await page.waitForLoadState('networkidle');
 
   // Check for feature locked page or upgrade modal
-  const isLocked = await page.locator('[data-testid="feature-locked"], text=/upgrade to unlock/i, text=/requires pro/i').isVisible();
+  const isLocked = await page.locator('[data-testid="feature-locked"]')
+    .or(page.locator('text=/upgrade to unlock/i'))
+    .or(page.locator('text=/requires pro/i'))
+    .first()
+    .isVisible()
+    .catch(() => false);
 
   if (shouldHaveAccess) {
     expect(isLocked).toBeFalsy();
