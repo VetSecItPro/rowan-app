@@ -5,7 +5,7 @@
  */
 
 import { Page, expect } from '@playwright/test';
-import { resilientFill, resilientClick, elementExists, getButton } from '@vetsecitpro/e2e-intelligence/helpers/resilient-selectors';
+import { resilientFill, resilientClick, elementExists, getButton } from './resilient-selectors';
 
 // Test user credentials — passwords from env vars (never hardcode for public repos)
 const testPassword = process.env.E2E_TEST_PASSWORD || '';

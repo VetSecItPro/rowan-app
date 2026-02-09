@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getButton, getInput, elementExists, resilientClick, resilientFill } from '@vetsecitpro/e2e-intelligence/helpers/resilient-selectors';
+import { getButton, getInput, elementExists, resilientClick, resilientFill } from './helpers/resilient-selectors';
 
 const BASE_URL = 'http://localhost:3000';
 

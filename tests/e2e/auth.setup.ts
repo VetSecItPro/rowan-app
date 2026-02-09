@@ -11,7 +11,7 @@
 
 import { test as setup, expect } from '@playwright/test';
 import { execSync } from 'child_process';
-import { resilientFill, resilientClick, elementExists } from '@vetsecitpro/e2e-intelligence/helpers/resilient-selectors';
+import { resilientFill, resilientClick, elementExists } from './helpers/resilient-selectors';
 
 const TEST_USERS = {
   smoke: {
