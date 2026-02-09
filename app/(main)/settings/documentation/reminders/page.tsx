@@ -24,6 +24,7 @@ import {
   Calendar,
   AlertCircle,
 } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;

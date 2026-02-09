@@ -8,10 +8,14 @@
 import Link from 'next/link';
 import { XCircle, ArrowLeft, CreditCard, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 export default function PaymentCanceledPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-black flex flex-col">
+      <PublicHeader />
+      <div className="flex-1 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -110,11 +114,13 @@ export default function PaymentCanceledPage() {
           className="mt-6 text-xs text-gray-500"
         >
           Questions? Contact us at{' '}
-          <a href="mailto:support@rowanapp.com" className="text-emerald-600 hover:underline">
-            support@rowanapp.com
+          <a href="mailto:contact@steelmotionllc.com" className="text-emerald-600 hover:underline">
+            contact@steelmotionllc.com
           </a>
         </motion.p>
       </motion.div>
+      </div>
+      <Footer />
     </div>
   );
 }

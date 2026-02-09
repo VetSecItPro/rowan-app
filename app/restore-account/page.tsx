@@ -10,6 +10,8 @@ import { RefreshCw, CheckCircle, Calendar, AlertTriangle, Loader2, Home } from '
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 export default function RestoreAccountPage() {
   const { user, loading: authLoading } = useAuth();
@@ -116,10 +118,13 @@ export default function RestoreAccountPage() {
 
   if (authLoading || checkingStatus) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-black flex flex-col">
+        <PublicHeader />
+        <div className="flex-1 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto mb-4" />
           <p className="text-gray-400">Checking account status...</p>
+        </div>
         </div>
       </div>
     );
@@ -127,11 +132,13 @@ export default function RestoreAccountPage() {
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4 transition-all duration-700 ${
+      className={`min-h-screen bg-black flex flex-col transition-all duration-700 ${
         mounted ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <div className="w-full max-w-3xl">
+      <PublicHeader />
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-3xl">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Image
@@ -300,7 +307,9 @@ export default function RestoreAccountPage() {
             </button>
           </div>
         )}
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }

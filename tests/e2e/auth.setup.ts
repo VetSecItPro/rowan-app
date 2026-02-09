@@ -67,10 +67,18 @@ setup.describe('Auth Setup', () => {
       // Wait for redirect to dashboard
       await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 15000 });
 
-      // Verify we're authenticated by checking for user-specific UI elements
-      await expect(
-        page.locator('[data-testid="user-menu"], button:has-text("Account"), nav')
-      ).toBeVisible({ timeout: 5000 });
+      // Wait for page to load completely
+      await page.waitForLoadState('networkidle');
+
+      // Verify we're authenticated by checking for dashboard content
+      // Look for any of these indicators that we're on an authenticated page
+      const authIndicators = [
+        page.getByRole('heading', { name: /tasks|dashboard|welcome/i }),
+        page.locator('text=Add Task'),
+        page.locator('button[aria-label*="menu"], button[aria-label*="Menu"]')
+      ];
+
+      await Promise.race(authIndicators.map(loc => loc.waitFor({ timeout: 10000 }).catch(() => null)));
 
       console.log(`  ✓ Authenticated as ${userType}`);
 

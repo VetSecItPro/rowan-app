@@ -6,6 +6,8 @@ import { ShoppingBag, Check, Loader2, AlertCircle, ChevronDown, ChevronUp } from
 import { format } from 'date-fns';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 interface ShoppingItem {
   id: string;
@@ -139,11 +141,15 @@ export default function PublicShoppingListPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-950 flex items-center justify-center p-4">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-emerald-400 animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Loading shopping list...</p>
+      <div className="min-h-screen bg-black flex flex-col">
+        <PublicHeader />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-emerald-400 animate-spin mx-auto mb-4" />
+            <p className="text-gray-400">Loading shopping list...</p>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -151,18 +157,22 @@ export default function PublicShoppingListPage() {
   // Error state
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-950 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-400" />
+      <div className="min-h-screen bg-black flex flex-col">
+        <PublicHeader />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+            <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-red-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Shopping List Not Found
+            </h2>
+            <p className="text-gray-400 mb-6">
+              {error || 'This shopping list may have been removed or made private.'}
+            </p>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Shopping List Not Found
-          </h2>
-          <p className="text-gray-400 mb-6">
-            {error || 'This shopping list may have been removed or made private.'}
-          </p>
         </div>
+        <Footer />
       </div>
     );
   }
@@ -172,8 +182,9 @@ export default function PublicShoppingListPage() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-950">
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-black flex flex-col">
+      <PublicHeader />
+      <div className="flex-1 max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 w-full">
         {/* Header */}
         <div className="bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
@@ -305,6 +316,7 @@ export default function PublicShoppingListPage() {
           <p>Powered by Rowan</p>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

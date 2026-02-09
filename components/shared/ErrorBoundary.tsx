@@ -105,7 +105,7 @@ export class ErrorBoundary extends Component<Props, State> {
       `Component Stack:\n${errorReport.componentStack}`
     );
 
-    window.open(`mailto:support@rowan.app?subject=${subject}&body=${body}`);
+    window.open(`mailto:contact@steelmotionllc.com?subject=${subject}&body=${body}`);
   };
 
   render() {

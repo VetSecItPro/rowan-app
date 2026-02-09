@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import { CheckCircle, Clock, Mail, Heart } from 'lucide-react';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 const deletionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
 
@@ -25,8 +27,10 @@ export default function GoodbyePage() {
   }, [signOut]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-black flex flex-col">
+      <PublicHeader />
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
         {/* Main Card */}
         <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 text-center">
           {/* Success Icon */}
@@ -104,7 +108,9 @@ export default function GoodbyePage() {
             This deletion process complies with GDPR Article 17 (Right to Erasure) and our Privacy Policy.
           </div>
         </div>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }

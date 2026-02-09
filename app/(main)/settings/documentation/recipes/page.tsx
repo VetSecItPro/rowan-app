@@ -4,6 +4,7 @@
 import Link from 'next/link';
 
 import { UtensilsCrossed, Search, Brain, Clock, Star, BookOpen, Globe, Sparkles, Heart, ChefHat, ArrowLeft } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;

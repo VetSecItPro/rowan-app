@@ -24,6 +24,7 @@ import {
   Heart,
   Star,
 } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;
@@ -1367,7 +1368,7 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Reach Us</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>Email:</strong> support@rowan.app</li>
+                  <li><strong>Email:</strong> contact@steelmotionllc.com</li>
                   <li><strong>In-App:</strong> Settings → Support → Contact Us</li>
                   <li><strong>Response Time:</strong> Usually within 24 hours (Pro/Family get priority)</li>
                 </ul>

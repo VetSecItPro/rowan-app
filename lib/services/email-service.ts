@@ -36,7 +36,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 // Email service configuration
 const FROM_EMAIL = 'Rowan <notifications@rowanapp.com>';
-const REPLY_TO_EMAIL = 'support@rowanapp.com';
+const REPLY_TO_EMAIL = 'contact@steelmotionllc.com';
 
 /**
  * Executes a function with automatic retry on failure using exponential backoff.

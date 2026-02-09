@@ -12,36 +12,15 @@ export const metadata: Metadata = {
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
+import { PublicHeader } from '@/components/layout/PublicHeader';
+import { Footer } from '@/components/layout/Footer';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-black">
-      {/* Header */}
-      <header className="bg-black border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            {/* Logo and Brand - Clickable */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <Image
-                src="/rowan-logo.png"
-                alt="Rowan Logo"
-                width={32}
-                height={32}
-                className="w-8 h-8 transition-transform group-hover:scale-110"
-              />
-              <span className="text-2xl font-semibold gradient-text">Rowan</span>
-            </Link>
+      <PublicHeader />
 
-            {/* Menu */}
-            <div className="flex items-center gap-4">
-              <HamburgerMenu />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="bg-gradient-to-b from-black via-purple-900/30 to-purple-900/30">
+      <div className="bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
             href="/"
@@ -377,7 +356,7 @@ export default function TermsPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">Informal Resolution</h3>
               <p className="text-gray-300 mb-4">
-                If you have a dispute, please contact us at <a href="mailto:support@rowan.app" className="text-purple-400 hover:underline">support@rowan.app</a> to try to resolve it informally first.
+                If you have a dispute, please contact us at <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a> to try to resolve it informally first.
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">Arbitration</h3>
@@ -428,13 +407,14 @@ export default function TermsPage() {
                 Questions about these Terms of Service? Contact us:
               </p>
               <ul className="list-none text-gray-300 space-y-2">
-                <li>Email: <a href="mailto:legal@rowan.app" className="text-purple-400 hover:underline">legal@rowan.app</a></li>
-                <li>Support: <a href="mailto:support@rowan.app" className="text-purple-400 hover:underline">support@rowan.app</a></li>
+                <li>Email: <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a></li>
+                <li>Support: <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a></li>
               </ul>
             </section>
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

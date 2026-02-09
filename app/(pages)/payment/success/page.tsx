@@ -13,10 +13,12 @@ import { CheckCircle, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useValidatedSearchParams, PaymentSuccessParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { createClient } from '@/lib/supabase/client';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center"><Loader2 className="h-8 w-8 text-emerald-500 animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="h-8 w-8 text-emerald-500 animate-spin" /></div>}>
       <PaymentSuccessContent />
     </Suspense>
   );
@@ -96,7 +98,9 @@ function PaymentSuccessContent() {
   }, [router, subscriptionActive]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-black flex flex-col">
+      <PublicHeader />
+      <div className="flex-1 flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -221,6 +225,8 @@ function PaymentSuccessContent() {
           </motion.p>
         )}
       </motion.div>
+      </div>
+      <Footer />
     </div>
   );
 }

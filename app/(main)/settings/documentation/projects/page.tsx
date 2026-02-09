@@ -4,6 +4,7 @@
 import Link from 'next/link';
 
 import { FolderOpen, Target, DollarSign, TrendingUp, Users, Calendar, FileText, BarChart3, Clock, CheckSquare, ArrowLeft } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
 
 interface GuideSection {
   title: string;

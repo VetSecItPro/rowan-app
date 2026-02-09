@@ -16,8 +16,8 @@ export default function GlobalError({
 
   return (
     <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
-      <body className="bg-gray-900 text-white">
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950">
+      <body className="bg-black text-white">
+        <div className="min-h-screen flex items-center justify-center bg-black">
           <div className="text-center p-8 bg-gray-800 border border-gray-700/50 rounded-2xl shadow-2xl max-w-md">
             <h1 className="text-6xl font-bold text-white mb-4">500</h1>
             <h2 className="text-2xl font-semibold text-gray-200 mb-4">

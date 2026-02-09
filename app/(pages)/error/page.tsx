@@ -4,6 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { Footer } from '@/components/layout/Footer';
+import { PublicHeader } from '@/components/layout/PublicHeader';
 
 const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
   beta_check_failed: {
@@ -30,7 +32,9 @@ function ErrorContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-950 px-4">
+    <div className="min-h-screen flex flex-col bg-black">
+      <PublicHeader />
+      <div className="flex-1 flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10">
           <AlertTriangle className="h-8 w-8 text-amber-500" />
@@ -68,6 +72,8 @@ function ErrorContent() {
           </p>
         )}
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }
@@ -75,7 +81,7 @@ function ErrorContent() {
 export default function ErrorPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="animate-spin h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
       </div>
     }>

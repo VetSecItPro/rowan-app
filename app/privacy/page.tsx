@@ -12,36 +12,15 @@ export const metadata: Metadata = {
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
+import { PublicHeader } from '@/components/layout/PublicHeader';
+import { Footer } from '@/components/layout/Footer';
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-black">
-      {/* Header */}
-      <header className="bg-black border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            {/* Logo and Brand - Clickable */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <Image
-                src="/rowan-logo.png"
-                alt="Rowan Logo"
-                width={32}
-                height={32}
-                className="w-8 h-8 transition-transform group-hover:scale-110"
-              />
-              <span className="text-2xl font-semibold gradient-text">Rowan</span>
-            </Link>
+      <PublicHeader />
 
-            {/* Menu */}
-            <div className="flex items-center gap-4">
-              <HamburgerMenu />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="bg-gradient-to-b from-black via-purple-900/30 to-purple-900/30">
+      <div className="bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Link
             href="/"
@@ -65,11 +44,11 @@ export default function PrivacyPage() {
                 <p><strong>Rowan App</strong></p>
                 <p>Operated by VetSecItPro</p>
                 <p>United States</p>
-                <p>Email: <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a></p>
+                <p>Email: <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a></p>
               </div>
               <p className="text-gray-300 mt-4">
                 <strong>Data Protection Contact:</strong> For any privacy-related inquiries or to exercise your data protection rights,
-                please contact us at <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a>.
+                please contact us at <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
                 We aim to respond to all requests within 30 days.
               </p>
               <p className="text-gray-400 mt-4 text-sm">
@@ -125,7 +104,7 @@ export default function PrivacyPage() {
                     <li>Service performance optimization</li>
                   </ul>
                   <p className="text-gray-400 text-xs mt-2">
-                    You have the right to object to processing based on legitimate interests. Contact us at privacy@rowan.app.
+                    You have the right to object to processing based on legitimate interests. Contact us at contact@steelmotionllc.com.
                   </p>
                 </div>
 
@@ -323,7 +302,7 @@ export default function PrivacyPage() {
               </ul>
               <p className="text-gray-300">
                 You can request a copy of the relevant transfer mechanisms by contacting us at{' '}
-                <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a>.
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
               </p>
             </section>
 
@@ -487,7 +466,7 @@ export default function PrivacyPage() {
                 <strong>How to Exercise Your Rights:</strong>
               </p>
               <ul className="list-disc list-inside text-gray-300 space-y-1">
-                <li>Email us at <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a></li>
+                <li>Email us at <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a></li>
                 <li>Use the data export feature in Settings {'>'} Privacy</li>
                 <li>Use the account deletion feature in Settings {'>'} Privacy</li>
               </ul>
@@ -532,7 +511,7 @@ export default function PrivacyPage() {
                 Rowan is designed for adults (18+) managing household and family activities. We do not knowingly collect
                 information from children under 13 (or 16 in the EEA). If you are a parent and believe your child has
                 provided us with information, please contact us immediately at{' '}
-                <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a>.
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
               </p>
             </section>
 
@@ -549,7 +528,7 @@ export default function PrivacyPage() {
               </ul>
               <p className="text-gray-300">
                 To exercise your CCPA rights, contact us at{' '}
-                <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a>.
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">contact@steelmotionllc.com</a>.
               </p>
             </section>
 
@@ -572,13 +551,11 @@ export default function PrivacyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-white mb-4">Contact Us</h2>
               <p className="text-gray-300 mb-4">
-                If you have questions, concerns, or requests regarding this Privacy Policy or our data practices:
+                If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, contact us at{' '}
+                <a href="mailto:contact@steelmotionllc.com" className="text-purple-400 hover:underline">
+                  contact@steelmotionllc.com
+                </a>
               </p>
-              <ul className="list-none text-gray-300 space-y-2">
-                <li><strong>Privacy Inquiries:</strong> <a href="mailto:privacy@rowan.app" className="text-purple-400 hover:underline">privacy@rowan.app</a></li>
-                <li><strong>General Support:</strong> <a href="mailto:support@rowan.app" className="text-purple-400 hover:underline">support@rowan.app</a></li>
-                <li><strong>Security Issues:</strong> <a href="mailto:security@rowan.app" className="text-purple-400 hover:underline">security@rowan.app</a></li>
-              </ul>
               <p className="text-gray-300 mt-4">
                 We aim to respond to all privacy-related inquiries within 30 days.
               </p>
@@ -586,6 +563,7 @@ export default function PrivacyPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
