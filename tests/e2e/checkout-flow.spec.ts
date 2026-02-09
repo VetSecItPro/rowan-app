@@ -4,6 +4,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { resilientClick } from './helpers/resilient-selectors';
 
 test.describe('Authenticated Checkout Flow', () => {
   // Use pre-authenticated smoke user session
@@ -13,9 +14,11 @@ test.describe('Authenticated Checkout Flow', () => {
     await page.goto('/pricing');
     await page.waitForLoadState('networkidle');
 
-    // Click upgrade button for Pro tier
-    const upgradeButton = page.locator('button:has-text("Get Pro"), button:has-text("Choose Pro"), button:has-text("Start Pro")').first();
-    await upgradeButton.click();
+    // Click upgrade button for Pro tier using resilient selector
+    await resilientClick(page, 'upgrade-pro-button', {
+      role: 'button',
+      text: /Get Pro|Choose Pro|Start Pro/i,
+    });
 
     // Should redirect to Polar Checkout
     await expect(
