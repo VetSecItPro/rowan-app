@@ -7,6 +7,33 @@
 import { Page, expect } from '@playwright/test';
 import { resilientFill, resilientClick, elementExists, getButton } from './resilient-selectors';
 
+/**
+ * Dismiss cookie consent banner if visible
+ * This prevents the banner from blocking clicks on mobile viewports
+ */
+export async function dismissCookieBanner(page: Page): Promise<void> {
+  try {
+    // Check if cookie banner is visible (z-index 60 fixed bottom banner)
+    const bannerVisible = await elementExists(page, 'cookie-consent-accept', {
+      role: 'button',
+      text: 'Got it',
+    });
+
+    if (bannerVisible) {
+      await resilientClick(page, 'cookie-consent-accept', {
+        role: 'button',
+        text: 'Got it',
+      });
+
+      // Wait for banner to animate out
+      await page.waitForTimeout(500);
+    }
+  } catch (error) {
+    // Silently fail - banner may not be present
+    console.log('Cookie banner not found or already dismissed');
+  }
+}
+
 // Test user credentials — passwords from env vars (never hardcode for public repos)
 const testPassword = process.env.E2E_TEST_PASSWORD || '';
 export const TEST_USERS = {

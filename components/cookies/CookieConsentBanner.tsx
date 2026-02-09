@@ -80,6 +80,7 @@ export function CookieConsentBanner() {
 
             <div className="flex gap-2 w-full sm:w-auto">
               <Button
+                data-testid="cookie-consent-accept"
                 size="sm"
                 onClick={handleAcknowledge}
                 className="w-full sm:w-auto bg-green-600 hover:bg-green-700"

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { getButton, getInput, elementExists, resilientClick, resilientFill } from './helpers/resilient-selectors';
+import { dismissCookieBanner } from './helpers/test-utils';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -7,6 +8,9 @@ test.describe('Auth Flow Tests', () => {
 
   test('Homepage loads without beta gate', async ({ page }) => {
     await page.goto(BASE_URL);
+
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
 
     // Check for hero CTA using resilient selector
     const ctaButton = await getButton(page, 'hero-cta-signup', 'Try Free for 14 Days');
@@ -24,6 +28,9 @@ test.describe('Auth Flow Tests', () => {
 
     // Wait for page to load
     await page.waitForLoadState('networkidle');
+
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
 
     // Check for form fields using resilient selectors
     const emailInput = await getInput(page, 'signup-email-input', { type: 'email' });
@@ -49,6 +56,9 @@ test.describe('Auth Flow Tests', () => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
 
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
+
     // Try submitting empty form using resilient selector
     await resilientClick(page, 'signup-submit-button', {
       role: 'button',
@@ -65,6 +75,9 @@ test.describe('Auth Flow Tests', () => {
   test('Signup flow with test data', async ({ page }) => {
     await page.goto(`${BASE_URL}/signup`);
     await page.waitForLoadState('networkidle');
+
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
 
     // Fill the form using resilient selectors
     await resilientFill(page, 'signup-email-input', 'playwright-test@example.com', {
@@ -118,6 +131,9 @@ test.describe('Auth Flow Tests', () => {
     await page.goto(`${BASE_URL}/login`);
     await page.waitForLoadState('networkidle');
 
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
+
     // Check for form fields using resilient selectors
     const emailInput = await getInput(page, 'login-email-input', { type: 'email' });
     const passwordInput = await getInput(page, 'login-password-input', { type: 'password' });
@@ -147,6 +163,9 @@ test.describe('Auth Flow Tests', () => {
     await page.goto(`${BASE_URL}/login`);
     await page.waitForLoadState('networkidle');
 
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
+
     // Try submitting empty form using resilient selector
     await resilientClick(page, 'login-submit-button', {
       role: 'button',
@@ -162,6 +181,9 @@ test.describe('Auth Flow Tests', () => {
   test('Login flow with invalid credentials shows error', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`);
     await page.waitForLoadState('networkidle');
+
+    // Dismiss cookie banner if present (fixes mobile viewport blocking)
+    await dismissCookieBanner(page);
 
     // Fill form with invalid credentials using resilient selectors
     await resilientFill(page, 'login-email-input', 'nonexistent@test.com', {
