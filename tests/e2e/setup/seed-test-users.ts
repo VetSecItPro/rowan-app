@@ -88,10 +88,29 @@ async function seedTestUsers() {
 
       if (orphanedProfiles && orphanedProfiles.length > 0) {
         for (const profile of orphanedProfiles) {
-          // Delete orphaned profile and related data
+          // Delete orphaned profile and related data (in correct order for FK constraints)
+          // 1. First get and delete spaces owned by this user
+          const { data: userSpaces } = await supabase
+            .from('spaces')
+            .select('id')
+            .eq('user_id', profile.id);
+
+          if (userSpaces) {
+            for (const space of userSpaces) {
+              await supabase.from('space_members').delete().eq('space_id', space.id);
+              await supabase.from('spaces').delete().eq('id', space.id);
+            }
+          }
+
+          // 2. Delete space memberships
           await supabase.from('space_members').delete().eq('user_id', profile.id);
+
+          // 3. Delete subscriptions
           await supabase.from('subscriptions').delete().eq('user_id', profile.id);
+
+          // 4. Finally delete the profile
           await supabase.from('users').delete().eq('id', profile.id);
+
           console.log(`  Cleaned up orphaned profile: ${profile.id}`);
         }
       }
@@ -170,6 +189,21 @@ async function seedTestUsers() {
         }
 
         console.log(`  ✓ User profile created manually`);
+
+        // Verify the profile was actually created
+        await sleep(500);
+        const { data: verifiedProfile } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .limit(1)
+          .single();
+
+        if (!verifiedProfile) {
+          throw new Error('Failed to verify user profile after manual creation');
+        }
+
+        console.log(`  ✓ User profile verified after manual creation`);
       }
 
       // Step 6: Verify space exists (created by second trigger)
@@ -197,6 +231,18 @@ async function seedTestUsers() {
       if (!spaceId) {
         // Triggers didn't work - create space manually using service_role
         console.log('  Space not auto-provisioned, creating manually...');
+
+        // Double-check user profile exists before creating space
+        const { data: finalProfileCheck } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', userId)
+          .limit(1)
+          .single();
+
+        if (!finalProfileCheck) {
+          throw new Error(`User profile not found for userId ${userId} before space creation`);
+        }
 
         const spaceName = `${testUser.name}'s Space`;
 
