@@ -78,7 +78,10 @@ setup.describe('Auth Setup', () => {
       await page.waitForTimeout(2000);
 
       // Wait for redirect to dashboard
-      await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 15000 });
+      // Increased timeout to 30s to handle CI resource constraints and potential rate limiting
+      // Pro/family users (3rd/4th in sequence) sometimes take 19-22s to redirect
+      console.log(`  Waiting for redirect to dashboard/tasks (current URL: ${page.url()})...`);
+      await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 30000 });
 
       // Wait for page to load completely
       await page.waitForLoadState('networkidle');
