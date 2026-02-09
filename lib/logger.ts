@@ -146,6 +146,16 @@ class Logger {
    * Captures exceptions to Sentry in production
    */
   error(message: string, error?: Error | unknown, context?: LogContext) {
+    // Serialize Error objects properly (Error properties are non-enumerable)
+    const serializedError = error instanceof Error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause,
+        }
+      : error;
+
     if (error instanceof Error && process.env.NODE_ENV === 'production') {
       Sentry.captureException(error, {
         tags: {
@@ -154,9 +164,10 @@ class Logger {
         },
         extra: this.sanitize(context) as Record<string, unknown> | undefined,
       });
-    } else {
-      this.log('error', message, { ...context, error });
     }
+
+    // Always log in all environments (not just else block)
+    this.log('error', message, { ...context, error: serializedError });
   }
 }
 
