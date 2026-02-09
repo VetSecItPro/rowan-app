@@ -178,6 +178,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
         Cancel
       </button>
       <button
+        data-testid="task-submit-button"
         type="submit"
         form="new-task-form"
         disabled={!!dateError}
@@ -233,6 +234,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
             </label>
             <div className="relative">
               <input
+                data-testid="task-title-input"
                 type="text"
                 required
                 value={formData.title}

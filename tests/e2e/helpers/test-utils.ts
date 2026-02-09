@@ -249,7 +249,7 @@ export async function createTask(page: Page, title: string): Promise<boolean> {
   // Fill task form using resilient selector
   await resilientFill(page, 'task-title-input', title, {
     role: 'textbox',
-    placeholder: /task/i,
+    placeholder: /complete|e\.g\./i,
   });
 
   // Submit using resilient selector
