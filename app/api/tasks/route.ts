@@ -187,10 +187,11 @@ export async function POST(req: NextRequest) {
     } catch (usageError) {
       // Log but don't block - allow task creation to proceed
       // This prevents E2E test failures if usage tracking is unavailable
-      logger.warn('[API] Usage limit check failed, proceeding anyway', usageError, {
+      logger.warn('[API] Usage limit check failed, proceeding anyway', {
         component: 'TasksAPI',
         action: 'POST',
         userId: user.id,
+        error: usageError,
       });
       Sentry.captureException(usageError, {
         level: 'warning',
@@ -251,10 +252,11 @@ export async function POST(req: NextRequest) {
       await trackUsage(user.id, 'tasks_created');
     } catch (trackError) {
       // Log but don't block - task was already created successfully
-      logger.warn('[API] Usage tracking failed', trackError, {
+      logger.warn('[API] Usage tracking failed', {
         component: 'TasksAPI',
         action: 'POST',
         userId: user.id,
+        error: trackError,
       });
     }
 
