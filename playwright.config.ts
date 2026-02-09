@@ -8,6 +8,9 @@ export default defineConfig({
   // Test directory
   testDir: './tests/e2e',
 
+  // Global setup — runs ONCE before all tests (seeds users)
+  globalSetup: './tests/e2e/global-setup.ts',
+
   // Run tests in parallel
   fullyParallel: true,
 

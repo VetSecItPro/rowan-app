@@ -10,7 +10,6 @@
  */
 
 import { test as setup, expect } from '@playwright/test';
-import { execSync } from 'child_process';
 import { resilientFill, resilientClick, elementExists } from './helpers/resilient-selectors';
 
 const TEST_USERS = {
@@ -37,19 +36,8 @@ const TEST_USERS = {
 };
 
 setup.describe('Auth Setup', () => {
-  setup.beforeAll(() => {
-    console.log('\n🌱 Seeding E2E test users...');
-    try {
-      execSync('npx tsx tests/e2e/setup/seed-test-users.ts', {
-        stdio: 'inherit',
-        env: process.env,
-      });
-      console.log('✅ Test users seeded\n');
-    } catch (error) {
-      console.error('❌ Failed to seed test users:', error);
-      throw error;
-    }
-  });
+  // NOTE: Test user seeding now happens in global-setup.ts (runs ONCE before all tests)
+  // This prevents re-seeding on retries which was causing errors
 
   for (const [userType, user] of Object.entries(TEST_USERS)) {
     setup(`authenticate as ${userType} user`, async ({ page }) => {
