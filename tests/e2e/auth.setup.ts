@@ -46,6 +46,15 @@ setup.describe('Auth Setup', () => {
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
 
+      // Dismiss cookie banner if present (prevents click blocking on mobile viewports)
+      const cookieAcceptButton = page.locator('button:has-text("Accept"), button:has-text("Essential")').first();
+      if (await cookieAcceptButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+        await cookieAcceptButton.click({ timeout: 5000 }).catch(() => {
+          console.log('  Cookie banner already dismissed or not found');
+        });
+        await page.waitForTimeout(500); // Wait for banner to animate out
+      }
+
       // Fill login form using resilient selectors
       await resilientFill(page, 'login-email-input', user.email, {
         role: 'textbox',
