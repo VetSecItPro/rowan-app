@@ -80,73 +80,65 @@ async function seedTestUsers() {
     }
 
     try {
-      // Step 1: Clean up any orphaned user profiles from previous test runs
-      const { data: orphanedProfiles } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', testUser.email);
-
-      if (orphanedProfiles && orphanedProfiles.length > 0) {
-        for (const profile of orphanedProfiles) {
-          // Delete orphaned profile and related data (in correct order for FK constraints)
-          // 1. First get and delete spaces owned by this user
-          const { data: userSpaces } = await supabase
-            .from('spaces')
-            .select('id')
-            .eq('user_id', profile.id);
-
-          if (userSpaces) {
-            for (const space of userSpaces) {
-              await supabase.from('space_members').delete().eq('space_id', space.id);
-              await supabase.from('spaces').delete().eq('id', space.id);
-            }
-          }
-
-          // 2. Delete space memberships
-          await supabase.from('space_members').delete().eq('user_id', profile.id);
-
-          // 3. Delete subscriptions
-          await supabase.from('subscriptions').delete().eq('user_id', profile.id);
-
-          // 4. Finally delete the profile
-          await supabase.from('users').delete().eq('id', profile.id);
-
-          console.log(`  Cleaned up orphaned profile: ${profile.id}`);
-        }
-      }
-
-      // Step 2: Check if auth user exists
+      // Step 1: Check if auth user exists first
       const { data: existingUsers } = await supabase.auth.admin.listUsers();
-      const existingUser = existingUsers?.users?.find((u) => u.email === testUser.email);
+      const existingAuthUser = existingUsers?.users?.find((u) => u.email === testUser.email);
 
-      let userId: string;
+      // Step 2: If auth user exists, delete it completely and start fresh
+      // This ensures we don't have mismatches between auth.users and public.users
+      if (existingAuthUser) {
+        console.log(`  Found existing auth user ${existingAuthUser.id}, cleaning up...`);
 
-      if (existingUser) {
-        console.log(`✓ ${testUser.email}: Already exists (${existingUser.id})`);
-        userId = existingUser.id;
-      } else {
-        // Step 3: Create user
-        console.log(`  Creating ${testUser.email}...`);
-        const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
-          email: testUser.email,
-          password: testUser.password,
-          email_confirm: true,
-          user_metadata: {
-            name: testUser.name,
-          },
-        });
+        // Delete all related data in correct order
+        // 1. First get and delete spaces owned by this user
+        const { data: userSpaces } = await supabase
+          .from('spaces')
+          .select('id')
+          .eq('user_id', existingAuthUser.id);
 
-        if (createError || !newUser?.user) {
-          throw new Error(`Failed to create user: ${createError?.message}`);
+        if (userSpaces) {
+          for (const space of userSpaces) {
+            await supabase.from('space_members').delete().eq('space_id', space.id);
+            await supabase.from('spaces').delete().eq('id', space.id);
+          }
         }
 
-        userId = newUser.user.id;
-        console.log(`  ✓ Created user: ${userId}`);
+        // 2. Delete space memberships
+        await supabase.from('space_members').delete().eq('user_id', existingAuthUser.id);
 
-        // Step 4: Wait for DB trigger to provision space
-        console.log('  Waiting for space provisioning (1.5s)...');
-        await sleep(1500);
+        // 3. Delete subscriptions
+        await supabase.from('subscriptions').delete().eq('user_id', existingAuthUser.id);
+
+        // 4. Delete the profile
+        await supabase.from('users').delete().eq('id', existingAuthUser.id);
+
+        // 5. Delete the auth user
+        await supabase.auth.admin.deleteUser(existingAuthUser.id);
+
+        console.log(`  ✓ Cleaned up existing user completely`);
       }
+
+      // Step 3: Create fresh user (we always delete and recreate to avoid mismatches)
+      console.log(`  Creating ${testUser.email}...`);
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email: testUser.email,
+        password: testUser.password,
+        email_confirm: true,
+        user_metadata: {
+          name: testUser.name,
+        },
+      });
+
+      if (createError || !newUser?.user) {
+        throw new Error(`Failed to create user: ${createError?.message}`);
+      }
+
+      const userId = newUser.user.id;
+      console.log(`  ✓ Created user: ${userId}`);
+
+      // Step 4: Wait for DB trigger to provision space
+      console.log('  Waiting for space provisioning (1.5s)...');
+      await sleep(1500);
 
       // Step 5: Verify user profile exists in public.users (created by trigger)
       console.log('  Verifying user profile...');
