@@ -506,6 +506,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                       Title *
                     </label>
                     <input
+                      data-testid="task-title-input"
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleInputChange('title', e.target.value)}
@@ -894,6 +895,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                 Cancel
               </button>
               <button
+                data-testid="task-submit-button"
                 onClick={() => {
                   logger.info('Submit button clicked', { component: 'UnifiedItemModal', data: { titleTrimmed: formData.title.trim(), dateError } });
                   handleSubmit();
