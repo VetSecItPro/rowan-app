@@ -10,7 +10,6 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, ArrowLeft, CheckCircle } from 'lucide-react';
-import { RestoreAccountModal } from '@/components/settings/RestoreAccountModal';
 import { useValidatedSearchParams, LoginParamsSchema } from '@/lib/hooks/useValidatedSearchParams';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
@@ -41,14 +40,9 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [useMagicLink, setUseMagicLink] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [isProcessingCallback, setIsProcessingCallback] = useState(false);
-  const [deletionInfo, setDeletionInfo] = useState<{
-    deletionRequestedAt: string;
-    permanentDeletionAt: string;
-  } | null>(null);
   const { signIn } = useAuth();
   const router = useRouter();
   const { params } = useValidatedSearchParams(LoginParamsSchema);
@@ -190,38 +184,13 @@ export default function LoginPage() {
         setError('Invalid email or password. Please try again.');
         setIsLoading(false);
       } else {
-        // Login successful - check if account is marked for deletion
-        try {
-          const response = await fetch('/api/user/cancel-deletion');
-          const data = await response.json();
-
-          if (data.markedForDeletion) {
-            // Account is marked for deletion - show restoration modal
-            setDeletionInfo({
-              deletionRequestedAt: data.deletionRequestedAt,
-              permanentDeletionAt: data.permanentDeletionAt,
-            });
-            setShowRestoreModal(true);
-            setIsLoading(false);
-          } else {
-            // Account is not marked for deletion - proceed to redirect or dashboard
-            setTimeout(() => {
-              // Check for redirect parameter (e.g., from invitation signup flow)
-              const redirectTo = params?.redirect ? decodeURIComponent(params.redirect) : '/dashboard';
-              // Validate redirect is internal (security: prevent open redirect)
-              const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
-              window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
-            }, 500);
-          }
-        } catch (checkError) {
-          logger.error('Error checking deletion status:', checkError, { component: 'page', action: 'execution' });
-          // If check fails, proceed to redirect or dashboard anyway (don't block login)
-          setTimeout(() => {
-            const redirectTo = params?.redirect ? decodeURIComponent(params.redirect) : '/dashboard';
-            const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
-            window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
-          }, 500);
-        }
+        // Login successful - redirect immediately
+        // NOTE: Deletion check moved to dashboard page to prevent login redirect failures
+        // Check for redirect parameter (e.g., from invitation signup flow)
+        const redirectTo = params?.redirect ? decodeURIComponent(params.redirect) : '/dashboard';
+        // Validate redirect is internal (security: prevent open redirect)
+        const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
+        window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');
@@ -567,19 +536,6 @@ export default function LoginPage() {
         </motion.div>
       </div>
 
-      {/* Restore Account Modal */}
-      {deletionInfo && (
-        <RestoreAccountModal
-          isOpen={showRestoreModal}
-          onClose={() => {
-            setShowRestoreModal(false);
-            // Allow user to continue to dashboard if they dismiss the modal
-            router.push('/dashboard');
-          }}
-          deletionRequestedAt={deletionInfo.deletionRequestedAt}
-          permanentDeletionAt={deletionInfo.permanentDeletionAt}
-        />
-      )}
     </div>
   );
 }
