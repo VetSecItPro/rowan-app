@@ -300,7 +300,8 @@ async function seedTestUsers() {
 
       // CRITICAL: Wait for profile transaction to fully commit before checking/creating space
       // This prevents FK constraint violations when manually creating the space
-      await sleep(1000);
+      // Increased to 2s after seeing failures at 1s in CI (Run 21820742204)
+      await sleep(2000);
 
       // Step 6: Verify space exists (created by second trigger)
       console.log('  Verifying space provisioning...');
