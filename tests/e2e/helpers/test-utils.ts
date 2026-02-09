@@ -5,6 +5,7 @@
  */
 
 import { Page, expect } from '@playwright/test';
+import { resilientFill, resilientClick, elementExists, getButton } from '@vetsecitpro/e2e-intelligence/helpers/resilient-selectors';
 
 // Test user credentials — passwords from env vars (never hardcode for public repos)
 const testPassword = process.env.E2E_TEST_PASSWORD || '';
@@ -40,7 +41,7 @@ export const TEST_CARDS = {
 };
 
 /**
- * Login as a test user
+ * Login as a test user using resilient selectors
  */
 export async function loginAsUser(
   page: Page,
@@ -51,32 +52,58 @@ export async function loginAsUser(
   await page.goto('/login');
   await page.waitForLoadState('networkidle');
 
-  // Fill login form
-  await page.fill('input[type="email"]', user.email);
-  await page.fill('input[type="password"]', user.password);
+  // Fill login form using resilient selectors
+  await resilientFill(page, 'login-email-input', user.email, {
+    role: 'textbox',
+    type: 'email',
+  });
+
+  await resilientFill(page, 'login-password-input', user.password, {
+    role: 'textbox',
+    type: 'password',
+  });
 
   // Submit form
-  await page.click('button[type="submit"]');
+  await resilientClick(page, 'login-submit-button', {
+    role: 'button',
+    text: 'Sign In',
+  });
 
   // Wait for redirect to dashboard
   await page.waitForURL(/\/(dashboard|tasks)/);
 }
 
 /**
- * Logout current user
+ * Logout current user using resilient selectors
  */
 export async function logout(page: Page): Promise<void> {
-  // Click user menu or logout button
-  const logoutButton = page.locator('[data-testid="logout-button"], button:has-text("Sign out"), button:has-text("Logout")');
+  // Try direct logout button first
+  const hasLogoutButton = await elementExists(page, 'logout-button', {
+    role: 'button',
+    text: 'Sign out',
+  });
 
-  if (await logoutButton.isVisible()) {
-    await logoutButton.click();
+  if (hasLogoutButton) {
+    await resilientClick(page, 'logout-button', {
+      role: 'button',
+      text: 'Sign out',
+    });
   } else {
-    // Try dropdown menu
-    const userMenu = page.locator('[data-testid="user-menu"], button:has-text("Account")');
-    if (await userMenu.isVisible()) {
-      await userMenu.click();
-      await page.click('button:has-text("Sign out"), button:has-text("Logout")');
+    // Try user menu dropdown
+    const hasUserMenu = await elementExists(page, 'user-menu-button', {
+      role: 'button',
+    });
+
+    if (hasUserMenu) {
+      await resilientClick(page, 'user-menu-button', {
+        role: 'button',
+      });
+
+      // Click logout in dropdown
+      await resilientClick(page, 'logout-button', {
+        role: 'button',
+        text: 'Sign out',
+      });
     }
   }
 
@@ -91,7 +118,6 @@ export async function goToPricingPage(page: Page): Promise<void> {
   await page.waitForLoadState('domcontentloaded');
 
   // Verify pricing page loaded - look for h1 heading with "family" in the text
-  // The page h1 is "The family command center that works"
   await expect(
     page.locator('h1').filter({ hasText: /family|pricing|plans|upgrade/i }).first()
   ).toBeVisible();
@@ -104,31 +130,40 @@ export async function togglePricingPeriod(
   page: Page,
   period: 'monthly' | 'annual'
 ): Promise<void> {
-  // The pricing page has separate Monthly/Annual buttons, not a single toggle
-  // Click the specific button for the desired period
+  // Use resilient selector for pricing period buttons
   if (period === 'annual') {
-    await page.getByRole('button', { name: 'Annual' }).click();
+    await resilientClick(page, 'pricing-annual-button', {
+      role: 'button',
+      text: 'Annual',
+    });
   } else {
-    await page.getByRole('button', { name: 'Monthly' }).click();
+    await resilientClick(page, 'pricing-monthly-button', {
+      role: 'button',
+      text: 'Monthly',
+    });
   }
 }
 
 /**
- * Check if upgrade modal is visible
+ * Check if upgrade modal is visible using resilient selector
  */
 export async function isUpgradeModalVisible(page: Page): Promise<boolean> {
-  const modal = page.locator('[data-testid="upgrade-modal"], [role="dialog"]:has-text("Upgrade"), [role="dialog"]:has-text("unlock")');
-  return await modal.isVisible();
+  return await elementExists(page, 'upgrade-modal', {
+    role: 'dialog',
+  });
 }
 
 /**
- * Close upgrade modal if visible
+ * Close upgrade modal if visible using resilient selector
  */
 export async function closeUpgradeModal(page: Page): Promise<void> {
-  const closeButton = page.locator('[data-testid="close-modal"], button:has-text("Not now"), button[aria-label="Close"]');
+  const isVisible = await isUpgradeModalVisible(page);
 
-  if (await closeButton.isVisible()) {
-    await closeButton.click();
+  if (isVisible) {
+    await resilientClick(page, 'modal-close-button', {
+      role: 'button',
+      name: 'Close',
+    });
   }
 }
 
@@ -152,13 +187,10 @@ export async function verifyFeatureAccess(
   await page.goto(route);
   await page.waitForLoadState('networkidle');
 
-  // Check for feature locked page or upgrade modal
-  const isLocked = await page.locator('[data-testid="feature-locked"]')
-    .or(page.locator('text=/upgrade to unlock/i'))
-    .or(page.locator('text=/requires pro/i'))
-    .first()
-    .isVisible()
-    .catch(() => false);
+  // Check for feature locked using resilient selector
+  const isLocked = await elementExists(page, 'feature-locked-message', {
+    text: /upgrade to unlock|requires pro/i,
+  });
 
   if (shouldHaveAccess) {
     expect(isLocked).toBeFalsy();
@@ -168,15 +200,17 @@ export async function verifyFeatureAccess(
 }
 
 /**
- * Create a task (for testing task limits)
+ * Create a task (for testing task limits) using resilient selectors
  */
 export async function createTask(page: Page, title: string): Promise<boolean> {
   await page.goto('/tasks');
   await page.waitForLoadState('networkidle');
 
-  // Click add task button
-  const addButton = page.locator('[data-testid="add-task"], button:has-text("Add Task"), button:has-text("New Task")');
-  await addButton.click();
+  // Click add task button using resilient selector
+  await resilientClick(page, 'add-task-button', {
+    role: 'button',
+    text: 'Add Task',
+  });
 
   // Check if limit modal appears
   const limitModal = await isUpgradeModalVisible(page);
@@ -185,11 +219,17 @@ export async function createTask(page: Page, title: string): Promise<boolean> {
     return false;
   }
 
-  // Fill task form
-  await page.fill('input[name="title"], input[placeholder*="task"]', title);
+  // Fill task form using resilient selector
+  await resilientFill(page, 'task-title-input', title, {
+    role: 'textbox',
+    placeholder: /task/i,
+  });
 
-  // Submit
-  await page.click('button[type="submit"], button:has-text("Create"), button:has-text("Add")');
+  // Submit using resilient selector
+  await resilientClick(page, 'task-submit-button', {
+    role: 'button',
+    text: /create|add/i,
+  });
 
   // Wait for task to appear
   await page.waitForSelector(`text=${title}`, { timeout: 5000 });
@@ -203,18 +243,29 @@ export async function getTaskCount(page: Page): Promise<number> {
   await page.goto('/tasks');
   await page.waitForLoadState('networkidle');
 
-  // Look for task count indicator or count task items
-  const countIndicator = page.locator('[data-testid="task-count"], text=/\\d+.*tasks?/i');
+  // Look for task count indicator using resilient selector
+  const hasCountIndicator = await elementExists(page, 'task-count', {
+    text: /\d+.*tasks?/i,
+  });
 
-  if (await countIndicator.isVisible()) {
-    const text = await countIndicator.textContent();
+  if (hasCountIndicator) {
+    const countElement = await getButton(page, 'task-count');
+    const text = await countElement.textContent();
     const match = text?.match(/(\d+)/);
     return match ? parseInt(match[1], 10) : 0;
   }
 
-  // Count task items
-  const taskItems = page.locator('[data-testid="task-item"], .task-item, [class*="task"]');
-  return await taskItems.count();
+  // Count task items using resilient selector
+  const taskItems = page.locator('[data-testid^="task-item"]');
+  const count = await taskItems.count();
+
+  // Fallback to class-based selector if testids not found
+  if (count === 0) {
+    const fallbackItems = page.locator('.task-item, [class*="task"]');
+    return await fallbackItems.count();
+  }
+
+  return count;
 }
 
 /**
@@ -271,7 +322,7 @@ export async function waitForSubscriptionUpdate(
 }
 
 /**
- * Check subscription status in settings
+ * Check subscription status in settings using resilient selectors
  */
 export async function getSubscriptionStatus(page: Page): Promise<{
   tier: string;
@@ -280,12 +331,22 @@ export async function getSubscriptionStatus(page: Page): Promise<{
   await page.goto('/settings?tab=subscription');
   await page.waitForLoadState('networkidle');
 
-  // Extract tier and status from page
-  const tierElement = page.locator('[data-testid="subscription-tier"], .subscription-tier');
-  const statusElement = page.locator('[data-testid="subscription-status"], .subscription-status');
+  // Extract tier and status using resilient selectors
+  const hasTierElement = await elementExists(page, 'subscription-tier');
+  const hasStatusElement = await elementExists(page, 'subscription-status');
 
-  const tier = await tierElement.textContent() || 'free';
-  const status = await statusElement.textContent() || 'active';
+  let tier = 'free';
+  let status = 'active';
+
+  if (hasTierElement) {
+    const tierElement = page.getByTestId('subscription-tier');
+    tier = (await tierElement.textContent()) || 'free';
+  }
+
+  if (hasStatusElement) {
+    const statusElement = page.getByTestId('subscription-status');
+    status = (await statusElement.textContent()) || 'active';
+  }
 
   return {
     tier: tier.toLowerCase(),

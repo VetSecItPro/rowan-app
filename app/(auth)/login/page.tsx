@@ -455,6 +455,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     inputMode="email"
+                    data-testid="login-email-input"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
@@ -476,6 +477,7 @@ export default function LoginPage() {
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    data-testid="login-password-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-12 pr-14 py-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-300 text-base md:text-sm shadow-sm"
@@ -511,6 +513,7 @@ export default function LoginPage() {
               {/* Sign in button */}
               <button
                 type="submit"
+                data-testid="login-submit-button"
                 disabled={isLoading}
                 className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-gray-900 transform hover:-translate-y-0.5"
               >

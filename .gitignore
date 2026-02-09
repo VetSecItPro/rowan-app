@@ -148,6 +148,7 @@ docs/
 
 # Test and audit reports
 .test-reports/
+.test-suggestions/
 
 # All markdown files (notes, plans, strategy, optimization)
 *.md

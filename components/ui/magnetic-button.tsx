@@ -8,6 +8,7 @@ interface MagneticButtonProps {
     className?: string;
     strength?: number;
     onClick?: () => void;
+    testId?: string;
 }
 
 export function MagneticButton({
@@ -15,6 +16,7 @@ export function MagneticButton({
     className = "",
     strength = 30,
     onClick,
+    testId,
 }: MagneticButtonProps) {
     const ref = useRef<HTMLDivElement>(null);
     const x = useMotionValue(0);
@@ -51,6 +53,7 @@ export function MagneticButton({
             ref={ref}
             role="button"
             tabIndex={0}
+            data-testid={testId}
             onMouseMove={handleMouseMove}
             onMouseLeave={reset}
             onClick={onClick}

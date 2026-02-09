@@ -82,6 +82,7 @@ export function PublicHeader({ animated = false }: PublicHeaderProps) {
             {user ? (
               <Link
                 href="/dashboard"
+                data-testid="public-header-dashboard-link"
                 className="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
               >
                 Dashboard
@@ -90,12 +91,14 @@ export function PublicHeader({ animated = false }: PublicHeaderProps) {
               <>
                 <Link
                   href="/login"
+                  data-testid="public-header-login-link"
                   className="px-5 py-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white text-sm font-medium rounded-full transition-all"
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
+                  data-testid="public-header-signup-link"
                   className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
                   Sign Up
@@ -146,6 +149,7 @@ export function PublicHeader({ animated = false }: PublicHeaderProps) {
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
+                  data-testid="public-header-mobile-dashboard-link"
                   className="w-full py-2.5 text-center bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-full transition-all"
                 >
                   Dashboard
@@ -155,6 +159,7 @@ export function PublicHeader({ animated = false }: PublicHeaderProps) {
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
+                    data-testid="public-header-mobile-login-link"
                     className="w-full py-2.5 text-center border border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 text-sm font-medium rounded-full transition-all"
                   >
                     Login
@@ -162,6 +167,7 @@ export function PublicHeader({ animated = false }: PublicHeaderProps) {
                   <Link
                     href="/signup"
                     onClick={() => setMobileMenuOpen(false)}
+                    data-testid="public-header-mobile-signup-link"
                     className="w-full py-2.5 text-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all"
                   >
                     Sign Up

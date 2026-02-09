@@ -104,7 +104,7 @@ export function HeroSection({ onSignupClick }: HeroSectionProps) {
                         transition={{ duration: 0.6, delay: 0.3 }}
                         className="flex items-center justify-center mt-2"
                     >
-                        <MagneticButton className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={onSignupClick}>
+                        <MagneticButton testId="hero-cta-signup" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]" onClick={onSignupClick}>
                             <div className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full font-semibold text-sm transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
                                 Try Free for 14 Days
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
