@@ -374,10 +374,13 @@ export async function middleware(req: NextRequest) {
     const userCreatedAt = session.user.created_at ? new Date(session.user.created_at) : null;
     const emailConfirmedAt = session.user.email_confirmed_at;
 
+    // Exempt E2E test users from email verification
+    const isTestUser = session.user.email?.endsWith('@rowan-test.app');
+
     // Only enforce email verification for users created AFTER the cutoff date
     const isNewUser = userCreatedAt && userCreatedAt >= EMAIL_VERIFICATION_CUTOFF;
 
-    if (isNewUser && !emailConfirmedAt) {
+    if (isNewUser && !emailConfirmedAt && !isTestUser) {
       // New user without verified email - redirect to verification page
       // Allow access to verification-related pages to avoid redirect loop
       const verificationPaths = ['/verify-email', '/api/auth/resend-verification'];

@@ -160,12 +160,10 @@ async function seedTestUsers() {
 
       // Step 3: Create fresh user (we always delete and recreate to avoid mismatches)
       console.log(`  Creating ${testUser.email}...`);
-      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+      const { data: newUser, error: createError} = await supabase.auth.admin.createUser({
         email: testUser.email,
         password: testUser.password,
-        email_confirm: true,
-        // Explicitly set email_confirmed_at to bypass email verification middleware
-        email_confirmed_at: new Date().toISOString(),
+        email_confirm: true, // This automatically sets email_confirmed_at
         user_metadata: {
           name: testUser.name,
         },
