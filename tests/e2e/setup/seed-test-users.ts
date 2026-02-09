@@ -294,6 +294,10 @@ async function seedTestUsers() {
         console.log(`  ✓ User profile verified`);
       }
 
+      // CRITICAL: Wait for profile transaction to fully commit before checking/creating space
+      // This prevents FK constraint violations when manually creating the space
+      await sleep(1000);
+
       // Step 6: Verify space exists (created by second trigger)
       console.log('  Verifying space provisioning...');
       retries = 0;
@@ -390,7 +394,8 @@ async function seedTestUsers() {
       console.log(`  ✓ Subscription set to: ${testUser.tier}\n`);
     } catch (error) {
       console.error(`❌ ${testUser.email}: ${error instanceof Error ? error.message : String(error)}\n`);
-      process.exit(1);
+      // Don't call process.exit(1) here - throw instead so outer catch handler can cleanup lock file
+      throw error;
     }
   }
 
