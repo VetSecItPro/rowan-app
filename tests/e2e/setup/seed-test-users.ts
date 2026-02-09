@@ -152,6 +152,10 @@ async function seedTestUsers() {
         await supabase.auth.admin.deleteUser(existingAuthUser.id);
 
         console.log(`  ✓ Cleaned up existing user completely`);
+
+        // CRITICAL: Wait for DELETE to fully commit before creating new user
+        // This prevents "user already registered" errors on retries
+        await sleep(1000);
       }
 
       // Step 3: Create fresh user (we always delete and recreate to avoid mismatches)
