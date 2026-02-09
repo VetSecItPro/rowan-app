@@ -201,11 +201,6 @@ export default function MealsPage() {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.meals.recipes(spaceId) });
   }, [spaceId, queryClient]);
 
-  const invalidateAll = useCallback(() => {
-    invalidateMeals();
-    invalidateRecipes();
-  }, [invalidateMeals, invalidateRecipes]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
   const [searchQuery, setSearchQuery] = useState('');

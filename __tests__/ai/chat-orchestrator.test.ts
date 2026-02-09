@@ -7,7 +7,7 @@
  * Gemini API is mocked — these test the orchestration logic, not the LLM.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { buildSystemPrompt, buildMinimalSystemPrompt, type SpaceContext } from '@/lib/services/ai/system-prompt';
 import { getToolCallPreview } from '@/lib/services/ai/tool-executor';
 

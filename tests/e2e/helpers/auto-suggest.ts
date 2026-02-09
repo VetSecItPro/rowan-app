@@ -5,11 +5,22 @@
 
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
+
+interface SelectorContext {
+  role?: string;
+  text?: string | RegExp;
+  type?: string;
+  placeholder?: string | RegExp;
+  customFallback?: string | boolean;
+  exact?: boolean;
+  [key: string]: unknown;
+}
 
 interface TestIdSuggestion {
   timestamp: string;
   testId: string;
-  context: any;
+  context: SelectorContext;
   priority: 'low' | 'medium' | 'high' | 'critical';
   suggestedFix: string;
   file?: string;
@@ -21,7 +32,7 @@ interface FallbackLog {
   timestamp: string;
   testId: string;
   strategyUsed: string;
-  context: any;
+  context: SelectorContext;
   severity: 'INFO' | 'WARNING' | 'BRITTLE' | 'ERROR';
 }
 
@@ -44,7 +55,7 @@ function ensureSuggestionsDir(): void {
 export async function logFallbackUsage(
   strategy: string,
   testId: string,
-  context: any,
+  context: SelectorContext,
   severity: FallbackLog['severity'] = 'WARNING'
 ): Promise<void> {
   ensureSuggestionsDir();
@@ -77,7 +88,7 @@ export async function logFallbackUsage(
  */
 export async function createTestIdSuggestion(
   testId: string,
-  context: any,
+  context: SelectorContext,
   priority: TestIdSuggestion['priority'] = 'medium'
 ): Promise<void> {
   ensureSuggestionsDir();
@@ -130,7 +141,7 @@ export async function createTestIdSuggestion(
 /**
  * Generate suggested fix based on context
  */
-function generateSuggestedFix(testId: string, context: any): string {
+function generateSuggestedFix(testId: string, context: SelectorContext): string {
   const { role, text, type, placeholder, customFallback } = context;
 
   if (customFallback) {
@@ -243,8 +254,6 @@ This issue was automatically created by the E2E Intelligence System during test 
 
   try {
     // Use GitHub CLI to create issue
-    const { execSync } = require('child_process');
-
     execSync(
       `gh issue create --title "${title}" --body "${body.replace(/"/g, '\\"')}" --label "e2e,testid,auto-generated,${suggestion.priority}"`,
       {

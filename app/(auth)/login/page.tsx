@@ -4,7 +4,6 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/auth-context';
@@ -44,7 +43,6 @@ export default function LoginPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [isProcessingCallback, setIsProcessingCallback] = useState(false);
   const { signIn } = useAuth();
-  const router = useRouter();
   const { params } = useValidatedSearchParams(LoginParamsSchema);
 
   // Handle Supabase auth callback (magic link, OAuth, etc.)
