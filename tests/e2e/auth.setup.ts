@@ -36,8 +36,8 @@ const TEST_USERS = {
 };
 
 setup.describe('Auth Setup', () => {
-  // NOTE: Test user seeding now happens in global-setup.ts (runs ONCE before all tests)
-  // This prevents re-seeding on retries which was causing errors
+  // NOTE: Test user seeding happens in GitHub Actions workflow (seed-users job)
+  // This prevents race conditions from multiple test files seeding simultaneously
 
   for (const [userType, user] of Object.entries(TEST_USERS)) {
     setup(`authenticate as ${userType} user`, async ({ page }) => {
