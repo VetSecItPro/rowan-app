@@ -164,6 +164,8 @@ async function seedTestUsers() {
         email: testUser.email,
         password: testUser.password,
         email_confirm: true,
+        // Explicitly set email_confirmed_at to bypass email verification middleware
+        email_confirmed_at: new Date().toISOString(),
         user_metadata: {
           name: testUser.name,
         },
