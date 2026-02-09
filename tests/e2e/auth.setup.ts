@@ -69,23 +69,45 @@ setup.describe('Auth Setup', () => {
       // Wait for page to load completely
       await page.waitForLoadState('networkidle');
 
-      // Verify we're authenticated using resilient selectors
-      // Check for dashboard heading or add task button
-      const isDashboardVisible = await elementExists(page, 'dashboard-heading', {
-        role: 'heading',
-      });
+      // ROBUST AUTH VERIFICATION: Retry multiple times to handle auth context hydration
+      // In CI, React context may take time to hydrate after SSR
+      const maxRetries = 10;
+      const retryDelay = 1000; // 1 second between retries
+      let verified = false;
 
-      const isAddTaskVisible = await elementExists(page, 'add-task-button', {
-        role: 'button',
-        text: 'Add Task',
-      });
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        console.log(`  Verifying auth (attempt ${attempt}/${maxRetries})...`);
 
-      // At least one auth indicator should be present
-      if (!isDashboardVisible && !isAddTaskVisible) {
-        throw new Error(`Authentication verification failed for ${userType} user`);
+        // Check for dashboard heading or add task button
+        const isDashboardVisible = await elementExists(page, 'dashboard-heading', {
+          role: 'heading',
+        });
+
+        const isAddTaskVisible = await elementExists(page, 'add-task-button', {
+          role: 'button',
+          text: 'Add Task',
+        });
+
+        if (isDashboardVisible || isAddTaskVisible) {
+          verified = true;
+          console.log(`  ✓ Authenticated as ${userType} (verified on attempt ${attempt})`);
+          break;
+        }
+
+        if (attempt < maxRetries) {
+          console.log(`  Retry in ${retryDelay}ms...`);
+          await page.waitForTimeout(retryDelay);
+        }
       }
 
-      console.log(`  ✓ Authenticated as ${userType}`);
+      if (!verified) {
+        // Log the current URL and page content for debugging
+        console.error(`  ✗ Auth verification failed after ${maxRetries} attempts`);
+        console.error(`  Current URL: ${page.url()}`);
+        const bodyText = await page.locator('body').textContent();
+        console.error(`  Page text (first 200 chars): ${bodyText?.substring(0, 200)}`);
+        throw new Error(`Authentication verification failed for ${userType} user after ${maxRetries} retries`);
+      }
 
       // Save storage state
       await page.context().storageState({ path: user.storageState });
