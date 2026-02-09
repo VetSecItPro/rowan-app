@@ -147,6 +147,13 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install chromium --with-deps
 
+      - name: Seed E2E test users
+        run: pnpm tsx tests/e2e/setup/seed-test-users.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+
       - name: Run E2E tests
         run: pnpm test:e2e:chromium
 
@@ -157,6 +164,13 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+      - name: Cleanup E2E test users
+        if: always()
+        run: pnpm tsx tests/e2e/setup/cleanup-test-users.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
   # ─── Lighthouse (builds and starts prod server) ───
   lighthouse:
