@@ -391,7 +391,12 @@ async function seedTestUsers() {
         throw new Error(`Failed to upsert subscription: ${subError.message}`);
       }
 
-      console.log(`  ✓ Subscription set to: ${testUser.tier}\n`);
+      console.log(`  ✓ Subscription set to: ${testUser.tier}`);
+
+      // CRITICAL: Wait for subscription transaction to fully commit
+      // This prevents subscription fetch errors when users try to log in immediately after seeding
+      await sleep(500);
+      console.log(`  ✓ User ${testUser.email} fully seeded and committed\n`);
     } catch (error) {
       console.error(`❌ ${testUser.email}: ${error instanceof Error ? error.message : String(error)}\n`);
       // Don't call process.exit(1) here - throw instead so outer catch handler can cleanup lock file
