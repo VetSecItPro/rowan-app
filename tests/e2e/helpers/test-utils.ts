@@ -236,7 +236,7 @@ export async function createTask(page: Page, title: string): Promise<boolean> {
   // Click add task button using resilient selector
   await resilientClick(page, 'add-task-button', {
     role: 'button',
-    text: 'Add Task',
+    text: /New Task|Add Task/i,
   });
 
   // Check if limit modal appears
