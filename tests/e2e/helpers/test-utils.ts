@@ -60,8 +60,11 @@ export const TEST_USERS = {
 /**
  * Ensure the test user is authenticated. If the session is invalid
  * (e.g., Supabase's getUser() network call failed in CI, or refresh
- * token was rotated by a prior test), re-authenticate via UI login
- * and save the updated storage state for subsequent tests.
+ * token was rotated by a prior test), re-authenticate and save the
+ * updated storage state for subsequent tests.
+ *
+ * Uses API-based auth (POST /api/auth/signin) as primary method — faster
+ * and avoids UI form issues. Falls back to UI login if API fails.
  *
  * Call this at the start of any test that needs a valid auth session.
  */
@@ -93,11 +96,93 @@ export async function ensureAuthenticated(
   // Session expired or API auth failed — re-authenticate
   console.warn(`Session invalid for ${userType} user (redirect=${redirectedToLogin}, apiOk=${apiAuthValid}), re-authenticating...`);
 
-  // Navigate to login if not already there
-  if (!redirectedToLogin) {
-    await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  // CRITICAL: Clear ALL cookies before re-login. Stale Supabase cookies
+  // (chunked JWT tokens from @supabase/ssr) conflict with new sessions.
+  // Without clearing, the login form succeeds client-side but the
+  // subsequent redirect sends stale cookies to middleware, which calls
+  // getUser() with the old tokens → fails → redirects back to /login.
+  await page.context().clearCookies();
+
+  // Strategy 1: API-based auth (fast, no UI interaction needed)
+  // POST /api/auth/signin sets cookies server-side via response headers.
+  const apiLoginSuccess = await tryApiLogin(page, user);
+  if (apiLoginSuccess) {
+    await page.context().storageState({ path: user.storageState });
+    console.log(`  ✓ Re-authenticated ${userType} user via API and saved session`);
+    return;
   }
 
+  // Strategy 2: UI login fallback (if API route is rate-limited or unavailable)
+  console.warn(`  API login failed for ${userType}, falling back to UI login...`);
+  await tryUiLogin(page, user);
+
+  // Save updated storage state so subsequent tests in this run get valid cookies
+  await page.context().storageState({ path: user.storageState });
+  console.log(`  ✓ Re-authenticated ${userType} user via UI and saved session`);
+}
+
+/**
+ * Attempt to sign in via the /api/auth/signin API route.
+ * This is faster and more reliable than UI login — sets cookies server-side.
+ * Returns true if login succeeded and auth is verified.
+ */
+async function tryApiLogin(
+  page: Page,
+  user: { email: string; password: string }
+): Promise<boolean> {
+  try {
+    // Navigate to app first so page.request sends cookies to localhost
+    await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+    const response = await page.request.post('/api/auth/signin', {
+      data: { email: user.email, password: user.password },
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 15000,
+    });
+
+    if (!response.ok()) {
+      const body = await response.text().catch(() => '(unreadable)');
+      console.warn(`  API signin returned ${response.status()}: ${body.substring(0, 200)}`);
+      return false;
+    }
+
+    // Verify auth works after API login — navigate to protected page
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+    // Check we're not redirected back to login
+    if (page.url().includes('/login')) {
+      console.warn('  API signin succeeded but dashboard redirected to login');
+      return false;
+    }
+
+    // Verify with an API call
+    const verify = await page.request
+      .get('/api/csrf/token', { timeout: 10000 })
+      .then(r => r.ok())
+      .catch(() => false);
+
+    if (!verify) {
+      console.warn('  API signin succeeded but CSRF token check failed');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.warn(`  API login error: ${error instanceof Error ? error.message : String(error)}`);
+    return false;
+  }
+}
+
+/**
+ * Attempt to sign in via the UI login form.
+ * Clears cookies first to avoid stale session conflicts.
+ * Throws if login fails after all attempts.
+ */
+async function tryUiLogin(
+  page: Page,
+  user: { email: string; password: string }
+): Promise<void> {
+  await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForLoadState('networkidle').catch(() => {});
   await dismissCookieBanner(page);
 
@@ -109,21 +194,38 @@ export async function ensureAuthenticated(
   await passwordInput.waitFor({ state: 'visible', timeout: 5000 });
   await passwordInput.fill(user.password);
 
-  await page.keyboard.press('Enter');
+  // Click submit button (more reliable than Enter for form submission)
+  const submitButton = page.locator('[data-testid="login-submit-button"], button[type="submit"]').first();
+  await submitButton.click();
 
-  // Wait for redirect away from /login — 90s for CI dev server compilation.
-  // Pro user login consistently takes >45s on first attempt due to page compilation.
-  await page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 90000 });
+  // Check for login error messages before waiting for redirect
+  // The login form shows errors inline (e.g., "Invalid email or password", rate limit)
+  const errorOrRedirect = await Promise.race([
+    page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 90000 })
+      .then(() => 'redirected' as const),
+    page.locator('.text-red-400, [role="alert"]').first()
+      .waitFor({ state: 'visible', timeout: 10000 })
+      .then(async () => {
+        const errorText = await page.locator('.text-red-400, [role="alert"]').first().textContent();
+        return `error:${errorText}` as const;
+      })
+      .catch(() => null), // No error appeared — keep waiting for redirect
+  ]);
+
+  if (typeof errorOrRedirect === 'string' && errorOrRedirect.startsWith('error:')) {
+    throw new Error(`Login form error for ${user.email}: ${errorOrRedirect.substring(6)}`);
+  }
+
+  // If we got here with null error race, the redirect race is still pending — wait for it
+  if (errorOrRedirect === null) {
+    await page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 80000 });
+  }
 
   // Verify auth via API
   const verifyResponse = await page.request.get('/api/csrf/token', { timeout: 10000 }).catch(() => null);
   if (!verifyResponse?.ok()) {
-    throw new Error(`Re-authentication failed for ${userType} user`);
+    throw new Error(`UI re-authentication succeeded (redirect OK) but API verification failed`);
   }
-
-  // Save updated storage state so subsequent tests in this run get valid cookies
-  await page.context().storageState({ path: user.storageState });
-  console.log(`  ✓ Re-authenticated ${userType} user and saved session`);
 }
 
 // Payment test cards (Polar uses Stripe under the hood)
