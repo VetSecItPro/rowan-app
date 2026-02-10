@@ -88,7 +88,7 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-800 rounded w-1/3"></div>
@@ -101,7 +101,7 @@ export default function ProjectDetailPage() {
 
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gray-900 p-6">
+      <div className="min-h-screen bg-black p-6">
         <div className="max-w-6xl mx-auto">
           <div className="bg-red-900/20 border border-red-800 rounded-xl p-6">
             <p className="text-red-400">{error || 'Project not found'}</p>
@@ -137,7 +137,7 @@ export default function ProjectDetailPage() {
   const isOverBudget = project.budget_variance < 0;
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen bg-black p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

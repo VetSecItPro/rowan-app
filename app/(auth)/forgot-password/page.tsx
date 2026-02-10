@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-black p-4">
         <motion.div
           className="w-full max-w-md bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
           initial="hidden"
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950 p-4 font-inter">
+    <div className="min-h-screen flex items-center justify-center bg-black p-4 font-inter">
       <motion.div
         className="w-full max-w-md bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
         initial="hidden"

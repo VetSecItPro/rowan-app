@@ -1,6 +1,6 @@
 export default function VerifyEmailLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-950 via-teal-950 to-cyan-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-black p-4">
       <div className="max-w-md w-full bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
         {/* Loading spinner */}
         <div className="w-16 h-16 bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4">

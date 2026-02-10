@@ -28,7 +28,6 @@ export interface SubscriptionMetrics {
   proSubscribers: number;
   familySubscribers: number;
   freeUsers: number;
-  trialUsers: number;
 
   // Distribution
   tierDistribution: {
@@ -94,8 +93,6 @@ interface SubscriptionRow {
   polar_subscription_id: string | null;
   subscription_started_at: string | null;
   subscription_ends_at: string | null;
-  trial_started_at: string | null;
-  trial_ends_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -166,21 +163,13 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     logger.error('Error fetching subscription events:', eventsError, { component: 'lib-subscription-analytics-service', action: 'service_call' });
   }
 
-  // Fetch trial users
-  const { data: trials } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .not('trial_ends_at', 'is', null)
-    .gt('trial_ends_at', now.toISOString());
-
-  // Fetch free users (users with no subscription or expired trial)
+  // Fetch total users
   const { count: totalUsersCount } = await supabase
     .from('users')
     .select('*', { count: 'exact', head: true });
 
   const activeSubscriptions: SubscriptionRow[] = subscriptions || [];
   const subscriptionEvents: SubscriptionEventRow[] = events || [];
-  const trialSubscriptions: SubscriptionRow[] = trials || [];
 
   // Calculate metrics
   const proSubs = activeSubscriptions.filter(s => s.tier === 'pro');
@@ -255,12 +244,11 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
 
   // Free users calculation
   const totalUsers = totalUsersCount || 0;
-  const freeUsers = totalUsers - totalSubscribers - trialSubscriptions.length;
+  const freeUsers = totalUsers - totalSubscribers;
 
   // Conversion rate (new paid / total free users who could convert)
-  const potentialConverts = freeUsers + trialSubscriptions.length;
-  const conversionRate = potentialConverts > 0
-    ? Math.round((newSubscriptionsThisMonth / potentialConverts) * 10000) / 100
+  const conversionRate = freeUsers > 0
+    ? Math.round((newSubscriptionsThisMonth / freeUsers) * 10000) / 100
     : 0;
 
   return {
@@ -271,7 +259,6 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     proSubscribers: proSubs.length,
     familySubscribers: familySubs.length,
     freeUsers: Math.max(0, freeUsers),
-    trialUsers: trialSubscriptions.length,
     tierDistribution,
     periodDistribution,
     newSubscriptionsThisMonth,

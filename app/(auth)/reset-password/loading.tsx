@@ -1,6 +1,6 @@
 export default function ResetPasswordLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-950 via-teal-950 to-cyan-950">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <div className="w-full max-w-md p-6">
         {/* Card */}
         <div className="bg-gray-800/80 p-8 rounded-xl border border-gray-700">

@@ -29,26 +29,16 @@ export async function GET(request: NextRequest) {
     }
 
     // DEV ONLY: Allow mocking subscription tier for testing (before auth check)
-    const mockTier = request.nextUrl.searchParams.get('mockTier') as SubscriptionTier | 'trial' | null;
+    const mockTier = request.nextUrl.searchParams.get('mockTier') as SubscriptionTier | null;
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev && mockTier) {
       logger.info(`[DEV] Mocking subscription tier: ${mockTier}`, { component: 'api-route' });
 
-      // Return mock data for testing (bypasses auth for dev testing)
-      const isTrialMock = mockTier === 'trial';
-      const actualTier = isTrialMock ? 'free' : mockTier as SubscriptionTier;
-
       return NextResponse.json({
-        tier: actualTier,
-        trial: {
-          isInTrial: isTrialMock,
-          daysRemaining: isTrialMock ? 10 : 0,
-          trialEndsAt: isTrialMock ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString() : null,
-          trialStartedAt: isTrialMock ? new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() : null,
-        },
+        tier: mockTier as SubscriptionTier,
         subscription: {
-          tier: actualTier,
+          tier: mockTier as SubscriptionTier,
           status: mockTier === 'free' ? 'none' : 'active',
           isActive: mockTier !== 'free',
           isPastDue: false,
@@ -85,14 +75,6 @@ export async function GET(request: NextRequest) {
     const response = {
       // Top-level tier
       tier: subscriptionStatus.tier,
-
-      // Trial status (for client-side trial banner/modal)
-      trial: {
-        isInTrial: subscriptionStatus.trial.isInTrial,
-        daysRemaining: subscriptionStatus.trial.daysRemaining,
-        trialEndsAt: subscriptionStatus.trial.trialEndsAt,
-        trialStartedAt: subscriptionStatus.trial.trialStartedAt,
-      },
 
       // Full subscription details
       subscription: {

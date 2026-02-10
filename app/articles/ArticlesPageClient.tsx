@@ -57,7 +57,7 @@ export default function ArticlesPageClient({ articles }: ArticlesPageClientProps
   const featuredArticles = articles.filter(a => a.featured)
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black">
       <PublicHeader />
 
       <main>

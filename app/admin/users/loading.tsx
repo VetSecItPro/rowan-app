@@ -1,6 +1,6 @@
 export default function UsersLoading() {
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen bg-black p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

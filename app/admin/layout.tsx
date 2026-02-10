@@ -19,7 +19,7 @@ export default function AdminLayout({
   // The root layout already provides base styling (dark mode only)
   return (
     <AdminQueryProvider>
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-black">
         {children}
       </div>
     </AdminQueryProvider>

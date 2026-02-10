@@ -254,7 +254,7 @@ const guideSections: GuideSection[] = [
 
 export default function ProjectsDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-cyan-950/30 to-blue-950/20">
+    <div className="min-h-screen bg-black">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">

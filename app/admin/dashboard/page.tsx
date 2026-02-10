@@ -321,7 +321,7 @@ function AdminDashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black">
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 sticky top-0 z-10">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
@@ -525,7 +525,7 @@ function AdminDashboardContent() {
 export default function AdminDashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>

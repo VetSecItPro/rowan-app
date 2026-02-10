@@ -6,7 +6,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
-import type { SubscriptionTier, TrialStatus, FeatureLimits } from '@/lib/types';
+import type { SubscriptionTier, FeatureLimits } from '@/lib/types';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 
@@ -89,15 +89,8 @@ const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 export interface SubscriptionContextValue {
   // Core subscription state
   tier: SubscriptionTier;
-  effectiveTier: SubscriptionTier; // Considers trial (pro)
+  effectiveTier: SubscriptionTier;
   isLoading: boolean;
-
-  // Trial state
-  trial: TrialStatus;
-  isInTrial: boolean;
-  trialDaysRemaining: number;
-  isTrialExpiringSoon: boolean; // < 3 days
-  hasTrialExpired: boolean;
 
   // Feature access
   limits: FeatureLimits;
@@ -117,12 +110,6 @@ interface SubscriptionProviderProps {
 export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [tier, setTier] = useState<SubscriptionTier>('free');
   const [isLoading, setIsLoading] = useState(true);
-  const [trial, setTrial] = useState<TrialStatus>({
-    isInTrial: false,
-    daysRemaining: 0,
-    trialEndsAt: null,
-    trialStartedAt: null,
-  });
   const [, setUpgradeModalOpen] = useState(false);
   const [, setUpgradeFeature] = useState<string | undefined>();
 
@@ -222,12 +209,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
               }
 
               setTier('free');
-              setTrial({
-                isInTrial: false,
-                daysRemaining: 0,
-                trialEndsAt: null,
-                trialStartedAt: null,
-              });
               return;
             }
 
@@ -248,15 +229,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
             }
 
             setTier(data.tier || 'free');
-
-            if (data.trial) {
-              setTrial({
-                isInTrial: data.trial.isInTrial || false,
-                daysRemaining: data.trial.daysRemaining || 0,
-                trialEndsAt: data.trial.trialEndsAt ? new Date(data.trial.trialEndsAt) : null,
-                trialStartedAt: data.trial.trialStartedAt ? new Date(data.trial.trialStartedAt) : null,
-              });
-            }
 
             // Success - track metrics in Sentry
             const totalDuration = performance.now() - startTime;
@@ -387,17 +359,8 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  // Computed values - Trial
-  const isInTrial = trial.isInTrial;
-  const trialDaysRemaining = trial.daysRemaining;
-  const isTrialExpiringSoon = isInTrial && trialDaysRemaining <= 3;
-  const hasTrialExpired = !isInTrial && trial.trialStartedAt !== null && trial.trialEndsAt !== null;
-
-  // Effective tier considers trial (pro)
-  const effectiveTier = useMemo(() => {
-    if (isInTrial) return 'pro';
-    return tier;
-  }, [isInTrial, tier]);
+  // Effective tier is the actual subscription tier
+  const effectiveTier = tier;
 
   const limits = useMemo(() => FEATURE_LIMITS[effectiveTier], [effectiveTier]);
 
@@ -417,11 +380,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     tier,
     effectiveTier,
     isLoading,
-    trial,
-    isInTrial,
-    trialDaysRemaining,
-    isTrialExpiringSoon,
-    hasTrialExpired,
     limits,
     canAccess,
     refresh: fetchSubscription,
@@ -430,11 +388,6 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
     tier,
     effectiveTier,
     isLoading,
-    trial,
-    isInTrial,
-    trialDaysRemaining,
-    isTrialExpiringSoon,
-    hasTrialExpired,
     limits,
     canAccess,
     fetchSubscription,
@@ -466,12 +419,11 @@ export function useSubscriptionSafe(): SubscriptionContextValue | null {
 
 // Convenience hook for checking feature access
 export function useFeatureAccess(feature: keyof FeatureLimits) {
-  const { canAccess, effectiveTier, isInTrial, showUpgradeModal } = useSubscription();
+  const { canAccess, effectiveTier, showUpgradeModal } = useSubscription();
 
   return {
     hasAccess: canAccess(feature),
     tier: effectiveTier,
-    isInTrial,
     requestUpgrade: () => showUpgradeModal(feature as string),
   };
 }
@@ -487,7 +439,6 @@ export function useFeatureAccessSafe(feature: keyof FeatureLimits) {
     return {
       hasAccess: false,
       tier: 'free' as const,
-      isInTrial: false,
       requestUpgrade: () => {},
     };
   }
@@ -495,7 +446,6 @@ export function useFeatureAccessSafe(feature: keyof FeatureLimits) {
   return {
     hasAccess: context.canAccess(feature),
     tier: context.effectiveTier,
-    isInTrial: context.isInTrial,
     requestUpgrade: () => context.showUpgradeModal(feature as string),
   };
 }

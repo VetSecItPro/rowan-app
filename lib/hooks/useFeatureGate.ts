@@ -76,12 +76,8 @@ interface UseFeatureGateResult {
   hasAccess: boolean;
   /** Whether the subscription data is still loading */
   isLoading: boolean;
-  /** The user's current effective tier (considers trial) */
+  /** The user's current effective tier */
   tier: SubscriptionTier;
-  /** Whether the user is in a trial period */
-  isInTrial: boolean;
-  /** Days remaining in trial (0 if not in trial) */
-  trialDaysRemaining: number;
   /** The minimum tier required for this feature */
   requiredTier: SubscriptionTier;
   /** Human-readable feature name */
@@ -122,8 +118,6 @@ export function useFeatureGate(feature: GatedFeature): UseFeatureGateResult {
   const canAccess = subscription?.canAccess ?? (() => false);
   const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isLoading = subscription?.isLoading ?? true;
-  const isInTrial = subscription?.isInTrial ?? false;
-  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
   const showUpgradeModal = useMemo(
     () => subscription?.showUpgradeModal ?? (() => {}),
     [subscription]
@@ -150,8 +144,6 @@ export function useFeatureGate(feature: GatedFeature): UseFeatureGateResult {
     hasAccess,
     isLoading,
     tier: effectiveTier,
-    isInTrial,
-    trialDaysRemaining,
     requiredTier,
     featureName,
     promptUpgrade,
@@ -173,8 +165,6 @@ export function useFeatureGateSafe(feature: GatedFeature): UseFeatureGateResult 
     canAccess,
     effectiveTier,
     isLoading,
-    isInTrial,
-    trialDaysRemaining,
     showUpgradeModal
   } = subscription;
 
@@ -187,8 +177,6 @@ export function useFeatureGateSafe(feature: GatedFeature): UseFeatureGateResult 
     hasAccess,
     isLoading,
     tier: effectiveTier,
-    isInTrial,
-    trialDaysRemaining,
     requiredTier,
     featureName,
     promptUpgrade: () => showUpgradeModal(feature),
