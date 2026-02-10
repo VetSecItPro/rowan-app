@@ -243,7 +243,7 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            data-testid={`${testId}-content`}
+            data-testid={testId}
             // Mobile-first: slide up from bottom
             initial={{
               y: '100%',
@@ -327,7 +327,7 @@ export function Modal({
                 {!hideCloseButton && (
                   <button
                     onClick={onClose}
-                    data-testid={`${testId}-close-button`}
+                    data-testid="modal-close-button"
                     className={`
                       absolute top-2.5 right-3 sm:top-3.5 sm:right-4
                       w-10 h-10 sm:w-9 sm:h-9

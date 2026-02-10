@@ -143,6 +143,7 @@ export function UpgradeModal({
       maxWidth="lg"
       headerGradient="bg-gradient-to-r from-emerald-500 to-teal-500"
       footer={footerContent}
+      testId="upgrade-modal"
     >
       <div className="space-y-6">
         {/* Feature Icon */}
