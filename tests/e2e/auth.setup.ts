@@ -26,8 +26,8 @@ const TEST_USERS = {
 };
 
 setup.describe('Auth Setup', () => {
-  // NOTE: Test user seeding happens in GitHub Actions workflow (seed-users job)
-  // This prevents race conditions from multiple test files seeding simultaneously
+  // NOTE: Test user seeding happens in global-setup.ts (runs once before all tests)
+  // This prevents race conditions from multiple test workers seeding simultaneously
 
   for (const [userType, user] of Object.entries(TEST_USERS)) {
     setup(`authenticate as ${userType} user`, async ({ page }) => {

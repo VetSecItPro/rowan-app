@@ -12,6 +12,9 @@ process.env.PLAYWRIGHT_TEST = 'true';
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
+  // Global setup - runs ONCE before all tests
+  globalSetup: './tests/e2e/global-setup.ts',
+
   // Test directory
   testDir: './tests/e2e',
 
