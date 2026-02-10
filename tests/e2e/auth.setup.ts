@@ -110,7 +110,7 @@ setup.describe('Auth Setup', () => {
 
         const isAddTaskVisible = await elementExists(page, 'add-task-button', {
           role: 'button',
-          text: 'Add Task',
+          text: /New Task|Add Task/i,
         });
 
         if (isDashboardVisible || isAddTaskVisible) {
