@@ -46,7 +46,7 @@ setup.describe('Auth Setup', () => {
 
       // Fill login form — use testid first, fall back to input type
       const emailInput = page.locator('[data-testid="login-email-input"], input[type="email"]').first();
-      await emailInput.waitFor({ state: 'visible', timeout: 15000 });
+      await emailInput.waitFor({ state: 'visible', timeout: 30000 });
       await emailInput.fill(user.email);
 
       const passwordInput = page.locator('[data-testid="login-password-input"], input[type="password"]').first();

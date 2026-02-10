@@ -371,6 +371,10 @@ async function seedTestUsers() {
       }
 
       // Step 7: Upsert subscription
+      // CRITICAL: Explicitly set trial_started_at and trial_ends_at.
+      // The provision_new_user trigger auto-creates a subscription with a beta trial
+      // (trial_ends_at = beta end date). If we don't clear these columns for free users,
+      // the subscription context sees isInTrial=true → effectiveTier='pro', bypassing feature gating.
       const { error: subError } = await supabase.from('subscriptions').upsert(
         {
           user_id: userId,
@@ -378,6 +382,9 @@ async function seedTestUsers() {
           status: 'active',
           period: 'monthly',
           subscription_started_at: new Date().toISOString(),
+          // Clear trial for free users; pro users don't need trial either (they have the real tier)
+          trial_started_at: null,
+          trial_ends_at: null,
         },
         {
           onConflict: 'user_id',
