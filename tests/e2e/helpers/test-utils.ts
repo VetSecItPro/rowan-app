@@ -227,15 +227,20 @@ export async function verifyFeatureAccess(
   });
 
   // Wait for subscription context to finish loading.
+  // The SubscriptionProvider retries up to 3 times with 20s timeout each (worst case ~60s+).
+  // Use a generous timeout that exceeds the subscription fetch retry cycle.
+  const GATE_TIMEOUT = 75000;
+
   // Poll for the final state: locked message, upgrade modal, or feature content.
   let resolvedState: 'locked' | 'modal' | 'content' | 'loading' = 'loading';
   try {
     const result = await Promise.race([
-      page.waitForSelector('[data-testid="feature-locked-message"]', { state: 'visible', timeout: 30000 })
+      page.waitForSelector('[data-testid="feature-locked-message"]', { state: 'visible', timeout: GATE_TIMEOUT })
         .then(() => 'locked' as const),
-      page.waitForSelector('[data-testid="upgrade-modal"]', { state: 'visible', timeout: 30000 })
+      page.waitForSelector('[data-testid="upgrade-modal"]', { state: 'visible', timeout: GATE_TIMEOUT })
         .then(() => 'modal' as const),
-      page.waitForSelector('h1', { state: 'visible', timeout: 30000 })
+      // Wait for h1 that is NOT inside a loading skeleton (the page shell may render h1 early)
+      page.waitForSelector('h1:not(.animate-pulse *)', { state: 'visible', timeout: GATE_TIMEOUT })
         .then(() => 'content' as const),
     ]);
     resolvedState = result;

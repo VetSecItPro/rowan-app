@@ -1,5 +1,6 @@
 import * as chrono from 'chrono-node';
 import { addHours } from 'date-fns';
+import { escapeRegExp } from '@/lib/utils/input-sanitization';
 
 export interface ParsedEvent {
   title: string;
@@ -42,8 +43,8 @@ export function parseEventText(input: string): ParsedEvent {
   const locationMatch = input.match(/\s+at\s+([A-Z][a-zA-Z\s&']+?)(?:\s+(?:on|at|for|every|tomorrow|today|next|this|@|$))/i);
   if (locationMatch && locationMatch[1]) {
     result.location = locationMatch[1].trim();
-    // Remove location from title
-    result.title = result.title.replace(new RegExp(`\\s+at\\s+${locationMatch[1]}`, 'i'), '').trim();
+    // Remove location from title (escape regex special chars to prevent ReDoS)
+    result.title = result.title.replace(new RegExp(`\\s+at\\s+${escapeRegExp(locationMatch[1])}`, 'i'), '').trim();
   }
 
   // Extract duration (pattern: "for X hours/minutes")

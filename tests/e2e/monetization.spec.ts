@@ -290,11 +290,11 @@ test.describe('Monetization Features', () => {
       // Navigate to subscription settings
       await page.goto('/settings?tab=subscription');
       await page.waitForLoadState('networkidle');
-      // Wait for subscription context to hydrate (shows loading skeleton initially)
-      await page.waitForTimeout(3000);
 
-      // Should show current plan - wait for loading to finish
-      await expect(page.getByTestId('subscription-plan-name')).toBeVisible({ timeout: 15000 });
+      // Wait for subscription context to fully hydrate.
+      // The SubscriptionProvider retries up to 3 times with 20s timeout each (worst case ~60s).
+      // Wait for the loading skeleton to disappear OR the plan name to appear.
+      await expect(page.getByTestId('subscription-plan-name')).toBeVisible({ timeout: 75000 });
       await expect(page.getByTestId('subscription-plan-name')).toContainText(/Pro Plan|Family Plan|Free Plan/i);
 
       // Should show billing management button or upgrade option
