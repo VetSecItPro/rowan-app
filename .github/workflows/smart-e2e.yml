@@ -59,6 +59,8 @@ jobs:
       repo-name: rowan
       node-version: '20'
       base-url: 'http://localhost:3000'
+      extra-env: |
+        NEXT_PUBLIC_ENABLE_MONETIZATION=true
     secrets:
       SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}

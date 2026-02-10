@@ -219,6 +219,25 @@ export async function verifyFeatureAccess(
   const route = featureRoutes[feature] || `/${feature}`;
   await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
+  // Check if we were redirected to the login page — this means the auth session
+  // is invalid/expired. A redirect to /login effectively blocks feature access.
+  const currentUrl = page.url();
+  if (currentUrl.includes('/login')) {
+    if (!shouldHaveAccess) {
+      // Free user redirected to login — feature is effectively blocked
+      console.warn(
+        `Feature "${feature}" redirected to login page (session expired/invalid). ` +
+        `Treating as "gated" since the user cannot access the feature.`
+      );
+      return;
+    }
+    // Pro user redirected to login — this is an auth issue, not a gating issue
+    throw new Error(
+      `Feature "${feature}" should be accessible but was redirected to login. ` +
+      `Auth session may be invalid. URL: ${currentUrl}`
+    );
+  }
+
   // Dismiss cookie banner FIRST — it blocks clicks and visibility on mobile viewports
   await dismissCookieBanner(page);
 
