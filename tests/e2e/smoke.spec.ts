@@ -74,12 +74,23 @@ test.describe('Smoke Flow', () => {
     const spaceId = await getPrimarySpaceId(page);
 
     // Tasks: create + update
+    // Supabase's getUser() can intermittently fail in CI even after ensureAuthenticated
+    // passes — retry once with re-authentication on 401
     const taskTitle = `Smoke Task ${Date.now()}`;
-    const taskCreate = await page.request.post('/api/tasks', {
+    let taskCreate = await page.request.post('/api/tasks', {
       data: { space_id: spaceId, title: taskTitle },
       headers: await freshHeaders(page),
       timeout: 30000,
     });
+    if (taskCreate.status() === 401) {
+      console.warn('Task create returned 401 — re-authenticating and retrying...');
+      await ensureAuthenticated(page, 'pro');
+      taskCreate = await page.request.post('/api/tasks', {
+        data: { space_id: spaceId, title: taskTitle },
+        headers: await freshHeaders(page),
+        timeout: 30000,
+      });
+    }
     if (!taskCreate.ok()) {
       const body = await taskCreate.text();
       throw new Error(`Task create failed: ${taskCreate.status()} ${body}`);

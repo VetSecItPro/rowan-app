@@ -75,13 +75,28 @@ export async function ensureAuthenticated(
   // page.request may not carry cookies until after a page navigation.
   await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-  // If we weren't redirected to login, session is valid
-  if (!page.url().includes('/login')) {
-    return;
+  // Check BOTH navigation and API auth. Navigation can succeed while API
+  // calls fail due to intermittent Supabase getUser() network failures in CI.
+  const redirectedToLogin = page.url().includes('/login');
+  let apiAuthValid = false;
+  if (!redirectedToLogin) {
+    apiAuthValid = await page.request
+      .get('/api/csrf/token', { timeout: 10000 })
+      .then(r => r.ok())
+      .catch(() => false);
   }
 
-  // Session expired — we're on /login, re-authenticate
-  console.warn(`Session expired for ${userType} user, re-authenticating...`);
+  if (!redirectedToLogin && apiAuthValid) {
+    return; // Session is fully valid
+  }
+
+  // Session expired or API auth failed — re-authenticate
+  console.warn(`Session invalid for ${userType} user (redirect=${redirectedToLogin}, apiOk=${apiAuthValid}), re-authenticating...`);
+
+  // Navigate to login if not already there
+  if (!redirectedToLogin) {
+    await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  }
 
   await page.waitForLoadState('networkidle').catch(() => {});
   await dismissCookieBanner(page);
@@ -96,8 +111,9 @@ export async function ensureAuthenticated(
 
   await page.keyboard.press('Enter');
 
-  // Wait for redirect away from /login
-  await page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 45000 });
+  // Wait for redirect away from /login — 90s for CI dev server compilation.
+  // Pro user login consistently takes >45s on first attempt due to page compilation.
+  await page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 90000 });
 
   // Verify auth via API
   const verifyResponse = await page.request.get('/api/csrf/token', { timeout: 10000 }).catch(() => null);
