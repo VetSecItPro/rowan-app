@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { TEST_USERS } from './helpers/test-utils';
+import { TEST_USERS, ensureAuthenticated } from './helpers/test-utils';
 
 // Use pro user for smoke tests (any authenticated user works)
 const SMOKE_USER = TEST_USERS.pro;
@@ -67,6 +67,9 @@ test.describe('Smoke Flow', () => {
     // Smoke test makes many sequential API calls — needs extra time
     // Under parallel test load, individual API calls may be slow (rate limiting, server load)
     test.setTimeout(300000);
+
+    // Ensure pro user session is valid (re-authenticates if expired)
+    await ensureAuthenticated(page, 'pro');
 
     const spaceId = await getPrimarySpaceId(page);
 

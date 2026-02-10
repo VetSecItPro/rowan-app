@@ -47,13 +47,68 @@ export const TEST_USERS = {
     email: 'test-free@rowan-test.app',
     password: testPassword,
     tier: 'free' as const,
+    storageState: 'tests/e2e/.auth/free.json',
   },
   pro: {
     email: 'test-pro@rowan-test.app',
     password: testPassword,
     tier: 'pro' as const,
+    storageState: 'tests/e2e/.auth/pro.json',
   },
 };
+
+/**
+ * Ensure the test user is authenticated. If the session is invalid
+ * (e.g., Supabase's getUser() network call failed in CI, or refresh
+ * token was rotated by a prior test), re-authenticate via UI login
+ * and save the updated storage state for subsequent tests.
+ *
+ * Call this at the start of any test that needs a valid auth session.
+ */
+export async function ensureAuthenticated(
+  page: Page,
+  userType: keyof typeof TEST_USERS
+): Promise<void> {
+  const user = TEST_USERS[userType];
+
+  // Navigate to a protected page to activate cookies and check session.
+  // page.request may not carry cookies until after a page navigation.
+  await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+  // If we weren't redirected to login, session is valid
+  if (!page.url().includes('/login')) {
+    return;
+  }
+
+  // Session expired — we're on /login, re-authenticate
+  console.warn(`Session expired for ${userType} user, re-authenticating...`);
+
+  await page.waitForLoadState('networkidle').catch(() => {});
+  await dismissCookieBanner(page);
+
+  const emailInput = page.locator('[data-testid="login-email-input"], input[type="email"]').first();
+  await emailInput.waitFor({ state: 'visible', timeout: 15000 });
+  await emailInput.fill(user.email);
+
+  const passwordInput = page.locator('[data-testid="login-password-input"], input[type="password"]').first();
+  await passwordInput.waitFor({ state: 'visible', timeout: 5000 });
+  await passwordInput.fill(user.password);
+
+  await page.keyboard.press('Enter');
+
+  // Wait for redirect away from /login
+  await page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 45000 });
+
+  // Verify auth via API
+  const verifyResponse = await page.request.get('/api/csrf/token', { timeout: 10000 }).catch(() => null);
+  if (!verifyResponse?.ok()) {
+    throw new Error(`Re-authentication failed for ${userType} user`);
+  }
+
+  // Save updated storage state so subsequent tests in this run get valid cookies
+  await page.context().storageState({ path: user.storageState });
+  console.log(`  ✓ Re-authenticated ${userType} user and saved session`);
+}
 
 // Payment test cards (Polar uses Stripe under the hood)
 export const TEST_CARDS = {
@@ -219,23 +274,23 @@ export async function verifyFeatureAccess(
   const route = featureRoutes[feature] || `/${feature}`;
   await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-  // Check if we were redirected to the login page — this means the auth session
-  // is invalid/expired. A redirect to /login effectively blocks feature access.
-  const currentUrl = page.url();
-  if (currentUrl.includes('/login')) {
-    if (!shouldHaveAccess) {
-      // Free user redirected to login — feature is effectively blocked
-      console.warn(
-        `Feature "${feature}" redirected to login page (session expired/invalid). ` +
-        `Treating as "gated" since the user cannot access the feature.`
+  // Check if we were redirected to the login page — session expired.
+  // Instead of silently passing or failing, re-authenticate and retry.
+  if (page.url().includes('/login')) {
+    const userType = shouldHaveAccess ? 'pro' : 'free';
+    console.warn(`Feature "${feature}": session expired, re-authenticating as ${userType}...`);
+    await ensureAuthenticated(page, userType);
+
+    // Re-navigate to the feature page after re-authentication
+    await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 30000 });
+
+    // If still redirected to login after re-auth, that's a real failure
+    if (page.url().includes('/login')) {
+      throw new Error(
+        `Feature "${feature}" still redirects to login after re-authentication. ` +
+        `Auth is fundamentally broken. URL: ${page.url()}`
       );
-      return;
     }
-    // Pro user redirected to login — this is an auth issue, not a gating issue
-    throw new Error(
-      `Feature "${feature}" should be accessible but was redirected to login. ` +
-      `Auth session may be invalid. URL: ${currentUrl}`
-    );
   }
 
   // Dismiss cookie banner FIRST — it blocks clicks and visibility on mobile viewports

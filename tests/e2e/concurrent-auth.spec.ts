@@ -108,8 +108,9 @@ async function createUsersViaAdmin(users: TestUser[]): Promise<Map<string, strin
         user_id: user.supabaseId,
         tier: user.tier,
         status: 'active',
-        current_period_start: new Date().toISOString(),
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        period: 'monthly',
+        subscription_started_at: new Date().toISOString(),
+        subscription_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       }, { onConflict: 'user_id' });
 
     if (error) {

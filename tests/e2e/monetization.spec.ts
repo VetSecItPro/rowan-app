@@ -20,6 +20,7 @@ import {
   isUpgradeModalVisible,
   closeUpgradeModal,
   verifyFeatureAccess,
+  ensureAuthenticated,
 } from './helpers/test-utils';
 
 test.describe('Monetization Features', () => {
@@ -38,30 +39,21 @@ test.describe('Monetization Features', () => {
     test('free user hits daily task creation limit', async ({ page }) => {
       test.setTimeout(180000);
 
-      // Navigate to dashboard first to ensure auth cookies are active
-      await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
-
-      // Check if we were redirected to login — auth session may be invalid
-      if (page.url().includes('/login')) {
-        console.warn('Free user redirected to login — auth session invalid. Skipping task limit test.');
-        return;
-      }
+      // Ensure free user session is valid (re-authenticates if expired)
+      await ensureAuthenticated(page, 'free');
 
       // Get a CSRF token for API calls (with retry for session hydration)
       let csrfToken = '';
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 3; i++) {
         const csrfResponse = await page.request.get('/api/csrf/token', { timeout: 30000 });
         if (csrfResponse.ok()) {
           const csrfPayload = await csrfResponse.json();
           csrfToken = csrfPayload.token as string;
           break;
         }
-        if (i < 4) await page.waitForTimeout(2000 * (i + 1));
+        if (i < 2) await page.waitForTimeout(2000 * (i + 1));
       }
-      if (!csrfToken) {
-        console.warn('Failed to get CSRF token after 5 attempts — auth session may be invalid');
-        return;
-      }
+      expect(csrfToken).toBeTruthy();
 
       // Get space ID with progressive backoff (space provisioning trigger can lag 5-10s)
       let spaceId: string | undefined;
@@ -75,10 +67,7 @@ test.describe('Monetization Features', () => {
         }
         if (i < 4) await page.waitForTimeout(3000 * (i + 1));
       }
-      if (!spaceId) {
-        console.warn('Failed to get space ID after 5 attempts — space provisioning may not have completed');
-        return;
-      }
+      expect(spaceId).toBeTruthy();
 
       // Create tasks via API until we hit the daily limit
       // Free tier limit is 10 daily task creations (from feature-limits.ts)
@@ -299,6 +288,9 @@ test.describe('Monetization Features', () => {
      */
     test('subscription settings page loads correctly', async ({ page }) => {
       test.setTimeout(90000);
+
+      // Ensure pro user session is valid (re-authenticates if expired)
+      await ensureAuthenticated(page, 'pro');
 
       // Navigate to subscription settings
       await page.goto('/settings?tab=subscription');
