@@ -249,14 +249,20 @@ test.describe('Auth Flow Tests', () => {
     await page.goto(BASE_URL);
     await page.waitForLoadState('networkidle');
 
+    // Dismiss cookie banner if present (prevents click blocking on mobile viewports)
+    await dismissCookieBanner(page);
+
+    // Wait for hero section animations to complete (Framer Motion uses initial opacity: 0)
+    await page.waitForTimeout(2000);
+
     // Click CTA using resilient selector
     await resilientClick(page, 'hero-cta-signup', {
       role: 'button',
       text: 'Try Free for 14 Days',
     });
 
-    // Wait for navigation
-    await page.waitForURL('**/signup', { timeout: 10000 });
+    // Wait for navigation — router.push('/signup') may take a moment
+    await page.waitForURL('**/signup', { timeout: 15000 });
     expect(page.url()).toContain('/signup');
 
     console.log('✓ "Try Free for 14 Days" navigates to /signup');

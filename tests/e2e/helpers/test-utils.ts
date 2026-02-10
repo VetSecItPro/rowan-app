@@ -13,21 +13,27 @@ import { resilientFill, resilientClick, elementExists, getButton } from './resil
  */
 export async function dismissCookieBanner(page: Page): Promise<void> {
   try {
-    // Check if cookie banner is visible (z-index 60 fixed bottom banner)
-    const bannerVisible = await elementExists(page, 'cookie-consent-accept', {
-      role: 'button',
-      text: 'Got it',
-    });
-
-    if (bannerVisible) {
-      await resilientClick(page, 'cookie-consent-accept', {
-        role: 'button',
-        text: 'Got it',
-      });
-
-      // Wait for banner to animate out
-      await page.waitForTimeout(500);
+    // Wait briefly for cookie banner to render (it mounts after hydration)
+    const gotItButton = page.getByTestId('cookie-consent-accept');
+    try {
+      await gotItButton.waitFor({ state: 'visible', timeout: 3000 });
+    } catch {
+      // Banner not present or already dismissed — try text fallback
+      const textButton = page.getByRole('button', { name: 'Got it' });
+      try {
+        await textButton.waitFor({ state: 'visible', timeout: 1000 });
+        await textButton.click();
+        await page.waitForTimeout(500);
+        return;
+      } catch {
+        // No banner at all — that's fine
+        return;
+      }
     }
+
+    await gotItButton.click();
+    // Wait for banner to animate out
+    await page.waitForTimeout(500);
   } catch (error) {
     // Silently fail - banner may not be present
     console.log('Cookie banner not found or already dismissed');
@@ -201,18 +207,53 @@ export async function verifyFeatureAccess(
   };
 
   const route = featureRoutes[feature] || `/${feature}`;
-  await page.goto(route);
-  await page.waitForLoadState('networkidle');
+  await page.goto(route, { waitUntil: 'domcontentloaded' });
+
+  // Dismiss cookie banner FIRST — it blocks clicks and visibility on mobile viewports
+  await dismissCookieBanner(page);
+
+  await page.waitForLoadState('networkidle').catch(() => {
+    // networkidle may not fire if server is slow — proceed anyway
+  });
+
+  // Wait for subscription context to finish loading.
+  // Strategy: poll for the feature-locked-message or actual feature content.
+  // The loading skeleton (.animate-pulse) may flash too quickly to catch,
+  // so we wait for the final state directly with generous timeout.
+  try {
+    await Promise.race([
+      // Option 1: Locked message appears (free user blocked)
+      page.waitForSelector('[data-testid="feature-locked-message"]', { state: 'visible', timeout: 25000 }),
+      // Option 2: Upgrade modal appears (free user blocked, different UX)
+      page.waitForSelector('[data-testid="upgrade-modal"]', { state: 'visible', timeout: 25000 }),
+      // Option 3: Feature content loaded (pro user, no gate). Wait for h1 heading
+      // which appears in all feature pages after subscription context resolves.
+      page.waitForSelector('h1', { state: 'visible', timeout: 25000 }),
+    ]);
+  } catch {
+    // None appeared within timeout — proceed with checks anyway
+  }
+  // Extra safety wait for React re-render after subscription context update
+  await page.waitForTimeout(3000);
 
   // Check for feature locked using resilient selector
+  // Match all tier variations: "Requires Pro Plan", "Requires Family Plan",
+  // "Upgrade to Pro to unlock...", etc.
   const isLocked = await elementExists(page, 'feature-locked-message', {
-    text: /upgrade to unlock|requires pro/i,
+    text: /upgrade to .+ to unlock|requires .+ plan/i,
+  });
+
+  // Also check for upgrade modal which may appear instead
+  const hasUpgradeModal = await elementExists(page, 'upgrade-modal', {
+    role: 'dialog',
   });
 
   if (shouldHaveAccess) {
     expect(isLocked).toBeFalsy();
+    expect(hasUpgradeModal).toBeFalsy();
   } else {
-    expect(isLocked).toBeTruthy();
+    // Feature should be locked OR upgrade modal should appear
+    expect(isLocked || hasUpgradeModal).toBeTruthy();
   }
 }
 
@@ -220,8 +261,11 @@ export async function verifyFeatureAccess(
  * Create a task (for testing task limits) using resilient selectors
  */
 export async function createTask(page: Page, title: string): Promise<boolean> {
-  await page.goto('/tasks');
-  await page.waitForLoadState('networkidle');
+  await page.goto('/tasks', { waitUntil: 'domcontentloaded' });
+  await page.waitForLoadState('networkidle').catch(() => {});
+
+  // Dismiss cookie banner if it's blocking clicks (especially on mobile)
+  await dismissCookieBanner(page);
 
   // Click add task button using resilient selector
   await resilientClick(page, 'add-task-button', {

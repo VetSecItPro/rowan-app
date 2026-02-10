@@ -28,7 +28,8 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
 
   // Opt out of parallel tests on CI for stability
-  workers: process.env.CI ? 1 : undefined,
+  // Limit local workers to 2 to prevent overloading the dev server
+  workers: process.env.CI ? 1 : 2,
 
   // Reporter to use
   reporter: [
