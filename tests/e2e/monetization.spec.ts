@@ -38,15 +38,33 @@ test.describe('Monetization Features', () => {
     test('free user hits daily task creation limit', async ({ page }) => {
       test.setTimeout(120000);
 
-      // Get a CSRF token and space ID for API calls (with timeout for load)
-      const csrfResponse = await page.request.get('/api/csrf/token', { timeout: 30000 });
-      const csrfPayload = await csrfResponse.json();
-      const csrfToken = csrfPayload.token as string;
+      // Navigate to dashboard first to ensure auth cookies are active
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-      const spacesResponse = await page.request.get('/api/spaces', { timeout: 30000 });
-      const spacesResult = await spacesResponse.json();
-      const spaces = spacesResult.data || spacesResult;
-      const spaceId = Array.isArray(spaces) ? spaces[0]?.id : undefined;
+      // Get a CSRF token and space ID for API calls (with retry for session hydration)
+      let csrfToken = '';
+      for (let i = 0; i < 3; i++) {
+        const csrfResponse = await page.request.get('/api/csrf/token', { timeout: 30000 });
+        if (csrfResponse.ok()) {
+          const csrfPayload = await csrfResponse.json();
+          csrfToken = csrfPayload.token as string;
+          break;
+        }
+        if (i < 2) await page.waitForTimeout(2000);
+      }
+      expect(csrfToken).toBeTruthy();
+
+      let spaceId: string | undefined;
+      for (let i = 0; i < 3; i++) {
+        const spacesResponse = await page.request.get('/api/spaces', { timeout: 30000 });
+        if (spacesResponse.ok()) {
+          const spacesResult = await spacesResponse.json();
+          const spaces = spacesResult.data || spacesResult;
+          spaceId = Array.isArray(spaces) ? spaces[0]?.id : undefined;
+          if (spaceId) break;
+        }
+        if (i < 2) await page.waitForTimeout(2000);
+      }
       expect(spaceId).toBeTruthy();
 
       // Create tasks via API until we hit the daily limit

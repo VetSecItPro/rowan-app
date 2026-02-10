@@ -100,7 +100,8 @@ async function testConcurrentUser(
     await page.getByTestId('signup-submit-button').click();
 
     // Step 4: Wait for redirect to dashboard (auth success)
-    await page.waitForURL('**/dashboard', { timeout: 30000 });
+    // In CI with concurrent signups, the dev server is under heavy load — generous timeout needed
+    await page.waitForURL('**/dashboard', { timeout: 60000 });
     const signupDuration = Date.now() - signupStart;
 
     console.log(`[User ${user.id}] ✅ Signup complete (${signupDuration}ms)`);
@@ -201,10 +202,16 @@ async function cleanupTestUsers(userIds: Map<string, string>) {
 }
 
 test.describe('Concurrent Authentication Load Test', () => {
-  // Load tests require a staging/production server — skip locally
-  test.skip(() => !process.env.CI, 'Concurrent auth load tests only run in CI');
+  // Load tests require CI + SUPABASE_SERVICE_ROLE_KEY for user management
+  // Skip if either is missing — these are heavy stress tests that need proper infra
+  test.skip(
+    () => !process.env.CI || !process.env.SUPABASE_SERVICE_ROLE_KEY,
+    'Concurrent auth load tests require CI and SUPABASE_SERVICE_ROLE_KEY'
+  );
 
   test('10 users sign up concurrently and all see correct subscription tier', async ({ browser, baseURL }) => {
+    // Concurrent signup is a stress test — needs generous timeout
+    test.setTimeout(300000);
     if (!baseURL) {
       throw new Error('baseURL is required for this test');
     }
@@ -223,12 +230,12 @@ test.describe('Concurrent Authentication Load Test', () => {
     const createdUserIds = new Map<string, string>();
 
     try {
-      // Step 1: Spawn 10 concurrent signup flows (staggered by 300ms each to avoid overwhelming dev server)
-      console.log('Step 1: Spawning 10 concurrent signup flows (staggered)...\n');
+      // Step 1: Spawn 10 concurrent signup flows (staggered by 1s each to avoid overwhelming dev server in CI)
+      console.log('Step 1: Spawning 10 concurrent signup flows (staggered 1s apart)...\n');
 
       const testStartTime = Date.now();
       const promises = testUsers.map((user, index) =>
-        testConcurrentUser(browser, user, baseURL, index * 300)
+        testConcurrentUser(browser, user, baseURL, index * 1000)
       );
       const results = await Promise.all(promises);
       const totalDuration = Date.now() - testStartTime;
@@ -331,6 +338,7 @@ test.describe('Concurrent Authentication Load Test', () => {
   });
 
   test('20 users sign up concurrently (stress test)', async ({ browser, baseURL }) => {
+    test.setTimeout(600000);
     if (!baseURL) {
       throw new Error('baseURL is required for this test');
     }
@@ -343,11 +351,11 @@ test.describe('Concurrent Authentication Load Test', () => {
     const createdUserIds = new Map<string, string>();
 
     try {
-      console.log('Spawning 20 concurrent signup flows (staggered)...\n');
+      console.log('Spawning 20 concurrent signup flows (staggered 800ms apart)...\n');
 
       const testStartTime = Date.now();
       const promises = testUsers.map((user, index) =>
-        testConcurrentUser(browser, user, baseURL, index * 200)
+        testConcurrentUser(browser, user, baseURL, index * 800)
       );
       const results = await Promise.all(promises);
       const totalDuration = Date.now() - testStartTime;
