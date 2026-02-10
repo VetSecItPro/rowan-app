@@ -10,6 +10,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
+import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
@@ -101,6 +102,9 @@ type CreateHabitInput = {
 };
 
 export default function GoalsPage() {
+  // SECURITY: Check feature access FIRST, before loading any data
+  const { hasAccess, isLoading: gateLoading } = useFeatureGate('goals');
+
   const { currentSpace, user } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -205,13 +209,17 @@ export default function GoalsPage() {
   }, [goals]);
 
   useEffect(() => {
-    loadData();
+    // SECURITY: Only load data if user has access
+    if (!gateLoading && hasAccess) {
+      loadData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace]);
+  }, [currentSpace, gateLoading, hasAccess]);
 
   // Real-time subscription for goals and milestones
   useEffect(() => {
-    if (!currentSpace) return;
+    // SECURITY: Only subscribe if user has access
+    if (!currentSpace || !hasAccess || gateLoading) return;
 
     const supabase = createClient();
 

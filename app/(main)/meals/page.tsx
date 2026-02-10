@@ -33,6 +33,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 import { showSuccess, showError } from '@/lib/utils/toast';
 import { toast } from 'sonner';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
+import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 
 type ViewMode = 'calendar' | 'list' | 'recipes';
@@ -152,11 +153,15 @@ const CalendarDayCell = memo(({
 CalendarDayCell.displayName = 'CalendarDayCell';
 
 export default function MealsPage() {
+  // SECURITY: Check feature access FIRST, before loading any data
+  const { hasAccess, isLoading: gateLoading } = useFeatureGate('mealPlanning');
+
   const { currentSpace, user } = useAuthWithSpaces();
   const queryClient = useQueryClient();
   const spaceId = currentSpace?.id;
 
   // React Query: fetch meals + stats
+  // IMPORTANT: Only fetch if user has access (prevents data loading for free users)
   const {
     data: mealsData,
     isLoading: mealsLoading,
@@ -170,7 +175,7 @@ export default function MealsPage() {
       ]);
       return { meals, stats };
     },
-    enabled: !!spaceId && !!user,
+    enabled: !!spaceId && !!user && !gateLoading && hasAccess,
     ...QUERY_OPTIONS.features,
   });
 
@@ -184,7 +189,7 @@ export default function MealsPage() {
   } = useQuery({
     queryKey: QUERY_KEYS.meals.recipes(spaceId || ''),
     queryFn: () => mealsService.getRecipes(spaceId!),
-    enabled: !!spaceId,
+    enabled: !!spaceId && !gateLoading && hasAccess,
     ...QUERY_OPTIONS.features,
   });
 
@@ -835,11 +840,20 @@ export default function MealsPage() {
     }
   }, [pendingMealData, selectedRecipeForReview, spaceId, invalidateMeals]);
 
+  // Render feature gate wrapper (handles loading and blocked states)
   return (
     <FeatureGateWrapper
       feature="mealPlanning"
       title="Meal Planning"
       description="Plan your family meals, save recipes, and automatically generate shopping lists. Upgrade to Pro to unlock this feature."
+      loadingFallback={
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-pulse flex flex-col items-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-gray-700" />
+            <div className="h-4 w-32 rounded bg-gray-700" />
+          </div>
+        </div>
+      }
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
       <PullToRefresh onRefresh={handlePullToRefresh}>

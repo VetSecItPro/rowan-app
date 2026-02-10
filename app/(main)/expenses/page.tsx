@@ -8,6 +8,7 @@ import { logger } from '@/lib/logger';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 // Using native HTML elements and existing components
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
+import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,9 @@ interface ExpenseSummary {
 }
 
 export default function ExpensesPage() {
+  // SECURITY: Check feature access FIRST
+  const { hasAccess, isLoading: gateLoading } = useFeatureGate('household');
+
   const [activeTab, setActiveTab] = useState('scanner');
   const [recentExpenses] = useState<ExpenseSummary>({
     total: 2847.32,

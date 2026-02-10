@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { TEST_USERS } from './helpers/test-utils';
 
-const SMOKE_USER = TEST_USERS.smoke;
+// Use pro user for smoke tests (any authenticated user works)
+const SMOKE_USER = TEST_USERS.pro;
 
 async function getCsrfToken(page: import('@playwright/test').Page): Promise<string> {
   const response = await page.request.get('/api/csrf/token');
@@ -20,8 +21,8 @@ async function getPrimarySpaceId(page: import('@playwright/test').Page): Promise
 }
 
 test.describe('Smoke Flow', () => {
-  // Use pre-authenticated smoke user session
-  test.use({ storageState: 'tests/e2e/.auth/smoke.json' });
+  // Use pre-authenticated pro user session (any authenticated user works for smoke tests)
+  test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
   test('login and core flows work end-to-end', async ({ page }) => {
 

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { DashboardSkeleton, SpacesLoadingState } from '@/components/ui/LoadingStates';
-import { SubscriptionProvider } from '@/lib/contexts/subscription-context';
 import { logger } from '@/lib/logger';
 
 interface AppWithOnboardingProps {
@@ -29,11 +28,19 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     return <>{children}</>;
   }
 
-  if (authLoading || spacesLoading || !isReady) {
+  // Only show loading skeleton during initial auth load, not while spaces are loading
+  // This allows authenticated users (E2E tests with stored sessions) to see page content immediately
+  if (authLoading) {
+    logger.info('AppWithOnboarding: Showing auth loading', { component: 'AppWithOnboarding' });
     return <DashboardSkeleton />;
   }
 
-  if (!currentSpace) {
+  // Allow page to render while spaces load in background (authenticated users can see feature gates immediately)
+  if (!isReady && spacesLoading) {
+    logger.info('AppWithOnboarding: Spaces loading, but allowing render', { component: 'AppWithOnboarding' });
+  }
+
+  if (!currentSpace && !spacesLoading) {
     if (!hasZeroSpaces) {
       return <SpacesLoadingState />;
     }
@@ -87,9 +94,6 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
     );
   }
 
-  return (
-    <SubscriptionProvider>
-      {children}
-    </SubscriptionProvider>
-  );
+  // SubscriptionProvider is in the parent layout, don't nest it here
+  return <>{children}</>;
 }

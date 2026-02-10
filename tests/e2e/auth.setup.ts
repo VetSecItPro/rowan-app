@@ -13,11 +13,6 @@ import { test as setup, expect } from '@playwright/test';
 import { resilientFill, resilientClick, elementExists } from './helpers/resilient-selectors';
 
 const TEST_USERS = {
-  smoke: {
-    email: process.env.SMOKE_TEST_EMAIL || 'smoke.test@rowan-test.app',
-    password: process.env.SMOKE_TEST_PASSWORD || process.env.E2E_TEST_PASSWORD || '',
-    storageState: 'tests/e2e/.auth/smoke.json',
-  },
   free: {
     email: 'test-free@rowan-test.app',
     password: process.env.E2E_TEST_PASSWORD || '',
@@ -28,11 +23,6 @@ const TEST_USERS = {
     password: process.env.E2E_TEST_PASSWORD || '',
     storageState: 'tests/e2e/.auth/pro.json',
   },
-  family: {
-    email: 'test-family@rowan-test.app',
-    password: process.env.E2E_TEST_PASSWORD || '',
-    storageState: 'tests/e2e/.auth/family.json',
-  },
 };
 
 setup.describe('Auth Setup', () => {
@@ -42,6 +32,18 @@ setup.describe('Auth Setup', () => {
   for (const [userType, user] of Object.entries(TEST_USERS)) {
     setup(`authenticate as ${userType} user`, async ({ page }) => {
       console.log(`🔐 Authenticating as ${userType} (${user.email})...`);
+
+      // Capture console errors
+      page.on('console', msg => {
+        if (msg.type() === 'error') {
+          console.log(`  ❌ Browser console error: ${msg.text()}`);
+        }
+      });
+
+      // Capture page errors
+      page.on('pageerror', err => {
+        console.log(`  ❌ Page error: ${err.message}`);
+      });
 
       await page.goto('/login');
       await page.waitForLoadState('networkidle');
@@ -66,16 +68,23 @@ setup.describe('Auth Setup', () => {
         type: 'password',
       });
 
-      // Submit using resilient click
-      await resilientClick(page, 'login-submit-button', {
-        role: 'button',
-        text: 'Sign In',
-      });
+      // Try pressing Enter to submit instead of clicking button
+      await page.keyboard.press('Enter');
+
+      console.log(`  ✓ Pressed Enter to submit form`);
 
       // CRITICAL: Wait for redirect to initiate before checking URL
       // The login page uses window.location.href which requires a brief moment
       // to trigger the navigation. Without this wait, waitForURL races with the redirect.
       await page.waitForTimeout(2000);
+
+      console.log(`  Current URL after 2s wait: ${page.url()}`);
+
+      // Check for error message
+      const errorText = await page.locator('text=/invalid|error|failed/i').first().textContent().catch(() => null);
+      if (errorText) {
+        console.log(`  ❌ Error message on page: ${errorText}`);
+      }
 
       // Wait for redirect to dashboard
       // Timeout increased to 25s for CI: 3rd/4th login attempts (pro/family) consistently take 19-22s

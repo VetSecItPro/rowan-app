@@ -118,7 +118,8 @@ export function useFeatureGate(feature: GatedFeature): UseFeatureGateResult {
   const subscription = useSubscriptionSafe();
 
   // Default values when provider isn't available (during loading/auth)
-  const canAccess = subscription?.canAccess ?? (() => true);
+  // SECURITY: Default to DENY access if provider unavailable
+  const canAccess = subscription?.canAccess ?? (() => false);
   const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isLoading = subscription?.isLoading ?? true;
   const isInTrial = subscription?.isInTrial ?? false;
@@ -211,8 +212,9 @@ export function useMultiFeatureGate(features: GatedFeature[]): {
   tier: SubscriptionTier;
 } {
   const subscription = useSubscriptionSafe();
+  // SECURITY: Default to DENY access if provider unavailable
   const canAccess = useMemo(
-    () => subscription?.canAccess ?? (() => true),
+    () => subscription?.canAccess ?? (() => false),
     [subscription]
   );
   const effectiveTier = subscription?.effectiveTier ?? 'free';
@@ -253,7 +255,8 @@ export function useNumericLimit(
   promptIfExceeded: (currentCount: number) => boolean;
 } {
   const subscription = useSubscriptionSafe();
-  const limits = subscription?.limits ?? { maxActiveTasks: Infinity, maxShoppingLists: Infinity, maxShoppingItems: Infinity, maxUsers: Infinity, maxSpaces: Infinity };
+  // SECURITY: Default to FREE tier limits if provider unavailable
+  const limits = subscription?.limits ?? { maxActiveTasks: 50, maxShoppingLists: 3, maxShoppingItems: 50, maxUsers: 2, maxSpaces: 1 };
   const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isLoading = subscription?.isLoading ?? true;
   const showUpgradeModal = useMemo(

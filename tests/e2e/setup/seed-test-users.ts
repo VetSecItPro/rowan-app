@@ -13,9 +13,13 @@
  *   - E2E_TEST_PASSWORD
  */
 
+import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
+
+// Load .env.local for local development
+config({ path: '.env.local' });
 
 interface TestUser {
   email: string;
@@ -25,12 +29,6 @@ interface TestUser {
 }
 
 const TEST_USERS: TestUser[] = [
-  {
-    email: 'smoke.test@rowan-test.app',
-    password: process.env.E2E_TEST_PASSWORD || process.env.SMOKE_TEST_PASSWORD || '',
-    name: 'Smoke Test',
-    tier: 'pro',
-  },
   {
     email: 'test-free@rowan-test.app',
     password: process.env.E2E_TEST_PASSWORD || '',
@@ -42,12 +40,6 @@ const TEST_USERS: TestUser[] = [
     password: process.env.E2E_TEST_PASSWORD || '',
     name: 'Pro Test User',
     tier: 'pro',
-  },
-  {
-    email: 'test-family@rowan-test.app',
-    password: process.env.E2E_TEST_PASSWORD || '',
-    name: 'Family Test User',
-    tier: 'family',
   },
 ];
 

@@ -133,11 +133,16 @@ export async function deleteCachePattern(pattern: string): Promise<boolean> {
 export async function cacheAside<T>(
   key: string,
   fetchFn: () => Promise<T>,
-  ttlSeconds: number = CACHE_TTL.MEDIUM
+  ttlSeconds: number = CACHE_TTL.MEDIUM,
+  onCacheHit?: () => void
 ): Promise<T> {
   // Try to get from cache
   const cached = await getCache<T>(key);
   if (cached !== null) {
+    // Call the cache hit callback if provided
+    if (onCacheHit) {
+      onCacheHit();
+    }
     return cached;
   }
 

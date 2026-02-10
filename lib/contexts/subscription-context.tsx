@@ -8,6 +8,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import type { SubscriptionTier, TrialStatus, FeatureLimits } from '@/lib/types';
 import { logger } from '@/lib/logger';
+import * as Sentry from '@sentry/nextjs';
 
 // Feature limits by tier
 const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
@@ -125,8 +126,16 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const [, setUpgradeModalOpen] = useState(false);
   const [, setUpgradeFeature] = useState<string | undefined>();
 
-  // Fetch subscription status
+  // Fetch subscription status with retry logic and performance monitoring
   const fetchSubscription = useCallback(async () => {
+    const startTime = performance.now();
+    const isTest = typeof process !== 'undefined' &&
+                   (process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST === 'true');
+
+    // Retry configuration for production resilience
+    const MAX_RETRIES = 3;
+    const TIMEOUT_MS = 20000; // 20 second timeout per attempt
+
     try {
       // DEV ONLY: Check for mockTier in URL for testing feature gating
       let url = '/api/subscriptions';
@@ -139,32 +148,234 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
         }
       }
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        // Not logged in or error - default to free
-        setTier('free');
-        setTrial({
-          isInTrial: false,
-          daysRemaining: 0,
-          trialEndsAt: null,
-          trialStartedAt: null,
-        });
-        return;
-      }
+      let lastError: Error | null = null;
 
-      const data = await response.json();
-      setTier(data.tier || 'free');
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          // Exponential backoff delay before retry (skip on first attempt)
+          if (attempt > 0) {
+            const delayMs = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
+            logger.info(`Retrying subscription fetch after ${delayMs}ms delay`, {
+              component: 'subscription-context',
+              attempt: attempt + 1,
+              maxRetries: MAX_RETRIES,
+            });
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+          }
 
-      if (data.trial) {
-        setTrial({
-          isInTrial: data.trial.isInTrial || false,
-          daysRemaining: data.trial.daysRemaining || 0,
-          trialEndsAt: data.trial.trialEndsAt ? new Date(data.trial.trialEndsAt) : null,
-          trialStartedAt: data.trial.trialStartedAt ? new Date(data.trial.trialStartedAt) : null,
-        });
+          // Production-grade timeout - allows API to respond under heavy concurrent load
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => {
+            logger.warn('Subscription fetch timeout - aborting after 20s', {
+              component: 'subscription-context',
+              attempt: attempt + 1,
+            });
+            controller.abort();
+          }, TIMEOUT_MS);
+
+          let fetchSucceeded = false;
+
+          try {
+            logger.info('Fetching subscription from API', {
+              component: 'subscription-context',
+              url,
+              attempt: attempt + 1,
+            });
+
+            const response = await fetch(url, {
+              signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            fetchSucceeded = true;
+
+            const fetchDuration = performance.now() - startTime;
+            logger.info('Subscription API responded', {
+              component: 'subscription-context',
+              status: response.status,
+              duration: `${fetchDuration.toFixed(0)}ms`,
+              attempt: attempt + 1,
+            });
+
+            // Add breadcrumb for successful fetch
+            if (!isTest) {
+              Sentry.addBreadcrumb({
+                category: 'subscription',
+                message: 'Subscription API responded',
+                level: 'info',
+                data: {
+                  status: response.status,
+                  duration_ms: fetchDuration,
+                  attempt: attempt + 1,
+                },
+              });
+            }
+
+            if (!response.ok) {
+              // Not logged in or error - default to free
+              logger.warn('Subscription API returned non-ok status, defaulting to free', {
+                component: 'subscription-context',
+                status: response.status,
+                attempt: attempt + 1,
+              });
+              if (isTest) {
+                console.log(`[SUBSCRIPTION-CONTEXT] API error - status ${response.status}, defaulting to FREE`);
+              }
+
+              setTier('free');
+              setTrial({
+                isInTrial: false,
+                daysRemaining: 0,
+                trialEndsAt: null,
+                trialStartedAt: null,
+              });
+              return;
+            }
+
+            const data = await response.json();
+            logger.info('Subscription data received', {
+              component: 'subscription-context',
+              tier: data.tier,
+              attempt: attempt + 1,
+            });
+
+            if (isTest) {
+              console.log(`[SUBSCRIPTION-PROVIDER] Received from API:`, {
+                topLevelTier: data.tier,
+                subscriptionTier: data.subscription?.tier,
+                subscriptionStatus: data.subscription?.status,
+                willSetTier: data.tier || 'free',
+              });
+            }
+
+            setTier(data.tier || 'free');
+
+            if (data.trial) {
+              setTrial({
+                isInTrial: data.trial.isInTrial || false,
+                daysRemaining: data.trial.daysRemaining || 0,
+                trialEndsAt: data.trial.trialEndsAt ? new Date(data.trial.trialEndsAt) : null,
+                trialStartedAt: data.trial.trialStartedAt ? new Date(data.trial.trialStartedAt) : null,
+              });
+            }
+
+            // Success - track metrics in Sentry
+            const totalDuration = performance.now() - startTime;
+
+            if (!isTest) {
+              Sentry.addBreadcrumb({
+                category: 'subscription',
+                message: 'Subscription fetch successful',
+                level: 'info',
+                data: {
+                  total_duration_ms: totalDuration,
+                  successful_attempt: attempt + 1,
+                  tier: data.tier,
+                },
+              });
+
+              // Set custom measurement for performance tracking
+              Sentry.setMeasurement('subscription_fetch_duration', totalDuration, 'millisecond');
+              Sentry.setContext('subscription_fetch', {
+                duration_ms: totalDuration,
+                attempts: attempt + 1,
+                tier: data.tier,
+                cache_hit: false,
+              });
+            }
+
+            return; // Success - exit retry loop
+          } catch (fetchError) {
+            if (!fetchSucceeded) {
+              clearTimeout(timeoutId);
+            }
+
+            lastError = fetchError as Error;
+
+            if (lastError.name === 'AbortError') {
+              logger.warn('Subscription fetch aborted (timeout)', {
+                component: 'subscription-context',
+                timeout: '20s',
+                attempt: attempt + 1,
+              });
+
+              if (!isTest) {
+                Sentry.addBreadcrumb({
+                  category: 'subscription',
+                  message: 'Subscription fetch timeout',
+                  level: 'warning',
+                  data: {
+                    error: 'AbortError - timeout',
+                    timeout_ms: TIMEOUT_MS,
+                    attempt: attempt + 1,
+                  },
+                });
+              }
+            } else {
+              logger.error('Subscription fetch error', {
+                component: 'subscription-context',
+                error: lastError.message,
+                attempt: attempt + 1,
+              });
+
+              if (!isTest) {
+                Sentry.addBreadcrumb({
+                  category: 'subscription',
+                  message: 'Subscription fetch error',
+                  level: 'error',
+                  data: {
+                    error: lastError.message,
+                    attempt: attempt + 1,
+                  },
+                });
+              }
+            }
+
+            // If this is the last attempt, throw to outer catch
+            if (attempt === MAX_RETRIES - 1) {
+              throw lastError;
+            }
+
+            // Otherwise, continue to next retry
+            continue;
+          }
+        } catch (attemptError) {
+          throw attemptError;
+        }
       }
     } catch (error) {
-      logger.error('Error fetching subscription:', error, { component: 'subscription-context', action: 'service_call' });
+      const totalDuration = performance.now() - startTime;
+
+      logger.error('Error fetching subscription after all retries:', error, {
+        component: 'subscription-context',
+        action: 'service_call',
+        duration: `${totalDuration.toFixed(0)}ms`,
+      });
+
+      // Capture error in Sentry with context
+      if (!isTest) {
+        Sentry.setMeasurement('subscription_fetch_duration', totalDuration, 'millisecond');
+        Sentry.setContext('subscription_fetch', {
+          duration_ms: totalDuration,
+          attempts: MAX_RETRIES,
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+
+        Sentry.captureException(error, {
+          tags: {
+            component: 'subscription-context',
+            operation: 'fetch-subscription',
+          },
+          contexts: {
+            subscription_retry: {
+              max_attempts: MAX_RETRIES,
+              total_duration_ms: totalDuration,
+              timeout_ms: TIMEOUT_MS,
+            },
+          },
+        });
+      }
+
       // Default to free on error
       setTier('free');
     } finally {

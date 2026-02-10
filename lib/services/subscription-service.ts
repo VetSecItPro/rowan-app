@@ -10,6 +10,7 @@ import { createClient } from '../supabase/server';
 import type { SubscriptionTier, SubscriptionStatus, Subscription, TrialStatus } from '../types';
 import { logger } from '@/lib/logger';
 import { cacheAside, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
+import * as Sentry from '@sentry/nextjs';
 
 // Trial configuration
 export const TRIAL_DURATION_DAYS = 14;
@@ -17,30 +18,119 @@ export const TRIAL_DURATION_DAYS = 14;
 /**
  * Get user's current subscription
  * OPTIMIZATION: Cached in Redis for 5 minutes to reduce DB lookups
+ *
+ * @param userId - The user ID to fetch subscription for
+ * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
  */
-export async function getUserSubscription(userId: string): Promise<Subscription | null> {
+export async function getUserSubscription(
+  userId: string,
+  supabaseClient?: Awaited<ReturnType<typeof createClient>>
+): Promise<Subscription | null> {
+  // Disable caching in test environment to prevent stale data
+  const isTest = process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST === 'true';
   const cacheKey = cacheKeys.subscription(userId);
 
-  return cacheAside<Subscription | null>(
+  const startTime = Date.now();
+  let cacheHit = false;
+
+  const result = await cacheAside<Subscription | null>(
     cacheKey,
     async () => {
-      const supabase = await createClient();
+      // Cache miss - track in Sentry
+      cacheHit = false;
 
-      const { data, error } = await supabase
+      const dbQueryStart = Date.now();
+
+      // Use provided client (from API route) or create new one
+      // Using the API route's client eliminates JWT refresh race conditions under concurrent load
+      const supabase = supabaseClient || await createClient();
+
+      const { data, error} = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', userId)
         .single();
 
+      const dbQueryDuration = Date.now() - dbQueryStart;
+
+      // Track database query performance in Sentry
+      if (!isTest) {
+        Sentry.addBreadcrumb({
+          category: 'database',
+          message: 'Subscription database query',
+          level: error ? 'error' : 'info',
+          data: {
+            duration_ms: dbQueryDuration,
+            success: !error,
+            tier: data?.tier || 'unknown',
+            using_provided_client: !!supabaseClient,
+          },
+        });
+
+        if (!error) {
+          Sentry.setMeasurement('subscription_db_query_duration', dbQueryDuration, 'millisecond');
+        }
+      }
+
       if (error) {
-        logger.error('Error fetching subscription:', error, { component: 'lib-subscription-service', action: 'service_call' });
+        logger.error('Error fetching subscription:', error, {
+          component: 'lib-subscription-service',
+          action: 'service_call',
+          userId,
+          usingProvidedClient: !!supabaseClient,
+          duration_ms: dbQueryDuration,
+        });
+
+        // Capture error in Sentry
+        if (!isTest) {
+          Sentry.captureException(error, {
+            tags: {
+              component: 'subscription-service',
+              operation: 'get-user-subscription',
+            },
+            contexts: {
+              subscription: {
+                user_id: userId,
+                using_provided_client: !!supabaseClient,
+                duration_ms: dbQueryDuration,
+              },
+            },
+          });
+        }
+
         return null;
       }
 
       return data;
     },
-    CACHE_TTL.MEDIUM // 5 minutes
+    isTest ? 0 : CACHE_TTL.MEDIUM, // No cache in tests, 5 minutes in prod
+    () => { cacheHit = true; } // Callback when cache hit occurs
   );
+
+  const totalDuration = Date.now() - startTime;
+
+  // Track cache hit rate and total duration in Sentry
+  if (!isTest) {
+    Sentry.addBreadcrumb({
+      category: 'cache',
+      message: cacheHit ? 'Subscription cache hit' : 'Subscription cache miss',
+      level: 'info',
+      data: {
+        cache_hit: cacheHit,
+        total_duration_ms: totalDuration,
+        tier: result?.tier || 'null',
+      },
+    });
+
+    Sentry.setMeasurement('subscription_service_duration', totalDuration, 'millisecond');
+    Sentry.setContext('subscription_cache', {
+      cache_hit: cacheHit,
+      duration_ms: totalDuration,
+      tier: result?.tier || 'null',
+    });
+  }
+
+  return result;
 }
 
 /**
@@ -249,8 +339,14 @@ export async function reactivateSubscription(
 
 /**
  * Get subscription status with detailed info
+ *
+ * @param userId - The user ID to fetch subscription status for
+ * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
  */
-export async function getSubscriptionStatus(userId: string): Promise<{
+export async function getSubscriptionStatus(
+  userId: string,
+  supabaseClient?: Awaited<ReturnType<typeof createClient>>
+): Promise<{
   tier: SubscriptionTier;
   status: SubscriptionStatus;
   isActive: boolean;
@@ -260,9 +356,9 @@ export async function getSubscriptionStatus(userId: string): Promise<{
   daysUntilExpiration: number | null;
   trial: TrialStatus;
 }> {
-  const subscription = await getUserSubscription(userId);
+  const subscription = await getUserSubscription(userId, supabaseClient);
   const expirationDate = await getSubscriptionExpirationDate(userId);
-  const trialStatus = await getTrialStatus(userId);
+  const trialStatus = await getTrialStatus(userId, supabaseClient);
 
   let daysUntilExpiration: number | null = null;
   if (expirationDate) {
@@ -272,7 +368,7 @@ export async function getSubscriptionStatus(userId: string): Promise<{
     );
   }
 
-  return {
+  const result = {
     tier: subscription?.tier || 'free',
     status: subscription?.status || 'active',
     isActive: subscription?.status === 'active',
@@ -282,6 +378,8 @@ export async function getSubscriptionStatus(userId: string): Promise<{
     daysUntilExpiration,
     trial: trialStatus,
   };
+
+  return result;
 }
 
 // ============================================================================
@@ -290,9 +388,15 @@ export async function getSubscriptionStatus(userId: string): Promise<{
 
 /**
  * Get user's trial status
+ *
+ * @param userId - The user ID to fetch trial status for
+ * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
  */
-export async function getTrialStatus(userId: string): Promise<TrialStatus> {
-  const subscription = await getUserSubscription(userId);
+export async function getTrialStatus(
+  userId: string,
+  supabaseClient?: Awaited<ReturnType<typeof createClient>>
+): Promise<TrialStatus> {
+  const subscription = await getUserSubscription(userId, supabaseClient);
 
   // If no subscription or has paid tier, not in trial
   if (!subscription || subscription.tier !== 'free') {

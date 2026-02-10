@@ -1,4 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
+import { config } from 'dotenv';
+
+// Load .env.local for E2E test environment variables (E2E_TEST_PASSWORD, etc.)
+config({ path: '.env.local' });
+
+// Set flag to disable caching during E2E tests (prevents stale subscription data)
+process.env.PLAYWRIGHT_TEST = 'true';
 
 /**
  * Playwright Configuration for Rowan App E2E Tests
@@ -89,7 +96,11 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --hostname localhost --port 3000',
     url: 'http://localhost:3000',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI, // Allow reusing in local dev, fresh in CI
     timeout: 120000,
+    // Pass PLAYWRIGHT_TEST env var to dev server for cache-busting
+    env: {
+      PLAYWRIGHT_TEST: 'true',
+    },
   },
 });

@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get subscription status
-    const subscriptionStatus = await getSubscriptionStatus(user.id);
+    // Get subscription status - pass the authenticated client to avoid JWT refresh race conditions
+    const subscriptionStatus = await getSubscriptionStatus(user.id, supabase);
 
     // Get feature access details
     const featureAccess = await getUserFeatureAccess(user.id);
@@ -109,10 +109,12 @@ export async function GET(request: NextRequest) {
       dailyUsage: featureAccess.dailyUsage,
     };
 
+    // Return response with no-cache header in test environment
+    const isTest = process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST === 'true';
     return NextResponse.json(response, {
       status: 200,
       headers: {
-        'Cache-Control': 'private, max-age=300', // Cache for 5 minutes
+        'Cache-Control': isTest ? 'no-store' : 'private, max-age=300', // No cache in tests, 5 minutes in prod
       },
     });
   } catch (error) {
