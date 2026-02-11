@@ -17,8 +17,10 @@ jobs:
   seed-users:
     name: Seed Test Users
     runs-on: ubuntu-latest
-    # Skip if commit message contains [skip-e2e] (saves CI minutes when iterating on regular CI)
-    if: "!contains(github.event.head_commit.message, '[skip-e2e]')"
+    # Skip if commit message or PR title contains [skip-e2e] (saves CI minutes when iterating)
+    if: >-
+      !contains(github.event.head_commit.message || '', '[skip-e2e]') &&
+      !contains(github.event.pull_request.title || '', '[skip-e2e]')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
