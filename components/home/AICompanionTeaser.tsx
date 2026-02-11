@@ -132,7 +132,7 @@ export function AICompanionTeaser() {
 
             <p className="text-gray-400 text-base sm:text-lg max-w-md mb-6">
               Create tasks, check your calendar, plan meals, and manage your household
-              — all through natural conversation. Available on every plan.
+              , all through natural conversation. Available on every plan.
             </p>
 
             {/* Voice wave */}

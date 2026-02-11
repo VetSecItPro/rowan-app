@@ -10,13 +10,13 @@ interface PricingPreviewSectionProps {
 
 const tiers = [
   {
-    name: 'Free Trial',
+    name: 'Free',
     price: '$0',
-    period: 'for 14 days',
-    description: '14 days of Pro features, no credit card',
+    period: '/forever',
+    description: 'Everything you need to get started',
     features: [
-      'Full access to all Pro features',
-      '2 household members',
+      'Tasks, calendar & shopping lists',
+      'Up to 4 household members',
       'No credit card required',
     ],
     popular: false,
@@ -84,7 +84,7 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
             Simple, transparent pricing
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Start free for 14 days. Upgrade only when you love it.
+            Start free, upgrade when you&apos;re ready.
           </p>
         </motion.div>
 

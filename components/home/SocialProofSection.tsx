@@ -101,7 +101,7 @@ export function SocialProofSection() {
             </span>
           </h2>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Security, privacy, and reliability are not afterthoughts — they are the foundation.
+            Security, privacy, and reliability are not afterthoughts. They are the foundation.
           </p>
         </motion.div>
 

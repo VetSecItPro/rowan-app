@@ -7,12 +7,12 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { MobileStickyBar } from '@/components/home/MobileStickyBar';
 
 // Dynamic imports for below-fold sections (reduces initial bundle)
-const SocialProofSection = dynamic(() => import('@/components/home/SocialProofSection').then(m => ({ default: m.SocialProofSection })), { ssr: false });
 const PainPointsSection = dynamic(() => import('@/components/home/PainPointsSection').then(m => ({ default: m.PainPointsSection })), { ssr: false });
-const FeatureGrid = dynamic(() => import('@/components/home/FeatureGrid').then(m => ({ default: m.FeatureGrid })), { ssr: false });
-const AICompanionTeaser = dynamic(() => import('@/components/home/AICompanionTeaser').then(m => ({ default: m.AICompanionTeaser })), { ssr: false });
-const TestimonialsSection = dynamic(() => import('@/components/home/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })), { ssr: false });
+const HowItWorksSection = dynamic(() => import('@/components/home/HowItWorksSection').then(m => ({ default: m.HowItWorksSection })), { ssr: false });
+const FeatureShowcase = dynamic(() => import('@/components/home/FeatureShowcase').then(m => ({ default: m.FeatureShowcase })), { ssr: false });
+const TrustSecuritySection = dynamic(() => import('@/components/home/TrustSecuritySection').then(m => ({ default: m.TrustSecuritySection })), { ssr: false });
 const PricingPreviewSection = dynamic(() => import('@/components/home/PricingPreviewSection').then(m => ({ default: m.PricingPreviewSection })), { ssr: false });
+const FAQSection = dynamic(() => import('@/components/home/FAQSection').then(m => ({ default: m.FAQSection })), { ssr: false });
 const FinalCTASection = dynamic(() => import('@/components/home/FinalCTASection').then(m => ({ default: m.FinalCTASection })), { ssr: false });
 const PWAInstallPrompt = dynamic(() => import('@/components/ui/PWAInstallPrompt'), { ssr: false });
 const Footer = dynamic(() => import('@/components/layout/Footer').then(m => ({ default: m.Footer })), { ssr: false });
@@ -59,19 +59,19 @@ export default function HomePage() {
           onPricingClick={() => router.push('/pricing')}
         />
 
-        <SocialProofSection />
-
         <PainPointsSection />
 
-        <FeatureGrid />
+        <HowItWorksSection />
 
-        <AICompanionTeaser />
+        <FeatureShowcase />
 
-        <TestimonialsSection />
+        <TrustSecuritySection />
 
         <PricingPreviewSection
           onSignupClick={() => router.push('/signup')}
         />
+
+        <FAQSection />
 
         <FinalCTASection />
       </main>
