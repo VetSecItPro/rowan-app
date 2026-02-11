@@ -100,7 +100,7 @@ export function TrustSecuritySection() {
         >
           <Link
             href="/security"
-            className="text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium"
+            className="text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md"
           >
             Learn more about our security practices &rarr;
           </Link>

@@ -45,7 +45,7 @@ function FamilyChatStep() {
       >
         <div className="flex-1 text-sm text-gray-600">Type a message...</div>
         <div className="w-7 h-7 rounded-full bg-green-500/20 flex items-center justify-center">
-          <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-3.5 h-3.5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </div>

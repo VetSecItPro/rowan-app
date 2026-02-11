@@ -171,3 +171,4 @@ docs/CI-CD-SETUP.md
 
 # Playwright MCP
 .playwright-mcp/
+.design-reports/

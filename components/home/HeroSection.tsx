@@ -89,7 +89,7 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
                   className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
                   onClick={onSignupClick}
                 >
-                  <div className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full font-semibold text-sm transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 flex items-center justify-center gap-2">
+                  <div className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-full font-semibold text-sm transition-all shadow-2xl shadow-blue-500/50 hover:shadow-blue-500/70 active:scale-[0.97] flex items-center justify-center gap-2">
                     Start Free
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -101,7 +101,7 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
                     e.preventDefault();
                     document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="px-6 py-3 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  className="px-6 py-3 text-sm font-medium text-gray-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-full"
                 >
                   See How It Works
                 </a>

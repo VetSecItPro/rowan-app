@@ -55,7 +55,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: {
       <button
         onClick={onToggle}
         aria-expanded={isOpen}
-        className="w-full flex items-center justify-between gap-4 py-5 text-left group"
+        className="w-full flex items-center justify-between gap-4 py-5 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-lg"
       >
         <span className="text-sm sm:text-base font-medium text-white group-hover:text-blue-300 transition-colors">
           {question}
