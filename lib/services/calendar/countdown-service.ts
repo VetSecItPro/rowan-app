@@ -227,7 +227,7 @@ export const countdownService = {
       // Fetch calendar events with show_countdown enabled
       const eventsPromise = supabase
         .from('calendar_events')
-        .select('*')
+        .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
         .gte('start_time', now)
@@ -237,7 +237,7 @@ export const countdownService = {
       // Fetch important dates with show_on_countdown enabled
       const importantDatesPromise = supabase
         .from('important_dates')
-        .select('*')
+        .select('id, space_id, title, person_name, date_type, month, day_of_month, year_started, year_ended, emoji, color, notes, notify_days_before, shopping_reminder_enabled, shopping_reminder_days_before, shopping_reminder_text, show_on_calendar, calendar_all_day, show_on_countdown, countdown_days_before, countdown_label, linked_calendar_event_id, is_active, created_by, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_on_countdown', true)
         .eq('is_active', true);
@@ -304,7 +304,7 @@ export const countdownService = {
 
       const { data: events, error } = await supabase
         .from('calendar_events')
-        .select('*')
+        .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
         .gte('start_time', todayStart.toISOString())
@@ -370,7 +370,7 @@ export const countdownService = {
 
       const { data: event, error } = await supabase
         .from('calendar_events')
-        .select('*')
+        .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
         .eq('id', eventId)
         .single();
 

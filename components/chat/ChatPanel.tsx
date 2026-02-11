@@ -32,6 +32,8 @@ interface ChatPanelProps {
   onClose: () => void;
   /** Callback when a new assistant message arrives (for unread badge) */
   onNewAssistantMessage?: () => void;
+  /** Whether voice input is enabled in user settings */
+  voiceEnabled?: boolean;
 }
 
 export default function ChatPanel({
@@ -39,9 +41,11 @@ export default function ChatPanel({
   isOpen,
   onClose,
   onNewAssistantMessage,
+  voiceEnabled,
 }: ChatPanelProps) {
   const {
     messages,
+    conversationId,
     isLoading,
     isStreaming,
     pendingAction,
@@ -97,6 +101,18 @@ export default function ChatPanel({
       sendMessage(lastUserMessageRef.current);
     }
   }, [clearError, sendMessage]);
+
+  const handleFeedback = useCallback(async (messageId: string, feedback: 'positive' | 'negative') => {
+    try {
+      await fetch('/api/ai/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId, conversationId, feedback }),
+      });
+    } catch {
+      // Silently fail — feedback is non-critical
+    }
+  }, [conversationId]);
 
   return (
     <AnimatePresence>
@@ -183,7 +199,9 @@ export default function ChatPanel({
                   <ChatMessage
                     key={msg.id}
                     message={msg}
+                    conversationId={conversationId}
                     onConfirm={handleConfirm}
+                    onFeedback={handleFeedback}
                   />
                 ))}
               </AnimatePresence>
@@ -214,6 +232,7 @@ export default function ChatPanel({
               isLoading={isLoading}
               isStreaming={isStreaming}
               disabled={!!pendingAction}
+              voiceEnabled={voiceEnabled}
             />
           </motion.div>
         </>

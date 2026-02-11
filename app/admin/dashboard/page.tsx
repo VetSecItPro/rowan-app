@@ -23,6 +23,7 @@ import {
   Zap,
   DollarSign,
   Settings,
+  Bot,
   type LucideIcon
 } from 'lucide-react';
 // Import content panels for tabbed management console
@@ -35,6 +36,7 @@ import {
   RevenuePanel,
   SystemPanel,
   FeedbackPanel,
+  AIUsagePanel,
 } from '@/components/admin/panels';
 
 interface DashboardStats {
@@ -53,7 +55,7 @@ interface ActivityItem {
   email?: string;
 }
 
-type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'feedback' | 'system';
+type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'ai' | 'feedback' | 'system';
 
 interface Tab {
   id: TabId;
@@ -70,6 +72,7 @@ const TABS: Tab[] = [
   { id: 'engagement', label: 'Engagement', icon: Zap, color: 'text-cyan-500', description: 'Traffic & features' },
   { id: 'retention', label: 'Retention', icon: Activity, color: 'text-purple-500', description: 'DAU/MAU & cohorts' },
   { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-orange-500', description: 'Subscriptions & MRR' },
+  { id: 'ai', label: 'AI Costs', icon: Bot, color: 'text-sky-500', description: 'AI usage & cost monitoring' },
   { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-amber-500', description: 'User feedback & bugs' },
   { id: 'system', label: 'System', icon: Settings, color: 'text-gray-500', description: 'Health & settings' },
 ];
@@ -214,7 +217,7 @@ function AdminDashboardContent() {
 
   // Get initial tab from URL or default to 'overview'
   const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'feedback', 'system'];
+  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'ai', 'feedback', 'system'];
   const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'overview';
 
   const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
@@ -311,6 +314,8 @@ function AdminDashboardContent() {
         return <RetentionPanel />;
       case 'revenue':
         return <RevenuePanel />;
+      case 'ai':
+        return <AIUsagePanel />;
       case 'feedback':
         return <FeedbackPanel />;
       case 'system':

@@ -118,7 +118,7 @@ export const eventAttachmentsService = {
 
     const { data, error } = await supabase
       .from('event_attachments')
-      .select('*')
+      .select('id, event_id, file_name, file_size, mime_type, storage_path, uploaded_by, created_at')
       .eq('event_id', eventId)
       .order('created_at', { ascending: false });
 
@@ -204,7 +204,7 @@ export const eventAttachmentsService = {
 
     const { count, error } = await supabase
       .from('event_attachments')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('event_id', eventId);
 
     if (error) throw error;

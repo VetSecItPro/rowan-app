@@ -360,7 +360,7 @@ export const goalsService = {
     const { data, error } = await supabase
       .from('goals')
       .select(`
-        *,
+        id, space_id, title, description, category, status, progress, visibility, template_id, priority, priority_order, is_pinned, target_date, assigned_to, created_by, created_at, updated_at, completed_at,
         milestones:goal_milestones(*),
         assignee:assigned_to (
           id,
@@ -397,7 +397,7 @@ export const goalsService = {
     const { data, error } = await supabase
       .from('goals')
       .select(`
-        *,
+        id, space_id, title, description, category, status, progress, visibility, template_id, priority, priority_order, is_pinned, target_date, assigned_to, created_by, created_at, updated_at, completed_at,
         milestones:goal_milestones(*),
         assignee:assigned_to (
           id,
@@ -761,7 +761,7 @@ export const goalsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_collaborators')
-      .select('*')
+      .select('id, goal_id, user_id, role, invited_by, invited_at, created_at, updated_at')
       .eq('goal_id', goalId)
       .order('created_at', { ascending: false });
 
@@ -861,7 +861,7 @@ export const goalsService = {
     const supabase = createClient();
     let query = supabase
       .from('goal_templates')
-      .select('*, milestones:milestone_templates(*)')
+      .select('id, title, description, category, icon, target_days, is_public, created_by, usage_count, created_at, updated_at, milestones:milestone_templates(*)')
       .order('usage_count', { ascending: false });
 
     if (category) {
@@ -884,7 +884,7 @@ export const goalsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_templates')
-      .select('*, milestones:milestone_templates(*)')
+      .select('id, title, description, category, icon, target_days, is_public, created_by, usage_count, created_at, updated_at, milestones:milestone_templates(*)')
       .eq('id', id)
       .single();
 
@@ -1115,7 +1115,7 @@ export const goalsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_check_ins')
-      .select('*')
+      .select('id, goal_id, user_id, progress_percentage, mood, notes, blockers, need_help_from_partner, voice_note_url, voice_note_duration, check_in_type, scheduled_date, created_at, updated_at')
       .eq('goal_id', goalId)
       .order('created_at', { ascending: false });
 
@@ -1133,7 +1133,7 @@ export const goalsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_check_ins')
-      .select('*')
+      .select('id, goal_id, user_id, progress_percentage, mood, notes, blockers, need_help_from_partner, voice_note_url, voice_note_duration, check_in_type, scheduled_date, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -1151,7 +1151,7 @@ export const goalsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('goal_check_in_photos')
-      .select('*')
+      .select('id, check_in_id, photo_url, caption, order_index, created_at')
       .eq('check_in_id', checkInId)
       .order('order_index', { ascending: true });
 
@@ -1264,7 +1264,7 @@ export const goalsService = {
     const supabase = createClient();
     let query = supabase
       .from('goal_check_in_settings')
-      .select('*')
+      .select('id, goal_id, user_id, frequency, day_of_week, day_of_month, reminder_time, enable_reminders, enable_voice_notes, enable_photos, reminder_days_before, auto_schedule, created_at, updated_at')
       .eq('goal_id', goalId);
 
     if (userId) {
@@ -1426,7 +1426,7 @@ export const goalsService = {
       const { data, error } = await supabase
         .from('goal_activities')
         .select(`
-          *,
+          id, space_id, goal_id, milestone_id, check_in_id, user_id, activity_type, activity_data, title, description, entity_title, entity_type, created_at, updated_at,
           user:users(id, name, avatar_url),
           goal:goals(id, title, status, progress),
           milestone:goal_milestones(id, title, completed),
@@ -1465,7 +1465,7 @@ export const goalsService = {
     const { data, error } = await supabase
       .from('goal_activities')
       .select(`
-        *,
+        id, space_id, goal_id, milestone_id, check_in_id, user_id, activity_type, activity_data, title, description, entity_title, entity_type, created_at, updated_at,
         user:users(id, name, avatar_url),
         goal:goals(id, title, status, progress),
         milestone:goal_milestones(id, title, completed),
@@ -1519,7 +1519,7 @@ export const goalsService = {
     const { data, error } = await supabase
       .from('goal_comments')
       .select(`
-        *,
+        id, goal_id, user_id, parent_comment_id, content, content_type, reaction_counts, is_edited, edited_at, created_at, updated_at,
         user:users(id, name, avatar_url)
       `)
       .eq('goal_id', goalId)
@@ -1535,7 +1535,7 @@ export const goalsService = {
       const { data: replies, error: repliesError } = await supabase
         .from('goal_comments')
         .select(`
-          *,
+          id, goal_id, user_id, parent_comment_id, content, content_type, reaction_counts, is_edited, edited_at, created_at, updated_at,
           user:users(id, name, avatar_url)
         `)
         .eq('parent_comment_id', comment.id)
@@ -1784,7 +1784,7 @@ export const goalsService = {
     const { data, error } = await supabase
       .from('goal_mentions')
       .select(`
-        *,
+        id, comment_id, mentioned_user_id, mentioning_user_id, is_read, read_at, created_at,
         comment:goal_comments(
           id,
           content,

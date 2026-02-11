@@ -44,7 +44,7 @@ export async function getUserSubscription(
 
       const { data, error} = await supabase
         .from('subscriptions')
-        .select('*')
+        .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, is_founding_member, founding_member_number, founding_member_locked_price_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
         .eq('user_id', userId)
         .single();
 

@@ -109,7 +109,7 @@ export async function getGoalContributions(goalId: string): Promise<GoalContribu
 
   const { data, error } = await supabase
     .from('goal_contributions')
-    .select('*')
+    .select('id, goal_id, user_id, amount, contribution_date, description, payment_method, expense_id, created_at, updated_at, created_by')
     .eq('goal_id', goalId)
     .order('contribution_date', { ascending: false });
 
@@ -128,7 +128,7 @@ export async function getGoalContribution(contributionId: string): Promise<GoalC
 
   const { data, error } = await supabase
     .from('goal_contributions')
-    .select('*')
+    .select('id, goal_id, user_id, amount, contribution_date, description, payment_method, expense_id, created_at, updated_at, created_by')
     .eq('id', contributionId)
     .single();
 
@@ -220,7 +220,7 @@ export async function getUserContributions(
 
   let query = supabase
     .from('goal_contributions')
-    .select('*')
+    .select('id, goal_id, user_id, amount, contribution_date, description, payment_method, expense_id, created_at, updated_at, created_by')
     .eq('user_id', userId)
     .order('contribution_date', { ascending: false });
 
@@ -280,7 +280,7 @@ export async function getFinancialGoals(spaceId: string): Promise<FinancialGoal[
 
   const { data, error } = await supabase
     .from('goals')
-    .select('*')
+    .select('id, space_id, title, description, status, target_amount, current_amount, target_date, is_financial, progress, visibility, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('is_financial', true)
     .order('created_at', { ascending: false });
@@ -300,7 +300,7 @@ export async function getFinancialGoal(goalId: string): Promise<FinancialGoal | 
 
   const { data, error } = await supabase
     .from('goals')
-    .select('*')
+    .select('id, space_id, title, description, status, target_amount, current_amount, target_date, is_financial, progress, visibility, created_by, created_at, updated_at')
     .eq('id', goalId)
     .eq('is_financial', true)
     .single();
@@ -346,7 +346,7 @@ export async function getGoalContributionStats(goalId: string): Promise<GoalCont
 
   const { data, error } = await supabase
     .from('goal_contribution_stats')
-    .select('*')
+    .select('goal_id, contribution_count, contributor_count, total_contributed, avg_contribution, first_contribution_date, last_contribution_date, target_amount, current_amount, target_date, completion_percentage, amount_remaining')
     .eq('goal_id', goalId)
     .single();
 
@@ -454,7 +454,7 @@ export async function getGoalsNearingTarget(
 
   const { data, error } = await supabase
     .from('goals')
-    .select('*')
+    .select('id, space_id, title, description, status, target_amount, current_amount, target_date, is_financial, progress, visibility, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('is_financial', true)
     .gte('progress', threshold)
@@ -478,7 +478,7 @@ export async function getGoalsBehindSchedule(spaceId: string): Promise<Financial
 
   const { data, error } = await supabase
     .from('goals')
-    .select('*')
+    .select('id, space_id, title, description, status, target_amount, current_amount, target_date, is_financial, progress, visibility, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('is_financial', true)
     .not('target_date', 'is', null)
@@ -505,7 +505,7 @@ export async function getRecentContributions(
 
   const { data, error } = await supabase
     .from('goal_contributions')
-    .select('*, goals!goal_id!inner(title, space_id), users!user_id!inner(email)')
+    .select('id, goal_id, user_id, amount, contribution_date, description, payment_method, expense_id, created_at, updated_at, created_by, goals!goal_id!inner(title, space_id), users!user_id!inner(email)')
     .eq('goals.space_id', spaceId)
     .order('contribution_date', { ascending: false })
     .limit(limit);

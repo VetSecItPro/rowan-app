@@ -217,7 +217,7 @@ export async function getBudgetVariances(
   // Get budget categories
   const { data: budgetCategories, error: budgetError } = await supabase
     .from('budget_categories')
-    .select('*')
+    .select('id, space_id, category_name, allocated_amount, created_at, updated_at')
     .eq('space_id', spaceId);
 
   if (budgetError) throw budgetError;

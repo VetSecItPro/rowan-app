@@ -30,6 +30,7 @@ const tiers = [
       'Unlimited tasks, calendar & lists',
       '2 household members',
       'Meal planning & recipes',
+      'AI Assistant (Limited)',
     ],
     popular: true,
   },
@@ -41,7 +42,8 @@ const tiers = [
     features: [
       'Everything in Pro',
       '6 household members',
-      'AI features & advanced analytics',
+      'AI Assistant (Full + Voice)',
+      'Advanced analytics',
     ],
     popular: false,
   },

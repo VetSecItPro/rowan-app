@@ -2,7 +2,7 @@
  * AICompanionTeaser — Marketing section for the AI companion feature
  *
  * "Just Ask Rowan" — animated chat mockup showing conversational commands,
- * voice wave visualizer, and "Get Early Access" CTA.
+ * voice wave visualizer, and "Try Rowan AI" CTA.
  * Not gated behind the AI feature flag (this is marketing content).
  */
 
@@ -118,9 +118,9 @@ export function AICompanionTeaser() {
             transition={{ duration: prefersReducedMotion ? 0.01 : 0.6 }}
           >
             {/* Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-6">
               <Sparkles className="w-3 h-3" />
-              Coming Soon
+              Now Available
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-4">
@@ -132,7 +132,7 @@ export function AICompanionTeaser() {
 
             <p className="text-gray-400 text-base sm:text-lg max-w-md mb-6">
               Create tasks, check your calendar, plan meals, and manage your household
-              — all through natural conversation. Voice or text.
+              — all through natural conversation. Available on every plan.
             </p>
 
             {/* Voice wave */}
@@ -148,7 +148,7 @@ export function AICompanionTeaser() {
               href="/signup"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-full transition-all shadow-lg shadow-blue-500/25 active:scale-95 group"
             >
-              Get Early Access
+              Try Rowan AI
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>

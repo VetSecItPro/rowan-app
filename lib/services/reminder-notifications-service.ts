@@ -439,7 +439,7 @@ export const reminderNotificationsService = {
 
     const { count, error } = await supabase
       .from('reminder_notifications')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('is_read', false);
 
@@ -494,7 +494,7 @@ export const reminderNotificationsService = {
 
     const query = supabase
       .from('user_notification_preferences')
-      .select('*')
+      .select('id, user_id, email_task_assignments, email_event_reminders, email_new_messages, email_shopping_lists, email_meal_reminders, email_general_reminders, push_enabled, push_task_updates, push_reminders, push_messages, push_shopping_updates, push_event_alerts, digest_frequency, digest_time, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone, created_at, updated_at')
       .eq('user_id', userId);
 
     const { data, error } = await query.single();

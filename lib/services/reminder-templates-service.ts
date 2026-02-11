@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { escapeRegExp } from '@/lib/utils/input-sanitization';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -75,7 +76,7 @@ export const reminderTemplatesService = {
     const { data, error } = await supabase
       .from('reminder_templates')
       .select(`
-        *,
+        id, space_id, created_by, name, description, emoji, category, priority, template_title, template_description, reminder_type, default_time_offset_minutes, default_location, repeat_pattern, repeat_days, is_system_template, usage_count, created_at, updated_at,
         creator:created_by (
           id,
           name,
@@ -105,7 +106,7 @@ export const reminderTemplatesService = {
 
     const { data, error } = await supabase
       .from('reminder_templates')
-      .select('*')
+      .select('id, space_id, created_by, name, description, emoji, category, priority, template_title, template_description, reminder_type, default_time_offset_minutes, default_location, repeat_pattern, repeat_days, is_system_template, usage_count, created_at, updated_at')
       .eq('is_system_template', true)
       .order('usage_count', { ascending: false });
 
@@ -126,7 +127,7 @@ export const reminderTemplatesService = {
     const { data, error } = await supabase
       .from('reminder_templates')
       .select(`
-        *,
+        id, space_id, created_by, name, description, emoji, category, priority, template_title, template_description, reminder_type, default_time_offset_minutes, default_location, repeat_pattern, repeat_days, is_system_template, usage_count, created_at, updated_at,
         creator:created_by (
           id,
           name,
@@ -158,7 +159,7 @@ export const reminderTemplatesService = {
     const { data, error } = await supabase
       .from('reminder_templates')
       .select(`
-        *,
+        id, space_id, created_by, name, description, emoji, category, priority, template_title, template_description, reminder_type, default_time_offset_minutes, default_location, repeat_pattern, repeat_days, is_system_template, usage_count, created_at, updated_at,
         creator:created_by (
           id,
           name,
@@ -371,14 +372,16 @@ export const reminderTemplatesService = {
     // Replace variables in title
     let title = template.template_title;
     Object.entries(variables).forEach(([key, value]) => {
-      title = title.replace(new RegExp(`\\[${key}\\]`, 'gi'), value);
+      // SECURITY: Escape key to prevent ReDoS when used in RegExp
+      title = title.replace(new RegExp(`\\[${escapeRegExp(key)}\\]`, 'gi'), value);
     });
 
     // Replace variables in description
     let description = template.template_description;
     if (description) {
       Object.entries(variables).forEach(([key, value]) => {
-        description = description!.replace(new RegExp(`\\[${key}\\]`, 'gi'), value);
+        // SECURITY: Escape key to prevent ReDoS when used in RegExp
+        description = description!.replace(new RegExp(`\\[${escapeRegExp(key)}\\]`, 'gi'), value);
       });
     }
 
@@ -441,7 +444,7 @@ export const reminderTemplatesService = {
 
     const { data, error } = await supabase
       .from('reminder_templates')
-      .select('*')
+      .select('id, space_id, created_by, name, description, emoji, category, priority, template_title, template_description, reminder_type, default_time_offset_minutes, default_location, repeat_pattern, repeat_days, is_system_template, usage_count, created_at, updated_at')
       .or(`is_system_template.eq.true,space_id.eq.${spaceId}`)
       .order('usage_count', { ascending: false })
       .limit(limit);
@@ -462,7 +465,7 @@ export const reminderTemplatesService = {
 
     let templatesQuery = supabase
       .from('reminder_templates')
-      .select('*')
+      .select('id, space_id, created_by, name, description, emoji, category, priority, template_title, template_description, reminder_type, default_time_offset_minutes, default_location, repeat_pattern, repeat_days, is_system_template, usage_count, created_at, updated_at')
       .or(`is_system_template.eq.true,space_id.eq.${spaceId}`);
 
     // Search in name, description, and template_title (sanitized to prevent SQL injection)

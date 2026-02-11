@@ -34,7 +34,7 @@ export async function performSync(
   // Get connection details
   const { data: connection, error: connectionError } = await supabase
     .from('calendar_connections')
-    .select('*')
+    .select('id, user_id, space_id, provider, provider_account_id, provider_calendar_id, access_token_vault_id, refresh_token_vault_id, token_expires_at, sync_direction, sync_status, sync_token, last_sync_at, next_sync_at, webhook_channel_id, webhook_resource_id, webhook_expires_at, provider_config, created_at, updated_at')
     .eq('id', connectionId)
     .single();
 
@@ -266,7 +266,7 @@ async function processInboundEvent(
   // Check if we have a mapping for this event
   const { data: mapping } = await supabase
     .from('calendar_event_mappings')
-    .select('*, rowan_event:events(*)')
+    .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at, rowan_event:events(*)')
     .eq('connection_id', connection.id)
     .eq('external_event_id', externalEvent.id)
     .single();
@@ -434,7 +434,7 @@ async function processOutboundQueue(
   // Get pending queue items for this connection
   const { data: queueItems } = await supabase
     .from('calendar_sync_queue')
-    .select('*')
+    .select('id, event_id, connection_id, mapping_id, operation, priority, status, event_snapshot, retry_count, max_retries, last_error, next_retry_at, created_at, updated_at, processed_at')
     .eq('connection_id', connection.id)
     .in('status', ['pending', 'failed'])
     .lt('retry_count', 3)
@@ -500,7 +500,7 @@ async function processOutboundCreate(
   // Get the Rowan event
   const { data: event } = await supabase
     .from('events')
-    .select('*')
+    .select('id, space_id, title, description, start_time, end_time, all_day, location, category, status, is_recurring, recurrence_pattern, custom_color, timezone, assigned_to, event_type, external_source, last_external_sync, sync_locked, created_at, updated_at, created_by')
     .eq('id', queueItem.event_id)
     .single();
 
@@ -543,7 +543,7 @@ async function processOutboundUpdate(
   // Get mapping
   const { data: mapping } = await supabase
     .from('calendar_event_mappings')
-    .select('*')
+    .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at')
     .eq('rowan_event_id', queueItem.event_id)
     .eq('connection_id', connection.id)
     .single();
@@ -557,7 +557,7 @@ async function processOutboundUpdate(
   // Get the Rowan event
   const { data: event } = await supabase
     .from('events')
-    .select('*')
+    .select('id, space_id, title, description, start_time, end_time, all_day, location, category, status, is_recurring, recurrence_pattern, custom_color, timezone, assigned_to, event_type, external_source, last_external_sync, sync_locked, created_at, updated_at, created_by')
     .eq('id', queueItem.event_id)
     .single();
 
@@ -601,14 +601,14 @@ async function processOutboundDelete(
   if (queueItem.mapping_id) {
     const { data } = await supabase
       .from('calendar_event_mappings')
-      .select('*')
+      .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at')
       .eq('id', queueItem.mapping_id)
       .single();
     mapping = data;
   } else if (queueItem.event_id) {
     const { data } = await supabase
       .from('calendar_event_mappings')
-      .select('*')
+      .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at')
       .eq('rowan_event_id', queueItem.event_id)
       .eq('connection_id', connection.id)
       .single();
@@ -891,7 +891,7 @@ async function processAppleInboundEvent(
   // Check if we have a mapping for this event (by UID)
   const { data: mapping } = await supabase
     .from('calendar_event_mappings')
-    .select('*, rowan_event:events(*)')
+    .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at, rowan_event:events(*)')
     .eq('connection_id', connection.id)
     .eq('external_event_id', parsedEvent.uid)
     .single();
@@ -1056,7 +1056,7 @@ async function processAppleOutboundQueue(
   // Get pending queue items for this connection
   const { data: queueItems } = await supabase
     .from('calendar_sync_queue')
-    .select('*')
+    .select('id, event_id, connection_id, mapping_id, operation, priority, status, event_snapshot, retry_count, max_retries, last_error, next_retry_at, created_at, updated_at, processed_at')
     .eq('connection_id', connection.id)
     .in('status', ['pending', 'failed'])
     .lt('retry_count', 3)
@@ -1122,7 +1122,7 @@ async function processAppleOutboundCreate(
   // Get the Rowan event
   const { data: event } = await supabase
     .from('events')
-    .select('*')
+    .select('id, space_id, title, description, start_time, end_time, all_day, location, category, status, is_recurring, recurrence_pattern, custom_color, timezone, assigned_to, event_type, external_source, last_external_sync, sync_locked, created_at, updated_at, created_by')
     .eq('id', queueItem.event_id)
     .single();
 
@@ -1165,7 +1165,7 @@ async function processAppleOutboundUpdate(
   // Get mapping
   const { data: mapping } = await supabase
     .from('calendar_event_mappings')
-    .select('*')
+    .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at')
     .eq('rowan_event_id', queueItem.event_id)
     .eq('connection_id', connection.id)
     .single();
@@ -1179,7 +1179,7 @@ async function processAppleOutboundUpdate(
   // Get the Rowan event
   const { data: event } = await supabase
     .from('events')
-    .select('*')
+    .select('id, space_id, title, description, start_time, end_time, all_day, location, category, status, is_recurring, recurrence_pattern, custom_color, timezone, assigned_to, event_type, external_source, last_external_sync, sync_locked, created_at, updated_at, created_by')
     .eq('id', queueItem.event_id)
     .single();
 
@@ -1228,14 +1228,14 @@ async function processAppleOutboundDelete(
   if (queueItem.mapping_id) {
     const { data } = await supabase
       .from('calendar_event_mappings')
-      .select('*')
+      .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at')
       .eq('id', queueItem.mapping_id)
       .single();
     mapping = data;
   } else if (queueItem.event_id) {
     const { data } = await supabase
       .from('calendar_event_mappings')
-      .select('*')
+      .select('id, rowan_event_id, connection_id, external_event_id, external_calendar_id, sync_direction, rowan_etag, external_etag, last_synced_at, has_conflict, conflict_detected_at, created_at, updated_at')
       .eq('rowan_event_id', queueItem.event_id)
       .eq('connection_id', connection.id)
       .single();

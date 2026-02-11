@@ -261,7 +261,7 @@ export async function exportMonthlyExpenseSummary(
   // Get expenses
   const { data: expenses, error } = await supabase
     .from('expenses')
-    .select('*')
+    .select('id, space_id, category, amount, date, description, payment_method, title')
     .eq('space_id', spaceId)
     .gte('date', format(startDate, 'yyyy-MM-dd'))
     .lte('date', format(endDate, 'yyyy-MM-dd'))
@@ -390,7 +390,7 @@ export async function exportProjectCostReport(projectId: string): Promise<void> 
   // Get project details
   const { data: project, error: projectError } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, name, status, priority, description, estimated_budget, actual_cost, budget_variance')
     .eq('id', projectId)
     .single();
 
@@ -399,7 +399,7 @@ export async function exportProjectCostReport(projectId: string): Promise<void> 
   // Get project expenses
   const { data: expenses, error: expensesError } = await supabase
     .from('expenses')
-    .select('*')
+    .select('id, space_id, category, amount, date, description, payment_method, title')
     .eq('project_id', projectId)
     .order('date', { ascending: false });
 

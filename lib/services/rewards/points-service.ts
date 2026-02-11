@@ -33,7 +33,7 @@ export const pointsService = {
     // Try to get existing record (use maybeSingle to avoid 406 error when no rows)
     const { data: existing, error: fetchError } = await supabase
       .from('reward_points')
-      .select('*')
+      .select('id, user_id, space_id, points, level, current_streak, longest_streak, last_activity_at, created_at, updated_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .maybeSingle();
@@ -381,7 +381,7 @@ export const pointsService = {
 
     const { data, error } = await supabase
       .from('point_transactions')
-      .select('*')
+      .select('id, user_id, space_id, source_type, source_id, points, reason, metadata, created_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false })
@@ -440,7 +440,7 @@ export const pointsService = {
       // Get points record (use maybeSingle to handle users without records)
       const { data: pointsRecord } = await supabase
         .from('reward_points')
-        .select('*')
+        .select('id, user_id, space_id, points, level, current_streak, longest_streak, last_activity_at, created_at, updated_at')
         .eq('user_id', user.id)
         .eq('space_id', spaceId)
         .maybeSingle();

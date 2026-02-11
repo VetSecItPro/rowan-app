@@ -503,7 +503,7 @@ Thank you for shopping with us!`;
       const supabase = createClient();
       const { data, error } = await supabase
         .from('receipts')
-        .select('*')
+        .select('id, expense_id, space_id, image_url, image_file_id, raw_text, extracted_data, confidence_score, processing_status, error_message, created_by, created_at, updated_at')
         .eq('id', receiptId)
         .single();
 
@@ -523,7 +523,7 @@ Thank you for shopping with us!`;
       const supabase = createClient();
       const { data, error } = await supabase
         .from('receipts')
-        .select('*')
+        .select('id, expense_id, space_id, image_url, image_file_id, raw_text, extracted_data, confidence_score, processing_status, error_message, created_by, created_at, updated_at')
         .eq('space_id', spaceId)
         .order('created_at', { ascending: false });
 

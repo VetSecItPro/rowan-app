@@ -22,8 +22,8 @@ export async function canAccessFeature(
   const allowed = limits[feature] === true;
 
   if (!allowed) {
-    // Family-only features
-    const familyOnlyFeatures = ['canUseAI', 'canUseIntegrations'];
+    // Determine required tier for upgrade message
+    const familyOnlyFeatures = ['canUseIntegrations'];
     const requiredTier = familyOnlyFeatures.includes(feature) ? 'Family' : 'Pro';
     return {
       allowed: false,
@@ -193,7 +193,7 @@ export async function shouldPromptUpgrade(
     goals: 'pro',
     household: 'pro',
     eventProposals: 'pro',
-    ai: 'family',
+    ai: 'pro',
     integrations: 'family',
   };
 

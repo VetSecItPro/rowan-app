@@ -11,13 +11,16 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
 
-interface OAuthState {
-  connection_id: string;
-  space_id: string;
-  user_id: string;
-  nonce?: string; // For replay protection
-  timestamp?: number; // For expiration check
-}
+// SECURITY: Zod schema to validate OAuth state from base64 parameter
+const OAuthStateSchema = z.object({
+  connection_id: z.string().uuid(),
+  space_id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  nonce: z.string().optional(),
+  timestamp: z.number().optional(),
+});
+
+type OAuthState = z.infer<typeof OAuthStateSchema>;
 
 // OAuth state expiration time (10 minutes)
 const OAUTH_STATE_EXPIRATION_MS = 10 * 60 * 1000;
@@ -66,10 +69,19 @@ export async function GET(request: NextRequest) {
     const validated = GoogleOAuthCallbackSchema.parse(params);
 
     // Decode and validate state
+    // SECURITY: Validate OAuth state with Zod to prevent prototype pollution
     let oauthState: OAuthState;
     try {
       const stateJson = Buffer.from(validated.state, 'base64url').toString('utf-8');
-      oauthState = JSON.parse(stateJson) as OAuthState;
+      const parsed = OAuthStateSchema.safeParse(JSON.parse(stateJson));
+      if (!parsed.success) {
+        logger.warn('OAuth state failed Zod validation', { component: 'calendar/callback/google', action: 'invalid_state' });
+        const errorUrl = new URL('/settings', baseUrl);
+        errorUrl.searchParams.set('tab', 'integrations');
+        errorUrl.searchParams.set('error', 'invalid_state');
+        return NextResponse.redirect(errorUrl);
+      }
+      oauthState = parsed.data;
     } catch {
       logger.warn('Invalid OAuth state', { component: 'calendar/callback/google', action: 'invalid_state' });
       const errorUrl = new URL('/settings', baseUrl);

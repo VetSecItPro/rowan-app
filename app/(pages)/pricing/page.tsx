@@ -164,6 +164,7 @@ export default function PricingPage() {
                 'Goals & milestones',
                 'Household management',
                 'Real-time collaboration',
+                'AI Assistant (Limited)',
                 '2 spaces',
                 '2 household members',
               ]}
@@ -188,7 +189,7 @@ export default function PricingPage() {
                 '3 spaces (vs 2)',
                 '6 household members (vs 2)',
                 '5GB storage (vs 2GB)',
-                'AI features',
+                'AI Assistant (Full + Voice)',
                 'External integrations',
                 'Priority support',
                 'Advanced analytics',

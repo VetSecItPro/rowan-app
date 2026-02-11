@@ -17,7 +17,7 @@ interface CalendarPreferences {
 export const taskCalendarService = {
   async syncTaskToCalendar(taskId: string): Promise<TaskCalendarEvent | null> {
     const supabase = createClient();
-    const { data: task } = await supabase.from('tasks').select('*').eq('id', taskId).single();
+    const { data: task } = await supabase.from('tasks').select('id, space_id, title, description, due_date, assigned_to, created_by').eq('id', taskId).single();
     if (!task || !task.due_date) return null;
 
     const { data: event, error: eventError } = await supabase.from('events').insert({

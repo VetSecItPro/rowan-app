@@ -15,7 +15,7 @@ import ChatPanel from './ChatPanel';
 export default function ChatFAB() {
   const ctx = useChatContextSafe();
 
-  // Don't render if no context (outside provider) or AI disabled
+  // Don't render if no context, AI disabled, or user lacks AI access (tier check)
   if (!ctx?.enabled || !ctx.spaceId) return null;
 
   return (
@@ -54,6 +54,7 @@ export default function ChatFAB() {
         isOpen={ctx.isOpen}
         onClose={ctx.closeChat}
         onNewAssistantMessage={ctx.handleNewAssistantMessage}
+        voiceEnabled={ctx.voiceEnabled}
       />
     </>
   );

@@ -155,6 +155,15 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
     setIsOpen(false);
 
     if (notification.action_url) {
+      // SECURITY: Validate URL is internal path only to prevent open redirect
+      if (!notification.action_url.startsWith('/')) {
+        logger.warn('Rejected external redirect from notification', {
+          component: 'ComprehensiveNotificationCenter',
+          action: 'open_redirect_blocked',
+        });
+        router.push('/dashboard');
+        return;
+      }
       router.push(notification.action_url);
     } else {
       // Default navigation based on type

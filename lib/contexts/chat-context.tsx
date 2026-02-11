@@ -19,8 +19,11 @@ import { useChat } from '@/lib/hooks/useChat';
 import { useAISuggestions } from '@/lib/hooks/useAISuggestions';
 import { useAIBriefing } from '@/lib/hooks/useAIBriefing';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { useCanAccessAI } from '@/lib/hooks/useCanAccessAI';
+import { useAISettings } from '@/lib/hooks/useAISettings';
 import { FEATURE_FLAGS } from '@/lib/constants/feature-flags';
 import type { ChatMessage, PendingAction } from '@/lib/types/chat';
+import type { SubscriptionTier } from '@/lib/types';
 import type { AISuggestion } from '@/lib/services/ai/suggestion-service';
 import type { BriefingOutput } from '@/lib/services/ai/briefing-service';
 
@@ -29,8 +32,12 @@ import type { BriefingOutput } from '@/lib/services/ai/briefing-service';
 // ---------------------------------------------------------------------------
 
 interface ChatContextValue {
-  // Feature flag
+  // Feature flag + subscription tier
   enabled: boolean;
+  canAccessAI: boolean;
+  aiTier: SubscriptionTier;
+  aiAccessLoading: boolean;
+  promptUpgrade: () => void;
   spaceId: string | undefined;
 
   // Panel state
@@ -40,6 +47,9 @@ interface ChatContextValue {
   toggleChat: () => void;
   hasUnread: boolean;
 
+  // Voice
+  voiceEnabled: boolean;
+
   // Chat state (from useChat)
   messages: ChatMessage[];
   conversationId: string;
@@ -47,7 +57,7 @@ interface ChatContextValue {
   isStreaming: boolean;
   pendingAction: PendingAction | null;
   error: string | null;
-  sendMessage: (text: string) => void;
+  sendMessage: (text: string, voiceDurationSeconds?: number) => void;
   confirmAction: (actionId: string, confirmed: boolean) => void;
   clearChat: () => void;
   stopStreaming: () => void;
@@ -98,7 +108,12 @@ interface ChatProviderProps {
 export function ChatProvider({ children }: ChatProviderProps) {
   const { currentSpace } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
-  const enabled = FEATURE_FLAGS.AI_COMPANION && !!spaceId;
+  const { canAccess: canAccessAI, tier: aiTier, isLoading: aiAccessLoading, promptUpgrade } = useCanAccessAI();
+  const enabled = FEATURE_FLAGS.AI_COMPANION && canAccessAI && !!spaceId;
+
+  // AI user settings (voice toggle, etc.)
+  const { settings: aiSettings } = useAISettings(enabled);
+  const voiceEnabled = aiSettings.voice_enabled;
 
   // Panel open/close
   const [isOpen, setIsOpen] = useState(false);
@@ -139,7 +154,14 @@ export function ChatProvider({ children }: ChatProviderProps) {
 
   const value: ChatContextValue = {
     enabled,
+    canAccessAI,
+    aiTier,
+    aiAccessLoading,
+    promptUpgrade,
     spaceId,
+
+    // Voice
+    voiceEnabled,
 
     // Panel
     isOpen,

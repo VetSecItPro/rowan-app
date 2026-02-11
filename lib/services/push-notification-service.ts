@@ -285,7 +285,7 @@ export async function getActiveTokensForUsers(
 
     const { data, error } = await supabase
       .from('push_tokens')
-      .select('*')
+      .select('id, user_id, space_id, token, platform, device_name, is_active, last_used_at, created_at, updated_at')
       .in('user_id', userIds)
       .eq('space_id', spaceId)
       .eq('is_active', true);

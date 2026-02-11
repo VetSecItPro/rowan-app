@@ -174,7 +174,7 @@ export const recurringGoalsService = {
 
     const { data, error } = await supabase
       .from('recurring_goal_templates')
-      .select('*')
+      .select('id, space_id, created_by, title, description, category, tags, target_type, target_value, target_unit, recurrence_type, recurrence_pattern, start_date, end_date, is_habit, habit_category, ideal_streak_length, allow_partial_completion, is_active, created_at, updated_at')
       .eq('space_id', spaceId)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
@@ -271,7 +271,7 @@ export const recurringGoalsService = {
     try {
       const { data, error } = await supabase
         .from('recurring_goal_templates')
-        .select('*')
+        .select('id, space_id, created_by, title, description, category, tags, target_type, target_value, target_unit, recurrence_type, recurrence_pattern, start_date, end_date, is_habit, habit_category, ideal_streak_length, allow_partial_completion, is_active, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('is_habit', true)
         .eq('is_active', true)
@@ -406,7 +406,7 @@ export const recurringGoalsService = {
     let query = supabase
       .from('recurring_goal_instances')
       .select(`
-        *,
+        id, template_id, goal_id, period_start, period_end, target_value, current_value, status, completion_percentage, completed_at, auto_generated, generation_date, created_at, updated_at,
         template:recurring_goal_templates(*)
       `)
       .eq('template_id', templateId)
@@ -491,7 +491,7 @@ export const recurringGoalsService = {
     let query = supabase
       .from('habit_entries')
       .select(`
-        *,
+        id, template_id, user_id, entry_date, completed, completion_value, notes, mood, completed_at, reminder_sent, created_at, updated_at,
         template:recurring_goal_templates(*)
       `)
       .eq('template_id', templateId)
@@ -628,7 +628,7 @@ export const recurringGoalsService = {
 
     const { data, error } = await supabase
       .from('habit_streaks')
-      .select('*')
+      .select('id, template_id, user_id, streak_type, streak_count, start_date, end_date, is_active, created_at, updated_at')
       .eq('template_id', templateId)
       .eq('user_id', user.id)
       .order('streak_type', { ascending: true });
@@ -654,7 +654,7 @@ export const recurringGoalsService = {
 
     const { data, error } = await supabase
       .from('habit_analytics')
-      .select('*')
+      .select('id, template_id, user_id, period_type, period_start, period_end, total_days, completed_days, completion_rate, average_value, total_value, best_streak, current_streak, trend_direction, trend_percentage, created_at, updated_at')
       .eq('template_id', templateId)
       .eq('user_id', user.id)
       .eq('period_type', periodType)

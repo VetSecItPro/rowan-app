@@ -15,6 +15,7 @@ import {
   deleteConversation,
 } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 
 export async function GET(
   req: NextRequest,
@@ -35,6 +36,12 @@ export async function GET(
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // AI access check (tier only, no budget check for reading conversations)
+    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
     }
 
     const { id } = await params;
@@ -84,6 +91,12 @@ export async function DELETE(
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // AI access check (tier only)
+    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
     }
 
     const { id } = await params;

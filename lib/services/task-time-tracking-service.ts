@@ -39,7 +39,7 @@ export const taskTimeTrackingService = {
     try {
       const { data, error } = await supabase
         .from('task_time_entries')
-        .select('*')
+        .select('id, task_id, user_id, start_time, end_time, duration, notes, is_manual, created_at, updated_at')
         .eq('task_id', taskId)
         .order('start_time', { ascending: false });
 
@@ -108,7 +108,7 @@ export const taskTimeTrackingService = {
     try {
       const { data, error } = await supabase
         .from('task_time_entries')
-        .select('*')
+        .select('id, task_id, user_id, start_time, end_time, duration, notes, is_manual, created_at, updated_at')
         .eq('user_id', userId)
         .is('end_time', null)
         .order('start_time', { ascending: false })
@@ -204,7 +204,7 @@ export const taskTimeTrackingService = {
     try {
       const { data, error } = await supabase
         .from('task_time_entries')
-        .select('*')
+        .select('id, task_id, user_id, start_time, end_time, duration, notes, is_manual, created_at, updated_at')
         .eq('user_id', userId)
         .gte('start_time', startDate)
         .lte('start_time', endDate)

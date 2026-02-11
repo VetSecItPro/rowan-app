@@ -115,6 +115,7 @@ export interface AIUserSettings {
   proactive_suggestions: boolean;
   morning_briefing: boolean;
   preferred_voice_lang: string;
+  ai_onboarding_seen: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -136,11 +137,15 @@ export interface AIUserSettingsUpdate {
   proactive_suggestions?: boolean;
   morning_briefing?: boolean;
   preferred_voice_lang?: string;
+  ai_onboarding_seen?: boolean;
 }
 
 // =============================================
 // AI Usage (Daily Aggregates)
 // =============================================
+
+/** Valid AI feature source identifiers */
+export type AIFeatureSource = 'chat' | 'briefing' | 'suggestions' | 'event_parser' | 'digest' | 'ocr' | 'recipe_parse';
 
 /** Row from ai_usage_daily table */
 export interface AIUsageDaily {
@@ -153,6 +158,8 @@ export interface AIUsageDaily {
   voice_seconds: number;
   conversation_count: number;
   tool_calls_count: number;
+  feature_source: AIFeatureSource;
+  estimated_cost_usd: number;
   created_at: string;
 }
 
@@ -166,6 +173,7 @@ export interface AIUsageDailyUpsert {
   voice_seconds?: number;
   conversation_count?: number;
   tool_calls_count?: number;
+  feature_source?: AIFeatureSource;
 }
 
 // =============================================
@@ -213,4 +221,9 @@ export interface AIBudgetCheckResult {
   remaining_voice_seconds: number;
   remaining_conversations: number;
   reset_at: string;
+  reason?: string;
+  remaining?: {
+    input_tokens: number;
+    output_tokens: number;
+  };
 }

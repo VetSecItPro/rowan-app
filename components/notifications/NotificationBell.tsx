@@ -126,6 +126,14 @@ export default function NotificationBell() {
   const handleNotificationClick = (notification: Notification) => {
     handleMarkAsRead(notification.id);
     if (notification.link) {
+      // SECURITY: Validate URL is internal path only to prevent open redirect
+      if (!notification.link.startsWith('/')) {
+        logger.warn('Rejected external redirect from notification', {
+          component: 'NotificationBell',
+          action: 'open_redirect_blocked',
+        });
+        return;
+      }
       router.push(notification.link);
       setIsOpen(false);
     }

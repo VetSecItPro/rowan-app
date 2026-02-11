@@ -74,7 +74,8 @@ import {
   CreditCard,
   Gift,
   Search,
-  CheckCircle2
+  CheckCircle2,
+  Bot,
 } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'subscription' | 'security' | 'notifications' | 'privacy-data' | 'data-management' | 'integrations' | 'documentation' | 'analytics';
@@ -144,6 +145,7 @@ const documentationSearchKeywords: Record<string, string[]> = {
   spaces: ['space', 'collaboration', 'team', 'invite', 'partner', 'share', 'family'],
   checkin: ['check-in', 'checkin', 'wellness', 'mood', 'emotion', 'feeling', 'daily'],
   subscriptions: ['subscription', 'billing', 'payment', 'plan', 'pricing', 'trial', 'pro', 'family', 'upgrade', 'cancel'],
+  'ai-companion': ['ai', 'assistant', 'chat', 'rowan ai', 'companion', 'voice', 'briefing', 'suggestion', 'smart'],
 };
 
 const documentationFeatures = [
@@ -305,6 +307,17 @@ const documentationFeatures = [
     hoverBorder: 'hover:border-emerald-500',
     hoverShadow: 'hover:shadow-emerald-500/50',
     href: '/settings/documentation/subscriptions',
+    available: true,
+  },
+  {
+    id: 'ai-companion',
+    name: 'AI Companion',
+    description: 'Chat with Rowan AI — your household assistant for tasks, schedules, and more',
+    icon: Bot,
+    color: 'from-blue-500 to-purple-600',
+    hoverBorder: 'hover:border-blue-500',
+    hoverShadow: 'hover:shadow-blue-500/50',
+    href: '/settings/documentation/ai-companion',
     available: true,
   },
   {

@@ -54,7 +54,7 @@ export const notificationService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('notification_preferences')
-      .select('*')
+      .select('email_enabled, email_reminders, email_task_assignments, email_events, email_shopping_lists, email_meal_reminders, email_messages, email_digest_frequency, push_enabled, push_reminders, push_tasks, push_messages, push_shopping_updates, push_events, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, timezone')
       .eq('user_id', userId)
       .maybeSingle();
 

@@ -70,7 +70,7 @@ export async function exportExpenses(
 
   const { data: expenses, error } = await supabase
     .from('expenses')
-    .select('*')
+    .select('id, space_id, title, amount, category, date, description, notes, payment_method, paid_by, split_type, is_recurring, created_at, updated_at')
     .eq('space_id', spaceId)
     .gte('date', startDate)
     .lte('date', endDate)
@@ -168,7 +168,7 @@ export async function exportProjectCosts(projectId: string): Promise<void> {
   // Get project details
   const { data: project, error: projectError } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, space_id, name, description, status, priority, start_date, estimated_completion_date, actual_completion_date, estimated_budget, actual_cost, budget_variance, variance_percentage, location, tags, created_by, created_at, updated_at')
     .eq('id', projectId)
     .single();
 
@@ -177,7 +177,7 @@ export async function exportProjectCosts(projectId: string): Promise<void> {
   // Get project expenses
   const { data: expenses, error: expensesError } = await supabase
     .from('expenses')
-    .select('*')
+    .select('id, space_id, title, amount, category, date, description, notes, payment_method, paid_by, split_type, is_recurring, project_id, created_at, updated_at')
     .eq('project_id', projectId)
     .order('date', { ascending: false });
 
@@ -205,7 +205,7 @@ export async function exportCategoryBreakdown(
 
   const { data: expenses, error } = await supabase
     .from('expenses')
-    .select('*')
+    .select('id, space_id, title, amount, category, date, description, notes, payment_method, paid_by, split_type, is_recurring, created_at, updated_at')
     .eq('space_id', spaceId)
     .gte('date', startDate)
     .lte('date', endDate)

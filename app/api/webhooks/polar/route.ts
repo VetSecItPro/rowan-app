@@ -18,11 +18,18 @@ import { sendSubscriptionWelcomeEmail, sendSubscriptionCancelledEmail } from '@/
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
 import type { SubscriptionTier, SubscriptionPeriod } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 // PERF: Prevent serverless timeout — FIX-015
 export const maxDuration = 60;
+
+// SECURITY: Zod schema to validate webhook payload structure
+const PolarWebhookEventSchema = z.object({
+  type: z.string(),
+  data: z.record(z.string(), z.unknown()),
+});
 
 // Polar webhook event types
 interface PolarWebhookEvent {
@@ -95,9 +102,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // SECURITY: Parse and validate webhook payload with Zod
   let event: PolarWebhookEvent;
   try {
-    event = JSON.parse(body);
+    const rawParsed = JSON.parse(body);
+    const validated = PolarWebhookEventSchema.safeParse(rawParsed);
+    if (!validated.success) {
+      logger.error('Webhook payload failed Zod validation', undefined, {
+        component: 'PolarWebhook',
+      });
+      return NextResponse.json(
+        { error: 'Invalid webhook payload structure' },
+        { status: 400 }
+      );
+    }
+    event = rawParsed as PolarWebhookEvent;
   } catch {
     logger.error('Failed to parse webhook body', undefined, {
       component: 'PolarWebhook',
@@ -335,6 +354,24 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // SECURITY: Re-check subscription state before sending email to prevent
+        // duplicate welcome emails from concurrent webhook deliveries (TOCTOU guard)
+        const { data: freshSub } = await supabaseAdmin
+          .from('subscriptions')
+          .select('polar_subscription_id, status, updated_at')
+          .eq('user_id', subscription.user_id)
+          .single();
+
+        // If the subscription was already updated by a concurrent webhook
+        // (polar_subscription_id matches and status is active from a different update),
+        // check if the update timestamp is older than 5 seconds — if so, skip email
+        const updateAge = freshSub?.updated_at
+          ? Date.now() - new Date(freshSub.updated_at).getTime()
+          : 0;
+        const isLikelyDuplicate = freshSub?.polar_subscription_id === subscriptionId
+          && freshSub?.status === 'active'
+          && updateAge > 5000;
+
         // Get user info for email
         const { data: userData } = await supabaseAdmin
           .from('users')
@@ -342,7 +379,7 @@ export async function POST(request: NextRequest) {
           .eq('id', subscription.user_id)
           .single();
 
-        if (userData?.email) {
+        if (userData?.email && !isLikelyDuplicate) {
           // Send welcome email (non-blocking)
           // TODO: Send different email for founding members
           sendSubscriptionWelcomeEmail({

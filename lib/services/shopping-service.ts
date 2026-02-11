@@ -437,7 +437,7 @@ export const shoppingService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('shopping_templates')
-      .select('*')
+      .select('id, space_id, name, description, items, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
 
@@ -500,7 +500,7 @@ export const shoppingService = {
     // Get template
     const { data: template, error: templateError } = await supabase
       .from('shopping_templates')
-      .select('*')
+      .select('id, space_id, name, description, items, created_at, updated_at')
       .eq('id', templateId)
       .single();
 

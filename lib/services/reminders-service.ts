@@ -142,7 +142,7 @@ export const remindersService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('reminders')
-      .select('*')
+      .select('id, space_id, title, description, remind_at, is_recurring, recurrence_pattern, assigned_to, created_by, completed, completed_at, created_at, updated_at, category, emoji, priority, status, snooze_until, reminder_time')
       .eq('id', id)
       .single();
 

@@ -65,7 +65,7 @@ export const choreRotationService = {
    */
   async getRotation(choreId: string): Promise<ChoreRotation | null> {
     const supabase = createClient();
-    const { data, error } = await supabase.from('chore_rotations').select('*').eq('chore_id', choreId).single();
+    const { data, error } = await supabase.from('chore_rotations').select('id, chore_id, rotation_name, rotation_type, user_order, rotation_frequency, next_rotation_date, created_by, created_at, updated_at').eq('chore_id', choreId).single();
     if (error && error.code !== 'PGRST116') throw error;
     return data;
   },

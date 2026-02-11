@@ -77,7 +77,7 @@ export const voiceTranscriptionService = {
 
     const { data, error } = await supabase
       .from('voice_transcriptions')
-      .select('*')
+      .select('transcription, confidence, language, duration, wordCount, keywords')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -98,7 +98,7 @@ export const voiceTranscriptionService = {
 
     const { data, error } = await supabase
       .from('voice_transcriptions')
-      .select('*')
+      .select('transcription, confidence, language, duration, wordCount, keywords')
       .eq('user_id', userId)
       .textSearch('transcription', query)
       .order('created_at', { ascending: false });

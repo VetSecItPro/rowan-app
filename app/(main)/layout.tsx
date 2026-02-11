@@ -6,6 +6,7 @@ import ChatFAB from "@/components/chat/ChatFAB";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { ChatProvider } from "@/lib/contexts/chat-context";
 import { SubscriptionProvider } from "@/lib/contexts/subscription-context";
+import { AIOnboardingGate } from "@/components/ai/AIOnboardingGate";
 
 // Force dynamic rendering for authenticated routes (auth context, real-time data)
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           </div>
           <BottomNav />
           <ChatFAB />
+          <AIOnboardingGate />
         </ChatProvider>
       </AppWithOnboarding>
     </SubscriptionProvider>

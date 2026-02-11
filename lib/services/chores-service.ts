@@ -70,7 +70,7 @@ export const choresService = {
     try {
       let query = supabase
         .from('chores')
-        .select('*')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
         .eq('space_id', spaceId);
 
       // Apply filters if provided
@@ -126,7 +126,7 @@ export const choresService = {
     try {
       const { data, error } = await supabase
         .from('chores')
-        .select('*')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
         .eq('id', id)
         .single();
 
@@ -259,7 +259,7 @@ export const choresService = {
           // Return the chore without updating order
           const { data: choreData, error: fetchError } = await supabase
             .from('chores')
-            .select('*')
+            .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
             .eq('id', id)
             .single();
 
@@ -305,7 +305,7 @@ export const choresService = {
     try {
       const { data, error } = await supabase
         .from('chores')
-        .select('*')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
         .eq('space_id', spaceId)
         .eq('assigned_to', userId)
         .order('created_at', { ascending: false });
@@ -333,7 +333,7 @@ export const choresService = {
     try {
       const { data, error } = await supabase
         .from('chores')
-        .select('*')
+        .select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, completion_percentage, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_applied_at, penalty_points_deducted')
         .eq('space_id', spaceId)
         .eq('frequency', frequency)
         .order('created_at', { ascending: false });

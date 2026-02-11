@@ -46,7 +46,7 @@ export const taskAttachmentsService = {
 
   async getAttachments(taskId: string): Promise<TaskAttachment[]> {
     const supabase = createClient();
-    const { data, error } = await supabase.from('task_attachments').select('*').eq('task_id', taskId).order('uploaded_at', { ascending: false });
+    const { data, error } = await supabase.from('task_attachments').select('id, task_id, file_name, file_size, file_type, storage_path, storage_bucket, thumbnail_path, is_image, is_document, is_video, uploaded_by, uploaded_at').eq('task_id', taskId).order('uploaded_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },

@@ -7,84 +7,12 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import type { SubscriptionTier, FeatureLimits } from '@/lib/types';
+import { FEATURE_LIMITS } from '@/lib/config/feature-limits';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 
-// Feature limits by tier
-export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
-  free: {
-    maxActiveTasks: 50,
-    dailyTaskCreation: 5,
-    canCreateCalendar: false,
-    maxShoppingLists: 3,
-    maxShoppingItems: 50,
-    dailyShoppingUpdates: 10,
-    messageHistoryDays: 30,
-    dailyMessages: 20,
-    dailyQuickActions: 10,
-    canUploadPhotos: false,
-    canUseMealPlanning: false,
-    canUseReminders: true,
-    canUseGoals: false,
-    canUseHousehold: false,
-    canUseLocation: false,
-    canUseAI: false,
-    canUseIntegrations: false,
-    canUseEventProposals: false,
-    realtimeSyncDelay: 5000,
-    maxUsers: 2,
-    maxSpaces: 1,  // Free tier: 1 space
-  },
-  pro: {
-    maxActiveTasks: Infinity,
-    dailyTaskCreation: Infinity,
-    canCreateCalendar: true,
-    maxShoppingLists: Infinity,
-    maxShoppingItems: Infinity,
-    dailyShoppingUpdates: Infinity,
-    messageHistoryDays: Infinity,
-    dailyMessages: Infinity,
-    dailyQuickActions: Infinity,
-    canUploadPhotos: true,
-    canUseMealPlanning: true,
-    canUseReminders: true,
-    canUseGoals: true,
-    canUseHousehold: true,
-    canUseLocation: true,
-    canUseAI: false,
-    canUseIntegrations: false,
-    canUseEventProposals: true,
-    realtimeSyncDelay: 0,
-    maxUsers: 2,
-    maxSpaces: 2,  // Pro tier: 2 spaces
-    storageGB: 5,
-  },
-  family: {
-    maxActiveTasks: Infinity,
-    dailyTaskCreation: Infinity,
-    canCreateCalendar: true,
-    maxShoppingLists: Infinity,
-    maxShoppingItems: Infinity,
-    dailyShoppingUpdates: Infinity,
-    messageHistoryDays: Infinity,
-    dailyMessages: Infinity,
-    dailyQuickActions: Infinity,
-    canUploadPhotos: true,
-    canUseMealPlanning: true,
-    canUseReminders: true,
-    canUseGoals: true,
-    canUseHousehold: true,
-    canUseLocation: true,
-    canUseAI: true,
-    canUseIntegrations: true,
-    canUseEventProposals: true,
-    realtimeSyncDelay: 0,
-    maxUsers: 6,
-    maxSpaces: 3,  // Family tier: 3 spaces
-    storageGB: 15,
-    prioritySupport: true,
-  },
-};
+// Re-export for backwards compatibility (consumers may import from here)
+export { FEATURE_LIMITS };
 
 export interface SubscriptionContextValue {
   // Core subscription state
@@ -367,7 +295,8 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
   const canAccess = useCallback((feature: keyof FeatureLimits): boolean => {
     const value = limits[feature];
     if (typeof value === 'boolean') return value;
-    if (typeof value === 'number') return value > 0;
+    // -1 = unlimited (has access), 0 = no access, >0 = limited access
+    if (typeof value === 'number') return value !== 0;
     return true;
   }, [limits]);
 

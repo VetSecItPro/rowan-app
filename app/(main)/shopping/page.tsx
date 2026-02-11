@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -877,6 +878,12 @@ export default function ShoppingPage() {
                       Create Shopping List
                     </button>
                   </div>
+                )}
+                {!searchQuery && statusFilter === 'active' && (
+                  <AIContextualHint
+                    featureKey="shopping"
+                    prompt="Add milk, eggs, and bread to my grocery list"
+                  />
                 )}
               </div>
             ) : (

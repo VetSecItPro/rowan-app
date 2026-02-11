@@ -89,7 +89,7 @@ export const projectsService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('expenses')
-      .select('*')
+      .select('id, space_id, title, amount, category, date, due_date, paid_by, description, notes, project_id, status, payment_method, paid_at, recurring, is_recurring, recurring_frequency, split_type, created_by, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('due_date', { ascending: true });
 
@@ -108,7 +108,7 @@ export const projectsService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('expenses')
-      .select('*')
+      .select('id, space_id, title, amount, category, date, due_date, paid_by, description, notes, project_id, status, payment_method, paid_at, recurring, is_recurring, recurring_frequency, split_type, created_by, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -206,7 +206,7 @@ export const projectsService = {
       const supabase = getSupabaseClient(supabaseClient);
       const { data, error } = await supabase
         .from('budgets')
-        .select('*')
+        .select('id, space_id, monthly_budget, created_by, created_at, updated_at')
         .eq('space_id', spaceId)
         .maybeSingle();
 

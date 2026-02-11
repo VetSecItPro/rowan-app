@@ -69,6 +69,8 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
     dismissSuggestion,
     briefing,
     dismissBriefing,
+    voiceEnabled,
+    conversationId,
   } = useChatContext();
 
   const { user } = useAuthWithSpaces();
@@ -93,6 +95,18 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
     },
     [sendMessage]
   );
+
+  const handleFeedback = useCallback(async (messageId: string, feedback: 'positive' | 'negative') => {
+    try {
+      await fetch('/api/ai/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId, conversationId, feedback }),
+      });
+    } catch {
+      // Silently fail — feedback is non-critical
+    }
+  }, [conversationId]);
 
   const hasMessages = messages.length > 0;
   const hasBriefing = !!briefing;
@@ -184,7 +198,9 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
               <ChatMessage
                 key={msg.id}
                 message={msg}
+                conversationId={conversationId}
                 onConfirm={pendingAction ? confirmAction : undefined}
+                onFeedback={handleFeedback}
               />
             ))}
           </div>
@@ -223,6 +239,7 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
           isStreaming={isStreaming}
           disabled={!!pendingAction}
           placeholder="Ask Rowan anything..."
+          voiceEnabled={voiceEnabled}
         />
       </div>
     </div>

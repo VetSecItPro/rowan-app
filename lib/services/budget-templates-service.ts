@@ -66,7 +66,7 @@ export async function getBudgetTemplates(): Promise<BudgetTemplate[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('budget_templates')
-    .select('*')
+    .select('id, name, description, household_type, icon, recommended_income_min, recommended_income_max, is_active, sort_order, created_at, updated_at')
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
 
@@ -83,7 +83,7 @@ export async function getTemplatesByHouseholdType(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('budget_templates')
-    .select('*')
+    .select('id, name, description, household_type, icon, recommended_income_min, recommended_income_max, is_active, sort_order, created_at, updated_at')
     .eq('household_type', householdType)
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
@@ -101,7 +101,7 @@ export async function getTemplateById(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('budget_templates')
-    .select('*')
+    .select('id, name, description, household_type, icon, recommended_income_min, recommended_income_max, is_active, sort_order, created_at, updated_at')
     .eq('id', templateId)
     .single();
 
@@ -118,7 +118,7 @@ export async function getTemplateCategories(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('budget_template_categories')
-    .select('*')
+    .select('id, template_id, category_name, percentage, icon, color, description, sort_order, created_at')
     .eq('template_id', templateId)
     .order('sort_order', { ascending: true });
 
@@ -185,7 +185,7 @@ export async function getBudgetCategories(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('budget_categories')
-    .select('*')
+    .select('id, space_id, category_name, allocated_amount, spent_amount, icon, color, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('category_name', { ascending: true });
 

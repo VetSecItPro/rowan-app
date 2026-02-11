@@ -51,7 +51,7 @@ export async function getUserNotifications(userId: string, limit = 50): Promise<
   try {
     const { data, error } = await supabase
       .from('notifications')
-      .select('*')
+      .select('id, user_id, space_id, type, title, message, link, read, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -76,7 +76,7 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
   try {
     const { count, error } = await supabase
       .from('notifications')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('read', false);
 
@@ -160,7 +160,7 @@ export async function getGoalMilestoneNotifications(
 
   const { data, error } = await supabase
     .from('notifications')
-    .select('*')
+    .select('id, user_id, space_id, type, title, message, link, read, created_at')
     .eq('user_id', userId)
     .eq('type', 'goal_milestone')
     .order('created_at', { ascending: false })
@@ -180,7 +180,7 @@ export async function getGoalMilestones(goalId: string): Promise<GoalMilestone[]
 
   const { data, error } = await supabase
     .from('goal_milestones')
-    .select('*')
+    .select('id, goal_id, title, description, target_date, completed, completed_at, type, target_value, current_value, created_at, updated_at')
     .eq('goal_id', goalId)
     .order('target_value', { ascending: true });
 
@@ -196,7 +196,7 @@ export async function getCompletedMilestones(goalId: string): Promise<GoalMilest
 
   const { data, error } = await supabase
     .from('goal_milestones')
-    .select('*')
+    .select('id, goal_id, title, description, target_date, completed, completed_at, type, target_value, current_value, created_at, updated_at')
     .eq('goal_id', goalId)
     .eq('completed', true)
     .order('completed_at', { ascending: false });
@@ -213,7 +213,7 @@ export async function getNextMilestone(goalId: string): Promise<GoalMilestone | 
 
   const { data, error } = await supabase
     .from('goal_milestones')
-    .select('*')
+    .select('id, goal_id, title, description, target_date, completed, completed_at, type, target_value, current_value, created_at, updated_at')
     .eq('goal_id', goalId)
     .eq('completed', false)
     .eq('type', 'percentage')
@@ -251,7 +251,7 @@ export async function hasCompletedMilestones(goalId: string): Promise<boolean> {
 
   const { count, error } = await supabase
     .from('goal_milestones')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('goal_id', goalId)
     .eq('completed', true);
 
@@ -268,7 +268,7 @@ export async function getMilestoneCompletionPercentage(goalId: string): Promise<
   // Get total milestones count
   const { count: totalCount, error: totalError } = await supabase
     .from('goal_milestones')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('goal_id', goalId)
     .eq('type', 'percentage');
 
@@ -277,7 +277,7 @@ export async function getMilestoneCompletionPercentage(goalId: string): Promise<
   // Get completed milestones count
   const { count: completedCount, error: completedError } = await supabase
     .from('goal_milestones')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('goal_id', goalId)
     .eq('type', 'percentage')
     .eq('completed', true);

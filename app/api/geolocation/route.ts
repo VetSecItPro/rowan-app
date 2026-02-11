@@ -64,6 +64,28 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // SECURITY: Validate IP format to prevent SSRF via header injection
+    const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipv6Regex = /^[0-9a-fA-F:]+$/;
+    if (!ipv4Regex.test(clientIP) && !ipv6Regex.test(clientIP)) {
+      logger.warn('Invalid IP format detected, using fallback', {
+        component: 'geolocation',
+        action: 'ssrf_blocked',
+      });
+      return NextResponse.json({
+        city: 'Dallas',
+        region: 'Texas',
+        country: 'United States',
+        country_code: 'US',
+        latitude: 32.7767,
+        longitude: -96.7970,
+        timezone: 'America/Chicago',
+        postal: '75201',
+        ip: 'invalid',
+        fallback: true,
+      });
+    }
+
     logger.debug('Getting location', { component: 'geolocation' });
 
     // Call ipapi.co for geolocation

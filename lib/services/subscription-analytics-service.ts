@@ -145,7 +145,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
   // Fetch all active subscriptions
   const { data: subscriptions, error: subError } = await supabase
     .from('subscriptions')
-    .select('*')
+    .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
     .in('status', ['active', 'past_due']);
 
   if (subError) {
@@ -156,7 +156,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
   // Fetch subscription events for this month
   const { data: events, error: eventsError } = await supabase
     .from('subscription_events')
-    .select('*')
+    .select('id, user_id, event_type, from_tier, to_tier, trigger_source, metadata, created_at')
     .gte('created_at', startOfMonth.toISOString());
 
   if (eventsError) {
@@ -166,7 +166,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
   // Fetch total users
   const { count: totalUsersCount } = await supabase
     .from('users')
-    .select('*', { count: 'exact', head: true });
+    .select('id', { count: 'exact', head: true });
 
   const activeSubscriptions: SubscriptionRow[] = subscriptions || [];
   const subscriptionEvents: SubscriptionEventRow[] = events || [];
@@ -285,7 +285,7 @@ export async function getSubscriptionEvents(options: {
 
   let query = supabase
     .from('subscription_events')
-    .select('*, users!inner(email)', { count: 'exact' });
+    .select('id, user_id, event_type, from_tier, to_tier, trigger_source, metadata, created_at, users!inner(email)', { count: 'exact' });
 
   if (eventType) {
     query = query.eq('event_type', eventType);
@@ -335,14 +335,14 @@ export async function getDailyRevenueData(days: number = 30): Promise<DailyReven
   // Fetch subscription events for the period
   const { data: events } = await supabase
     .from('subscription_events')
-    .select('*')
+    .select('id, user_id, event_type, from_tier, to_tier, trigger_source, metadata, created_at')
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
   // Fetch current subscriptions for MRR calculation
   const { data: subscriptions } = await supabase
     .from('subscriptions')
-    .select('*')
+    .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
     .in('status', ['active', 'past_due']);
 
   // Calculate current MRR as baseline
@@ -428,7 +428,7 @@ export async function getUserSubscription(userId: string) {
 
   const { data, error } = await supabase
     .from('subscriptions')
-    .select('*')
+    .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
     .eq('user_id', userId)
     .single();
 

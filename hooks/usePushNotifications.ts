@@ -80,6 +80,14 @@ export function usePushNotifications(
    */
   const handleNotificationNavigation = useCallback((data?: Record<string, string>) => {
     if (data?.actionUrl) {
+      // SECURITY: Validate URL is internal path only to prevent open redirect
+      if (!data.actionUrl.startsWith('/')) {
+        logger.warn('Rejected external redirect from notification', {
+          component: 'usePushNotifications',
+          action: 'open_redirect_blocked',
+        });
+        return;
+      }
       router.push(data.actionUrl);
     }
   }, [router]);

@@ -12,6 +12,7 @@ import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import { logger } from '@/lib/logger';
 import { listConversations } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,6 +41,12 @@ export async function GET(req: NextRequest) {
       await verifySpaceAccess(user.id, spaceId);
     } catch {
       return Response.json({ error: 'Access denied' }, { status: 403 });
+    }
+
+    // AI access check (tier only, no budget check for listing conversations)
+    const aiAccess = await validateAIAccess(supabase, user.id, spaceId, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
     }
 
     const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') ?? '20'), 50);

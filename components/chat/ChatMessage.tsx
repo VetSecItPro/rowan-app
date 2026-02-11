@@ -10,8 +10,9 @@
 
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Bot, User } from 'lucide-react';
+import { Bot, User, ThumbsUp, ThumbsDown } from 'lucide-react';
 import type { ChatMessage as ChatMessageType } from '@/lib/types/chat';
 import ConfirmationCard from './ConfirmationCard';
 import MarkdownMessage from './MarkdownMessage';
@@ -19,11 +20,21 @@ import TypingIndicator from './TypingIndicator';
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  conversationId?: string;
   onConfirm?: (actionId: string, confirmed: boolean) => void;
+  onFeedback?: (messageId: string, feedback: 'positive' | 'negative') => void;
 }
 
-export default function ChatMessage({ message, onConfirm }: ChatMessageProps) {
+export default function ChatMessage({ message, conversationId, onConfirm, onFeedback }: ChatMessageProps) {
   const isUser = message.role === 'user';
+  const [localFeedback, setLocalFeedback] = useState<'positive' | 'negative' | null>(message.feedback ?? null);
+
+  const handleFeedback = (type: 'positive' | 'negative') => {
+    // Toggle off if clicking the same feedback
+    if (localFeedback === type) return;
+    setLocalFeedback(type);
+    onFeedback?.(message.id, type);
+  };
 
   return (
     <motion.div
@@ -99,6 +110,36 @@ export default function ChatMessage({ message, onConfirm }: ChatMessageProps) {
           >
             <span>{message.result.success ? 'Done' : 'Failed'}:</span>
             <span>{message.result.message}</span>
+          </div>
+        )}
+
+        {/* Feedback buttons — only for assistant messages with content, not streaming */}
+        {!isUser && message.content && !message.isStreaming && (
+          <div className="flex items-center gap-1 mt-0.5">
+            <button
+              onClick={() => handleFeedback('positive')}
+              className={`p-1 rounded-md transition-colors ${
+                localFeedback === 'positive'
+                  ? 'text-emerald-400 bg-emerald-500/10'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+              }`}
+              aria-label="Helpful"
+              title="Helpful"
+            >
+              <ThumbsUp className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => handleFeedback('negative')}
+              className={`p-1 rounded-md transition-colors ${
+                localFeedback === 'negative'
+                  ? 'text-red-400 bg-red-500/10'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+              }`}
+              aria-label="Not helpful"
+              title="Not helpful"
+            >
+              <ThumbsDown className="w-3 h-3" />
+            </button>
           </div>
         )}
       </div>

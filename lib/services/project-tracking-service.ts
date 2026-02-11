@@ -157,7 +157,7 @@ export async function getProjects(spaceId: string): Promise<Project[]> {
 
   const { data, error } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, space_id, name, description, status, priority, start_date, estimated_completion_date, actual_completion_date, estimated_budget, actual_cost, budget_variance, variance_percentage, location, tags, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('created_at', { ascending: false });
 
@@ -173,7 +173,7 @@ export async function getProject(projectId: string): Promise<Project | null> {
 
   const { data, error } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, space_id, name, description, status, priority, start_date, estimated_completion_date, actual_completion_date, estimated_budget, actual_cost, budget_variance, variance_percentage, location, tags, created_by, created_at, updated_at')
     .eq('id', projectId)
     .single();
 
@@ -255,7 +255,7 @@ export async function getProjectsByStatus(
 
   const { data, error } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, space_id, name, description, status, priority, start_date, estimated_completion_date, actual_completion_date, estimated_budget, actual_cost, budget_variance, variance_percentage, location, tags, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('status', status)
     .order('priority', { ascending: false });
@@ -272,7 +272,7 @@ export async function getProjectsOverBudget(spaceId: string): Promise<Project[]>
 
   const { data, error } = await supabase
     .from('projects')
-    .select('*')
+    .select('id, space_id, name, description, status, priority, start_date, estimated_completion_date, actual_completion_date, estimated_budget, actual_cost, budget_variance, variance_percentage, location, tags, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .lt('budget_variance', 0)
     .order('budget_variance', { ascending: true });
@@ -291,7 +291,7 @@ export async function getVendors(spaceId: string): Promise<Vendor[]> {
 
   const { data, error } = await supabase
     .from('vendors')
-    .select('*')
+    .select('id, space_id, name, company_name, trade, email, phone, address, website, license_number, insurance_verified, rating, notes, is_preferred, is_active, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('is_active', true)
     .order('name', { ascending: true });
@@ -308,7 +308,7 @@ export async function getVendor(vendorId: string): Promise<Vendor | null> {
 
   const { data, error } = await supabase
     .from('vendors')
-    .select('*')
+    .select('id, space_id, name, company_name, trade, email, phone, address, website, license_number, insurance_verified, rating, notes, is_preferred, is_active, created_by, created_at, updated_at')
     .eq('id', vendorId)
     .single();
 
@@ -371,7 +371,7 @@ export async function getPreferredVendors(spaceId: string): Promise<Vendor[]> {
 
   const { data, error } = await supabase
     .from('vendors')
-    .select('*')
+    .select('id, space_id, name, company_name, trade, email, phone, address, website, license_number, insurance_verified, rating, notes, is_preferred, is_active, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('is_preferred', true)
     .eq('is_active', true)
@@ -405,7 +405,7 @@ export async function getVendorsByTrade(spaceId: string, trade: string): Promise
 
   const { data, error } = await supabase
     .from('vendors')
-    .select('*')
+    .select('id, space_id, name, company_name, trade, email, phone, address, website, license_number, insurance_verified, rating, notes, is_preferred, is_active, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .ilike('trade', `%${sanitizeSearchInput(trade)}%`)
     .eq('is_active', true)
@@ -425,7 +425,7 @@ export async function getProjectLineItems(projectId: string): Promise<ProjectLin
 
   const { data, error } = await supabase
     .from('project_line_items')
-    .select('*')
+    .select('id, project_id, vendor_id, category, description, quantity, unit_price, estimated_cost, actual_cost, is_paid, paid_date, notes, created_at, updated_at')
     .eq('project_id', projectId)
     .order('category', { ascending: true });
 
@@ -523,7 +523,7 @@ export async function getProjectPhotos(projectId: string): Promise<ProjectPhoto[
 
   const { data, error } = await supabase
     .from('project_photos')
-    .select('*')
+    .select('id, project_id, title, description, photo_url, photo_type, taken_date, display_order, uploaded_by, created_at, updated_at')
     .eq('project_id', projectId)
     .order('display_order', { ascending: true })
     .order('taken_date', { ascending: false });
@@ -590,7 +590,7 @@ export async function getProjectPhotosByType(
 
   const { data, error } = await supabase
     .from('project_photos')
-    .select('*')
+    .select('id, project_id, title, description, photo_url, photo_type, taken_date, display_order, uploaded_by, created_at, updated_at')
     .eq('project_id', projectId)
     .eq('photo_type', photoType)
     .order('taken_date', { ascending: false });

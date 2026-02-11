@@ -110,7 +110,7 @@ export const eventCommentsService = {
     // Get top-level comments (no parent) - fetch without user join since FK is to auth.users
     const { data: topLevelComments, error: topError } = await supabase
       .from('event_comments')
-      .select('*')
+      .select('id, event_id, user_id, content, mentions, parent_comment_id, created_at, updated_at')
       .eq('event_id', eventId)
       .is('parent_comment_id', null)
       .order('created_at', { ascending: true });
@@ -120,7 +120,7 @@ export const eventCommentsService = {
     // Get all replies
     const { data: replies, error: repliesError } = await supabase
       .from('event_comments')
-      .select('*')
+      .select('id, event_id, user_id, content, mentions, parent_comment_id, created_at, updated_at')
       .eq('event_id', eventId)
       .not('parent_comment_id', 'is', null)
       .order('created_at', { ascending: true });
@@ -175,7 +175,7 @@ export const eventCommentsService = {
 
     const { data, error } = await supabase
       .from('event_comments')
-      .select('*')
+      .select('id, event_id, user_id, content, mentions, parent_comment_id, created_at, updated_at')
       .eq('id', commentId)
       .single();
 
@@ -254,7 +254,7 @@ export const eventCommentsService = {
 
     const { count, error } = await supabase
       .from('event_comments')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('event_id', eventId);
 
     if (error) throw error;

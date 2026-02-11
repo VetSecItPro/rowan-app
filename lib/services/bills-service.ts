@@ -96,7 +96,7 @@ export async function getBills(spaceId: string): Promise<Bill[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('bills')
-    .select('*')
+    .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('due_date', { ascending: true });
 
@@ -114,7 +114,7 @@ export async function getBillById(billId: string): Promise<Bill | null> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('bills')
-    .select('*')
+    .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
     .eq('id', billId)
     .single();
 
@@ -136,7 +136,7 @@ export async function getBillsByStatus(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('bills')
-    .select('*')
+    .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('status', status)
     .order('due_date', { ascending: true });
@@ -161,7 +161,7 @@ export async function getUpcomingBills(spaceId: string): Promise<Bill[]> {
 
   const { data, error } = await supabase
     .from('bills')
-    .select('*')
+    .select('id, space_id, name, amount, category, payee, notes, due_date, frequency, status, auto_pay, last_paid_date, next_due_date, linked_expense_id, linked_calendar_event_id, linked_reminder_id, reminder_enabled, reminder_days_before, last_reminder_sent_at, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('status', 'scheduled')
     .gte('due_date', today)

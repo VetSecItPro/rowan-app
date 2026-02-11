@@ -85,7 +85,7 @@ export class InAppNotificationsService {
     try {
       let query = this.supabase
         .from('in_app_notifications')
-        .select('*')
+        .select('id, user_id, partnership_id, type, title, content, priority, is_read, space_id, space_name, related_item_id, related_item_type, action_url, emoji, sender_id, sender_name, created_at, read_at, metadata')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
@@ -134,7 +134,7 @@ export class InAppNotificationsService {
     try {
       const { count, error } = await this.supabase
         .from('in_app_notifications')
-        .select('*', { count: 'exact', head: true })
+        .select('id', { count: 'exact', head: true })
         .eq('user_id', userId)
         .eq('is_read', false);
 

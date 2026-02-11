@@ -43,7 +43,7 @@ export const projectMilestonesService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('project_milestones')
-      .select('*')
+      .select('id, project_id, space_id, title, description, is_completed, completed_at, due_date, sort_order, created_at, updated_at')
       .eq('project_id', projectId)
       .order('sort_order', { ascending: true });
 

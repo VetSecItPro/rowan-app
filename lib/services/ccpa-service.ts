@@ -99,7 +99,7 @@ class CCPAService {
 
       const { data, error } = await supabase
         .from('ccpa_opt_out_status')
-        .select('*')
+        .select('user_id, opted_out, opt_out_date, ip_address, user_agent, california_resident, verification_method, created_at, updated_at')
         .eq('user_id', userId)
         .single();
 
@@ -163,7 +163,7 @@ class CCPAService {
       // Get CCPA audit logs for this user
       const { data: auditLogs, error: auditError } = await supabase
         .from('ccpa_audit_log')
-        .select('*')
+        .select('id, user_id, action, action_details, timestamp')
         .eq('user_id', userId)
         .order('timestamp', { ascending: false });
 

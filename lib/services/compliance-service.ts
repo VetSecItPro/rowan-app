@@ -223,7 +223,7 @@ export async function getDataProcessingAgreements(userId: string): Promise<{
 
     const { data, error } = await supabase
       .from('data_processing_agreements')
-      .select('*')
+      .select('id, user_id, agreement_type, agreement_version, legal_basis, consented, consent_date, consent_method, withdrawn, processing_purposes, data_categories, retention_period, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -371,7 +371,7 @@ export async function getComplianceEvents(
 
     let query = supabase
       .from('compliance_events_log')
-      .select('*')
+      .select('id, user_id, event_type, event_category, description, metadata, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 

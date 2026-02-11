@@ -19,6 +19,12 @@ const PII_PATTERNS: Record<string, RegExp> = {
   routing_number: /\brouting\b.*?\b\d{9}\b/gi,
   phone: /\b(?:\+1[- ]?)?\(?\d{3}\)?[- ]?\d{3}[- ]?\d{4}\b/g,
   email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
+  // Extended patterns for broader PII coverage
+  passport: /\b[A-Z]{1,2}\d{6,9}\b/g,
+  drivers_license: /\b[A-Z]{1,2}\d{5,8}\b/g,
+  bank_account: /\b(?:account|acct)\s*#?\s*\d{8,17}\b/gi,
+  iban: /\b[A-Z]{2}\d{2}[A-Z0-9]{4,30}\b/g,
+  dob: /\b(?:dob|date of birth|born)\s*:?\s*\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/gi,
 };
 
 // Human-readable labels for warning messages
@@ -28,6 +34,11 @@ const PII_LABELS: Record<string, string> = {
   routing_number: 'bank routing number',
   phone: 'phone number',
   email: 'email address',
+  passport: 'passport number',
+  drivers_license: "driver's license number",
+  bank_account: 'bank account number',
+  iban: 'IBAN',
+  dob: 'date of birth',
 };
 
 // ---------------------------------------------------------------------------

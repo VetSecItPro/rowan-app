@@ -8,9 +8,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit, checkAISuggestionsRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import { aiContextService } from '@/lib/services/ai/ai-context-service';
 import { generateSuggestions } from '@/lib/services/ai/suggestion-service';
 import { logger } from '@/lib/logger';
@@ -60,6 +61,21 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: 'spaceId is required' },
         { status: 400 }
+      );
+    }
+
+    // AI access check (subscription tier — no budget check for rule-based suggestions)
+    const aiAccess = await validateAIAccess(supabase, user.id, spaceId, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
+    }
+
+    // Per-user suggestions rate limit (10 per hour)
+    const { success: suggestionsRateOk } = await checkAISuggestionsRateLimit(user.id);
+    if (!suggestionsRateOk) {
+      return NextResponse.json(
+        { error: 'Too many suggestion requests. Try again later.' },
+        { status: 429 }
       );
     }
 

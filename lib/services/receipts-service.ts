@@ -181,7 +181,7 @@ export async function getReceipts(spaceId: string): Promise<Receipt[]> {
 
   const { data, error } = await supabase
     .from('receipts')
-    .select('*')
+    .select('id, space_id, expense_id, storage_path, file_name, file_size, mime_type, merchant_name, total_amount, receipt_date, category, currency, ocr_text, ocr_confidence, ocr_processed_at, created_at, updated_at, created_by')
     .eq('space_id', spaceId)
     .order('created_at', { ascending: false });
 
@@ -197,7 +197,7 @@ export async function getReceiptById(receiptId: string): Promise<Receipt | null>
 
   const { data, error } = await supabase
     .from('receipts')
-    .select('*')
+    .select('id, space_id, expense_id, storage_path, file_name, file_size, mime_type, merchant_name, total_amount, receipt_date, category, currency, ocr_text, ocr_confidence, ocr_processed_at, created_at, updated_at, created_by')
     .eq('id', receiptId)
     .single();
 
@@ -213,7 +213,7 @@ export async function getReceiptsByExpense(expenseId: string): Promise<Receipt[]
 
   const { data, error } = await supabase
     .from('receipts')
-    .select('*')
+    .select('id, space_id, expense_id, storage_path, file_name, file_size, mime_type, merchant_name, total_amount, receipt_date, category, currency, ocr_text, ocr_confidence, ocr_processed_at, created_at, updated_at, created_by')
     .eq('expense_id', expenseId)
     .order('created_at', { ascending: false });
 
@@ -302,7 +302,7 @@ export async function searchReceipts(
 
   let query = supabase
     .from('receipts')
-    .select('*')
+    .select('id, space_id, expense_id, storage_path, file_name, file_size, mime_type, merchant_name, total_amount, receipt_date, category, currency, ocr_text, ocr_confidence, ocr_processed_at, created_at, updated_at, created_by')
     .eq('space_id', spaceId);
 
   if (params.merchant_name) {

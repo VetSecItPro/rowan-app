@@ -16,7 +16,7 @@ export interface TaskCategory {
 export const taskCategoriesService = {
   async getCategories(spaceId: string): Promise<TaskCategory[]> {
     const supabase = createClient();
-    const { data, error } = await supabase.from('task_categories').select('*').eq('space_id', spaceId).order('sort_order');
+    const { data, error } = await supabase.from('task_categories').select('id, space_id, name, color, icon, description, sort_order, created_by, created_at, updated_at').eq('space_id', spaceId).order('sort_order');
     if (error) throw error;
     return data || [];
   },

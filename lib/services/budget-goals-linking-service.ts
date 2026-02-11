@@ -164,7 +164,7 @@ export async function getBudgetGoalLinks(spaceId: string): Promise<BudgetGoalLin
 
   const { data, error } = await supabase
     .from('budget_goal_links')
-    .select('*')
+    .select('id, space_id, goal_id, budget_category, link_type, target_amount, current_amount, target_percentage, current_percentage, time_period, auto_update, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('created_at', { ascending: false });
 
@@ -180,7 +180,7 @@ export async function getBudgetGoalLinksForGoal(goalId: string): Promise<BudgetG
 
   const { data, error } = await supabase
     .from('budget_goal_links')
-    .select('*')
+    .select('id, space_id, goal_id, budget_category, link_type, target_amount, current_amount, target_percentage, current_percentage, time_period, auto_update, created_by, created_at, updated_at')
     .eq('goal_id', goalId);
 
   if (error) throw error;
@@ -298,7 +298,7 @@ export async function getBudgetProgressWithGoals(spaceId: string): Promise<Budge
   const linkedGoalIds = budgetLinks.map(link => link.goal_id);
   const { data: linkedGoals, error } = await supabase
     .from('goals')
-    .select('*')
+    .select('id, space_id, title, description, category, status, progress, visibility, template_id, priority, priority_order, is_pinned, target_date, assigned_to, created_by, created_at, updated_at, completed_at')
     .in('id', linkedGoalIds);
 
   if (error) throw error;
@@ -348,7 +348,7 @@ export async function calculateSavingsGoalProgress(
   // Get goal details
   const { data: goal, error: goalError } = await supabase
     .from('goals')
-    .select('*')
+    .select('id, space_id, title, description, category, status, progress, visibility, template_id, priority, priority_order, is_pinned, target_date, assigned_to, created_by, created_at, updated_at, completed_at')
     .eq('id', goalId)
     .single();
 
