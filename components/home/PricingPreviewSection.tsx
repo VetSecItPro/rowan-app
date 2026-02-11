@@ -94,7 +94,7 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
           whileInView={prefersReducedMotion ? { opacity: 1 } : "visible"}
           viewport={{ once: true, margin: '-50px' }}
           transition={prefersReducedMotion ? { duration: 0.01 } : undefined}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
         >
           {tiers.map((tier) => (
             <motion.div

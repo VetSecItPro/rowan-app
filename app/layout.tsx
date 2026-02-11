@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   description: "Collaborative life management for couples and families. Tasks, meals, budgets, goals, calendar, and more.",
   manifest: '/manifest.json',
   appleWebApp: {
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Rowan',
   },
   other: {

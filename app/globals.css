@@ -38,6 +38,22 @@
   --color-border-default: rgba(255, 255, 255, 0.1);
 }
 
+/* ==================== NATIVE-FEEL POLISH ==================== */
+/* Suppress browser tap highlight on mobile for native-like feel */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text selection on interactive UI elements (buttons, nav items, labels) */
+button,
+[role="button"],
+a,
+nav,
+label {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* ==================== GLOBAL LIGHT MODE OVERRIDES ==================== */
 /* Force all light mode classes to use dark mode equivalents */
 /* This ensures dark mode even if components have light mode classes */

@@ -53,9 +53,9 @@ export function HowItWorksSection() {
                 </motion.div>
 
                 <div className="relative">
-                    <div className="hidden md:block absolute top-6 left-[10%] right-[10%] h-px bg-gradient-to-r from-blue-500/50 via-purple-500/50 to-emerald-500/50" />
+                    <div className="hidden lg:block absolute top-6 left-[10%] right-[10%] h-px bg-gradient-to-r from-blue-500/50 via-purple-500/50 to-emerald-500/50" />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 relative">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-4 relative">
                         {steps.map((step, index) => {
                             const Icon = step.icon;
                             return (
@@ -97,7 +97,7 @@ export function HowItWorksSection() {
                                     </p>
 
                                     {index < steps.length - 1 && (
-                                        <div className="md:hidden absolute -bottom-4 left-1/2 -translate-x-1/2 w-px h-8 bg-gradient-to-b from-blue-500/50 to-purple-500/50" />
+                                        <div className="lg:hidden absolute -bottom-4 left-1/2 -translate-x-1/2 w-px h-8 bg-gradient-to-b from-blue-500/50 to-purple-500/50" />
                                     )}
                                 </motion.div>
                             );

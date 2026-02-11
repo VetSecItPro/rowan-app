@@ -187,7 +187,7 @@ function FeatureSection({
                   <Check
                     className={`w-4 h-4 ${textColorMap[feature.color] || 'text-blue-500'} flex-shrink-0 mt-0.5`}
                   />
-                  <span className="text-sm text-gray-500">{bullet}</span>
+                  <span className="text-sm text-gray-400">{bullet}</span>
                 </li>
               ))}
             </ul>

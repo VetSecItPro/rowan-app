@@ -47,14 +47,14 @@ export function FinalCTASection() {
         <MagneticButton>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold text-base rounded-full transition-all shadow-lg shadow-blue-500/25 active:scale-95 group"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold text-base rounded-full transition-all shadow-lg shadow-blue-500/25 active:scale-95 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             Start Free
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </MagneticButton>
 
-        <p className="text-xs text-gray-600 mt-4">
+        <p className="text-xs text-gray-500 mt-4">
           No credit card required. Cancel anytime.
         </p>
       </motion.div>
