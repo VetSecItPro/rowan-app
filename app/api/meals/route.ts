@@ -146,15 +146,15 @@ export async function POST(req: NextRequest) {
     try {
       await verifySpaceAccess(user.id, space_id);
     } catch (error) {
-    Sentry.captureException(error, {
-      tags: {
-        endpoint: '/api/meals',
-        method: 'POST',
-      },
-      extra: {
-        timestamp: new Date().toISOString(),
-      },
-    });
+      Sentry.captureException(error, {
+        tags: {
+          endpoint: '/api/meals',
+          method: 'POST',
+        },
+        extra: {
+          timestamp: new Date().toISOString(),
+        },
+      });
 
       return NextResponse.json(
         { error: 'You do not have access to this space' },
@@ -163,9 +163,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Create meal using service with sanitized inputs
+    // Note: Zod schema uses "recipe_name" but DB column is "name" (migration 20251012000002)
     const meal = await mealsService.createMeal({
-      ...body,
-      recipe_name: recipe_name ? sanitizePlainText(recipe_name) : undefined,
+      space_id: body.space_id,
+      meal_type: body.meal_type,
+      scheduled_date: body.scheduled_date,
+      recipe_id: body.recipe_id || undefined,
+      name: recipe_name ? sanitizePlainText(recipe_name) : (body.name || undefined),
       notes: notes ? sanitizePlainText(notes) : undefined,
     }, supabase);
 

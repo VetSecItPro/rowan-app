@@ -102,7 +102,7 @@ function UnsubscribeContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="max-w-md w-full mx-4">
           <div className="bg-gray-800 rounded-xl shadow-lg p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -123,7 +123,7 @@ function UnsubscribeContent() {
   const color = getTypeColor();
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="max-w-md w-full mx-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -279,7 +279,7 @@ function UnsubscribeContent() {
 export default function UnsubscribePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     }>

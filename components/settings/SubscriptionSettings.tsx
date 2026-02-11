@@ -2,8 +2,7 @@
 
 /**
  * Subscription Settings Tab
- * Displays subscription status, trial info, and upgrade options
- * Updated to use correct type properties from subscription-context
+ * Displays subscription status and upgrade options
  */
 
 import React, { useState, useEffect } from 'react';
@@ -12,7 +11,6 @@ import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   Crown,
-  Clock,
   Check,
   Sparkles,
   Zap,
@@ -103,10 +101,6 @@ export function SubscriptionSettings() {
   const tier = subscription?.tier ?? 'free';
   const effectiveTier = subscription?.effectiveTier ?? 'free';
   const isLoading = subscription?.isLoading ?? true;
-  const isInTrial = subscription?.isInTrial ?? false;
-  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
-  const hasTrialExpired = subscription?.hasTrialExpired ?? false;
-  const trial = subscription?.trial ?? null;
   const limits: FeatureLimits = subscription?.limits ?? {
     maxActiveTasks: Infinity,
     dailyTaskCreation: Infinity,
@@ -230,19 +224,11 @@ export function SubscriptionSettings() {
                 <h3 data-testid="subscription-plan-name" className="text-xl font-bold text-white">
                   {currentTierDetails.name} Plan
                 </h3>
-                {isInTrial && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-900/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300 border border-amber-800">
-                    <Clock className="h-3 w-3" />
-                    Trial
-                  </span>
-                )}
               </div>
               <p className="text-sm text-gray-400">
-                {isInTrial
-                  ? `You're enjoying Pro features during your free trial`
-                  : tier === 'free'
-                    ? 'Upgrade to unlock more features and remove limits'
-                    : 'Thank you for being a valued subscriber!'
+                {tier === 'free'
+                  ? 'Upgrade to unlock more features and remove limits'
+                  : 'Thank you for being a valued subscriber!'
                 }
               </p>
             </div>
@@ -258,50 +244,6 @@ export function SubscriptionSettings() {
             </Link>
           )}
         </div>
-
-        {/* Trial Status */}
-        {isInTrial && (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-amber-900/20 to-orange-900/20 border border-amber-800">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-5 w-5 text-amber-400" />
-              <span className="font-semibold text-amber-200">
-                {trialDaysRemaining} {trialDaysRemaining === 1 ? 'day' : 'days'} remaining in your trial
-              </span>
-            </div>
-            <p className="text-sm text-amber-300 mb-3">
-              {trial?.trialEndsAt
-                ? `Your trial ends on ${new Date(trial.trialEndsAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`
-                : 'Your trial is active.'
-              }
-              {' '}Upgrade before it ends to keep all Pro features.
-            </p>
-            <div className="h-2.5 rounded-full bg-amber-800 overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.max(0, (trialDaysRemaining / 14) * 100)}%` }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-amber-400">
-              {Math.round((trialDaysRemaining / 14) * 100)}% of trial remaining
-            </p>
-          </div>
-        )}
-
-        {hasTrialExpired && (
-          <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-red-900/20 to-rose-900/20 border border-red-800">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-5 w-5 text-red-400" />
-              <span className="font-semibold text-red-200">
-                Your trial has ended
-              </span>
-            </div>
-            <p className="text-sm text-red-300">
-              You&apos;ve been moved to the Free plan with limited features. Upgrade now to regain access to all Pro features.
-            </p>
-          </div>
-        )}
 
         {/* Current Plan Features */}
         <div className="border-t border-gray-700 pt-5">

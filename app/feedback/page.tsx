@@ -132,7 +132,7 @@ export default function MyFeedbackPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex flex-col">
+      <div className="min-h-screen bg-black flex flex-col">
         <Header />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full"></div>
@@ -143,7 +143,7 @@ export default function MyFeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <Header />
       <div className="flex-1 bg-gray-900">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">

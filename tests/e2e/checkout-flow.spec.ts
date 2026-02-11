@@ -7,8 +7,8 @@ import { test, expect } from '@playwright/test';
 import { resilientClick } from './helpers/resilient-selectors';
 
 test.describe('Authenticated Checkout Flow', () => {
-  // Use pre-authenticated smoke user session
-  test.use({ storageState: 'tests/e2e/.auth/smoke.json' });
+  // Use pre-authenticated pro user session (any authenticated user works for checkout)
+  test.use({ storageState: 'tests/e2e/.auth/pro.json' });
 
   test('should redirect to Polar checkout when clicking Pro plan', async ({ page }) => {
     await page.goto('/pricing');

@@ -2,8 +2,11 @@
  * Playwright Auth Teardown
  *
  * Runs after all E2E tests complete:
- * 1. Deletes test users via teardown script
+ * 1. Deletes test users via teardown script (local only)
  * 2. Removes storage state files
+ *
+ * In CI, user cleanup is handled by the dedicated cleanup-users job
+ * in smart-e2e.yml to avoid race conditions between parallel shards.
  */
 
 import { test as teardown } from '@playwright/test';
@@ -13,20 +16,25 @@ import * as path from 'path';
 
 teardown.describe('Auth Teardown', () => {
   teardown('cleanup test users and auth state', () => {
-    console.log('\n🧹 Tearing down E2E test users...');
+    // In CI, test user cleanup is handled by the cleanup-users job.
+    // Per-shard teardown would delete users that other shards still need.
+    if (!process.env.CI) {
+      console.log('\n🧹 Tearing down E2E test users...');
 
-    try {
-      execSync('npx tsx tests/e2e/setup/teardown-test-users.ts', {
-        stdio: 'inherit',
-        env: process.env,
-      });
-      console.log('✅ Test users deleted\n');
-    } catch (error) {
-      console.error('⚠️ Test user teardown failed (may have already been deleted):', error);
-      // Don't throw — allow teardown to continue
+      try {
+        execSync('npx tsx tests/e2e/setup/teardown-test-users.ts', {
+          stdio: 'inherit',
+          env: process.env,
+        });
+        console.log('✅ Test users deleted\n');
+      } catch (error) {
+        console.error('⚠️ Test user teardown failed (may have already been deleted):', error);
+      }
+    } else {
+      console.log('\n✅ CI detected — skipping user teardown (handled by cleanup-users job)\n');
     }
 
-    // Delete storage state files
+    // Delete storage state files (safe to do in CI — each shard has its own)
     console.log('🧹 Deleting auth storage state files...');
     const authDir = path.join(__dirname, '.auth');
 
@@ -43,7 +51,6 @@ teardown.describe('Auth Teardown', () => {
       console.log('✅ Auth state cleaned\n');
     } catch (error) {
       console.error('⚠️ Failed to delete auth state files:', error);
-      // Don't throw — teardown should always succeed
     }
   });
 });

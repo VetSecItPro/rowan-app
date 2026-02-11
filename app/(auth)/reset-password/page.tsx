@@ -295,7 +295,7 @@ function ResetPasswordForm() {
 
   if (isCheckingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <motion.div
           className="flex flex-col items-center gap-4"
           initial={{ opacity: 0 }}
@@ -310,7 +310,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-black p-4">
         <motion.div
           className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50 text-center"
           initial="hidden"
@@ -336,7 +336,7 @@ function ResetPasswordForm() {
 
   if (!hasValidSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-black p-4">
         <motion.div
           className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50 text-center"
           initial="hidden"
@@ -367,7 +367,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-black p-4">
       <motion.div
         className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
         initial="hidden"
@@ -518,7 +518,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 to-zinc-950">
+        <div className="min-h-screen flex items-center justify-center bg-black">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
         </div>
       }

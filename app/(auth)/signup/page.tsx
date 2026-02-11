@@ -235,7 +235,7 @@ export default function SignUpPage() {
     <div className="min-h-screen flex flex-col lg:flex-row transition-all duration-500">
       {/* Mobile Header - Green section with logo */}
       <div
-        className={`lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
+        className={`lg:hidden bg-black pt-8 pb-12 px-4 transform transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
       >
         <Link href="/" className="flex flex-col items-center group">
@@ -254,7 +254,7 @@ export default function SignUpPage() {
 
       {/* Desktop Left side - Branding */}
       <div
-        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+        className={`hidden lg:flex lg:w-1/2 bg-black flex-col items-center justify-center p-12 relative overflow-hidden transform transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
           }`}
       >
 

@@ -18,6 +18,7 @@ export function PricingToggle({ value, onChange }: PricingToggleProps) {
         {/* Monthly Button */}
         <button
           type="button"
+          data-testid="pricing-monthly-button"
           onClick={() => onChange('monthly')}
           className={`rounded-full px-8 py-2.5 text-base font-semibold transition-all ${
             value === 'monthly'
@@ -39,6 +40,7 @@ export function PricingToggle({ value, onChange }: PricingToggleProps) {
 
           <button
             type="button"
+            data-testid="pricing-annual-button"
             onClick={() => onChange('annual')}
             className={`rounded-full px-8 py-2.5 text-base font-semibold transition-all ${
               value === 'annual'

@@ -166,7 +166,7 @@ export default function Landing2Page() {
   const year = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white font-[ui-sans-serif,system-ui,sans-serif]">
+    <div className="min-h-screen bg-black text-white font-[ui-sans-serif,system-ui,sans-serif]">
       {/* Background */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_15%_10%,rgba(59,130,246,0.16),transparent_45%),radial-gradient(900px_circle_at_80%_20%,rgba(34,211,238,0.14),transparent_45%),radial-gradient(900px_circle_at_50%_100%,rgba(99,102,241,0.10),transparent_40%)] opacity-90 bg-[radial-gradient(1200px_circle_at_15%_10%,rgba(59,130,246,0.14),transparent_45%),radial-gradient(900px_circle_at_80%_20%,rgba(34,211,238,0.12),transparent_45%),radial-gradient(900px_circle_at_50%_100%,rgba(99,102,241,0.10),transparent_40%)]" />

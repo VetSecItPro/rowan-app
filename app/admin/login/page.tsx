@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       {/* Clean background - no gradients */}
       <div className="absolute inset-0 bg-gray-900" />
 

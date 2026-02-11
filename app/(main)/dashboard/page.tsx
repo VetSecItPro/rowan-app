@@ -41,7 +41,6 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { WelcomeWidget } from '@/components/dashboard/WelcomeWidget';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
-import { TrialStatusBanner } from '@/components/subscription';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
@@ -370,7 +369,7 @@ export default function DashboardPage() {
   // Show loading state while checking authentication
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
           <div className="inline-block w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
           <p className="text-gray-400">Loading...</p>
@@ -395,8 +394,6 @@ export default function DashboardPage() {
               {/* Time-Aware Welcome Widget */}
               <WelcomeWidget userName={user?.name ?? undefined} />
 
-              {/* Trial Status Banner - Shows trial countdown or upgrade prompt */}
-              <TrialStatusBanner />
 
               {/* Today at a Glance - Shows today's events, tasks, meals, reminders */}
               {spaceId && (

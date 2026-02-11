@@ -2,7 +2,7 @@ export default function LoginLoading() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Mobile Header skeleton */}
-      <div className="lg:hidden bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 pt-8 pb-12 px-4">
+      <div className="lg:hidden bg-black pt-8 pb-12 px-4">
         <div className="flex flex-col items-center">
           <div className="w-18 h-18 bg-white/20 rounded-xl animate-pulse" />
           <div className="mt-2 h-8 w-20 bg-white/20 rounded animate-pulse" />
@@ -10,7 +10,7 @@ export default function LoginLoading() {
       </div>
 
       {/* Desktop Left side skeleton */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-600 via-teal-600 from-emerald-900 to-cyan-900 flex-col items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-black flex-col items-center justify-center p-12">
         <div className="text-center">
           <div className="flex items-center justify-center gap-4 mb-8">
             <div className="w-28 h-28 bg-white/20 rounded-xl animate-pulse" />
@@ -26,7 +26,7 @@ export default function LoginLoading() {
       </div>
 
       {/* Right side - Form skeleton */}
-      <div className="flex-1 lg:w-1/2 bg-gray-900 flex items-center justify-center p-4 sm:p-8">
+      <div className="flex-1 lg:w-1/2 bg-black flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md">
           {/* Header skeleton */}
           <div className="mb-8">

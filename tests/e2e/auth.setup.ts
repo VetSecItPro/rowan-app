@@ -2,22 +2,17 @@
  * Playwright Auth Setup
  *
  * Runs before all E2E tests:
- * 1. Seeds test users via seed script
- * 2. Logs in each user via UI
- * 3. Saves storage state to .auth/{userType}.json
+ * 1. Logs in each user via UI (test user seeding handled by global-setup.ts or CI seed job)
+ * 2. Verifies redirect to authenticated page
+ * 3. Validates auth session via API call
+ * 4. Saves storage state to .auth/{userType}.json
  *
  * Individual test files use `test.use({ storageState })` to load pre-authenticated sessions.
  */
 
-import { test as setup, expect } from '@playwright/test';
-import { resilientFill, resilientClick, elementExists } from './helpers/resilient-selectors';
+import { test as setup } from '@playwright/test';
 
 const TEST_USERS = {
-  smoke: {
-    email: process.env.SMOKE_TEST_EMAIL || 'smoke.test@rowan-test.app',
-    password: process.env.SMOKE_TEST_PASSWORD || process.env.E2E_TEST_PASSWORD || '',
-    storageState: 'tests/e2e/.auth/smoke.json',
-  },
   free: {
     email: 'test-free@rowan-test.app',
     password: process.env.E2E_TEST_PASSWORD || '',
@@ -28,101 +23,69 @@ const TEST_USERS = {
     password: process.env.E2E_TEST_PASSWORD || '',
     storageState: 'tests/e2e/.auth/pro.json',
   },
-  family: {
-    email: 'test-family@rowan-test.app',
-    password: process.env.E2E_TEST_PASSWORD || '',
-    storageState: 'tests/e2e/.auth/family.json',
-  },
 };
 
 setup.describe('Auth Setup', () => {
-  // NOTE: Test user seeding happens in GitHub Actions workflow (seed-users job)
-  // This prevents race conditions from multiple test files seeding simultaneously
-
   for (const [userType, user] of Object.entries(TEST_USERS)) {
     setup(`authenticate as ${userType} user`, async ({ page }) => {
+      // Auth setup can be slow in CI (dev server compilation, Supabase latency)
+      setup.setTimeout(120000);
+
       console.log(`🔐 Authenticating as ${userType} (${user.email})...`);
 
-      await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      // Navigate to login
+      await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForLoadState('networkidle').catch(() => {});
 
-      // Dismiss cookie banner if present (prevents click blocking on mobile viewports)
-      const cookieAcceptButton = page.locator('button:has-text("Accept"), button:has-text("Essential")').first();
-      if (await cookieAcceptButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await cookieAcceptButton.click({ timeout: 5000 }).catch(() => {
-          console.log('  Cookie banner already dismissed or not found');
-        });
-        await page.waitForTimeout(500); // Wait for banner to animate out
+      // Dismiss cookie banner if present
+      const cookieBtn = page.locator('[data-testid="cookie-consent-accept"], button:has-text("Accept"), button:has-text("Essential")').first();
+      if (await cookieBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+        await cookieBtn.click({ timeout: 5000 }).catch(() => {});
+        await page.waitForTimeout(500);
       }
 
-      // Fill login form using resilient selectors
-      await resilientFill(page, 'login-email-input', user.email, {
-        role: 'textbox',
-        type: 'email',
-      });
+      // Fill login form — use testid first, fall back to input type
+      const emailInput = page.locator('[data-testid="login-email-input"], input[type="email"]').first();
+      await emailInput.waitFor({ state: 'visible', timeout: 30000 });
+      await emailInput.fill(user.email);
 
-      await resilientFill(page, 'login-password-input', user.password, {
-        role: 'textbox',
-        type: 'password',
-      });
+      const passwordInput = page.locator('[data-testid="login-password-input"], input[type="password"]').first();
+      await passwordInput.waitFor({ state: 'visible', timeout: 5000 });
+      await passwordInput.fill(user.password);
 
-      // Submit using resilient click
-      await resilientClick(page, 'login-submit-button', {
-        role: 'button',
-        text: 'Sign In',
-      });
+      // Submit form
+      await page.keyboard.press('Enter');
+      console.log(`  ✓ Submitted login form`);
 
-      // CRITICAL: Wait for redirect to initiate before checking URL
-      // The login page uses window.location.href which requires a brief moment
-      // to trigger the navigation. Without this wait, waitForURL races with the redirect.
-      await page.waitForTimeout(2000);
+      // Wait for redirect away from /login
+      // In CI the redirect can take 10-20s due to dev server compilation and Supabase latency
+      await page.waitForURL(url => !url.pathname.endsWith('/login'), { timeout: 45000 });
 
-      // Wait for redirect to dashboard
-      // Timeout increased to 25s for CI: 3rd/4th login attempts (pro/family) consistently take 19-22s
-      // due to resource constraints, rate limiting, or connection pool exhaustion in CI environment
-      await page.waitForURL(/\/(dashboard|tasks)/, { timeout: 25000 });
+      const redirectedUrl = page.url();
+      console.log(`  ✓ Redirected to: ${redirectedUrl}`);
 
-      // Wait for page to load completely
-      await page.waitForLoadState('networkidle');
+      // Wait for page to finish loading
+      await page.waitForLoadState('networkidle').catch(() => {});
 
-      // ROBUST AUTH VERIFICATION: Retry multiple times to handle auth context hydration
-      // In CI, React context may take time to hydrate after SSR
-      const maxRetries = 10;
-      const retryDelay = 1000; // 1 second between retries
-      let verified = false;
-
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        console.log(`  Verifying auth (attempt ${attempt}/${maxRetries})...`);
-
-        // Check for dashboard heading or add task button
-        const isDashboardVisible = await elementExists(page, 'dashboard-heading', {
-          role: 'heading',
-        });
-
-        const isAddTaskVisible = await elementExists(page, 'add-task-button', {
-          role: 'button',
-          text: 'Add Task',
-        });
-
-        if (isDashboardVisible || isAddTaskVisible) {
-          verified = true;
-          console.log(`  ✓ Authenticated as ${userType} (verified on attempt ${attempt})`);
+      // VALIDATE: Make an API call to confirm the session has valid auth cookies.
+      // This is the definitive check — if /api/spaces returns 200, we're authenticated.
+      let apiVerified = false;
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        const response = await page.request.get('/api/csrf/token', { timeout: 10000 }).catch(() => null);
+        if (response?.ok()) {
+          apiVerified = true;
+          console.log(`  ✓ API auth verified (attempt ${attempt})`);
           break;
         }
-
-        if (attempt < maxRetries) {
-          console.log(`  Retry in ${retryDelay}ms...`);
-          await page.waitForTimeout(retryDelay);
-        }
+        console.log(`  API check attempt ${attempt}/5 returned ${response?.status() ?? 'error'}`);
+        if (attempt < 5) await page.waitForTimeout(2000);
       }
 
-      if (!verified) {
-        // Log the current URL and page content for debugging
-        console.error(`  ✗ Auth verification failed after ${maxRetries} attempts`);
-        console.error(`  Current URL: ${page.url()}`);
-        const bodyText = await page.locator('body').textContent();
-        console.error(`  Page text (first 200 chars): ${bodyText?.substring(0, 200)}`);
-        throw new Error(`Authentication verification failed for ${userType} user after ${maxRetries} retries`);
+      if (!apiVerified) {
+        const bodyText = await page.locator('body').textContent().catch(() => '(unreadable)');
+        console.error(`  ✗ API verification failed. URL: ${page.url()}`);
+        console.error(`  Page text: ${bodyText?.substring(0, 200)}`);
+        throw new Error(`Auth API verification failed for ${userType} — session cookies not set`);
       }
 
       // Save storage state

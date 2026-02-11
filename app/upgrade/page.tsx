@@ -54,7 +54,7 @@ function UpgradePageContent() {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-800 rounded-full">
             <Sparkles className="w-4 h-4 text-blue-400" />
             <span className="text-sm font-semibold text-blue-100">
-              Beta Tester Upgrade
+              Upgrade Your Plan
             </span>
           </div>
         </div>
@@ -64,7 +64,7 @@ function UpgradePageContent() {
           Ready to Keep Your Family Organized?
         </h1>
         <p className="text-xl text-center text-gray-400 mb-12 max-w-2xl mx-auto">
-          You&apos;ve experienced Rowan during the beta. Now continue enjoying all the features with a full account.
+          Unlock all features and supercharge your family organization with a full account.
         </p>
 
         {/* Features Grid */}

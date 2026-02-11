@@ -253,7 +253,7 @@ export default function InstallPageClient() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-black flex flex-col">
       <PublicHeaderLite />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 pb-28 sm:pb-8">

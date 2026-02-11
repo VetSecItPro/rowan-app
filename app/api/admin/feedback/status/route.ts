@@ -71,7 +71,7 @@ export async function PATCH(req: NextRequest) {
 
     // Update feedback status
     const { data: feedback, error: updateError } = await supabaseAdmin
-      .from('beta_feedback')
+      .from('feedback_submissions')
       .update({
         status: validatedData.status,
         admin_response: validatedData.adminResponse || null,
@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
 
     // Bulk update feedback
     const { data: updatedFeedback, error: updateError } = await supabaseAdmin
-      .from('beta_feedback')
+      .from('feedback_submissions')
       .update({
         status: validatedData.status,
         admin_response: validatedData.adminResponse || null,

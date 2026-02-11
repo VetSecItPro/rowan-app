@@ -29,7 +29,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
   // 404 for unknown articles
   if (!article) {
     return (
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-black">
         <PublicHeader />
         <main className="pt-32 pb-20 px-4">
           <div className="max-w-2xl mx-auto text-center">
@@ -57,7 +57,7 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
   const hasContent = !!renderedContent
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black">
       <PublicHeader />
 
       <main>

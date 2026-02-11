@@ -15,10 +15,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 const TEST_USER_EMAILS = [
-  'smoke.test@rowan-test.app',
   'test-free@rowan-test.app',
   'test-pro@rowan-test.app',
-  'test-family@rowan-test.app',
 ];
 
 async function cleanupTestUsers() {

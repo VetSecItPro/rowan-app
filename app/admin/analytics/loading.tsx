@@ -1,6 +1,6 @@
 export default function AnalyticsLoading() {
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen bg-black p-6">
       {/* Header */}
       <div className="mb-8">
         <div className="h-8 w-40 bg-gray-800 rounded animate-pulse mb-2" />

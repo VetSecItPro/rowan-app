@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { useFeatureGate, type GatedFeature } from '@/lib/hooks/useFeatureGate';
-import { Crown, Lock, Sparkles, Clock, ArrowRight } from 'lucide-react';
+import { Crown, Lock, Sparkles, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface FeatureGateWrapperProps {
@@ -49,8 +49,6 @@ export function FeatureGateWrapper({
     isLoading,
     featureName,
     requiredTier,
-    isInTrial,
-    trialDaysRemaining,
     promptUpgrade,
   } = useFeatureGate(feature);
 
@@ -77,8 +75,6 @@ export function FeatureGateWrapper({
           featureName={title || featureName}
           description={description}
           requiredTier={requiredTier}
-          isInTrial={isInTrial}
-          trialDaysRemaining={trialDaysRemaining}
           onUpgrade={promptUpgrade}
         />
       );
@@ -123,15 +119,11 @@ function FeatureGateBlockedPage({
   featureName,
   description,
   requiredTier,
-  isInTrial,
-  trialDaysRemaining,
   onUpgrade: _onUpgrade,
 }: {
   featureName: string;
   description?: string;
   requiredTier: string;
-  isInTrial: boolean;
-  trialDaysRemaining: number;
   onUpgrade: () => void;
 }) {
   const tierDisplay = requiredTier === 'family' ? 'Family' : 'Pro';
@@ -152,14 +144,6 @@ function FeatureGateBlockedPage({
       <p className="text-gray-400 max-w-md mb-6">
         {description || `Upgrade to ${tierDisplay} to unlock ${featureName.toLowerCase()} and supercharge your family organization.`}
       </p>
-
-      {/* Trial badge */}
-      {isInTrial && (
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-amber-900/30 px-4 py-2 text-amber-300">
-          <Clock className="h-4 w-4" />
-          <span className="text-sm font-medium">{trialDaysRemaining} days left in trial</span>
-        </div>
-      )}
 
       {/* Tier badge */}
       <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-emerald-900/30 px-4 py-2">

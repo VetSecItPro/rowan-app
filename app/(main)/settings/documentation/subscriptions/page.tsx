@@ -229,7 +229,7 @@ const guideSections: GuideSection[] = [
 
 export default function SubscriptionsDocumentationPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-emerald-950/30 to-teal-950/20">
+    <div className="min-h-screen bg-black">
         <div className="max-w-7xl mx-auto p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8">

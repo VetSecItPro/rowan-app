@@ -66,3 +66,26 @@ export function isValidSearchQuery(input: string, minLength: number = 1): boolea
   const sanitized = sanitizeSearchInput(input);
   return sanitized.length >= minLength;
 }
+
+/**
+ * Escape special RegExp characters in a string to prevent ReDoS attacks
+ *
+ * This function escapes all special regex characters to make user input safe
+ * for use in RegExp constructors, preventing Regular Expression Denial of
+ * Service (ReDoS) attacks.
+ *
+ * @param str - String to escape
+ * @returns String with regex special characters escaped
+ *
+ * @example
+ * const userInput = "location*"; // Contains regex metacharacter *
+ * const pattern = new RegExp(`at\\s+${escapeRegExp(userInput)}`, 'i');
+ * // Result: Regex with escaped metacharacters (safe)
+ */
+export function escapeRegExp(str: string): string {
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
+  // Escape all regex special characters: . * + ? ^ $ { } ( ) | [ ] \
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

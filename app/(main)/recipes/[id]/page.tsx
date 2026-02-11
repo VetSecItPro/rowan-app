@@ -128,7 +128,7 @@ export default function RecipeDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="flex items-center gap-3">
           <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
           <span className="text-gray-400">Loading recipe...</span>
@@ -139,7 +139,7 @@ export default function RecipeDetailPage() {
 
   if (!recipe) {
     return (
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <ChefHat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Recipe not found</h1>
@@ -163,7 +163,7 @@ export default function RecipeDetailPage() {
   const safeSourceUrl = recipe.source_url ? sanitizeUrl(recipe.source_url) : '';
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -29,26 +29,16 @@ export async function GET(request: NextRequest) {
     }
 
     // DEV ONLY: Allow mocking subscription tier for testing (before auth check)
-    const mockTier = request.nextUrl.searchParams.get('mockTier') as SubscriptionTier | 'trial' | null;
+    const mockTier = request.nextUrl.searchParams.get('mockTier') as SubscriptionTier | null;
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev && mockTier) {
       logger.info(`[DEV] Mocking subscription tier: ${mockTier}`, { component: 'api-route' });
 
-      // Return mock data for testing (bypasses auth for dev testing)
-      const isTrialMock = mockTier === 'trial';
-      const actualTier = isTrialMock ? 'free' : mockTier as SubscriptionTier;
-
       return NextResponse.json({
-        tier: actualTier,
-        trial: {
-          isInTrial: isTrialMock,
-          daysRemaining: isTrialMock ? 10 : 0,
-          trialEndsAt: isTrialMock ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString() : null,
-          trialStartedAt: isTrialMock ? new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() : null,
-        },
+        tier: mockTier as SubscriptionTier,
         subscription: {
-          tier: actualTier,
+          tier: mockTier as SubscriptionTier,
           status: mockTier === 'free' ? 'none' : 'active',
           isActive: mockTier !== 'free',
           isPastDue: false,
@@ -75,8 +65,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get subscription status
-    const subscriptionStatus = await getSubscriptionStatus(user.id);
+    // Get subscription status - pass the authenticated client to avoid JWT refresh race conditions
+    const subscriptionStatus = await getSubscriptionStatus(user.id, supabase);
 
     // Get feature access details
     const featureAccess = await getUserFeatureAccess(user.id);
@@ -85,14 +75,6 @@ export async function GET(request: NextRequest) {
     const response = {
       // Top-level tier
       tier: subscriptionStatus.tier,
-
-      // Trial status (for client-side trial banner/modal)
-      trial: {
-        isInTrial: subscriptionStatus.trial.isInTrial,
-        daysRemaining: subscriptionStatus.trial.daysRemaining,
-        trialEndsAt: subscriptionStatus.trial.trialEndsAt,
-        trialStartedAt: subscriptionStatus.trial.trialStartedAt,
-      },
 
       // Full subscription details
       subscription: {
@@ -109,10 +91,12 @@ export async function GET(request: NextRequest) {
       dailyUsage: featureAccess.dailyUsage,
     };
 
+    // Return response with no-cache header in test environment
+    const isTest = process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST === 'true';
     return NextResponse.json(response, {
       status: 200,
       headers: {
-        'Cache-Control': 'private, max-age=300', // Cache for 5 minutes
+        'Cache-Control': isTest ? 'no-store' : 'private, max-age=300', // No cache in tests, 5 minutes in prod
       },
     });
   } catch (error) {

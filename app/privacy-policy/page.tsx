@@ -13,7 +13,7 @@ import { Shield, Eye, Download, Trash2, MapPin, Users, Lock } from 'lucide-react
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gray-900 py-12">
+    <div className="min-h-screen bg-black py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">

@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
 import { useAdmin } from '@/hooks/useAdmin';
-import { TrialBadge } from '@/components/subscription';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
 
@@ -336,12 +335,9 @@ export function Sidebar() {
       {/* Header with subtle branding */}
       <div className={`flex items-center h-14 px-3 border-b border-gray-700/30 ${effectivelyExpanded ? 'justify-between' : 'justify-center'}`}>
         {effectivelyExpanded && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
-              Features
-            </span>
-            <TrialBadge />
-          </div>
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+            Features
+          </span>
         )}
         <button
           onClick={toggleSidebar}

@@ -2,12 +2,12 @@
 
 /**
  * Upgrade Modal
- * Trial-aware modal prompting users to upgrade
+ * Modal prompting users to upgrade their subscription
  */
 
 import React from 'react';
 import Link from 'next/link';
-import { Crown, Check, Clock, Sparkles, Zap, Lock } from 'lucide-react';
+import { Crown, Check, Sparkles, Zap, Lock } from 'lucide-react';
 import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import { Modal } from '@/components/ui/Modal';
 
@@ -101,12 +101,6 @@ export function UpgradeModal({
   description: customDescription,
 }: UpgradeModalProps) {
   const subscription = useSubscriptionSafe();
-  const isInTrial = subscription?.isInTrial ?? false;
-  const trialDaysRemaining = subscription?.trialDaysRemaining ?? 0;
-  const hasTrialExpired = subscription?.hasTrialExpired ?? false;
-  // Tier info available from subscription context but not used in current UI
-  const _effectiveTier = subscription?.effectiveTier ?? 'free';
-  void _effectiveTier;
 
   const featureInfo = feature ? FEATURE_MESSAGES[feature] : null;
   const title = customTitle || featureInfo?.title || 'Upgrade to Pro';
@@ -143,6 +137,7 @@ export function UpgradeModal({
       maxWidth="lg"
       headerGradient="bg-gradient-to-r from-emerald-500 to-teal-500"
       footer={footerContent}
+      testId="upgrade-modal"
     >
       <div className="space-y-6">
         {/* Feature Icon */}
@@ -151,31 +146,7 @@ export function UpgradeModal({
             {featureInfo?.icon || <Crown className="h-8 w-8" />}
           </div>
 
-          {/* Trial status badge */}
-          {isInTrial && (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 text-amber-400 px-3 py-1 text-sm">
-              <Clock className="h-4 w-4" />
-              <span>{trialDaysRemaining} days left in trial</span>
-            </div>
-          )}
-
-          {hasTrialExpired && (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 text-red-400 px-3 py-1 text-sm">
-              <Clock className="h-4 w-4" />
-              <span>Your trial has ended</span>
-            </div>
-          )}
         </div>
-
-        {/* Trial message */}
-        {isInTrial && (
-          <div className="rounded-lg bg-amber-900/20 p-4 border border-amber-800">
-            <p className="text-sm text-amber-200">
-              <strong>You&apos;re on a free trial!</strong> You currently have access to this feature.
-              Upgrade before your trial ends to keep using it.
-            </p>
-          </div>
-        )}
 
         {/* Features list */}
         <div className="space-y-4">
@@ -219,7 +190,6 @@ export function FeatureLockOverlay({
   const subscription = useSubscriptionSafe();
   const canAccess = subscription?.canAccess ?? (() => true);
   const showUpgradeModal = subscription?.showUpgradeModal ?? (() => {});
-  const isInTrial = subscription?.isInTrial ?? false;
   const featureKey = feature as keyof typeof FEATURE_MESSAGES;
 
   // Check if feature is accessible (default to true if no provider)
@@ -239,7 +209,7 @@ export function FeatureLockOverlay({
         <div className="flex items-center gap-2 rounded-lg bg-gray-900/80 px-4 py-2 text-white shadow-lg">
           <Lock className="h-4 w-4" />
           <span className="text-sm font-medium">
-            {isInTrial ? 'Unlock Feature' : 'Upgrade to Unlock'}
+            Upgrade to Unlock
           </span>
         </div>
       </div>

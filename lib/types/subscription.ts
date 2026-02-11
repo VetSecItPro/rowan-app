@@ -46,25 +46,11 @@ export interface Subscription {
   founding_member_number: number | null;
   founding_member_locked_price_id: string | null;
 
-  // Trial period
-  trial_started_at: string | null;
-  trial_ends_at: string | null;
-
   // Timestamps
   subscription_started_at: string | null;
   subscription_ends_at: string | null;
   created_at: string;
   updated_at: string;
-}
-
-/**
- * Trial status information
- */
-export interface TrialStatus {
-  isInTrial: boolean;
-  daysRemaining: number;
-  trialEndsAt: Date | null;
-  trialStartedAt: Date | null;
 }
 
 // ============================================================================
@@ -80,9 +66,7 @@ export type SubscriptionEventType =
   | 'cancel'
   | 'reactivate'
   | 'payment_failed'
-  | 'payment_succeeded'
-  | 'trial_started'
-  | 'trial_expired';
+  | 'payment_succeeded';
 
 /**
  * Sources that trigger upgrades (for conversion tracking)

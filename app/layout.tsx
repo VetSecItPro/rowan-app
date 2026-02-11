@@ -93,7 +93,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://vercel.live" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
-      <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 text-white`} style={{ scrollbarGutter: 'stable' }}>
+      <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-black text-white`} style={{ scrollbarGutter: 'stable' }}>
         <AppQueryProvider>
         <DeviceProvider>
           <AuthProvider>

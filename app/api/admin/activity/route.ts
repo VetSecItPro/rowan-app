@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 interface ActivityItem {
   id: string;
-  type: 'user_signup' | 'beta_feedback' | 'feedback';
+  type: 'user_signup' | 'feedback';
   title: string;
   description: string;
   timestamp: string;
@@ -22,15 +22,6 @@ interface ProfileRecord {
   email?: string;
   full_name?: string;
   created_at: string;
-}
-
-interface BetaFeedbackRecord {
-  id: string;
-  title?: string;
-  category?: string;
-  created_at: string;
-  user_id: string;
-  profiles: { email?: string; full_name?: string } | null;
 }
 
 interface FeedbackSubmissionRecord {
@@ -92,36 +83,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 2. Recent beta feedback
-    const { data: betaFeedback, error: feedbackError } = await supabaseAdmin
-      .from('beta_feedback')
-      .select(`
-        id,
-        title,
-        category,
-        created_at,
-        user_id,
-        profiles!inner(email, full_name)
-      `)
-      .gte('created_at', cutoffIso)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (!feedbackError && betaFeedback) {
-      (betaFeedback as BetaFeedbackRecord[]).forEach((fb) => {
-        const profile = fb.profiles as unknown as { email?: string; full_name?: string } | null;
-        activities.push({
-          id: `feedback-${fb.id}`,
-          type: 'beta_feedback',
-          title: fb.category === 'bug' ? 'Bug report' : 'Feature request',
-          description: fb.title || 'Feedback submitted',
-          timestamp: fb.created_at,
-          email: profile?.email,
-        });
-      });
-    }
-
-    // 4. Recent feedback submissions
+    // 2. Recent feedback submissions
     const { data: feedbackSubmissions, error: submissionsError } = await supabaseAdmin
       .from('feedback_submissions')
       .select(`
