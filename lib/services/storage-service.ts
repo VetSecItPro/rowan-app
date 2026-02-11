@@ -381,7 +381,7 @@ export async function getSpaceStorageUsage(
     // Get current usage from storage_usage table
     const { data: usage, error: usageError } = await supabase
       .from('storage_usage')
-      .select('*')
+      .select('id, space_id, total_bytes, file_count, storage_limit_bytes, last_calculated_at, created_at, updated_at')
       .eq('space_id', spaceId)
       .single();
 
@@ -402,7 +402,7 @@ export async function getSpaceStorageUsage(
       // Fetch the newly created record
       const { data: newUsage, error: newError } = await supabase
         .from('storage_usage')
-        .select('*')
+        .select('id, space_id, total_bytes, file_count, storage_limit_bytes, last_calculated_at, created_at, updated_at')
         .eq('space_id', spaceId)
         .single();
 
@@ -534,7 +534,7 @@ export async function shouldShowStorageWarning(
     // Check if user has already dismissed this warning
     const { data: dismissal, error: dismissalError } = await supabase
       .from('storage_warnings')
-      .select('*')
+      .select('id, user_id, space_id, warning_type, dismissed_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .eq('warning_type', warningType)

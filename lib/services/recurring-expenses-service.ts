@@ -357,7 +357,7 @@ export async function getRecurringPatterns(spaceId: string): Promise<RecurringEx
 
   const { data, error } = await supabase
     .from('recurring_expense_patterns')
-    .select('*')
+    .select('id, space_id, pattern_name, merchant_name, category, frequency, average_amount, amount_variance, confidence_score, detection_method, first_occurrence, last_occurrence, occurrence_count, expense_ids, next_expected_date, next_expected_amount, user_confirmed, user_ignored, auto_created, created_at, updated_at, last_analyzed_at')
     .eq('space_id', spaceId)
     .eq('user_ignored', false)
     .order('confidence_score', { ascending: false });
@@ -428,7 +428,7 @@ export async function getUpcomingRecurring(spaceId: string): Promise<RecurringEx
 
   const { data, error } = await supabase
     .from('recurring_expense_patterns')
-    .select('*')
+    .select('id, space_id, pattern_name, merchant_name, category, frequency, average_amount, amount_variance, confidence_score, detection_method, first_occurrence, last_occurrence, occurrence_count, expense_ids, next_expected_date, next_expected_amount, user_confirmed, user_ignored, auto_created, created_at, updated_at, last_analyzed_at')
     .eq('space_id', spaceId)
     .eq('user_ignored', false)
     .gte('next_expected_date', today)
@@ -451,7 +451,7 @@ export async function createExpenseFromPattern(
   // Get the pattern
   const { data: pattern, error: patternError } = await supabase
     .from('recurring_expense_patterns')
-    .select('*')
+    .select('id, space_id, pattern_name, merchant_name, category, frequency, average_amount, amount_variance, confidence_score, detection_method, first_occurrence, last_occurrence, occurrence_count, expense_ids, next_expected_date, next_expected_amount, user_confirmed, user_ignored, auto_created, created_at, updated_at, last_analyzed_at')
     .eq('id', patternId)
     .single();
 

@@ -105,13 +105,19 @@ export async function POST(request: NextRequest) {
 
     const validated = parsed.data;
 
-    // Parse browser info from validated string
+    // SECURITY: Parse browser info with Zod validation to prevent malformed JSON
     let browserInfo: Record<string, unknown> | undefined;
     if (validated.browser_info) {
       try {
-        browserInfo = JSON.parse(validated.browser_info);
+        const rawParsed = JSON.parse(validated.browser_info);
+        const BrowserInfoSchema = z.record(z.string(), z.unknown());
+        const parseResult = BrowserInfoSchema.safeParse(rawParsed);
+        browserInfo = parseResult.success ? parseResult.data : undefined;
+        if (!parseResult.success) {
+          logger.warn('Browser info failed Zod validation', { component: 'api-route', action: 'validation_failed' });
+        }
       } catch (e) {
-        logger.error('Failed to parse browser info:', e, { component: 'api-route', action: 'api_request' });
+        logger.warn('Failed to parse browser info:', { component: 'api-route', action: 'parse_failed', error: e });
       }
     }
 

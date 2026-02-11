@@ -31,7 +31,7 @@ export const personalWorkspaceService = {
 
       const { data, error } = await supabase
         .from('spaces')
-        .select('*')
+        .select('id, name, description, type, created_at, updated_at, user_id, created_by, settings, is_personal, auto_created')
         .eq('user_id', userId)
         .eq('is_personal', true)
         .single();
@@ -182,7 +182,7 @@ export const personalWorkspaceService = {
 
       const { data, error } = await supabase
         .from('workspace_migrations')
-        .select('*')
+        .select('id, user_id, from_space_id, to_space_id, item_type, item_id, migrated_at, created_at')
         .eq('user_id', userId)
         .order('migrated_at', { ascending: false });
 

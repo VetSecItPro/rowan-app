@@ -31,7 +31,7 @@ export const taskSnoozeService = {
 
   async getSnoozeHistory(taskId: string): Promise<TaskSnoozeHistory[]> {
     const supabase = createClient();
-    const { data, error } = await supabase.from('task_snooze_history').select('*').eq('task_id', taskId).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('task_snooze_history').select('id, task_id, snoozed_until, snoozed_by, reason, created_at').eq('task_id', taskId).order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];
   },

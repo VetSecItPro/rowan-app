@@ -188,7 +188,7 @@ export async function getSpace(
     // Get space details
     const { data: space, error: spaceError } = await supabase
       .from('spaces')
-      .select('*')
+      .select('id, name, description, type, created_at, updated_at, user_id, created_by, settings, is_personal, auto_created')
       .eq('id', spaceId)
       .single();
 

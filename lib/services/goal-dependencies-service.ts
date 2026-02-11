@@ -115,7 +115,7 @@ export async function getDependencies(spaceId: string): Promise<GoalDependency[]
 
   const { data, error } = await supabase
     .from('goal_dependencies')
-    .select('*')
+    .select('id, space_id, goal_id, depends_on_goal_id, dependency_type, completion_threshold, auto_unlock, unlock_delay_days, status, satisfied_at, bypassed_at, bypassed_by, bypass_reason, created_at, updated_at, created_by')
     .eq('space_id', spaceId)
     .order('created_at', { ascending: false });
 
@@ -131,7 +131,7 @@ export async function getGoalDependencies(goalId: string): Promise<GoalDependenc
 
   const { data, error } = await supabase
     .from('goal_dependencies')
-    .select('*')
+    .select('id, space_id, goal_id, depends_on_goal_id, dependency_type, completion_threshold, auto_unlock, unlock_delay_days, status, satisfied_at, bypassed_at, bypassed_by, bypass_reason, created_at, updated_at, created_by')
     .eq('goal_id', goalId)
     .order('created_at', { ascending: false });
 
@@ -147,7 +147,7 @@ export async function getDependentGoals(goalId: string): Promise<GoalDependency[
 
   const { data, error } = await supabase
     .from('goal_dependencies')
-    .select('*')
+    .select('id, space_id, goal_id, depends_on_goal_id, dependency_type, completion_threshold, auto_unlock, unlock_delay_days, status, satisfied_at, bypassed_at, bypassed_by, bypass_reason, created_at, updated_at, created_by')
     .eq('depends_on_goal_id', goalId)
     .order('created_at', { ascending: false });
 

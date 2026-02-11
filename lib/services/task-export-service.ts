@@ -29,7 +29,7 @@ const DEFAULT_COLUMNS: ColumnKey[] = ['title', 'description', 'status', 'priorit
 export const taskExportService = {
   async exportToCSV(spaceId: string, filters?: { status?: string; category?: string; assigned_to?: string; columns?: string[] }): Promise<string> {
     const supabase = createClient();
-    let query = supabase.from('tasks').select('*').eq('space_id', spaceId);
+    let query = supabase.from('tasks').select('title, description, status, priority, category, due_date, assigned_to, created_at').eq('space_id', spaceId);
 
     if (filters?.status) query = query.eq('status', filters.status);
     if (filters?.category) query = query.eq('category', filters.category);

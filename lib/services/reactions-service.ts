@@ -48,7 +48,7 @@ export const reactionsService = {
 
     const { data, error } = await supabase
       .from('checkin_reactions')
-      .select('*')
+      .select('id, checkin_id, from_user_id, reaction_type, message, created_at')
       .eq('checkin_id', checkinId)
       .order('created_at', { ascending: true });
 
@@ -64,7 +64,7 @@ export const reactionsService = {
 
     const { data, error } = await supabase
       .from('checkin_reactions')
-      .select('*')
+      .select('id, checkin_id, from_user_id, reaction_type, message, created_at')
       .eq('from_user_id', userId)
       .order('created_at', { ascending: false });
 
@@ -94,7 +94,7 @@ export const reactionsService = {
 
     const { data, error } = await supabase
       .from('checkin_reactions')
-      .select('*')
+      .select('id, checkin_id, from_user_id, reaction_type, message, created_at')
       .eq('checkin_id', checkinId)
       .eq('from_user_id', userId)
       .maybeSingle();

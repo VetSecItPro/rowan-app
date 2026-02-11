@@ -19,6 +19,8 @@ export const chatMessageSchema = z.object({
     confirmed: z.boolean(),
     editedParameters: z.record(z.string(), z.unknown()).optional(),
   }).optional(),
+  // Voice input duration tracking (Web Speech API — client-side, no API cost)
+  voiceDurationSeconds: z.number().int().min(0).max(300).optional(),
 });
 
 // Validate and sanitize chat input

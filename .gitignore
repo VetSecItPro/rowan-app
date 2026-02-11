@@ -79,6 +79,14 @@ docs/security/MONETIZATION_SECURITY.md
 .mcp.json
 .claude/
 
+# AI agent directories (cursor, aider, etc.)
+.agent/
+.agents/
+.cursor/
+
+# Root-level screenshots (design comparison artifacts)
+rowan-homepage-*.png
+
 # Root-level audit documents
 Claude-finalaudit-1feb.md
 rowan-sec-audit-jan26.md

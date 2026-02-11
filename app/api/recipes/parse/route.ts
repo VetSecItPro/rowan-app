@@ -6,6 +6,25 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// SECURITY: Zod schema to validate AI-generated recipe JSON
+const AIRecipeSchema = z.object({
+  name: z.string().max(500),
+  description: z.string().max(2000).optional().nullable(),
+  ingredients: z.array(z.object({
+    name: z.string().max(200),
+    amount: z.string().max(50).optional().nullable(),
+    unit: z.string().max(50).optional().nullable(),
+  })).min(1).max(200),
+  instructions: z.union([z.string(), z.array(z.string())]).optional().nullable(),
+  prep_time: z.number().min(0).max(10000).optional().nullable(),
+  cook_time: z.number().min(0).max(10000).optional().nullable(),
+  servings: z.number().min(0).max(1000).optional().nullable(),
+  difficulty: z.string().max(50).optional().nullable(),
+  cuisine_type: z.string().max(100).optional().nullable(),
+  tags: z.array(z.string().max(50)).max(20).optional().nullable(),
+}).passthrough();
 
 export const maxDuration = 60;
 
@@ -94,9 +113,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Use Gemini 1.5 Flash for cost-effectiveness
+    // Use Gemini 2.5 Flash
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: { maxOutputTokens: 4096 },
     });
 
@@ -158,8 +177,21 @@ ${text ? `Recipe content:\n<user_input>\n${text}\n</user_input>` : 'See the imag
       cleanedText = cleanedText.replace(/^```\s*/, '').replace(/\s*```$/, '');
     }
 
-    // Parse the JSON response
-    const recipeData = JSON.parse(cleanedText);
+    // SECURITY: Parse and validate AI response with Zod to prevent malformed data
+    const rawParsed = JSON.parse(cleanedText);
+    const parseResult = AIRecipeSchema.safeParse(rawParsed);
+    if (!parseResult.success) {
+      logger.warn('AI recipe response failed Zod validation', {
+        component: 'api/recipes/parse',
+        action: 'validation_failed',
+        errors: parseResult.error.issues.map(i => i.message).join(', '),
+      });
+      return NextResponse.json(
+        { error: 'Could not extract recipe information. Please try with a different recipe.' },
+        { status: 400 }
+      );
+    }
+    const recipeData = parseResult.data;
 
     // Validate that we have the required fields
     if (!recipeData.name || !recipeData.ingredients || recipeData.ingredients.length === 0) {

@@ -69,7 +69,7 @@ export async function getAllBadges(): Promise<AchievementBadge[]> {
   try {
     const { data, error } = await supabase
       .from('achievement_badges')
-      .select('*')
+      .select('id, name, description, icon, category, requirement, rarity, points, created_at')
       .order('rarity', { ascending: true })
       .order('points', { ascending: true });
 

@@ -123,7 +123,7 @@ export async function getExpenseSplits(expenseId: string): Promise<ExpenseSplit[
 
   const { data, error } = await supabase
     .from('expense_splits')
-    .select('*')
+    .select('id, expense_id, user_id, amount_owed, amount_paid, percentage, is_payer, status, settled_at, created_at, updated_at')
     .eq('expense_id', expenseId);
 
   if (error) throw error;
@@ -146,7 +146,7 @@ export async function getUserOwedExpenses(
 
   let query = supabase
     .from('expense_splits')
-    .select('*, expenses!expense_id!inner(*)')
+    .select('id, expense_id, user_id, amount_owed, amount_paid, percentage, is_payer, status, settled_at, created_at, updated_at, expenses!expense_id!inner(*)')
     .eq('user_id', userId)
     .eq('is_payer', false)
     .neq('status', 'settled');
@@ -218,7 +218,7 @@ export async function settleExpenseSplit(splitId: string, amount?: number): Prom
   // Get current split
   const { data: split, error: fetchError } = await supabase
     .from('expense_splits')
-    .select('*')
+    .select('id, expense_id, user_id, amount_owed, amount_paid, percentage, is_payer, status, settled_at, created_at, updated_at')
     .eq('id', splitId)
     .single();
 
@@ -318,7 +318,7 @@ export async function getSettlements(spaceId: string, limit = 50): Promise<Settl
 
   const { data, error } = await supabase
     .from('settlements')
-    .select('*')
+    .select('id, space_id, from_user_id, to_user_id, amount, settlement_date, payment_method, reference_number, notes, expense_ids, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('settlement_date', { ascending: false })
     .limit(limit);
@@ -345,7 +345,7 @@ export async function getSettlementsBetweenUsers(
 
   const { data, error } = await supabase
     .from('settlements')
-    .select('*')
+    .select('id, space_id, from_user_id, to_user_id, amount, settlement_date, payment_method, reference_number, notes, expense_ids, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .or(`from_user_id.eq.${user1Id},to_user_id.eq.${user1Id}`)
     .or(`from_user_id.eq.${user2Id},to_user_id.eq.${user2Id}`)
@@ -383,7 +383,7 @@ export async function getPartnershipBalance(spaceId: string): Promise<Partnershi
 
   const { data, error } = await supabase
     .from('partnership_balances')
-    .select('*')
+    .select('id, partnership_id, space_id, user1_id, user2_id, balance, user1_income, user2_income, last_calculated_at, created_at, updated_at')
     .eq('space_id', spaceId)
     .single();
 
@@ -461,7 +461,7 @@ export async function calculateCurrentBalance(spaceId: string): Promise<BalanceS
   // Get all unsettled splits for this space
   const { data: splits, error } = await supabase
     .from('expense_splits')
-    .select('*, expenses!expense_id!inner(space_id), users!user_id!inner(email)')
+    .select('id, expense_id, user_id, amount_owed, amount_paid, percentage, is_payer, status, settled_at, created_at, updated_at, expenses!expense_id!inner(space_id), users!user_id!inner(email)')
     .eq('expenses.space_id', spaceId)
     .neq('status', 'settled');
 
@@ -518,7 +518,7 @@ export async function getSettlementSummary(spaceId: string): Promise<SettlementS
 
   const { data, error } = await supabase
     .from('settlement_summary')
-    .select('*')
+    .select('space_id, from_user_id, to_user_id, settlement_count, total_settled, first_settlement, last_settlement')
     .eq('space_id', spaceId);
 
   if (error) throw error;

@@ -29,7 +29,7 @@ export const rewardsService = {
 
     let query = supabase
       .from('rewards_catalog')
-      .select('*')
+      .select('id, space_id, name, description, cost_points, category, image_url, emoji, is_active, max_redemptions_per_week, created_by, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('cost_points', { ascending: true });
 
@@ -54,7 +54,7 @@ export const rewardsService = {
 
     const { data, error } = await supabase
       .from('rewards_catalog')
-      .select('*')
+      .select('id, space_id, name, description, cost_points, category, image_url, emoji, is_active, max_redemptions_per_week, created_by, created_at, updated_at')
       .eq('id', rewardId)
       .single();
 
@@ -195,7 +195,7 @@ export const rewardsService = {
     let query = supabase
       .from('reward_redemptions')
       .select(`
-        *,
+        id, user_id, space_id, reward_id, points_spent, status, notes, approved_by, approved_at, fulfilled_at, created_at, updated_at,
         reward:rewards_catalog(*),
         user:users!reward_redemptions_user_id_fkey(id, name, avatar_url)
       `)
@@ -359,7 +359,7 @@ export const rewardsService = {
     // Get redemption details first
     const { data: existing, error: fetchError } = await supabase
       .from('reward_redemptions')
-      .select('*, reward:rewards_catalog(*)')
+      .select('id, user_id, space_id, reward_id, points_spent, status, notes, approved_by, approved_at, fulfilled_at, created_at, updated_at, reward:rewards_catalog(*)')
       .eq('id', redemptionId)
       .single();
 
@@ -417,7 +417,7 @@ export const rewardsService = {
     // Get redemption details
     const { data: existing, error: fetchError } = await supabase
       .from('reward_redemptions')
-      .select('*, reward:rewards_catalog(*)')
+      .select('id, user_id, space_id, reward_id, points_spent, status, notes, approved_by, approved_at, fulfilled_at, created_at, updated_at, reward:rewards_catalog(*)')
       .eq('id', redemptionId)
       .eq('user_id', userId)
       .single();

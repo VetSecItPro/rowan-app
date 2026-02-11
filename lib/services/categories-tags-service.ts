@@ -95,7 +95,7 @@ export async function getCustomCategories(
 
   let query = supabase
     .from('custom_categories')
-    .select('*')
+    .select('id, space_id, name, description, icon, color, parent_category_id, monthly_budget, is_active, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('name', { ascending: true });
 
@@ -117,7 +117,7 @@ export async function getCustomCategory(categoryId: string): Promise<CustomCateg
 
   const { data, error } = await supabase
     .from('custom_categories')
-    .select('*')
+    .select('id, space_id, name, description, icon, color, parent_category_id, monthly_budget, is_active, created_by, created_at, updated_at')
     .eq('id', categoryId)
     .single();
 
@@ -191,7 +191,7 @@ export async function getSubcategories(parentCategoryId: string): Promise<Custom
 
   const { data, error } = await supabase
     .from('custom_categories')
-    .select('*')
+    .select('id, space_id, name, description, icon, color, parent_category_id, monthly_budget, is_active, created_by, created_at, updated_at')
     .eq('parent_category_id', parentCategoryId)
     .eq('is_active', true)
     .order('name', { ascending: true });
@@ -209,7 +209,7 @@ export async function getCategoryHierarchy(spaceId: string): Promise<CustomCateg
   // Get all active categories
   const { data: categories, error } = await supabase
     .from('custom_categories')
-    .select('*')
+    .select('id, space_id, name, description, icon, color, parent_category_id, monthly_budget, is_active, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .eq('is_active', true)
     .order('name', { ascending: true });
@@ -230,7 +230,7 @@ export async function getTags(spaceId: string): Promise<Tag[]> {
 
   const { data, error } = await supabase
     .from('tags')
-    .select('*')
+    .select('id, space_id, name, color, description, created_by, created_at, updated_at')
     .eq('space_id', spaceId)
     .order('name', { ascending: true });
 
@@ -244,7 +244,7 @@ export async function getTags(spaceId: string): Promise<Tag[]> {
 export async function getTag(tagId: string): Promise<Tag | null> {
   const supabase = createClient();
 
-  const { data, error } = await supabase.from('tags').select('*').eq('id', tagId).single();
+  const { data, error } = await supabase.from('tags').select('id, space_id, name, color, description, created_by, created_at, updated_at').eq('id', tagId).single();
 
   if (error) throw error;
   return data;

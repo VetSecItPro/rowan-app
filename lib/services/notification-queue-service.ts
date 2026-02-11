@@ -120,7 +120,7 @@ export const notificationQueueService = {
 
     const { data, error } = await supabase
       .from('notification_queue')
-      .select('*')
+      .select('id, user_id, space_id, notification_type, notification_data, delivery_method, scheduled_for, status, sent_at, failed_at, failure_reason, retry_count, suppressed_by_quiet_hours, original_scheduled_for, created_at, updated_at')
       .eq('status', 'pending')
       .lte('scheduled_for', now)
       .order('scheduled_for', { ascending: true })

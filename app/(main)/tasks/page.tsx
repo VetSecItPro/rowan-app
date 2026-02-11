@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { TaskCard } from '@/components/tasks/TaskCard';
@@ -793,13 +794,19 @@ export default function TasksPage() {
                         : 'Create your first task or chore to get started!'}
                     </p>
                     {!searchQuery && statusFilter === 'all' && (
-                      <button
-                        onClick={() => handleOpenModal('task')}
-                        className="px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Create Task or Chore
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleOpenModal('task')}
+                          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Create Task or Chore
+                        </button>
+                        <AIContextualHint
+                          featureKey="tasks"
+                          prompt="Add 'clean kitchen' to my tasks for today"
+                        />
+                      </>
                     )}
                   </div>
                 ) : enableDragDrop && currentSpace ? (

@@ -294,7 +294,7 @@ export const reminderAttachmentsService = {
     // Get attachment details first
     const { data: attachment, error: fetchError } = await supabase
       .from('reminder_attachments')
-      .select('*')
+      .select('id, reminder_id, type, file_path, file_size, mime_type, url, linked_id, display_name, uploaded_by, created_at, updated_at')
       .eq('id', attachmentId)
       .eq('uploaded_by', userId) // Verify ownership
       .single();

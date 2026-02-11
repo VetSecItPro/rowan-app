@@ -54,7 +54,7 @@ export const taskTemplatesService = {
     try {
       const { data, error } = await supabase
         .from('task_templates')
-        .select('*')
+        .select('id, space_id, name, description, title, task_description, category, priority, estimated_duration, default_recurrence_pattern, default_recurrence_interval, default_recurrence_days_of_week, default_assigned_to, use_count, is_favorite, tags, created_by, created_at, updated_at')
         .eq('space_id', spaceId)
         .order('use_count', { ascending: false });
 
@@ -74,7 +74,7 @@ export const taskTemplatesService = {
     try {
       const { data, error } = await supabase
         .from('task_templates')
-        .select('*')
+        .select('id, space_id, name, description, title, task_description, category, priority, estimated_duration, default_recurrence_pattern, default_recurrence_interval, default_recurrence_days_of_week, default_assigned_to, use_count, is_favorite, tags, created_by, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('is_favorite', true)
         .order('use_count', { ascending: false });
@@ -95,7 +95,7 @@ export const taskTemplatesService = {
     try {
       let templatesQuery = supabase
         .from('task_templates')
-        .select('*')
+        .select('id, space_id, name, description, title, task_description, category, priority, estimated_duration, default_recurrence_pattern, default_recurrence_interval, default_recurrence_days_of_week, default_assigned_to, use_count, is_favorite, tags, created_by, created_at, updated_at')
         .eq('space_id', spaceId);
 
       // Search in name and description (sanitized to prevent SQL injection)
@@ -144,7 +144,7 @@ export const taskTemplatesService = {
       // Get task
       const { data: task, error: taskError } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, space_id, title, description, category, priority, assigned_to')
         .eq('id', taskId)
         .single();
 
@@ -260,7 +260,7 @@ export const taskTemplatesService = {
       // Get template
       const { data: template, error: templateError } = await supabase
         .from('task_templates')
-        .select('*')
+        .select('id, space_id, name, description, title, task_description, category, priority, estimated_duration, default_recurrence_pattern, default_recurrence_interval, default_recurrence_days_of_week, default_assigned_to, use_count, is_favorite, tags, created_by, created_at, updated_at')
         .eq('id', templateId)
         .single();
 

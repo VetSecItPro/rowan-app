@@ -60,7 +60,7 @@ export const smartSchedulingService = {
     // 1. Get all events for the space in date range
     const { data: events, error } = await supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('space_id', options.spaceId)
       .gte('start_time', options.dateRange.start.toISOString())
       .lte('start_time', options.dateRange.end.toISOString())
@@ -71,7 +71,7 @@ export const smartSchedulingService = {
     // 2. Get availability blocks for participants
     const { data: availabilityBlocks, error: availError } = await supabase
       .from('availability_blocks')
-      .select('*')
+      .select('id, user_id, day_of_week, start_time, end_time, block_type, created_at')
       .in('user_id', options.participants);
 
     if (availError) throw availError;
@@ -278,7 +278,7 @@ export const smartSchedulingService = {
 
     const { data, error } = await supabase
       .from('availability_blocks')
-      .select('*')
+      .select('id, user_id, day_of_week, start_time, end_time, block_type, created_at')
       .eq('user_id', userId)
       .order('day_of_week', { ascending: true })
       .order('start_time', { ascending: true });

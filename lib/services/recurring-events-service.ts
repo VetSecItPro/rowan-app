@@ -338,7 +338,7 @@ export const recurringEventsService = {
     // FIX-308: Add limit to prevent unbounded query
     let query = supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('space_id', spaceId);
 
     if (!includeDeleted) {
@@ -387,7 +387,7 @@ export const recurringEventsService = {
     // Get the master event
     const { data: masterEvent, error: masterError } = await supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('id', seriesId)
       .single();
 
@@ -445,7 +445,7 @@ export const recurringEventsService = {
     // Get the master event
     const { data: masterEvent, error: masterError } = await supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('id', seriesId)
       .single();
 
@@ -511,7 +511,7 @@ export const recurringEventsService = {
     // Get the master event
     const { data: masterEvent, error: masterError } = await supabase
       .from('events')
-      .select('*')
+      .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
       .eq('id', seriesId)
       .single();
 

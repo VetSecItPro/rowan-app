@@ -28,7 +28,7 @@ export const taskRemindersService = {
 
   async getTaskReminders(taskId: string): Promise<TaskReminder[]> {
     const supabase = createClient();
-    const { data, error } = await supabase.from('task_reminders').select('*').eq('task_id', taskId).order('remind_at');
+    const { data, error } = await supabase.from('task_reminders').select('id, task_id, user_id, remind_at, reminder_type, offset_type, custom_offset_minutes, is_sent, sent_at, created_by, created_at, updated_at').eq('task_id', taskId).order('remind_at');
     if (error) throw error;
     return data || [];
   },

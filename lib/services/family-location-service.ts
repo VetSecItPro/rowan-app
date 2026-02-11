@@ -289,7 +289,7 @@ export async function getLastLocation(
 
     const { data, error } = await supabase
       .from('user_locations')
-      .select('*')
+      .select('id, user_id, space_id, latitude, longitude, accuracy, altitude, altitude_accuracy, speed, heading, battery_level, is_charging, recorded_at, created_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .order('recorded_at', { ascending: false })
@@ -350,7 +350,7 @@ export async function getFamilyLocations(
     // Get sharing settings for all members
     const { data: settings, error: settingsError } = await supabase
       .from('location_sharing_settings')
-      .select('*')
+      .select('id, user_id, space_id, sharing_enabled, precision, history_retention_days, notify_arrivals, notify_departures, quiet_hours_start, quiet_hours_end, created_at, updated_at')
       .eq('space_id', spaceId);
 
     if (settingsError) {
@@ -367,7 +367,7 @@ export async function getFamilyLocations(
     // Get places for current location matching
     const { data: places } = await supabase
       .from('family_places')
-      .select('*')
+      .select('id, space_id, name, icon, color, latitude, longitude, address, radius_meters, notify_on_arrival, notify_on_departure, created_by, created_at, updated_at')
       .eq('space_id', spaceId);
 
     const familyLocations: FamilyMemberLocation[] = [];
@@ -462,7 +462,7 @@ export async function getLocationHistory(
 
     const { data, error } = await supabase
       .from('user_locations')
-      .select('*')
+      .select('id, user_id, space_id, latitude, longitude, accuracy, altitude, altitude_accuracy, speed, heading, battery_level, is_charging, recorded_at, created_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .gte('recorded_at', since)
@@ -552,7 +552,7 @@ export async function getPlaces(
 
     const { data, error } = await supabase
       .from('family_places')
-      .select('*')
+      .select('id, space_id, name, icon, color, latitude, longitude, address, radius_meters, notify_on_arrival, notify_on_departure, created_by, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('name');
 
@@ -663,7 +663,7 @@ export async function getSharingSettings(
     // Try to get existing settings
     const { data, error } = await supabase
       .from('location_sharing_settings')
-      .select('*')
+      .select('id, user_id, space_id, sharing_enabled, precision, history_retention_days, notify_arrivals, notify_departures, quiet_hours_start, quiet_hours_end, created_at, updated_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .single();

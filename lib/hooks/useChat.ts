@@ -295,7 +295,7 @@ export function useChat(spaceId: string) {
    * Send a chat message to the API and stream the response.
    */
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, voiceDurationSeconds?: number) => {
       if (!text.trim() || state.isLoading) return;
 
       // Cancel any in-flight request
@@ -306,25 +306,44 @@ export function useChat(spaceId: string) {
       dispatch({ type: 'SEND_MESSAGE', message: text.trim() });
 
       try {
-        const response = await fetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        const body: Record<string, unknown> = {
             message: text.trim(),
             conversationId: conversationIdRef.current,
             spaceId,
-          }),
+        };
+        if (voiceDurationSeconds != null && voiceDurationSeconds > 0) {
+          body.voiceDurationSeconds = voiceDurationSeconds;
+        }
+        const response = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
           signal: controller.signal,
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
+
+          // Surface specific error types for 403 (tier) and 429 (budget)
+          let errorMessage = errorData?.error ?? 'Failed to send message';
+          let retryable = response.status >= 500;
+
+          if (response.status === 403) {
+            errorMessage = errorData?.upgrade_url
+              ? 'AI features require a Pro or Family subscription.'
+              : errorMessage;
+            retryable = false;
+          } else if (response.status === 429) {
+            const resetAt = errorData?.reset_at;
+            errorMessage = resetAt
+              ? `Daily AI limit reached. Resets at ${new Date(resetAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}.`
+              : errorData?.error ?? 'Daily AI limit reached. Please try again tomorrow.';
+            retryable = false;
+          }
+
           dispatch({
             type: 'ERROR',
-            event: {
-              message: errorData?.error ?? 'Failed to send message',
-              retryable: response.status >= 500,
-            },
+            event: { message: errorMessage, retryable },
           });
           dispatch({ type: 'DONE' });
           return;
@@ -400,9 +419,16 @@ export function useChat(spaceId: string) {
         });
 
         if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          const is429 = response.status === 429;
           dispatch({
             type: 'ERROR',
-            event: { message: 'Failed to process confirmation', retryable: true },
+            event: {
+              message: is429
+                ? (errorData?.error ?? 'Daily AI limit reached.')
+                : 'Failed to process confirmation',
+              retryable: response.status >= 500,
+            },
           });
           dispatch({ type: 'DONE' });
           return;

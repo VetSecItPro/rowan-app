@@ -76,7 +76,7 @@ export async function createInvitation(
     // Check for existing pending invitation
     const { data: existingInvitation } = await supabase
       .from('space_invitations')
-      .select('*')
+      .select('id, space_id, email, invited_by, token, status, role, created_at, expires_at')
       .eq('space_id', spaceId)
       .eq('email', validated.email)
       .eq('status', 'pending')
@@ -364,7 +364,7 @@ export async function getPendingInvitations(
     // Get pending invitations
     const { data, error } = await supabase
       .from('space_invitations')
-      .select('*')
+      .select('id, space_id, email, invited_by, token, status, role, created_at, expires_at')
       .eq('space_id', spaceId)
       .eq('status', 'pending')
       .order('created_at', { ascending: false });

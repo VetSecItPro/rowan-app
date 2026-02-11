@@ -93,6 +93,8 @@ export interface ChatMessage {
   result?: ResultEvent;
   // Whether this message is currently streaming
   isStreaming?: boolean;
+  // User feedback on assistant messages
+  feedback?: 'positive' | 'negative' | null;
 }
 
 // A conversation session

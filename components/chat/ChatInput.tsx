@@ -16,12 +16,13 @@ import { Send, Square } from 'lucide-react';
 import VoiceInputButton from './VoiceInputButton';
 
 interface ChatInputProps {
-  onSend: (message: string) => void;
+  onSend: (message: string, voiceDurationSeconds?: number) => void;
   onStop?: () => void;
   isLoading: boolean;
   isStreaming: boolean;
   disabled?: boolean;
   placeholder?: string;
+  voiceEnabled?: boolean;
 }
 
 export default function ChatInput({
@@ -31,6 +32,7 @@ export default function ChatInput({
   isStreaming,
   disabled,
   placeholder = 'Ask Rowan anything...',
+  voiceEnabled = true,
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -69,9 +71,9 @@ export default function ChatInput({
   }, []);
 
   const handleVoiceTranscript = useCallback(
-    (text: string) => {
+    (text: string, durationSeconds?: number) => {
       if (text.trim()) {
-        onSend(text.trim());
+        onSend(text.trim(), durationSeconds);
       }
     },
     [onSend]
@@ -97,6 +99,7 @@ export default function ChatInput({
         <VoiceInputButton
           onTranscript={handleVoiceTranscript}
           disabled={disabled || isLoading}
+          voiceEnabled={voiceEnabled}
         />
       )}
 

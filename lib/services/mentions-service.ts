@@ -126,7 +126,7 @@ export async function getMentionsForMessage(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('message_mentions')
-    .select('*')
+    .select('id, message_id, mentioned_user_id, mentioned_by_user_id, space_id, created_at, read, read_at')
     .eq('message_id', messageId)
     .order('created_at', { ascending: true });
 
@@ -148,7 +148,7 @@ export async function getUnreadMentions(
   const supabase = createClient();
   let query = supabase
     .from('message_mentions')
-    .select('*')
+    .select('id, message_id, mentioned_user_id, mentioned_by_user_id, space_id, created_at, read, read_at')
     .eq('mentioned_user_id', userId)
     .eq('read', false)
     .order('created_at', { ascending: false });

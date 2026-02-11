@@ -74,7 +74,7 @@ export const taskRecurrenceService = {
       // Get template task
       const { data: template, error: templateError } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, space_id, title, description, category, priority, assigned_to, created_by')
         .eq('id', templateId)
         .single();
 
@@ -116,7 +116,7 @@ export const taskRecurrenceService = {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, space_id, title, description, category, priority, status, due_date, assigned_to, created_by, estimated_hours, calendar_sync, quick_note, tags, color, sort_order, archived, archived_at, is_snoozed, snoozed_until, snoozed_by, snooze_count, is_recurring, recurrence_pattern, recurrence_interval, recurrence_days_of_week, recurrence_day_of_month, recurrence_month, recurrence_end_date, recurrence_end_count, parent_recurrence_id, is_recurrence_template, recurrence_exceptions, recurrence_metadata, created_at, updated_at, completed_at')
         .eq('space_id', spaceId)
         .eq('is_recurrence_template', true)
         .order('created_at', { ascending: false });
@@ -137,7 +137,7 @@ export const taskRecurrenceService = {
     try {
       const { data, error } = await supabase
         .from('tasks')
-        .select('*')
+        .select('id, space_id, title, description, category, priority, status, due_date, assigned_to, created_by, estimated_hours, calendar_sync, quick_note, tags, color, sort_order, archived, archived_at, is_snoozed, snoozed_until, snoozed_by, snooze_count, is_recurring, recurrence_pattern, recurrence_interval, recurrence_days_of_week, recurrence_day_of_month, recurrence_month, recurrence_end_date, recurrence_end_count, parent_recurrence_id, is_recurrence_template, recurrence_exceptions, recurrence_metadata, created_at, updated_at, completed_at')
         .eq('parent_recurrence_id', templateId)
         .order('due_date', { ascending: true });
 

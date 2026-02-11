@@ -11,6 +11,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { getSettings, updateSettings } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 
 export async function GET(req: NextRequest) {
   try {
@@ -28,6 +29,12 @@ export async function GET(req: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // AI access check (tier only, no budget check for reading settings)
+    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
     }
 
     const settings = await getSettings(supabase, user.id);
@@ -59,10 +66,16 @@ export async function PUT(req: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // AI access check (tier only, no budget check for settings)
+    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
+    }
+
     const body = await req.json();
 
     // Only allow known fields
-    const allowedFields = ['ai_enabled', 'voice_enabled', 'proactive_suggestions', 'morning_briefing', 'preferred_voice_lang'];
+    const allowedFields = ['ai_enabled', 'voice_enabled', 'proactive_suggestions', 'morning_briefing', 'preferred_voice_lang', 'ai_onboarding_seen'];
     const updateData: Record<string, unknown> = {};
     for (const key of allowedFields) {
       if (key in body) {

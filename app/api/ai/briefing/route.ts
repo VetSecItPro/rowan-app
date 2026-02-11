@@ -9,9 +9,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit, checkAIBriefingRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import { briefingService } from '@/lib/services/ai/briefing-service';
 import { getSettings } from '@/lib/services/ai/conversation-persistence-service';
 import { logger } from '@/lib/logger';
@@ -55,6 +56,30 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Space ID from query param
+    const spaceId = req.nextUrl.searchParams.get('spaceId');
+    if (!spaceId) {
+      return NextResponse.json(
+        { error: 'spaceId is required' },
+        { status: 400 }
+      );
+    }
+
+    // AI access check (subscription tier + budget)
+    const aiAccess = await validateAIAccess(supabase, user.id, spaceId);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
+    }
+
+    // Per-user briefing rate limit (1 per hour)
+    const { success: briefingRateOk } = await checkAIBriefingRateLimit(user.id);
+    if (!briefingRateOk) {
+      return NextResponse.json(
+        { error: 'Briefing already generated recently. Try again in an hour.' },
+        { status: 429 }
+      );
+    }
+
     // Time window check (6am - 11am)
     const hour = new Date().getHours();
     if (hour < 6 || hour >= 11) {
@@ -70,15 +95,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: 'Morning briefing is disabled' },
         { status: 404 }
-      );
-    }
-
-    // Space ID from query param
-    const spaceId = req.nextUrl.searchParams.get('spaceId');
-    if (!spaceId) {
-      return NextResponse.json(
-        { error: 'spaceId is required' },
-        { status: 400 }
       );
     }
 

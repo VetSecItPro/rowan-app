@@ -194,7 +194,7 @@ export const mealsService = {
     const supabase = createClient();
     const { data, error} = await supabase
       .from('recipes')
-      .select('*')
+      .select('id, space_id, name, description, ingredients, instructions, prep_time, cook_time, servings, category, created_by, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('name', { ascending: true });
 
@@ -212,7 +212,7 @@ export const mealsService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('recipes')
-      .select('*')
+      .select('id, space_id, name, description, ingredients, instructions, prep_time, cook_time, servings, category, created_by, created_at, updated_at')
       .eq('id', id)
       .single();
 

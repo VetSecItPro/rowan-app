@@ -551,7 +551,7 @@ export const calendarService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('event_templates')
-      .select('*')
+      .select('id, space_id, created_by, name, description, category, icon, is_system_template, default_duration, default_location, default_attendees, default_reminders, default_color, default_recurrence, use_count, last_used_at, created_at, updated_at')
       .or(`space_id.eq.${spaceId},is_system_template.eq.true`)
       .order('is_system_template', { ascending: false })
       .order('use_count', { ascending: false })
@@ -571,7 +571,7 @@ export const calendarService = {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('event_templates')
-      .select('*')
+      .select('id, space_id, created_by, name, description, category, icon, is_system_template, default_duration, default_location, default_attendees, default_reminders, default_color, default_recurrence, use_count, last_used_at, created_at, updated_at')
       .eq('id', id)
       .single();
 

@@ -303,7 +303,7 @@ export async function getUserSessions(userId: string, supabaseClient?: SupabaseC
 
     const { data, error } = await supabase
       .from('user_sessions')
-      .select('*')
+      .select('id, user_id, session_token, device_type, browser, browser_version, os, os_version, device_name, ip_address, city, region, country, country_code, latitude, longitude, is_current, last_active, created_at, expires_at, revoked_at, user_agent')
       .eq('user_id', userId)
       .is('revoked_at', null)
       .order('last_active', { ascending: false });

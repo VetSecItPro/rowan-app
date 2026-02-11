@@ -8,7 +8,7 @@
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { checkGeneralRateLimit, checkAIChatRateLimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { setSentryUser } from '@/lib/sentry-utils';
@@ -20,13 +20,14 @@ import {
   getConversation,
   addMessage,
   recordUsage,
-  checkBudget,
 } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import {
   detectPIIInUserInput,
   sanitizeContextForLLM,
 } from '@/lib/services/ai/ai-privacy-service';
+import { sanitizeUserInput } from '@/lib/services/ai/ai-input-sanitizer';
 import { aiContextService } from '@/lib/services/ai/ai-context-service';
 import type { AIToolCall, AIToolResult } from '@/lib/types/ai';
 
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { message, conversationId, spaceId, confirmAction } = parsed;
+    const { message, conversationId, spaceId, confirmAction, voiceDurationSeconds } = parsed;
 
     // -- Verify space access ----------------------------------------------
     try {
@@ -93,14 +94,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // -- Budget check (non-blocking, soft limit) --------------------------
-    const budgetResult = await checkBudget(supabase, user.id, 'free').catch(() => null);
-    if (budgetResult && !budgetResult.allowed) {
+    // -- AI access check (subscription tier + budget) ---------------------
+    const aiAccess = await validateAIAccess(supabase, user.id, spaceId);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
+    }
+
+    // -- Per-user rate limiting (tier-based) --------------------------------
+    const { success: aiRateOk } = await checkAIChatRateLimit(user.id, aiAccess.tier);
+    if (!aiRateOk) {
       return new Response(
-        JSON.stringify({
-          error: 'Daily AI usage limit reached. Resets at midnight UTC.',
-          reset_at: budgetResult.reset_at,
-        }),
+        JSON.stringify({ error: 'You\'re sending messages too fast. Please slow down.' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -126,8 +130,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // -- Input sanitization (prompt injection + HTML/script stripping) ------
+    const sanitized = sanitizeUserInput(message, user.id);
+    if (sanitized.wasBlocked) {
+      return new Response(
+        JSON.stringify({ error: sanitized.blockReason ?? 'Message blocked for safety reasons.' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    const safeMessage = sanitized.wasModified ? sanitized.sanitized : message;
+
     // -- PII detection (warn but don't block) ------------------------------
-    const piiResult = detectPIIInUserInput(message);
+    const piiResult = detectPIIInUserInput(safeMessage);
 
     // -- Build space context for system prompt ----------------------------
     const rawSpaceContext = await aiContextService.buildFullContext(supabase, spaceId, user);
@@ -162,7 +176,7 @@ export async function POST(req: NextRequest) {
           }
 
           const events = chatOrchestratorService.processMessage({
-            message,
+            message: safeMessage,
             conversationId: activeConversationId,
             context: { spaceId, userId: user.id },
             spaceContext,
@@ -192,11 +206,12 @@ export async function POST(req: NextRequest) {
             activeConversationId,
             user.id,
             spaceId,
-            message,
+            safeMessage,
             fullAssistantText,
             toolCalls,
             toolResults,
-            latencyMs
+            latencyMs,
+            voiceDurationSeconds
           ).catch((err) => {
             logger.warn('[API] Failed to persist AI messages', {
               component: 'api-route',
@@ -261,7 +276,8 @@ async function persistMessages(
   assistantText: string,
   toolCalls: AIToolCall[],
   toolResults: AIToolResult[],
-  latencyMs: number
+  latencyMs: number,
+  voiceDurationSeconds?: number
 ): Promise<void> {
   // Estimate tokens (~4 chars per token as rough approximation)
   const estimatedInputTokens = Math.ceil(userMessage.length / 4);
@@ -285,19 +301,21 @@ async function persistMessages(
       tool_calls_json: toolCalls.length > 0 ? toolCalls : null,
       tool_results_json: toolResults.length > 0 ? toolResults : null,
       output_tokens: estimatedOutputTokens,
-      model_used: 'gemini-2.0-flash',
+      model_used: 'gemini-2.5-flash',
       latency_ms: latencyMs,
     });
   }
 
-  // Record daily usage
+  // Record daily usage with feature_source for cost tracking
   await recordUsage(supabase, {
     user_id: userId,
     space_id: spaceId,
     date: new Date().toISOString().split('T')[0],
     input_tokens: estimatedInputTokens,
     output_tokens: estimatedOutputTokens,
+    voice_seconds: voiceDurationSeconds ?? 0,
     conversation_count: 0, // Only count 1 for new conversations
     tool_calls_count: toolCalls.length,
+    feature_source: 'chat',
   });
 }

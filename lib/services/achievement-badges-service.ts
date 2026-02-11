@@ -66,7 +66,7 @@ export async function getAllBadges(): Promise<AchievementBadge[]> {
 
   const { data, error } = await supabase
     .from('achievement_badges')
-    .select('*')
+    .select('id, name, description, category, icon, color, criteria, points, rarity, is_active, is_secret, created_at, updated_at')
     .eq('is_active', true)
     .order('category', { ascending: true })
     .order('points', { ascending: true });
@@ -83,7 +83,7 @@ export async function getBadgesByCategory(category: BadgeCategory): Promise<Achi
 
   const { data, error } = await supabase
     .from('achievement_badges')
-    .select('*')
+    .select('id, name, description, category, icon, color, criteria, points, rarity, is_active, is_secret, created_at, updated_at')
     .eq('category', category)
     .eq('is_active', true)
     .order('points', { ascending: true });

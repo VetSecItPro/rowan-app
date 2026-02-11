@@ -122,7 +122,7 @@ class SmartNudgesService {
   async getNudgeSettings(userId: string, spaceId: string): Promise<NudgeSettings | null> {
     const { data, error } = await this.supabase
       .from('nudge_settings')
-      .select('*')
+      .select('id, user_id, space_id, nudges_enabled, daily_nudges_enabled, weekly_summary_enabled, milestone_reminders_enabled, deadline_alerts_enabled, motivation_quotes_enabled, preferred_nudge_time, preferred_timezone, nudge_frequency_days, max_daily_nudges, quiet_hours_start, quiet_hours_end, weekend_nudges_enabled, created_at, updated_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .single();
@@ -176,7 +176,7 @@ class SmartNudgesService {
   async getNudgeTemplates(category?: string): Promise<NudgeTemplate[]> {
     let query = this.supabase
       .from('nudge_templates')
-      .select('*')
+      .select('id, name, category, trigger_type, title, message, action_text, icon, goal_categories, days_before_deadline, days_since_activity, priority, is_active, is_system, created_at, updated_at')
       .eq('is_active', true)
       .order('priority', { ascending: false });
 
@@ -329,7 +329,7 @@ class SmartNudgesService {
   ): Promise<NudgeHistory[]> {
     const { data, error } = await this.supabase
       .from('nudge_history')
-      .select('*')
+      .select('id, user_id, space_id, goal_id, template_id, title, message, category, trigger_type, delivery_method, sent_at, read_at, clicked_at, dismissed_at, was_effective, effectiveness_score, created_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .order('sent_at', { ascending: false })
@@ -346,7 +346,7 @@ class SmartNudgesService {
 
     const { data, error } = await this.supabase
       .from('nudge_history')
-      .select('*')
+      .select('id, user_id, space_id, goal_id, template_id, title, message, category, trigger_type, delivery_method, sent_at, read_at, clicked_at, dismissed_at, was_effective, effectiveness_score, created_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .gte('sent_at', startDate.toISOString());
@@ -376,7 +376,7 @@ class SmartNudgesService {
   async getGoalNudgeTracking(goalId: string, userId: string): Promise<GoalNudgeTracking | null> {
     const { data, error } = await this.supabase
       .from('goal_nudge_tracking')
-      .select('*')
+      .select('id, goal_id, user_id, last_nudge_sent_at, last_activity_at, nudge_count, is_snoozed, snoozed_until, custom_nudge_enabled, custom_nudge_frequency_days, created_at, updated_at')
       .eq('goal_id', goalId)
       .eq('user_id', userId)
       .single();

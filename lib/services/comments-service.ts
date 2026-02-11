@@ -200,7 +200,7 @@ async function enrichWithReactions(
 
   if (commentIds.length === 0) return;
 
-  const { data, error } = await supabase.from('reaction_counts').select('*').in('comment_id', commentIds);
+  const { data, error } = await supabase.from('reaction_counts').select('comment_id, emoji, reaction_count, user_ids').in('comment_id', commentIds);
 
   if (error) throw error;
 
@@ -360,7 +360,7 @@ export async function getCommentCount(
 export async function getCommentMentions(commentId: string): Promise<Mention[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase.from('mentions').select('*').eq('comment_id', commentId);
+  const { data, error } = await supabase.from('mentions').select('id, comment_id, mentioned_user_id, is_read, read_at, created_at').eq('comment_id', commentId);
 
   if (error) throw error;
   return data || [];
@@ -374,7 +374,7 @@ export async function getUnreadMentions(userId: string, limit = 50): Promise<Unr
 
   const { data, error } = await supabase
     .from('unread_mentions')
-    .select('*')
+    .select('id, comment_id, mentioned_user_id, comment_content, commentable_type, commentable_id, comment_author_id, comment_author_email, created_at')
     .eq('mentioned_user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -426,7 +426,7 @@ export async function getUnreadMentionCount(userId: string): Promise<number> {
 
   const { count, error } = await supabase
     .from('mentions')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('mentioned_user_id', userId)
     .eq('is_read', false);
 
@@ -480,7 +480,7 @@ export async function getCommentReactions(
 ): Promise<{ emoji: string; count: number; user_ids: string[] }[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase.from('reaction_counts').select('*').eq('comment_id', commentId);
+  const { data, error } = await supabase.from('reaction_counts').select('comment_id, emoji, reaction_count, user_ids').eq('comment_id', commentId);
 
   if (error) throw error;
 
@@ -554,7 +554,7 @@ export async function getEntityActivityLogs(
 
   const { data, error } = await supabase
     .from('activity_logs')
-    .select('*')
+    .select('id, space_id, activity_type, entity_type, entity_id, user_id, user_email, description, metadata, is_system, created_at')
     .eq('entity_type', entityType)
     .eq('entity_id', entityId)
     .order('created_at', { ascending: false })
@@ -572,7 +572,7 @@ export async function getSpaceActivityLogs(spaceId: string, limit = 100): Promis
 
   const { data, error } = await supabase
     .from('activity_logs')
-    .select('*')
+    .select('id, space_id, activity_type, entity_type, entity_id, user_id, user_email, description, metadata, is_system, created_at')
     .eq('space_id', spaceId)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -589,7 +589,7 @@ export async function getUserActivityLogs(userId: string, spaceId?: string, limi
 
   let query = supabase
     .from('activity_logs')
-    .select('*')
+    .select('id, space_id, activity_type, entity_type, entity_id, user_id, user_email, description, metadata, is_system, created_at')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -616,7 +616,7 @@ export async function getActivityLogsByType(
 
   const { data, error } = await supabase
     .from('activity_logs')
-    .select('*')
+    .select('id, space_id, activity_type, entity_type, entity_id, user_id, user_email, description, metadata, is_system, created_at')
     .eq('space_id', spaceId)
     .eq('activity_type', activityType)
     .order('created_at', { ascending: false })

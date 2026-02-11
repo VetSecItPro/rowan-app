@@ -282,7 +282,7 @@ export const importantDatesService = {
     try {
       let query = supabase
         .from('important_dates')
-        .select('*')
+        .select('id, space_id, title, person_name, date_type, month, day_of_month, year_started, year_ended, emoji, color, notes, notify_days_before, shopping_reminder_enabled, shopping_reminder_days_before, shopping_reminder_text, show_on_calendar, calendar_all_day, show_on_countdown, countdown_days_before, countdown_label, linked_calendar_event_id, is_active, created_by, created_at, updated_at')
         .eq('space_id', spaceId);
 
       // Apply filters
@@ -353,7 +353,7 @@ export const importantDatesService = {
     try {
       const { data, error } = await supabase
         .from('important_dates')
-        .select('*')
+        .select('id, space_id, title, person_name, date_type, month, day_of_month, year_started, year_ended, emoji, color, notes, notify_days_before, shopping_reminder_enabled, shopping_reminder_days_before, shopping_reminder_text, show_on_calendar, calendar_all_day, show_on_countdown, countdown_days_before, countdown_label, linked_calendar_event_id, is_active, created_by, created_at, updated_at')
         .eq('id', id)
         .single();
 

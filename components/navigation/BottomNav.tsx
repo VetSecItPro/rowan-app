@@ -18,6 +18,7 @@ import {
   Bot,
   Calendar,
   MoreHorizontal,
+  Lock,
 } from 'lucide-react';
 import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import { triggerHaptic, ImpactStyle } from '@/lib/native/haptics';
@@ -70,28 +71,45 @@ export function BottomNav() {
           const isCenter = tab.id === 'rowan';
           const Icon = tab.icon;
           const showUnread = tab.id === 'rowan' && chatCtx?.hasUnread;
+          const hasAIAccess = chatCtx?.canAccessAI ?? false;
 
           // Center AI tab — action button (not navigation)
           if (isCenter) {
+            const isLocked = !hasAIAccess;
             return (
               <button
                 key={tab.id}
                 onClick={() => {
                   triggerHaptic(ImpactStyle.Light);
-                  chatCtx?.toggleChat();
+                  if (isLocked) {
+                    chatCtx?.promptUpgrade();
+                  } else {
+                    chatCtx?.toggleChat();
+                  }
                 }}
                 className="relative flex flex-col items-center justify-center flex-1 h-full"
                 role="tab"
-                aria-label="Open AI chat"
+                aria-label={isLocked ? 'Upgrade to Pro for AI' : 'Open AI chat'}
               >
                 <motion.div
                   whileTap={{ scale: 0.85 }}
-                  className="relative -mt-3 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30"
+                  className={`relative -mt-3 w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${
+                    isLocked
+                      ? 'bg-gray-700 shadow-gray-700/20'
+                      : 'bg-blue-600 shadow-blue-600/30'
+                  }`}
                 >
-                  <Icon className="w-6 h-6 text-white" />
+                  <Icon className={`w-6 h-6 ${isLocked ? 'text-gray-400' : 'text-white'}`} />
+
+                  {/* Lock badge for free users */}
+                  {isLocked && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gray-600 rounded-full border-2 border-gray-900 flex items-center justify-center">
+                      <Lock className="w-2.5 h-2.5 text-gray-300" />
+                    </span>
+                  )}
 
                   {/* Unread badge */}
-                  {showUnread && (
+                  {!isLocked && showUnread && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -101,6 +119,10 @@ export function BottomNav() {
                     </motion.span>
                   )}
                 </motion.div>
+
+                {isLocked && (
+                  <span className="text-[8px] text-gray-500 mt-0.5">Pro</span>
+                )}
               </button>
             );
           }

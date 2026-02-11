@@ -9,6 +9,7 @@ import { useDevice } from '@/lib/contexts/DeviceContext';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import nextDynamic from 'next/dynamic';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -1776,6 +1777,10 @@ export default function CalendarPage() {
                             <Plus className="w-5 h-5" />
                             Create Event
                           </button>
+                          <AIContextualHint
+                            featureKey="calendar"
+                            prompt="Schedule a dentist appointment for Friday at 2pm"
+                          />
                         </div>
                       );
                     }

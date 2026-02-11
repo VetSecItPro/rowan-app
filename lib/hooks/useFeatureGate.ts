@@ -46,7 +46,7 @@ const FEATURE_TIER_MAP: Record<GatedFeature, SubscriptionTier> = {
   household: 'pro',
   location: 'pro',
   photos: 'pro',
-  ai: 'family',
+  ai: 'pro',
   integrations: 'family',
   calendar: 'pro',
   reminders: 'free', // Available to all

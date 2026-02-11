@@ -57,6 +57,71 @@ export const sensitiveOperationRateLimit = redis ? new Ratelimit({
   prefix: 'rowan:sensitive',
 }) : null;
 
+// ---------------------------------------------------------------------------
+// AI per-user rate limiters (keyed by userId, not IP)
+// ---------------------------------------------------------------------------
+
+// AI chat: Pro = 20 msg/min, Family = 30 msg/min
+export const aiChatRateLimitPro = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, '1 m'),
+  analytics: true,
+  prefix: 'rowan:ai:chat:pro',
+}) : null;
+
+export const aiChatRateLimitFamily = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(30, '1 m'),
+  analytics: true,
+  prefix: 'rowan:ai:chat:family',
+}) : null;
+
+// AI briefing: 1 per hour per user (across all tiers)
+export const aiBriefingRateLimit = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(1, '1 h'),
+  analytics: true,
+  prefix: 'rowan:ai:briefing',
+}) : null;
+
+// AI suggestions: 10 per hour per user (across all tiers)
+export const aiSuggestionsRateLimit = redis ? new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '1 h'),
+  analytics: true,
+  prefix: 'rowan:ai:suggestions',
+}) : null;
+
+/**
+ * Check AI chat rate limit by user ID and tier.
+ * Returns { success } — false if user is sending too fast.
+ */
+export async function checkAIChatRateLimit(
+  userId: string,
+  tier: string
+): Promise<{ success: boolean }> {
+  const limiter = tier === 'family' ? aiChatRateLimitFamily : aiChatRateLimitPro;
+  return checkRateLimit(userId, limiter, tier === 'family' ? 30 : 20, 60000);
+}
+
+/**
+ * Check AI briefing rate limit by user ID.
+ */
+export async function checkAIBriefingRateLimit(
+  userId: string
+): Promise<{ success: boolean }> {
+  return checkRateLimit(userId, aiBriefingRateLimit, 1, 3600000);
+}
+
+/**
+ * Check AI suggestions rate limit by user ID.
+ */
+export async function checkAISuggestionsRateLimit(
+  userId: string
+): Promise<{ success: boolean }> {
+  return checkRateLimit(userId, aiSuggestionsRateLimit, 10, 3600000);
+}
+
 /**
  * Helper function to check rate limits with automatic fallback
  * Uses Redis if available, otherwise falls back to in-memory rate limiting

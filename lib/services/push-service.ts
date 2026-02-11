@@ -403,7 +403,7 @@ class PushNotificationService {
 
     const { data, error } = await supabase
       .from('push_subscriptions')
-      .select('*')
+      .select('id, user_id, endpoint, p256dh, auth, user_agent, is_active, created_at, updated_at')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('created_at', { ascending: false });

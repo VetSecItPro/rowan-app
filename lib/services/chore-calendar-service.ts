@@ -38,7 +38,7 @@ export const choreCalendarService = {
    */
   async syncChoreToCalendar(choreId: string): Promise<Record<string, unknown>[] | null> {
     const supabase = createClient();
-    const { data: chore } = await supabase.from('chores').select('*').eq('id', choreId).single();
+    const { data: chore } = await supabase.from('chores').select('id, space_id, title, description, frequency, assigned_to, status, due_date, completed_at, notes, created_by, created_at, updated_at, sort_order, calendar_sync, category, point_value').eq('id', choreId).single();
 
     if (!chore || !chore.due_date) return null;
 

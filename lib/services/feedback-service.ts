@@ -108,7 +108,7 @@ export const feedbackService = {
 
       const { data, error } = await supabase
         .from('feedback_submissions')
-        .select('*')
+        .select('id, user_id, space_id, feedback_type, feature_name, page_url, description, screenshot_url, browser_info, status, admin_notes, created_at, updated_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 

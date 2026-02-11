@@ -96,7 +96,7 @@ export const eventProposalsService = {
 
     let query = supabase
       .from('event_proposals')
-      .select('*')
+      .select('id, event_id, space_id, proposed_by, title, description, time_slots, status, counter_proposal_id, approved_slot_index, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
 
@@ -127,7 +127,7 @@ export const eventProposalsService = {
 
     const { data, error } = await supabase
       .from('event_proposals')
-      .select('*')
+      .select('id, event_id, space_id, proposed_by, title, description, time_slots, status, counter_proposal_id, approved_slot_index, created_at, updated_at')
       .eq('id', proposalId)
       .single();
 
@@ -175,7 +175,7 @@ export const eventProposalsService = {
 
     const { data, error } = await supabase
       .from('event_proposal_votes')
-      .select('*')
+      .select('id, proposal_id, time_slot_index, user_id, vote, comment, created_at, updated_at')
       .eq('proposal_id', proposalId)
       .order('created_at', { ascending: false });
 

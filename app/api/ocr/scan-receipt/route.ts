@@ -6,6 +6,16 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { validateImageMagicBytes, isFormatAllowed, ALLOWED_RECEIPT_FORMATS } from '@/lib/utils/file-validation';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+// SECURITY: Zod schema to validate AI-generated receipt JSON
+const AIReceiptSchema = z.object({
+  merchant_name: z.string().max(300).optional().nullable(),
+  total_amount: z.union([z.string(), z.number()]).optional().nullable(),
+  receipt_date: z.string().max(100).optional().nullable(),
+  category: z.string().max(100).optional().nullable(),
+  confidence: z.number().min(0).max(100).optional().nullable(),
+}).passthrough();
 
 // =====================================================
 // GEMINI VISION OCR API ROUTE
@@ -127,7 +137,7 @@ Extract the data now:`;
 
     // Call Gemini Vision API
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: { maxOutputTokens: 4096 },
     });
 
@@ -152,18 +162,24 @@ Extract the data now:`;
       jsonText = jsonText.replace(/```\n?/, '').replace(/\n?```$/, '');
     }
 
-    // Parse the JSON response
-    type ParsedReceipt = {
-      merchant_name?: string;
-      total_amount?: string | number;
-      receipt_date?: string;
-      category?: string;
-      confidence?: number;
-    };
+    // SECURITY: Parse and validate AI response with Zod
+    type ParsedReceipt = z.infer<typeof AIReceiptSchema>;
 
     let parsedData: ParsedReceipt;
     try {
-      parsedData = JSON.parse(jsonText) as ParsedReceipt;
+      const rawParsed = JSON.parse(jsonText);
+      const parseResult = AIReceiptSchema.safeParse(rawParsed);
+      if (!parseResult.success) {
+        logger.warn('AI receipt response failed Zod validation', {
+          component: 'api/ocr/scan-receipt',
+          action: 'validation_failed',
+        });
+        return NextResponse.json(
+          { error: 'OCR processing succeeded but data extraction failed', fallback: true },
+          { status: 500 }
+        );
+      }
+      parsedData = parseResult.data;
     } catch {
       logger.warn('Failed to parse Gemini OCR response', { component: 'api/ocr/scan-receipt', action: 'parse_failed' });
       // Fallback to regex-based extraction if JSON parsing fails

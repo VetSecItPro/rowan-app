@@ -322,7 +322,7 @@ async function syncICSFeed(
     // Get connection details
     const { data: connection, error: connectionError } = await supabase
       .from('calendar_connections')
-      .select('*')
+      .select('id, user_id, space_id, provider, provider_account_id, provider_calendar_id, access_token_vault_id, refresh_token_vault_id, token_expires_at, sync_direction, sync_status, sync_token, last_sync_at, next_sync_at, webhook_channel_id, webhook_resource_id, webhook_expires_at, provider_config, created_at, updated_at')
       .eq('id', connectionId)
       .single();
 

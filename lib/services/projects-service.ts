@@ -60,7 +60,7 @@ export const projectsOnlyService = {
     // FIX-308: Add limit to prevent unbounded query
     const { data, error } = await supabase
       .from('projects')
-      .select('*')
+      .select('id, space_id, name, description, status, start_date, target_date, budget_amount, created_by, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false })
       .limit(1000);
@@ -80,7 +80,7 @@ export const projectsOnlyService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('projects')
-      .select('*')
+      .select('id, space_id, name, description, status, start_date, target_date, budget_amount, created_by, created_at, updated_at')
       .eq('id', id)
       .single();
 

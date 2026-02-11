@@ -196,7 +196,7 @@ class FinancialReportsService {
   async getReportTemplates(spaceId?: string, category?: string): Promise<ReportTemplate[]> {
     let query = this.supabase
       .from('report_templates')
-      .select('*')
+      .select('id, name, description, category, report_type, config, default_date_range, is_system, is_active, requires_goals, requires_budget, created_by, space_id, created_at, updated_at')
       .eq('is_active', true)
       .order('category', { ascending: true })
       .order('name', { ascending: true });
@@ -226,7 +226,7 @@ class FinancialReportsService {
   async getReportTemplate(id: string): Promise<ReportTemplate | null> {
     const { data, error } = await this.supabase
       .from('report_templates')
-      .select('*')
+      .select('id, name, description, category, report_type, config, default_date_range, is_system, is_active, requires_goals, requires_budget, created_by, space_id, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -601,7 +601,7 @@ class FinancialReportsService {
   async getGeneratedReports(spaceId: string, limit = 50): Promise<GeneratedReport[]> {
     const { data, error } = await this.supabase
       .from('generated_reports')
-      .select('*')
+      .select('id, template_id, space_id, title, description, report_type, date_range_start, date_range_end, data, charts_config, summary_stats, pdf_url, pdf_size, file_path, generated_at, generated_by, generation_time_ms, status, is_shared, share_token, shared_until, view_count, download_count, last_viewed_at, created_at, updated_at')
       .eq('space_id', spaceId)
       .order('generated_at', { ascending: false })
       .limit(limit);
@@ -619,7 +619,7 @@ class FinancialReportsService {
   async getGeneratedReport(id: string): Promise<GeneratedReport | null> {
     const { data, error } = await this.supabase
       .from('generated_reports')
-      .select('*')
+      .select('id, template_id, space_id, title, description, report_type, date_range_start, date_range_end, data, charts_config, summary_stats, pdf_url, pdf_size, file_path, generated_at, generated_by, generation_time_ms, status, is_shared, share_token, shared_until, view_count, download_count, last_viewed_at, created_at, updated_at')
       .eq('id', id)
       .single();
 
@@ -693,7 +693,7 @@ class FinancialReportsService {
   async getSharedReport(shareToken: string): Promise<GeneratedReport | null> {
     const { data, error } = await this.supabase
       .from('generated_reports')
-      .select('*')
+      .select('id, template_id, space_id, title, description, report_type, date_range_start, date_range_end, data, charts_config, summary_stats, pdf_url, pdf_size, file_path, generated_at, generated_by, generation_time_ms, status, is_shared, share_token, shared_until, view_count, download_count, last_viewed_at, created_at, updated_at')
       .eq('share_token', shareToken)
       .eq('is_shared', true)
       .single();
@@ -765,7 +765,7 @@ class FinancialReportsService {
     const { data, error } = await this.supabase
       .from('report_favorites')
       .select(`
-        *,
+        id, user_id, report_id, template_id, name, notes, created_at,
         generated_reports(*),
         report_templates(*)
       `)

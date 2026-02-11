@@ -83,7 +83,7 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     canUseGoals: true,
     canUseHousehold: true,
     canUseLocation: true,
-    canUseAI: false, // Family tier only
+    canUseAI: true, // Pro + Family tiers
     canUseIntegrations: false, // Family tier only
     canUseEventProposals: true, // Pro tier and above
 

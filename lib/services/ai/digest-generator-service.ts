@@ -105,7 +105,7 @@ class DigestGeneratorService {
       }
       this.genAI = new GoogleGenerativeAI(apiKey);
       this.model = this.genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         generationConfig: {
           temperature: 0.7, // Higher temperature for more natural, varied responses
           topP: 0.9,

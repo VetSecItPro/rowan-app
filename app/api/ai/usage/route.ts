@@ -2,6 +2,7 @@
  * GET /api/ai/usage?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
  *
  * Get AI usage summary and budget status for the current user.
+ * Returns real subscription tier (no longer hardcoded).
  */
 
 import { NextRequest } from 'next/server';
@@ -15,6 +16,7 @@ import {
   getTokenBudget,
 } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
+import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,6 +36,14 @@ export async function GET(req: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // AI access check (tier only, no budget check for reading usage)
+    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
+    if (!aiAccess.allowed) {
+      return buildAIAccessDeniedResponse(aiAccess);
+    }
+
+    const tier = aiAccess.tier;
+
     // Default to last 30 days
     const today = new Date().toISOString().split('T')[0];
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -41,12 +51,11 @@ export async function GET(req: NextRequest) {
     const startDate = req.nextUrl.searchParams.get('startDate') ?? thirtyDaysAgo;
     const endDate = req.nextUrl.searchParams.get('endDate') ?? today;
 
-    // TODO: Get actual tier from subscription context
-    const tier = 'free';
+    const spaceId = req.nextUrl.searchParams.get('spaceId');
 
     const [usageSummary, budgetStatus] = await Promise.all([
       getUsageSummary(supabase, user.id, startDate, endDate),
-      checkBudget(supabase, user.id, tier),
+      checkBudget(supabase, user.id, tier, spaceId ?? undefined),
     ]);
 
     return Response.json({

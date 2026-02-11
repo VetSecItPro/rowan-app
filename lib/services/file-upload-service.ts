@@ -409,7 +409,7 @@ export const fileUploadService = {
     // Get attachment data
     const { data: attachment, error: fetchError } = await supabase
       .from('message_attachments')
-      .select('*')
+      .select('id, storage_path, thumbnail_path')
       .eq('id', attachmentId)
       .single();
 

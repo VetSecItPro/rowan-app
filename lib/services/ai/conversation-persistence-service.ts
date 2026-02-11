@@ -27,31 +27,51 @@ import type {
   AIUsageSummary,
   AITokenBudget,
   AIBudgetCheckResult,
+  AIFeatureSource,
 } from '@/lib/types/ai';
 
 // ---------------------------------------------------------------------------
 // Token budgets per subscription tier
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Gemini 2.5 Flash pricing (per 1M tokens)
+// ---------------------------------------------------------------------------
+
+const GEMINI_PRICING = {
+  input_per_million: 0.15,   // $0.15 / 1M input tokens
+  output_per_million: 0.60,  // $0.60 / 1M output tokens
+};
+
+/** Calculate estimated cost in USD for a token usage record */
+export function calculateCostUsd(inputTokens: number, outputTokens: number): number {
+  const inputCost = (inputTokens / 1_000_000) * GEMINI_PRICING.input_per_million;
+  const outputCost = (outputTokens / 1_000_000) * GEMINI_PRICING.output_per_million;
+  return Math.round((inputCost + outputCost) * 1_000_000) / 1_000_000; // 6 decimal places
+}
+
+/** Per-user daily token budgets */
 const TOKEN_BUDGETS: Record<string, AITokenBudget> = {
-  free: {
-    daily_input_tokens: 50_000,
-    daily_output_tokens: 25_000,
-    daily_voice_seconds: 60,
-    daily_conversations: 10,
-  },
   pro: {
-    daily_input_tokens: 500_000,
-    daily_output_tokens: 250_000,
+    daily_input_tokens: 150_000,
+    daily_output_tokens: 60_000,
     daily_voice_seconds: 600,
-    daily_conversations: 100,
+    daily_conversations: 50,
   },
   family: {
-    daily_input_tokens: 1_000_000,
-    daily_output_tokens: 500_000,
+    daily_input_tokens: 150_000,
+    daily_output_tokens: 60_000,
     daily_voice_seconds: 1_800,
-    daily_conversations: 200,
+    daily_conversations: 100,
   },
+};
+
+/** Per-space daily token caps (hard limit shared across all users in a space) */
+const SPACE_TOKEN_BUDGETS: AITokenBudget = {
+  daily_input_tokens: 400_000,
+  daily_output_tokens: 160_000,
+  daily_voice_seconds: 3_600,
+  daily_conversations: 300,
 };
 
 // ---------------------------------------------------------------------------
@@ -69,7 +89,7 @@ export async function createConversation(
       user_id: data.user_id,
       space_id: data.space_id,
       title: data.title ?? null,
-      model_used: data.model_used ?? 'gemini-2.0-flash',
+      model_used: data.model_used ?? 'gemini-2.5-flash',
     })
     .select('id, user_id, space_id, title, started_at, last_message_at, message_count, summary, model_used, total_input_tokens, total_output_tokens, created_at, updated_at')
     .single();
@@ -270,7 +290,7 @@ export async function getSettings(
 ): Promise<AIUserSettings> {
   const { data, error } = await supabase
     .from('ai_user_settings')
-    .select('id, user_id, ai_enabled, voice_enabled, proactive_suggestions, morning_briefing, preferred_voice_lang, created_at, updated_at')
+    .select('id, user_id, ai_enabled, voice_enabled, proactive_suggestions, morning_briefing, preferred_voice_lang, ai_onboarding_seen, created_at, updated_at')
     .eq('user_id', userId)
     .single();
 
@@ -307,7 +327,7 @@ async function createDefaultSettings(
   const { data, error } = await supabase
     .from('ai_user_settings')
     .insert(defaults)
-    .select('id, user_id, ai_enabled, voice_enabled, proactive_suggestions, morning_briefing, preferred_voice_lang, created_at, updated_at')
+    .select('id, user_id, ai_enabled, voice_enabled, proactive_suggestions, morning_briefing, preferred_voice_lang, ai_onboarding_seen, created_at, updated_at')
     .single();
 
   if (error) {
@@ -331,7 +351,7 @@ export async function updateSettings(
     .from('ai_user_settings')
     .update(data)
     .eq('user_id', userId)
-    .select('id, user_id, ai_enabled, voice_enabled, proactive_suggestions, morning_briefing, preferred_voice_lang, created_at, updated_at')
+    .select('id, user_id, ai_enabled, voice_enabled, proactive_suggestions, morning_briefing, preferred_voice_lang, ai_onboarding_seen, created_at, updated_at')
     .single();
 
   if (error) {
@@ -349,19 +369,24 @@ export async function updateSettings(
 // Usage Tracking
 // ---------------------------------------------------------------------------
 
-/** Record usage for the current day (upsert — increments if exists) */
+/** Record usage for the current day (upsert — increments if exists, partitioned by feature_source) */
 export async function recordUsage(
   supabase: SupabaseClient,
   data: AIUsageDailyUpsert
 ): Promise<void> {
   const today = data.date || new Date().toISOString().split('T')[0];
+  const featureSource: AIFeatureSource = data.feature_source ?? 'chat';
+  const inputTokens = data.input_tokens ?? 0;
+  const outputTokens = data.output_tokens ?? 0;
+  const costUsd = calculateCostUsd(inputTokens, outputTokens);
 
-  // Check if a row exists for today
+  // Check if a row exists for today + feature_source
   const { data: existing } = await supabase
     .from('ai_usage_daily')
-    .select('id, input_tokens, output_tokens, voice_seconds, conversation_count, tool_calls_count')
+    .select('id, input_tokens, output_tokens, voice_seconds, conversation_count, tool_calls_count, estimated_cost_usd')
     .eq('user_id', data.user_id)
     .eq('date', today)
+    .eq('feature_source', featureSource)
     .single();
 
   if (existing) {
@@ -369,11 +394,12 @@ export async function recordUsage(
     const { error } = await supabase
       .from('ai_usage_daily')
       .update({
-        input_tokens: (existing.input_tokens ?? 0) + (data.input_tokens ?? 0),
-        output_tokens: (existing.output_tokens ?? 0) + (data.output_tokens ?? 0),
+        input_tokens: (existing.input_tokens ?? 0) + inputTokens,
+        output_tokens: (existing.output_tokens ?? 0) + outputTokens,
         voice_seconds: (existing.voice_seconds ?? 0) + (data.voice_seconds ?? 0),
         conversation_count: (existing.conversation_count ?? 0) + (data.conversation_count ?? 0),
         tool_calls_count: (existing.tool_calls_count ?? 0) + (data.tool_calls_count ?? 0),
+        estimated_cost_usd: (existing.estimated_cost_usd ?? 0) + costUsd,
       })
       .eq('id', existing.id);
 
@@ -384,18 +410,20 @@ export async function recordUsage(
       });
     }
   } else {
-    // Insert new row for today
+    // Insert new row for today + feature_source
     const { error } = await supabase
       .from('ai_usage_daily')
       .insert({
         user_id: data.user_id,
         space_id: data.space_id,
         date: today,
-        input_tokens: data.input_tokens ?? 0,
-        output_tokens: data.output_tokens ?? 0,
+        input_tokens: inputTokens,
+        output_tokens: outputTokens,
         voice_seconds: data.voice_seconds ?? 0,
         conversation_count: data.conversation_count ?? 0,
         tool_calls_count: data.tool_calls_count ?? 0,
+        feature_source: featureSource,
+        estimated_cost_usd: costUsd,
       });
 
     if (error) {
@@ -405,6 +433,9 @@ export async function recordUsage(
       });
     }
   }
+
+  // 4.2.6/4.2.7: Check cost thresholds for Sentry alerts (non-blocking)
+  checkCostThresholds(supabase, data.user_id, today).catch(() => {});
 }
 
 /** Get usage summary for a date range */
@@ -444,50 +475,178 @@ export async function getUsageSummary(
 // Budget Checking
 // ---------------------------------------------------------------------------
 
-/** Check if user is within their daily AI token budget */
+/**
+ * Check if user is within their daily AI token budget.
+ * Checks both per-user limits AND per-space limits (hard cap).
+ */
 export async function checkBudget(
   supabase: SupabaseClient,
   userId: string,
-  tier: string
+  tier: string,
+  spaceId?: string
 ): Promise<AIBudgetCheckResult> {
-  const budget = TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.free;
+  const budget = TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.pro;
   const today = new Date().toISOString().split('T')[0];
 
-  const { data: usage } = await supabase
+  // Reset at midnight UTC
+  const tomorrow = new Date();
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  tomorrow.setUTCHours(0, 0, 0, 0);
+  const resetAt = tomorrow.toISOString();
+
+  // 1. Check per-user budget
+  const { data: userUsage } = await supabase
     .from('ai_usage_daily')
     .select('input_tokens, output_tokens, voice_seconds, conversation_count')
     .eq('user_id', userId)
     .eq('date', today)
     .single();
 
-  const used = {
-    input_tokens: usage?.input_tokens ?? 0,
-    output_tokens: usage?.output_tokens ?? 0,
-    voice_seconds: usage?.voice_seconds ?? 0,
-    conversations: usage?.conversation_count ?? 0,
+  const userUsed = {
+    input_tokens: userUsage?.input_tokens ?? 0,
+    output_tokens: userUsage?.output_tokens ?? 0,
+    voice_seconds: userUsage?.voice_seconds ?? 0,
+    conversations: userUsage?.conversation_count ?? 0,
   };
 
-  const remaining_input = Math.max(0, budget.daily_input_tokens - used.input_tokens);
-  const remaining_output = Math.max(0, budget.daily_output_tokens - used.output_tokens);
-  const remaining_voice = Math.max(0, budget.daily_voice_seconds - used.voice_seconds);
-  const remaining_conversations = Math.max(0, budget.daily_conversations - used.conversations);
+  const userRemainingInput = Math.max(0, budget.daily_input_tokens - userUsed.input_tokens);
+  const userRemainingOutput = Math.max(0, budget.daily_output_tokens - userUsed.output_tokens);
+  const userRemainingVoice = Math.max(0, budget.daily_voice_seconds - userUsed.voice_seconds);
+  const userRemainingConversations = Math.max(0, budget.daily_conversations - userUsed.conversations);
 
-  // Reset at midnight UTC
-  const tomorrow = new Date();
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  tomorrow.setUTCHours(0, 0, 0, 0);
+  const userAllowed = userRemainingInput > 0 && userRemainingOutput > 0 && userRemainingConversations > 0;
+
+  if (!userAllowed) {
+    return {
+      allowed: false,
+      remaining_input_tokens: userRemainingInput,
+      remaining_output_tokens: userRemainingOutput,
+      remaining_voice_seconds: userRemainingVoice,
+      remaining_conversations: userRemainingConversations,
+      reset_at: resetAt,
+      reason: 'You\'ve reached your daily AI limit. Resets at midnight UTC.',
+      remaining: { input_tokens: userRemainingInput, output_tokens: userRemainingOutput },
+    };
+  }
+
+  // 2. Check per-space budget (if spaceId provided)
+  if (spaceId) {
+    const { data: spaceUsageRows } = await supabase
+      .from('ai_usage_daily')
+      .select('input_tokens, output_tokens, voice_seconds, conversation_count')
+      .eq('space_id', spaceId)
+      .eq('date', today);
+
+    const spaceUsed = {
+      input_tokens: (spaceUsageRows ?? []).reduce((sum, r) => sum + (r.input_tokens ?? 0), 0),
+      output_tokens: (spaceUsageRows ?? []).reduce((sum, r) => sum + (r.output_tokens ?? 0), 0),
+      voice_seconds: (spaceUsageRows ?? []).reduce((sum, r) => sum + (r.voice_seconds ?? 0), 0),
+      conversations: (spaceUsageRows ?? []).reduce((sum, r) => sum + (r.conversation_count ?? 0), 0),
+    };
+
+    const spaceRemainingInput = Math.max(0, SPACE_TOKEN_BUDGETS.daily_input_tokens - spaceUsed.input_tokens);
+    const spaceRemainingOutput = Math.max(0, SPACE_TOKEN_BUDGETS.daily_output_tokens - spaceUsed.output_tokens);
+
+    const spaceAllowed = spaceRemainingInput > 0 && spaceRemainingOutput > 0;
+
+    if (!spaceAllowed) {
+      return {
+        allowed: false,
+        remaining_input_tokens: Math.min(userRemainingInput, spaceRemainingInput),
+        remaining_output_tokens: Math.min(userRemainingOutput, spaceRemainingOutput),
+        remaining_voice_seconds: userRemainingVoice,
+        remaining_conversations: userRemainingConversations,
+        reset_at: resetAt,
+        reason: 'Your household has reached its daily AI limit. Resets at midnight UTC.',
+        remaining: { input_tokens: spaceRemainingInput, output_tokens: spaceRemainingOutput },
+      };
+    }
+
+    // Return the minimum of user and space remaining
+    return {
+      allowed: true,
+      remaining_input_tokens: Math.min(userRemainingInput, spaceRemainingInput),
+      remaining_output_tokens: Math.min(userRemainingOutput, spaceRemainingOutput),
+      remaining_voice_seconds: userRemainingVoice,
+      remaining_conversations: userRemainingConversations,
+      reset_at: resetAt,
+      remaining: {
+        input_tokens: Math.min(userRemainingInput, spaceRemainingInput),
+        output_tokens: Math.min(userRemainingOutput, spaceRemainingOutput),
+      },
+    };
+  }
 
   return {
-    allowed: remaining_input > 0 && remaining_output > 0 && remaining_conversations > 0,
-    remaining_input_tokens: remaining_input,
-    remaining_output_tokens: remaining_output,
-    remaining_voice_seconds: remaining_voice,
-    remaining_conversations: remaining_conversations,
-    reset_at: tomorrow.toISOString(),
+    allowed: true,
+    remaining_input_tokens: userRemainingInput,
+    remaining_output_tokens: userRemainingOutput,
+    remaining_voice_seconds: userRemainingVoice,
+    remaining_conversations: userRemainingConversations,
+    reset_at: resetAt,
+    remaining: { input_tokens: userRemainingInput, output_tokens: userRemainingOutput },
   };
 }
 
 /** Get the token budget for a tier */
 export function getTokenBudget(tier: string): AITokenBudget {
   return TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.free;
+}
+
+// ---------------------------------------------------------------------------
+// Cost Threshold Alerts (4.2.6, 4.2.7)
+// ---------------------------------------------------------------------------
+
+const DAILY_COST_ALERT_THRESHOLD = parseFloat(process.env.AI_DAILY_COST_ALERT_THRESHOLD || '5');
+const USER_COST_ALERT_THRESHOLD = parseFloat(process.env.AI_USER_COST_ALERT_THRESHOLD || '2');
+
+/** Check daily and per-user cost thresholds, fire Sentry alert if exceeded */
+async function checkCostThresholds(
+  supabase: SupabaseClient,
+  userId: string,
+  today: string
+): Promise<void> {
+  try {
+    // Check per-user cost for today
+    const { data: userRows } = await supabase
+      .from('ai_usage_daily')
+      .select('estimated_cost_usd')
+      .eq('user_id', userId)
+      .eq('date', today);
+
+    const userDailyCost = (userRows ?? []).reduce((sum, r) => sum + (r.estimated_cost_usd ?? 0), 0);
+
+    if (userDailyCost > USER_COST_ALERT_THRESHOLD) {
+      // Dynamic import Sentry to avoid build-time issues
+      const Sentry = await import('@sentry/nextjs').catch(() => null);
+      if (Sentry) {
+        Sentry.captureMessage(`AI cost alert: User ${userId} exceeded $${USER_COST_ALERT_THRESHOLD}/day threshold ($${userDailyCost.toFixed(4)})`, {
+          level: 'warning',
+          tags: { alert_type: 'ai_user_cost', user_id: userId },
+          extra: { userDailyCost, threshold: USER_COST_ALERT_THRESHOLD, date: today },
+        });
+      }
+    }
+
+    // Check total daily cost across all users
+    const { data: allRows } = await supabase
+      .from('ai_usage_daily')
+      .select('estimated_cost_usd')
+      .eq('date', today);
+
+    const totalDailyCost = (allRows ?? []).reduce((sum, r) => sum + (r.estimated_cost_usd ?? 0), 0);
+
+    if (totalDailyCost > DAILY_COST_ALERT_THRESHOLD) {
+      const Sentry = await import('@sentry/nextjs').catch(() => null);
+      if (Sentry) {
+        Sentry.captureMessage(`AI cost alert: Total daily spend exceeded $${DAILY_COST_ALERT_THRESHOLD} threshold ($${totalDailyCost.toFixed(4)})`, {
+          level: 'error',
+          tags: { alert_type: 'ai_daily_cost_total' },
+          extra: { totalDailyCost, threshold: DAILY_COST_ALERT_THRESHOLD, date: today },
+        });
+      }
+    }
+  } catch {
+    // Non-critical — don't let cost checks break usage tracking
+  }
 }

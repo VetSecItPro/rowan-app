@@ -281,7 +281,7 @@ export async function applyLatePenalty(
     // Get the chore details
     const { data: chore, error: choreError } = await supabase
       .from('chores')
-      .select('*')
+      .select('id, title, due_date, late_penalty_enabled, late_penalty_points, grace_period_hours, penalty_points_deducted')
       .eq('id', validated.choreId)
       .single();
 
@@ -452,7 +452,7 @@ export async function forgivePenalty(
     // Get the penalty record
     const { data: penalty, error: penaltyError } = await supabase
       .from('late_penalties')
-      .select('*')
+      .select('id, space_id, chore_id, user_id, points_deducted, days_late, due_date, completion_date, penalty_type, is_forgiven, forgiven_by, forgiven_at, forgiven_reason, created_at, updated_at')
       .eq('id', validated.penaltyId)
       .single();
 
@@ -558,7 +558,7 @@ export async function getUserPenalties(
 
     let query = supabase
       .from('late_penalties')
-      .select('*')
+      .select('id, space_id, chore_id, user_id, points_deducted, days_late, due_date, completion_date, penalty_type, is_forgiven, forgiven_by, forgiven_at, forgiven_reason, created_at, updated_at')
       .eq('user_id', userId)
       .eq('space_id', spaceId)
       .order('created_at', { ascending: false });
@@ -609,7 +609,7 @@ export async function getPenaltyStats(
 
     let query = supabase
       .from('late_penalties')
-      .select('*')
+      .select('id, space_id, chore_id, user_id, points_deducted, days_late, due_date, completion_date, penalty_type, is_forgiven, forgiven_by, forgiven_at, forgiven_reason, created_at, updated_at')
       .eq('space_id', spaceId);
 
     if (startDate) {

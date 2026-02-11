@@ -53,7 +53,7 @@ export const taskCommentsService = {
     try {
       const { data, error } = await supabase
         .from('task_comments')
-        .select('*')
+        .select('id, task_id, user_id, content, parent_comment_id, is_edited, edited_at, created_at, updated_at')
         .eq('task_id', taskId)
         .order('created_at', { ascending: true });
 
@@ -176,7 +176,7 @@ export const taskCommentsService = {
     try {
       const { data, error } = await supabase
         .from('task_comment_reactions')
-        .select('*')
+        .select('id, comment_id, user_id, emoji, created_at')
         .eq('comment_id', commentId);
 
       if (error) throw error;
@@ -239,7 +239,7 @@ export const taskCommentsService = {
     try {
       const { data, error } = await supabase
         .from('task_reactions')
-        .select('*')
+        .select('id, task_id, user_id, emoji, created_at')
         .eq('task_id', taskId);
 
       if (error) throw error;

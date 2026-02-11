@@ -113,7 +113,7 @@ export async function getMonthVariance(spaceId: string, date: Date): Promise<Mon
   // Get all budgets for the month
   const { data: budgets, error } = await supabase
     .from('budgets')
-    .select('*')
+    .select('id, space_id, category, amount, month')
     .eq('space_id', spaceId)
     .eq('month', monthKey);
 

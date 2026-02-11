@@ -11,19 +11,30 @@
 
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff } from 'lucide-react';
 import { useVoiceInput } from '@/lib/hooks/useVoiceInput';
 
 interface VoiceInputButtonProps {
-  /** Called with final transcript text */
-  onTranscript: (text: string) => void;
+  /** Called with final transcript text and duration in seconds */
+  onTranscript: (text: string, durationSeconds?: number) => void;
   /** Disable when chat is loading/streaming */
   disabled?: boolean;
+  /** Whether voice input is enabled in user settings (default: true) */
+  voiceEnabled?: boolean;
 }
 
-export default function VoiceInputButton({ onTranscript, disabled }: VoiceInputButtonProps) {
+export default function VoiceInputButton({ onTranscript, disabled, voiceEnabled = true }: VoiceInputButtonProps) {
+  const listenStartRef = useRef<number>(0);
+  const handleVoiceResult = useCallback((text: string) => {
+    const durationSeconds = listenStartRef.current
+      ? Math.round((Date.now() - listenStartRef.current) / 1000)
+      : undefined;
+    listenStartRef.current = 0;
+    onTranscript(text, durationSeconds);
+  }, [onTranscript]);
+
   const {
     isSupported,
     isListening,
@@ -32,7 +43,7 @@ export default function VoiceInputButton({ onTranscript, disabled }: VoiceInputB
     startListening,
     stopListening,
   } = useVoiceInput({
-    onResult: onTranscript,
+    onResult: handleVoiceResult,
     silenceTimeout: 8000,
   });
 
@@ -40,12 +51,13 @@ export default function VoiceInputButton({ onTranscript, disabled }: VoiceInputB
     if (isListening) {
       stopListening();
     } else {
+      listenStartRef.current = Date.now();
       startListening();
     }
   }, [isListening, startListening, stopListening]);
 
-  // Don't render if speech recognition isn't available
-  if (!isSupported) return null;
+  // Don't render if speech recognition isn't available or voice is disabled
+  if (!isSupported || !voiceEnabled) return null;
 
   return (
     <div className="relative flex flex-col items-center">

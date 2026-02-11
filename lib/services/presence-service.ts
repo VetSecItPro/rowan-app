@@ -67,7 +67,7 @@ export async function getSpaceMembersWithPresence(
     // Use the database view we created
     const { data, error } = await supabase
       .from('space_members_with_presence')
-      .select('*')
+      .select('space_id, user_id, role, joined_at, name, email, avatar_url, presence_status, last_activity, presence_updated_at')
       .eq('space_id', spaceId);
 
     if (error) {

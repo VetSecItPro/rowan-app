@@ -55,7 +55,7 @@ export const taskSubtasksService = {
     try {
       const { data, error } = await supabase
         .from('subtasks')
-        .select('*')
+        .select('id, parent_task_id, title, description, status, priority, sort_order, assigned_to, due_date, estimated_duration, actual_duration, completed_at, completed_by, created_by, created_at, updated_at')
         .eq('parent_task_id', parentTaskId)
         .order('sort_order', { ascending: true });
 
