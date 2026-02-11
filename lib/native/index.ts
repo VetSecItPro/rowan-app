@@ -68,6 +68,13 @@ export {
   type CalendarPermissionStatus,
 } from './calendar';
 
+// Haptic feedback
+export {
+  triggerHaptic,
+  triggerSelectionHaptic,
+  ImpactStyle,
+} from './haptics';
+
 // Network status
 export {
   isNetworkAvailable,

@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 
 // Feature limits by tier
-const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
+export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
   free: {
     maxActiveTasks: 50,
     dailyTaskCreation: 5,
@@ -101,7 +101,7 @@ export interface SubscriptionContextValue {
   showUpgradeModal: (feature?: string) => void;
 }
 
-const SubscriptionContext = createContext<SubscriptionContextValue | undefined>(undefined);
+export const SubscriptionContext = createContext<SubscriptionContextValue | undefined>(undefined);
 
 interface SubscriptionProviderProps {
   children: ReactNode;

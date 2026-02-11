@@ -59,7 +59,7 @@ interface AuthContextType {
   refreshSpaces: () => Promise<void>; // No-op async function
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 type SignUpProfile = Record<string, unknown>;
 

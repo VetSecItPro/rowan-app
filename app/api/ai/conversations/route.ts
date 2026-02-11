@@ -1,0 +1,57 @@
+/**
+ * GET /api/ai/conversations?spaceId=xxx
+ *
+ * List conversation history for the current user in a space.
+ */
+
+import { NextRequest } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { checkGeneralRateLimit } from '@/lib/ratelimit';
+import { extractIP } from '@/lib/ratelimit-fallback';
+import { verifySpaceAccess } from '@/lib/services/authorization-service';
+import { logger } from '@/lib/logger';
+import { listConversations } from '@/lib/services/ai/conversation-persistence-service';
+import { featureFlags } from '@/lib/constants/feature-flags';
+
+export async function GET(req: NextRequest) {
+  try {
+    const ip = extractIP(req.headers);
+    const { success } = await checkGeneralRateLimit(ip);
+    if (!success) {
+      return Response.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
+    if (!featureFlags.isAICompanionEnabled()) {
+      return Response.json({ error: 'AI companion is not enabled' }, { status: 403 });
+    }
+
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const spaceId = req.nextUrl.searchParams.get('spaceId');
+    if (!spaceId) {
+      return Response.json({ error: 'spaceId is required' }, { status: 400 });
+    }
+
+    try {
+      await verifySpaceAccess(user.id, spaceId);
+    } catch {
+      return Response.json({ error: 'Access denied' }, { status: 403 });
+    }
+
+    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') ?? '20'), 50);
+    const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') ?? '0'), 0);
+
+    const conversations = await listConversations(supabase, spaceId, limit, offset);
+    return Response.json({ data: conversations });
+  } catch (error) {
+    logger.error('[API] /api/ai/conversations GET error:', error, {
+      component: 'api-route',
+      action: 'api_request',
+    });
+    return Response.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

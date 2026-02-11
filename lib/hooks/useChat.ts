@@ -29,6 +29,7 @@ import type {
 
 type ChatAction =
   | { type: 'SEND_MESSAGE'; message: string }
+  | { type: 'SET_CONVERSATION_ID'; conversationId: string }
   | { type: 'STREAM_TEXT'; text: string }
   | { type: 'TOOL_CALL'; event: ToolCallEvent }
   | { type: 'CONFIRMATION'; event: ConfirmationEvent }
@@ -75,6 +76,9 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         error: null,
       };
     }
+
+    case 'SET_CONVERSATION_ID':
+      return { ...state, conversationId: action.conversationId };
 
     case 'STREAM_TEXT': {
       const messages = [...state.messages];
@@ -242,7 +246,7 @@ async function* parseSSEStream(
 // ---------------------------------------------------------------------------
 
 export function useChat(spaceId: string) {
-  const conversationIdRef = useRef(crypto.randomUUID());
+  const conversationIdRef = useRef('new');
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const [state, dispatch] = useReducer(
@@ -257,6 +261,11 @@ export function useChat(spaceId: string) {
   const processStream = useCallback(async (response: Response) => {
     for await (const event of parseSSEStream(response)) {
       switch (event.type) {
+        case 'conversation_id':
+          // Server assigned/confirmed a conversation ID
+          conversationIdRef.current = event.data as string;
+          dispatch({ type: 'SET_CONVERSATION_ID', conversationId: event.data as string });
+          break;
         case 'text':
           dispatch({ type: 'STREAM_TEXT', text: event.data as string });
           break;
@@ -416,10 +425,10 @@ export function useChat(spaceId: string) {
    */
   const clearChat = useCallback(() => {
     abortControllerRef.current?.abort();
-    conversationIdRef.current = crypto.randomUUID();
+    conversationIdRef.current = 'new';
     dispatch({
       type: 'CLEAR_CHAT',
-      conversationId: conversationIdRef.current,
+      conversationId: 'new',
     });
   }, []);
 

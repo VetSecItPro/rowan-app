@@ -5,25 +5,41 @@
  * - Auto-scrolling message list
  * - Streaming text display
  * - Confirmation flow for tool calls
+ * - Empty state with example prompts
+ * - Error banner with retry
  * - New conversation button
  */
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCcw, Bot } from 'lucide-react';
 import { useChat } from '@/lib/hooks/useChat';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+import EmptyState from './EmptyState';
+import ErrorBanner from './ErrorBanner';
+import QuickActions from './QuickActions';
+import SuggestionCards from './SuggestionCards';
+import MorningBriefing from './MorningBriefing';
+import { useAISuggestions } from '@/lib/hooks/useAISuggestions';
+import { useAIBriefing } from '@/lib/hooks/useAIBriefing';
 
 interface ChatPanelProps {
   spaceId: string;
   isOpen: boolean;
   onClose: () => void;
+  /** Callback when a new assistant message arrives (for unread badge) */
+  onNewAssistantMessage?: () => void;
 }
 
-export default function ChatPanel({ spaceId, isOpen, onClose }: ChatPanelProps) {
+export default function ChatPanel({
+  spaceId,
+  isOpen,
+  onClose,
+  onNewAssistantMessage,
+}: ChatPanelProps) {
   const {
     messages,
     isLoading,
@@ -37,7 +53,32 @@ export default function ChatPanel({ spaceId, isOpen, onClose }: ChatPanelProps) 
     clearError,
   } = useChat(spaceId);
 
+  const { suggestions, dismiss: dismissSuggestion } = useAISuggestions(spaceId);
+  const { briefing, dismiss: dismissBriefing } = useAIBriefing(spaceId);
+
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastUserMessageRef = useRef<string | null>(null);
+  const prevMessageCountRef = useRef(0);
+
+  // Track the last user message for retry
+  useEffect(() => {
+    const userMessages = messages.filter((m) => m.role === 'user');
+    const last = userMessages[userMessages.length - 1];
+    if (last?.content) {
+      lastUserMessageRef.current = last.content;
+    }
+  }, [messages]);
+
+  // Notify parent when a new assistant message arrives while panel is closed
+  useEffect(() => {
+    if (!isOpen && messages.length > prevMessageCountRef.current) {
+      const newest = messages[messages.length - 1];
+      if (newest?.role === 'assistant' && !newest.isStreaming && newest.content) {
+        onNewAssistantMessage?.();
+      }
+    }
+    prevMessageCountRef.current = messages.length;
+  }, [messages, isOpen, onNewAssistantMessage]);
 
   // Auto-scroll to bottom on new messages or streaming text
   useEffect(() => {
@@ -49,6 +90,13 @@ export default function ChatPanel({ spaceId, isOpen, onClose }: ChatPanelProps) 
   const handleConfirm = (actionId: string, confirmed: boolean) => {
     confirmAction(actionId, confirmed);
   };
+
+  const handleRetry = useCallback(() => {
+    if (lastUserMessageRef.current) {
+      clearError();
+      sendMessage(lastUserMessageRef.current);
+    }
+  }, [clearError, sendMessage]);
 
   return (
     <AnimatePresence>
@@ -108,18 +156,25 @@ export default function ChatPanel({ spaceId, isOpen, onClose }: ChatPanelProps) 
               ref={scrollRef}
               className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
             >
-              {messages.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full text-center px-6">
-                  <div className="w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center mb-4">
-                    <Bot className="w-6 h-6 text-blue-400" />
-                  </div>
-                  <h3 className="text-sm font-medium text-white mb-1">
-                    Hey! I&apos;m Rowan
-                  </h3>
-                  <p className="text-xs text-gray-400 max-w-[280px]">
-                    I can help you create tasks, plan meals, schedule events,
-                    and manage your household. Just ask!
-                  </p>
+              {/* Morning briefing — shown above empty state */}
+              {briefing && messages.length === 0 && (
+                <MorningBriefing
+                  briefing={briefing}
+                  onAskRowan={sendMessage}
+                  onDismiss={dismissBriefing}
+                />
+              )}
+
+              {messages.length === 0 && <EmptyState onSend={sendMessage} />}
+
+              {/* Proactive suggestions */}
+              {suggestions.length > 0 && messages.length === 0 && (
+                <div className="mb-2">
+                  <SuggestionCards
+                    suggestions={suggestions}
+                    onAction={sendMessage}
+                    onDismiss={dismissSuggestion}
+                  />
                 </div>
               )}
 
@@ -137,24 +192,20 @@ export default function ChatPanel({ spaceId, isOpen, onClose }: ChatPanelProps) 
             {/* Error banner */}
             <AnimatePresence>
               {error && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="px-4 py-2 bg-red-500/10 border-t border-red-500/20"
-                >
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs text-red-300">{error}</p>
-                    <button
-                      onClick={clearError}
-                      className="text-xs text-red-400 hover:text-red-300 ml-2"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </motion.div>
+                <ErrorBanner
+                  message={error}
+                  onDismiss={clearError}
+                  onRetry={lastUserMessageRef.current ? handleRetry : undefined}
+                />
               )}
             </AnimatePresence>
+
+            {/* Quick actions — show above input when conversation is empty */}
+            {messages.length === 0 && (
+              <div className="px-3 pb-1">
+                <QuickActions onSend={sendMessage} />
+              </div>
+            )}
 
             {/* Input */}
             <ChatInput

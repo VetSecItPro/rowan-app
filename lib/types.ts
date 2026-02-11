@@ -6,6 +6,32 @@
 export type { CreateTaskInput, UpdateTaskInput as UpdateTaskInputZod } from './validations/task-schemas';
 
 // =============================================
+// RE-EXPORTS: AI COMPANION TYPES
+// =============================================
+
+export type {
+  AIConversation,
+  AIConversationInsert,
+  AIConversationUpdate,
+  AIMessage,
+  AIMessageInsert,
+  AIMessageRole,
+  AIInputType,
+  AIToolCall,
+  AIToolResult,
+  AIUserSettings,
+  AIUserSettingsInsert,
+  AIUserSettingsUpdate,
+  AIUsageDaily,
+  AIUsageDailyUpsert,
+  AIConversationWithMessages,
+  AIConversationSummary,
+  AIUsageSummary,
+  AITokenBudget,
+  AIBudgetCheckResult,
+} from './types/ai';
+
+// =============================================
 // RE-EXPORTS: SUBSCRIPTION TYPES
 // =============================================
 

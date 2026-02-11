@@ -122,7 +122,10 @@ export function Header() {
           {/* Right side navigation */}
           <div className="flex items-center gap-1 sm:gap-4">
             <FeedbackButton />
-            <HamburgerMenu />
+            {/* Hidden on mobile — BottomNav Menu tab replaces it */}
+            <div className="hidden md:block">
+              <HamburgerMenu />
+            </div>
 
             {/* Notifications */}
             {user && (

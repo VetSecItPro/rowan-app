@@ -38,6 +38,39 @@ import type {
 } from '@/lib/types/chat';
 
 // ---------------------------------------------------------------------------
+// Retry helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Retry a Gemini API call with exponential backoff.
+ * Only retries on transient errors (5xx, rate limits, network).
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts: number = 3,
+  baseDelayMs: number = 1000
+): Promise<T> {
+  let lastError: Error | undefined;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      const isRetryable =
+        lastError.message.includes('429') ||
+        lastError.message.includes('500') ||
+        lastError.message.includes('503') ||
+        lastError.message.includes('ECONNRESET') ||
+        lastError.message.includes('fetch failed');
+      if (!isRetryable || attempt === maxAttempts) throw lastError;
+      const delay = baseDelayMs * Math.pow(2, attempt - 1);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
+// ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
 
@@ -188,7 +221,7 @@ class ChatOrchestratorService {
       const chat = model.startChat({ history });
 
       // -- Send message (streaming) ----------------------------------------
-      const streamResult = await chat.sendMessageStream(message);
+      const streamResult = await withRetry(() => chat.sendMessageStream(message));
 
       let fullText = '';
       const functionCalls: Array<{
@@ -319,7 +352,7 @@ class ChatOrchestratorService {
       }
 
       // Send all results back to Gemini for a natural-language summary
-      const followUp = await chat.sendMessageStream(responseParts);
+      const followUp = await withRetry(() => chat.sendMessageStream(responseParts));
       let followUpText = '';
       for await (const chunk of followUp.stream) {
         const parts = chunk.candidates?.[0]?.content?.parts ?? [];
@@ -467,7 +500,7 @@ class ChatOrchestratorService {
         },
       ];
 
-      const followUp = await chat.sendMessageStream(responseParts);
+      const followUp = await withRetry(() => chat.sendMessageStream(responseParts));
       let followUpText = '';
       for await (const chunk of followUp.stream) {
         const parts = chunk.candidates?.[0]?.content?.parts ?? [];

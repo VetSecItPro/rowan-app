@@ -64,7 +64,7 @@ const defaultDeviceValue: DeviceContextValue = {
   windowHeight: 768,
 };
 
-const DeviceContext = createContext<DeviceContextValue>(defaultDeviceValue);
+export const DeviceContext = createContext<DeviceContextValue>(defaultDeviceValue);
 
 /**
  * Detect platform from user agent (only runs on client)

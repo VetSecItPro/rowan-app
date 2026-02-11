@@ -14,6 +14,7 @@ interface FeatureFlags {
   SMART_ONBOARDING: boolean;
   WORKSPACE_MIGRATION: boolean;
   MONETIZATION: boolean;
+  AI_COMPANION: boolean;
 }
 
 /**
@@ -53,6 +54,14 @@ export const FEATURE_FLAGS: FeatureFlags = {
    * Enable with: NEXT_PUBLIC_ENABLE_MONETIZATION=true
    */
   MONETIZATION: process.env.NEXT_PUBLIC_ENABLE_MONETIZATION === 'true',
+
+  /**
+   * AI Companion Feature
+   * Enables the AI chat assistant (ChatFAB, conversation persistence, voice)
+   *
+   * Enable with: NEXT_PUBLIC_ENABLE_AI_COMPANION=true
+   */
+  AI_COMPANION: process.env.NEXT_PUBLIC_ENABLE_AI_COMPANION === 'true',
 };
 
 /**
@@ -99,6 +108,13 @@ export const featureFlags = {
    * Check if any personal workspace features are enabled
    * Useful for conditional UI rendering
    */
+  /**
+   * Check if AI companion features are enabled
+   */
+  isAICompanionEnabled(): boolean {
+    return FEATURE_FLAGS.AI_COMPANION;
+  },
+
   isPersonalWorkspaceSuiteEnabled(): boolean {
     return (
       FEATURE_FLAGS.PERSONAL_WORKSPACES ||
@@ -131,6 +147,7 @@ export const featureFlagHelpers = {
       NEXT_PUBLIC_ENABLE_SMART_ONBOARDING: process.env.NEXT_PUBLIC_ENABLE_SMART_ONBOARDING,
       NEXT_PUBLIC_ENABLE_WORKSPACE_MIGRATION: process.env.NEXT_PUBLIC_ENABLE_WORKSPACE_MIGRATION,
       NEXT_PUBLIC_ENABLE_MONETIZATION: process.env.NEXT_PUBLIC_ENABLE_MONETIZATION,
+      NEXT_PUBLIC_ENABLE_AI_COMPANION: process.env.NEXT_PUBLIC_ENABLE_AI_COMPANION,
     };
   }
 };

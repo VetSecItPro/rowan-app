@@ -2,8 +2,9 @@
  * ChatMessage — Single chat message bubble
  *
  * Renders user and assistant messages with:
+ * - Markdown-rendered assistant text
  * - Feature-colored tool results
- * - Streaming text cursor
+ * - Typing indicator while streaming
  * - Inline confirmation cards
  */
 
@@ -12,8 +13,9 @@
 import { motion } from 'framer-motion';
 import { Bot, User } from 'lucide-react';
 import type { ChatMessage as ChatMessageType } from '@/lib/types/chat';
-import { FEATURE_COLORS } from '@/lib/types/chat';
 import ConfirmationCard from './ConfirmationCard';
+import MarkdownMessage from './MarkdownMessage';
+import TypingIndicator from './TypingIndicator';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -58,9 +60,13 @@ export default function ChatMessage({ message, onConfirm }: ChatMessageProps) {
                 : 'bg-gray-700/80 text-gray-100 rounded-bl-md'
             }`}
           >
-            <span className="whitespace-pre-wrap">{message.content}</span>
-            {message.isStreaming && (
-              <span className="inline-block w-1.5 h-4 ml-0.5 bg-white/60 animate-pulse rounded-sm" />
+            {isUser ? (
+              <span className="whitespace-pre-wrap">{message.content}</span>
+            ) : (
+              <MarkdownMessage
+                content={message.content}
+                isStreaming={message.isStreaming}
+              />
             )}
           </div>
         )}
@@ -68,11 +74,7 @@ export default function ChatMessage({ message, onConfirm }: ChatMessageProps) {
         {/* Streaming indicator with no text yet */}
         {message.isStreaming && !message.content && (
           <div className="bg-gray-700/80 rounded-2xl rounded-bl-md px-4 py-3">
-            <div className="flex gap-1.5">
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:150ms]" />
-              <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:300ms]" />
-            </div>
+            <TypingIndicator />
           </div>
         )}
 

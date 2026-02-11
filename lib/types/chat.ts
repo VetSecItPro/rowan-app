@@ -7,7 +7,7 @@
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 // The types of events that can stream from the server
-export type ChatStreamEventType = 'text' | 'tool_call' | 'confirmation' | 'result' | 'error' | 'done';
+export type ChatStreamEventType = 'text' | 'tool_call' | 'confirmation' | 'result' | 'error' | 'done' | 'conversation_id';
 
 // A single streamed event from the server
 export interface ChatStreamEvent {
