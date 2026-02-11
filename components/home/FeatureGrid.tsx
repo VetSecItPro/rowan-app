@@ -113,7 +113,7 @@ const secondaryFeatures = [
     name: 'Messages',
     icon: MessageCircle,
     gradient: 'from-green-500 to-emerald-500',
-    oneLiner: 'Private family chat — no more chaotic group texts.',
+    oneLiner: 'Private family chat. No more chaotic group texts.',
   },
   {
     name: 'Check-In',

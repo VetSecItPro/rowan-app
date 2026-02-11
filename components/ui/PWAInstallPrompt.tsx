@@ -158,7 +158,7 @@ export default function PWAInstallPrompt() {
               </p>
             ) : (
               <p className="text-xs text-gray-400 mt-0.5">
-                Installs locally — no app store, works offline
+                Installs locally, no app store, works offline
               </p>
             )}
           </div>

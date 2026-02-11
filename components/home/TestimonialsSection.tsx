@@ -42,7 +42,7 @@ const TESTIMONIALS: Testimonial[] = [
     rating: 5,
   },
   {
-    quote: "As a military family that moves often, having one app for everything — chores, meals, budget — has been a game changer.",
+    quote: "As a military family that moves often, having one app for everything (chores, meals, budget) has been a game changer.",
     author: 'Mike T.',
     role: 'Army Veteran, Virginia',
     avatarInitial: 'M',

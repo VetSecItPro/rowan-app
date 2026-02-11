@@ -43,7 +43,7 @@ export function InstallSection({ onSignupClick }: InstallSectionProps) {
           transition={{ duration: prefersReducedMotion ? 0.01 : 0.6, delay: prefersReducedMotion ? 0 : 0.1 }}
           className="text-lg sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto"
         >
-          Join families who are finally getting organized — with one app for everything.
+          Join families who are finally getting organized with one app for everything.
         </motion.p>
 
         <motion.div

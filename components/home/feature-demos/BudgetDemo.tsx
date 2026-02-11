@@ -255,7 +255,7 @@ function BudgetAlertsStep() {
           </div>
           <div className="flex-1">
             <p className="text-xs font-medium text-orange-100">Groceries</p>
-            <p className="text-[10px] text-orange-300/70">$390 of $600 — 65%</p>
+            <p className="text-[10px] text-orange-300/70">$390 of $600 · 65%</p>
           </div>
         </div>
       </motion.div>
@@ -273,7 +273,7 @@ function BudgetAlertsStep() {
           </div>
           <div className="flex-1">
             <p className="text-xs font-medium text-green-100">Entertainment</p>
-            <p className="text-[10px] text-green-300/70">$60 of $200 — on track</p>
+            <p className="text-[10px] text-green-300/70">$60 of $200 · on track</p>
           </div>
         </div>
       </motion.div>

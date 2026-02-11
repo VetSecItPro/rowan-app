@@ -15,14 +15,14 @@ const steps = [
     {
         number: 2,
         title: "Invite Your People",
-        description: "Add your partner, kids, roommates — anyone who shares your life.",
+        description: "Add your partner, kids, roommates, anyone who shares your life.",
         icon: UserPlus,
         gradient: "from-purple-500 to-blue-500"
     },
     {
         number: 3,
         title: "Manage Everything Together",
-        description: "Tasks, calendars, budgets, meals, and more — all in one place, always in sync.",
+        description: "Tasks, calendars, budgets, meals, and more. All in one place, always in sync.",
         icon: Grid3x3,
         gradient: "from-cyan-500 to-emerald-500"
     }
@@ -34,7 +34,7 @@ export function HowItWorksSection() {
     const isInView = useInView(sectionRef, { once: false, margin: "-50px" });
 
     return (
-        <section ref={sectionRef} className="relative py-24 px-4 sm:px-6 lg:px-8">
+        <section id="how-it-works" ref={sectionRef} className="relative py-24 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <motion.div
                     initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}

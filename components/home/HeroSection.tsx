@@ -5,15 +5,8 @@ import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
-import dynamic from 'next/dynamic';
-
-const AnimatedProductDemo = dynamic(
-  () => import('@/components/home/AnimatedProductDemo').then(mod => ({ default: mod.AnimatedProductDemo })),
-  {
-    ssr: false,
-    loading: () => <div className="w-[260px] sm:w-[300px] lg:w-[320px] h-[380px] bg-gray-800/50 rounded-[2rem] animate-pulse mx-auto" />,
-  }
-);
+import { Player } from '@remotion/player';
+import { HeroShowcase } from '@/remotion/compositions/HeroShowcase';
 
 interface HeroSectionProps {
   onSignupClick: () => void;
@@ -81,7 +74,7 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-lg mx-auto lg:mx-0 mb-8"
               >
-                Tasks, calendars, budgets, meals, and more — in one app that actually keeps your household in sync.
+                Tasks, calendars, budgets, meals, and more in one app that actually keeps your household in sync.
               </motion.p>
 
               {/* CTA buttons */}
@@ -102,12 +95,16 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
                   </div>
                 </MagneticButton>
 
-                <button
-                  onClick={onPricingClick}
+                <a
+                  href="#how-it-works"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   className="px-6 py-3 text-sm font-medium text-gray-300 hover:text-white transition-colors"
                 >
                   See How It Works
-                </button>
+                </a>
               </motion.div>
 
               {/* Trust signals */}
@@ -133,7 +130,21 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
               transition={{ duration: 0.8, delay: 0.3 }}
               className="flex justify-center lg:justify-end"
             >
-              <AnimatedProductDemo />
+              <div className="w-full max-w-[680px] rounded-2xl overflow-hidden border border-gray-800/40 bg-black shadow-2xl shadow-black/40">
+                <Player
+                  component={HeroShowcase}
+                  durationInFrames={300}
+                  fps={30}
+                  compositionWidth={1280}
+                  compositionHeight={720}
+                  style={{ width: '100%' }}
+                  loop
+                  autoPlay
+                  controls={false}
+                  showVolumeControls={false}
+                  clickToPlay={false}
+                />
+              </div>
             </motion.div>
           </div>
         </motion.div>
