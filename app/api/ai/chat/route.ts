@@ -27,7 +27,7 @@ import {
   detectPIIInUserInput,
   sanitizeContextForLLM,
 } from '@/lib/services/ai/ai-privacy-service';
-import type { SpaceContext } from '@/lib/services/ai/system-prompt';
+import { aiContextService } from '@/lib/services/ai/ai-context-service';
 import type { AIToolCall, AIToolResult } from '@/lib/types/ai';
 
 export const maxDuration = 60; // Allow up to 60s for AI responses
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
     const piiResult = detectPIIInUserInput(message);
 
     // -- Build space context for system prompt ----------------------------
-    const rawSpaceContext = await buildSpaceContext(supabase, spaceId, user);
+    const rawSpaceContext = await aiContextService.buildFullContext(supabase, spaceId, user);
     const spaceContext = sanitizeContextForLLM(rawSpaceContext);
 
     // -- Stream response via SSE ------------------------------------------
@@ -247,127 +247,6 @@ export async function POST(req: NextRequest) {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/**
- * Build space context for the AI system prompt.
- * Fetches space info, members, and recent activity in parallel.
- */
-async function buildSpaceContext(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  spaceId: string,
-  user: { id: string; email?: string; user_metadata?: { name?: string } }
-): Promise<SpaceContext> {
-  // Fetch all context data in parallel for speed
-  const [spaceResult, membersResult, tasksResult, choresResult, shoppingResult, eventsResult] =
-    await Promise.all([
-      // Space name
-      supabase.from('spaces').select('name').eq('id', spaceId).single(),
-
-      // Members with display names
-      supabase
-        .from('space_members')
-        .select(`user_id, role, user_profiles:user_id ( name, email )`)
-        .eq('space_id', spaceId)
-        .order('joined_at', { ascending: true }),
-
-      // Recent tasks (last 10 active)
-      supabase
-        .from('tasks')
-        .select('title, status, due_date, assigned_to')
-        .eq('space_id', spaceId)
-        .in('status', ['pending', 'in_progress'])
-        .order('created_at', { ascending: false })
-        .limit(10),
-
-      // Active chores
-      supabase
-        .from('chores')
-        .select('title, frequency, assigned_to')
-        .eq('space_id', spaceId)
-        .in('status', ['pending', 'in_progress'])
-        .order('created_at', { ascending: false })
-        .limit(10),
-
-      // Active shopping lists with item counts
-      supabase
-        .from('shopping_lists')
-        .select('title, id')
-        .eq('space_id', spaceId)
-        .limit(5),
-
-      // Upcoming events (next 7 days)
-      supabase
-        .from('calendar_events')
-        .select('title, start_time')
-        .eq('space_id', spaceId)
-        .gte('start_time', new Date().toISOString())
-        .lte('start_time', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString())
-        .order('start_time', { ascending: true })
-        .limit(10),
-    ]);
-
-  type MemberRow = {
-    user_id: string;
-    role: string;
-    user_profiles: { name: string | null; email: string | null } | null;
-  };
-
-  const memberList = ((membersResult.data as MemberRow[] | null) ?? []).map((m) => ({
-    id: m.user_id,
-    displayName: m.user_profiles?.name || m.user_profiles?.email || 'Unknown',
-    role: m.role,
-  }));
-
-  // Type aliases for Supabase query results
-  type TaskRow = { title: string; status: string; due_date: string | null; assigned_to: string | null };
-  type ChoreRow = { title: string; frequency: string; assigned_to: string | null };
-  type ShoppingListRow = { title: string; id: string };
-  type EventRow = { title: string; start_time: string | null };
-
-  // Count items per shopping list
-  const shoppingLists = await Promise.all(
-    ((shoppingResult.data as ShoppingListRow[] | null) ?? []).map(async (list) => {
-      const { count } = await supabase
-        .from('shopping_items')
-        .select('id', { count: 'exact', head: true })
-        .eq('list_id', list.id)
-        .eq('purchased', false);
-      return { title: list.title, item_count: count ?? 0 };
-    })
-  );
-
-  const tasks = (tasksResult.data as TaskRow[] | null) ?? [];
-  const chores = (choresResult.data as ChoreRow[] | null) ?? [];
-  const events = (eventsResult.data as EventRow[] | null) ?? [];
-
-  return {
-    spaceId,
-    spaceName: spaceResult.data?.name ?? 'My Space',
-    members: memberList,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    userName:
-      user.user_metadata?.name ||
-      user.email?.split('@')[0] ||
-      'there',
-    userId: user.id,
-    recentTasks: tasks.map((t) => ({
-      title: t.title,
-      status: t.status,
-      due_date: t.due_date,
-      assigned_to: t.assigned_to,
-    })),
-    recentChores: chores.map((c) => ({
-      title: c.title,
-      frequency: c.frequency,
-      assigned_to: c.assigned_to,
-    })),
-    activeShoppingLists: shoppingLists.filter((l) => l.item_count > 0),
-    upcomingEvents: events.map((e) => ({
-      title: e.title,
-      start_time: e.start_time,
-    })),
-  };
-}
 
 /**
  * Persist user + assistant messages and record usage.

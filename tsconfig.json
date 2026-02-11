@@ -38,6 +38,8 @@
   "exclude": [
     "node_modules",
     "**/*.backup.ts",
-    "**/*.backup.tsx"
+    "**/*.backup.tsx",
+    "remotion",
+    "remotion.config.ts"
   ]
 }

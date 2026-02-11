@@ -1,0 +1,96 @@
+/**
+ * MorningBriefing — Special first-message briefing card
+ *
+ * Renders as a gradient-bordered card with:
+ * - Time-of-day greeting
+ * - Markdown-rendered briefing text
+ * - Highlight pills (tasks due, overdue, events)
+ * - "Ask Rowan" and "Dismiss" buttons
+ */
+
+'use client';
+
+import { motion } from 'framer-motion';
+import { Sunrise, MessageCircle, X } from 'lucide-react';
+import MarkdownMessage from './MarkdownMessage';
+import type { BriefingOutput } from '@/lib/services/ai/briefing-service';
+
+interface MorningBriefingProps {
+  briefing: BriefingOutput;
+  onAskRowan: (message: string) => void;
+  onDismiss: () => void;
+}
+
+export default function MorningBriefing({
+  briefing,
+  onAskRowan,
+  onDismiss,
+}: MorningBriefingProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-gray-800/50 to-purple-500/5 p-4"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
+            <Sunrise className="w-4 h-4 text-amber-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">
+              {briefing.greeting}
+            </h3>
+            <p className="text-[10px] text-gray-400">Morning Briefing</p>
+          </div>
+        </div>
+        <button
+          onClick={onDismiss}
+          className="p-1.5 rounded-lg hover:bg-gray-700/50 text-gray-500 hover:text-gray-300 transition-colors"
+          aria-label="Dismiss briefing"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* Briefing body */}
+      <div className="mb-3">
+        <MarkdownMessage content={briefing.briefingText} />
+      </div>
+
+      {/* Highlight pills */}
+      {briefing.highlights.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {briefing.highlights.map((highlight) => (
+            <span
+              key={highlight}
+              className="inline-flex items-center text-[10px] font-medium px-2.5 py-1 rounded-full bg-gray-700/50 text-gray-300"
+            >
+              {highlight}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onAskRowan('Tell me more about my day')}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+        >
+          <MessageCircle className="w-3.5 h-3.5" />
+          Ask Rowan
+        </button>
+        <button
+          onClick={onDismiss}
+          className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-300 transition-colors"
+        >
+          Dismiss
+        </button>
+      </div>
+    </motion.div>
+  );
+}

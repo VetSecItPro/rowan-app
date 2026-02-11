@@ -25,6 +25,21 @@ export interface SpaceContext {
   activeShoppingLists?: Array<{ title: string; item_count: number }>;
   /** Upcoming events (next 7 days) for context awareness */
   upcomingEvents?: Array<{ title: string; start_time?: string | null }>;
+  /** Enhanced summary context from ai-context-service */
+  summary?: {
+    taskCounts: { total: number; pending: number; overdue: number; dueToday: number };
+    budgetRemaining: number | null;
+    activeGoals: number;
+    choreStats: { total: number; pending: number };
+    shoppingLists: Array<{ title: string; itemCount: number }>;
+    upcomingEvents: Array<{ title: string; startTime: string }>;
+  };
+  /** Recent activity from the last 24 hours */
+  recentActivity?: {
+    completedTasks: Array<{ title: string; completedAt: string }>;
+    newExpenses: Array<{ description: string; amount: number; category: string }>;
+    upcomingEvents: Array<{ title: string; startTime: string }>;
+  };
 }
 
 const ROWAN_PERSONALITY = `You are Rowan, a warm and helpful AI assistant for a family household management app. You help families organize their lives through natural conversation.
@@ -105,6 +120,36 @@ export function buildSystemPrompt(context: SpaceContext): string {
       .map(e => `  - "${e.title}"${e.start_time ? ` at ${e.start_time}` : ''}`)
       .join('\n');
     sections.push(`UPCOMING EVENTS (next 7 days):\n${eventLines}`);
+  }
+
+  // Enhanced summary context
+  if (context.summary) {
+    const s = context.summary;
+    const summaryLines = [
+      `  - Tasks: ${s.taskCounts.pending} pending, ${s.taskCounts.overdue} overdue, ${s.taskCounts.dueToday} due today (${s.taskCounts.total} total)`,
+      `  - Goals: ${s.activeGoals} active`,
+      `  - Chores: ${s.choreStats.pending} pending (${s.choreStats.total} total)`,
+    ];
+    if (s.budgetRemaining !== null) {
+      summaryLines.push(`  - Budget remaining: $${s.budgetRemaining.toFixed(2)}`);
+    }
+    sections.push(`HOUSEHOLD SUMMARY:\n${summaryLines.join('\n')}`);
+  }
+
+  // Recent activity (last 24h)
+  if (context.recentActivity) {
+    const a = context.recentActivity;
+    const activityLines: string[] = [];
+    if (a.completedTasks.length > 0) {
+      activityLines.push(`  Completed: ${a.completedTasks.map((t) => `"${t.title}"`).join(', ')}`);
+    }
+    if (a.newExpenses.length > 0) {
+      const total = a.newExpenses.reduce((sum, e) => sum + e.amount, 0);
+      activityLines.push(`  Spending: $${total.toFixed(2)} across ${a.newExpenses.length} expenses`);
+    }
+    if (activityLines.length > 0) {
+      sections.push(`LAST 24 HOURS:\n${activityLines.join('\n')}`);
+    }
   }
 
   const recentActivityBlock = sections.length > 0
