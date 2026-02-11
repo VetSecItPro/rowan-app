@@ -47,7 +47,7 @@ export function PainPointsSection() {
                     className="mt-10"
                 >
                     <span className="text-2xl sm:text-3xl font-display font-bold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                        Rowan fixes this.
+                        You shouldn&apos;t have to be the family secretary.
                     </span>
                 </motion.div>
             </div>

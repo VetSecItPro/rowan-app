@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import nextDynamic from 'next/dynamic';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { useDashboardMode } from '@/lib/hooks/useDashboardMode';
+import { FEATURE_FLAGS } from '@/lib/constants/feature-flags';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { checkInsService, type DailyCheckIn, type CheckInStats } from '@/lib/services/checkins-service';
 import { reactionsService, type CheckInReaction } from '@/lib/services/reactions-service';
@@ -15,6 +17,7 @@ import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import { useDashboardStats } from '@/lib/hooks/useDashboardStats';
 import {
+  Bot,
   CheckSquare,
   Calendar,
   Bell,
@@ -79,6 +82,10 @@ const LeaderboardWidget = nextDynamic(
   { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-48" /> }
 );
 
+const AIDashboard = nextDynamic(
+  () => import('@/components/dashboard/AIDashboard').then(mod => ({ default: mod.AIDashboard })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" /> }
+);
 
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.95 },
@@ -176,6 +183,7 @@ export default function DashboardPage() {
   const spaceId = currentSpace?.id;
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const { mode: dashboardMode, setDashboardMode, mounted: dashModeMounted } = useDashboardMode();
 
   // Prefetch all feature data immediately for instant navigation to other pages
   usePrefetchAllData({ delay: 300 });
@@ -378,6 +386,18 @@ export default function DashboardPage() {
     );
   }
 
+  // AI Dashboard mode — full-page inline chat experience
+  if (dashModeMounted && dashboardMode === 'ai') {
+    return (
+      <PageErrorBoundary
+        pageName="AI Dashboard"
+        pageDescription="your AI-powered dashboard with Rowan"
+      >
+        <AIDashboard onSwitchToTraditional={() => setDashboardMode('traditional')} />
+      </PageErrorBoundary>
+    );
+  }
+
   return (
     <PageErrorBoundary
       pageName="Dashboard"
@@ -392,8 +412,20 @@ export default function DashboardPage() {
           <div className="min-h-screen p-4 sm:p-6 md:p-8">
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
               {/* Time-Aware Welcome Widget */}
-              <WelcomeWidget userName={user?.name ?? undefined} />
-
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <WelcomeWidget userName={user?.name ?? undefined} />
+                </div>
+                {FEATURE_FLAGS.AI_COMPANION && spaceId && (
+                  <button
+                    onClick={() => setDashboardMode('ai')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg transition-colors shrink-0 ml-3"
+                  >
+                    <Bot className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">AI Dashboard</span>
+                  </button>
+                )}
+              </div>
 
               {/* Today at a Glance - Shows today's events, tasks, meals, reminders */}
               {spaceId && (
