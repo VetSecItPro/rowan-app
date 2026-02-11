@@ -11,14 +11,15 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
+import { FEATURE_FLAGS } from '@/lib/constants/feature-flags';
 import ChatPanel from './ChatPanel';
 
 export default function ChatFAB() {
   const { currentSpace } = useAuthWithSpaces();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Don't render if no space is selected
-  if (!currentSpace?.id) return null;
+  // Don't render if AI companion is disabled or no space is selected
+  if (!FEATURE_FLAGS.AI_COMPANION || !currentSpace?.id) return null;
 
   return (
     <>

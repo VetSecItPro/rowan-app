@@ -7,6 +7,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Shared concurrency group prevents parallel E2E runs across workflows
+# Both CI and Smart E2E share the same Supabase test users — concurrent
+# seed scripts delete/recreate users, invalidating each other's sessions
+concurrency:
+  group: e2e-supabase-shared
+  cancel-in-progress: false
+
 permissions:
   contents: read
   issues: write

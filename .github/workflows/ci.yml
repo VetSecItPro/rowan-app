@@ -125,6 +125,11 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: build
+    # Shared concurrency group prevents parallel E2E runs across workflows
+    # Both CI and Smart E2E share the same Supabase test users
+    concurrency:
+      group: e2e-supabase-shared
+      cancel-in-progress: false
     env:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}

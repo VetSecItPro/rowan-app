@@ -24,7 +24,7 @@ interface SpacesContextType {
   deleteSpace: (spaceId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
-const SpacesContext = createContext<SpacesContextType | null>(null);
+export const SpacesContext = createContext<SpacesContextType | null>(null);
 
 export function SpacesProvider({ children }: { children: ReactNode }) {
   const { user, session, loading: authLoading } = useAuth();
