@@ -293,6 +293,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
+                inputMode="numeric"
                 min="1"
                 value={formData.interval_value}
                 onChange={(e) => setFormData(prev => ({ ...prev, interval_value: parseInt(e.target.value) }))}

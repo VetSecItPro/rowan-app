@@ -144,10 +144,12 @@ export const TwoWeekCalendarView = dynamic(
     loading: () => (
       <div className="bg-gray-800 rounded-lg p-6">
         <MealLoadingFallback text="Loading two-week view..." />
-        <div className="grid grid-cols-7 gap-4 mt-4">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <div key={i} className="h-24 bg-gray-700 rounded-lg animate-pulse" />
-          ))}
+        <div className="overflow-x-auto mt-4">
+          <div className="grid grid-cols-7 gap-4 min-w-[320px]">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <div key={i} className="h-24 bg-gray-700 rounded-lg animate-pulse" />
+            ))}
+          </div>
         </div>
       </div>
     ),

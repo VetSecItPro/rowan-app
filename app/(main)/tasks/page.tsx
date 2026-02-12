@@ -563,8 +563,8 @@ export default function TasksPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Tasks & Chores' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={loadData}>
-        <div className="min-h-full p-3 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
+        <div className="min-h-full p-3 sm:p-8 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8 md:space-y-8">
           {/* Header - Compact on Mobile */}
           <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             {/* Title Row */}
@@ -573,7 +573,7 @@ export default function TasksPage() {
                 <CheckSquare className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
+                <h1 className="text-lg sm:text-3xl md:text-3xl lg:text-4xl font-bold bg-gradient-tasks bg-clip-text text-transparent">
                   Tasks & Chores
                 </h1>
                 <p className="text-xs sm:text-base text-gray-400 hidden sm:block">
@@ -630,9 +630,9 @@ export default function TasksPage() {
           {/* Stats Dashboard - Hidden on mobile */}
           <div className="hidden sm:block">
             {/* Stats cards - only visible on desktop */}
-            <div className="stats-grid-mobile gap-4 sm:gap-6 grid">
+            <div className="stats-grid-mobile gap-4 sm:gap-6 md:gap-6 grid">
               {/* Pending */}
-              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
                   <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Pending</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-500 rounded-xl flex items-center justify-center">
@@ -651,7 +651,7 @@ export default function TasksPage() {
               </div>
 
               {/* In Progress */}
-              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
                   <h3 className="text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500 rounded-xl flex items-center justify-center">
@@ -670,7 +670,7 @@ export default function TasksPage() {
               </div>
 
               {/* Completed */}
-              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
                   <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
@@ -696,7 +696,7 @@ export default function TasksPage() {
               </div>
 
               {/* Total Tasks & Chores */}
-              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+              <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-3 sm:mb-4">
                   <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Total Tasks & Chores</h3>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-tasks rounded-xl flex items-center justify-center">
@@ -785,22 +785,26 @@ export default function TasksPage() {
                     ))}
                   </div>
                 ) : filteredItems.length === 0 ? (
-                  <div className="text-center py-8 sm:py-12">
-                    <CheckSquare className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                    <p className="text-gray-400 text-sm sm:text-lg mb-1 sm:mb-2">No tasks or chores found</p>
-                    <p className="text-gray-500 text-xs sm:text-base mb-4 sm:mb-6">
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4">
+                      <CheckSquare className="w-8 h-8 text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      {searchQuery || statusFilter !== 'all' ? 'No matching items' : 'Ready to get organized?'}
+                    </h3>
+                    <p className="text-sm text-gray-400 max-w-sm mb-6">
                       {searchQuery || statusFilter !== 'all'
-                        ? 'Try adjusting your filters'
-                        : 'Create your first task or chore to get started!'}
+                        ? 'Try adjusting your filters to find what you\'re looking for.'
+                        : 'Create your first task to start conquering your to-do list.'}
                     </p>
                     {!searchQuery && statusFilter === 'all' && (
                       <>
                         <button
                           onClick={() => handleOpenModal('task')}
-                          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium"
+                          className="px-5 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-blue-600/20"
                         >
                           <Plus className="w-4 h-4" />
-                          Create Task or Chore
+                          Add Task
                         </button>
                         <AIContextualHint
                           featureKey="tasks"

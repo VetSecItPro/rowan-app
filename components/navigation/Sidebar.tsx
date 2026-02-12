@@ -62,13 +62,18 @@ const NavItemComponent = memo(function NavItemComponent({
     setIsHovered(false);
   }, []);
 
+  // Touch support: prefetch on touch start (tablets/touch laptops)
+  const handleTouchStart = useCallback(() => {
+    onPrefetch(item.href);
+  }, [item.href, onPrefetch]);
+
   return (
-    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <li onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onTouchStart={handleTouchStart}>
       <Link
         href={item.href}
         prefetch={true}
         data-testid={`nav${item.href.replace(/\//g, '-')}-link`}
-        className={`group relative flex items-center py-3 rounded-lg transition-colors duration-200 ${
+        className={`group relative flex items-center py-3 rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
           isExpanded ? 'gap-3 px-2.5' : 'justify-center px-2'
         } ${
           isActive
@@ -123,14 +128,14 @@ const NavItemComponent = memo(function NavItemComponent({
           >
             {item.name}
           </p>
-          <p className="text-[11px] text-gray-500 truncate">
+          <p className="text-[11px] text-gray-400 truncate">
             {item.description}
           </p>
         </div>
 
-        {/* Tooltip - only show when collapsed */}
-        {!isExpanded && (
-          <div className="pointer-events-none absolute left-full ml-3 px-3 py-2 bg-gray-800/95 backdrop-blur-sm text-white text-sm rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 whitespace-nowrap z-50 shadow-xl border border-white/10">
+        {/* Tooltip - only show when collapsed and hovered (not on touch) */}
+        {!isExpanded && isHovered && (
+          <div className="pointer-events-none absolute left-full ml-3 px-3 py-2 bg-gray-800/95 backdrop-blur-sm text-white text-sm rounded-xl whitespace-nowrap z-50 shadow-xl border border-white/10 animate-in fade-in duration-150">
             <p className="font-semibold">{item.name}</p>
             <p className="text-[11px] text-gray-400">{item.description}</p>
             <div className="absolute left-0 top-1/2 -translate-x-[5px] -translate-y-1/2 w-2.5 h-2.5 bg-gray-800/95 rotate-45 border-l border-b border-white/10" />

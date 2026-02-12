@@ -405,7 +405,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
           <Eye className="w-4 h-4 text-cyan-500" />
           <h3 className="text-sm font-semibold text-white">Traffic Overview</h3>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <MetricCard
             title="Page Views"
             value={data.trafficMetrics?.totalPageViews || 0}

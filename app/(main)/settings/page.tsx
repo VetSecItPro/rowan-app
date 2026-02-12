@@ -1060,6 +1060,7 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="email"
+                          inputMode="email"
                           value={profileData.email}
                           id="field-2"
               onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}

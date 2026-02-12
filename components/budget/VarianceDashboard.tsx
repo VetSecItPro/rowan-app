@@ -96,7 +96,7 @@ export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
   if (!currentVariance) {
     return (
       <div className="text-center py-12">
-        <Target className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+        <Target className="w-12 h-12 text-gray-400 mx-auto mb-3" />
         <p className="text-gray-400">No budget data available for analysis</p>
       </div>
     );

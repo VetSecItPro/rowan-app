@@ -87,7 +87,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
               <button
                 onClick={handleCheckboxClick}
                 aria-label={`Toggle event status: ${event.status === 'not-started' ? 'Not Started' : event.status === 'in-progress' ? 'In Progress' : 'Completed'}`}
-                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 hover:scale-105 ${
+                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
                   event.status === 'completed'
                     ? 'bg-green-500 border-green-500'
                     : event.status === 'in-progress'

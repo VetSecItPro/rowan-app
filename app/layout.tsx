@@ -10,6 +10,7 @@ import { NetworkStatus } from "@/components/ui/NetworkStatus";
 import { KeyboardShortcuts } from "@/components/ui/KeyboardShortcuts";
 import { Toaster } from 'sonner';
 import { AppQueryProvider } from '@/lib/providers/query-client-provider';
+import { MotionProvider } from '@/components/providers/MotionProvider';
 
 // Optimized font loading with Next.js font module
 // Automatically self-hosted, preloaded, and optimized
@@ -94,40 +95,42 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
       </head>
       <body className={`${jakarta.variable} ${playfair.variable} font-sans antialiased bg-black text-white`} style={{ scrollbarGutter: 'stable' }}>
-        <AppQueryProvider>
-        <DeviceProvider>
-          <AuthProvider>
-            <SpacesProvider>
-              <ClientErrorBoundary>
-                <NetworkStatus />
-                <KeyboardShortcuts />
-                {children}
-              </ClientErrorBoundary>
-            </SpacesProvider>
-            <CookieConsent />
-            <Toaster
-              position="top-center"
-              duration={4000}
-              closeButton
-              richColors
-              theme="dark"
-              toastOptions={{
-                className: 'w-full max-w-md mx-4 sm:mx-0 backdrop-blur-md',
-                style: {
-                  fontSize: '14px',
-                  padding: '12px 16px',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                },
-              }}
-              visibleToasts={3}
-              offset="16px"
-              gap={8}
-              swipeDirections={['right', 'top']}
-            />
-          </AuthProvider>
-        </DeviceProvider>
-        </AppQueryProvider>
+        <MotionProvider>
+          <AppQueryProvider>
+            <DeviceProvider>
+              <AuthProvider>
+                <SpacesProvider>
+                  <ClientErrorBoundary>
+                    <NetworkStatus />
+                    <KeyboardShortcuts />
+                    {children}
+                  </ClientErrorBoundary>
+                </SpacesProvider>
+                <CookieConsent />
+                <Toaster
+                  position="top-center"
+                  duration={4000}
+                  closeButton
+                  richColors
+                  theme="dark"
+                  toastOptions={{
+                    className: 'w-full max-w-md mx-4 sm:mx-0 backdrop-blur-md',
+                    style: {
+                      fontSize: '14px',
+                      padding: '12px 16px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                    },
+                  }}
+                  visibleToasts={3}
+                  offset="16px"
+                  gap={8}
+                  swipeDirections={['right', 'top']}
+                />
+              </AuthProvider>
+            </DeviceProvider>
+          </AppQueryProvider>
+        </MotionProvider>
       </body>
     </html>
   );

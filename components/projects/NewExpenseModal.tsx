@@ -168,7 +168,7 @@ function ExpenseForm({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpen
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="field-2" className="block text-sm font-medium mb-2 cursor-pointer">Amount *</label>
-              <input type="number" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-900 border rounded-lg" />
+              <input type="number" inputMode="numeric" required step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} className="w-full px-4 py-3 text-base md:px-4 md:py-2.5 md:text-sm bg-gray-900 border rounded-lg" />
             </div>
             <div>
               <label htmlFor="field-3" className="block text-sm font-medium mb-2 cursor-pointer">Category</label>

@@ -406,6 +406,7 @@ export function CategoryManager({ domain, showTags = true, showBudgets = true, c
                         <Input
                           id="budget"
                           type="number"
+                          inputMode="numeric"
                           step="0.01"
                           value={newCategoryForm.monthly_budget}
                           onChange={(e) => setNewCategoryForm(prev => ({ ...prev, monthly_budget: e.target.value }))}

@@ -31,7 +31,7 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
 
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
-          <h3 className="text-xl font-bold text-white truncate flex-1 min-w-0 pr-2">{recipe.name}</h3>
+          <h3 className="text-xl font-bold text-white line-clamp-2 flex-1 min-w-0 pr-2">{recipe.name}</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={() => onEdit(recipe)}

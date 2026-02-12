@@ -119,6 +119,7 @@ export function IncomeInput({
         <input
           id="income-input"
           type="number"
+          inputMode="numeric"
           step="100"
           min="0"
           max="10000000"

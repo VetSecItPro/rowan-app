@@ -182,7 +182,7 @@ export function RecipePreviewModal({
           />
 
           {safeImageUrl && (
-            <div className="h-48 sm:h-64 overflow-hidden bg-gray-700 rounded-t-2xl sm:rounded-t-xl">
+            <div className="h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-700 rounded-t-2xl sm:rounded-t-xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={safeImageUrl}
@@ -280,7 +280,7 @@ export function RecipePreviewModal({
               <h3 className="text-lg font-semibold text-white mb-3">
                 Ingredients ({recipe.ingredients.length})
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2">
                 {recipe.ingredients.map((ing, idx) => (
                   <div
                     key={idx}
@@ -324,7 +324,7 @@ export function RecipePreviewModal({
         </div>
 
         {/* Footer Actions - Mobile Optimized */}
-        <div className="flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/90 backdrop-blur-md pb-safe-4 sm:pb-4">
+        <div className="flex-shrink-0 px-4 sm:px-5 md:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/90 backdrop-blur-md pb-safe-4 sm:pb-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={onClose}

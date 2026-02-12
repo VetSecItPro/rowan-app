@@ -803,6 +803,7 @@ export default function MessagesPage() {
       <PageErrorBoundary>
         {/* Mobile: fixed height container that doesn't scroll; Desktop: normal layout */}
         <div className="md:p-8 p-2 h-[calc(100dvh-100px)] md:h-auto overflow-hidden md:overflow-visible">
+        <h1 className="sr-only">Messages</h1>
         <div className="max-w-7xl mx-auto h-full md:h-auto flex flex-col md:block md:space-y-8">
           {/* Header - Hidden on mobile for more chat space */}
           <div className="hidden md:flex items-center gap-3 sm:gap-4">
@@ -925,9 +926,9 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Interface - WhatsApp Style */}
-            <div className="flex-1 min-h-0 bg-[#efeae2] bg-[#0b141a] md:rounded-3xl overflow-hidden flex flex-col md:border md:border-gray-700">
+            <div className="flex-1 min-h-0 bg-[#0b141a] md:rounded-3xl overflow-hidden flex flex-col md:border md:border-gray-700">
             {/* Chat Header - WhatsApp Style */}
-            <div className="px-3 py-2 bg-[#f0f2f5] bg-[#202c33] border-b border-gray-700">
+            <div className="px-3 py-2 bg-[#202c33] border-b border-gray-700">
               <div className="flex items-center gap-3">
                 {/* Back/Menu Button */}
                 <button
@@ -1023,7 +1024,7 @@ export default function MessagesPage() {
 
             {/* Mobile Thread Navigation Bar */}
             {conversations.length > 1 && (
-              <div className="md:hidden px-2 py-1.5 border-b border-gray-700 bg-[#f0f2f5] bg-[#202c33]">
+              <div className="md:hidden px-2 py-1.5 border-b border-gray-700 bg-[#202c33]">
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
                   {/* New Thread Button - First */}
                   <button
@@ -1056,17 +1057,12 @@ export default function MessagesPage() {
               </div>
             )}
 
-            {/* Messages Area - WhatsApp Style */}
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 py-2 space-y-1 relative"
+            {/* Messages Area - Dark WhatsApp Style */}
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 py-2 space-y-1 relative bg-[#0b141a]"
               style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300000008'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                backgroundColor: '#efeae2'
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
               }}
             >
-              {/* Dark mode background override */}
-              <div className="hidden block absolute inset-0 bg-[#0b141a]" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-              }} />
 
               {/* Content */}
               <div className="relative z-10 space-y-1">
@@ -1158,7 +1154,7 @@ export default function MessagesPage() {
             </div>
 
             {/* Message Input - WhatsApp Style */}
-            <div className="flex-shrink-0 px-2 py-2 bg-[#f0f2f5] bg-[#202c33]">
+            <div className="flex-shrink-0 px-2 py-2 bg-[#202c33]">
               <div className="flex items-center gap-2">
                 {/* Message Input with Emoji Inside */}
                 <div className="flex-1 flex items-center bg-[#2a3942] rounded-3xl shadow-sm relative">

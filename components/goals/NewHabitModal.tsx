@@ -237,6 +237,7 @@ export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: N
               <input
                 id="habit-target"
                 type="number"
+                inputMode="numeric"
                 min="1"
                 max="100"
                 value={formData.target_count || 1}

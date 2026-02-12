@@ -853,6 +853,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="email"
+                    inputMode="email"
                     id="calendar-email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
@@ -953,6 +954,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="email"
+                    inputMode="email"
                     id="apple-email"
                     value={appleEmail}
                     onChange={(e) => setAppleEmail(e.target.value)}

@@ -318,7 +318,8 @@ export const WeekCalendarView = memo(function WeekCalendarView({
       </div>
 
       {/* Desktop: 7-Column Grid */}
-      <div className="hidden sm:grid grid-cols-7 gap-3">
+      <div className="hidden sm:block overflow-x-auto">
+      <div className="grid grid-cols-7 gap-3">
         {weekDays.map((day) => {
           const dayMeals = getMealsForDate(day);
           const isToday = isSameDay(day, new Date());
@@ -420,6 +421,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

@@ -251,6 +251,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                 </label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   required={showValueInputs}
                   min="0"
                   step={formData.type === 'money' ? '0.01' : '1'}
@@ -266,6 +267,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
                 </label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min="0"
                   step={formData.type === 'money' ? '0.01' : '1'}
                   value={formData.current_value || ''}

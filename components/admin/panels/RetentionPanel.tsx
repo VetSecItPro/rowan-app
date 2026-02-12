@@ -82,7 +82,7 @@ const DauMauPanel = memo(function DauMauPanel() {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-blue-600 rounded-xl p-5 text-white">
           <div className="flex items-center justify-between">
             <div>

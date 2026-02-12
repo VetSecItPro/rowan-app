@@ -300,6 +300,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="number"
+                      inputMode="numeric"
                       step="0.01"
                       value={newSettlement.amount}
                       onChange={(e) => setNewSettlement(prev => ({ ...prev, amount: e.target.value }))}

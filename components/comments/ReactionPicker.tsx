@@ -76,7 +76,7 @@ export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProp
           </svg>
         </button>
       </div>
-      <div className="grid grid-cols-8 gap-1">
+      <div className="grid grid-cols-4 sm:grid-cols-8 gap-1">
         {COMMON_REACTIONS.map((emoji) => (
           <button
             key={emoji}

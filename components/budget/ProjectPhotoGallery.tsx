@@ -106,7 +106,7 @@ export function ProjectPhotoGallery({
   return (
     <div className="space-y-6">
       {/* Photo Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {Object.entries(photosByType).map(([type, count]) => (
           <div
             key={type}

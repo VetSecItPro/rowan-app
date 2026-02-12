@@ -55,7 +55,7 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCard
           </div>
         </div>
         <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} aria-label="Chore options menu" className="p-1 text-gray-400 hover:text-gray-300 transition-colors"><MoreVertical className="w-5 h-5" /></button>
+          <button onClick={() => setShowMenu(!showMenu)} aria-label="Chore options menu" className="p-2 text-gray-400 hover:text-gray-300 transition-colors"><MoreVertical className="w-5 h-5" /></button>
           {showMenu && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />

@@ -433,7 +433,7 @@ export function RewardsManagement({
                 <label className="block text-sm font-medium text-gray-300 mb-1">
                   Category
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                   {CATEGORY_OPTIONS.map((cat) => (
                     <button
                       key={cat.value}
@@ -462,6 +462,7 @@ export function RewardsManagement({
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={formData.cost_points}
                     onChange={(e) => setFormData(prev => ({ ...prev, cost_points: parseInt(e.target.value) || 0 }))}
                     min={1}
@@ -488,6 +489,7 @@ export function RewardsManagement({
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={formData.max_redemptions_per_week || ''}
                     onChange={(e) => setFormData(prev => ({
                       ...prev,

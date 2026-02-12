@@ -283,7 +283,8 @@ export function ProgressiveCalendarSkeleton({
       </div>
 
       {/* Calendar Grid */}
-      <div className={`grid gap-2 ${type === 'week' ? 'grid-cols-7' : 'grid-cols-7'}`}>
+      <div className="overflow-x-auto">
+      <div className={`grid gap-2 grid-cols-7 min-w-[320px]`}>
         {Array.from({ length: totalDays }).map((_, i) => (
           <div
             key={i}
@@ -303,6 +304,7 @@ export function ProgressiveCalendarSkeleton({
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

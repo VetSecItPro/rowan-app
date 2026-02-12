@@ -817,18 +817,22 @@ export default function RemindersPage(): React.JSX.Element {
                 ))}
               </div>
             ) : filteredReminders.length === 0 ? (
-              <div className="text-center py-12">
-                <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg mb-2">No reminders found</p>
-                <p className="text-gray-500 mb-6">
-                  {searchQuery || statusFilter !== 'all' || categoryFilter !== 'all' || priorityFilter !== 'all' || assignmentFilter !== 'all'
-                    ? 'Try adjusting your filters'
-                    : 'Create your first reminder to get started!'}
+              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-4">
+                  <Bell className="w-8 h-8 text-pink-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  {hasActiveFilters ? 'No matching reminders' : 'Never forget again!'}
+                </h3>
+                <p className="text-sm text-gray-400 max-w-sm mb-6">
+                  {hasActiveFilters
+                    ? 'Try adjusting your filters to find what you\'re looking for.'
+                    : 'Create your first reminder to stay on top of things.'}
                 </p>
                 {hasActiveFilters ? (
                   <button
                     onClick={handleClearAllFilters}
-                    className="mt-4 px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors"
+                    className="px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors"
                   >
                     Clear All Filters
                   </button>

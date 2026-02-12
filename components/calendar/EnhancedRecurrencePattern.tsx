@@ -156,6 +156,7 @@ export function EnhancedRecurrencePattern({
             <div className="flex gap-2">
               <input
                 type="number"
+                inputMode="numeric"
                 min="1"
                 max="99"
                 value={pattern.interval}
@@ -247,6 +248,7 @@ export function EnhancedRecurrencePattern({
                 </label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min="1"
                   max="31"
                   value={pattern.day_of_month || 1}
@@ -394,6 +396,7 @@ export function EnhancedRecurrencePattern({
                 <div className="flex items-center gap-2 ml-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     min="1"
                     max="999"
                     value={endCount}

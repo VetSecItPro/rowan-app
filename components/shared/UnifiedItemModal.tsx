@@ -587,6 +587,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                       <div className="relative">
                         <input
                           type="number"
+                          inputMode="numeric"
                           value={formData.point_value}
                           onChange={(e) => handleInputChange('point_value', e.target.value)}
                           placeholder="10"
@@ -612,6 +613,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                     <div className="relative">
                       <input
                         type="number"
+                        inputMode="numeric"
                         value={formData.estimated_hours}
                         onChange={(e) => handleInputChange('estimated_hours', e.target.value)}
                         placeholder="How long will this take?"
@@ -818,6 +820,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                                 <div className="relative">
                                   <input
                                     type="number"
+                                    inputMode="numeric"
                                     min="1"
                                     max={recurringData.pattern === 'daily' ? 31 : recurringData.pattern === 'weekly' ? 52 : 12}
                                     value={recurringData.interval || ''}

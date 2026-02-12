@@ -158,6 +158,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="email"
+                inputMode="email"
                 required
                 value={email}
                 id="field-1"

@@ -87,7 +87,7 @@ export function BottomNav() {
                     chatCtx?.toggleChat();
                   }
                 }}
-                className="relative flex flex-col items-center justify-center flex-1 h-full"
+                className="relative flex flex-col items-center justify-center flex-1 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-lg"
                 role="tab"
                 aria-label={isLocked ? 'Upgrade to Pro for AI' : 'Open AI chat'}
               >
@@ -133,7 +133,7 @@ export function BottomNav() {
               key={tab.id}
               href={tab.href!}
               onClick={() => triggerHaptic(ImpactStyle.Light)}
-              className="relative flex flex-col items-center justify-center flex-1 h-full"
+              className="relative flex flex-col items-center justify-center flex-1 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-lg"
               role="tab"
               aria-selected={active}
               aria-label={tab.label}
