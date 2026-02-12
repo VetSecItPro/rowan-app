@@ -279,26 +279,23 @@ export function DateTimePicker({
           {/* Mobile backdrop overlay */}
           {isMobile && (
             <div
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]"
+              className="fixed inset-0 bg-black/70 z-[70]"
               onClick={() => setIsOpen(false)}
             />
           )}
 
           <div
             ref={calendarRef}
-            className={`bg-gray-800 border border-gray-700 shadow-2xl ${
+            className={`bg-gray-800 border border-gray-700 shadow-2xl z-[70] ${
               isMobile
                 ? 'fixed inset-x-0 bottom-0 rounded-t-2xl p-4 pb-safe max-h-[85vh] overflow-y-auto animate-bottom-sheet'
                 : 'absolute rounded-lg p-4'
             }`}
-            style={isMobile ? {
-              zIndex: 10000
-            } : {
+            style={isMobile ? undefined : {
               top: position.top,
               left: position.left,
               width: 400,
               maxWidth: 'calc(100vw - 32px)',
-              zIndex: 10000
             }}
           >
             {/* Mobile drag handle */}
@@ -446,7 +443,7 @@ export function DateTimePicker({
                       isMobile ? 'px-6 py-3 text-base min-h-[44px]' : 'px-4 py-2 text-sm'
                     }`}
                   >
-                    <Check className={isMobile ? 'w-4 h-4' : 'w-3 h-3'} />
+                    <Check aria-hidden="true" className={isMobile ? 'w-4 h-4' : 'w-3 h-3'} />
                     Done
                   </button>
                 )}

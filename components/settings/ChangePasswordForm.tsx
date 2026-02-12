@@ -90,7 +90,7 @@ export function ChangePasswordForm() {
           {success && (
             <div className="mb-4 p-4 bg-green-900/20 border border-green-800 rounded-lg">
               <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                <Check aria-hidden="true" className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-green-200">Password changed successfully!</p>
                   <p className="text-xs text-green-300 mt-1">
@@ -105,7 +105,7 @@ export function ChangePasswordForm() {
           {error && (
             <div className="mb-4 p-4 bg-red-900/20 border border-red-800 rounded-lg">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle aria-hidden="true" className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-red-200">Error</p>
                   <p className="text-xs text-red-300 mt-1">{error}</p>
@@ -198,7 +198,7 @@ export function ChangePasswordForm() {
                   {requirements.map((req, index) => (
                     <li key={index} className="flex items-center gap-2 text-xs">
                       {req.met ? (
-                        <Check className="w-3.5 h-3.5 text-green-500" />
+                        <Check aria-hidden="true" className="w-3.5 h-3.5 text-green-500" />
                       ) : (
                         <div className="w-3.5 h-3.5 rounded-full border border-gray-500" />
                       )}
@@ -219,12 +219,12 @@ export function ChangePasswordForm() {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
                   Updating...
                 </>
               ) : (
                 <>
-                  <Lock className="w-4 h-4" />
+                  <Lock aria-hidden="true" className="w-4 h-4" />
                   Update Password
                 </>
               )}

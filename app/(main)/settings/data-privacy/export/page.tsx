@@ -5,6 +5,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ExportDataModal } from '@/components/settings/ExportDataModal';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 import {
   Download,
   FileJson,
@@ -34,7 +35,7 @@ export default function DataExportPage() {
 
   const handleDateRangeExport = async () => {
     if (!startDate || !endDate) {
-      alert('Please select both start and end dates');
+      showWarning('Please select both start and end dates');
       return;
     }
 
@@ -62,7 +63,7 @@ export default function DataExportPage() {
       document.body.removeChild(a);
     } catch (error) {
       logger.error('Export error:', error, { component: 'page', action: 'execution' });
-      alert('Failed to export data. Please try again.');
+      showError('Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);
     }
@@ -118,7 +119,7 @@ export default function DataExportPage() {
     ]}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Download className="w-6 h-6 text-white" />
@@ -133,7 +134,7 @@ export default function DataExportPage() {
         </div>
 
         {/* Quick Export - All Data */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Export All Data</h2>
           <p className="text-sm text-gray-400 mb-6">
             Export all your data across all categories in a single file. Choose your preferred format below.
@@ -149,7 +150,7 @@ export default function DataExportPage() {
         </div>
 
         {/* Export by Date Range */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4 mb-6">
             <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
               <Calendar className="w-5 h-5 text-white" />
@@ -281,7 +282,7 @@ export default function DataExportPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <a
             href="/settings/audit-log"
-            className="p-4 bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
+            className="p-4 bg-gray-800/40 border border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -294,7 +295,7 @@ export default function DataExportPage() {
 
           <a
             href="/settings/data-privacy/bulk-operations"
-            className="p-4 bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
+            className="p-4 bg-gray-800/40 border border-gray-700/20 rounded-xl hover:shadow-lg transition-all group"
           >
             <div className="flex items-center justify-between">
               <div>

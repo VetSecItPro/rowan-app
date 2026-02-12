@@ -1,5 +1,3 @@
-'use client';
-
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import {
   Database,
@@ -147,7 +145,7 @@ export default function DataPrivacyPage() {
     ]}>
       <div className="space-y-8">
         {/* Header */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <h1 className="text-3xl font-bold text-white mb-3">
             Data & Privacy Management
           </h1>
@@ -185,7 +183,7 @@ export default function DataPrivacyPage() {
               <Link
                 key={feature.id}
                 href={feature.href}
-                className="group relative bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+                className="group relative bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
               >
                 {/* Badge */}
                 <div className="absolute top-4 right-4">

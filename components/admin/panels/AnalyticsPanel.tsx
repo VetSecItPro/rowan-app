@@ -2,6 +2,7 @@
 
 import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   BarChart3,
   TrendingUp,
@@ -15,6 +16,9 @@ import {
   MousePointer,
   Layers,
 } from 'lucide-react';
+import { useComparison } from '@/components/admin/ComparisonContext';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface TrafficMetrics {
   totalPageViews: number;
@@ -82,15 +86,19 @@ interface AnalyticsData {
 const MetricCard = memo(function MetricCard({
   title,
   value,
+  previousValue,
   subtitle,
   icon: Icon,
-  color = 'cyan'
+  color = 'cyan',
+  onClick,
 }: {
   title: string;
   value: string | number;
+  previousValue?: string | number;
   subtitle?: string;
   icon: React.ComponentType<{ className?: string }>;
   color?: 'cyan' | 'blue' | 'green' | 'purple' | 'orange' | 'pink';
+  onClick?: () => void;
 }) {
   const colorClasses: Record<string, { bg: string; icon: string }> = {
     cyan: { bg: 'bg-cyan-500', icon: 'text-cyan-500' },
@@ -102,11 +110,22 @@ const MetricCard = memo(function MetricCard({
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4">
+    <div
+      className={`bg-gray-800 rounded-lg p-4 transition-colors ${
+        onClick ? 'cursor-pointer hover:bg-gray-750 hover:border-gray-600 border border-transparent' : ''
+      }`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+    >
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-gray-400 truncate">{title}</p>
           <p className="text-2xl font-bold text-white mt-1">{value}</p>
+          {previousValue !== undefined && (
+            <p className="text-xs text-gray-500 mt-0.5">Previous: {previousValue}</p>
+          )}
           {subtitle && (
             <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
           )}
@@ -310,6 +329,17 @@ const HourlyActivityChart = memo(function HourlyActivityChart({
 
 export const AnalyticsPanel = memo(function AnalyticsPanel() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const { compareEnabled } = useComparison();
+
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    previousData?: DrillDownDataPoint[];
+    color?: string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
 
   const defaultData: AnalyticsData = {
     summary: {
@@ -344,10 +374,14 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
     userGrowth: [],
   };
 
-  const { data: analyticsData, isLoading, refetch } = useQuery({
-    queryKey: ['admin-analytics', timeRange],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: analyticsData, isLoading, refetch } = useQuery<AnalyticsData & { previousPeriod?: any }>({
+    queryKey: ['admin-analytics', timeRange, compareEnabled ? 'compare' : 'no-compare'],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}`);
+      const url = compareEnabled
+        ? `/api/admin/analytics?range=${timeRange}&compare=true`
+        : `/api/admin/analytics?range=${timeRange}`;
+      const response = await adminFetch(url);
       if (!response.ok) throw new Error('Failed to fetch analytics');
       const result = await response.json();
       return result.analytics;
@@ -361,6 +395,60 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  // Open drill-down for a specific metric
+  const openDrillDown = useCallback((metric: string) => {
+    if (!analyticsData) return;
+    let chartData: DrillDownDataPoint[] = [];
+    let previousChartData: DrillDownDataPoint[] | undefined;
+    let title = '';
+    let color = '#06b6d4';
+
+    switch (metric) {
+      case 'pageViews':
+        chartData = (analyticsData.trafficTrends || []).map((d) => ({
+          date: d.date, value: d.pageViews,
+        }));
+        if (compareEnabled && analyticsData.previousPeriod?.trafficTrends) {
+          previousChartData = analyticsData.previousPeriod.trafficTrends.map((d: { date: string; pageViews: number }) => ({
+            date: d.date, value: d.pageViews,
+          }));
+        }
+        title = 'Page Views — Daily Traffic';
+        color = '#06b6d4';
+        break;
+      case 'visitors':
+        chartData = (analyticsData.userGrowth || []).map((d) => ({
+          date: d.date, value: d.users,
+        }));
+        if (compareEnabled && analyticsData.previousPeriod?.userGrowth) {
+          previousChartData = analyticsData.previousPeriod.userGrowth.map((d: { date: string; users: number }) => ({
+            date: d.date, value: d.users,
+          }));
+        }
+        title = 'Unique Visitors — Daily Growth';
+        color = '#3b82f6';
+        break;
+      case 'activeUsers':
+        chartData = (analyticsData.trafficTrends || []).map((d) => ({
+          date: d.date, value: d.pageViews,
+        }));
+        title = 'Active Users — Daily Activity';
+        color = '#10b981';
+        break;
+      case 'pagesPerSession':
+        chartData = (analyticsData.trafficTrends || []).map((d) => ({
+          date: d.date, value: d.pageViews,
+        }));
+        title = 'Pages per Session — Daily Average';
+        color = '#a855f7';
+        break;
+    }
+
+    if (chartData.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data: chartData, previousData: previousChartData, color });
+    }
+  }, [analyticsData, compareEnabled]);
 
   if (isLoading) {
     return (
@@ -409,16 +497,24 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
           <MetricCard
             title="Page Views"
             value={data.trafficMetrics?.totalPageViews || 0}
+            previousValue={compareEnabled && analyticsData?.previousPeriod?.summary?.totalPageViews !== undefined
+              ? analyticsData.previousPeriod.summary.totalPageViews
+              : undefined}
             subtitle={`${data.trafficMetrics?.totalEventsAllTime || 0} all time`}
             icon={Eye}
             color="cyan"
+            onClick={() => openDrillDown('pageViews')}
           />
           <MetricCard
             title="Unique Visitors"
             value={data.trafficMetrics?.uniqueSessions || 0}
+            previousValue={compareEnabled && analyticsData?.previousPeriod?.summary?.uniqueVisitors !== undefined
+              ? analyticsData.previousPeriod.summary.uniqueVisitors
+              : undefined}
             subtitle="By session"
             icon={Users}
             color="blue"
+            onClick={() => openDrillDown('visitors')}
           />
           <MetricCard
             title="Active Users"
@@ -426,6 +522,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
             subtitle="Logged in"
             icon={Activity}
             color="green"
+            onClick={() => openDrillDown('activeUsers')}
           />
           <MetricCard
             title="Pages/Session"
@@ -433,6 +530,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
             subtitle="Average"
             icon={Layers}
             color="purple"
+            onClick={() => openDrillDown('pagesPerSession')}
           />
         </div>
       </div>
@@ -550,6 +648,21 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       <div className="text-xs text-gray-500 text-center py-2">
         Analytics data is cached for 15 minutes. Click refresh to get latest data.
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle={`Last ${timeRange === '7d' ? '7' : timeRange === '30d' ? '30' : '90'} days`}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          previousData={drillDown.previousData}
+          metric={drillDown.metric}
+          color={drillDown.color}
+        />
+      </DrillDownModal>
     </div>
   );
 });

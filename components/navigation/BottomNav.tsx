@@ -62,7 +62,6 @@ export function BottomNav() {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/30 pb-safe"
-      role="tablist"
       aria-label="Main navigation"
     >
       <div className="flex items-center justify-around h-14 px-2">
@@ -88,7 +87,6 @@ export function BottomNav() {
                   }
                 }}
                 className="relative flex flex-col items-center justify-center flex-1 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-lg"
-                role="tab"
                 aria-label={isLocked ? 'Upgrade to Pro for AI' : 'Open AI chat'}
               >
                 <motion.div
@@ -134,8 +132,7 @@ export function BottomNav() {
               href={tab.href!}
               onClick={() => triggerHaptic(ImpactStyle.Light)}
               className="relative flex flex-col items-center justify-center flex-1 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-lg"
-              role="tab"
-              aria-selected={active}
+              aria-current={active ? 'page' : undefined}
               aria-label={tab.label}
             >
               <motion.div

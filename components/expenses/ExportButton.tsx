@@ -5,6 +5,7 @@ import { Download, FileText, X, Calendar, FileSpreadsheet, File } from 'lucide-r
 import { exportService } from '@/lib/services/export-service';
 import { pdfExportService } from '@/lib/services/pdf-export-service';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface ExportButtonProps {
   spaceId: string;
@@ -32,7 +33,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
         if (exportType === 'monthly') {
           await pdfExportService.exportMonthlyExpenseSummary(spaceId, year, month);
         } else {
-          alert('PDF export currently only supports monthly summaries. Please select "This Month" or switch to CSV format.');
+          showWarning('PDF export currently only supports monthly summaries. Please select "This Month" or switch to CSV format.');
           return;
         }
       } else {
@@ -51,7 +52,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
       setIsOpen(false);
     } catch (error) {
       logger.error('Export failed:', error, { component: 'ExportButton', action: 'component_action' });
-      alert('Failed to export expenses. Please try again.');
+      showError('Failed to export expenses. Please try again.');
     } finally {
       setIsExporting(false);
     }
@@ -70,7 +71,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setIsOpen(false)}
           />
 

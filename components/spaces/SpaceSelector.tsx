@@ -149,7 +149,7 @@ export function SpaceSelector({
   const dropdownContent = (
     <div
       ref={dropdownRef}
-      className="fixed bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-[9999]"
+      className="fixed bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-[70]"
       style={{
         top: `${dropdownPosition.top}px`,
         left: `${dropdownPosition.left}px`,

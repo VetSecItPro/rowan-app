@@ -213,7 +213,7 @@ export function MessageCard({
           <div className={`absolute -top-12 z-[100] opacity-0 invisible group-hover/message:opacity-100 group-hover/message:visible hover:opacity-100 hover:visible transition-all duration-300 ease-out pointer-events-none ${
             isOwn ? 'left-0' : 'right-0'
           }`}>
-              <div className="flex items-center gap-0.5 bg-gray-800/80 backdrop-blur-xl backdrop-saturate-150 rounded-full shadow-xl shadow-black/30 border border-gray-600/50 p-1 pointer-events-auto ring-1 ring-white/5">
+              <div className="flex items-center gap-0.5 bg-gray-800/95 rounded-full shadow-xl shadow-black/30 border border-gray-600/50 p-1 pointer-events-auto ring-1 ring-white/5">
                 {/* Edit Button - Always show for own messages, or if user has edit permissions */}
                 {isOwn && (
                   <button

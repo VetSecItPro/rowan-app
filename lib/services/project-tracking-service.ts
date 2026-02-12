@@ -236,7 +236,7 @@ export async function getProjectSummary(projectId: string): Promise<Record<strin
 
   const { data, error } = await supabase
     .from('project_summary')
-    .select('*')
+    .select('project_id, space_id, name, status, priority, estimated_budget, actual_cost, budget_variance, variance_percentage, start_date, estimated_completion_date, actual_completion_date, line_item_count, expense_count, photo_count, vendor_count, vendor_names, created_by, created_at, updated_at')
     .eq('project_id', projectId)
     .single();
 
@@ -389,7 +389,7 @@ export async function getVendorSpendSummary(vendorId: string): Promise<Record<st
 
   const { data, error } = await supabase
     .from('vendor_spend_summary')
-    .select('*')
+    .select('vendor_id, space_id, name, company_name, trade, rating, is_preferred, project_count, expense_count, total_spent, first_transaction_date, last_transaction_date')
     .eq('vendor_id', vendorId)
     .single();
 
@@ -488,7 +488,7 @@ export async function getProjectCostBreakdown(projectId: string): Promise<Record
 
   const { data, error } = await supabase
     .from('project_cost_breakdown')
-    .select('*')
+    .select('project_id, category, line_item_count, total_estimated, total_actual, variance, variance_percentage')
     .eq('project_id', projectId)
     .order('total_estimated', { ascending: false });
 
@@ -692,7 +692,7 @@ export async function getProjectExpenses(projectId: string): Promise<Record<stri
 
   const { data, error } = await supabase
     .from('expenses')
-    .select('*')
+    .select('id, space_id, title, amount, category, date, description, notes, payment_method, paid_by, status, due_date, paid_at, recurring, is_recurring, recurring_frequency, split_type, project_id, created_by, created_at, updated_at')
     .eq('project_id', projectId)
     .order('date', { ascending: false });
 

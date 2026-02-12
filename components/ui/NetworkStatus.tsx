@@ -54,7 +54,7 @@ export function NetworkStatus() {
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-3 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
+        className="fixed top-0 left-0 right-0 z-[70] px-4 py-3 flex items-center justify-center gap-3 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
@@ -75,7 +75,7 @@ export function NetworkStatus() {
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
+        className="fixed top-0 left-0 right-0 z-[70] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
@@ -92,7 +92,7 @@ export function NetworkStatus() {
       <div
         role="status"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-blue-600 text-white transition-all duration-300 animate-slide-down"
+        className="fixed top-0 left-0 right-0 z-[70] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-blue-600 text-white transition-all duration-300 animate-slide-down"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
@@ -109,7 +109,7 @@ export function NetworkStatus() {
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-emerald-600 text-white animate-slide-down transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-[70] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-emerald-600 text-white animate-slide-down transition-all duration-300"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
@@ -126,7 +126,7 @@ export function NetworkStatus() {
       <div
         role="alert"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-red-600 text-white transition-all duration-300 animate-slide-down"
+        className="fixed top-0 left-0 right-0 z-[70] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-red-600 text-white transition-all duration-300 animate-slide-down"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}
@@ -143,7 +143,7 @@ export function NetworkStatus() {
       <div
         role="status"
         aria-live="polite"
-        className="fixed top-0 left-0 right-0 z-[9999] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
+        className="fixed top-0 left-0 right-0 z-[70] px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium bg-zinc-800 text-white transition-all duration-300 animate-slide-down border-b border-zinc-700"
         style={{
           paddingTop: 'max(0.75rem, env(safe-area-inset-top))'
         }}

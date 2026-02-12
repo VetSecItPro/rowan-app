@@ -383,14 +383,14 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
 
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
       {/* Enhanced Wide Modal */}
       <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800 sm:max-w-6xl sm:max-h-[95vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden" style={{ overflowX: 'visible' }}>
 
         {/* Loading Overlay for Space Creation */}
         {spaceCreationLoading && (
-          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-gray-800/90 z-50 flex items-center justify-center rounded-2xl">
             <div className="text-center">
               <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
               <p className="text-sm text-gray-400">Setting up your space...</p>
@@ -400,7 +400,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
 
         {/* Error Message */}
         {spaceError && !spaceCreationLoading && (
-          <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-gray-800/90 z-50 flex items-center justify-center rounded-2xl">
             <div className="text-center max-w-sm mx-4">
               <p className="text-red-400 mb-4">{spaceError}</p>
               <button

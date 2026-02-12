@@ -9,6 +9,7 @@ import { voiceTranscriptionService } from '@/lib/services/voice-transcription-se
 import { PremiumButton, SecondaryButton } from '@/components/ui/EnhancedButton';
 import { logger } from '@/lib/logger';
 import { Modal } from '@/components/ui/Modal';
+import { showError } from '@/lib/utils/toast';
 
 type VoiceNoteMetadata = {
   transcription?: string;
@@ -145,7 +146,7 @@ export function GoalCheckInModal({
       onClose();
     } catch (error) {
       logger.error('Error saving check-in:', error, { component: 'GoalCheckInModal', action: 'component_action' });
-      alert('Failed to save check-in. Please try again.');
+      showError('Failed to save check-in. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

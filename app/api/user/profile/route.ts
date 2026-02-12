@@ -95,8 +95,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Validate email format (RFC 5322 compliant)
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { error: 'Please enter a valid email address' },
@@ -334,7 +334,7 @@ export async function GET(request: NextRequest) {
     // Get user profile from database
     const { data: userProfile, error: profileError } = await supabase
       .from('users')
-      .select('*')
+      .select('id, name, email, avatar_url, created_at, updated_at')
       .eq('id', user.id)
       .single();
 

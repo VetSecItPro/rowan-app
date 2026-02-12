@@ -1,5 +1,3 @@
-'use client';
-
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import {
   CheckSquare,

@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 
 import {
@@ -259,7 +257,7 @@ export default function SubscriptionsDocumentationPage() {
           <div className="mb-12 max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Free Plan */}
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-gray-400 to-gray-500 flex items-center justify-center mb-4">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
@@ -271,7 +269,7 @@ export default function SubscriptionsDocumentationPage() {
               </div>
 
               {/* Pro Plan */}
-              <div className="p-6 bg-gradient-to-br from-emerald-900/30 to-teal-900/30 backdrop-blur-sm border-2 border-emerald-700 rounded-2xl relative">
+              <div className="p-6 bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border-2 border-emerald-700 rounded-2xl relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-3 py-1 text-xs font-bold bg-emerald-500 text-white rounded-full">POPULAR</span>
                 </div>
@@ -286,7 +284,7 @@ export default function SubscriptionsDocumentationPage() {
               </div>
 
               {/* Family Plan */}
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-white" />
                 </div>
@@ -346,7 +344,7 @@ export default function SubscriptionsDocumentationPage() {
                       <Link
                         key={index}
                         href={article.href}
-                        className="group p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 hover:border-emerald-600 rounded-2xl hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 hover:-translate-y-1"
+                        className="group p-6 bg-gray-800/80 border border-gray-700/60 hover:border-emerald-600 rounded-2xl hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 hover:-translate-y-1"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
@@ -373,7 +371,7 @@ export default function SubscriptionsDocumentationPage() {
 
           {/* Feature Comparison Table */}
           <div className="mt-16 max-w-5xl mx-auto">
-            <div className="p-8 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl shadow-lg">
+            <div className="p-8 bg-gray-800/80 border border-gray-700/60 rounded-2xl shadow-lg">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">Feature Comparison</h3>
 
               <div className="overflow-x-auto">
@@ -449,7 +447,7 @@ export default function SubscriptionsDocumentationPage() {
 
           {/* Quick Reference */}
           <div className="mt-12 max-w-4xl mx-auto">
-            <div className="p-8 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 backdrop-blur-sm border border-emerald-800/60 rounded-2xl shadow-lg">
+            <div className="p-8 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-800/60 rounded-2xl shadow-lg">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">Quick Reference</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

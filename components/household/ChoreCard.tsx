@@ -3,7 +3,7 @@
 import { Check, MoreVertical, Clock, AlertCircle, Pause } from 'lucide-react';
 import { Chore } from '@/lib/types';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 interface ChoreCardProps {
   chore: Chore;
@@ -12,7 +12,7 @@ interface ChoreCardProps {
   onDelete: (choreId: string) => void;
 }
 
-export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCardProps) {
+export const ChoreCard = memo(function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -69,4 +69,4 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCard
       </div>
     </div>
   );
-}
+});

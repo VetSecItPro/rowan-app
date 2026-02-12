@@ -60,7 +60,7 @@ export function BudgetTabBar() {
   })();
 
   return (
-    <div className="w-full bg-gray-900/80 backdrop-blur-lg border-b border-gray-800/50 sticky top-0 z-30">
+    <div className="w-full bg-gray-900/95 border-b border-gray-800/50 sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4">
         <div
           className="flex gap-1 overflow-x-auto py-3 scrollbar-hide -mx-4 px-4"

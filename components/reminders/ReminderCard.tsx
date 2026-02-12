@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Clock, Flag, MoreVertical, Check, Edit, Trash2, ChevronDown, ChevronUp, MessageCircle, Activity, Paperclip, DollarSign } from 'lucide-react';
 import { Reminder } from '@/lib/services/reminders-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { ActivityTimeline } from './ActivityTimeline';
 import { CommentsSection } from './CommentsSection';
 import { AttachmentList } from './AttachmentList';
@@ -37,7 +37,7 @@ const categoryConfig = {
   household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-300', bgColor: 'bg-amber-900/30' },
 };
 
-export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
+export const ReminderCard = memo(function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
@@ -100,7 +100,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMar
               {reminder.status === 'snoozed' && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full" />}
             </button>
             {/* Improved tooltip positioning */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[99999] shadow-xl border border-gray-600">
+            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[70] shadow-xl border border-gray-600">
               {reminder.status === 'active' ? 'Active - Click to snooze' : reminder.status === 'snoozed' ? 'Snoozed - Click to complete' : 'Completed - Click to reactivate'}
               {/* Tooltip arrow pointing up */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-700"></div>
@@ -333,4 +333,4 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMar
       />
     </div>
   );
-}
+});

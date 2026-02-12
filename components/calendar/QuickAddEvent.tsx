@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import type { AIParseResult } from '@/lib/services/ai/event-parser-service';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { showWarning } from '@/lib/utils/toast';
 import type { CreateEventInput } from '@/lib/services/calendar-service';
 
 interface QuickAddEventProps {
@@ -169,7 +170,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
       const parsed = parseEventText(input);
 
       if (!isValidParsedEvent(parsed)) {
-        alert('Please enter a valid event description');
+        showWarning('Please enter a valid event description');
         return;
       }
 
@@ -186,7 +187,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
     } else {
       // AI mode - use parsed preview
       if (!parsedPreview || !parsedPreview.title) {
-        alert('Please wait for AI to parse the event or enter valid text');
+        showWarning('Please wait for AI to parse the event or enter valid text');
         return;
       }
 
@@ -253,7 +254,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-20 px-4">
       <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full border-2 border-purple-700 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
         {/* Header */}
         <div className="bg-purple-600 p-4 flex items-center justify-between">

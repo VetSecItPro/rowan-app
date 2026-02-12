@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
   AlertTriangle,
   DollarSign,
@@ -17,7 +17,7 @@ interface BudgetVarianceCardProps {
   onUpdateBudget?: (newBudget: number) => void;
 }
 
-export function BudgetVarianceCard({
+function BudgetVarianceCardComponent({
   project,
   lineItems,
   onUpdateBudget
@@ -320,7 +320,7 @@ export function BudgetVarianceCard({
       {showBudgetAdjust && (
         <>
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setShowBudgetAdjust(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -400,3 +400,5 @@ export function BudgetVarianceCard({
     </div>
   );
 }
+
+export const BudgetVarianceCard = memo(BudgetVarianceCardComponent);

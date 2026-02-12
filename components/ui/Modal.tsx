@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useId } from 'react';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useScrollLock } from '@/lib/hooks/useScrollLock';
@@ -56,6 +56,10 @@ export function Modal({
   hideCloseButton = false,
   testId = 'modal',
 }: ModalProps) {
+  // Unique ID for aria-labelledby (prevents duplicate IDs in modal chains)
+  const uniqueId = useId();
+  const titleId = `${testId}-title-${uniqueId}`;
+
   // Refs
   const modalRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -179,9 +183,9 @@ export function Modal({
 
       // Trigger haptic feedback when crossing threshold
       if (newY - touchStart > dismissThreshold && !hasTriggeredHaptic) {
-        if ('vibrate' in navigator) {
-          navigator.vibrate(10);
-        }
+        import('@/lib/native/haptics').then(({ triggerHaptic }) => triggerHaptic()).catch(() => {
+          if ('vibrate' in navigator) navigator.vibrate(10);
+        });
         setHasTriggeredHaptic(true);
       }
     }
@@ -247,7 +251,7 @@ export function Modal({
             ref={modalRef}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="modal-title"
+            aria-labelledby={titleId}
             data-testid={testId}
             // Mobile-first: slide up from bottom
             initial={{
@@ -316,7 +320,7 @@ export function Modal({
               <div className="flex items-center justify-between mt-1 sm:mt-0">
                 <div className="pr-10">
                   <h2
-                    id="modal-title"
+                    id={titleId}
                     className={`text-base sm:text-xl font-semibold sm:font-bold ${headerGradient ? 'text-white' : 'text-white'}`}
                   >
                     {title}

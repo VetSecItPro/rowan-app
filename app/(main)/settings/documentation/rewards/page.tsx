@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 
 import {
@@ -266,7 +264,7 @@ export default function RewardsDocumentationPage() {
           <div className="mb-12 max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Earn Points */}
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-yellow-400 to-yellow-500 flex items-center justify-center mb-4">
                   <Coins className="w-6 h-6 text-white" />
                 </div>
@@ -277,7 +275,7 @@ export default function RewardsDocumentationPage() {
               </div>
 
               {/* Browse Rewards */}
-              <div className="p-6 bg-gradient-to-br from-amber-900/30 to-orange-900/30 backdrop-blur-sm border-2 border-amber-700 rounded-2xl relative">
+              <div className="p-6 bg-gradient-to-br from-amber-900/30 to-orange-900/30 border-2 border-amber-700 rounded-2xl relative">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-3 py-1 text-xs font-bold bg-amber-500 text-white rounded-full">FUN</span>
                 </div>
@@ -291,7 +289,7 @@ export default function RewardsDocumentationPage() {
               </div>
 
               {/* Redeem & Enjoy */}
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center mb-4">
                   <Gift className="w-6 h-6 text-white" />
                 </div>
@@ -351,7 +349,7 @@ export default function RewardsDocumentationPage() {
                       <Link
                         key={index}
                         href={article.href}
-                        className="group p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 hover:border-amber-600 rounded-2xl hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 hover:-translate-y-1"
+                        className="group p-6 bg-gray-800/80 border border-gray-700/60 hover:border-amber-600 rounded-2xl hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 hover:-translate-y-1"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">
@@ -378,7 +376,7 @@ export default function RewardsDocumentationPage() {
 
           {/* Quick Reference */}
           <div className="mt-16 max-w-5xl mx-auto">
-            <div className="p-8 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl shadow-lg">
+            <div className="p-8 bg-gray-800/80 border border-gray-700/60 rounded-2xl shadow-lg">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">How It Works</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

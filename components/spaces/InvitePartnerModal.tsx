@@ -189,8 +189,6 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
                 backgroundPosition: 'right 12px center',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: '16px',
-                position: 'relative',
-                zIndex: 9999
               }}
             >
               <option value="member">Member</option>

@@ -11,6 +11,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import { sanitizeUrl } from '@/lib/sanitize';
+import { showError } from '@/lib/utils/toast';
 
 export default function RecipesPage() {
   const { user } = useAuth();
@@ -111,7 +112,7 @@ export default function RecipesPage() {
       setRecipes(prev => prev.filter(r => r.id !== recipeId));
     } catch (error) {
       logger.error('Failed to delete recipe:', error, { component: 'page', action: 'execution' });
-      alert('Failed to delete recipe. Please try again.');
+      showError('Failed to delete recipe. Please try again.');
     } finally {
       setDeletingId(null);
     }
@@ -141,7 +142,7 @@ export default function RecipesPage() {
             <div className="flex gap-3">
               <Link
                 href="/recipes/discover"
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition-colors backdrop-blur-sm border border-white/20"
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition-colors border border-white/20"
               >
                 Discover Recipes
               </Link>

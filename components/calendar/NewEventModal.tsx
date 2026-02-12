@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Smile, Image as ImageIcon, Paperclip, ShoppingCart, Trash2, Timer, X } from 'lucide-react';
+import { Smile, Image as ImageIcon, Paperclip, ShoppingCart, Trash2, Timer, X, ChevronDown } from 'lucide-react';
 import { CreateEventInput, CalendarEvent } from '@/lib/services/calendar-service';
 import { eventAttachmentsService } from '@/lib/services/event-attachments-service';
 import { shoppingService, ShoppingList } from '@/lib/services/shopping-service';
@@ -11,6 +11,7 @@ import { Dropdown } from '@/components/ui/Dropdown';
 import { DateTimePicker } from '@/components/ui/DateTimePicker';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showWarning } from '@/lib/utils/toast';
 
 interface NewEventModalProps {
   isOpen: boolean;
@@ -80,6 +81,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
   const [selectedListId, setSelectedListId] = useState('');
   const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
   const [showCountdown, setShowCountdown] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [countdownLabel, setCountdownLabel] = useState('');
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -292,7 +294,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
     }
 
     if (invalidFiles.length > 0) {
-      alert(`Invalid image file(s):\n${invalidFiles.join('\n')}\n\nOnly JPG, PNG, GIF, and WebP images are allowed.`);
+      showWarning(`Invalid image file(s): ${invalidFiles.join(', ')}. Only JPG, PNG, GIF, and WebP images are allowed.`);
     }
 
     e.target.value = '';
@@ -316,7 +318,7 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
     }
 
     if (invalidFiles.length > 0) {
-      alert(`Invalid file(s):\n${invalidFiles.join('\n')}\n\nOnly PDF, Word, Excel, PowerPoint, TXT, CSV, and ZIP files are allowed.`);
+      showWarning(`Invalid file(s): ${invalidFiles.join(', ')}. Only PDF, Word, Excel, PowerPoint, TXT, CSV, and ZIP files are allowed.`);
     }
 
     e.target.value = '';
@@ -616,6 +618,20 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
             />
           </div>
 
+          {/* More Options — Progressive Disclosure */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-300 transition-colors"
+            >
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''}`} aria-hidden="true" />
+              {showAdvanced ? 'Hide' : 'More'} Options
+            </button>
+          </div>
+
+          {showAdvanced && (
+            <div className="space-y-6 pt-2 border-t border-gray-700/50">
           {/* Recurring */}
           <div>
             <label htmlFor="field-8" className="flex items-center gap-2 cursor-pointer">
@@ -830,6 +846,8 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               ))}
             </div>
           </div>
+            </div>
+          )}
 
           {/* Hidden File Inputs */}
           <input

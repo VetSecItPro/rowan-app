@@ -198,7 +198,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
         </div>
 
         {/* Month Total */}
-        <div className="mt-4 flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg p-3">
+        <div className="mt-4 flex items-center justify-center gap-2 bg-white/10 rounded-lg p-3">
           <DollarSign className="w-5 h-5" />
           <span className="text-lg font-bold">
             Total this month: ${getMonthTotal().toLocaleString()}

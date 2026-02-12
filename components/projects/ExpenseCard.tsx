@@ -3,7 +3,7 @@
 import { DollarSign, MoreVertical, CheckCircle } from 'lucide-react';
 import { Expense } from '@/lib/services/budgets-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 interface ExpenseCardProps {
   expense: Expense;
@@ -12,7 +12,7 @@ interface ExpenseCardProps {
   onStatusChange: (expenseId: string, newStatus: 'pending' | 'paid') => void;
 }
 
-export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: ExpenseCardProps) {
+function ExpenseCardComponent({ expense, onEdit, onDelete, onStatusChange }: ExpenseCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleMarkAsPaid = () => {
@@ -71,3 +71,5 @@ export function ExpenseCard({ expense, onEdit, onDelete, onStatusChange }: Expen
     </div>
   );
 }
+
+export const ExpenseCard = memo(ExpenseCardComponent);

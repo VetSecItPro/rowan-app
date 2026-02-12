@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 import {
   Tags,
   FolderOpen,
@@ -148,7 +149,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       resetCategoryForm();
     } catch (error) {
       logger.error('Error saving category:', error, { component: 'CategoryTagManager', action: 'component_action' });
-      alert('Failed to save category');
+      showError('Failed to save category');
     }
   };
 
@@ -169,7 +170,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       await loadData();
     } catch (error) {
       logger.error('Error deleting category:', error, { component: 'CategoryTagManager', action: 'component_action' });
-      alert('Failed to delete category');
+      showError('Failed to delete category');
     }
   };
 
@@ -207,7 +208,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       resetTagForm();
     } catch (error) {
       logger.error('Error saving tag:', error, { component: 'CategoryTagManager', action: 'component_action' });
-      alert('Failed to save tag');
+      showError('Failed to save tag');
     }
   };
 
@@ -226,7 +227,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
       await loadData();
     } catch (error) {
       logger.error('Error deleting tag:', error, { component: 'CategoryTagManager', action: 'component_action' });
-      alert('Failed to delete tag');
+      showError('Failed to delete tag');
     }
   };
 

@@ -451,7 +451,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
   if (!preferences) {
     return (
       <div className="flex items-center justify-center py-12 text-red-500">
-        <AlertCircle className="w-5 h-5 mr-2" />
+        <AlertCircle aria-hidden="true" className="w-5 h-5 mr-2" />
         Failed to load notification settings
       </div>
     );
@@ -502,7 +502,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
       {/* Error message */}
       {error && (
         <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg text-red-300 flex items-center gap-2">
-          <AlertCircle className="w-5 h-5" />
+          <AlertCircle aria-hidden="true" className="w-5 h-5" />
           {error}
         </div>
       )}
@@ -592,7 +592,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
 
             {pushError && (
               <div className="mt-3 p-3 bg-red-900/20 border border-red-800 rounded-lg text-sm text-red-300 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <AlertCircle aria-hidden="true" className="w-4 h-4 flex-shrink-0" />
                 {pushError}
               </div>
             )}

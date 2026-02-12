@@ -37,13 +37,40 @@ export function EnhancedWeekView({
   // Always show all 7 days - the container is scrollable on mobile
   const weekDays = allWeekDays;
 
-  // Update current time every minute
+  // Update current time every minute, pausing when tab is hidden
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000); // Update every minute
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    return () => clearInterval(interval);
+    const startInterval = () => {
+      if (intervalId) clearInterval(intervalId);
+      // Update immediately when becoming visible
+      setCurrentTime(new Date());
+      intervalId = setInterval(() => setCurrentTime(new Date()), 60000);
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        startInterval();
+      }
+    };
+
+    // Start interval initially
+    startInterval();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   // Calculate event position and height
@@ -373,7 +400,7 @@ export function EnhancedWeekView({
       {/* Drag indicator overlay */}
       {draggedEvent && (
         <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-          <div className="bg-purple-500/20 backdrop-blur-sm px-4 py-2 rounded-lg text-sm text-purple-100 font-medium">
+          <div className="bg-purple-500/30 px-4 py-2 rounded-lg text-sm text-purple-100 font-medium">
             Dragging: {draggedEvent.title}
           </div>
         </div>

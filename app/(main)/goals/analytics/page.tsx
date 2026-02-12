@@ -8,6 +8,7 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { getGoalAnalytics, GoalAnalytics, DateRange } from '@/lib/services/goal-analytics-service';
 import StatCards from '@/components/goals/analytics/StatCards';
 import { logger } from '@/lib/logger';
+import { showInfo } from '@/lib/utils/toast';
 // Use dynamic imports for chart components to reduce initial bundle size
 import {
   DynamicCompletionRateChart,
@@ -78,7 +79,7 @@ export default function GoalsAnalyticsPage() {
 
   const handleExport = () => {
     // TODO: Implement export functionality (PNG/PDF)
-    alert('Export functionality coming soon!');
+    showInfo('Export functionality coming soon!');
   };
 
   if (!spaceId) {

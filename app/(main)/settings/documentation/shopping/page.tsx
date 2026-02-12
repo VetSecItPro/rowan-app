@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
 import Link from 'next/link';
 
 import { type LucideIcon, ArrowLeft, ShoppingCart, BookOpen, Play, Plus, List, Calendar, CheckSquare, Lightbulb, FileText, Grid3x3, Tags, Share2, Clock } from 'lucide-react';

@@ -38,6 +38,10 @@ import {
   FeedbackPanel,
   AIUsagePanel,
 } from '@/components/admin/panels';
+import { ComparisonProvider } from '@/components/admin/ComparisonContext';
+import { ComparisonToggle } from '@/components/admin/ComparisonToggle';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface DashboardStats {
   totalUsers: number;
@@ -84,7 +88,8 @@ const StatCard = memo(function StatCard({
   icon: Icon,
   trend,
   trendValue,
-  color = 'blue'
+  color = 'blue',
+  onClick,
 }: {
   title: string;
   value: number | string;
@@ -92,6 +97,7 @@ const StatCard = memo(function StatCard({
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
   color?: 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'gray';
+  onClick?: () => void;
 }) {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-500',
@@ -103,7 +109,15 @@ const StatCard = memo(function StatCard({
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4">
+    <div
+      className={`bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-4 transition-colors ${
+        onClick ? 'cursor-pointer hover:bg-gray-750 hover:border-gray-600' : ''
+      }`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+    >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-medium text-gray-400">{title}</p>
@@ -222,6 +236,16 @@ function AdminDashboardContent() {
 
   const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
 
+  // Drill-down modal state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    previousData?: DrillDownDataPoint[];
+    color?: string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
   // Update URL when tab changes
   const setActiveTab = useCallback((tab: TabId) => {
     setActiveTabState(tab);
@@ -259,6 +283,67 @@ function AdminDashboardContent() {
     gcTime: 10 * 60 * 1000,
     refetchInterval: 2 * 60 * 1000,
   });
+
+  // Fetch 30d analytics for stat card drill-down charts
+  const { data: analyticsData } = useQuery({
+    queryKey: ['admin-analytics', '30d'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/analytics?range=30d');
+      if (!response.ok) throw new Error('Failed to fetch analytics');
+      const data = await response.json();
+      return data.analytics;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
+
+  // Helper to open drill-down modal from stat cards
+  const openStatDrillDown = useCallback((metric: string) => {
+    if (!analyticsData) return;
+
+    let data: DrillDownDataPoint[] = [];
+    let title = '';
+    let color = '#8b5cf6';
+
+    switch (metric) {
+      case 'users':
+        data = (analyticsData.userGrowth || []).map((d: { date: string; users: number }) => ({
+          date: d.date,
+          value: d.users,
+        }));
+        title = 'User Registrations';
+        color = '#3b82f6';
+        break;
+      case 'active':
+        data = (analyticsData.trafficTrends || []).map((d: { date: string; pageViews: number }) => ({
+          date: d.date,
+          value: d.pageViews,
+        }));
+        title = 'Daily Page Views (Activity Proxy)';
+        color = '#10b981';
+        break;
+      case 'signups':
+        data = (analyticsData.signupTrends || []).map((d: { date: string; notifications: number }) => ({
+          date: d.date,
+          value: d.notifications,
+        }));
+        title = 'Launch Signups';
+        color = '#f97316';
+        break;
+      case 'today':
+        data = (analyticsData.userGrowth || []).map((d: { date: string; users: number }) => ({
+          date: d.date,
+          value: d.users,
+        }));
+        title = 'Daily Signups';
+        color = '#a855f7';
+        break;
+    }
+
+    if (data.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data, color });
+    }
+  }, [analyticsData]);
 
   // Helper to format relative time
   const formatRelativeTime = (timestamp: string) => {
@@ -352,6 +437,7 @@ function AdminDashboardContent() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <ComparisonToggle />
               <button
                 onClick={() => refetch()}
                 disabled={isFetching}
@@ -379,6 +465,7 @@ function AdminDashboardContent() {
               color="blue"
               trend={(stats.totalUsers ?? 0) > 0 ? "up" : undefined}
               trendValue={(stats.totalUsers ?? 0) > 0 ? "Growing" : undefined}
+              onClick={() => openStatDrillDown('users')}
             />
             <StatCard
               title="Active Users"
@@ -387,6 +474,7 @@ function AdminDashboardContent() {
               color="green"
               trend={(stats.activeUsers ?? 0) > 0 ? "up" : undefined}
               trendValue={(stats.activeUsers ?? 0) > 0 ? "Active" : undefined}
+              onClick={() => openStatDrillDown('active')}
             />
             <StatCard
               title="Launch Signups"
@@ -395,6 +483,7 @@ function AdminDashboardContent() {
               color="orange"
               trend={(stats.launchSignups ?? 0) > 0 ? "up" : undefined}
               trendValue={(stats.launchSignups ?? 0) > 0 ? "Interested" : undefined}
+              onClick={() => openStatDrillDown('signups')}
             />
             <StatCard
               title="Signups Today"
@@ -403,6 +492,7 @@ function AdminDashboardContent() {
               color="purple"
               trend={(stats.signupsToday ?? 0) > 0 ? "up" : undefined}
               trendValue={(stats.signupsToday ?? 0) > 0 ? "Today" : undefined}
+              onClick={() => openStatDrillDown('today')}
             />
           </div>
         )}
@@ -522,19 +612,36 @@ function AdminDashboardContent() {
           </div>
         </div>
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle="Last 30 days"
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          previousData={drillDown.previousData}
+          metric={drillDown.metric}
+          color={drillDown.color}
+        />
+      </DrillDownModal>
     </div>
   );
 }
 
-// Wrap with Suspense for useSearchParams
+// Wrap with Suspense for useSearchParams + ComparisonProvider for toggle state
 export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
-      <AdminDashboardContent />
-    </Suspense>
+    <ComparisonProvider>
+      <Suspense fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }>
+        <AdminDashboardContent />
+      </Suspense>
+    </ComparisonProvider>
   );
 }

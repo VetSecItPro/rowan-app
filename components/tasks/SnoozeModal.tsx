@@ -5,6 +5,7 @@ import { History } from 'lucide-react';
 import { taskSnoozeService } from '@/lib/services/task-snooze-service';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface SnoozeModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
       onClose();
     } catch (error) {
       logger.error('Error snoozing task:', error, { component: 'SnoozeModal', action: 'component_action' });
-      alert('Failed to snooze task');
+      showError('Failed to snooze task');
     } finally {
       setLoading(false);
     }
@@ -84,12 +85,12 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
 
   function handleCustomSnooze() {
     if (!customDate || !customTime) {
-      alert('Please select both date and time');
+      showWarning('Please select both date and time');
       return;
     }
     const snoozeDate = new Date(`${customDate}T${customTime}`);
     if (snoozeDate <= new Date()) {
-      alert('Snooze time must be in the future');
+      showWarning('Snooze time must be in the future');
       return;
     }
     handleSnooze(snoozeDate);

@@ -3,9 +3,8 @@
 import Image from 'next/image';
 import { UtensilsCrossed, MoreVertical, CheckSquare } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
-import { formatTimestamp } from '@/lib/utils/date-utils';
-import { parseDateString } from '@/lib/utils/date';
-import { useState } from 'react';
+import { formatTimestamp, parseDateString } from '@/lib/utils/date-utils';
+import { useState, memo } from 'react';
 
 interface MealCardProps {
   meal: Meal;
@@ -20,7 +19,7 @@ const mealTypeColors = {
   snack: 'bg-purple-500',
 };
 
-export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
+function MealCardComponent({ meal, onEdit, onDelete }: MealCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const typeColor = mealTypeColors[meal.meal_type] || 'bg-gray-500';
 
@@ -91,3 +90,5 @@ export function MealCard({ meal, onEdit, onDelete }: MealCardProps) {
     </div>
   );
 }
+
+export const MealCard = memo(MealCardComponent);

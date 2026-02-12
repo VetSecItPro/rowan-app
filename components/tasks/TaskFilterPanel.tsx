@@ -118,7 +118,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
   ];
 
   return (
-    <div className="bg-gray-800/60 backdrop-blur-md rounded-lg border border-gray-700/50 shadow-lg">
+    <div className="bg-gray-800/80 rounded-lg border border-gray-700/50 shadow-lg">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -163,7 +163,7 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
               value={filters.search || ''}
               onChange={(e) => updateFilter('search', e.target.value || undefined)}
               placeholder="Search tasks..."
-              className="w-full px-3 py-2 border border-gray-700/50 rounded-lg bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
+              className="w-full px-3 py-2 border border-gray-700/50 rounded-lg bg-gray-800/80 transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
             />
           </div>
 
@@ -277,13 +277,13 @@ export function TaskFilterPanel({ spaceId, onFilterChange }: TaskFilterPanelProp
                 type="date"
                 value={filters.dueDateFrom || ''}
                 onChange={(e) => updateFilter('dueDateFrom', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-700/50 rounded-lg bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
+                className="px-3 py-2 text-sm border border-gray-700/50 rounded-lg bg-gray-800/80 transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
               />
               <input
                 type="date"
                 value={filters.dueDateTo || ''}
                 onChange={(e) => updateFilter('dueDateTo', e.target.value || undefined)}
-                className="px-3 py-2 text-sm border border-gray-700/50 rounded-lg bg-gray-800/60 backdrop-blur-sm transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
+                className="px-3 py-2 text-sm border border-gray-700/50 rounded-lg bg-gray-800/80 transition-colors hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-800"
               />
             </div>
           </div>

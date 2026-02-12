@@ -130,13 +130,13 @@ export function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4">
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-pointer transition-opacity hover:bg-black/60"
+        className="absolute inset-0 bg-black/80 cursor-pointer transition-opacity hover:bg-black/70"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         ref={dialogRef}
-        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
+        className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-800/95 border border-gray-700/50 sm:max-w-md sm:max-h-[90vh] overflow-hidden overscroll-contain sm:rounded-xl shadow-2xl flex flex-col"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="dialog-title"

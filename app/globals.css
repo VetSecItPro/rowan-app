@@ -1968,7 +1968,7 @@ select:focus,
 
   /* Glassmorphism for Sonner Toasts — dark mode only */
   [data-sonner-toast] {
-    @apply backdrop-blur-xl border border-gray-700/50 shadow-2xl;
+    @apply border border-gray-700/50 shadow-2xl;
   }
 
   [data-sonner-toast][data-type="success"] {

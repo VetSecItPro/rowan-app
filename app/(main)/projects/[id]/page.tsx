@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 import {
   ArrowLeft,
   Folder,
@@ -82,7 +83,7 @@ export default function ProjectDetailPage() {
       router.push('/projects');
     } catch (err) {
       logger.error('Error deleting project:', err, { component: 'page', action: 'execution' });
-      alert('Failed to delete project');
+      showError('Failed to delete project');
     }
   };
 

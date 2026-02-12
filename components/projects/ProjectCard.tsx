@@ -7,6 +7,7 @@ import type { Project } from '@/lib/services/project-tracking-service';
 import { pdfExportService } from '@/lib/services/pdf-export-service';
 import { projectMilestonesService } from '@/lib/services/project-milestones-service';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface ProjectCardProps {
   project: Project;
@@ -62,7 +63,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
       await pdfExportService.exportProjectCostReport(project.id);
     } catch (error) {
       logger.error('Failed to export project report:', error, { component: 'ProjectCard', action: 'component_action' });
-      alert('Failed to export project report. Please try again.');
+      showError('Failed to export project report. Please try again.');
     } finally {
       setIsExporting(false);
     }

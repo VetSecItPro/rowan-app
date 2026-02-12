@@ -5,6 +5,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { Shield, Download, Trash2, Eye, EyeOff } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { showSuccess, showError } from '@/lib/utils/toast';
 
 export default function PrivacyDataPage() {
   const [privacySettings, setPrivacySettings] = useState({
@@ -58,13 +59,13 @@ export default function PrivacyDataPage() {
       });
 
       if (response.ok) {
-        alert('Privacy settings updated successfully!');
+        showSuccess('Privacy settings updated successfully!');
       } else {
         throw new Error('Failed to update settings');
       }
     } catch (error) {
       logger.error('Failed to save privacy settings:', error, { component: 'page', action: 'execution' });
-      alert('Failed to update privacy settings. Please try again.');
+      showError('Failed to update privacy settings. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -439,7 +439,7 @@ export default function DashboardPage() {
                 {loading ? (
                   <div className="grid stats-grid-mobile gap-4 sm:gap-6">
                     {[...Array(8)].map((_, i) => (
-                      <div key={i} className="bg-gray-800/40 backdrop-blur-md border border-gray-700/20 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
+                      <div key={i} className="bg-gray-800/40 border border-gray-700/20 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg animate-pulse">
                         <div className="h-28 sm:h-32 bg-gray-700 rounded" />
                       </div>
                     ))}
@@ -450,7 +450,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={0}>
                       <Link
                         href="/tasks"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-blue-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-blue-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(59,130,246,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-3 sm:mb-4">
                           <div className="flex-1">
@@ -516,7 +516,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={1}>
                       <Link
                         href="/calendar"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-purple-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-purple-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(168,85,247,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -569,7 +569,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={2}>
                       <Link
                         href="/reminders"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-pink-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-pink-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -630,7 +630,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={3}>
                       <Link
                         href="/messages"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-green-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-green-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(34,197,94,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={4}>
                       <Link
                         href="/shopping"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-teal-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-teal-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(20,184,166,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -742,7 +742,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={5}>
                       <Link
                         href="/meals"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-orange-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-orange-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(239,68,68,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -795,7 +795,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={6}>
                       <Link
                         href="/projects"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-yellow-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-yellow-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(234,179,8,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -859,7 +859,7 @@ export default function DashboardPage() {
                     <AnimatedCard index={7}>
                       <Link
                         href="/goals"
-                        className="group bg-gray-800/30 backdrop-blur-md border-2 border-gray-700/20 hover:border-indigo-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
+                        className="group bg-gray-800/40 border-2 border-gray-700/20 hover:border-indigo-500 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(99,102,241,0.5)] hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 flex flex-col min-h-[340px] h-full"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
@@ -961,7 +961,7 @@ export default function DashboardPage() {
                 {/* Left: Daily Check-In */}
                 <div
                   id="daily-checkin"
-                  className="group bg-gradient-to-br from-pink-900/30 via-purple-900/30 to-blue-900/30 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-500/20 hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
+                  className="group bg-gradient-to-br from-pink-900/30 via-purple-900/30 to-blue-900/30 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(236,72,153,0.3)] border border-pink-500/20 hover:border-pink-400/50 transition-all duration-300 flex flex-col scroll-mt-24">
                   {/* Compact Header with Date, Toggle, and Streak Badge */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                     <div className="flex flex-col gap-1">
@@ -1060,7 +1060,7 @@ export default function DashboardPage() {
                           return (
                             <>
                               {userEmoji && (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/60 backdrop-blur-md rounded-full border border-pink-700/50">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/80 rounded-full border border-pink-700/50">
                                   <span className="text-xl">{userEmoji}</span>
                                   <span className="text-xs font-medium text-gray-300">You</span>
                                 </div>
@@ -1069,7 +1069,7 @@ export default function DashboardPage() {
                               {/* Partner mood or placeholder */}
                               {partnerEmoji && partnerToday ? (
                                 <>
-                                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/60 backdrop-blur-md rounded-full border border-purple-700/50">
+                                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-800/80 rounded-full border border-purple-700/50">
                                     <span className="text-xl">{partnerEmoji}</span>
                                     <span className="text-xs font-medium text-gray-300">Partner</span>
                                   </div>
@@ -1116,7 +1116,7 @@ export default function DashboardPage() {
                                   </div>
                                 </>
                               ) : userEmoji ? (
-                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-700/60 backdrop-blur-md rounded-full border border-gray-600/50">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-gray-700/80 rounded-full border border-gray-600/50">
                                   <span className="text-xl">💭</span>
                                   <span className="text-xs font-medium text-gray-400">Partner hasn&apos;t checked in yet</span>
                                 </div>
@@ -1227,7 +1227,7 @@ export default function DashboardPage() {
 
                         if (todayCheckIn && !selectedMood) {
                           return (
-                            <div className="mt-4 p-4 bg-gradient-to-br from-gray-800/60 to-purple-900/20 backdrop-blur-sm rounded-xl border border-purple-700/30">
+                            <div className="mt-4 p-4 bg-gradient-to-br from-gray-800/60 to-purple-900/20 rounded-xl border border-purple-700/30">
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                   <span className="text-2xl">{moodOptions.find(m => m.value === todayCheckIn.mood)?.emoji}</span>
@@ -1299,7 +1299,7 @@ export default function DashboardPage() {
                         // If not checked in today, show 7-day mood trend
                         if (!todayCheckIn && last7Days.length > 0) {
                           return (
-                            <div className="mt-4 p-4 bg-gradient-to-br from-gray-800/60 to-blue-900/20 backdrop-blur-sm rounded-xl border border-blue-700/30">
+                            <div className="mt-4 p-4 bg-gradient-to-br from-gray-800/60 to-blue-900/20 rounded-xl border border-blue-700/30">
                               <p className="text-xs font-medium text-gray-400 mb-3">
                                 Your mood over the last 7 days
                               </p>
@@ -1615,7 +1615,7 @@ export default function DashboardPage() {
                               return sortedDates.map(date => (
                                 <div key={date} className="space-y-2">
                                   {/* Date Header */}
-                                  <div className="sticky top-0 bg-gradient-to-r from-pink-900/40 to-purple-900/40 backdrop-blur-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-pink-700/50">
+                                  <div className="sticky top-0 bg-gradient-to-r from-pink-900/60 to-purple-900/60 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-pink-700/50">
                                     <p className="text-xs sm:text-sm font-semibold text-white">
                                       {formatDate(date, 'EEEE, MMMM d, yyyy')}
                                     </p>
@@ -1707,7 +1707,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Right: Activity Feed */}
-                <div className="group bg-gradient-to-br from-slate-900/30 via-gray-900/20 to-stone-900/10 backdrop-blur-sm rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-500/20 hover:border-gray-400/50 transition-all duration-300 flex flex-col">
+                <div className="group bg-gradient-to-br from-slate-900/30 via-gray-900/20 to-stone-900/10 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-500/20 hover:border-gray-400/50 transition-all duration-300 flex flex-col">
                   {/* Header */}
                   <div className="flex items-center gap-2 mb-4 flex-shrink-0">
                     <Activity className="w-5 h-5 text-purple-400" />

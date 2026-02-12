@@ -3,7 +3,7 @@
 import { MoreVertical, Check } from 'lucide-react';
 import { ShoppingList } from '@/lib/services/shopping-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { getCategoryIcon, getCategoryLabel } from '@/lib/constants/shopping-categories';
 import type { ShoppingCategory } from '@/lib/constants/shopping-categories';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -22,7 +22,7 @@ interface ShoppingListCardProps {
   onUpdateQuantity?: (itemId: string, newQuantity: number) => void;
 }
 
-export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity }: ShoppingListCardProps) {
+export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
@@ -327,4 +327,4 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
       </div>
     </div>
   );
-}
+});

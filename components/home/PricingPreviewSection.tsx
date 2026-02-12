@@ -128,7 +128,7 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
               <ul className="space-y-3 mb-8 flex-1">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                    <Check aria-hidden="true" className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
                     <span className="text-sm text-gray-300">{feature}</span>
                   </li>
                 ))}

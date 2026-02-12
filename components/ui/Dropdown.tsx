@@ -186,7 +186,7 @@ export function Dropdown({
         <span className="block truncate min-h-[1.25rem] flex items-center">
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+        <ChevronDown aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
       </button>
     );
   }
@@ -219,6 +219,7 @@ export function Dropdown({
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown
+          aria-hidden="true"
           className={`
             absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none
             transition-transform duration-200
@@ -231,14 +232,14 @@ export function Dropdown({
       {isOpen && isHydrated && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-50"
+          className="absolute bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto z-[70]"
           style={{
             top: position.top,
             left: position.left,
             width: position.width,
-            zIndex: 10000
           }}
           role="listbox"
+          aria-label={`${selectedOption ? selectedOption.label : placeholder} dropdown options`}
         >
           {options.map((option, index) => (
             <button

@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.limit(10000);
 
     if (error) {
       logger.error('Error fetching feedback:', error, { component: 'api-route', action: 'api_request' });

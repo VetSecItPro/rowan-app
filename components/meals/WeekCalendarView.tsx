@@ -4,7 +4,7 @@ import { useMemo, memo, useState, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks } from 'date-fns';
 import { ChevronLeft, ChevronRight, Plus, Sunrise, Sun, Moon, Cookie, CheckSquare, Square, Trash2, ShoppingBag } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
-import { parseDateString } from '@/lib/utils/date';
+import { parseDateString } from '@/lib/utils/date-utils';
 
 interface WeekCalendarViewProps {
   currentWeek: Date;

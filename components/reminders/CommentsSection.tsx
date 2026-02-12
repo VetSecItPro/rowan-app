@@ -10,6 +10,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { MentionInput } from './MentionInput';
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface CommentsSectionProps {
   reminderId: string;
@@ -112,8 +113,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
         prev.map(c => c.id === tempComment.id ? newComment : c)
       );
 
-      // Force refresh comments as backup (in case real-time subscription fails)
-      setTimeout(() => fetchComments(), 1000);
+      // Realtime subscription handles refresh — no backup fetch needed (PERF-022)
 
     } catch (error) {
       logger.error('Error creating comment:', error, { component: 'CommentsSection', action: 'component_action' });
@@ -122,7 +122,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       setComments(prev => prev.filter(c => c.id !== tempComment.id));
       setNewCommentContent(tempComment.content); // Restore content for retry
 
-      alert('Failed to post comment. Please try again.');
+      showError('Failed to post comment. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -153,7 +153,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       // Comments will update via real-time subscription
     } catch (error) {
       logger.error('Error updating comment:', error, { component: 'CommentsSection', action: 'component_action' });
-      alert('Failed to update comment. Please try again.');
+      showError('Failed to update comment. Please try again.');
     }
   };
 
@@ -172,7 +172,7 @@ export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
       // Comments will update via real-time subscription
     } catch (error) {
       logger.error('Error deleting comment:', error, { component: 'CommentsSection', action: 'component_action' });
-      alert('Failed to delete comment. Please try again.');
+      showError('Failed to delete comment. Please try again.');
     } finally {
       setShowDeleteConfirm(false);
       setCommentToDelete(null);

@@ -204,7 +204,7 @@ export function MentionInput({
       {showAutocomplete && filteredUsers.length > 0 && (
         <div
           ref={autocompleteRef}
-          className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800/80 backdrop-blur-lg
+          className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800/95
             border border-gray-700/50 rounded-lg shadow-xl z-50
             max-h-60 overflow-y-auto"
         >

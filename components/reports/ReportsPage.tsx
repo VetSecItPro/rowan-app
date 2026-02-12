@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { logger } from '@/lib/logger';
 import {
-  DocumentTextIcon,
-  ChartBarIcon,
-  CalendarIcon,
-  FolderIcon,
-  PlusIcon
-} from '@heroicons/react/24/outline';
+  FileText,
+  BarChart3,
+  Calendar,
+  Folder,
+  Plus
+} from 'lucide-react';
 import { ReportTemplateSelector } from './ReportTemplateSelector';
 import { ReportLibrary } from './ReportLibrary';
 import { ReportGenerator } from './ReportGenerator';
@@ -76,26 +76,26 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
     {
       id: 'templates' as TabType,
       name: 'Templates',
-      icon: DocumentTextIcon,
+      icon: FileText,
       description: 'Choose from pre-built report templates'
     },
     {
       id: 'library' as TabType,
       name: 'Report Library',
-      icon: FolderIcon,
+      icon: Folder,
       description: 'View and manage generated reports'
     },
     {
       id: 'generate' as TabType,
       name: 'Generate',
-      icon: ChartBarIcon,
+      icon: BarChart3,
       description: 'Create new reports',
       hidden: !selectedTemplate
     },
     {
       id: 'viewer' as TabType,
       name: 'View Report',
-      icon: CalendarIcon,
+      icon: Calendar,
       description: 'View report details',
       hidden: !selectedReport
     }
@@ -136,7 +136,7 @@ export function ReportsPage({ className = '' }: ReportsPageProps) {
             onClick={() => setActiveTab('templates')}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            <PlusIcon className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-2" />
             New Report
           </button>
         </div>

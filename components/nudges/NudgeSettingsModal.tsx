@@ -326,7 +326,7 @@ export function NudgeSettingsModal({
                           value={settings.nudge_frequency_days}
                           onChange={(e) => handleChange('nudge_frequency_days', parseInt(e.target.value))}
                           className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white relative z-50"
-                          style={{ position: 'relative', zIndex: 9999 }}
+                          style={{ position: 'relative' }}
                         >
                           <option value={1}>Every day</option>
                           <option value={2}>Every 2 days</option>
@@ -344,7 +344,7 @@ export function NudgeSettingsModal({
                           value={settings.max_daily_nudges}
                           onChange={(e) => handleChange('max_daily_nudges', parseInt(e.target.value))}
                           className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white relative z-50"
-                          style={{ position: 'relative', zIndex: 9999 }}
+                          style={{ position: 'relative' }}
                         >
                           <option value={1}>1 nudge</option>
                           <option value={2}>2 nudges</option>

@@ -5,6 +5,7 @@ import { Plus, Trash2, GripVertical } from 'lucide-react';
 import { shoppingService, type TemplateItemInput } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface CreateCustomTemplateModalProps {
   isOpen: boolean;
@@ -62,7 +63,7 @@ export function CreateCustomTemplateModal({ isOpen, onClose, onSave, spaceId }: 
 
   const handleSave = async () => {
     if (!name.trim() || items.length === 0) {
-      alert('Please enter a template name and at least one item.');
+      showWarning('Please enter a template name and at least one item.');
       return;
     }
 
@@ -77,7 +78,7 @@ export function CreateCustomTemplateModal({ isOpen, onClose, onSave, spaceId }: 
       setItems([]);
     } catch (error) {
       logger.error('Failed to create custom template:', error, { component: 'CreateCustomTemplateModal', action: 'component_action' });
-      alert('Failed to create template. Please try again.');
+      showError('Failed to create template. Please try again.');
     } finally {
       setSaving(false);
     }

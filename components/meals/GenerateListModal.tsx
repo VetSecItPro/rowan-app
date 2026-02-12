@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ShoppingBag, Check, Loader2 } from 'lucide-react';
 import { Meal } from '@/lib/services/meals-service';
-import { formatDateString } from '@/lib/utils/date';
+import { formatDateString } from '@/lib/utils/date-utils';
 import { showSuccess } from '@/lib/utils/toast';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';

@@ -86,7 +86,7 @@ function TaskScene() {
                 : 'border-gray-600 bg-transparent'
             }`}
           >
-            {task.done && <Check className="w-3 h-3 text-white" />}
+            {task.done && <Check aria-hidden="true" className="w-3 h-3 text-white" />}
           </div>
           <span
             className={`text-xs ${
@@ -176,7 +176,7 @@ function ShoppingScene() {
                 item.done ? 'bg-emerald-500 border-emerald-500' : 'border-gray-600'
               }`}
             >
-              {item.done && <Check className="w-2.5 h-2.5 text-white" />}
+              {item.done && <Check aria-hidden="true" className="w-2.5 h-2.5 text-white" />}
             </div>
             <span className={`text-xs ${item.done ? 'text-gray-500 line-through' : 'text-gray-200'}`}>
               {item.label}

@@ -29,15 +29,42 @@ export function EnhancedDayView({
   const [currentTime, setCurrentTime] = useState(new Date());
   const isToday = isSameDay(date, new Date());
 
-  // Update current time every minute
+  // Update current time every minute, pausing when tab is hidden
   useEffect(() => {
     if (!isToday) return;
 
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000); // Update every minute
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    return () => clearInterval(interval);
+    const startInterval = () => {
+      if (intervalId) clearInterval(intervalId);
+      // Update immediately when becoming visible
+      setCurrentTime(new Date());
+      intervalId = setInterval(() => setCurrentTime(new Date()), 60000);
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        startInterval();
+      }
+    };
+
+    // Start interval initially
+    startInterval();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isToday]);
 
   // Get events for this day

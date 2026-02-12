@@ -3,7 +3,7 @@
 import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2, Check, ShoppingCart, Eye, DollarSign } from 'lucide-react';
 import { CalendarEvent } from '@/lib/services/calendar-service';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Link from 'next/link';
 
 interface LinkedShoppingList {
@@ -22,7 +22,7 @@ interface EventCardProps {
   linkedShoppingList?: LinkedShoppingList;
 }
 
-export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetails, onMarkBillPaid, linkedShoppingList }: EventCardProps) {
+export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetails, onMarkBillPaid, linkedShoppingList }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const isBillEvent = Boolean(event.linked_bill_id);
 
@@ -78,7 +78,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
   };
 
   return (
-    <div className="bg-gray-800 sm:bg-gray-800/60 sm:backdrop-blur-md border border-gray-700 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
+    <div className="bg-gray-800 sm:bg-gray-800/80 border border-gray-700 sm:border-gray-700/50 rounded-xl p-3 sm:p-4 md:p-6 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -190,7 +190,7 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
               />
-              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-lg shadow-xl z-20">
+              <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-800/95 border border-gray-700/50 rounded-lg shadow-xl z-20">
                 {/* Mark Bill as Paid - Only show for bill-linked events that aren't completed */}
                 {isBillEvent && onMarkBillPaid && event.linked_bill_id && event.status !== 'completed' && (
                   <button
@@ -247,4 +247,4 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetai
       </div>
     </div>
   );
-}
+});

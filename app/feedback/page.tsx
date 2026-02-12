@@ -262,7 +262,7 @@ export default function MyFeedbackPage() {
 
       {/* Detail Modal */}
       {showDetailModal && selectedFeedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
           <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-xl shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-gray-800 bg-gray-900">
               <h2 className="text-2xl font-bold text-white">Feedback Details</h2>

@@ -312,7 +312,7 @@ function ResetPasswordForm() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black p-4">
         <motion.div
-          className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50 text-center"
+          className="max-w-md w-full bg-gray-900/95 rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50 text-center"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -338,7 +338,7 @@ function ResetPasswordForm() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black p-4">
         <motion.div
-          className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50 text-center"
+          className="max-w-md w-full bg-gray-900/95 rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50 text-center"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -369,7 +369,7 @@ function ResetPasswordForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4">
       <motion.div
-        className="max-w-md w-full bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
+        className="max-w-md w-full bg-gray-900/95 rounded-3xl shadow-2xl p-8 sm:p-10 border border-gray-800/50"
         initial="hidden"
         animate="visible"
         variants={containerVariants}

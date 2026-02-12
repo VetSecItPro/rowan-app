@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Smartphone, X, Key, QrCode, Copy, Check } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { showError, showSuccess, showWarning, showInfo } from '@/lib/utils/toast';
 
 interface TwoFactorAuthProps {
   onStatusChange?: (enabled: boolean) => void;
@@ -77,11 +78,11 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
         setFactorId(result.data.id);
         setShowSetupModal(true);
       } else {
-        alert('Failed to start 2FA setup: ' + result.error);
+        showError('Failed to start 2FA setup: ' + result.error);
       }
     } catch (error) {
       logger.error('Error starting 2FA setup:', error, { component: 'TwoFactorAuth', action: 'component_action' });
-      alert('Failed to start 2FA setup');
+      showError('Failed to start 2FA setup');
     } finally {
       setIsProcessing(false);
     }
@@ -89,12 +90,12 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
 
   const verifyAndEnable = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
-      alert('Please enter a valid 6-digit code');
+      showWarning('Please enter a valid 6-digit code');
       return;
     }
 
     if (!factorId) {
-      alert('No setup session found. Please restart the process.');
+      showWarning('No setup session found. Please restart the process.');
       return;
     }
 
@@ -125,13 +126,13 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
 
         // Reload status
         loadMFAStatus();
-        alert('2FA has been enabled successfully!');
+        showSuccess('2FA has been enabled successfully!');
       } else {
-        alert('Invalid verification code. Please try again.');
+        showError('Invalid verification code. Please try again.');
       }
     } catch (error) {
       logger.error('Error verifying 2FA code:', error, { component: 'TwoFactorAuth', action: 'component_action' });
-      alert('Failed to verify code. Please try again.');
+      showError('Failed to verify code. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -139,7 +140,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
 
   const disable2FA = async () => {
     if (!mfaFactor) {
-      alert('No MFA factor found');
+      showError('No MFA factor found');
       return;
     }
 
@@ -169,13 +170,13 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
           onStatusChange(false);
         }
 
-        alert('2FA has been disabled.');
+        showInfo('2FA has been disabled.');
       } else {
-        alert('Failed to disable 2FA: ' + result.error);
+        showError('Failed to disable 2FA: ' + result.error);
       }
     } catch (error) {
       logger.error('Error disabling 2FA:', error, { component: 'TwoFactorAuth', action: 'component_action' });
-      alert('Failed to disable 2FA');
+      showError('Failed to disable 2FA');
     } finally {
       setIsProcessing(false);
     }
@@ -279,7 +280,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
       {/* Setup Modal */}
       {showSetupModal && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="2fa-setup-title"

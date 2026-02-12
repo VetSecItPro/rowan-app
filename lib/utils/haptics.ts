@@ -139,3 +139,29 @@ export function withHaptic<T extends (...args: unknown[]) => unknown>(
 export const hapticLight = () => triggerHaptic('light');
 export const hapticMedium = () => triggerHaptic('medium');
 export const hapticHeavy = () => triggerHaptic('heavy');
+
+/**
+ * Object-based haptic API for concise usage in components.
+ * Usage: haptic.light(), haptic.success(), haptic[type]()
+ */
+export const haptic: Record<HapticFeedbackType, () => void> = {
+  light: () => triggerHaptic('light'),
+  medium: () => triggerHaptic('medium'),
+  heavy: () => triggerHaptic('heavy'),
+  success: () => triggerHaptic('success'),
+  warning: () => triggerHaptic('warning'),
+  error: () => triggerHaptic('error'),
+  selection: () => triggerHaptic('selection'),
+};
+
+/**
+ * CSS class names for enhanced touch interactions on mobile.
+ */
+export const hapticStyles = {
+  base: 'transition-all duration-150 ease-out',
+  light: 'active:scale-[0.98] active:opacity-90',
+  medium: 'active:scale-[0.96] active:opacity-85',
+  heavy: 'active:scale-[0.94] active:opacity-80',
+  bounce: 'active:scale-105 transition-transform duration-100',
+  touchable: 'transition-all duration-150 ease-out active:scale-[0.98] active:opacity-90',
+};

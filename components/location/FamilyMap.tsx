@@ -244,7 +244,6 @@ export function FamilyMap({ spaceId, className }: FamilyMapProps) {
             <FamilyMemberCard
               key={member.user_id}
               member={member}
-              places={places}
               currentLocation={currentLocation}
               isSelected={selectedMember?.user_id === member.user_id}
               onClick={() => setSelectedMember(selectedMember?.user_id === member.user_id ? null : member)}
@@ -283,7 +282,7 @@ export function FamilyMap({ spaceId, className }: FamilyMapProps) {
             exit={{ opacity: 0, height: 0 }}
             className="border-t border-gray-700 overflow-hidden"
           >
-            <MemberDetails member={selectedMember} places={places} currentLocation={currentLocation} />
+            <MemberDetails member={selectedMember} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -293,13 +292,12 @@ export function FamilyMap({ spaceId, className }: FamilyMapProps) {
 
 interface FamilyMemberCardProps {
   member: FamilyMemberLocation;
-  places: FamilyPlace[];
   currentLocation: { latitude: number; longitude: number } | null;
   isSelected: boolean;
   onClick: () => void;
 }
 
-function FamilyMemberCard({ member, places: _places, currentLocation, isSelected, onClick }: FamilyMemberCardProps) {
+function FamilyMemberCard({ member, currentLocation, isSelected, onClick }: FamilyMemberCardProps) {
   // Find if member is at a known place
   const currentPlace = member.current_place;
   const statusColor = getStatusColor(member.minutes_ago);
@@ -394,11 +392,9 @@ function FamilyMemberCard({ member, places: _places, currentLocation, isSelected
 
 interface MemberDetailsProps {
   member: FamilyMemberLocation;
-  places: FamilyPlace[];
-  currentLocation: { latitude: number; longitude: number } | null;
 }
 
-function MemberDetails({ member, places: _places, currentLocation: _currentLocation }: MemberDetailsProps) {
+function MemberDetails({ member }: MemberDetailsProps) {
   return (
     <div className="p-4 bg-gray-900/50">
       <div className="grid grid-cols-2 gap-4">

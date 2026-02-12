@@ -80,7 +80,7 @@ export function RestoreAccountModal({
             </>
           ) : (
             <>
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw aria-hidden="true" className="w-4 h-4" />
               Restore My Account
             </>
           )}
@@ -105,7 +105,7 @@ export function RestoreAccountModal({
       <div className="space-y-6">
         {/* Warning Notice */}
         <div className="flex items-start gap-3 p-4 bg-orange-900/20 border border-orange-800 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
+          <AlertTriangle aria-hidden="true" className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
           <div>
             <h3 className="font-medium text-orange-200 mb-1">
               Your account is scheduled for deletion
@@ -128,7 +128,7 @@ export function RestoreAccountModal({
 
           <div className="grid gap-3">
             <div className="flex items-start gap-3 p-3 bg-green-900/20 border border-green-800 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+              <CheckCircle aria-hidden="true" className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-medium text-white">Cancel Deletion</p>
                 <p className="text-sm text-gray-400">
@@ -138,7 +138,7 @@ export function RestoreAccountModal({
             </div>
 
             <div className="flex items-start gap-3 p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
-              <RefreshCw className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+              <RefreshCw aria-hidden="true" className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-medium text-white">Full Access Restored</p>
                 <p className="text-sm text-gray-400">
@@ -148,7 +148,7 @@ export function RestoreAccountModal({
             </div>
 
             <div className="flex items-start gap-3 p-3 bg-purple-900/20 border border-purple-800 rounded-lg">
-              <Calendar className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+              <Calendar aria-hidden="true" className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-medium text-white">No Data Loss</p>
                 <p className="text-sm text-gray-400">

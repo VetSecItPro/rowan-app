@@ -24,12 +24,16 @@ const AIRecipeSchema = z.object({
   difficulty: z.string().max(50).optional().nullable(),
   cuisine_type: z.string().max(100).optional().nullable(),
   tags: z.array(z.string().max(50)).max(20).optional().nullable(),
-}).passthrough();
+}).strip();
 
 export const maxDuration = 60;
 
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
+// SECURITY: Fail fast if API key missing — matches service layer pattern
+const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+}
+const genAI = new GoogleGenerativeAI(apiKey);
 
 // SECURITY: Input size limits to prevent abuse and excessive API costs
 const MAX_TEXT_LENGTH = 50000; // ~50KB text

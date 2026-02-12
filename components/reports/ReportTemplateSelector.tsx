@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import {
-  ChartBarIcon,
-  DocumentChartBarIcon,
-  CurrencyDollarIcon,
-  ArrowTrendingUpIcon,
-  PresentationChartBarIcon,
-  CalendarIcon,
-  FunnelIcon
-} from '@heroicons/react/24/outline';
+  BarChart3,
+  FileBarChart,
+  DollarSign,
+  TrendingUp,
+  Presentation,
+  Calendar,
+  Filter
+} from 'lucide-react';
 import { type ReportTemplate } from '@/lib/services/financial-reports-service';
 
 interface ReportTemplateSelectorProps {
@@ -18,11 +18,11 @@ interface ReportTemplateSelectorProps {
 }
 
 const categoryIcons = {
-  budget: CurrencyDollarIcon,
-  expenses: DocumentChartBarIcon,
-  goals: PresentationChartBarIcon,
-  trends: ArrowTrendingUpIcon,
-  summary: ChartBarIcon
+  budget: DollarSign,
+  expenses: FileBarChart,
+  goals: Presentation,
+  trends: TrendingUp,
+  summary: BarChart3
 };
 
 const categoryColors = {
@@ -102,7 +102,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       {/* Templates Grid */}
       {filteredTemplates.length === 0 ? (
         <div className="text-center py-12">
-          <FunnelIcon className="mx-auto h-12 w-12 text-gray-400" />
+          <Filter className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-white">
             No templates found
           </h3>
@@ -113,7 +113,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTemplates.map((template) => {
-            const Icon = categoryIcons[template.category as keyof typeof categoryIcons] || ChartBarIcon;
+            const Icon = categoryIcons[template.category as keyof typeof categoryIcons] || BarChart3;
             const colorClass = categoryColors[template.category as keyof typeof categoryColors] || categoryColors.summary;
 
             return (
@@ -148,7 +148,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
                   <div className="flex flex-wrap gap-2">
                     {template.config?.charts && (
                       <span className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-900/20 text-blue-400">
-                        <ChartBarIcon className="h-3 w-3 mr-1" />
+                        <BarChart3 className="h-3 w-3 mr-1" />
                         Charts
                       </span>
                     )}
@@ -180,7 +180,7 @@ export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTe
       {/* System Templates Info */}
       <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
         <div className="flex">
-          <CalendarIcon className="h-5 w-5 text-blue-400 flex-shrink-0" />
+          <Calendar className="h-5 w-5 text-blue-400 flex-shrink-0" />
           <div className="ml-3">
             <h3 className="text-sm font-medium text-blue-200">
               About Report Templates

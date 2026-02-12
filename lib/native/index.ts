@@ -87,3 +87,95 @@ export {
   type NetworkStatus,
   type ConnectionQuality,
 } from './network';
+
+// Secure storage
+export {
+  secureSet,
+  secureGet,
+  secureRemove,
+  secureClear,
+} from './secure-storage';
+
+// Voice recorder
+export {
+  isRecordingAvailable,
+  requestAudioPermission,
+  startRecording,
+  stopRecording,
+  pauseRecording,
+  resumeRecording,
+} from './voice-recorder';
+
+// App badge
+export {
+  isBadgeSupported,
+  setBadgeCount,
+  getBadgeCount,
+  clearBadge,
+} from './badge';
+
+// In-app review
+export {
+  isReviewAvailable,
+  requestReview,
+} from './in-app-review';
+
+// File picker
+export {
+  pickFile,
+  pickImages,
+  type PickedFile,
+} from './file-picker';
+
+// Local notifications
+export {
+  scheduleNotification,
+  cancelNotification,
+  cancelAllNotifications,
+  getPendingNotifications,
+  checkPermissions as checkNotificationPermissions,
+  requestPermissions as requestNotificationPermissions,
+  type ScheduleNotificationOptions,
+  type PendingNotification,
+} from './local-notifications';
+
+// Share
+export {
+  shareContent,
+  canShare,
+  type ShareOptions,
+} from './share';
+
+// Camera
+export {
+  takePicture,
+  pickImage,
+  isCameraAvailable,
+  type CameraResult,
+  type CameraPictureOptions,
+} from './camera';
+
+// Storage (Preferences)
+export {
+  setItem,
+  getItem,
+  removeItem,
+  clear as clearStorage,
+  keys as storageKeys,
+} from './storage';
+
+// Contacts
+export {
+  pickContact,
+  getContacts,
+  isContactsAvailable,
+  type ContactInfo,
+} from './contacts';
+
+// Biometric authentication
+export {
+  isBiometricAvailable,
+  getBiometricType,
+  authenticate,
+  type BiometricType,
+} from './biometric-auth';

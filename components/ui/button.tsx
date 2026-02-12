@@ -1,5 +1,5 @@
 import React from 'react';
-import { haptic, hapticStyles } from '@/lib/utils/haptic-feedback';
+import { haptic, hapticStyles } from '@/lib/utils/haptics';
 
 type HapticType = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection' | 'none';
 

@@ -102,7 +102,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-black/80 backdrop-blur-lg border-b border-gray-800/50 sticky top-0 z-50">
+    <header className="bg-black/95 border-b border-gray-800/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2 sm:py-4">
           {/* Logo and Brand */}
@@ -203,11 +203,10 @@ export function Header() {
                   {isDropdownOpen && mounted && dropdownPosition.top > 0 && createPortal(
                     <div
                       ref={dropdownRef}
-                      className="fixed w-56 bg-gray-800/95 backdrop-blur-xl rounded-lg shadow-xl border border-gray-700/50 py-1 animate-in fade-in slide-in-from-top-2 duration-200"
+                      className="fixed w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700/50 py-1 animate-in fade-in slide-in-from-top-2 duration-200 z-[70]"
                       style={{
                         top: `${dropdownPosition.top}px`,
                         right: `${dropdownPosition.right}px`,
-                        zIndex: 10000,
                         maxHeight: 'calc(100vh - 100px)',
                         overflowY: 'auto',
                       }}

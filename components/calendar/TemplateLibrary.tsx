@@ -5,6 +5,7 @@ import { X, Clock, Plus, Trash2, Star } from 'lucide-react';
 import { calendarService, EventTemplate } from '@/lib/services/calendar-service';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface TemplateLibraryProps {
   isOpen: boolean;
@@ -60,7 +61,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
       setTemplates(templates.filter(t => t.id !== templateToDelete));
     } catch (error) {
       logger.error('Error deleting template:', error, { component: 'TemplateLibrary', action: 'component_action' });
-      alert('Failed to delete template');
+      showError('Failed to delete template');
     } finally {
       setShowDeleteConfirm(false);
       setTemplateToDelete(null);
@@ -87,7 +88,7 @@ export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="bg-purple-600 p-6 flex items-center justify-between">

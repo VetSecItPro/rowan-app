@@ -80,7 +80,7 @@ export function Tooltip({ content, children, delay = 300, position = 'top', clas
 
   const tooltipElement = isVisible && isClient ? (
     <div
-      className={`fixed z-[9999] pointer-events-none ${getPositionClasses()}`}
+      className={`fixed z-[70] pointer-events-none ${getPositionClasses()}`}
       style={{ left: `${coords.x}px`, top: `${coords.y}px` }}
     >
       <div

@@ -15,13 +15,18 @@ const AIReceiptSchema = z.object({
   receipt_date: z.string().max(100).optional().nullable(),
   category: z.string().max(100).optional().nullable(),
   confidence: z.number().min(0).max(100).optional().nullable(),
-}).passthrough();
+}).strip();
 
 // =====================================================
 // GEMINI VISION OCR API ROUTE
 // =====================================================
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
+// SECURITY: Fail fast if API key missing — matches service layer pattern
+const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+}
+const genAI = new GoogleGenerativeAI(apiKey);
 
 /**
  * POST /api/ocr/scan-receipt

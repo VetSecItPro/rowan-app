@@ -1,5 +1,3 @@
-'use client';
-
 import { ArrowLeft, MessageSquare, BookOpen, Github, HelpCircle, Bug, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,7 +29,7 @@ export default function SupportPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <Link
               href="/settings/documentation"
-              className="group p-6 bg-gray-800/60 backdrop-blur-md border-2 border-gray-700/50 hover:border-purple-500 hover:shadow-purple-500/50 rounded-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
+              className="group p-6 bg-gray-800/80 border-2 border-gray-700/50 hover:border-purple-500 hover:shadow-purple-500/50 rounded-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
             >
               <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center mb-4">
                 <BookOpen className="w-6 h-6 text-white" />
@@ -48,7 +46,7 @@ export default function SupportPage() {
               href="https://github.com/VetSecItPro/rowan-app"
               target="_blank"
               rel="noopener noreferrer"
-              className="group p-6 bg-gray-800/60 backdrop-blur-md border-2 border-gray-700/50 hover:border-purple-500 hover:shadow-purple-500/50 rounded-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
+              className="group p-6 bg-gray-800/80 border-2 border-gray-700/50 hover:border-purple-500 hover:shadow-purple-500/50 rounded-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
             >
               <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 flex items-center justify-center mb-4">
                 <Github className="w-6 h-6 text-white" />
@@ -70,7 +68,7 @@ export default function SupportPage() {
                 href="https://github.com/VetSecItPro/rowan-app/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-6 bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl hover:shadow-lg transition-shadow"
+                className="p-6 bg-gray-800/80 border border-gray-700/50 rounded-xl hover:shadow-lg transition-shadow"
               >
                 <Bug className="w-8 h-8 text-red-500 mb-3" />
                 <h3 className="font-semibold text-white mb-2">Report a Bug</h3>
@@ -83,7 +81,7 @@ export default function SupportPage() {
                 href="https://github.com/VetSecItPro/rowan-app/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-6 bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl hover:shadow-lg transition-shadow"
+                className="p-6 bg-gray-800/80 border border-gray-700/50 rounded-xl hover:shadow-lg transition-shadow"
               >
                 <Lightbulb className="w-8 h-8 text-yellow-500 mb-3" />
                 <h3 className="font-semibold text-white mb-2">Feature Request</h3>
@@ -96,7 +94,7 @@ export default function SupportPage() {
                 href="https://github.com/VetSecItPro/rowan-app/discussions"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-6 bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl hover:shadow-lg transition-shadow"
+                className="p-6 bg-gray-800/80 border border-gray-700/50 rounded-xl hover:shadow-lg transition-shadow"
               >
                 <MessageSquare className="w-8 h-8 text-blue-500 mb-3" />
                 <h3 className="font-semibold text-white mb-2">Community</h3>
@@ -108,7 +106,7 @@ export default function SupportPage() {
           </div>
 
           {/* FAQ Section */}
-          <div className="p-6 bg-purple-900/40 backdrop-blur-md border border-purple-800/50 rounded-xl">
+          <div className="p-6 bg-purple-900/50 border border-purple-800/50 rounded-xl">
             <h3 className="text-lg font-semibold text-white mb-4">Frequently Asked Questions</h3>
             <div className="space-y-4">
               <div>

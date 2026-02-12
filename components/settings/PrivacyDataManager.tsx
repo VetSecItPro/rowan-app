@@ -210,7 +210,7 @@ export function PrivacyDataManager() {
   if (!preferences) {
     return (
       <div className="text-center py-12">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <AlertCircle aria-hidden="true" className="w-12 h-12 text-red-500 mx-auto mb-4" />
         <p className="text-gray-400">Failed to load privacy settings</p>
         <button
           onClick={loadAllData}
@@ -238,7 +238,7 @@ export function PrivacyDataManager() {
       {success && (
         <div className="p-4 bg-green-900/20 border border-green-800 rounded-xl">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-400" />
+            <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-400" />
             <p className="text-sm text-green-200">{success}</p>
           </div>
         </div>
@@ -247,7 +247,7 @@ export function PrivacyDataManager() {
       {error && (
         <div className="p-4 bg-red-900/20 border border-red-800 rounded-xl">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-400" />
+            <AlertCircle aria-hidden="true" className="w-4 h-4 text-red-400" />
             <p className="text-sm text-red-200">{error}</p>
           </div>
         </div>
@@ -255,7 +255,7 @@ export function PrivacyDataManager() {
 
 
       {/* Legal Compliance Section */}
-      <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+      <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
             <Shield className="w-5 h-5 text-white" />
@@ -296,7 +296,7 @@ export function PrivacyDataManager() {
       </div>
 
       {/* Data Management Section */}
-      <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+      <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
         <div className="flex items-start gap-4 mb-6">
           <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
             <Database className="w-5 h-5 text-white" />

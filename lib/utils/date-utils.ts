@@ -1,4 +1,19 @@
-import { format, parseISO, formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
+
+/**
+ * Parse a date-only string (YYYY-MM-DD) without timezone conversion.
+ *
+ * IMPORTANT: `new Date("2025-12-03")` interprets as UTC midnight, which becomes
+ * Dec 2 at 7pm in CST (UTC-5). This function splits the string and creates
+ * a local-timezone Date to avoid that shift.
+ *
+ * @param dateString - Date string in YYYY-MM-DD format
+ * @returns Date object in local timezone
+ */
+export function parseDateString(dateString: string): Date {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
 
 /**
  * Format a date-only string (yyyy-MM-dd) without timezone conversion.
@@ -12,7 +27,18 @@ import { format, parseISO, formatDistanceToNow } from 'date-fns';
  * formatDate('2025-10-09', 'EEEE, MMMM d, yyyy') // "Thursday, October 9, 2025"
  */
 export function formatDate(dateString: string, formatStr: string): string {
-  return format(parseISO(dateString), formatStr);
+  return format(parseDateString(dateString), formatStr);
+}
+
+/**
+ * Format a date-only string for display with a default format.
+ *
+ * @param dateString - Date string in YYYY-MM-DD format
+ * @param formatStr - Format string for date-fns (default: 'MMM d, yyyy')
+ * @returns Formatted date string
+ */
+export function formatDateString(dateString: string, formatStr: string = 'MMM d, yyyy'): string {
+  return format(parseDateString(dateString), formatStr);
 }
 
 /**
@@ -69,17 +95,6 @@ export function formatTimestampDate(timestamp: string): string {
  */
 export function getCurrentDateString(): string {
   return format(new Date(), 'yyyy-MM-dd');
-}
-
-/**
- * Convert a date string to a Date object for comparisons.
- * Handles timezone-neutral parsing for date-only strings.
- *
- * @param dateString - Date string in yyyy-MM-dd format
- * @returns Date object
- */
-export function parseDateString(dateString: string): Date {
-  return parseISO(dateString);
 }
 
 /**

@@ -175,7 +175,7 @@ export function FeatureShowcase() {
                       <div
                         className={`w-5 h-5 rounded-full ${group.checkBg} flex items-center justify-center flex-shrink-0 mt-0.5`}
                       >
-                        <Check className={`w-3 h-3 ${group.checkColor}`} strokeWidth={3} />
+                        <Check aria-hidden="true" className={`w-3 h-3 ${group.checkColor}`} strokeWidth={3} />
                       </div>
                       <span className="text-sm text-gray-400 leading-relaxed">{benefit}</span>
                     </li>

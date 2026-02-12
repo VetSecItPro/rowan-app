@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
 import Link from 'next/link';
 
 import {
@@ -260,7 +257,7 @@ export default function SpacesDocumentationPage() {
           {/* Feature Overview */}
           <div className="mb-12 max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 flex items-center justify-center mb-4">
                   <Building className="w-6 h-6 text-white" />
                 </div>
@@ -270,7 +267,7 @@ export default function SpacesDocumentationPage() {
                 </p>
               </div>
 
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mb-4">
                   <Mail className="w-6 h-6 text-white" />
                 </div>
@@ -280,7 +277,7 @@ export default function SpacesDocumentationPage() {
                 </p>
               </div>
 
-              <div className="p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-2xl">
+              <div className="p-6 bg-gray-800/80 border border-gray-700/60 rounded-2xl">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center mb-4">
                   <Eye className="w-6 h-6 text-white" />
                 </div>
@@ -318,7 +315,7 @@ export default function SpacesDocumentationPage() {
                       <Link
                         key={index}
                         href={article.href}
-                        className="group p-6 bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 hover:border-teal-600 rounded-2xl hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300 hover:-translate-y-1"
+                        className="group p-6 bg-gray-800/80 border border-gray-700/60 hover:border-teal-600 rounded-2xl hover:shadow-lg hover:shadow-teal-500/20 transition-all duration-300 hover:-translate-y-1"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <h3 className="text-lg font-bold text-white group-hover:text-teal-400 transition-colors">
@@ -345,7 +342,7 @@ export default function SpacesDocumentationPage() {
 
           {/* Quick Reference */}
           <div className="mt-16 max-w-4xl mx-auto">
-            <div className="p-8 bg-gradient-to-r from-teal-900/30 to-cyan-900/30 backdrop-blur-sm border border-teal-800/60 rounded-2xl shadow-lg">
+            <div className="p-8 bg-gradient-to-r from-teal-900/30 to-cyan-900/30 border border-teal-800/60 rounded-2xl shadow-lg">
               <h3 className="text-2xl font-bold text-white mb-6 text-center">Quick Reference</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -6,6 +6,7 @@ import { taskAttachmentsService, TaskAttachment } from '@/lib/services/task-atta
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface AttachmentsModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
 
     // Validate file size (50MB limit)
     if (file.size > 50 * 1024 * 1024) {
-      alert('File size must be less than 50MB');
+      showWarning('File size must be less than 50MB');
       return;
     }
 
@@ -71,7 +72,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
       }, 500);
     } catch (error) {
       logger.error('Error uploading file:', error, { component: 'AttachmentsModal', action: 'component_action' });
-      alert('Failed to upload file');
+      showError('Failed to upload file');
       setUploading(false);
       setUploadProgress(0);
     }

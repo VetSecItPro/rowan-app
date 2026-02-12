@@ -5,6 +5,7 @@ import { CheckCircle, Trash2, AlertCircle, X, MoreHorizontal } from 'lucide-reac
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface BulkActionsBarProps {
   selectedTaskIds: string[];
@@ -34,7 +35,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onClearSelection();
     } catch (error) {
       logger.error('Error updating tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
-      alert('Failed to update tasks');
+      showError('Failed to update tasks');
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onClearSelection();
     } catch (error) {
       logger.error('Error updating tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
-      alert('Failed to update tasks');
+      showError('Failed to update tasks');
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onClearSelection();
     } catch (error) {
       logger.error('Error deleting tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
-      alert('Failed to delete tasks');
+      showError('Failed to delete tasks');
     } finally {
       setLoading(false);
     }
@@ -102,7 +103,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
       onClearSelection();
     } catch (error) {
       logger.error('Error completing tasks:', error, { component: 'BulkActionsBar', action: 'component_action' });
-      alert('Failed to complete tasks');
+      showError('Failed to complete tasks');
     } finally {
       setLoading(false);
     }

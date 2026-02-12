@@ -69,7 +69,7 @@ function UpgradePageContent() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+          <div className="bg-gray-800/95 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
               <Users className="w-6 h-6 text-white" />
             </div>
@@ -79,7 +79,7 @@ function UpgradePageContent() {
             </p>
           </div>
 
-          <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+          <div className="bg-gray-800/95 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
               <Zap className="w-6 h-6 text-white" />
             </div>
@@ -89,7 +89,7 @@ function UpgradePageContent() {
             </p>
           </div>
 
-          <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+          <div className="bg-gray-800/95 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
               <Shield className="w-6 h-6 text-white" />
             </div>
@@ -102,7 +102,7 @@ function UpgradePageContent() {
 
         {/* Pricing Card */}
         <div className="max-w-md mx-auto">
-          <div className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden">
+          <div className="bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden">
             {/* Pricing Header */}
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center">
               <h2 className="text-3xl font-bold text-white mb-2">Full Access</h2>

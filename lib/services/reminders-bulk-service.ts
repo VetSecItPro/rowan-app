@@ -1,4 +1,4 @@
-import { remindersService } from './reminders-service';
+import { createClient } from '@/lib/supabase/client';
 import type { Reminder } from './reminders-service';
 
 // =============================================
@@ -18,83 +18,105 @@ export const remindersBulkService = {
    * Complete multiple reminders at once
    */
   async completeReminders(reminderIds: string[]): Promise<BulkOperationResult> {
-    let successCount = 0;
-    let failedCount = 0;
     const errors: string[] = [];
 
-    for (const id of reminderIds) {
-      try {
-        await remindersService.updateReminder(id, {
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-        });
-        successCount++;
-      } catch (error) {
-        failedCount++;
-        errors.push(`Failed to complete reminder ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+    if (reminderIds.length === 0) {
+      return { success: true, successCount: 0, failedCount: 0, errors };
     }
 
-    return {
-      success: failedCount === 0,
-      successCount,
-      failedCount,
-      errors,
-    };
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+      })
+      .in('id', reminderIds)
+      .select('id');
+
+    if (error) {
+      errors.push(`Failed to complete reminders: ${error.message}`);
+      return { success: false, successCount: 0, failedCount: reminderIds.length, errors };
+    }
+
+    const successCount = data?.length ?? 0;
+    const failedCount = reminderIds.length - successCount;
+
+    if (failedCount > 0) {
+      const updatedIds = new Set((data || []).map((r: { id: string }) => r.id));
+      const missingIds = reminderIds.filter((id) => !updatedIds.has(id));
+      errors.push(`Reminders not found or not updated: ${missingIds.join(', ')}`);
+    }
+
+    return { success: failedCount === 0, successCount, failedCount, errors };
   },
 
   /**
    * Delete multiple reminders at once
    */
   async deleteReminders(reminderIds: string[]): Promise<BulkOperationResult> {
-    let successCount = 0;
-    let failedCount = 0;
     const errors: string[] = [];
 
-    for (const id of reminderIds) {
-      try {
-        await remindersService.deleteReminder(id);
-        successCount++;
-      } catch (error) {
-        failedCount++;
-        errors.push(`Failed to delete reminder ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+    if (reminderIds.length === 0) {
+      return { success: true, successCount: 0, failedCount: 0, errors };
     }
 
-    return {
-      success: failedCount === 0,
-      successCount,
-      failedCount,
-      errors,
-    };
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .delete()
+      .in('id', reminderIds)
+      .select('id');
+
+    if (error) {
+      errors.push(`Failed to delete reminders: ${error.message}`);
+      return { success: false, successCount: 0, failedCount: reminderIds.length, errors };
+    }
+
+    const successCount = data?.length ?? 0;
+    const failedCount = reminderIds.length - successCount;
+
+    if (failedCount > 0) {
+      const deletedIds = new Set((data || []).map((r: { id: string }) => r.id));
+      const missingIds = reminderIds.filter((id) => !deletedIds.has(id));
+      errors.push(`Reminders not found or not deleted: ${missingIds.join(', ')}`);
+    }
+
+    return { success: failedCount === 0, successCount, failedCount, errors };
   },
 
   /**
    * Reassign multiple reminders to a new user
    */
   async reassignReminders(reminderIds: string[], newAssigneeId: string | null): Promise<BulkOperationResult> {
-    let successCount = 0;
-    let failedCount = 0;
     const errors: string[] = [];
 
-    for (const id of reminderIds) {
-      try {
-        await remindersService.updateReminder(id, {
-          assigned_to: newAssigneeId || undefined,
-        });
-        successCount++;
-      } catch (error) {
-        failedCount++;
-        errors.push(`Failed to reassign reminder ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+    if (reminderIds.length === 0) {
+      return { success: true, successCount: 0, failedCount: 0, errors };
     }
 
-    return {
-      success: failedCount === 0,
-      successCount,
-      failedCount,
-      errors,
-    };
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .update({ assigned_to: newAssigneeId })
+      .in('id', reminderIds)
+      .select('id');
+
+    if (error) {
+      errors.push(`Failed to reassign reminders: ${error.message}`);
+      return { success: false, successCount: 0, failedCount: reminderIds.length, errors };
+    }
+
+    const successCount = data?.length ?? 0;
+    const failedCount = reminderIds.length - successCount;
+
+    if (failedCount > 0) {
+      const updatedIds = new Set((data || []).map((r: { id: string }) => r.id));
+      const missingIds = reminderIds.filter((id) => !updatedIds.has(id));
+      errors.push(`Reminders not found or not reassigned: ${missingIds.join(', ')}`);
+    }
+
+    return { success: failedCount === 0, successCount, failedCount, errors };
   },
 
   /**
@@ -104,28 +126,34 @@ export const remindersBulkService = {
     reminderIds: string[],
     newPriority: 'low' | 'medium' | 'high' | 'urgent'
   ): Promise<BulkOperationResult> {
-    let successCount = 0;
-    let failedCount = 0;
     const errors: string[] = [];
 
-    for (const id of reminderIds) {
-      try {
-        await remindersService.updateReminder(id, {
-          priority: newPriority,
-        });
-        successCount++;
-      } catch (error) {
-        failedCount++;
-        errors.push(`Failed to change priority for reminder ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+    if (reminderIds.length === 0) {
+      return { success: true, successCount: 0, failedCount: 0, errors };
     }
 
-    return {
-      success: failedCount === 0,
-      successCount,
-      failedCount,
-      errors,
-    };
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .update({ priority: newPriority })
+      .in('id', reminderIds)
+      .select('id');
+
+    if (error) {
+      errors.push(`Failed to change priority for reminders: ${error.message}`);
+      return { success: false, successCount: 0, failedCount: reminderIds.length, errors };
+    }
+
+    const successCount = data?.length ?? 0;
+    const failedCount = reminderIds.length - successCount;
+
+    if (failedCount > 0) {
+      const updatedIds = new Set((data || []).map((r: { id: string }) => r.id));
+      const missingIds = reminderIds.filter((id) => !updatedIds.has(id));
+      errors.push(`Reminders not found or priority not changed: ${missingIds.join(', ')}`);
+    }
+
+    return { success: failedCount === 0, successCount, failedCount, errors };
   },
 
   /**
@@ -135,28 +163,34 @@ export const remindersBulkService = {
     reminderIds: string[],
     newCategory: 'bills' | 'health' | 'work' | 'personal' | 'household'
   ): Promise<BulkOperationResult> {
-    let successCount = 0;
-    let failedCount = 0;
     const errors: string[] = [];
 
-    for (const id of reminderIds) {
-      try {
-        await remindersService.updateReminder(id, {
-          category: newCategory,
-        });
-        successCount++;
-      } catch (error) {
-        failedCount++;
-        errors.push(`Failed to change category for reminder ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+    if (reminderIds.length === 0) {
+      return { success: true, successCount: 0, failedCount: 0, errors };
     }
 
-    return {
-      success: failedCount === 0,
-      successCount,
-      failedCount,
-      errors,
-    };
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('reminders')
+      .update({ category: newCategory })
+      .in('id', reminderIds)
+      .select('id');
+
+    if (error) {
+      errors.push(`Failed to change category for reminders: ${error.message}`);
+      return { success: false, successCount: 0, failedCount: reminderIds.length, errors };
+    }
+
+    const successCount = data?.length ?? 0;
+    const failedCount = reminderIds.length - successCount;
+
+    if (failedCount > 0) {
+      const updatedIds = new Set((data || []).map((r: { id: string }) => r.id));
+      const missingIds = reminderIds.filter((id) => !updatedIds.has(id));
+      errors.push(`Reminders not found or category not changed: ${missingIds.join(', ')}`);
+    }
+
+    return { success: failedCount === 0, successCount, failedCount, errors };
   },
 
   /**

@@ -64,6 +64,7 @@ export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProp
         </span>
         <button
           onClick={onClose}
+          aria-label="Close reaction picker"
           className="text-gray-400 hover:text-gray-300"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,6 +82,7 @@ export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProp
           <button
             key={emoji}
             onClick={() => onSelect(emoji)}
+            aria-label={`React with ${emoji}`}
             className="flex h-8 w-8 items-center justify-center rounded text-lg transition-transform hover:scale-125 hover:bg-gray-700"
             title={emoji}
           >

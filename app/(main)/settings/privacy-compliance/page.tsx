@@ -114,7 +114,7 @@ export default function PrivacyCompliancePage() {
     ]}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Shield className="w-6 h-6 text-white" />
@@ -133,7 +133,7 @@ export default function PrivacyCompliancePage() {
         ) : (
           <>
             {/* CCPA Do Not Sell */}
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
                   <Lock className="w-5 h-5 text-white" />
@@ -177,7 +177,7 @@ export default function PrivacyCompliancePage() {
             </div>
 
             {/* Marketing Preferences */}
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
                   <Mail className="w-5 h-5 text-white" />
@@ -220,7 +220,7 @@ export default function PrivacyCompliancePage() {
             </div>
 
             {/* Cookie Preferences */}
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
                   <Cookie className="w-5 h-5 text-white" />
@@ -276,7 +276,7 @@ export default function PrivacyCompliancePage() {
             </div>
 
             {/* Data Sharing */}
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
                   <Share2 className="w-5 h-5 text-white" />
@@ -320,7 +320,7 @@ export default function PrivacyCompliancePage() {
 
             {/* Data Processing Agreements */}
             {agreements.length > 0 && (
-              <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+              <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center">
                     <FileText className="w-5 h-5 text-white" />

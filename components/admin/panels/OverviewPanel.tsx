@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
@@ -14,6 +14,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react';
+import { useComparison } from '@/components/admin/ComparisonContext';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 interface DashboardStats {
   users: {
@@ -57,17 +60,21 @@ interface AnalyticsData {
 const KPICard = memo(function KPICard({
   title,
   value,
+  previousValue,
   trend,
   trendLabel,
   icon: Icon,
   color,
+  onClick,
 }: {
   title: string;
   value: string | number;
+  previousValue?: string | number;
   trend?: number;
   trendLabel?: string;
   icon: React.ComponentType<{ className?: string }>;
   color: 'blue' | 'green' | 'purple' | 'cyan' | 'orange' | 'pink';
+  onClick?: () => void;
 }) {
   const colorClasses = {
     blue: 'bg-blue-500',
@@ -81,11 +88,22 @@ const KPICard = memo(function KPICard({
   const isPositive = trend !== undefined && trend >= 0;
 
   return (
-    <div className="bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-700">
+    <div
+      className={`bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-700 transition-colors ${
+        onClick ? 'cursor-pointer hover:bg-gray-750 hover:border-gray-600' : ''
+      }`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-gray-400">{title}</p>
           <p className="text-3xl font-bold text-white mt-2">{value}</p>
+          {previousValue !== undefined && (
+            <p className="text-xs text-gray-500 mt-0.5">Previous: {previousValue}</p>
+          )}
           {trend !== undefined && (
             <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
               {isPositive ? (
@@ -160,25 +178,39 @@ const QuickStat = memo(function QuickStat({
 });
 
 export const OverviewPanel = memo(function OverviewPanel() {
+  const { compareEnabled } = useComparison();
+
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    previousData?: DrillDownDataPoint[];
+    color?: string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
   // Fetch dashboard stats - shares cache with main dashboard page
-  // Returns just the stats object to match the dashboard page's queryFn
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
       const response = await adminFetch(`/api/admin/dashboard/stats?t=${Date.now()}&refresh=true`);
       if (!response.ok) throw new Error('Failed to fetch stats');
       const data = await response.json();
-      return data.stats; // Return just stats object, same as dashboard page
+      return data.stats;
     },
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });
 
-  // Fetch analytics for traffic data
+  // Fetch analytics for traffic data (with comparison if enabled)
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['admin-analytics', '30d'],
+    queryKey: ['admin-analytics', '30d', compareEnabled ? 'compare' : 'no-compare'],
     queryFn: async () => {
-      const response = await adminFetch('/api/admin/analytics?range=30d');
+      const url = compareEnabled
+        ? '/api/admin/analytics?range=30d&compare=true'
+        : '/api/admin/analytics?range=30d';
+      const response = await adminFetch(url);
       if (!response.ok) throw new Error('Failed to fetch analytics');
       const result = await response.json();
       return result.analytics;
@@ -188,6 +220,60 @@ export const OverviewPanel = memo(function OverviewPanel() {
   });
 
   const isLoading = statsLoading || analyticsLoading;
+
+  // Open drill-down for a specific KPI metric
+  const openDrillDown = useCallback((metric: string) => {
+    if (!analyticsData) return;
+    let data: DrillDownDataPoint[] = [];
+    let previousData: DrillDownDataPoint[] | undefined;
+    let title = '';
+    let color = '#8b5cf6';
+
+    switch (metric) {
+      case 'users':
+        data = (analyticsData.userGrowth || []).map((d: { date: string; users: number }) => ({
+          date: d.date, value: d.users,
+        }));
+        if (compareEnabled && analyticsData.previousPeriod?.userGrowth) {
+          previousData = analyticsData.previousPeriod.userGrowth.map((d: { date: string; users: number }) => ({
+            date: d.date, value: d.users,
+          }));
+        }
+        title = 'Total Users — Daily Registrations';
+        color = '#3b82f6';
+        break;
+      case 'pageViews':
+        data = (analyticsData.trafficTrends || []).map((d: { date: string; pageViews: number }) => ({
+          date: d.date, value: d.pageViews,
+        }));
+        if (compareEnabled && analyticsData.previousPeriod?.trafficTrends) {
+          previousData = analyticsData.previousPeriod.trafficTrends.map((d: { date: string; pageViews: number }) => ({
+            date: d.date, value: d.pageViews,
+          }));
+        }
+        title = 'Page Views — Daily Traffic';
+        color = '#06b6d4';
+        break;
+      case 'active':
+        data = (analyticsData.trafficTrends || []).map((d: { date: string; pageViews: number }) => ({
+          date: d.date, value: d.pageViews,
+        }));
+        title = 'Active Users — Daily Activity';
+        color = '#10b981';
+        break;
+      case 'conversion':
+        data = (analyticsData.signupTrends || []).map((d: { date: string; signups: number }) => ({
+          date: d.date, value: d.signups,
+        }));
+        title = 'Conversion — Daily Signups';
+        color = '#a855f7';
+        break;
+    }
+
+    if (data.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data, previousData, color });
+    }
+  }, [analyticsData, compareEnabled]);
 
   if (isLoading) {
     return (
@@ -219,28 +305,38 @@ export const OverviewPanel = memo(function OverviewPanel() {
           <KPICard
             title="Total Users"
             value={safeStats.users?.total || 0}
+            previousValue={compareEnabled && analyticsData?.previousPeriod?.summary?.totalUsers !== undefined
+              ? analyticsData.previousPeriod.summary.totalUsers
+              : undefined}
             trend={analytics.summary?.growthRate}
             trendLabel="vs last period"
             icon={Users}
             color="blue"
+            onClick={() => openDrillDown('users')}
           />
           <KPICard
             title="Page Views"
             value={analytics.trafficMetrics?.totalPageViews || 0}
+            previousValue={compareEnabled && analyticsData?.previousPeriod?.summary?.totalPageViews !== undefined
+              ? analyticsData.previousPeriod.summary.totalPageViews
+              : undefined}
             icon={Eye}
             color="cyan"
+            onClick={() => openDrillDown('pageViews')}
           />
           <KPICard
             title="Active Users"
             value={analytics.summary?.activeBetaUsers || 0}
             icon={Activity}
             color="green"
+            onClick={() => openDrillDown('active')}
           />
           <KPICard
             title="Conversion Rate"
             value={`${analytics.betaMetrics?.conversionRate || 0}%`}
             icon={TrendingUp}
             color="purple"
+            onClick={() => openDrillDown('conversion')}
           />
         </div>
       </div>
@@ -285,6 +381,21 @@ export const OverviewPanel = memo(function OverviewPanel() {
         <Clock className="w-3 h-3" />
         <span>Data refreshes every minute</span>
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle="Last 30 days"
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          previousData={drillDown.previousData}
+          metric={drillDown.metric}
+          color={drillDown.color}
+        />
+      </DrillDownModal>
     </div>
   );
 });

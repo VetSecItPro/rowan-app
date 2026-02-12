@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Modal } from '@/components/ui/Modal';
 import { formatDistance, format } from 'date-fns';
 import { logger } from '@/lib/logger';
+import { showError, showSuccess } from '@/lib/utils/toast';
 
 interface EventProposalModalProps {
   isOpen: boolean;
@@ -125,7 +126,7 @@ export function EventProposalModal({
       onClose();
     } catch (error) {
       logger.error('Failed to create proposal:', error, { component: 'EventProposalModal', action: 'component_action' });
-      alert('Failed to create proposal. Please try again.');
+      showError('Failed to create proposal. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -163,12 +164,12 @@ export function EventProposalModal({
     setLoading(true);
     try {
       await eventProposalsService.approveProposal(proposal.id, slotToApprove);
-      alert('Event created successfully!');
+      showSuccess('Event created successfully!');
       onProposalCreated?.();
       onClose();
     } catch (error) {
       logger.error('Failed to approve proposal:', error, { component: 'EventProposalModal', action: 'component_action' });
-      alert('Failed to create event. Please try again.');
+      showError('Failed to create event. Please try again.');
     } finally {
       setLoading(false);
       setShowApproveConfirm(false);

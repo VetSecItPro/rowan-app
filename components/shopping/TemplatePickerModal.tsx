@@ -5,6 +5,7 @@ import { FileText, ShoppingCart, Plus, Loader2, GripVertical } from 'lucide-reac
 import { shoppingService, type TemplateItemInput } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 import { CreateCustomTemplateModal } from './CreateCustomTemplateModal';
 
 interface Template {
@@ -57,7 +58,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
       onClose();
     } catch (error) {
       logger.error('Failed to create list from template:', error, { component: 'TemplatePickerModal', action: 'component_action' });
-      alert('Failed to create list from template. Please try again.');
+      showError('Failed to create list from template. Please try again.');
     } finally {
       setSelectedTemplateId(null);
     }

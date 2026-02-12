@@ -19,6 +19,7 @@ import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/
 import { CTAButton } from '@/components/ui/EnhancedButton';
 import { useRemindersRealtime } from '@/hooks/useRemindersRealtime';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 export default function RemindersPage(): React.JSX.Element {
   const { currentSpace, user, loading: authLoading } = useAuthWithSpaces();
@@ -227,7 +228,7 @@ export default function RemindersPage(): React.JSX.Element {
     } catch (error) {
       logger.error('Failed to save reminder:', error, { component: 'page', action: 'execution' });
       // Could add toast notification here for better UX
-      alert('Failed to save reminder. Please try again.');
+      showError('Failed to save reminder. Please try again.');
     }
   }, [editingReminder, user, setReminders]);
 
@@ -292,7 +293,7 @@ export default function RemindersPage(): React.JSX.Element {
       );
     } catch (error) {
       logger.error('Failed to mark bill as paid:', error, { component: 'page', action: 'execution' });
-      alert('Failed to mark bill as paid. Please try again.');
+      showError('Failed to mark bill as paid. Please try again.');
     }
   }, [setReminders]);
 
@@ -912,7 +913,7 @@ export default function RemindersPage(): React.JSX.Element {
         /* Show a message if no space exists */
         isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={handleCloseModal} />
+            <div className="absolute inset-0 bg-black/80" onClick={handleCloseModal} />
             <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
               <h3 className="text-xl font-bold text-white mb-4">No Space Available</h3>
               <p className="text-gray-400 mb-6">

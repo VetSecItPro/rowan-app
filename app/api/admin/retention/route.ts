@@ -24,6 +24,7 @@ import { z } from 'zod';
 const QueryParamsSchema = z.object({
   range: z.enum(['7d', '30d', '90d']).default('30d'),
   refresh: z.enum(['true', 'false']).optional(),
+  compare: z.enum(['true', 'false']).optional(),
 });
 
 // Force dynamic rendering for admin authentication
@@ -50,6 +51,13 @@ interface RetentionMetrics {
     rate: number;
     churned: number;
     retained: number;
+  };
+  previousPeriod?: {
+    dau: number;
+    wau: number;
+    mau: number;
+    stickiness: number;
+    dauTrend: { date: string; count: number }[];
   };
   lastUpdated: string;
 }
@@ -102,13 +110,19 @@ export async function GET(req: NextRequest) {
     const validatedParams = QueryParamsSchema.parse({
       range: searchParams.get('range') || '30d',
       refresh: searchParams.get('refresh') || undefined,
+      compare: searchParams.get('compare') || undefined,
     });
     const { range } = validatedParams;
     const forceRefresh = validatedParams.refresh === 'true';
+    const compareEnabled = validatedParams.compare === 'true';
 
     // Wrap retention computation in cache
+    const cacheKey = compareEnabled
+      ? `${ADMIN_CACHE_KEYS.retention(range)}:compare`
+      : ADMIN_CACHE_KEYS.retention(range);
+
     const retention = await withCache(
-      ADMIN_CACHE_KEYS.retention(range),
+      cacheKey,
       async (): Promise<RetentionMetrics> => {
         const now = new Date();
 
@@ -160,14 +174,16 @@ export async function GET(req: NextRequest) {
           supabaseAdmin
             .from('users')
             .select('id, created_at, last_seen')
-            .order('created_at', { ascending: true }),
+            .order('created_at', { ascending: true })
+            .limit(50000),
 
           // Feature events for daily activity trend
           supabaseAdmin
             .from('feature_events')
             .select('user_id, created_at')
             .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
+            .order('created_at', { ascending: true })
+            .limit(50000),
         ]);
 
         // Extract results
@@ -275,6 +291,75 @@ export async function GET(req: NextRequest) {
         const retained = totalUsersEver - churned;
         const churnRate = totalUsersEver > 0 ? Math.round((churned / totalUsersEver) * 100) : 0;
 
+        // Compute previous period comparison data
+        let previousPeriod = undefined;
+        if (compareEnabled) {
+          const rangeDays = range === '90d' ? 90 : range === '7d' ? 7 : 30;
+          const prevStart = new Date(startDate.getTime() - rangeDays * 24 * 60 * 60 * 1000);
+          const prevOneDayAgo = new Date(startDate.getTime() - 24 * 60 * 60 * 1000);
+          const prevOneWeekAgo = new Date(startDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const prevOneMonthAgo = new Date(startDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+          const [prevDauResult, prevWauResult, prevMauResult, prevEventsResult] = await Promise.allSettled([
+            supabaseAdmin
+              .from('users')
+              .select('id', { count: 'exact', head: true })
+              .gte('last_seen', prevOneDayAgo.toISOString())
+              .lt('last_seen', startDate.toISOString()),
+            supabaseAdmin
+              .from('users')
+              .select('id', { count: 'exact', head: true })
+              .gte('last_seen', prevOneWeekAgo.toISOString())
+              .lt('last_seen', startDate.toISOString()),
+            supabaseAdmin
+              .from('users')
+              .select('id', { count: 'exact', head: true })
+              .gte('last_seen', prevOneMonthAgo.toISOString())
+              .lt('last_seen', startDate.toISOString()),
+            supabaseAdmin
+              .from('feature_events')
+              .select('user_id, created_at')
+              .gte('created_at', prevStart.toISOString())
+              .lt('created_at', startDate.toISOString())
+              .limit(50000),
+          ]);
+
+          const prevDau = prevDauResult.status === 'fulfilled' ? (prevDauResult.value.count || 0) : 0;
+          const prevWau = prevWauResult.status === 'fulfilled' ? (prevWauResult.value.count || 0) : 0;
+          const prevMau = prevMauResult.status === 'fulfilled' ? (prevMauResult.value.count || 0) : 0;
+          const prevEvents = prevEventsResult.status === 'fulfilled' ? (prevEventsResult.value.data || []) : [];
+
+          // Build previous period DAU trend
+          const prevDailyActiveUsers: Record<string, Set<string>> = {};
+          prevEvents.forEach((event: { user_id: string | null; created_at: string }) => {
+            if (event.user_id) {
+              const dateStr = event.created_at.split('T')[0];
+              if (!prevDailyActiveUsers[dateStr]) {
+                prevDailyActiveUsers[dateStr] = new Set();
+              }
+              prevDailyActiveUsers[dateStr].add(event.user_id);
+            }
+          });
+
+          const prevDauTrend: { date: string; count: number }[] = [];
+          for (let i = 0; i < days; i++) {
+            const date = new Date(prevStart.getTime() + i * 24 * 60 * 60 * 1000);
+            const dateStr = date.toISOString().split('T')[0];
+            prevDauTrend.push({
+              date: dateStr,
+              count: prevDailyActiveUsers[dateStr]?.size || 0,
+            });
+          }
+
+          previousPeriod = {
+            dau: prevDau,
+            wau: prevWau,
+            mau: prevMau,
+            stickiness: prevMau > 0 ? Math.round((prevDau / prevMau) * 100) : 0,
+            dauTrend: prevDauTrend,
+          };
+        }
+
         return {
           dau,
           wau,
@@ -288,6 +373,7 @@ export async function GET(req: NextRequest) {
             churned,
             retained,
           },
+          previousPeriod,
           lastUpdated: new Date().toISOString(),
         };
       },

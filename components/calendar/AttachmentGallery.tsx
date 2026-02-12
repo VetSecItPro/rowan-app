@@ -7,6 +7,7 @@ import { eventAttachmentsService, EventAttachment } from '@/lib/services/event-a
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface AttachmentGalleryProps {
   eventId: string;
@@ -70,7 +71,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       await loadAttachments();
     } catch (error) {
       logger.error('Failed to upload files:', error, { component: 'AttachmentGallery', action: 'component_action' });
-      alert('Failed to upload one or more files. Please try again.');
+      showError('Failed to upload one or more files. Please try again.');
     } finally {
       setUploading(false);
       e.target.value = '';
@@ -95,7 +96,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       setAttachmentUrls(newUrls);
     } catch (error) {
       logger.error('Failed to delete attachment:', error, { component: 'AttachmentGallery', action: 'component_action' });
-      alert('Failed to delete attachment. Please try again.');
+      showError('Failed to delete attachment. Please try again.');
     } finally {
       setShowDeleteConfirm(false);
       setAttachmentToDelete(null);
@@ -120,7 +121,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
       logger.error('Failed to download attachment:', error, { component: 'AttachmentGallery', action: 'component_action' });
-      alert('Failed to download file. Please try again.');
+      showError('Failed to download file. Please try again.');
     }
   };
 
@@ -311,7 +312,7 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       {/* Image Preview Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <button

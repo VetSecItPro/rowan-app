@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
 import Link from 'next/link';
 
 import {
@@ -1454,7 +1451,7 @@ export default function GoalsDocumentationPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="mt-12 p-6 bg-indigo-900/40 backdrop-blur-md border border-indigo-800/50 rounded-xl">
+        <div className="mt-12 p-6 bg-indigo-900/50 border border-indigo-800/50 rounded-xl">
           <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <Link href="/goals" className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300">

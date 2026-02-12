@@ -51,11 +51,11 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
       {/* Clean background - no gradients */}
-      <div className="absolute inset-0 bg-gray-900" />
+      <div className="absolute inset-0 bg-black" />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Login Card */}
-        <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl p-8">
+        <div className="bg-gray-800/95 border border-gray-700/50 rounded-2xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center mb-4">

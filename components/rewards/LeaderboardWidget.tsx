@@ -72,17 +72,6 @@ export function LeaderboardWidget({
     }
   };
 
-  const _getPeriodLabel = () => {
-    switch (activePeriod) {
-      case 'week':
-        return 'This Week';
-      case 'month':
-        return 'This Month';
-      default:
-        return 'All Time';
-    }
-  };
-
   if (loading) {
     return (
       <div className={`bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-700 ${className}`}>

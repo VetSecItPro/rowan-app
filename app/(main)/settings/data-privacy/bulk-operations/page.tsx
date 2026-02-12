@@ -5,6 +5,7 @@ import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { showError, showWarning } from '@/lib/utils/toast';
 import {
   Database,
   Trash2,
@@ -35,7 +36,7 @@ export default function BulkOperationsPage() {
 
   const handleGetDeleteCount = async () => {
     if (!deleteStartDate || !deleteEndDate) {
-      alert('Please select both start and end dates');
+      showWarning('Please select both start and end dates');
       return;
     }
 
@@ -47,13 +48,13 @@ export default function BulkOperationsPage() {
       setDeleteCount(data.count || 0);
     } catch (error) {
       logger.error('Error getting delete count:', error, { component: 'page', action: 'execution' });
-      alert('Failed to get count');
+      showError('Failed to get count');
     }
   };
 
   const handleBulkDelete = async () => {
     if (!deleteStartDate || !deleteEndDate) {
-      alert('Please select both start and end dates');
+      showWarning('Please select both start and end dates');
       return;
     }
 
@@ -85,11 +86,11 @@ export default function BulkOperationsPage() {
         setDeleteStartDate('');
         setDeleteEndDate('');
       } else {
-        alert('Failed to delete expenses: ' + (data.error || 'Unknown error'));
+        showError('Failed to delete expenses: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
       logger.error('Error deleting expenses:', error, { component: 'page', action: 'execution' });
-      alert('Failed to delete expenses');
+      showError('Failed to delete expenses');
     } finally {
       setIsDeleting(false);
     }
@@ -97,7 +98,7 @@ export default function BulkOperationsPage() {
 
   const handleBulkArchive = async () => {
     if (!archiveDate) {
-      alert('Please select a date');
+      showWarning('Please select a date');
       return;
     }
 
@@ -129,11 +130,11 @@ export default function BulkOperationsPage() {
         setArchiveSuccess(true);
         setArchiveCount(data.archived_count);
       } else {
-        alert('Failed to archive tasks: ' + (data.error || 'Unknown error'));
+        showError('Failed to archive tasks: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
       logger.error('Error archiving tasks:', error, { component: 'page', action: 'execution' });
-      alert('Failed to archive tasks');
+      showError('Failed to archive tasks');
     } finally {
       setIsArchiving(false);
     }
@@ -147,7 +148,7 @@ export default function BulkOperationsPage() {
     ]}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Database className="w-6 h-6 text-white" />
@@ -162,7 +163,7 @@ export default function BulkOperationsPage() {
         </div>
 
         {/* Bulk Delete Expenses */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4 mb-6">
             <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
               <Trash2 className="w-5 h-5 text-white" />
@@ -255,7 +256,7 @@ export default function BulkOperationsPage() {
         </div>
 
         {/* Bulk Archive Tasks */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4 mb-6">
             <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center">
               <Archive className="w-5 h-5 text-white" />

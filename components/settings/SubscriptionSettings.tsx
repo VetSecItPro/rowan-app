@@ -248,7 +248,7 @@ export function SubscriptionSettings() {
         {/* Current Plan Features */}
         <div className="border-t border-gray-700 pt-5">
           <h4 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-            <Star className="h-4 w-4" />
+            <Star aria-hidden="true" className="h-4 w-4" />
             Your current features
           </h4>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -261,7 +261,7 @@ export function SubscriptionSettings() {
                       ? 'bg-emerald-900/30'
                       : 'bg-gray-800'
                 }`}>
-                  <Check className={`h-3 w-3 ${
+                  <Check aria-hidden="true" className={`h-3 w-3 ${
                     effectiveTier === 'family' ? 'text-purple-400' :
                     effectiveTier === 'pro' ? 'text-emerald-400' : 'text-gray-500'
                   }`} />

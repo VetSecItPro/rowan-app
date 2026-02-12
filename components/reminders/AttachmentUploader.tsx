@@ -5,6 +5,7 @@ import { Upload, Link as LinkIcon, X, Loader2 } from 'lucide-react';
 import { reminderAttachmentsService } from '@/lib/services/reminder-attachments-service';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
 
@@ -71,7 +72,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
     const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
       const names = oversizedFiles.map(f => f.name).join(', ');
-      alert(`Files exceed 2MB limit: ${names}`);
+      showWarning(`Files exceed 2MB limit: ${names}`);
       return;
     }
 
@@ -84,7 +85,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
           await reminderAttachmentsService.uploadFile(reminderId, file, user.id);
         } catch (error) {
           logger.error('Error uploading ${file.name}:', error, { component: 'AttachmentUploader', action: 'component_action' });
-          alert(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          showError(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
 
@@ -114,7 +115,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
       onUploadComplete();
     } catch (error) {
       logger.error('Error creating URL attachment:', error, { component: 'AttachmentUploader', action: 'component_action' });
-      alert(`Failed to add URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showError(`Failed to add URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsUploading(false);
     }

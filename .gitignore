@@ -54,6 +54,9 @@ test-*.js
 public/screenshots/
 /ios/
 
+# Generated build assets (icons, splash screens)
+.generated-icons/
+
 # Firebase config files (contain API keys)
 google-services.json
 GoogleService-Info.plist
@@ -172,3 +175,7 @@ docs/CI-CD-SETUP.md
 # Playwright MCP
 .playwright-mcp/
 .design-reports/
+.cleancode-reports/
+.cleancode-audit.json
+.deps-reports/
+.db/

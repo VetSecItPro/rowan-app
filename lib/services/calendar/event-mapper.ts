@@ -269,20 +269,6 @@ function parseICalDateTime(icalDateTime: string): string {
 // HELPER FUNCTIONS: COLOR MAPPING
 // =============================================================================
 
-const _GOOGLE_COLORS: Record<string, string> = {
-  '1': '#a4bdfc', // Lavender
-  '2': '#7ae7bf', // Sage
-  '3': '#dbadff', // Grape
-  '4': '#ff887c', // Flamingo
-  '5': '#fbd75b', // Banana
-  '6': '#ffb878', // Tangerine
-  '7': '#46d6db', // Peacock
-  '8': '#e1e1e1', // Graphite
-  '9': '#5484ed', // Blueberry
-  '10': '#51b749', // Basil
-  '11': '#dc2127', // Tomato
-};
-
 const ROWAN_TO_GOOGLE_COLOR: Record<string, string> = {
   blue: '9',
   purple: '3',

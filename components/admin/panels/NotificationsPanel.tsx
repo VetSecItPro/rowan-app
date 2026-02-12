@@ -60,9 +60,12 @@ const SourceBadge = memo(function SourceBadge({ source }: { source: string }) {
   );
 });
 
+const ITEMS_PER_PAGE = 25;
+
 export const NotificationsPanel = memo(function NotificationsPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'subscribed' | 'unsubscribed'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // React Query for notifications with caching
   const { data, isLoading, refetch } = useQuery({
@@ -90,11 +93,27 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
     refetch();
   }, [refetch]);
 
+  // Reset page when filter/search changes
+  const handleFilterChange = useCallback((f: 'all' | 'subscribed' | 'unsubscribed') => {
+    setFilter(f);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  }, []);
+
   // Filter by search term
   const filteredNotifications = notifications.filter(notif =>
     (notif.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (notif.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Pagination
+  const totalPages = Math.ceil(filteredNotifications.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedNotifications = filteredNotifications.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   // Calculate stats
   const stats: NotificationStats = {
@@ -154,7 +173,7 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
           {(['all', 'subscribed', 'unsubscribed'] as const).map((f) => (
             <button
               key={f}
-              onClick={() => setFilter(f)}
+              onClick={() => handleFilterChange(f)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 filter === f
                   ? 'bg-green-900/30 text-green-400'
@@ -172,7 +191,7 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
               type="text"
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-48 pl-9 pr-3 py-1.5 text-sm bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white"
             />
           </div>
@@ -199,7 +218,7 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {filteredNotifications.slice(0, 15).map((notif) => (
+              {paginatedNotifications.map((notif) => (
                 <tr key={notif.id} className="hover:bg-gray-800/50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -236,9 +255,30 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
               <p>No notifications found</p>
             </div>
           )}
-          {filteredNotifications.length > 15 && (
-            <div className="p-3 text-center text-sm text-gray-400 border-t border-gray-700">
-              Showing 15 of {filteredNotifications.length} notifications
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-3 border-t border-gray-700 bg-gray-800/50">
+              <span className="text-xs text-gray-400">
+                {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, filteredNotifications.length)} of {filteredNotifications.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-2.5 py-1 text-xs font-medium rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 hover:bg-gray-700"
+                >
+                  Prev
+                </button>
+                <span className="px-2 text-xs text-gray-400">
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-2.5 py-1 text-xs font-medium rounded-md transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 hover:bg-gray-700"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

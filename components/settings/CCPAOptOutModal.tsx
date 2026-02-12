@@ -178,7 +178,7 @@ export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
                         ? 'bg-green-900/20 border-green-800'
                         : 'bg-orange-900/20 border-orange-800'
                     }`}>
-                      <CheckCircle className={`w-5 h-5 ${
+                      <CheckCircle aria-hidden="true" className={`w-5 h-5 ${
                         ccpaStatus.opted_out ? 'text-green-400' : 'text-orange-400'
                       }`} />
                       <div>

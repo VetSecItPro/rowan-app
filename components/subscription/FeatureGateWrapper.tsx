@@ -220,7 +220,7 @@ function FeatureGateOverlay({
 
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="bg-gray-900/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-sm text-center">
+      <div className="bg-gray-900 rounded-2xl shadow-xl p-8 max-w-sm text-center">
         <div className="mb-4 mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-900/30">
           <Lock className="h-7 w-7 text-emerald-400" />
         </div>
