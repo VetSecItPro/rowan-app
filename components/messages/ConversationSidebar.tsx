@@ -144,7 +144,7 @@ export function ConversationSidebar({
   }, [dropdownOpenForId]);
 
   return (
-    <div className={`flex flex-col h-full bg-gray-900/50 backdrop-blur-2xl backdrop-saturate-150 border-r border-gray-700/30 shadow-xl conversation-sidebar ${className}`}>
+    <div className={`flex flex-col h-full bg-gray-900/95 border-r border-gray-700/30 shadow-xl conversation-sidebar ${className}`}>
       {/* Header - Simplified */}
       <div className="flex items-center justify-between p-3 border-b border-gray-700/20 bg-transparent">
         <h2 className="text-base font-semibold text-white flex items-center gap-2">
@@ -183,7 +183,7 @@ export function ConversationSidebar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-800/50 backdrop-blur-lg border border-gray-600/40 rounded-full focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-white placeholder-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-800/70 border border-gray-600/40 rounded-full focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-white placeholder-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
           />
         </div>
       </div>
@@ -254,7 +254,7 @@ export function ConversationSidebar({
       {dropdownOpenForId && mounted && createPortal(
         <div
           ref={dropdownRef}
-          className="fixed w-44 bg-gray-800/90 backdrop-blur-xl backdrop-saturate-150 border border-gray-600/50 rounded-2xl shadow-2xl shadow-black/40 py-1.5 z-[10000] ring-1 ring-white/5"
+          className="fixed w-44 bg-gray-800/95 border border-gray-600/50 rounded-2xl shadow-2xl shadow-black/40 py-1.5 z-[70] ring-1 ring-white/5"
           style={{
             top: dropdownPosition.top,
             right: dropdownPosition.right

@@ -7,6 +7,7 @@ import { taskDependenciesService } from '@/lib/services/task-dependencies-servic
 import { createClient } from '@/lib/supabase/client';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface DependenciesModalProps {
   isOpen: boolean;
@@ -88,10 +89,10 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
       if (message.includes('circular')) {
-        alert('Cannot add dependency: This would create a circular dependency chain');
+        showWarning('Cannot add dependency: This would create a circular dependency chain');
       } else {
         logger.error('Error adding dependency:', error, { component: 'DependenciesModal', action: 'component_action' });
-        alert('Failed to add dependency');
+        showError('Failed to add dependency');
       }
     } finally {
       setAdding(false);

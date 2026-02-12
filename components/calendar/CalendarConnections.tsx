@@ -801,7 +801,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={() => setShowEmailModal(false)}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/75" />
           <div
             className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
@@ -897,7 +897,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={() => setShowAppleModal(false)}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/75" />
           <div
             className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
@@ -1023,7 +1023,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={() => setShowIcsModal(false)}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/75" />
           <div
             className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
@@ -1226,7 +1226,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={() => setShowCoziModal(false)}
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/75" />
           <div
             className="relative bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}

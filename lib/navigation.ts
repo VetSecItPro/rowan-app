@@ -22,89 +22,46 @@ export interface NavItem {
   description: string;
 }
 
-export const NAVIGATION_ITEMS: NavItem[] = [
+export interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+// Grouped navigation — reduces cognitive load (Hick's law: <7 groups)
+export const NAVIGATION_GROUPS: NavGroup[] = [
   {
-    name: 'Tasks & Chores',
-    href: '/tasks',
-    icon: CheckSquare,
-    gradient: 'bg-gradient-tasks',
-    description: 'Get things done',
+    label: 'Daily',
+    items: [
+      { name: 'Tasks & Chores', href: '/tasks', icon: CheckSquare, gradient: 'bg-gradient-tasks', description: 'Get things done' },
+      { name: 'Calendar', href: '/calendar', icon: Calendar, gradient: 'bg-gradient-calendar', description: 'Stay synced' },
+      { name: 'Reminders', href: '/reminders', icon: Bell, gradient: 'bg-gradient-reminders', description: 'Never forget' },
+      { name: 'Daily Check-In', href: '/dashboard#daily-checkin', icon: Heart, gradient: 'bg-gradient-to-r from-pink-500 to-purple-500', description: 'Track your mood' },
+    ],
   },
   {
-    name: 'Calendar',
-    href: '/calendar',
-    icon: Calendar,
-    gradient: 'bg-gradient-calendar',
-    description: 'Stay synced',
+    label: 'Family',
+    items: [
+      { name: 'Messages', href: '/messages', icon: MessageCircle, gradient: 'bg-gradient-messages', description: 'Chat instantly' },
+      { name: 'Family Location', href: '/location', icon: MapPin, gradient: 'bg-gradient-location', description: 'Stay connected' },
+    ],
   },
   {
-    name: 'Reminders',
-    href: '/reminders',
-    icon: Bell,
-    gradient: 'bg-gradient-reminders',
-    description: 'Never forget',
+    label: 'Household',
+    items: [
+      { name: 'Meal Planning', href: '/meals', icon: UtensilsCrossed, gradient: 'bg-gradient-meals', description: 'Plan meals' },
+      { name: 'Shopping Lists', href: '/shopping', icon: ShoppingCart, gradient: 'bg-gradient-shopping', description: 'Shop together' },
+      { name: 'Projects & Budget', href: '/projects', icon: Home, gradient: 'bg-gradient-projects', description: 'Track & manage' },
+    ],
   },
   {
-    name: 'Messages',
-    href: '/messages',
-    icon: MessageCircle,
-    gradient: 'bg-gradient-messages',
-    description: 'Chat instantly',
-  },
-  {
-    name: 'Shopping Lists',
-    href: '/shopping',
-    icon: ShoppingCart,
-    gradient: 'bg-gradient-shopping',
-    description: 'Shop together',
-  },
-  {
-    name: 'Meal Planning',
-    href: '/meals',
-    icon: UtensilsCrossed,
-    gradient: 'bg-gradient-meals',
-    description: 'Plan meals',
-  },
-  {
-    name: 'Projects & Budget',
-    href: '/projects',
-    icon: Home,
-    gradient: 'bg-gradient-projects',
-    description: 'Track & manage',
-  },
-  {
-    name: 'Goals & Milestones',
-    href: '/goals',
-    icon: Target,
-    gradient: 'bg-gradient-goals',
-    description: 'Track progress',
-  },
-  {
-    name: 'Family Location',
-    href: '/location',
-    icon: MapPin,
-    gradient: 'bg-gradient-location',
-    description: 'Stay connected',
-  },
-  {
-    name: 'Rewards Shop',
-    href: '/rewards',
-    icon: Gift,
-    gradient: 'bg-gradient-to-r from-amber-500 to-orange-500',
-    description: 'Redeem points',
-  },
-  {
-    name: 'Daily Check-In',
-    href: '/dashboard#daily-checkin',
-    icon: Heart,
-    gradient: 'bg-gradient-to-r from-pink-500 to-purple-500',
-    description: 'Track your mood',
-  },
-  {
-    name: 'Year in Review',
-    href: '/year-in-review',
-    icon: Sparkles,
-    gradient: 'bg-gradient-to-r from-yellow-500 to-amber-500',
-    description: 'Annual insights',
+    label: 'Growth',
+    items: [
+      { name: 'Goals & Milestones', href: '/goals', icon: Target, gradient: 'bg-gradient-goals', description: 'Track progress' },
+      { name: 'Rewards Shop', href: '/rewards', icon: Gift, gradient: 'bg-gradient-to-r from-amber-500 to-orange-500', description: 'Redeem points' },
+      { name: 'Year in Review', href: '/year-in-review', icon: Sparkles, gradient: 'bg-gradient-to-r from-yellow-500 to-amber-500', description: 'Annual insights' },
+    ],
   },
 ];
+
+// Flat list for backward compatibility (BottomNav, etc.)
+export const NAVIGATION_ITEMS: NavItem[] = NAVIGATION_GROUPS.flatMap(g => g.items);

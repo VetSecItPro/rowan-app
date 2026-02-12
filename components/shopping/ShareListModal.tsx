@@ -70,9 +70,10 @@ export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: Share
   };
 
   const handleShare = async () => {
-    if (shareUrl && navigator.share) {
+    if (shareUrl) {
       try {
-        await navigator.share({
+        const { shareContent } = await import('@/lib/native/share');
+        await shareContent({
           title: `Shopping List: ${list?.title}`,
           text: `Check out this shopping list`,
           url: shareUrl,

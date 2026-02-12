@@ -23,7 +23,7 @@ export function PullToRefreshIndicator({
         transition: isRefreshing ? 'transform 0.3s ease-out' : 'none',
       }}
     >
-      <div className="bg-gray-800/90 backdrop-blur-lg rounded-full px-4 py-2 shadow-lg border border-gray-700">
+      <div className="bg-gray-800/95 rounded-full px-4 py-2 shadow-lg border border-gray-700">
         <div className="flex items-center gap-2">
           <Loader2 
             className={`w-4 h-4 text-indigo-500 ${isRefreshing ? 'animate-spin' : ''}`}

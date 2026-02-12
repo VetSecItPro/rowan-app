@@ -3,11 +3,13 @@
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { PublicHeaderLite } from '@/components/layout/PublicHeaderLite';
-import { HeroSection } from '@/components/home/HeroSection';
 import { MobileStickyBar } from '@/components/home/MobileStickyBar';
 
 // Loading placeholder to reserve space and prevent CLS
 const SectionSkeleton = () => <div className="py-20 px-4" aria-hidden="true" />;
+
+// PERF-001: Lazy-load HeroSection — pulls in @remotion/player (~100-200KB)
+const HeroSection = dynamic(() => import('@/components/home/HeroSection').then(m => ({ default: m.HeroSection })), { ssr: false, loading: SectionSkeleton });
 
 // Dynamic imports for below-fold sections (reduces initial bundle)
 const PainPointsSection = dynamic(() => import('@/components/home/PainPointsSection').then(m => ({ default: m.PainPointsSection })), { ssr: false, loading: SectionSkeleton });

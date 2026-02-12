@@ -16,6 +16,7 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { logger } from '@/lib/logger';
+import { showError, showSuccess, showWarning, showInfo } from '@/lib/utils/toast';
 // Lazy-loaded components for better initial page load
 import {
   LazyNewShoppingListModal,
@@ -216,7 +217,7 @@ export default function ShoppingPage() {
       setEditingList(null);
     } catch (error) {
       logger.error('Failed to save list:', error, { component: 'page', action: 'execution' });
-      alert('Failed to save shopping list. Please try again.');
+      showError('Failed to save shopping list. Please try again.');
     }
   }, [editingList, user, spaceId, queryClient, invalidateShopping]);
 
@@ -224,7 +225,7 @@ export default function ShoppingPage() {
   const handleDeleteList = useCallback(async (listId: string) => {
     // Prevent actions on optimistic lists (temp IDs)
     if (listId.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before deleting.');
+      showInfo('Please wait for the list to finish saving before deleting.');
       return;
     }
 
@@ -258,7 +259,7 @@ export default function ShoppingPage() {
   const handleCompleteList = useCallback(async (listId: string) => {
     // Prevent actions on optimistic lists (temp IDs)
     if (listId.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before completing.');
+      showInfo('Please wait for the list to finish saving before completing.');
       return;
     }
 
@@ -341,7 +342,7 @@ export default function ShoppingPage() {
   const handleEditList = useCallback((list: ShoppingList) => {
     // Prevent actions on optimistic lists (temp IDs)
     if (list.id.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before editing.');
+      showInfo('Please wait for the list to finish saving before editing.');
       return;
     }
 
@@ -427,7 +428,7 @@ export default function ShoppingPage() {
   const handleSaveAsTemplate = useCallback((list: ShoppingList) => {
     // Prevent actions on optimistic lists (temp IDs)
     if (list.id.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before creating a template.');
+      showInfo('Please wait for the list to finish saving before creating a template.');
       return;
     }
 
@@ -451,7 +452,7 @@ export default function ShoppingPage() {
       );
 
       // Show success message
-      alert('Template saved successfully!');
+      showSuccess('Template saved successfully!');
       setShowTemplateModal(false);
       setListForTemplate(null);
     } catch (error) {
@@ -463,7 +464,7 @@ export default function ShoppingPage() {
   const handleScheduleTrip = useCallback((list: ShoppingList) => {
     // Prevent actions on optimistic lists (temp IDs)
     if (list.id.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before scheduling a trip.');
+      showInfo('Please wait for the list to finish saving before scheduling a trip.');
       return;
     }
 
@@ -480,7 +481,7 @@ export default function ShoppingPage() {
   }) => {
     if (!currentSpace || !listToSchedule) {
       logger.error('Missing required data: currentSpace or listToSchedule', undefined, { component: 'page', action: 'execution' });
-      alert('Unable to schedule trip. Please try again.');
+      showError('Unable to schedule trip. Please try again.');
       return;
     }
 
@@ -551,7 +552,7 @@ export default function ShoppingPage() {
       logger.info('Trip scheduling completed successfully', { component: 'page' });
 
       // Show success message
-      alert(`Shopping trip scheduled for ${eventData.date} at ${eventData.time}!`);
+      showSuccess(`Shopping trip scheduled for ${eventData.date} at ${eventData.time}!`);
       setShowScheduleTripModal(false);
       setListToSchedule(null);
     } catch (error) {
@@ -564,7 +565,7 @@ export default function ShoppingPage() {
         errorMessage += 'Please try again.';
       }
 
-      alert(errorMessage);
+      showError(errorMessage);
       throw error;
     }
   }, [currentSpace, listToSchedule]);
@@ -574,7 +575,7 @@ export default function ShoppingPage() {
 
     // Prevent actions on optimistic lists (temp IDs)
     if (list.id.startsWith('temp-')) {
-      alert('Please wait for the list to finish saving before creating a task.');
+      showInfo('Please wait for the list to finish saving before creating a task.');
       return;
     }
 
@@ -602,10 +603,10 @@ export default function ShoppingPage() {
       await shoppingIntegrationService.linkToTask(list.id, task.id);
 
       // Show success message
-      alert(`Task created: ${task.title}`);
+      showSuccess(`Task created: ${task.title}`);
     } catch (error) {
       logger.error('Failed to create task:', error, { component: 'page', action: 'execution' });
-      alert('Failed to create task. Please try again.');
+      showError('Failed to create task. Please try again.');
     }
   }, [currentSpace, user?.id]);
 

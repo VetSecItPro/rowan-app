@@ -61,7 +61,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
     // Must be public to be accessible
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
-      .select('*')
+      .select('id, title, description, created_by, is_public, share_read_only, share_token')
       .eq('share_token', validatedToken)
       .eq('is_public', true)
       .single();
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
     // Get shopping items for this list
     const { data: items, error: itemsError } = await supabase
       .from('shopping_items')
-      .select('*')
+      .select('id, name, quantity, unit, category, is_checked, list_id, notes')
       .eq('list_id', shoppingList.id)
       .order('category', { ascending: true })
       .order('name', { ascending: true });

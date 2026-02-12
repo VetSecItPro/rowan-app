@@ -121,7 +121,7 @@ export default function AuditLogPage() {
     ]}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <Shield className="w-6 h-6 text-white" />
@@ -144,7 +144,7 @@ export default function AuditLogPage() {
         {/* Stats */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-gray-400">Total Events</h3>
                 <BarChart3 className="w-5 h-5 text-purple-500" />
@@ -152,7 +152,7 @@ export default function AuditLogPage() {
               <p className="text-2xl font-bold text-white">{stats.total}</p>
             </div>
 
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-gray-400">Recent (30d)</h3>
                 <Calendar className="w-5 h-5 text-blue-500" />
@@ -160,7 +160,7 @@ export default function AuditLogPage() {
               <p className="text-2xl font-bold text-white">{stats.recent_actions}</p>
             </div>
 
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-gray-400">Security Events</h3>
                 <Lock className="w-5 h-5 text-orange-500" />
@@ -168,7 +168,7 @@ export default function AuditLogPage() {
               <p className="text-2xl font-bold text-white">{stats.by_category.security}</p>
             </div>
 
-            <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
+            <div className="bg-gray-800/40 border border-gray-700/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium text-gray-400">Data Access</h3>
                 <Eye className="w-5 h-5 text-green-500" />
@@ -179,7 +179,7 @@ export default function AuditLogPage() {
         )}
 
         {/* Filters */}
-        <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4">
+        <div className="bg-gray-800/40 border border-gray-700/20 rounded-xl p-4">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center justify-between w-full"
@@ -270,7 +270,7 @@ export default function AuditLogPage() {
               return (
                 <div
                   key={entry.id}
-                  className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-xl p-4 hover:shadow-lg transition-shadow"
+                  className="bg-gray-800/40 border border-gray-700/20 rounded-xl p-4 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${CATEGORY_COLORS[entry.action_category]}`}>

@@ -23,7 +23,7 @@ export function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
       {/* Header Skeleton */}
-      <header className="bg-[#0a0a0f]/80 backdrop-blur-lg border-b border-gray-800/50 sticky top-0 z-50">
+      <header className="bg-[#0a0a0f]/95 border-b border-gray-800/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
@@ -106,7 +106,7 @@ export function DashboardSkeleton() {
 
       {/* Overlay with subtle loading indicator */}
       <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-gray-700">
+        <div className="bg-gray-800/95 rounded-lg px-3 py-2 shadow-lg border border-gray-700">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
             <span className="text-sm text-gray-400">Loading...</span>

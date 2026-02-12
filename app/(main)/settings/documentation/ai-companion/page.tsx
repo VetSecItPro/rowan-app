@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
 import Link from 'next/link';
 import {
   type LucideIcon,
@@ -121,6 +118,12 @@ const guideSections: GuideSection[] = [
         href: '#data-access',
       },
       {
+        title: 'How AI Processing Works',
+        description: 'Rowan AI is powered by Google Gemini. Your first names and household data are sent to Google to generate personalized responses. No data is used for model training.',
+        readTime: '2 min read',
+        href: '#ai-processing',
+      },
+      {
         title: 'Data Retention & Deletion',
         description: 'Conversations are automatically deleted after 90 days. You can export or delete all AI data anytime.',
         readTime: '2 min read',
@@ -154,7 +157,7 @@ export default function AICompanionDocPage() {
           </Link>
 
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center">
               <Bot className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -245,6 +248,14 @@ export default function AICompanionDocPage() {
               <div>
                 <p className="text-sm font-medium text-white">Household Data Only</p>
                 <p className="text-xs text-gray-400 mt-0.5">Tasks, events, lists — never passwords or financials</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-900/40">
+              <Bot className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-white">Powered by Google Gemini</p>
+                <p className="text-xs text-gray-400 mt-0.5">First names and household data are sent to Google for AI responses</p>
               </div>
             </div>
 

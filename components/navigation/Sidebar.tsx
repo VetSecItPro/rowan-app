@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
-import { NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
+import { NAVIGATION_GROUPS, NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
@@ -314,11 +314,13 @@ export function Sidebar() {
     });
   }, []);
 
-  // Memoize active states
-  const activeStates = useMemo(() => {
-    return NAVIGATION_ITEMS.map(item =>
-      pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href))
-    );
+  // Build active state lookup by href for grouped rendering
+  const activeByHref = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const item of NAVIGATION_ITEMS) {
+      map[item.href] = pathname === item.href || (item.href !== '/dashboard' && (pathname?.startsWith(item.href) ?? false));
+    }
+    return map;
   }, [pathname]);
 
   // Render placeholder during SSR to prevent layout shift
@@ -358,21 +360,36 @@ export function Sidebar() {
         </button>
       </div>
 
-      {/* Navigation Items */}
+      {/* Navigation Items — Grouped */}
       <nav className="flex-1 py-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-thumb-gray-700">
-        {/* Features Section with subtle background */}
-        <div className={`mb-3 rounded-xl bg-gradient-to-b from-gray-800/20 to-transparent ${effectivelyExpanded ? 'mx-2 p-2' : 'mx-1 p-1'}`}>
-          <ul className="space-y-1.5">
-            {NAVIGATION_ITEMS.map((item, index) => (
-              <NavItemComponent
-                key={item.href}
-                item={item}
-                isActive={activeStates[index] ?? false}
-                isExpanded={effectivelyExpanded}
-                onPrefetch={prefetchRoute}
-              />
-            ))}
-          </ul>
+        <div className={`rounded-xl bg-gradient-to-b from-gray-800/20 to-transparent ${effectivelyExpanded ? 'mx-2 p-2' : 'mx-1 p-1'}`}>
+          {NAVIGATION_GROUPS.map((group, groupIdx) => (
+            <div key={group.label}>
+              {/* Group separator (not before first group) */}
+              {groupIdx > 0 && (
+                <div className={`my-2 ${effectivelyExpanded ? 'mx-1' : 'mx-2'}`}>
+                  <div className="border-t border-gray-700/30" />
+                </div>
+              )}
+              {/* Group label — only when expanded */}
+              {effectivelyExpanded && (
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2.5 pt-1 pb-1.5">
+                  {group.label}
+                </span>
+              )}
+              <ul className="space-y-1.5">
+                {group.items.map((item) => (
+                  <NavItemComponent
+                    key={item.href}
+                    item={item}
+                    isActive={activeByHref[item.href] ?? false}
+                    isExpanded={effectivelyExpanded}
+                    onPrefetch={prefetchRoute}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </nav>
 

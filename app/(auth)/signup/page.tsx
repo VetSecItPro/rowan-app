@@ -298,7 +298,7 @@ export default function SignUpPage() {
         className="flex-1 lg:w-1/2 bg-gray-950 flex items-center justify-center p-4 sm:p-8 overflow-y-auto"
       >
         <motion.div
-          className="w-full max-w-md py-10 bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-800/50 my-8"
+          className="w-full max-w-md py-10 bg-gray-900/95 p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-800/50 my-8"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -564,7 +564,7 @@ export default function SignUpPage() {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    className="absolute z-10 w-full mt-2 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl"
+                    className="absolute z-10 w-full mt-2 bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl max-h-64 overflow-y-auto"
                   >
                     {colorThemes.map((theme) => (
                       <button

@@ -63,14 +63,20 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const timeRange = searchParams.get('range') || '7d'; // 7d, 30d, 90d
     const forceRefresh = searchParams.get('refresh') === 'true';
+    const compareEnabled = searchParams.get('compare') === 'true';
 
     // Wrap analytics computation in cache (15 minute TTL for expensive queries)
+    const cacheKey = compareEnabled
+      ? `${ADMIN_CACHE_KEYS.analytics(timeRange)}:compare`
+      : ADMIN_CACHE_KEYS.analytics(timeRange);
+
     const analytics = await withCache(
-      ADMIN_CACHE_KEYS.analytics(timeRange),
+      cacheKey,
       async () => {
         // Calculate date ranges
         const now = new Date();
         let startDate: Date;
+        const rangeDays = timeRange === '90d' ? 90 : timeRange === '30d' ? 30 : 7;
 
         switch (timeRange) {
           case '30d':
@@ -82,6 +88,10 @@ export async function GET(req: NextRequest) {
           default: // 7d
             startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         }
+
+        // Previous period dates (e.g., if range=30d, previous = day 31-60 ago)
+        const previousEnd = new Date(startDate.getTime());
+        const previousStart = new Date(startDate.getTime() - rangeDays * 24 * 60 * 60 * 1000);
 
         // Fetch comprehensive analytics data in parallel
         const [
@@ -100,21 +110,24 @@ export async function GET(req: NextRequest) {
             .from('launch_notifications')
             .select('created_at, source')
             .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
+            .order('created_at', { ascending: true })
+            .limit(10000),
 
           // User registrations over time
           supabaseAdmin
             .from('users')
             .select('created_at, id')
             .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
+            .order('created_at', { ascending: true })
+            .limit(10000),
 
           // Feature events for page view tracking
           supabaseAdmin
             .from('feature_events')
             .select('feature, action, device_type, browser, os, session_id, created_at')
             .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
+            .order('created_at', { ascending: true })
+            .limit(50000),
 
           // Total feature events count (all time)
           supabaseAdmin
@@ -126,27 +139,31 @@ export async function GET(req: NextRequest) {
             .from('feature_events')
             .select('device_type')
             .gte('created_at', startDate.toISOString())
-            .not('device_type', 'is', null),
+            .not('device_type', 'is', null)
+            .limit(50000),
 
           // Browser breakdown
           supabaseAdmin
             .from('feature_events')
             .select('browser, os')
             .gte('created_at', startDate.toISOString())
-            .not('browser', 'is', null),
+            .not('browser', 'is', null)
+            .limit(50000),
 
           // Top pages (features)
           supabaseAdmin
             .from('feature_events')
             .select('feature')
             .eq('action', 'page_view')
-            .gte('created_at', startDate.toISOString()),
+            .gte('created_at', startDate.toISOString())
+            .limit(50000),
 
           // Hourly activity pattern
           supabaseAdmin
             .from('feature_events')
             .select('created_at')
-            .gte('created_at', startDate.toISOString()),
+            .gte('created_at', startDate.toISOString())
+            .limit(50000),
         ]);
 
         // Process results
@@ -356,7 +373,88 @@ export async function GET(req: NextRequest) {
           lastUpdated: new Date().toISOString(),
         };
 
-        return analytics;
+        // Compute previous period data if comparison is enabled
+        let previousPeriod = undefined;
+        if (compareEnabled) {
+          const [
+            prevFeatureEventsResult,
+            prevUsersResult,
+            prevLaunchResult,
+          ] = await Promise.allSettled([
+            supabaseAdmin
+              .from('feature_events')
+              .select('action, created_at')
+              .gte('created_at', previousStart.toISOString())
+              .lt('created_at', previousEnd.toISOString())
+              .limit(50000),
+            supabaseAdmin
+              .from('users')
+              .select('created_at')
+              .gte('created_at', previousStart.toISOString())
+              .lt('created_at', previousEnd.toISOString())
+              .limit(10000),
+            supabaseAdmin
+              .from('launch_notifications')
+              .select('created_at')
+              .gte('created_at', previousStart.toISOString())
+              .lt('created_at', previousEnd.toISOString())
+              .limit(10000),
+          ]);
+
+          const prevFeatureEvents = prevFeatureEventsResult.status === 'fulfilled' ? (prevFeatureEventsResult.value.data || []) : [];
+          const prevUsers = prevUsersResult.status === 'fulfilled' ? (prevUsersResult.value.data || []) : [];
+          const prevLaunch = prevLaunchResult.status === 'fulfilled' ? (prevLaunchResult.value.data || []) : [];
+
+          const prevTotalPageViews = prevFeatureEvents.filter((e: { action: string }) => e.action === 'page_view').length;
+
+          // Daily page views for previous period
+          const prevDailyPageViews: Record<string, number> = {};
+          prevFeatureEvents.forEach((e: { action: string; created_at: string }) => {
+            if (e.action === 'page_view') {
+              const dateStr = e.created_at.split('T')[0];
+              prevDailyPageViews[dateStr] = (prevDailyPageViews[dateStr] || 0) + 1;
+            }
+          });
+
+          // Generate daily data for previous period (same number of days)
+          const prevDailyData = [];
+          for (let i = 0; i < days; i++) {
+            const date = new Date(previousStart.getTime() + i * 24 * 60 * 60 * 1000);
+            const dateStr = date.toISOString().split('T')[0];
+
+            const prevLaunchCount = prevLaunch.filter((n: { created_at: string }) =>
+              n.created_at.startsWith(dateStr)
+            ).length;
+            const prevUserCount = prevUsers.filter((u: { created_at: string }) =>
+              u.created_at.startsWith(dateStr)
+            ).length;
+
+            prevDailyData.push({
+              date: dateStr,
+              pageViews: prevDailyPageViews[dateStr] || 0,
+              userRegistrations: prevUserCount,
+              launchNotifications: prevLaunchCount,
+            });
+          }
+
+          previousPeriod = {
+            trafficTrends: prevDailyData.map(day => ({
+              date: day.date,
+              pageViews: day.pageViews,
+            })),
+            userGrowth: prevDailyData.map(day => ({
+              date: day.date,
+              users: day.userRegistrations,
+            })),
+            summary: {
+              totalPageViews: prevTotalPageViews,
+              totalUsers: prevUsers.length,
+              totalNotifications: prevLaunch.length,
+            },
+          };
+        }
+
+        return { ...analytics, previousPeriod };
       },
       { ttl: ADMIN_CACHE_TTL.analytics, skipCache: forceRefresh }
     );

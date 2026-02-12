@@ -102,7 +102,7 @@ function VerifyEmailChangeContent() {
         </div>
 
         {/* Card */}
-        <div className="bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 border border-gray-700/50">
+        <div className="bg-gray-800/95 rounded-2xl shadow-xl p-8 border border-gray-700/50">
           {isVerifying && (
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">

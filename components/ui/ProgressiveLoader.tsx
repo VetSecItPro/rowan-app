@@ -113,7 +113,7 @@ export function EnhancedModalSkeleton({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div className={`bg-gray-800 rounded-2xl shadow-2xl w-full p-6 transform transition-all duration-300 ${sizeClasses[size]}`}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

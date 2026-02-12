@@ -208,7 +208,7 @@ function ExpenseForm({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpen
                   setDateError('');
                 }
               }}
-              className={`w-full px-4 py-2 bg-gray-800/60 backdrop-blur-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white ${
+              className={`w-full px-4 py-2 bg-gray-800/80 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white ${
                 dateError ? 'border-red-500' : 'border-gray-700/50'
               }`}
             />
@@ -224,7 +224,7 @@ function ExpenseForm({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpen
       {/* Emoji Picker Portal */}
       {showEmojiPicker && emojiButtonRect && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-[9999] w-full sm:w-80 max-w-[calc(100vw-2rem)]"
+          className="fixed bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 z-[70] w-full sm:w-80 max-w-[calc(100vw-2rem)]"
           style={{
             top: `${emojiButtonRect.bottom + 8}px`,
             left: `${Math.max(16, emojiButtonRect.right - 320)}px`,

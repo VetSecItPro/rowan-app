@@ -37,7 +37,7 @@ export default function PageErrorBoundary({
   const PageErrorFallback = (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
-        <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-2xl p-6 shadow-lg">
+        <div className="bg-gray-800/80 border border-gray-700/50 rounded-2xl p-6 shadow-lg">
           <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-900/30 flex items-center justify-center">
             <AlertTriangle className="w-6 h-6 text-red-400" />
           </div>

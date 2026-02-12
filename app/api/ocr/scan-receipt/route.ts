@@ -15,13 +15,24 @@ const AIReceiptSchema = z.object({
   receipt_date: z.string().max(100).optional().nullable(),
   category: z.string().max(100).optional().nullable(),
   confidence: z.number().min(0).max(100).optional().nullable(),
-}).passthrough();
+}).strip();
 
 // =====================================================
 // GEMINI VISION OCR API ROUTE
 // =====================================================
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
+// Lazy-init Gemini client to avoid build-time crash when env var is missing
+let _genAI: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+  if (!_genAI) {
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+    }
+    _genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return _genAI;
+}
 
 /**
  * POST /api/ocr/scan-receipt
@@ -136,7 +147,7 @@ Rules:
 Extract the data now:`;
 
     // Call Gemini Vision API
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: 'gemini-2.5-flash',
       generationConfig: { maxOutputTokens: 4096 },
     });

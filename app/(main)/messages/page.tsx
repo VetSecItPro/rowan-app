@@ -990,7 +990,7 @@ export default function MessagesPage() {
 
               {/* Members Panel - Slides down */}
               {showMembersPanel && (
-                <div className="px-4 py-3 bg-gray-800/80 backdrop-blur-xl border-b border-gray-700">
+                <div className="px-4 py-3 bg-gray-800/95 border-b border-gray-700">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-semibold text-gray-300">Chat Members</h3>
                     <button

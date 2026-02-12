@@ -24,7 +24,6 @@ import { logger } from '@/lib/logger';
 interface MigrationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  personalSpace: Space & { role: string };
   targetSpaces: (Space & { role: string })[];
 }
 
@@ -85,7 +84,7 @@ const MIGRATION_ITEMS: MigrationItem[] = [
 
 type MigrationStep = 'selection' | 'target' | 'confirmation' | 'progress' | 'complete';
 
-export function MigrationModal({ isOpen, onClose, personalSpace: _personalSpace, targetSpaces }: MigrationModalProps) {
+export function MigrationModal({ isOpen, onClose, targetSpaces }: MigrationModalProps) {
   const [step, setStep] = useState<MigrationStep>('selection');
   const [selectedItems, setSelectedItems] = useState<MigrationItemType[]>(
     MIGRATION_ITEMS.filter(item => item.enabled).map(item => item.type)

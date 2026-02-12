@@ -28,9 +28,9 @@ export function PinnedMessages({
   const visibleMessages = isCollapsed ? [] : messages;
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/20 backdrop-blur-lg border border-amber-700/30 shadow-lg shadow-amber-900/20 ring-1 ring-white/5">
+    <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-orange-900/20 border border-amber-700/30 shadow-lg shadow-amber-900/20 ring-1 ring-white/5">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-amber-700/30 bg-gradient-to-r from-amber-800/30 to-yellow-800/20 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-amber-700/30 bg-gradient-to-r from-amber-800/30 to-yellow-800/20">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md">
             <Pin className="w-3.5 h-3.5 text-white" />
@@ -41,7 +41,7 @@ export function PinnedMessages({
         </div>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 hover:bg-amber-700/40 rounded-lg transition-all duration-200 backdrop-blur-sm"
+          className="p-1.5 hover:bg-amber-700/40 rounded-lg transition-all duration-200"
           aria-label={isCollapsed ? 'Expand pinned messages' : 'Collapse pinned messages'}
         >
           {isCollapsed ? (

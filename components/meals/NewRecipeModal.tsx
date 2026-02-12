@@ -10,6 +10,7 @@ import { RecipePreviewModal } from '@/components/meals/RecipePreviewModal';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { showError, showSuccess, showWarning } from '@/lib/utils/toast';
 
 interface NewRecipeModalProps {
   isOpen: boolean;
@@ -97,7 +98,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       // Validate file type
       const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
       if (!validTypes.includes(file.type)) {
-        alert('Please upload a valid image file (PNG, JPG, or JPEG)');
+        showWarning('Please upload a valid image file (PNG, JPG, or JPEG)');
         if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
@@ -105,7 +106,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
-        alert('Image size must be less than 5MB');
+        showWarning('Image size must be less than 5MB');
         if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
@@ -121,7 +122,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
 
   const handleParseRecipe = async () => {
     if (!recipeText && !recipeImage) {
-      alert('Please provide either recipe text or an image');
+      showWarning('Please provide either recipe text or an image');
       return;
     }
 
@@ -192,10 +193,10 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
       // Switch to manual tab so user can review and edit
       setActiveTab('manual');
 
-      alert('✓ Recipe parsed successfully! Please review and edit as needed before saving.');
+      showSuccess('Recipe parsed successfully! Please review and edit as needed before saving.');
     } catch (error) {
       logger.error('Parse error:', error, { component: 'NewRecipeModal', action: 'component_action' });
-      alert(error instanceof Error ? error.message : 'Failed to parse recipe. Please try again.');
+      showError(error instanceof Error ? error.message : 'Failed to parse recipe. Please try again.');
     } finally {
       setParsing(false);
     }

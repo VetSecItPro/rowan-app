@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
   Users,
   Calendar,
@@ -10,6 +11,9 @@ import {
   RefreshCw,
   ArrowUpRight,
 } from 'lucide-react';
+import { useComparison } from '@/components/admin/ComparisonContext';
+import { DrillDownModal } from '@/components/admin/DrillDownModal';
+import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
 type SubTab = 'dau-mau' | 'cohorts' | 'churn';
 
@@ -43,23 +47,81 @@ interface RetentionData {
 }
 
 // Hook to fetch retention data
-function useRetentionData(range: string = '30d') {
-  return useQuery<RetentionData>({
-    queryKey: ['admin-retention', range],
+function useRetentionData(range: string = '30d', compareEnabled: boolean = false) {
+  return useQuery<RetentionData & { previousPeriod?: { dau: number; wau: number; mau: number; stickiness: number; dauTrend: { date: string; count: number }[] } }>({
+    queryKey: ['admin-retention', range, compareEnabled ? 'compare' : 'no-compare'],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/retention?range=${range}`);
+      const url = compareEnabled
+        ? `/api/admin/retention?range=${range}&compare=true`
+        : `/api/admin/retention?range=${range}`;
+      const response = await adminFetch(url);
       if (!response.ok) throw new Error('Failed to fetch retention data');
       const result = await response.json();
       return result.retention;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 }
 
 // DAU/MAU Panel
 const DauMauPanel = memo(function DauMauPanel() {
-  const { data, isLoading, refetch, isFetching } = useRetentionData();
+  const { compareEnabled } = useComparison();
+  const { data, isLoading, refetch, isFetching } = useRetentionData('30d', compareEnabled);
+
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    previousData?: DrillDownDataPoint[];
+    color?: string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (!data) return;
+    const dauTrend = data.dauTrend || [];
+    const prevDauTrend = data.previousPeriod?.dauTrend;
+
+    let chartData: DrillDownDataPoint[] = [];
+    let previousChartData: DrillDownDataPoint[] | undefined;
+    let title = '';
+    let color = '#3b82f6';
+
+    switch (metric) {
+      case 'dau':
+        chartData = dauTrend.map((d) => ({ date: d.date, value: d.count }));
+        if (compareEnabled && prevDauTrend) {
+          previousChartData = prevDauTrend.map((d: { date: string; count: number }) => ({ date: d.date, value: d.count }));
+        }
+        title = 'Daily Active Users — Trend';
+        color = '#3b82f6';
+        break;
+      case 'wau':
+        chartData = dauTrend.map((d) => ({ date: d.date, value: d.count }));
+        title = 'Weekly Active Users — Daily Breakdown';
+        color = '#6366f1';
+        break;
+      case 'mau':
+        chartData = dauTrend.map((d) => ({ date: d.date, value: d.count }));
+        if (compareEnabled && prevDauTrend) {
+          previousChartData = prevDauTrend.map((d: { date: string; count: number }) => ({ date: d.date, value: d.count }));
+        }
+        title = 'Monthly Active Users — Daily Breakdown';
+        color = '#a855f7';
+        break;
+      case 'stickiness':
+        chartData = dauTrend.map((d) => ({ date: d.date, value: d.count }));
+        title = 'Stickiness — Daily Active Users';
+        color = '#10b981';
+        break;
+    }
+
+    if (chartData.length > 0) {
+      setDrillDown({ isOpen: true, title, metric, data: chartData, previousData: previousChartData, color });
+    }
+  }, [data, compareEnabled]);
 
   if (isLoading) {
     return (
@@ -75,6 +137,7 @@ const DauMauPanel = memo(function DauMauPanel() {
   const stickiness = data?.stickiness || 0;
   const stickinessLabel = data?.stickinessLabel || 'No data';
   const dauTrend = data?.dauTrend || [];
+  const prevPeriod = data?.previousPeriod;
 
   // Get last 7 days for weekly chart
   const weeklyData = dauTrend.slice(-7);
@@ -83,44 +146,80 @@ const DauMauPanel = memo(function DauMauPanel() {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-blue-600 rounded-xl p-5 text-white">
+        <div
+          className="bg-blue-600 rounded-xl p-5 text-white cursor-pointer hover:bg-blue-500 transition-colors"
+          onClick={() => openDrillDown('dau')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('dau'); }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm">Daily Active Users</p>
               <p className="text-4xl font-bold mt-2">{dau}</p>
+              {compareEnabled && prevPeriod && (
+                <p className="text-blue-200 text-xs mt-0.5">Previous: {prevPeriod.dau}</p>
+              )}
               <p className="text-blue-200 text-xs mt-1">Last 24 hours</p>
             </div>
             <Activity className="w-10 h-10 text-blue-200" />
           </div>
         </div>
 
-        <div className="bg-indigo-600 rounded-xl p-5 text-white">
+        <div
+          className="bg-indigo-600 rounded-xl p-5 text-white cursor-pointer hover:bg-indigo-500 transition-colors"
+          onClick={() => openDrillDown('wau')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('wau'); }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-indigo-100 text-sm">Weekly Active Users</p>
               <p className="text-4xl font-bold mt-2">{wau}</p>
+              {compareEnabled && prevPeriod && (
+                <p className="text-indigo-200 text-xs mt-0.5">Previous: {prevPeriod.wau}</p>
+              )}
               <p className="text-indigo-200 text-xs mt-1">Last 7 days</p>
             </div>
             <Users className="w-10 h-10 text-indigo-200" />
           </div>
         </div>
 
-        <div className="bg-purple-600 rounded-xl p-5 text-white">
+        <div
+          className="bg-purple-600 rounded-xl p-5 text-white cursor-pointer hover:bg-purple-500 transition-colors"
+          onClick={() => openDrillDown('mau')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('mau'); }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100 text-sm">Monthly Active Users</p>
               <p className="text-4xl font-bold mt-2">{mau}</p>
+              {compareEnabled && prevPeriod && (
+                <p className="text-purple-200 text-xs mt-0.5">Previous: {prevPeriod.mau}</p>
+              )}
               <p className="text-purple-200 text-xs mt-1">Last 30 days</p>
             </div>
             <Users className="w-10 h-10 text-purple-200" />
           </div>
         </div>
 
-        <div className="bg-green-600 rounded-xl p-5 text-white">
+        <div
+          className="bg-green-600 rounded-xl p-5 text-white cursor-pointer hover:bg-green-500 transition-colors"
+          onClick={() => openDrillDown('stickiness')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('stickiness'); }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Stickiness (DAU/MAU)</p>
               <p className="text-4xl font-bold mt-2">{stickiness}%</p>
+              {compareEnabled && prevPeriod && (
+                <p className="text-green-200 text-xs mt-0.5">Previous: {prevPeriod.stickiness}%</p>
+              )}
               <p className="text-green-200 text-xs mt-1">{stickinessLabel}</p>
             </div>
             <TrendingDown className="w-10 h-10 text-green-200 rotate-180" />
@@ -188,6 +287,21 @@ const DauMauPanel = memo(function DauMauPanel() {
           </div>
         )}
       </div>
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle="Last 30 days"
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          previousData={drillDown.previousData}
+          metric={drillDown.metric}
+          color={drillDown.color}
+        />
+      </DrillDownModal>
     </div>
   );
 });

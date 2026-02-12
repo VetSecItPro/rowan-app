@@ -131,7 +131,7 @@ export function RecipePreviewModal({
       {/* Backdrop */}
       <div
         className={`
-          absolute inset-0 bg-black/70 backdrop-blur-sm
+          absolute inset-0 bg-black/80
           transition-opacity duration-300
           ${isAnimating ? 'opacity-100' : 'opacity-0'}
         `}
@@ -324,7 +324,7 @@ export function RecipePreviewModal({
         </div>
 
         {/* Footer Actions - Mobile Optimized */}
-        <div className="flex-shrink-0 px-4 sm:px-5 md:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/90 backdrop-blur-md pb-safe-4 sm:pb-4">
+        <div className="flex-shrink-0 px-4 sm:px-5 md:px-6 py-3 sm:py-4 border-t border-gray-700/50 bg-gray-800/95 pb-safe-4 sm:pb-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={onClose}

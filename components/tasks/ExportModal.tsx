@@ -6,6 +6,7 @@ import { taskExportService } from '@/lib/services/task-export-service';
 import { TaskFilters } from './TaskFilterPanel';
 import { Modal } from '@/components/ui/Modal';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
       onClose();
     } catch (error) {
       logger.error('Error exporting tasks:', error, { component: 'ExportModal', action: 'component_action' });
-      alert('Failed to export tasks');
+      showError('Failed to export tasks');
     } finally {
       setLoading(false);
     }

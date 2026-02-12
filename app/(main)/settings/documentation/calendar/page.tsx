@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities, jsx-a11y/alt-text */
-'use client';
-
 import Link from 'next/link';
 
 import {

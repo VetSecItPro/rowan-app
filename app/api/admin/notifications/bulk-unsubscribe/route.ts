@@ -7,6 +7,7 @@ import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { logAdminAction } from '@/lib/utils/admin-audit';
 
 const BulkUnsubscribeSchema = z.object({
   ids: z.array(z.string().uuid()).min(1).max(1000),
@@ -83,7 +84,17 @@ export async function POST(req: NextRequest) {
 
     const processedCount = updatedRecords?.length || 0;
 
-    // Log the bulk unsubscribe action
+    // Audit log: bulk unsubscribe
+    const adminId = (sessionData as { adminId?: string }).adminId;
+    if (adminId) {
+      logAdminAction({
+        adminUserId: adminId,
+        action: 'bulk_unsubscribe',
+        targetResource: 'launch_notifications',
+        metadata: { requestedCount: ids.length, processedCount },
+        ipAddress: ip,
+      });
+    }
 
     // Optional: Send confirmation emails to unsubscribed users
     // This would typically be handled by a background job or queue

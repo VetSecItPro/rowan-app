@@ -114,7 +114,7 @@ export default function RootLayout({
                   richColors
                   theme="dark"
                   toastOptions={{
-                    className: 'w-full max-w-md mx-4 sm:mx-0 backdrop-blur-md',
+                    className: 'w-full max-w-md mx-4 sm:mx-0',
                     style: {
                       fontSize: '14px',
                       padding: '12px 16px',

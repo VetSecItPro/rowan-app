@@ -24,6 +24,7 @@ import { z } from 'zod';
 const QueryParamsSchema = z.object({
   range: z.enum(['7d', '30d', '90d']).default('30d'),
   refresh: z.enum(['true', 'false']).optional(),
+  compare: z.enum(['true', 'false']).optional(),
 });
 
 // Force dynamic rendering for admin authentication
@@ -51,6 +52,11 @@ interface AcquisitionMetrics {
   referrers: ReferrerData[];
   dailyTrend: { date: string; visitors: number; signups: number }[];
   topChannels: { channel: string; visitors: number; trend: number }[];
+  previousPeriod?: {
+    totalVisitors: number;
+    totalSignups: number;
+    dailyTrend: { date: string; visitors: number; signups: number }[];
+  };
   lastUpdated: string;
 }
 
@@ -102,13 +108,19 @@ export async function GET(req: NextRequest) {
     const validatedParams = QueryParamsSchema.parse({
       range: searchParams.get('range') || '30d',
       refresh: searchParams.get('refresh') || undefined,
+      compare: searchParams.get('compare') || undefined,
     });
     const { range } = validatedParams;
     const forceRefresh = validatedParams.refresh === 'true';
+    const compareEnabled = validatedParams.compare === 'true';
 
     // Wrap acquisition computation in cache
+    const cacheKey = compareEnabled
+      ? `${ADMIN_CACHE_KEYS.acquisition(range)}:compare`
+      : ADMIN_CACHE_KEYS.acquisition(range);
+
     const acquisition = await withCache(
-      ADMIN_CACHE_KEYS.acquisition(range),
+      cacheKey,
       async (): Promise<AcquisitionMetrics> => {
         const now = new Date();
 
@@ -139,7 +151,8 @@ export async function GET(req: NextRequest) {
             .from('launch_notifications')
             .select('id, source, referrer, created_at, email')
             .gte('created_at', startDate.toISOString())
-            .order('created_at', { ascending: true }),
+            .order('created_at', { ascending: true })
+            .limit(10000),
 
           // Previous period launch notifications for trend
           supabaseAdmin
@@ -152,7 +165,8 @@ export async function GET(req: NextRequest) {
           supabaseAdmin
             .from('users')
             .select('id, created_at')
-            .gte('created_at', startDate.toISOString()),
+            .gte('created_at', startDate.toISOString())
+            .limit(10000),
         ]);
 
         // Extract results
@@ -261,6 +275,59 @@ export async function GET(req: NextRequest) {
           .sort((a, b) => b.visitors - a.visitors)
           .slice(0, 5);
 
+        // Compute previous period data if comparison is enabled
+        let previousPeriod = undefined;
+        if (compareEnabled) {
+          const [prevLaunchDetailResult, prevUsersDetailResult] = await Promise.allSettled([
+            supabaseAdmin
+              .from('launch_notifications')
+              .select('created_at')
+              .gte('created_at', previousStart.toISOString())
+              .lt('created_at', startDate.toISOString())
+              .order('created_at', { ascending: true })
+              .limit(10000),
+            supabaseAdmin
+              .from('users')
+              .select('created_at')
+              .gte('created_at', previousStart.toISOString())
+              .lt('created_at', startDate.toISOString())
+              .limit(10000),
+          ]);
+
+          const prevLaunch = prevLaunchDetailResult.status === 'fulfilled' ? (prevLaunchDetailResult.value.data || []) : [];
+          const prevUsers = prevUsersDetailResult.status === 'fulfilled' ? (prevUsersDetailResult.value.data || []) : [];
+
+          // Daily visitors/signups for previous period
+          const prevDailyVisitors: Record<string, number> = {};
+          const prevDailySignups: Record<string, number> = {};
+
+          prevLaunch.forEach((item: { created_at: string }) => {
+            const dateStr = item.created_at.split('T')[0];
+            prevDailyVisitors[dateStr] = (prevDailyVisitors[dateStr] || 0) + 1;
+          });
+          prevUsers.forEach((user: { created_at: string }) => {
+            const dateStr = user.created_at.split('T')[0];
+            prevDailySignups[dateStr] = (prevDailySignups[dateStr] || 0) + 1;
+          });
+
+          const prevDailyTrend: { date: string; visitors: number; signups: number }[] = [];
+          for (let i = 0; i < days; i++) {
+            const date = new Date(previousStart.getTime() + i * 24 * 60 * 60 * 1000);
+            const dateStr = date.toISOString().split('T')[0];
+            prevDailyTrend.push({
+              date: dateStr,
+              visitors: prevDailyVisitors[dateStr] || 0,
+              signups: prevDailySignups[dateStr] || 0,
+            });
+          }
+
+          previousPeriod = {
+            totalVisitors: prevLaunch.length,
+            totalSignups: prevUsers.length,
+            dailyTrend: prevDailyTrend,
+          };
+        }
+
         return {
           totalVisitors,
           totalSignups,
@@ -269,6 +336,7 @@ export async function GET(req: NextRequest) {
           referrers,
           dailyTrend,
           topChannels,
+          previousPeriod,
           lastUpdated: new Date().toISOString(),
         };
       },

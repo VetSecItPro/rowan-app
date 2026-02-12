@@ -14,6 +14,7 @@ import {
   Loader2,
   FileSpreadsheet,
 } from 'lucide-react';
+import { showError } from '@/lib/utils/toast';
 import { logger } from '@/lib/logger';
 
 interface ExportOption {
@@ -197,7 +198,7 @@ export const ExportPanel = memo(function ExportPanel() {
       setLastExport({ name: option.name, time: new Date() });
     } catch (error) {
       logger.error('Export failed:', error, { component: 'ExportPanel', action: 'component_action' });
-      alert('Export failed. Please try again.');
+      showError('Export failed. Please try again.');
     } finally {
       setExportingId(null);
     }

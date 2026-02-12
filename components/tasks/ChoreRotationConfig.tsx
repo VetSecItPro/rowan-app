@@ -6,6 +6,7 @@ import { choreRotationService } from '@/lib/services/chore-rotation-service';
 import { createClient } from '@/lib/supabase/client';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface ChoreRotationConfigProps {
   taskId: string;
@@ -94,7 +95,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
 
   async function handleSave() {
     if (formData.member_ids.length < 2) {
-      alert('Please select at least 2 members for rotation');
+      showWarning('Please select at least 2 members for rotation');
       return;
     }
 
@@ -115,7 +116,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       setEditing(false);
     } catch (error) {
       logger.error('Error saving rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
-      alert('Failed to save rotation');
+      showError('Failed to save rotation');
     } finally {
       setSaving(false);
     }
@@ -137,7 +138,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
       });
     } catch (error) {
       logger.error('Error deleting rotation:', error, { component: 'ChoreRotationConfig', action: 'component_action' });
-      alert('Failed to delete rotation');
+      showError('Failed to delete rotation');
     }
   }
 

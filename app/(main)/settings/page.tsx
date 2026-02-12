@@ -15,6 +15,7 @@ import { DeleteSpaceModal } from '@/components/spaces/DeleteSpaceModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
+import { showError, showSuccess, showWarning, showInfo } from '@/lib/utils/toast';
 // Dynamic imports for optimized bundle splitting
 import {
   AccountDeletionModal,
@@ -488,7 +489,7 @@ export default function SettingsPage() {
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      alert(error);
+      showError(error instanceof Error ? error.message : String(error));
     }
 
     // Reset input
@@ -502,14 +503,14 @@ export default function SettingsPage() {
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(profileData.email)) {
-        alert('Please enter a valid email address');
+        showWarning('Please enter a valid email address');
         setIsSavingProfile(false);
         return;
       }
 
       // Validate name
       if (!profileData.name.trim()) {
-        alert('Please enter your name');
+        showWarning('Please enter your name');
         setIsSavingProfile(false);
         return;
       }
@@ -545,7 +546,7 @@ export default function SettingsPage() {
 
       // Show user-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
-      alert(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsSavingProfile(false);
     }
@@ -588,11 +589,11 @@ export default function SettingsPage() {
           member.id === memberId ? { ...member, role: newRole } : member
         ));
       } else {
-        alert(result.error || 'Failed to update role');
+        showError(result.error || 'Failed to update role');
       }
     } catch (error) {
       logger.error('Error updating member role:', error, { component: 'page', action: 'execution' });
-      alert('Failed to update member role');
+      showError('Failed to update member role');
     } finally {
       setIsUpdatingRole(null);
     }
@@ -603,13 +604,13 @@ export default function SettingsPage() {
     if (!member) return;
 
     if (member.isCurrentUser) {
-      alert('You cannot remove yourself. Use "Leave Space" instead.');
+      showWarning('You cannot remove yourself. Use "Leave Space" instead.');
       return;
     }
 
     const adminCount = spaceMembers.filter(m => m.role === 'Admin').length;
     if (member.role === 'Admin' && adminCount === 1) {
-      alert('Cannot remove the last admin. Promote another member to admin first.');
+      showWarning('Cannot remove the last admin. Promote another member to admin first.');
       return;
     }
 
@@ -635,11 +636,11 @@ export default function SettingsPage() {
       if (result.success) {
         setSpaceMembers(spaceMembers.filter(m => m.id !== memberToRemove));
       } else {
-        alert(result.error || 'Failed to remove member');
+        showError(result.error || 'Failed to remove member');
       }
     } catch (error) {
       logger.error('Error removing member:', error, { component: 'page', action: 'execution' });
-      alert('Failed to remove member');
+      showError('Failed to remove member');
     } finally {
       setShowRemoveMemberConfirm(false);
       setMemberToRemove(null);
@@ -648,12 +649,12 @@ export default function SettingsPage() {
 
   const handleRenameSpace = async () => {
     if (!newSpaceNameEdit.trim()) {
-      alert('Please enter a space name');
+      showWarning('Please enter a space name');
       return;
     }
 
     if (!currentSpace) {
-      alert('No space selected');
+      showError('No space selected');
       return;
     }
 
@@ -665,7 +666,7 @@ export default function SettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Success feedback
-      alert('Space renamed successfully!');
+      showSuccess('Space renamed successfully!');
 
       // Exit rename mode
       setIsRenamingSpace(false);
@@ -676,7 +677,7 @@ export default function SettingsPage() {
 
     } catch (error) {
       logger.error('Failed to rename space:', error, { component: 'page', action: 'execution' });
-      alert('Failed to rename space. Please try again.');
+      showError('Failed to rename space. Please try again.');
     } finally {
       setIsSavingSpaceName(false);
     }
@@ -684,17 +685,17 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     if (!deletePassword) {
-      alert('Please enter your password');
+      showWarning('Please enter your password');
       return;
     }
 
     if (deleteConfirmText !== 'DELETE') {
-      alert('Please type DELETE to confirm');
+      showWarning('Please type DELETE to confirm');
       return;
     }
 
     if (!deleteAcknowledged) {
-      alert('Please acknowledge that this action is permanent');
+      showWarning('Please acknowledge that this action is permanent');
       return;
     }
 
@@ -778,16 +779,16 @@ export default function SettingsPage() {
         // Refresh the list
         await fetchPendingInvitations();
         if (result.data.email_sent) {
-          alert('Invitation resent successfully!');
+          showSuccess('Invitation resent successfully!');
         } else {
-          alert('Invitation renewed but email failed. Share the link directly.');
+          showWarning('Invitation renewed but email failed. Share the link directly.');
         }
       } else {
-        alert(result.error || 'Failed to resend invitation');
+        showError(result.error || 'Failed to resend invitation');
       }
     } catch (error) {
       logger.error('Error resending invitation:', error, { component: 'page', action: 'execution' });
-      alert('Failed to resend invitation');
+      showError('Failed to resend invitation');
     } finally {
       setResendingInvitationId(null);
     }
@@ -808,11 +809,11 @@ export default function SettingsPage() {
       if (result.success) {
         setPendingInvitations(prev => prev.filter(inv => inv.id !== invitationId));
       } else {
-        alert(result.error || 'Failed to cancel invitation');
+        showError(result.error || 'Failed to cancel invitation');
       }
     } catch (error) {
       logger.error('Error cancelling invitation:', error, { component: 'page', action: 'execution' });
-      alert('Failed to cancel invitation');
+      showError('Failed to cancel invitation');
     } finally {
       setCancellingInvitationId(null);
     }
@@ -862,11 +863,11 @@ export default function SettingsPage() {
         setShowRevokeSessionModal(false);
         setSessionToRevoke(null);
       } else {
-        alert('Failed to revoke session');
+        showError('Failed to revoke session');
       }
     } catch (error) {
       logger.error('Error revoking session:', error, { component: 'page', action: 'execution' });
-      alert('Failed to revoke session');
+      showError('Failed to revoke session');
     }
   };
 
@@ -886,13 +887,13 @@ export default function SettingsPage() {
 
       if (error) {
         logger.error('Password reset error:', error, { component: 'page', action: 'execution' });
-        alert('Failed to send password reset email. Please try again.');
+        showError('Failed to send password reset email. Please try again.');
       } else {
         setResetEmailSent(true);
       }
     } catch (error) {
       logger.error('Password reset error:', error, { component: 'page', action: 'execution' });
-      alert('Failed to send password reset email. Please try again.');
+      showError('Failed to send password reset email. Please try again.');
     } finally {
       setIsRequestingReset(false);
     }
@@ -934,7 +935,7 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Sidebar Navigation */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
+              <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-lg">
                 {/* Mobile: Horizontal scrolling tabs */}
                 <nav className="lg:space-y-1 flex lg:flex-col overflow-x-auto lg:overflow-x-visible -mx-3 px-3 lg:mx-0 lg:px-0 pb-2 lg:pb-0 gap-2 lg:gap-0">
                   {tabs.map((tab) => {
@@ -968,7 +969,7 @@ export default function SettingsPage() {
 
             {/* Content Area */}
             <div className="lg:col-span-3">
-              <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
+              <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-lg">
                 <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}
@@ -1762,7 +1763,7 @@ export default function SettingsPage() {
                           <Link
                             key={feature.id}
                             href={feature.href}
-                            className={`btn-touch bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group active:scale-95`}
+                            className={`btn-touch bg-gray-800/80 border border-gray-700/50 rounded-xl p-6 hover:shadow-xl hover:-translate-y-2 ${feature.shadowColor} transition-all duration-300 group active:scale-95`}
                           >
                             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
                               <Icon className="w-7 h-7 text-white" />
@@ -1823,7 +1824,7 @@ export default function SettingsPage() {
                                 window.URL.revokeObjectURL(url);
                                 document.body.removeChild(a);
                               } catch {
-                                alert('Failed to export data. Please try again.');
+                                showError('Failed to export data. Please try again.');
                               }
                             }}
                             className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
@@ -1935,7 +1936,7 @@ export default function SettingsPage() {
                             <Link
                               key={feature.id}
                               href={feature.href}
-                              className={`btn-touch group relative p-6 bg-gray-800/70 backdrop-blur-sm border-2 border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105 active:scale-95`}
+                              className={`btn-touch group relative p-6 bg-gray-800/80 border-2 border-gray-700/60 ${feature.hoverBorder} ${feature.hoverShadow} rounded-2xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 hover:scale-105 active:scale-95`}
                             >
                               <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 shadow-lg`}>
                                 <Icon className="w-7 h-7 text-white" />
@@ -1956,7 +1957,7 @@ export default function SettingsPage() {
                           return (
                             <div
                               key={feature.id}
-                              className="relative p-6 bg-gray-900/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl opacity-60"
+                              className="relative p-6 bg-gray-900/50 border border-gray-700/50 rounded-2xl opacity-60"
                             >
                               <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} opacity-50 flex items-center justify-center mb-4`}>
                                 <Icon className="w-7 h-7 text-white" />
@@ -1989,7 +1990,7 @@ export default function SettingsPage() {
 
       {/* Quick Links - Mobile Only (footer links are hidden on mobile) */}
       <div className="md:hidden px-4 pb-6">
-        <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl p-4">
+        <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl p-4">
           <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
             <Link2 className="w-4 h-4" />
             Quick Links
@@ -2065,8 +2066,8 @@ export default function SettingsPage() {
 
       {/* Delete Account Modal */}
       {showDeleteAccountModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-700/50 max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red-900/30 flex items-center justify-center">
@@ -2161,8 +2162,8 @@ export default function SettingsPage() {
 
       {/* Revoke Session Modal */}
       {showRevokeSessionModal && sessionToRevoke && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-700/50 max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-yellow-900/30 flex items-center justify-center">

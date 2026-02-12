@@ -7,6 +7,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { encryptSessionData } from '@/lib/utils/session-crypto-edge';
 import { createClient as createStandaloneClient } from '@supabase/supabase-js';
+import { logAdminAction } from '@/lib/utils/admin-audit';
 
 const AdminLoginSchema = z.object({
   email: z.string().email('Invalid email format'),
@@ -73,8 +74,14 @@ export async function POST(req: NextRequest) {
 
     // Validate both checks succeeded (constant-time response regardless of which fails)
     if (adminError || !adminUser || authError || !authData.user) {
-      // Security: Sanitized logging - no user data exposed in production logs
-      // Failed attempts tracked in audit log, not console
+      // Log failed attempt (use a dummy UUID if no admin user found)
+      logAdminAction({
+        adminUserId: authData?.user?.id ?? '00000000-0000-0000-0000-000000000000',
+        action: 'login_failed',
+        targetResource: '/admin/login',
+        metadata: { email: normalizedEmail },
+        ipAddress: ip,
+      });
       return NextResponse.json(
         { error: 'Invalid credentials or access denied' },
         { status: 401 }
@@ -122,8 +129,14 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
-    // Security: Admin login tracked in database analytics, not console logs
-    // Prevents exposure of admin emails/roles in production logs
+    // Audit log: successful admin login
+    logAdminAction({
+      adminUserId: authData.user.id,
+      action: 'login_success',
+      targetResource: '/admin/login',
+      metadata: { role: adminUser.role },
+      ipAddress: ip,
+    });
 
     // Increment daily analytics for admin logins
     const today = new Date().toISOString().split('T')[0];

@@ -180,7 +180,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isMealTypeOpen && (
-              <div className="absolute w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
+              <div className="absolute w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 70 }}>
                 {mealTypeOptions.map((option) => {
                   const Icon = option.icon;
                   return (
@@ -217,7 +217,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
               </svg>
             </button>
             {isRecipeSelectorOpen && (
-              <div className="absolute w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 9999 }}>
+              <div className="absolute w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 70 }}>
                 {/* Search Input */}
                 <div className="sticky top-0 bg-gray-800 border-b border-gray-700 p-3 z-10">
                   <div className="relative">

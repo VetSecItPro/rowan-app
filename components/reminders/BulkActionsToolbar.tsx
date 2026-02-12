@@ -5,6 +5,7 @@ import { CheckCircle2, Trash2, Flag, Tag, Download, X, ChevronDown } from 'lucid
 import { remindersBulkService } from '@/lib/services/reminders-bulk-service';
 import { Reminder } from '@/lib/services/reminders-service';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -37,11 +38,11 @@ export function BulkActionsToolbar({
         onComplete();
         setShowCompleteConfirm(false);
       } else {
-        alert(`Completed ${result.successCount}, failed ${result.failedCount}`);
+        showWarning(`Completed ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
       logger.error('Bulk complete failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
-      alert('Failed to complete reminders');
+      showError('Failed to complete reminders');
     } finally {
       setIsProcessing(false);
     }
@@ -57,11 +58,11 @@ export function BulkActionsToolbar({
         onComplete();
         setShowDeleteConfirm(false);
       } else {
-        alert(`Deleted ${result.successCount}, failed ${result.failedCount}`);
+        showWarning(`Deleted ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
       logger.error('Bulk delete failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
-      alert('Failed to delete reminders');
+      showError('Failed to delete reminders');
     } finally {
       setIsProcessing(false);
     }
@@ -77,11 +78,11 @@ export function BulkActionsToolbar({
       if (result.success) {
         onComplete();
       } else {
-        alert(`Updated ${result.successCount}, failed ${result.failedCount}`);
+        showWarning(`Updated ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
       logger.error('Bulk priority change failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
-      alert('Failed to change priority');
+      showError('Failed to change priority');
     } finally {
       setIsProcessing(false);
       setShowPriorityMenu(false);
@@ -100,11 +101,11 @@ export function BulkActionsToolbar({
       if (result.success) {
         onComplete();
       } else {
-        alert(`Updated ${result.successCount}, failed ${result.failedCount}`);
+        showWarning(`Updated ${result.successCount}, failed ${result.failedCount}`);
       }
     } catch (error) {
       logger.error('Bulk category change failed:', error, { component: 'BulkActionsToolbar', action: 'component_action' });
-      alert('Failed to change category');
+      showError('Failed to change category');
     } finally {
       setIsProcessing(false);
       setShowCategoryMenu(false);
@@ -276,7 +277,7 @@ export function BulkActionsToolbar({
       {showCompleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80"
             onClick={() => setShowCompleteConfirm(false)}
           />
           <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">
@@ -310,7 +311,7 @@ export function BulkActionsToolbar({
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80"
             onClick={() => setShowDeleteConfirm(false)}
           />
           <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto overscroll-contain p-6">

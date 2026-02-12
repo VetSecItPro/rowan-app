@@ -109,14 +109,13 @@ export default function ArticlePageClient({ article, relatedArticles, renderedCo
 
               <div className="mt-8 flex items-center gap-4">
                 <button
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: article.title,
-                        text: article.description,
-                        url: window.location.href,
-                      })
-                    }
+                  onClick={async () => {
+                    const { shareContent } = await import('@/lib/native/share');
+                    await shareContent({
+                      title: article.title,
+                      text: article.description,
+                      url: window.location.href,
+                    });
                   }}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-700 text-gray-400 hover:bg-gray-800 transition-colors"
                 >

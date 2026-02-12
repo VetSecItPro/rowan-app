@@ -3,16 +3,15 @@ interface SkeletonLoaderProps {
   className?: string;
   height?: string;
   width?: string;
-  variant?: string;
 }
 
-export function SkeletonLoader({ count = 1, className = '', height = 'h-20', width = '', variant: _variant }: SkeletonLoaderProps) {
+export function SkeletonLoader({ count = 1, className = '', height = 'h-20', width = '' }: SkeletonLoaderProps) {
   return (
     <div className={`space-y-4 ${className}`}>
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className={`${height} ${width} bg-gray-800/20 backdrop-blur-xl border border-gray-700/10 rounded-2xl animate-pulse`}
+          className={`${height} ${width} bg-gray-800/30 border border-gray-700/10 rounded-2xl animate-pulse`}
         />
       ))}
     </div>
@@ -21,7 +20,7 @@ export function SkeletonLoader({ count = 1, className = '', height = 'h-20', wid
 
 export function SkeletonCard() {
   return (
-    <div className="bg-gray-800/30 backdrop-blur-xl border border-gray-700/20 rounded-2xl p-6 animate-pulse">
+    <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6 animate-pulse">
       <div className="space-y-4">
         <div className="h-4 bg-gray-700/20 rounded w-3/4" />
         <div className="h-4 bg-gray-700/20 rounded w-1/2" />
@@ -37,7 +36,7 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
       {Array.from({ length: rows }).map((_, index) => (
         <div
           key={index}
-          className="h-16 bg-gray-800/20 backdrop-blur-xl border border-gray-700/10 rounded-xl animate-pulse"
+          className="h-16 bg-gray-800/30 border border-gray-700/10 rounded-xl animate-pulse"
         />
       ))}
     </div>

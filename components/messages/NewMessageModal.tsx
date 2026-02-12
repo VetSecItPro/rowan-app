@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Smile, Image as ImageIcon, Paperclip, X } from 'lucide-react';
 import { CreateMessageInput, Message } from '@/lib/services/messages-service';
 import { Modal } from '@/components/ui/Modal';
+import { showWarning } from '@/lib/utils/toast';
 
 interface NewMessageModalProps {
   isOpen: boolean;
@@ -133,7 +134,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
     }
 
     if (invalidFiles.length > 0) {
-      alert(`Invalid image file(s):\n${invalidFiles.join('\n')}\n\nOnly JPG, PNG, GIF, and WebP images are allowed.`);
+      showWarning(`Invalid image file(s): ${invalidFiles.join(', ')}. Only JPG, PNG, GIF, and WebP images are allowed.`);
     }
 
     // Reset input
@@ -158,7 +159,7 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
     }
 
     if (invalidFiles.length > 0) {
-      alert(`Invalid file(s):\n${invalidFiles.join('\n')}\n\nOnly PDF, Word, Excel, PowerPoint, TXT, CSV, and ZIP files are allowed.`);
+      showWarning(`Invalid file(s): ${invalidFiles.join(', ')}. Only PDF, Word, Excel, PowerPoint, TXT, CSV, and ZIP files are allowed.`);
     }
 
     // Reset input

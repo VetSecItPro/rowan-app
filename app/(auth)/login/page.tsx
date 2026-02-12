@@ -277,7 +277,7 @@ export default function LoginPage() {
         className="flex-1 lg:w-1/2 bg-gray-950 flex items-center justify-center p-4 sm:p-8"
       >
         <motion.div
-          className="w-full max-w-md bg-gray-900/70 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-800/50"
+          className="w-full max-w-md bg-gray-900/95 p-8 sm:p-10 rounded-3xl shadow-2xl border border-gray-800/50"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
@@ -500,7 +500,7 @@ export default function LoginPage() {
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-gray-900/70 backdrop-blur-sm text-gray-400 font-medium tracking-wider uppercase text-[10px]">or continued with</span>
+                  <span className="px-4 bg-gray-900 text-gray-400 font-medium tracking-wider uppercase text-[10px]">or continued with</span>
                 </div>
               </div>
 

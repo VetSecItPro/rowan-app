@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
 import Link from 'next/link';
 
 import { UtensilsCrossed, Search, Brain, Clock, Star, BookOpen, Globe, Sparkles, Heart, ChefHat, ArrowLeft } from 'lucide-react';
@@ -295,7 +292,7 @@ export default function RecipesDocumentationPage() {
             {guideSections.map((section) => {
               const Icon = section.icon;
               return (
-                <div key={section.title} className="bg-gray-800/70 backdrop-blur-sm border border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
+                <div key={section.title} className="bg-gray-800/80 border border-gray-700/60 rounded-3xl overflow-hidden shadow-lg">
                   {/* Section Header */}
                   <div className={`p-8 bg-gradient-to-r ${section.color} text-white`}>
                     <div className="flex items-center gap-4">

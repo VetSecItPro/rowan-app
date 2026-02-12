@@ -94,6 +94,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
   const [isRecurring, setIsRecurring] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [recurringData, setRecurringData] = useState({
     pattern: 'weekly' as RecurrencePattern,
     interval: 1,
@@ -202,7 +203,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
     >
       {/* Loading Overlay for Space Creation */}
       {spaceCreationLoading && (
-        <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+        <div className="absolute inset-0 bg-gray-800/90 z-10 flex items-center justify-center rounded-2xl">
           <div className="text-center">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-3" />
             <p className="text-sm text-gray-400">Setting up your space...</p>
@@ -212,7 +213,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
 
       {/* Error Message */}
       {spaceError && !spaceCreationLoading && (
-        <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+        <div className="absolute inset-0 bg-gray-800/90 z-10 flex items-center justify-center rounded-2xl">
           <div className="text-center max-w-sm mx-4">
             <p className="text-red-400 mb-4">{spaceError}</p>
             <button
@@ -301,8 +302,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' | 'urgent' })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-50"
-                  style={{ position: 'relative', zIndex: 9999 }}
+                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-[70]"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -322,8 +322,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-50"
-                  style={{ position: 'relative', zIndex: 9999 }}
+                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-[70]"
                 >
                   <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
@@ -347,8 +346,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
                 <select
                   value={formData.category || ''}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-50"
-                  style={{ position: 'relative', zIndex: 9999 }}
+                  className="w-full pl-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white relative z-[70]"
                 >
                   <option value="">Select category...</option>
                   <option value="work">💼 Work</option>
@@ -392,7 +390,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
+                className={`w-full px-4 py-3 bg-gray-800/80 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white ${
                   dateError ? 'border-red-500' : 'border-gray-700/50'
                 }`}
               />
@@ -405,110 +403,113 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
             </div>
           </div>
 
-          {/* Recurring Task Section */}
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <button
-                type="button"
-                onClick={() => setIsRecurring(!isRecurring)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border-2 ${
-                  isRecurring
-                    ? 'bg-blue-600 text-white border-blue-500'
-                    : 'bg-gray-700 text-gray-300 border-gray-600'
-                }`}
-              >
-                <Repeat className="w-4 h-4" />
-                <span>Repeat</span>
-              </button>
-              {isRecurring && (
-                <span className="text-sm text-gray-400">
-                  Create recurring task
-                </span>
-              )}
-            </div>
+          {/* More Options — Progressive Disclosure */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-300 transition-colors"
+            >
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''}`} aria-hidden="true" />
+              {showAdvanced ? 'Hide' : 'More'} Options
+            </button>
+          </div>
 
-            {/* Recurring Options - Collapsible */}
-            {isRecurring && (
-              <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-900 rounded-lg border border-gray-700">
-                {/* Pattern and Interval Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {/* Pattern */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Pattern
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={recurringData.pattern}
-                        onChange={(e) => setRecurringData({
-                          ...recurringData,
-                          pattern: e.target.value as RecurrencePattern,
-                          daysOfWeek: [] // Reset days when pattern changes
-                        })}
-                        className="w-full pl-4 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white appearance-none"
-                      >
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="biweekly">Bi-weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  {/* Interval */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Every
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min="1"
-                      max="365"
-                      value={recurringData.interval}
-                      onChange={(e) => setRecurringData({
-                        ...recurringData,
-                        interval: Math.max(1, parseInt(e.target.value) || 1)
-                      })}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
-                    />
-                  </div>
+          {showAdvanced && (
+            <div className="space-y-6 pt-2 border-t border-gray-700/50">
+              {/* Recurring Task */}
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsRecurring(!isRecurring)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border-2 ${
+                      isRecurring
+                        ? 'bg-blue-600 text-white border-blue-500'
+                        : 'bg-gray-700 text-gray-300 border-gray-600'
+                    }`}
+                  >
+                    <Repeat className="w-4 h-4" aria-hidden="true" />
+                    <span>Repeat</span>
+                  </button>
+                  {isRecurring && (
+                    <span className="text-sm text-gray-400">
+                      Create recurring task
+                    </span>
+                  )}
                 </div>
 
-                {/* Days of Week - Show for weekly and biweekly patterns */}
-                {(recurringData.pattern === 'weekly' || recurringData.pattern === 'biweekly') && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2 sm:mb-3">
-                      Days of Week
-                    </label>
-                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
-                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => {
-                            const days = recurringData.daysOfWeek.includes(idx)
-                              ? recurringData.daysOfWeek.filter(d => d !== idx)
-                              : [...recurringData.daysOfWeek, idx];
-                            setRecurringData({ ...recurringData, daysOfWeek: days });
-                          }}
-                          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all text-xs sm:text-sm font-medium border-2 ${
-                            recurringData.daysOfWeek.includes(idx)
-                              ? 'bg-blue-500 text-white border-blue-400'
-                              : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
-                          }`}
-                        >
-                          {day}
-                        </button>
-                      ))}
+                {isRecurring && (
+                  <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-900 rounded-lg border border-gray-700">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Pattern</label>
+                        <div className="relative">
+                          <select
+                            value={recurringData.pattern}
+                            onChange={(e) => setRecurringData({
+                              ...recurringData,
+                              pattern: e.target.value as RecurrencePattern,
+                              daysOfWeek: []
+                            })}
+                            className="w-full pl-4 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white appearance-none"
+                          >
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Bi-weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                          </select>
+                          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Every</label>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          max="365"
+                          value={recurringData.interval}
+                          onChange={(e) => setRecurringData({
+                            ...recurringData,
+                            interval: Math.max(1, parseInt(e.target.value) || 1)
+                          })}
+                          className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
+                        />
+                      </div>
                     </div>
+                    {(recurringData.pattern === 'weekly' || recurringData.pattern === 'biweekly') && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 sm:mb-3">Days of Week</label>
+                        <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                const days = recurringData.daysOfWeek.includes(idx)
+                                  ? recurringData.daysOfWeek.filter(d => d !== idx)
+                                  : [...recurringData.daysOfWeek, idx];
+                                setRecurringData({ ...recurringData, daysOfWeek: days });
+                              }}
+                              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all text-xs sm:text-sm font-medium border-2 ${
+                                recurringData.daysOfWeek.includes(idx)
+                                  ? 'bg-blue-500 text-white border-blue-400'
+                                  : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600'
+                              }`}
+                            >
+                              {day}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
       </form>
     </Modal>

@@ -18,6 +18,7 @@ import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 // Phase 9: Unified Calendar View imports
 import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
@@ -532,7 +533,7 @@ export default function CalendarPage() {
       }, 100);
     } catch (error) {
       logger.error('Failed to create event from template:', error, { component: 'page', action: 'execution' });
-      alert('Failed to create event from template');
+      showError('Failed to create event from template');
     }
   }, [loadEvents, handleEditEvent]);
 

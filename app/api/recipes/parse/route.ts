@@ -24,12 +24,22 @@ const AIRecipeSchema = z.object({
   difficulty: z.string().max(50).optional().nullable(),
   cuisine_type: z.string().max(100).optional().nullable(),
   tags: z.array(z.string().max(50)).max(20).optional().nullable(),
-}).passthrough();
+}).strip();
 
 export const maxDuration = 60;
 
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '');
+// Lazy-init Gemini client to avoid build-time crash when env var is missing
+let _genAI: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+  if (!_genAI) {
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+    }
+    _genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return _genAI;
+}
 
 // SECURITY: Input size limits to prevent abuse and excessive API costs
 const MAX_TEXT_LENGTH = 50000; // ~50KB text
@@ -114,7 +124,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Use Gemini 2.5 Flash
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: 'gemini-2.5-flash',
       generationConfig: { maxOutputTokens: 4096 },
     });

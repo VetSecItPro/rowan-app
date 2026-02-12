@@ -217,7 +217,7 @@ function ChoreForm({
                   id="field-3"
               onChange={(e) => setCategory(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
-                  style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
+                  style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="">Select category...</option>
                   <option value="cleaning">🧹 Cleaning</option>
@@ -246,7 +246,7 @@ function ChoreForm({
                   id="field-4"
               onChange={(e) => setFormData({ ...formData, frequency: e.target.value as CreateChoreInput['frequency'] })}
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
-                  style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
+                  style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
@@ -339,7 +339,7 @@ function ChoreForm({
                   id="field-7"
               onChange={(e) => setFormData({ ...formData, status: e.target.value as CreateChoreInput['status'] })}
                   className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white appearance-none relative z-50"
-                  style={{ paddingRight: '2.5rem', position: 'relative', zIndex: 9999 }}
+                  style={{ paddingRight: '2.5rem' }}
                 >
                   <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
@@ -378,7 +378,7 @@ function ChoreForm({
                     setDateError('');
                   }
                 }}
-                className={`w-full px-4 py-3 bg-gray-800/60 backdrop-blur-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white ${
+                className={`w-full px-4 py-3 bg-gray-800/80 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white ${
                   dateError ? 'border-red-500' : 'border-gray-700/50'
                 }`}
               />

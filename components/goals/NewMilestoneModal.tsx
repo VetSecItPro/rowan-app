@@ -169,7 +169,7 @@ export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goal
 
                 {/* Emoji Picker Popup */}
                 {showEmojiPicker && (
-                  <div className="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 w-80 max-w-[calc(100vw-4rem)]" style={{ zIndex: 10001, transform: 'translateX(-50%)', right: '50%' }}>
+                  <div className="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-4 w-80 max-w-[calc(100vw-4rem)] z-[70]" style={{ transform: 'translateX(-50%)', right: '50%' }}>
                     <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>
                     <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-1.5">
                       {EMOJIS.map((emoji, idx) => (

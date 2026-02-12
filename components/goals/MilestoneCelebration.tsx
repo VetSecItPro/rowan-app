@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { X, Sparkles, Trophy, TrendingUp, Target } from 'lucide-react';
 interface MilestoneCelebrationProps {
   goalTitle: string;
@@ -21,6 +21,7 @@ export default function MilestoneCelebration({
 }: MilestoneCelebrationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Enhanced confetti celebration functions
   const triggerConfettiCelebration = useCallback(async () => {
@@ -53,15 +54,15 @@ export default function MilestoneCelebration({
       }
       frame();
 
-      // Additional center burst
-      setTimeout(() => {
+      // Additional center burst (PERF-021: tracked for cleanup)
+      timeoutsRef.current.push(setTimeout(() => {
         confetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 },
           colors: colors,
         });
-      }, 500);
+      }, 500));
     } else if (percentageReached >= 75) {
       // Strong celebration for 75%
       confetti({
@@ -70,7 +71,7 @@ export default function MilestoneCelebration({
         origin: { y: 0.6 },
         colors: ['#AA96DA', '#95E1D3', '#F38181'],
       });
-      setTimeout(() => {
+      timeoutsRef.current.push(setTimeout(() => {
         confetti({
           particleCount: 50,
           angle: 60,
@@ -85,7 +86,7 @@ export default function MilestoneCelebration({
           origin: { x: 1 },
           colors: ['#AA96DA', '#95E1D3'],
         });
-      }, 300);
+      }, 300));
     } else if (percentageReached >= 50) {
       // Medium celebration for 50%
       confetti({
@@ -108,30 +109,34 @@ export default function MilestoneCelebration({
 
   const handleClose = useCallback(() => {
     setIsAnimating(false);
-    setTimeout(() => {
+    const exitTimer = setTimeout(() => {
       setIsVisible(false);
       onClose();
     }, 300); // Wait for exit animation
+    timeoutsRef.current.push(exitTimer);
   }, [onClose]);
 
   useEffect(() => {
-    // Trigger entrance animation
-    setTimeout(() => {
+    // Trigger entrance animation (PERF-021: all timeouts tracked for cleanup)
+    const entranceTimer = setTimeout(() => {
       setIsVisible(true);
       setIsAnimating(true);
-      // Trigger enhanced confetti after modal appears
-      setTimeout(() => {
+      const confettiTimer = setTimeout(() => {
         triggerConfettiCelebration();
       }, 300);
+      timeoutsRef.current.push(confettiTimer);
     }, 10);
+    timeoutsRef.current.push(entranceTimer);
 
     // Auto-close after delay
     const closeTimer = setTimeout(() => {
       handleClose();
     }, autoCloseDelay);
+    timeoutsRef.current.push(closeTimer);
 
     return () => {
-      clearTimeout(closeTimer);
+      timeoutsRef.current.forEach(clearTimeout);
+      timeoutsRef.current = [];
     };
   }, [autoCloseDelay, handleClose, triggerConfettiCelebration]);
 
@@ -185,7 +190,7 @@ export default function MilestoneCelebration({
 
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 transition-opacity duration-300 ${
           isAnimating ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={handleClose}
@@ -221,7 +226,7 @@ export default function MilestoneCelebration({
             {/* Content */}
             <div className="relative z-10 text-center">
               {/* Icon */}
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-4 float-animation">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-white/25 rounded-full mb-4 float-animation">
                 {getMilestoneIcon()}
               </div>
 

@@ -6,6 +6,7 @@ import { taskApprovalsService } from '@/lib/services/task-approvals-service';
 import { Modal } from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { showError, showWarning } from '@/lib/utils/toast';
 
 interface ApprovalModalProps {
   isOpen: boolean;
@@ -105,7 +106,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       loadApprovals();
     } catch (error) {
       logger.error('Error requesting approval:', error, { component: 'ApprovalModal', action: 'component_action' });
-      alert('Failed to request approval');
+      showError('Failed to request approval');
     } finally {
       setRequesting(false);
     }
@@ -113,7 +114,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
 
   async function handleApprove(approvalId: string) {
     if (!reviewNote.trim()) {
-      alert('Please provide a review note');
+      showWarning('Please provide a review note');
       return;
     }
 
@@ -123,13 +124,13 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       loadApprovals();
     } catch (error) {
       logger.error('Error approving:', error, { component: 'ApprovalModal', action: 'component_action' });
-      alert('Failed to approve');
+      showError('Failed to approve');
     }
   }
 
   async function handleReject(approvalId: string) {
     if (!reviewNote.trim()) {
-      alert('Please provide a review note');
+      showWarning('Please provide a review note');
       return;
     }
 
@@ -139,7 +140,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
       loadApprovals();
     } catch (error) {
       logger.error('Error rejecting:', error, { component: 'ApprovalModal', action: 'component_action' });
-      alert('Failed to reject');
+      showError('Failed to reject');
     }
   }
 

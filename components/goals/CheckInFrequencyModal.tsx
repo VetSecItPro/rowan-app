@@ -364,8 +364,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
                       <select
                         value={settings.reminder_days_before}
                         onChange={(e) => updateSettings({ reminder_days_before: parseInt(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 relative z-50"
-                        style={{ position: 'relative', zIndex: 9999 }}
+                        className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 relative z-[70]"
                       >
                         {REMINDER_DAYS_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>

@@ -3,7 +3,7 @@
 import { DollarSign, MoreVertical } from 'lucide-react';
 import { Expense } from '@/lib/types';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 interface ExpenseCardProps {
   expense: Expense;
@@ -11,7 +11,7 @@ interface ExpenseCardProps {
   onDelete: (expenseId: string) => void;
 }
 
-export function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
+export const ExpenseCard = memo(function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -46,4 +46,4 @@ export function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
       <span className={`inline-block mt-3 px-3 py-1 text-xs font-medium rounded-full ${expense.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>{expense.status}</span>
     </div>
   );
-}
+});

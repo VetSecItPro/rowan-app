@@ -237,7 +237,7 @@ export function RecipeCardSkeleton() {
 
 export function GoalCardSkeleton() {
   return (
-    <div className="bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/10 rounded-xl p-6">
+    <div className="bg-black/50 border border-white/10 rounded-xl p-6">
       <div className="flex items-start gap-3 mb-4">
         <Skeleton className="min-w-[44px] min-h-[44px] rounded-lg flex-shrink-0" />
         <div className="flex-1 space-y-2">
@@ -267,7 +267,7 @@ export function GoalCardSkeleton() {
 
 export function MilestoneCardSkeleton() {
   return (
-    <div className="bg-black/40 backdrop-blur-lg backdrop-saturate-150 border border-white/10 rounded-xl p-6">
+    <div className="bg-black/50 border border-white/10 rounded-xl p-6">
       <div className="flex items-start gap-3 mb-4">
         <Skeleton className="min-w-[44px] min-h-[44px] rounded-lg flex-shrink-0" />
         <div className="flex-1 space-y-2">
@@ -309,7 +309,7 @@ export function StatsCardSkeleton() {
 
 export function TaskCardSkeleton() {
   return (
-    <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-lg p-4 sm:p-4">
+    <div className="bg-gray-800/80 border border-gray-700/50 rounded-lg p-4 sm:p-4">
       {/* Header */}
       <div className="flex items-start justify-between mb-3 gap-3">
         <div className="flex items-start gap-3 flex-1">

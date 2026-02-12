@@ -82,7 +82,7 @@ export const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps
     return (
       <div
         ref={ref}
-        className={`fixed inset-0 z-50 bg-background/80 backdrop-blur-sm ${className}`}
+        className={`fixed inset-0 z-50 bg-background/90 ${className}`}
         onClick={() => onOpenChange?.(false)}
         {...props}
       />

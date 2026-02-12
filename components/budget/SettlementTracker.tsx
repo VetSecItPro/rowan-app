@@ -280,7 +280,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
       {showNewSettlement && (
         <>
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setShowNewSettlement(false)}
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

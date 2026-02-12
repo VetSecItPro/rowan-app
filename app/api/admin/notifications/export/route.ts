@@ -7,6 +7,7 @@ import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { logAdminAction } from '@/lib/utils/admin-audit';
 
 type NotificationRecord = {
   id: string;
@@ -137,7 +138,17 @@ export async function POST(req: NextRequest) {
       // Combine headers and rows
       const csvContent = [headers.join(','), ...rows.map((row: string[]) => row.join(','))].join('\n');
 
-      // Log export activity
+      // Audit log: data export
+      const adminId = (sessionData as { adminId?: string }).adminId;
+      if (adminId) {
+        logAdminAction({
+          adminUserId: adminId,
+          action: 'data_export',
+          targetResource: 'launch_notifications',
+          metadata: { format: 'csv', recordCount: notifications?.length || 0 },
+          ipAddress: ip,
+        });
+      }
 
       // Return CSV file
       return new NextResponse(csvContent, {

@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { format, subDays, subMonths, subQuarters, subYears, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
 import { logger } from '@/lib/logger';
 import {
-  CalendarIcon,
-  ChartBarIcon,
-  DocumentTextIcon,
-  Cog6ToothIcon,
-  ExclamationTriangleIcon,
-  ClockIcon
-} from '@heroicons/react/24/outline';
+  Calendar,
+  BarChart3,
+  FileText,
+  Settings,
+  AlertTriangle,
+  Clock
+} from 'lucide-react';
 import { type ReportTemplate, type GeneratedReport, generateReport } from '@/lib/services/financial-reports-service';
 
 interface ReportGeneratorProps {
@@ -151,7 +151,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
           >
             {isGenerating ? (
               <div className="flex items-center">
-                <ClockIcon className="h-4 w-4 mr-2 animate-spin" />
+                <Clock className="h-4 w-4 mr-2 animate-spin" />
                 Generating...
               </div>
             ) : (
@@ -165,7 +165,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
       {error && (
         <div className="bg-red-900/20 border border-red-800 rounded-lg p-4">
           <div className="flex">
-            <ExclamationTriangleIcon className="h-5 w-5 text-red-400 flex-shrink-0" />
+            <AlertTriangle className="h-5 w-5 text-red-400 flex-shrink-0" />
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-200">
                 Generation Failed
@@ -184,7 +184,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
           {/* Template Info */}
           <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
             <div className="flex items-start">
-              <DocumentTextIcon className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <FileText className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="ml-3">
                 <h4 className="text-sm font-medium text-blue-200">
                   {template.name}
@@ -292,7 +292,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
             {/* Date Range Preview */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-3">
               <div className="flex items-center">
-                <CalendarIcon className="h-4 w-4 text-gray-400 mr-2" />
+                <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                 <span className="text-sm text-gray-400">
                   {format(customDateRange.start, 'MMM d, yyyy')} - {format(customDateRange.end, 'MMM d, yyyy')}
                 </span>
@@ -317,25 +317,25 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
               <div className="space-y-2">
                 {template.config?.charts && (
                   <div className="flex items-center text-sm text-gray-400">
-                    <ChartBarIcon className="h-4 w-4 mr-2 text-blue-500" />
+                    <BarChart3 className="h-4 w-4 mr-2 text-blue-500" />
                     Interactive charts and visualizations
                   </div>
                 )}
 
                 {template.config?.metrics && (
                   <div className="flex items-center text-sm text-gray-400">
-                    <Cog6ToothIcon className="h-4 w-4 mr-2 text-green-500" />
+                    <Settings className="h-4 w-4 mr-2 text-green-500" />
                     Key financial metrics and insights
                   </div>
                 )}
 
                 <div className="flex items-center text-sm text-gray-400">
-                  <DocumentTextIcon className="h-4 w-4 mr-2 text-purple-500" />
+                  <FileText className="h-4 w-4 mr-2 text-purple-500" />
                   Detailed data analysis and summaries
                 </div>
 
                 <div className="flex items-center text-sm text-gray-400">
-                  <DocumentTextIcon className="h-4 w-4 mr-2 text-orange-500" />
+                  <FileText className="h-4 w-4 mr-2 text-orange-500" />
                   Downloadable PDF report
                 </div>
               </div>
@@ -365,7 +365,7 @@ export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel
             {/* Generation Time Estimate */}
             <div className="mt-6 pt-4 border-t border-gray-700">
               <div className="flex items-center text-sm text-gray-400">
-                <ClockIcon className="h-4 w-4 mr-2" />
+                <Clock className="h-4 w-4 mr-2" />
                 Estimated generation time: 10-30 seconds
               </div>
             </div>

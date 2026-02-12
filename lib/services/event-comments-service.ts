@@ -77,7 +77,7 @@ export const eventCommentsService = {
         mentions: input.mentions || [],
         parent_comment_id: input.parent_comment_id
       }])
-      .select('*')
+      .select('id, event_id, user_id, content, mentions, parent_comment_id, created_at, updated_at')
       .single();
 
     if (error) throw error;
@@ -208,7 +208,7 @@ export const eventCommentsService = {
         mentions: input.mentions || []
       })
       .eq('id', commentId)
-      .select('*')
+      .select('id, event_id, user_id, content, mentions, parent_comment_id, created_at, updated_at')
       .single();
 
     if (error) throw error;

@@ -158,9 +158,10 @@ export default function BadgeNotification({
     const shareText = `🎉 Achievement Unlocked! 🎉\n\n${badge.badge.icon} ${badge.badge.name}\n"${badge.badge.description}"\n\n${badge.badge.rarity.charAt(0).toUpperCase() + badge.badge.rarity.slice(1)} Badge • +${badge.badge.points} points\n\nEarned on ${format(new Date(badge.earned_at), 'MMMM d, yyyy')}\n\n#RowanApp #Achievement #Goals`;
 
     try {
-      // Try Web Share API first (mobile/modern browsers)
-      if (navigator.share) {
-        await navigator.share({
+      // Try native share (uses system share sheet on mobile, Web Share API on web)
+      const { shareContent, canShare } = await import('@/lib/native/share');
+      if (await canShare()) {
+        await shareContent({
           title: '🎉 Achievement Unlocked!',
           text: shareText,
           url: window.location.origin,

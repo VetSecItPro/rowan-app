@@ -1,6 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-'use client';
-
 import Link from 'next/link';
 
 import { type LucideIcon, ArrowLeft, UtensilsCrossed, BookOpen, Play, Eye, Plus, ChefHat, Globe, Sparkles, ShoppingBag, Keyboard, Clock, Lightbulb, LayoutGrid } from 'lucide-react';
@@ -288,7 +285,7 @@ export default function MealPlanningDocumentation() {
                 {/* Section Header */}
                 <div className={`p-6 bg-gradient-to-r ${section.color}`}>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
                       <Icon className="w-5 h-5 text-white" />
                     </div>
                     <h2 className="text-xl font-bold text-white">{section.title}</h2>

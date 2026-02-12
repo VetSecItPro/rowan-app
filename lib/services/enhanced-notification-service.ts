@@ -181,79 +181,82 @@ export const enhancedNotificationService = {
     interface UserRecord { id: string; email: string | null; name: string | null }
     const usersMap = new Map<string, UserRecord>((users || []).map((u: UserRecord) => [u.id, u]));
 
-    for (const userId of userIds) {
-      try {
-        const user = usersMap.get(userId);
+    const settled = await Promise.allSettled(userIds.map(async (userId) => {
+      const user = usersMap.get(userId);
 
-        if (!user) {
-          results.errors.push(`User ${userId} not found`);
-          continue;
-        }
+      if (!user) {
+        results.errors.push(`User ${userId} not found`);
+        return;
+      }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendEmail = false;
+      // Individual notifications disabled - using digest-only system
+      const shouldSendEmail = false;
 
-        if (shouldSendEmail && user.email) {
-          const emailResult = await this.sendEmailNotification(
-            'goal_achievement',
-            user.email,
-            `🎉 Goal Achievement: ${data.goalTitle}`,
-            {
-              userName: user.name || 'User',
-              spaceName: data.spaceName,
-              achievementType: data.achievementType,
-              goalTitle: data.goalTitle,
-              milestoneTitle: data.milestoneTitle,
-              completedBy: data.completedBy,
-              completionDate: data.completionDate,
-              streakCount: data.streakCount,
-              nextMilestone: data.nextMilestone,
-              goalUrl: data.goalUrl,
-            }
-          );
-
-          if (emailResult.success) {
-            results.email++;
-          } else {
-            results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
+      if (shouldSendEmail && user.email) {
+        const emailResult = await this.sendEmailNotification(
+          'goal_achievement',
+          user.email,
+          `🎉 Goal Achievement: ${data.goalTitle}`,
+          {
+            userName: user.name || 'User',
+            spaceName: data.spaceName,
+            achievementType: data.achievementType,
+            goalTitle: data.goalTitle,
+            milestoneTitle: data.milestoneTitle,
+            completedBy: data.completedBy,
+            completionDate: data.completionDate,
+            streakCount: data.streakCount,
+            nextMilestone: data.nextMilestone,
+            goalUrl: data.goalUrl,
           }
+        );
 
-          // Notification logging removed - using digest-only system
+        if (emailResult.success) {
+          results.email++;
+        } else {
+          results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
         }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendPush = false;
+        // Notification logging removed - using digest-only system
+      }
 
-        if (shouldSendPush) {
-          const pushTitle = data.achievementType === 'goal_completed'
-            ? '🎉 Goal Completed!'
-            : data.achievementType === 'milestone_reached'
-            ? '🎯 Milestone Reached!'
-            : '🔥 Streak Achieved!';
+      // Individual notifications disabled - using digest-only system
+      const shouldSendPush = false;
 
-          const pushResult = await pushService.sendNotification(userId, {
-            title: pushTitle,
-            body: `${data.completedBy} completed "${data.goalTitle}" in ${data.spaceName}`,
-            data: {
-              type: 'goal_achievement',
-              achievementType: data.achievementType,
-              goalTitle: data.goalTitle,
-              url: data.goalUrl,
-            },
-          });
+      if (shouldSendPush) {
+        const pushTitle = data.achievementType === 'goal_completed'
+          ? '🎉 Goal Completed!'
+          : data.achievementType === 'milestone_reached'
+          ? '🎯 Milestone Reached!'
+          : '🔥 Streak Achieved!';
 
-          if (pushResult.success) {
-            results.push++;
-          } else {
-            results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
-          }
+        const pushResult = await pushService.sendNotification(userId, {
+          title: pushTitle,
+          body: `${data.completedBy} completed "${data.goalTitle}" in ${data.spaceName}`,
+          data: {
+            type: 'goal_achievement',
+            achievementType: data.achievementType,
+            goalTitle: data.goalTitle,
+            url: data.goalUrl,
+          },
+        });
+
+        if (pushResult.success) {
+          results.push++;
+        } else {
+          results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
         }
+      }
 
-        // Always create in-app notification
-        results.inApp++;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        results.errors.push(`Failed to process goal achievement notification for user ${userId}: ${errorMessage}`);
+      // Always create in-app notification
+      results.inApp++;
+    }));
+
+    // Collect errors from rejected promises
+    for (const result of settled) {
+      if (result.status === 'rejected') {
+        const errorMessage = result.reason instanceof Error ? result.reason.message : 'Unknown error';
+        results.errors.push(`Failed to process goal achievement notification: ${errorMessage}`);
       }
     }
 
@@ -291,77 +294,89 @@ export const enhancedNotificationService = {
       errors: [],
     };
 
-    for (const userId of userIds) {
-      const supabase = createClient();
-      try {
-        // Get user details
-        const { data: user, error: userError } = await supabase
-          .from('users')
-          .select('id, email, name')
-          .eq('id', userId)
-          .single();
+    // PERF: Batch fetch all users instead of per-user queries — PERF-015
+    const supabase = createClient();
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, email, name')
+      .in('id', userIds);
 
-        if (userError || !user) {
-          results.errors.push(`User ${userId} not found`);
-          continue;
-        }
+    if (usersError) {
+      results.errors.push(`Failed to fetch users: ${usersError.message}`);
+      return results;
+    }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendEmail = false;
+    interface UserRecord { id: string; email: string | null; name: string | null }
+    const usersMap = new Map<string, UserRecord>((users || []).map((u: UserRecord) => [u.id, u]));
 
-        if (shouldSendEmail && user.email) {
-          const emailResult = await this.sendEmailNotification(
-            'task_assignment',
-            user.email,
-            `📋 New Task: ${data.taskTitle}`,
-            {
-              userName: user.name || 'User',
-              spaceName: data.spaceName,
-              taskTitle: data.taskTitle,
-              assignedBy: data.assignedBy,
-              assignedTo: data.assignedTo,
-              priority: data.priority,
-              dueDate: data.dueDate,
-              description: data.description,
-              taskUrl: data.taskUrl,
-            }
-          );
+    const settled = await Promise.allSettled(userIds.map(async (userId) => {
+      const user = usersMap.get(userId);
 
-          if (emailResult.success) {
-            results.email++;
-          } else {
-            results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
+      if (!user) {
+        results.errors.push(`User ${userId} not found`);
+        return;
+      }
+
+      // Individual notifications disabled - using digest-only system
+      const shouldSendEmail = false;
+
+      if (shouldSendEmail && user.email) {
+        const emailResult = await this.sendEmailNotification(
+          'task_assignment',
+          user.email,
+          `📋 New Task: ${data.taskTitle}`,
+          {
+            userName: user.name || 'User',
+            spaceName: data.spaceName,
+            taskTitle: data.taskTitle,
+            assignedBy: data.assignedBy,
+            assignedTo: data.assignedTo,
+            priority: data.priority,
+            dueDate: data.dueDate,
+            description: data.description,
+            taskUrl: data.taskUrl,
           }
+        );
 
-          // Notification logging removed - using digest-only system
+        if (emailResult.success) {
+          results.email++;
+        } else {
+          results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
         }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendPush = false;
+        // Notification logging removed - using digest-only system
+      }
 
-        if (shouldSendPush) {
-          const pushResult = await pushService.sendNotification(userId, {
-            title: '📋 New Task Assigned',
-            body: `${data.assignedBy} assigned you "${data.taskTitle}" in ${data.spaceName}`,
-            data: {
-              type: 'task_assignment',
-              taskTitle: data.taskTitle,
-              url: data.taskUrl,
-            },
-          });
+      // Individual notifications disabled - using digest-only system
+      const shouldSendPush = false;
 
-          if (pushResult.success) {
-            results.push++;
-          } else {
-            results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
-          }
+      if (shouldSendPush) {
+        const pushResult = await pushService.sendNotification(userId, {
+          title: '📋 New Task Assigned',
+          body: `${data.assignedBy} assigned you "${data.taskTitle}" in ${data.spaceName}`,
+          data: {
+            type: 'task_assignment',
+            taskTitle: data.taskTitle,
+            url: data.taskUrl,
+          },
+        });
+
+        if (pushResult.success) {
+          results.push++;
+        } else {
+          results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
         }
+      }
 
-        // Always create in-app notification
-        results.inApp++;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        results.errors.push(`Failed to process task assignment notification for user ${userId}: ${errorMessage}`);
+      // Always create in-app notification
+      results.inApp++;
+    }));
+
+    // Collect errors from rejected promises
+    for (const result of settled) {
+      if (result.status === 'rejected') {
+        const errorMessage = result.reason instanceof Error ? result.reason.message : 'Unknown error';
+        results.errors.push(`Failed to process task assignment notification: ${errorMessage}`);
       }
     }
 
@@ -399,83 +414,95 @@ export const enhancedNotificationService = {
       errors: [],
     };
 
-    for (const userId of userIds) {
-      const supabase = createClient();
-      try {
-        // Get user details
-        const { data: user, error: userError } = await supabase
-          .from('users')
-          .select('id, email, name')
-          .eq('id', userId)
-          .single();
+    // PERF: Batch fetch all users instead of per-user queries — PERF-015
+    const supabase = createClient();
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, email, name')
+      .in('id', userIds);
 
-        if (userError || !user) {
-          results.errors.push(`User ${userId} not found`);
-          continue;
-        }
+    if (usersError) {
+      results.errors.push(`Failed to fetch users: ${usersError.message}`);
+      return results;
+    }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendEmail = false;
+    interface UserRecord { id: string; email: string | null; name: string | null }
+    const usersMap = new Map<string, UserRecord>((users || []).map((u: UserRecord) => [u.id, u]));
 
-        if (shouldSendEmail && user.email) {
-          const emailResult = await this.sendEmailNotification(
-            'event_reminder',
-            user.email,
-            `📅 Event Reminder: ${data.eventTitle}`,
-            {
-              userName: user.name || 'User',
-              spaceName: data.spaceName,
-              eventTitle: data.eventTitle,
-              description: data.description,
-              startTime: data.startTime,
-              endTime: data.endTime,
-              location: data.location,
-              reminderTime: data.reminderTime,
-              eventUrl: data.eventUrl,
-            }
-          );
+    const settled = await Promise.allSettled(userIds.map(async (userId) => {
+      const user = usersMap.get(userId);
 
-          if (emailResult.success) {
-            results.email++;
-          } else {
-            results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
+      if (!user) {
+        results.errors.push(`User ${userId} not found`);
+        return;
+      }
+
+      // Individual notifications disabled - using digest-only system
+      const shouldSendEmail = false;
+
+      if (shouldSendEmail && user.email) {
+        const emailResult = await this.sendEmailNotification(
+          'event_reminder',
+          user.email,
+          `📅 Event Reminder: ${data.eventTitle}`,
+          {
+            userName: user.name || 'User',
+            spaceName: data.spaceName,
+            eventTitle: data.eventTitle,
+            description: data.description,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            location: data.location,
+            reminderTime: data.reminderTime,
+            eventUrl: data.eventUrl,
           }
+        );
 
-          // Notification logging removed - using digest-only system
+        if (emailResult.success) {
+          results.email++;
+        } else {
+          results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
         }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendPush = false;
+        // Notification logging removed - using digest-only system
+      }
 
-        if (shouldSendPush) {
-          const reminderTexts = {
-            '15min': 'is starting in 15 minutes',
-            '1hour': 'is starting in 1 hour',
-            '1day': 'is tomorrow',
-          };
+      // Individual notifications disabled - using digest-only system
+      const shouldSendPush = false;
 
-          const pushResult = await pushService.sendNotification(userId, {
-            title: '📅 Event Reminder',
-            body: `"${data.eventTitle}" ${reminderTexts[data.reminderTime]} in ${data.spaceName}`,
-            data: {
-              type: 'event_reminder',
-              eventTitle: data.eventTitle,
-              url: data.eventUrl,
-            },
-          });
+      if (shouldSendPush) {
+        const reminderTexts = {
+          '15min': 'is starting in 15 minutes',
+          '1hour': 'is starting in 1 hour',
+          '1day': 'is tomorrow',
+        };
 
-          if (pushResult.success) {
-            results.push++;
-          } else {
-            results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
-          }
+        const pushResult = await pushService.sendNotification(userId, {
+          title: '📅 Event Reminder',
+          body: `"${data.eventTitle}" ${reminderTexts[data.reminderTime]} in ${data.spaceName}`,
+          data: {
+            type: 'event_reminder',
+            eventTitle: data.eventTitle,
+            url: data.eventUrl,
+          },
+        });
+
+        if (pushResult.success) {
+          results.push++;
+        } else {
+          results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
         }
+      }
 
-        // Always create in-app notification
-        results.inApp++;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        results.errors.push(`Failed to process event reminder notification for user ${userId}: ${errorMessage}`);
+      // Always create in-app notification
+      results.inApp++;
+    }));
+
+    // Collect errors from rejected promises
+    for (const result of settled) {
+      if (result.status === 'rejected') {
+        const errorMessage = result.reason instanceof Error ? result.reason.message : 'Unknown error';
+        results.errors.push(`Failed to process event reminder notification: ${errorMessage}`);
       }
     }
 
@@ -513,76 +540,88 @@ export const enhancedNotificationService = {
       errors: [],
     };
 
-    for (const userId of userIds) {
-      const supabase = createClient();
-      try {
-        // Get user details
-        const { data: user, error: userError } = await supabase
-          .from('users')
-          .select('id, email, name')
-          .eq('id', userId)
-          .single();
+    // PERF: Batch fetch all users instead of per-user queries — PERF-015
+    const supabase = createClient();
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, email, name')
+      .in('id', userIds);
 
-        if (userError || !user) {
-          results.errors.push(`User ${userId} not found`);
-          continue;
-        }
+    if (usersError) {
+      results.errors.push(`Failed to fetch users: ${usersError.message}`);
+      return results;
+    }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendEmail = false;
+    interface UserRecord { id: string; email: string | null; name: string | null }
+    const usersMap = new Map<string, UserRecord>((users || []).map((u: UserRecord) => [u.id, u]));
 
-        if (shouldSendEmail && user.email) {
-          const emailResult = await this.sendEmailNotification(
-            'new_message',
-            user.email,
-            `💬 New Message from ${data.senderName}`,
-            {
-              userName: user.name || 'User',
-              spaceName: data.spaceName,
-              senderName: data.senderName,
-              senderAvatar: data.senderAvatar,
-              messagePreview: data.messagePreview,
-              conversationTitle: data.conversationTitle,
-              isDirectMessage: data.isDirectMessage,
-              messageUrl: data.messageUrl,
-            }
-          );
+    const settled = await Promise.allSettled(userIds.map(async (userId) => {
+      const user = usersMap.get(userId);
 
-          if (emailResult.success) {
-            results.email++;
-          } else {
-            results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
+      if (!user) {
+        results.errors.push(`User ${userId} not found`);
+        return;
+      }
+
+      // Individual notifications disabled - using digest-only system
+      const shouldSendEmail = false;
+
+      if (shouldSendEmail && user.email) {
+        const emailResult = await this.sendEmailNotification(
+          'new_message',
+          user.email,
+          `💬 New Message from ${data.senderName}`,
+          {
+            userName: user.name || 'User',
+            spaceName: data.spaceName,
+            senderName: data.senderName,
+            senderAvatar: data.senderAvatar,
+            messagePreview: data.messagePreview,
+            conversationTitle: data.conversationTitle,
+            isDirectMessage: data.isDirectMessage,
+            messageUrl: data.messageUrl,
           }
+        );
 
-          // Notification logging removed - using digest-only system
+        if (emailResult.success) {
+          results.email++;
+        } else {
+          results.errors.push(`Email failed for ${userId}: ${emailResult.error}`);
         }
 
-        // Individual notifications disabled - using digest-only system
-        const shouldSendPush = false;
+        // Notification logging removed - using digest-only system
+      }
 
-        if (shouldSendPush) {
-          const pushResult = await pushService.sendNotification(userId, {
-            title: data.isDirectMessage ? '💬 New Direct Message' : '💬 New Message',
-            body: `${data.senderName}: ${data.messagePreview}`,
-            data: {
-              type: 'new_message',
-              senderName: data.senderName,
-              url: data.messageUrl,
-            },
-          });
+      // Individual notifications disabled - using digest-only system
+      const shouldSendPush = false;
 
-          if (pushResult.success) {
-            results.push++;
-          } else {
-            results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
-          }
+      if (shouldSendPush) {
+        const pushResult = await pushService.sendNotification(userId, {
+          title: data.isDirectMessage ? '💬 New Direct Message' : '💬 New Message',
+          body: `${data.senderName}: ${data.messagePreview}`,
+          data: {
+            type: 'new_message',
+            senderName: data.senderName,
+            url: data.messageUrl,
+          },
+        });
+
+        if (pushResult.success) {
+          results.push++;
+        } else {
+          results.errors.push(`Push failed for ${userId}: ${pushResult.error}`);
         }
+      }
 
-        // Always create in-app notification
-        results.inApp++;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        results.errors.push(`Failed to process new message notification for user ${userId}: ${errorMessage}`);
+      // Always create in-app notification
+      results.inApp++;
+    }));
+
+    // Collect errors from rejected promises
+    for (const result of settled) {
+      if (result.status === 'rejected') {
+        const errorMessage = result.reason instanceof Error ? result.reason.message : 'Unknown error';
+        results.errors.push(`Failed to process new message notification: ${errorMessage}`);
       }
     }
 

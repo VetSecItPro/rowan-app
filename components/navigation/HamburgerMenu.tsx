@@ -136,7 +136,7 @@ export function HamburgerMenu() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="fixed inset-0 bg-black/60 z-[9998] sm:hidden"
+                className="fixed inset-0 bg-black/60 z-[60] sm:hidden"
                 onClick={() => setIsOpen(false)}
               />
 
@@ -146,7 +146,7 @@ export function HamburgerMenu() {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="fixed inset-0 bg-gray-900 z-[9999] flex flex-col sm:hidden"
+                className="fixed inset-0 bg-gray-900 z-[60] flex flex-col sm:hidden"
               >
                 {/* Mobile Header with Logo */}
                 <div className="flex-shrink-0 flex items-center justify-between px-6 py-6 border-b border-gray-800">
@@ -252,7 +252,7 @@ export function HamburgerMenu() {
 
               {/* Desktop Menu Panel - Unchanged */}
               <div
-                className={`hidden sm:flex shadow-2xl z-[9999] flex-col animate-in bg-gray-900 w-80 max-h-[calc(100vh-5rem)] rounded-xl border border-gray-700 slide-in-from-top-2 fade-in duration-200`}
+                className={`hidden sm:flex shadow-2xl z-[60] flex-col animate-in bg-gray-900 w-80 max-h-[calc(100vh-5rem)] rounded-xl border border-gray-700 slide-in-from-top-2 fade-in duration-200`}
                 style={menuStyle}
               >
                 {/* Desktop Content - with data prefetching */}

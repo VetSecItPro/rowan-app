@@ -85,7 +85,7 @@ export default function UpcomingBillsWidget({
       <div className="bg-gradient-to-r from-red-500 to-orange-600 p-6 text-white">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-white/25 rounded-xl flex items-center justify-center">
               <DollarSign className="w-6 h-6" />
             </div>
             <div>
@@ -103,13 +103,13 @@ export default function UpcomingBillsWidget({
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+          <div className="bg-white/15 rounded-lg p-3">
             <p className="text-white/80 text-xs mb-1">This Week</p>
             <p className="text-xl font-bold">
               {upcomingBills.filter((b) => b.days_until_due <= 7).length}
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
+          <div className="bg-white/15 rounded-lg p-3">
             <p className="text-white/80 text-xs mb-1">Overdue</p>
             <p className="text-xl font-bold">{overdueBills.length}</p>
           </div>

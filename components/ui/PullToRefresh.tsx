@@ -50,10 +50,10 @@ export function PullToRefresh({
     if (isRefreshing) return;
     setIsRefreshing(true);
 
-    // Haptic feedback when available
-    if ('vibrate' in navigator) {
-      navigator.vibrate(10);
-    }
+    // Haptic feedback — native bridge on mobile, vibrate API on web
+    import('@/lib/native/haptics').then(({ triggerHaptic }) => triggerHaptic()).catch(() => {
+      if ('vibrate' in navigator) navigator.vibrate(10);
+    });
 
     try {
       await onRefresh();

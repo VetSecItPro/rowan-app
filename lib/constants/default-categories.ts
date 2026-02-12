@@ -1,3 +1,5 @@
+import { COLORS } from './colors';
+
 // Default category configurations for different domains
 export interface DefaultCategory {
   name: string;
@@ -14,7 +16,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Groceries',
     description: 'Food and household essentials',
     icon: '🛒',
-    color: '#10b981',
+    color: COLORS.emerald[500],
     domain: 'expense',
     monthly_budget: 400
   },
@@ -22,7 +24,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Dining',
     description: 'Restaurants and takeout',
     icon: '🍽️',
-    color: '#f59e0b',
+    color: COLORS.amber[500],
     domain: 'expense',
     monthly_budget: 200
   },
@@ -30,7 +32,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Transportation',
     description: 'Gas, parking, public transport',
     icon: '🚗',
-    color: '#3b82f6',
+    color: COLORS.blue[500],
     domain: 'expense',
     monthly_budget: 300
   },
@@ -38,7 +40,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Healthcare',
     description: 'Medical, dental, pharmacy',
     icon: '🏥',
-    color: '#ef4444',
+    color: COLORS.red[500],
     domain: 'expense',
     monthly_budget: 150
   },
@@ -46,7 +48,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Shopping',
     description: 'Clothing, electronics, misc purchases',
     icon: '🛍️',
-    color: '#8b5cf6',
+    color: COLORS.violet[500],
     domain: 'expense',
     monthly_budget: 250
   },
@@ -54,7 +56,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Entertainment',
     description: 'Movies, games, subscriptions',
     icon: '🎭',
-    color: '#ec4899',
+    color: COLORS.pink[500],
     domain: 'expense',
     monthly_budget: 100
   },
@@ -62,7 +64,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Utilities',
     description: 'Electric, water, gas, internet',
     icon: '⚡',
-    color: '#06b6d4',
+    color: COLORS.cyan[500],
     domain: 'expense',
     monthly_budget: 200
   },
@@ -70,7 +72,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Housing',
     description: 'Rent, mortgage, home maintenance',
     icon: '🏠',
-    color: '#84cc16',
+    color: COLORS.lime[500],
     domain: 'expense',
     monthly_budget: 1200
   },
@@ -78,7 +80,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Insurance',
     description: 'Auto, health, life insurance',
     icon: '🛡️',
-    color: '#64748b',
+    color: COLORS.slate[500],
     domain: 'expense',
     monthly_budget: 300
   },
@@ -86,7 +88,7 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
     name: 'Travel',
     description: 'Flights, hotels, vacation expenses',
     icon: '✈️',
-    color: '#0ea5e9',
+    color: COLORS.sky[500],
     domain: 'expense',
     monthly_budget: 200
   }
@@ -98,56 +100,56 @@ export const DEFAULT_TASK_CATEGORIES: DefaultCategory[] = [
     name: 'Work',
     description: 'Professional tasks and projects',
     icon: '💼',
-    color: '#3b82f6',
+    color: COLORS.blue[500],
     domain: 'task'
   },
   {
     name: 'Personal',
     description: 'Personal errands and tasks',
     icon: '👤',
-    color: '#10b981',
+    color: COLORS.emerald[500],
     domain: 'task'
   },
   {
     name: 'Health',
     description: 'Exercise, medical appointments',
     icon: '💪',
-    color: '#ef4444',
+    color: COLORS.red[500],
     domain: 'task'
   },
   {
     name: 'Learning',
     description: 'Education and skill development',
     icon: '📚',
-    color: '#8b5cf6',
+    color: COLORS.violet[500],
     domain: 'task'
   },
   {
     name: 'Household',
     description: 'Cleaning, maintenance, chores',
     icon: '🏠',
-    color: '#f59e0b',
+    color: COLORS.amber[500],
     domain: 'task'
   },
   {
     name: 'Social',
     description: 'Events, meetings, social activities',
     icon: '👥',
-    color: '#ec4899',
+    color: COLORS.pink[500],
     domain: 'task'
   },
   {
     name: 'Shopping',
     description: 'Purchases and errands',
     icon: '🛒',
-    color: '#06b6d4',
+    color: COLORS.cyan[500],
     domain: 'task'
   },
   {
     name: 'Finance',
     description: 'Bills, banking, budgeting',
     icon: '💰',
-    color: '#84cc16',
+    color: COLORS.lime[500],
     domain: 'task'
   }
 ];
@@ -158,63 +160,63 @@ export const DEFAULT_GOAL_CATEGORIES: DefaultCategory[] = [
     name: 'Health & Fitness',
     description: 'Exercise, nutrition, wellness goals',
     icon: '🏃',
-    color: '#ef4444',
+    color: COLORS.red[500],
     domain: 'goal'
   },
   {
     name: 'Career',
     description: 'Professional development and advancement',
     icon: '📈',
-    color: '#3b82f6',
+    color: COLORS.blue[500],
     domain: 'goal'
   },
   {
     name: 'Financial',
     description: 'Savings, investments, debt reduction',
     icon: '💰',
-    color: '#10b981',
+    color: COLORS.emerald[500],
     domain: 'goal'
   },
   {
     name: 'Education',
     description: 'Learning new skills or knowledge',
     icon: '🎓',
-    color: '#8b5cf6',
+    color: COLORS.violet[500],
     domain: 'goal'
   },
   {
     name: 'Personal',
     description: 'Self-improvement and personal growth',
     icon: '🌱',
-    color: '#84cc16',
+    color: COLORS.lime[500],
     domain: 'goal'
   },
   {
     name: 'Relationships',
     description: 'Family, friends, social connections',
     icon: '❤️',
-    color: '#ec4899',
+    color: COLORS.pink[500],
     domain: 'goal'
   },
   {
     name: 'Hobbies',
     description: 'Creative pursuits and interests',
     icon: '🎨',
-    color: '#f59e0b',
+    color: COLORS.amber[500],
     domain: 'goal'
   },
   {
     name: 'Travel',
     description: 'Vacation plans and adventures',
     icon: '🗺️',
-    color: '#06b6d4',
+    color: COLORS.cyan[500],
     domain: 'goal'
   },
   {
     name: 'Home',
     description: 'Home improvement and organization',
     icon: '🏡',
-    color: '#64748b',
+    color: COLORS.slate[500],
     domain: 'goal'
   }
 ];
@@ -225,28 +227,28 @@ export const DEFAULT_UNIVERSAL_CATEGORIES: DefaultCategory[] = [
     name: 'Urgent',
     description: 'High priority items requiring immediate attention',
     icon: '🚨',
-    color: '#dc2626',
+    color: COLORS.red[600],
     domain: 'universal'
   },
   {
     name: 'Important',
     description: 'Significant items with long-term impact',
     icon: '⭐',
-    color: '#f59e0b',
+    color: COLORS.amber[500],
     domain: 'universal'
   },
   {
     name: 'Routine',
     description: 'Regular, recurring activities',
     icon: '🔄',
-    color: '#6b7280',
+    color: COLORS.gray[500],
     domain: 'universal'
   },
   {
     name: 'Projects',
     description: 'Multi-step initiatives and complex tasks',
     icon: '📋',
-    color: '#3b82f6',
+    color: COLORS.blue[500],
     domain: 'universal'
   }
 ];
@@ -309,7 +311,7 @@ export function getSuggestedCategories(searchTerm: string, domain?: DefaultCateg
  */
 export function getCategoryColor(categoryName: string, domain?: DefaultCategory['domain']): string {
   const category = findDefaultCategory(categoryName, domain);
-  return category?.color || '#6b7280';
+  return category?.color || COLORS.gray[500];
 }
 
 /**

@@ -5,6 +5,7 @@ import { Download, FileJson, FileSpreadsheet, FileText, Check, AlertCircle } fro
 import { logDataExport } from '@/lib/services/audit-log-service';
 import { logger } from '@/lib/logger';
 import { Modal } from '@/components/ui/Modal';
+import { showInfo } from '@/lib/utils/toast';
 
 interface ExportDataModalProps {
   isOpen: boolean;
@@ -80,7 +81,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
         // For "all" CSV, show available types
         const data = await response.json();
         if (data.files) {
-          alert(`Multiple CSV files available. Use the data type selector to download specific types:\n\n${data.files.join('\n')}`);
+          showInfo(`Multiple CSV files available. Use the data type selector to download specific types: ${data.files.join(', ')}`);
         }
       } else {
         // Download CSV file
@@ -174,7 +175,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold text-white">JSON</h4>
                       {selectedFormat === 'json' && (
-                        <Check className="w-4 h-4 text-blue-500" />
+                        <Check aria-hidden="true" className="w-4 h-4 text-blue-500" />
                       )}
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
@@ -205,7 +206,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold text-white">CSV</h4>
                       {selectedFormat === 'csv' && (
-                        <Check className="w-4 h-4 text-green-500" />
+                        <Check aria-hidden="true" className="w-4 h-4 text-green-500" />
                       )}
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
@@ -236,7 +237,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold text-white">PDF</h4>
                       {selectedFormat === 'pdf' && (
-                        <Check className="w-4 h-4 text-purple-500" />
+                        <Check aria-hidden="true" className="w-4 h-4 text-purple-500" />
                       )}
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
@@ -269,7 +270,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
                         <p className="text-xs text-gray-400 mt-0.5">{type.description}</p>
                       </div>
                       {selectedDataType === type.value && (
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <Check aria-hidden="true" className="w-5 h-5 text-green-500 flex-shrink-0" />
                       )}
                     </div>
                   </button>
@@ -280,7 +281,7 @@ export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProp
 
           {/* Info Box */}
           <div className="flex items-start gap-3 p-4 bg-blue-900/20 border border-blue-800 rounded-xl">
-            <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+            <AlertCircle aria-hidden="true" className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-blue-200">
               <p className="font-medium mb-1">GDPR Compliance</p>
               <p className="text-xs">

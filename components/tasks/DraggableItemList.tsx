@@ -155,7 +155,7 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200"
+      className="bg-gray-800/80 border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200"
     >
       {/* Main row - compact single line */}
       <div className="flex items-center gap-2">
@@ -227,9 +227,9 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
 
           {showMenu && typeof document !== 'undefined' && createPortal(
             <>
-              <div className="fixed inset-0 z-[9999]" onClick={() => setShowMenu(false)} />
+              <div className="fixed inset-0 z-[60]" onClick={() => setShowMenu(false)} />
               <div
-                className="fixed w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-[10000] overflow-hidden"
+                className="fixed w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-[70] overflow-hidden"
                 style={{ top: menuPosition.top, left: menuPosition.left }}
               >
                 {onViewDetails && item.type === 'task' && (

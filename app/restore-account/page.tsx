@@ -152,7 +152,7 @@ export default function RestoreAccountPage() {
 
         {restored ? (
           // Success state
-          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 text-center">
+          <div className="bg-gray-900/95 rounded-3xl shadow-2xl border border-gray-700/50 p-8 text-center">
             <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
@@ -172,7 +172,7 @@ export default function RestoreAccountPage() {
           </div>
         ) : deletionInfo ? (
           // Account marked for deletion - show restoration option
-          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8">
+          <div className="bg-gray-900/95 rounded-3xl shadow-2xl border border-gray-700/50 p-8">
             <h1 className="text-3xl font-bold text-white mb-4 text-center">
               Restore Your Account
             </h1>
@@ -285,7 +285,7 @@ export default function RestoreAccountPage() {
           </div>
         ) : (
           // Account is NOT marked for deletion
-          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-8 text-center">
+          <div className="bg-gray-900/95 rounded-3xl shadow-2xl border border-gray-700/50 p-8 text-center">
             <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>

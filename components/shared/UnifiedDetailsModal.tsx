@@ -173,7 +173,7 @@ function DetailsModalContent({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] sm:flex sm:items-center sm:justify-center sm:p-4 bg-black/75">
       {/* Compact Elegant Modal - Fixed height for stability */}
       <div className="absolute top-14 left-0 right-0 bottom-0 sm:relative sm:inset-auto sm:top-auto bg-gray-900 w-full sm:max-w-lg sm:h-[540px] sm:max-h-[90vh] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
 

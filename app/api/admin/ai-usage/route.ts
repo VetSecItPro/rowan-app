@@ -90,7 +90,8 @@ export async function GET(req: NextRequest) {
       .select('user_id, space_id, date, input_tokens, output_tokens, voice_seconds, conversation_count, tool_calls_count, feature_source, estimated_cost_usd')
       .gte('date', start)
       .lte('date', end)
-      .order('date', { ascending: false });
+      .order('date', { ascending: false })
+      .limit(10000);
 
     if (usageError) {
       logger.error('[Admin AI] Failed to fetch usage data', usageError);

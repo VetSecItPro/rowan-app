@@ -3,17 +3,17 @@
 import { useState } from 'react';
 import { logger } from '@/lib/logger';
 import {
-  DocumentTextIcon,
-  CalendarIcon,
-  EyeIcon,
-  ArrowDownTrayIcon,
-  TrashIcon,
-  ClockIcon,
-  UserIcon,
-  MagnifyingGlassIcon,
-  FunnelIcon
-} from '@heroicons/react/24/outline';
-import { HeartIcon } from '@heroicons/react/24/solid';
+  FileText,
+  Calendar,
+  Eye,
+  Download,
+  Trash2,
+  Clock,
+  User,
+  Search,
+  Filter,
+  Heart
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { type GeneratedReport } from '@/lib/services/financial-reports-service';
 import { downloadReportPDF, deleteReport, toggleReportFavorite } from '@/lib/services/financial-reports-service';
@@ -114,7 +114,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search reports..."
@@ -159,7 +159,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
         <div className="text-center py-12">
           {searchQuery || selectedStatus !== 'all' || selectedType !== 'all' ? (
             <>
-              <FunnelIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <Filter className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-white">
                 No reports found
               </h3>
@@ -169,7 +169,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
             </>
           ) : (
             <>
-              <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <FileText className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-white">
                 No reports yet
               </h3>
@@ -190,7 +190,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                 <div className="flex-1">
                   {/* Header */}
                   <div className="flex items-start gap-3">
-                    <DocumentTextIcon className="h-6 w-6 text-gray-400 flex-shrink-0 mt-1" />
+                    <FileText className="h-6 w-6 text-gray-400 flex-shrink-0 mt-1" />
                     <div className="flex-1">
                       <h4 className="text-lg font-medium text-white">
                         {report.title}
@@ -205,22 +205,22 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                       onClick={() => handleToggleFavorite(report)}
                       className="text-gray-400 hover:text-red-500"
                     >
-                      <HeartIcon className={`h-5 w-5 ${report.is_favorite ? 'text-red-500' : ''}`} />
+                      <Heart className={`h-5 w-5 ${report.is_favorite ? 'text-red-500 fill-red-500' : ''}`} />
                     </button>
                   </div>
 
                   {/* Metadata */}
                   <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-400">
                     <div className="flex items-center gap-1">
-                      <CalendarIcon className="h-4 w-4" />
+                      <Calendar className="h-4 w-4" />
                       {new Date(report.date_range_start).toLocaleDateString()} - {new Date(report.date_range_end).toLocaleDateString()}
                     </div>
                     <div className="flex items-center gap-1">
-                      <ClockIcon className="h-4 w-4" />
+                      <Clock className="h-4 w-4" />
                       {formatDistanceToNow(new Date(report.generated_at), { addSuffix: true })}
                     </div>
                     <div className="flex items-center gap-1">
-                      <UserIcon className="h-4 w-4" />
+                      <User className="h-4 w-4" />
                       {report.report_type}
                     </div>
                     {report.pdf_size && (
@@ -261,7 +261,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                     onClick={() => onViewReport(report)}
                     className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
-                    <EyeIcon className="h-4 w-4 mr-1" />
+                    <Eye className="h-4 w-4 mr-1" />
                     View
                   </button>
 
@@ -271,7 +271,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                       disabled={loading === report.id}
                       className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                     >
-                      <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
+                      <Download className="h-4 w-4 mr-1" />
                       {loading === report.id ? 'Downloading...' : 'Download'}
                     </button>
                   )}
@@ -281,7 +281,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                     disabled={loading === report.id}
                     className="inline-flex items-center px-3 py-1.5 border border-red-600 shadow-sm text-sm font-medium rounded-md text-red-400 bg-gray-700 hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                   >
-                    <TrashIcon className="h-4 w-4 mr-1" />
+                    <Trash2 className="h-4 w-4 mr-1" />
                     Delete
                   </button>
                 </div>

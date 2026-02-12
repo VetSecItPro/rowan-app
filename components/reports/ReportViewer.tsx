@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { logger } from '@/lib/logger';
 import {
-  ArrowLeftIcon,
-  ArrowDownTrayIcon,
-  ShareIcon,
-  EyeIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  DocumentTextIcon,
-  PrinterIcon,
-  LinkIcon
-} from '@heroicons/react/24/outline';
+  ArrowLeft,
+  Download,
+  Share2,
+  Eye,
+  Calendar,
+  BarChart3,
+  FileText,
+  Printer,
+  Link
+} from 'lucide-react';
 import type { GeneratedReport, ReportData, ReportMetrics } from '@/lib/services/financial-reports-service';
 import { downloadReportPDF, getReportShareUrl, updateReportViews } from '@/lib/services/financial-reports-service';
 
@@ -166,7 +166,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
             onClick={onClose}
             className="mr-4 p-2 text-gray-400 hover:text-gray-300"
           >
-            <ArrowLeftIcon className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
             <h3 className="text-lg font-medium text-white">
@@ -184,7 +184,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
             disabled={loading}
             className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            <ShareIcon className="h-4 w-4 mr-1" />
+            <Share2 className="h-4 w-4 mr-1" />
             Share
           </button>
 
@@ -194,7 +194,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
               disabled={loading}
               className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
+              <Download className="h-4 w-4 mr-1" />
               {loading ? 'Downloading...' : 'Download PDF'}
             </button>
           )}
@@ -205,7 +205,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
       <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="flex items-center">
-            <CalendarIcon className="h-5 w-5 text-gray-400 mr-2" />
+            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
             <div>
               <div className="text-sm font-medium text-white">Date Range</div>
               <div className="text-sm text-gray-400">
@@ -215,7 +215,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           </div>
 
           <div className="flex items-center">
-            <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-2" />
+            <FileText className="h-5 w-5 text-gray-400 mr-2" />
             <div>
               <div className="text-sm font-medium text-white">Report Type</div>
               <div className="text-sm text-gray-400 capitalize">
@@ -225,7 +225,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           </div>
 
           <div className="flex items-center">
-            <EyeIcon className="h-5 w-5 text-gray-400 mr-2" />
+            <Eye className="h-5 w-5 text-gray-400 mr-2" />
             <div>
               <div className="text-sm font-medium text-white">Views</div>
               <div className="text-sm text-gray-400">
@@ -235,7 +235,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           </div>
 
           <div className="flex items-center">
-            <ArrowDownTrayIcon className="h-5 w-5 text-gray-400 mr-2" />
+            <Download className="h-5 w-5 text-gray-400 mr-2" />
             <div>
               <div className="text-sm font-medium text-white">Downloads</div>
               <div className="text-sm text-gray-400">
@@ -264,7 +264,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           </h4>
           <div className="flex items-center justify-center h-64 bg-gray-700 rounded-lg border-2 border-dashed border-gray-600">
             <div className="text-center">
-              <ChartBarIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-white">
                 Charts Available in PDF
               </h3>
@@ -283,7 +283,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
       {report.pdf_url && (
         <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
           <div className="flex">
-            <PrinterIcon className="h-5 w-5 text-blue-400 flex-shrink-0" />
+            <Printer className="h-5 w-5 text-blue-400 flex-shrink-0" />
             <div className="ml-3">
               <h3 className="text-sm font-medium text-blue-200">
                 Complete Report Available
@@ -305,7 +305,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-full bg-gray-800" onClick={e => e.stopPropagation()}>
             <div className="mt-3">
               <div className="flex items-center">
-                <LinkIcon className="h-6 w-6 text-blue-600 mr-2" />
+                <Link className="h-6 w-6 text-blue-600 mr-2" />
                 <h3 className="text-lg font-medium text-white">
                   Share Report
                 </h3>

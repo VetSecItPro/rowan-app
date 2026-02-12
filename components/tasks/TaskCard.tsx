@@ -68,7 +68,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
   };
 
   return (
-    <div className="bg-gray-800/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200">
+    <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl p-2.5 sm:p-3 hover:shadow-md transition-all duration-200">
       {/* Main row */}
       <div className="flex items-center gap-2">
         {/* Checkbox */}
@@ -115,6 +115,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         <div className="relative flex-shrink-0">
           <button
             onClick={() => setShowMenu(!showMenu)}
+            aria-label="Task options"
             className="p-2 text-gray-400 hover:text-gray-300 rounded"
           >
             <MoreVertical className="w-4 h-4" />

@@ -133,7 +133,7 @@ export default function PWAInstallPrompt() {
 
   return (
     <div
-      className="sticky bottom-0 z-50 md:z-40 bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/50 mb-[env(safe-area-inset-bottom,0px)]"
+      className="sticky bottom-0 z-50 md:z-40 bg-gray-900 border-t border-gray-700/50 mb-[env(safe-area-inset-bottom,0px)]"
       role="banner"
       aria-label="Install Rowan app"
     >

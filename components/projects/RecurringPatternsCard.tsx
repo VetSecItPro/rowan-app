@@ -13,6 +13,7 @@ import {
   createExpenseFromPattern,
   getUpcomingRecurring,
 } from '@/lib/services/recurring-expenses-service';
+import { showSuccess, showError } from '@/lib/utils/toast';
 
 interface RecurringPatternsCardProps {
   spaceId: string;
@@ -96,9 +97,9 @@ export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCard
       const result = await createExpenseFromPattern(patternId, userId);
       if (result.success) {
         await loadPatterns();
-        alert('Expense created successfully!');
+        showSuccess('Expense created successfully!');
       } else {
-        alert(`Error: ${result.error}`);
+        showError(`Error: ${result.error}`);
       }
     } catch (error) {
       logger.error('Error creating expense:', error, { component: 'RecurringPatternsCard', action: 'component_action' });

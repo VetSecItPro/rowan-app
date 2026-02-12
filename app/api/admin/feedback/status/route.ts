@@ -7,6 +7,7 @@ import { safeCookiesAsync } from '@/lib/utils/safe-cookies';
 import { decryptSessionData, validateSessionData } from '@/lib/utils/session-crypto-edge';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { logAdminAction } from '@/lib/utils/admin-audit';
 
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
@@ -92,6 +93,18 @@ export async function PATCH(req: NextRequest) {
 
     if (updateError) {
       throw new Error(`Failed to update feedback: ${updateError.message}`);
+    }
+
+    // Audit log
+    const adminId = (sessionData as { adminId?: string }).adminId;
+    if (adminId) {
+      logAdminAction({
+        adminUserId: adminId,
+        action: 'feedback_status_update',
+        targetResource: `feedback/${validatedData.feedbackId}`,
+        metadata: { newStatus: validatedData.status },
+        ipAddress: extractIP(req.headers),
+      });
     }
 
     return NextResponse.json({
@@ -203,7 +216,20 @@ export async function POST(req: NextRequest) {
       throw new Error(`Failed to bulk update feedback: ${updateError.message}`);
     }
 
-    // Log admin action
+    // Audit log
+    const adminId = (sessionData as { adminId?: string }).adminId;
+    if (adminId) {
+      logAdminAction({
+        adminUserId: adminId,
+        action: 'feedback_bulk_status_update',
+        targetResource: 'feedback/bulk',
+        metadata: {
+          count: validatedData.feedbackIds.length,
+          newStatus: validatedData.status,
+        },
+        ipAddress: extractIP(req.headers),
+      });
+    }
 
     return NextResponse.json({
       success: true,

@@ -3,7 +3,7 @@
 import { Check, MoreVertical } from 'lucide-react';
 import { Chore } from '@/lib/types';
 import { formatTimestamp } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 interface ChoreCardProps {
   chore: Chore;
@@ -13,7 +13,7 @@ interface ChoreCardProps {
   onUpdateProgress?: (chore: Chore) => void;
 }
 
-export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdateProgress }: ChoreCardProps) {
+function ChoreCardComponent({ chore, onStatusChange, onEdit, onDelete, onUpdateProgress }: ChoreCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -77,3 +77,5 @@ export function ChoreCard({ chore, onStatusChange, onEdit, onDelete, onUpdatePro
     </div>
   );
 }
+
+export const ChoreCard = memo(ChoreCardComponent);

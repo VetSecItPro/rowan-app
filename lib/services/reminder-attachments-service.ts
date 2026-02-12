@@ -40,21 +40,6 @@ export interface ReminderAttachment {
 
 const attachmentTypeSchema = z.enum(['file', 'url', 'link_task', 'link_shopping', 'link_event']);
 
-const _reminderAttachmentSchema = z.object({
-  id: z.string().uuid(),
-  reminder_id: z.string().uuid(),
-  type: attachmentTypeSchema,
-  file_path: z.string().optional(),
-  file_size: z.number().optional(),
-  mime_type: z.string().optional(),
-  url: z.string().url().optional(),
-  linked_id: z.string().uuid().optional(),
-  display_name: z.string().min(1).max(255),
-  uploaded_by: z.string().uuid(),
-  created_at: z.string(),
-  updated_at: z.string(),
-});
-
 const createFileAttachmentSchema = z.object({
   reminder_id: z.string().uuid(),
   display_name: z.string().min(1).max(255),

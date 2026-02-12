@@ -77,7 +77,7 @@ export const eventProposalsService = {
         time_slots: input.time_slots,
         status: 'pending'
       }])
-      .select('*')
+      .select('id, event_id, space_id, proposed_by, title, description, time_slots, status, counter_proposal_id, approved_slot_index, created_at, updated_at')
       .single();
 
     if (error) throw error;
@@ -159,7 +159,7 @@ export const eventProposalsService = {
       }], {
         onConflict: 'proposal_id,time_slot_index,user_id'
       })
-      .select('*')
+      .select('id, proposal_id, time_slot_index, user_id, vote, comment, created_at, updated_at')
       .single();
 
     if (error) throw error;
@@ -267,7 +267,7 @@ export const eventProposalsService = {
         approved_slot_index: selectedSlotIndex
       })
       .eq('id', proposalId)
-      .select('*')
+      .select('id, event_id, space_id, proposed_by, title, description, time_slots, status, counter_proposal_id, approved_slot_index, created_at, updated_at')
       .single();
 
     if (updateError) throw updateError;
@@ -296,7 +296,7 @@ export const eventProposalsService = {
       .from('event_proposals')
       .update({ status: 'rejected' })
       .eq('id', proposalId)
-      .select('*')
+      .select('id, event_id, space_id, proposed_by, title, description, time_slots, status, counter_proposal_id, approved_slot_index, created_at, updated_at')
       .single();
 
     if (error) throw error;
@@ -327,7 +327,7 @@ export const eventProposalsService = {
         status: 'pending',
         counter_proposal_id: originalProposalId
       }])
-      .select('*')
+      .select('id, event_id, space_id, proposed_by, title, description, time_slots, status, counter_proposal_id, approved_slot_index, created_at, updated_at')
       .single();
 
     if (error) throw error;

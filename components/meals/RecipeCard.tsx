@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Recipe } from '@/lib/services/meals-service';
 import { Clock, Users, Edit, Trash2, ChefHat } from 'lucide-react';
 
@@ -10,9 +11,9 @@ interface RecipeCardProps {
   onPlanMeal: (recipe: Recipe) => void;
 }
 
-export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardProps) {
+export const RecipeCard = memo(function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardProps) {
   return (
-    <div className="bg-gray-800/60 backdrop-blur-md border border-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
       {recipe.image_url && (
         <div className="w-full h-48 bg-gray-700 overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -106,4 +107,4 @@ export function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardP
       </div>
     </div>
   );
-}
+});

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { showWarning } from '@/lib/utils/toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
@@ -103,7 +104,7 @@ export function LocationSettings({ spaceId, className }: LocationSettingsProps) 
     const lng = newPlace.longitude || currentLocation?.longitude || 0;
 
     if (!lat || !lng) {
-      alert('Please enable location to add a place, or enter coordinates manually.');
+      showWarning('Please enable location to add a place, or enter coordinates manually.');
       return;
     }
 

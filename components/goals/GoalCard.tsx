@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Target, MoreVertical, Check, History, Settings } from 'lucide-react';
 import { Goal } from '@/lib/services/goals-service';
 import { formatDate } from '@/lib/utils/date-utils';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 interface GoalCardProps {
   goal: Goal;
@@ -16,7 +16,7 @@ interface GoalCardProps {
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
 }
 
-export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onFrequencySettings, onStatusChange }: GoalCardProps) {
+export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onFrequencySettings, onStatusChange }: GoalCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   // Determine status based on goal.status and progress
@@ -156,7 +156,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             <span className="text-sm text-gray-400">Progress</span>
             <span className={`text-sm font-bold ${getProgressTextColor()}`}>{goal.progress}%</span>
           </div>
-          <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+          <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden">
             <div
               className={`h-full bg-gradient-to-r ${getProgressColor()} transition-all duration-700 ease-out rounded-full shadow-sm`}
               style={{ width: `${goal.progress}%` }}
@@ -196,4 +196,4 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
       </div>
     </div>
   );
-}
+});

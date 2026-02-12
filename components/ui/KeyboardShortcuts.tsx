@@ -140,7 +140,7 @@ export function KeyboardShortcuts() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/80"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />

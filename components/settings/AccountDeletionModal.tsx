@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { Modal } from '@/components/ui/Modal';
+import { showError } from '@/lib/utils/toast';
 
 interface AccountDeletionModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalPr
 
       setHasExported(true);
     } catch {
-      alert('Failed to export data. Please try again.');
+      showError('Failed to export data. Please try again.');
     }
   };
 
@@ -52,7 +53,7 @@ export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalPr
       const result = await accountDeletionService.deleteUserAccount(user.id, supabase);
 
       if (!result.success) {
-        alert(result.error || 'Failed to delete account. Please try again.');
+        showError(result.error || 'Failed to delete account. Please try again.');
         setIsDeleting(false);
         return;
       }
@@ -62,7 +63,7 @@ export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalPr
       router.push('/goodbye');
     } catch (error) {
       logger.error('Account deletion error:', error, { component: 'AccountDeletionModal', action: 'component_action' });
-      alert('An unexpected error occurred. Please try again.');
+      showError('An unexpected error occurred. Please try again.');
       setIsDeleting(false);
     }
   };

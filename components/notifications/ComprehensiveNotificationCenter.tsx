@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { billsService } from '@/lib/services/bills-service';
+import { showError } from '@/lib/utils/toast';
 
 interface ComprehensiveNotificationCenterProps {
   userId: string;
@@ -142,7 +143,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
       await fetchNotifications();
     } catch (error) {
       logger.error('Error marking bill as paid:', error, { component: 'ComprehensiveNotificationCenter', action: 'component_action' });
-      alert('Failed to mark bill as paid. Please try again.');
+      showError('Failed to mark bill as paid. Please try again.');
     }
   };
 
@@ -243,9 +244,9 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
           />
 
           {/* Panel with Glassmorphism */}
-          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
+          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-gray-800/95 border border-gray-700/50 rounded-xl shadow-2xl z-50 max-h-[600px] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between backdrop-blur-md">
+            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h3 className="text-lg font-semibold text-white">
                   Notifications
@@ -364,7 +365,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-gray-700/50 text-center backdrop-blur-md">
+              <div className="p-3 border-t border-gray-700/50 text-center">
                 <button
                   onClick={() => {
                     setIsOpen(false);

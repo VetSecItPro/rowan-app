@@ -7,6 +7,7 @@ import { reminderAttachmentsService, ReminderAttachment } from '@/lib/services/r
 import { useAuth } from '@/lib/contexts/auth-context';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { logger } from '@/lib/logger';
+import { showError } from '@/lib/utils/toast';
 
 interface AttachmentListProps {
   reminderId: string;
@@ -69,7 +70,7 @@ export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListPro
       setAttachments((prev) => prev.filter((a) => a.id !== attachmentToDelete));
     } catch (error) {
       logger.error('Error deleting attachment:', error, { component: 'AttachmentList', action: 'component_action' });
-      alert(`Failed to delete attachment: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showError(`Failed to delete attachment: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setDeletingId(null);
       setAttachmentToDelete(null);

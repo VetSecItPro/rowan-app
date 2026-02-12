@@ -244,8 +244,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
           <select
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planning' | 'in_progress' | 'completed' | 'on_hold' })}
-            className="w-full pl-1 pr-1 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white relative z-50"
-            style={{ position: 'relative', zIndex: 9999 }}
+            className="w-full pl-1 pr-1 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white relative z-[70]"
           >
             <option value="planning">Planning</option>
             <option value="in_progress">In Progress</option>

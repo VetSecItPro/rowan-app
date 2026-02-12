@@ -122,7 +122,7 @@ const Section = memo(function Section({
 
   return (
     <SpotlightCard
-      className="flex flex-col h-full bg-gray-800/50 backdrop-blur-sm border-0"
+      className="flex flex-col h-full bg-gray-800/60 border-0"
       spotlightColor={spotlightColors[color]}
     >
       <div className="p-4 flex flex-col h-full">

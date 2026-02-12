@@ -66,7 +66,7 @@ export function CollapsibleStatsGrid({
           <span className="block text-sm font-semibold text-white truncate">{title}</span>
           <span className="block text-xs text-gray-400 truncate">{summary}</span>
         </span>
-        <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />
+        <ChevronDown aria-hidden="true" className={`h-4 w-4 text-gray-400 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />
       </button>
 
       {/* Stats cards - visible on desktop, collapsible on mobile */}

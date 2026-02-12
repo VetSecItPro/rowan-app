@@ -75,7 +75,7 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/85"
             onClick={handleSkip}
             aria-hidden="true"
           />
@@ -172,6 +172,11 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
                 ))}
               </div>
             </div>
+
+            {/* Privacy notice */}
+            <p className="px-6 text-[11px] text-gray-500 leading-relaxed text-center">
+              Rowan AI uses Google Gemini. First names and household data (tasks, events, lists) are shared with Google to personalize responses. Passwords and financial accounts are never shared.
+            </p>
 
             {/* Footer actions */}
             <div className="px-6 pb-6 pt-2 flex items-center justify-between">
