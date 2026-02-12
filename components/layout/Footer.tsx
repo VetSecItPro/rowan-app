@@ -64,12 +64,12 @@ export function Footer() {
               <h4 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3">
                 {col.title}
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-0.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-500 hover:text-white transition-colors"
+                      className="block py-1.5 text-sm text-gray-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md"
                     >
                       {link.label}
                     </Link>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig, useInView, useReducedMotion } from 'framer-motion';
 import { Pause } from 'lucide-react';
 
 export interface DemoStep {
@@ -130,7 +130,9 @@ export function AnimatedFeatureDemo({
               transition={{ duration: prefersReducedMotion ? 0.01 : 0.3 }}
               className="w-full"
             >
-              {currentStep.content}
+              <MotionConfig reducedMotion="user">
+                {currentStep.content}
+              </MotionConfig>
             </motion.div>
           </AnimatePresence>
 
@@ -154,13 +156,13 @@ export function AnimatedFeatureDemo({
           </AnimatePresence>
         </div>
 
-        <div className="flex gap-2 justify-center mt-4">
-          {steps.map((_, index) => (
+        <div className="flex gap-0 justify-center mt-4">
+          {steps.map((step, index) => (
             <button
               key={index}
               onClick={() => setCurrentStepIndex(index)}
-              className="group cursor-pointer"
-              aria-label={`Go to step ${index + 1}`}
+              className="group cursor-pointer p-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+              aria-label={`Go to step ${index + 1}: ${step.label}`}
             >
               <motion.div
                 initial={false}

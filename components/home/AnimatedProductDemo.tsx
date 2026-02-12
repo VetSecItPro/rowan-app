@@ -15,7 +15,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig, useReducedMotion } from 'framer-motion';
 import {
   CheckSquare,
   Calendar,
@@ -336,10 +336,12 @@ export function AnimatedProductDemo() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: prefersReducedMotion ? 0.01 : 0.3 }}
               className="absolute inset-0"
             >
-              <SceneComponent />
+              <MotionConfig reducedMotion="user">
+                <SceneComponent />
+              </MotionConfig>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -352,7 +354,8 @@ export function AnimatedProductDemo() {
               <button
                 key={scene.id}
                 onClick={() => setActiveScene(i)}
-                className={`p-1 transition-colors ${
+                aria-label={scene.title}
+                className={`p-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg ${
                   i === activeScene ? scene.color : 'text-gray-600'
                 }`}
               >
@@ -369,15 +372,20 @@ export function AnimatedProductDemo() {
       </div>
 
       {/* Scene indicator dots */}
-      <div className="flex justify-center gap-1.5 mt-4">
-        {SCENES.map((_, i) => (
+      <div className="flex justify-center gap-0 mt-4">
+        {SCENES.map((scene, i) => (
           <button
             key={i}
             onClick={() => setActiveScene(i)}
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-              i === activeScene ? 'bg-blue-400 w-4' : 'bg-gray-600'
-            }`}
-          />
+            aria-label={`Go to ${scene.title}`}
+            className="p-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-full"
+          >
+            <div
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === activeScene ? 'bg-blue-400 w-4' : 'bg-gray-600 w-1.5'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

@@ -97,6 +97,7 @@ export function TestimonialsSection() {
         </motion.div>
 
         {/* Cards — horizontal scroll on mobile, grid on desktop */}
+        <div className="relative">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -137,6 +138,9 @@ export function TestimonialsSection() {
             </motion.div>
           ))}
         </motion.div>
+        {/* Scroll fade hint — mobile only */}
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black to-transparent lg:hidden" aria-hidden="true" />
+        </div>
       </div>
     </section>
   );

@@ -14,7 +14,7 @@ interface FeatureCardProps {
 
 export function FeatureCard({ title, description, icon: Icon, gradient, href }: FeatureCardProps) {
   return (
-    <Link href={href} className="block group">
+    <Link href={href} className="block group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-xl">
       <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 transition-colors duration-200 hover:border-gray-700">
         <div className={`w-[60px] h-[60px] rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4`}>
           <Icon className="w-7 h-7 text-white" />

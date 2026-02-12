@@ -42,19 +42,22 @@ const faqs = [
   },
 ];
 
-function FAQItem({ question, answer, isOpen, onToggle }: {
+function FAQItem({ question, answer, isOpen, onToggle, index }: {
   question: string;
   answer: string;
   isOpen: boolean;
   onToggle: () => void;
+  index: number;
 }) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
     <div className="border-b border-gray-800/60 last:border-b-0">
       <button
+        id={`faq-trigger-${index}`}
         onClick={onToggle}
         aria-expanded={isOpen}
+        aria-controls={`faq-panel-${index}`}
         className="w-full flex items-center justify-between gap-4 py-5 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-lg"
       >
         <span className="text-sm sm:text-base font-medium text-white group-hover:text-blue-300 transition-colors">
@@ -70,6 +73,9 @@ function FAQItem({ question, answer, isOpen, onToggle }: {
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            id={`faq-panel-${index}`}
+            role="region"
+            aria-labelledby={`faq-trigger-${index}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{
               height: 'auto',
@@ -135,6 +141,7 @@ export function FAQSection() {
           {faqs.map((faq, index) => (
             <FAQItem
               key={index}
+              index={index}
               question={faq.question}
               answer={faq.answer}
               isOpen={openIndex === index}

@@ -254,7 +254,7 @@ export function FeatureGrid() {
         <motion.button
           onClick={() => setShowAll(!showAll)}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 mx-auto px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 rounded-full transition-colors"
+          className="flex items-center gap-2 mx-auto px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         >
           {showAll ? 'Show Less' : `See All ${primaryFeatures.length + secondaryFeatures.length} Features`}
           <ChevronDown
