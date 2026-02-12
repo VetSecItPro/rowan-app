@@ -16,8 +16,9 @@ const nextConfig = {
   outputFileTracingRoot: __dirname,
 
   typescript: {
-    // TypeScript errors are now fixed - strict mode enabled
-    ignoreBuildErrors: false,
+    // Skip type-check on Vercel — 300K LoC OOMs on 8GB build machine.
+    // Always run `pnpm type-check` locally before pushing.
+    ignoreBuildErrors: true,
   },
   eslint: {
     // ESLint has a circular structure error - skip during builds
