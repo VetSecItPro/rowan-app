@@ -39,23 +39,31 @@ const CONVO_DURATION = 5000; // 5s per conversation
 // Voice Wave Visualizer
 // ---------------------------------------------------------------------------
 
-function VoiceWave() {
+function VoiceWave({ reduced }: { reduced: boolean | null }) {
   return (
     <div className="flex items-center gap-[3px] h-5">
       {[0, 1, 2, 3, 4].map((i) => (
-        <motion.div
-          key={i}
-          className="w-[3px] rounded-full bg-blue-400"
-          animate={{
-            height: [6, 14 + i * 2, 8, 16 - i, 6],
-          }}
-          transition={{
-            duration: 1.2,
-            repeat: Infinity,
-            delay: i * 0.12,
-            ease: 'easeInOut',
-          }}
-        />
+        reduced ? (
+          <div
+            key={i}
+            className="w-[3px] rounded-full bg-blue-400"
+            style={{ height: 8 + i * 2 }}
+          />
+        ) : (
+          <motion.div
+            key={i}
+            className="w-[3px] rounded-full bg-blue-400"
+            animate={{
+              height: [6, 14 + i * 2, 8, 16 - i, 6],
+            }}
+            transition={{
+              duration: 1.2,
+              repeat: Infinity,
+              delay: i * 0.12,
+              ease: 'easeInOut',
+            }}
+          />
+        )
       ))}
     </div>
   );
@@ -140,13 +148,13 @@ export function AICompanionTeaser() {
               <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">
                 <Bot className="w-5 h-5 text-blue-400" />
               </div>
-              <VoiceWave />
+              <VoiceWave reduced={prefersReducedMotion} />
               <span className="text-xs text-gray-500">Voice commands supported</span>
             </div>
 
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-full transition-all shadow-lg shadow-blue-500/25 active:scale-95 group"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-full transition-all shadow-lg shadow-blue-500/25 active:scale-95 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               Try Rowan AI
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

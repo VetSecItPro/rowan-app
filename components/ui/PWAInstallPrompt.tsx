@@ -133,7 +133,7 @@ export default function PWAInstallPrompt() {
 
   return (
     <div
-      className="sticky bottom-0 z-40 bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/50"
+      className="sticky bottom-0 z-50 md:z-40 bg-gray-900/95 backdrop-blur-xl border-t border-gray-700/50 mb-[env(safe-area-inset-bottom,0px)]"
       role="banner"
       aria-label="Install Rowan app"
     >
@@ -166,7 +166,7 @@ export default function PWAInstallPrompt() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={dismiss}
-              className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors"
+              className="p-2 text-gray-500 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
               aria-label="Dismiss install prompt"
             >
               <X className="w-4 h-4" />
@@ -175,14 +175,14 @@ export default function PWAInstallPrompt() {
             {isIOS ? (
               <Link
                 href="/install"
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
               >
                 How to Install
               </Link>
             ) : (
               <button
                 onClick={handleInstall}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-4 py-2 rounded-full font-medium text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
               >
                 <Download className="w-4 h-4" />
                 Install

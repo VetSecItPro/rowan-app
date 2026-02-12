@@ -63,7 +63,7 @@ export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium transition-colors rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
                   isActiveLink(link.href)
                     ? 'text-white'
                     : 'text-gray-400 hover:text-white'
@@ -77,13 +77,13 @@ export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="px-5 py-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white text-sm font-medium rounded-full transition-all"
+              className="px-5 py-2 border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white text-sm font-medium rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
+              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all shadow-md hover:shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               Sign Up
             </Link>
@@ -91,7 +91,7 @@ export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
         </div>
 
         <button
-          className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+          className="md:hidden p-2 text-gray-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
@@ -128,14 +128,14 @@ export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2.5 text-center border border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 text-sm font-medium rounded-full transition-all"
+                className="w-full py-2.5 text-center border border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 text-sm font-medium rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2.5 text-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all"
+                className="w-full py-2.5 text-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-semibold rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 Sign Up
               </Link>
@@ -152,7 +152,7 @@ export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800/50"
+        className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800/50 pt-[env(safe-area-inset-top,0px)]"
       >
         {headerContent}
       </motion.header>
@@ -160,7 +160,7 @@ export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800/50">
+    <header className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-xl border-b border-gray-800/50 pt-[env(safe-area-inset-top,0px)]">
       {headerContent}
     </header>
   );
