@@ -36,14 +36,16 @@ jobs:
         run: |
           npx supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
 
-          # Repair migration history if there's a mismatch (migrations applied via MCP/dashboard)
-          # These versions were applied directly to production and are already in schema_migrations.
-          # Marking as "applied" ensures supabase db push skips them.
-          npx supabase migration repair --status applied \
-            20260202220000 20260202220001 20260207230000 20260207230001 \
-            20260209152915 20260209174615 20260210051145 20260210053733 20260210180356 \
-            20260211004240 20260211004450 20260211070103 20260211071812 20260211073557 \
-            20260212200307 20260212200443 20260212202216 || true
+          # Mark ALL existing migration files as "applied" so supabase db push
+          # only applies genuinely NEW migrations (ones not yet in the database).
+          # Most migrations predate schema_migrations tracking and were applied
+          # directly via MCP or the Supabase dashboard.
+          ALL_VERSIONS=$(ls supabase/migrations/*.sql \
+            | sed 's|.*/||; s|_.*||' \
+            | sort -u \
+            | tr '\n' ' ')
+          echo "Repairing ${ALL_VERSIONS// / } as applied..."
+          npx supabase migration repair --status applied $ALL_VERSIONS || true
 
           npx supabase db push --linked
         env:
