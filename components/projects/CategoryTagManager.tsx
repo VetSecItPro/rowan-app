@@ -397,6 +397,7 @@ export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagMana
                     <DollarSign className="w-5 h-5 text-gray-400" />
                     <input
                       type="number"
+                      inputMode="numeric"
                       placeholder="Monthly budget (optional)"
                       value={categoryBudget}
                       onChange={(e) => setCategoryBudget(e.target.value)}

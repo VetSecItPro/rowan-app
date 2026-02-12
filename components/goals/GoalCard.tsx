@@ -63,7 +63,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
           <button
             onClick={handleCheckboxClick}
             aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-            className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
+            className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
               goalState === 'completed'
                 ? 'bg-green-500 border-green-500'
                 : goalState === 'in-progress'
@@ -84,7 +84,7 @@ export function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onF
             <div className="w-8 h-8 bg-gradient-goals rounded-lg flex items-center justify-center flex-shrink-0">
               <Target className="w-4 h-4 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-white truncate">{goal.title}</h3>
+            <h3 className="text-lg font-semibold text-white line-clamp-2">{goal.title}</h3>
           </div>
           {goal.description && <p className="text-sm text-gray-400 ml-10 break-words line-clamp-2">{goal.description}</p>}
         </div>

@@ -132,6 +132,7 @@ export function SplitCalculator({
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="100"
                 step="0.01"
@@ -150,6 +151,7 @@ export function SplitCalculator({
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="100"
                 step="0.01"
@@ -182,6 +184,7 @@ export function SplitCalculator({
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 step="0.01"
                 value={user1FixedAmount}
@@ -199,6 +202,7 @@ export function SplitCalculator({
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 step="0.01"
                 value={user2FixedAmount}

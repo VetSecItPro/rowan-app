@@ -857,13 +857,13 @@ export default function MealsPage() {
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
       <PullToRefresh onRefresh={handlePullToRefresh}>
-      <div className="p-4 sm:p-8">
+      <div className="p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-row items-center gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-meals flex items-center justify-center flex-shrink-0"><UtensilsCrossed className="w-5 h-5 sm:w-6 sm:h-6 text-white" /></div>
               <div>
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-meals bg-clip-text text-transparent">Meal Planning</h1>
+                <h1 className="text-xl sm:text-3xl md:text-3xl lg:text-4xl font-bold bg-gradient-meals bg-clip-text text-transparent">Meal Planning</h1>
                 <p className="text-sm sm:text-base text-gray-400">Plan your meals together</p>
               </div>
             </div>
@@ -935,7 +935,7 @@ export default function MealsPage() {
             {/* This Week Card */}
             <button
               onClick={handleThisWeekClick}
-              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">This Week</h3>
@@ -955,7 +955,7 @@ export default function MealsPage() {
             {/* Next Two Weeks Card */}
             <button
               onClick={handleNextTwoWeeksClick}
-              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">Next Two Weeks</h3>
@@ -975,7 +975,7 @@ export default function MealsPage() {
             {/* Saved Recipes Card */}
             <button
               onClick={handleSavedRecipesClick}
-              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
+              className="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-400 transition-all duration-200 cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">Saved Recipes</h3>
@@ -1075,7 +1075,7 @@ export default function MealsPage() {
               {loading ? (
                 viewMode === 'recipes' ? (
                   /* Loading Skeletons for Recipes */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                     {[...Array(6)].map((_, i) => (
                       <RecipeCardSkeleton key={i} />
                     ))}
@@ -1109,36 +1109,30 @@ export default function MealsPage() {
               ) : viewMode === 'recipes' ? (
               /* Recipes View */
               filteredRecipes.length === 0 ? (
-                <div className="text-center py-12 max-w-lg mx-auto">
-                  <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <ChefHat className="w-12 h-12 text-orange-400" />
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
+                    <ChefHat className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">
-                    {searchQuery ? 'No recipes found' : 'Your recipe collection awaits'}
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {searchQuery ? 'No matching recipes' : 'Your recipe collection awaits'}
                   </h3>
-                  <p className="text-gray-400 mb-2">
+                  <p className="text-sm text-gray-400 max-w-sm mb-6">
                     {searchQuery
-                      ? `No recipes match "${searchQuery}". Try adjusting your search or browse all recipes.`
-                      : 'Save your favorite recipes to quickly plan meals and generate shopping lists.'
-                    }
+                      ? 'Try adjusting your search to find what you\'re looking for.'
+                      : 'Save your favorite recipes to quickly plan meals and generate shopping lists.'}
                   </p>
                   {!searchQuery && (
-                    <>
-                      <p className="text-sm text-gray-500 mb-6">
-                        💡 Tip: You can add recipes manually or import them from a URL!
-                      </p>
-                      <button
-                        onClick={handleOpenRecipeModal}
-                        className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2"
-                      >
-                        <ChefHat className="w-5 h-5" />
-                        Create Your First Recipe
-                      </button>
-                    </>
+                    <button
+                      onClick={handleOpenRecipeModal}
+                      className="px-5 py-2.5 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-orange-600/20"
+                    >
+                      <ChefHat className="w-4 h-4" />
+                      Add Recipe
+                    </button>
                   )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                   {filteredRecipes.map((recipe) => (
                     <MemoizedRecipeCard
                       key={recipe.id}
@@ -1346,35 +1340,26 @@ export default function MealsPage() {
             ) : (
               /* List View */
               filteredMeals.length === 0 ? (
-                <div className="text-center py-12 max-w-lg mx-auto">
-                  <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <UtensilsCrossed className="w-12 h-12 text-orange-400" />
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
+                    <UtensilsCrossed className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-3">
-                    {searchQuery ? 'No meals found' : 'Your meal planning journey begins'}
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {searchQuery ? 'No matching meals' : 'Plan your week of meals'}
                   </h3>
-                  <p className="text-gray-400 mb-2">
+                  <p className="text-sm text-gray-400 max-w-sm mb-6">
                     {searchQuery
-                      ? `No meals match "${searchQuery}". Try adjusting your search or browse all meals.`
-                      : 'Plan your meals ahead of time to save time, reduce stress, and eat healthier.'
-                    }
+                      ? 'Try adjusting your search to find what you\'re looking for.'
+                      : 'Plan meals ahead of time to eat healthier and reduce stress.'}
                   </p>
                   {!searchQuery && (
-                    <>
-                      <p className="text-sm text-gray-500 mb-6">
-                        💡 Tip: Link meals to recipes for automatic ingredient tracking and shopping list generation!
-                      </p>
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <CTAButton
-                          onClick={handleOpenMealModal}
-                          feature="meals"
-                          icon={<Plus className="w-5 h-5" />}
-                          className="rounded-full"
-                        >
-                          Plan Your First Meal
-                        </CTAButton>
-                      </div>
-                    </>
+                    <button
+                      onClick={handleOpenMealModal}
+                      className="px-5 py-2.5 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-orange-600/20"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Plan a Meal
+                    </button>
                   )}
                 </div>
               ) : (

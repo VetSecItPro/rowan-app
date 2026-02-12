@@ -323,6 +323,7 @@ export function DependenciesModal({
                       </label>
                       <input
                         type="number"
+                        inputMode="numeric"
                         min="1"
                         max="100"
                         value={completionThreshold}
@@ -337,6 +338,7 @@ export function DependenciesModal({
                       </label>
                       <input
                         type="number"
+                        inputMode="numeric"
                         min="0"
                         value={unlockDelay}
                         onChange={(e) => setUnlockDelay(parseInt(e.target.value))}

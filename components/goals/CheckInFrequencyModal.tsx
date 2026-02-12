@@ -295,6 +295,7 @@ export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: Ch
                   <div className="flex items-center gap-3">
                     <input
                       type="number"
+                      inputMode="numeric"
                       min="1"
                       max="31"
                       value={settings.day_of_month}

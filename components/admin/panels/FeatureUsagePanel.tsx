@@ -150,7 +150,8 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
       </div>
 
       {/* Stats Row - All 7 cards in single row */}
-      <div className="grid grid-cols-7 gap-2 flex-shrink-0">
+      <div className="overflow-x-auto">
+      <div className="grid grid-cols-7 gap-2 flex-shrink-0 min-w-[600px]">
         <div className="bg-gray-800 rounded-lg p-2 text-center">
           <p className="text-lg font-bold text-white">{formatNumber(data.totals.totalPageViews)}</p>
           <p className="text-xs text-gray-400">Views</p>
@@ -179,6 +180,7 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
           <p className="text-lg font-bold text-green-400">{formatNumber(data.totals.deviceBreakdown.tablet)}</p>
           <p className="text-xs text-gray-400">Tablet</p>
         </div>
+      </div>
       </div>
 
       {/* Feature Table */}

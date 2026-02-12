@@ -644,15 +644,15 @@ export default function ShoppingPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={async () => { await refetchLists(); }}>
-        <div className="p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-8">
+        <div className="p-4 sm:p-6 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-row items-center gap-3 sm:gap-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
                 <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white">Shopping Lists</h1>
+                <h1 className="text-xl sm:text-3xl md:text-3xl lg:text-4xl font-bold text-white">Shopping Lists</h1>
                 <p className="text-sm sm:text-base text-gray-400">Collaborative shopping made easy</p>
               </div>
             </div>
@@ -671,7 +671,7 @@ export default function ShoppingPage() {
           >
             <button
               onClick={handleItemsThisWeekClick}
-              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-5 md:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">Items This Week</h3>
@@ -689,7 +689,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleActiveListsClick}
-              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-5 md:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">Active Lists</h3>
@@ -707,7 +707,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleCompletedListsClick}
-              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-5 md:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">Completed Lists</h3>
@@ -732,7 +732,7 @@ export default function ShoppingPage() {
             </button>
             <button
               onClick={handleTotalListsClick}
-              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
+              className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-5 md:p-6 hover:bg-gray-700 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-gray-400 font-medium">Total Lists</h3>
@@ -787,7 +787,7 @@ export default function ShoppingPage() {
           </div>
 
           {/* Shopping Lists */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 sm:p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 sm:p-5 md:p-6">
             {/* Header with Month Badge and Status Filter */}
             <div className="flex flex-col gap-4 mb-6">
               <div className="flex items-center justify-between">
@@ -867,13 +867,21 @@ export default function ShoppingPage() {
                 ))}
               </div>
             ) : filteredLists.length === 0 ? (
-              <div className="text-center py-12">
-                <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-400 text-lg mb-2">No lists found</p>
-                <p className="text-gray-500 mb-6">{searchQuery || statusFilter !== 'active' ? 'Try adjusting your filters' : 'Create your first shopping list!'}</p>
+              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4">
+                  <ShoppingCart className="w-8 h-8 text-emerald-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  {searchQuery || statusFilter !== 'active' ? 'No matching lists' : 'Time to stock up!'}
+                </h3>
+                <p className="text-sm text-gray-400 max-w-sm mb-6">
+                  {searchQuery || statusFilter !== 'active'
+                    ? 'Try adjusting your filters to find what you\'re looking for.'
+                    : 'Create your first shopping list to keep track of what you need.'}
+                </p>
                 {!searchQuery && statusFilter === 'active' && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={handleOpenNewListModal} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors inline-flex items-center gap-2 font-medium shadow-md">
+                    <button onClick={handleOpenNewListModal} className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-emerald-500/20">
                       <Plus className="w-5 h-5" />
                       Create Shopping List
                     </button>

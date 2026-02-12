@@ -119,6 +119,7 @@ export function BudgetTemplateModal({
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                     <input
                       type="number"
+                      inputMode="numeric"
                       step="100"
                       min="0"
                       value={monthlyIncome}

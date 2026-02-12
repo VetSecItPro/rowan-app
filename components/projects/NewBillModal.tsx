@@ -201,6 +201,7 @@ export function NewBillModal({
                   <input
                     id="amount"
                     type="number"
+                    inputMode="numeric"
                     step="0.01"
                     min="0"
                     max="999999999"

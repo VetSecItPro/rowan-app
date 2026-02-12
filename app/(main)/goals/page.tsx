@@ -709,7 +709,7 @@ export default function GoalsPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={loadData} disabled={loading}>
-          <div className="p-4 sm:p-8">
+          <div className="p-4 sm:p-6 md:p-8">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -718,7 +718,7 @@ export default function GoalsPage() {
                 <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-3xl md:text-3xl lg:text-4xl font-bold bg-gradient-goals bg-clip-text text-transparent">
                   Goals & Milestones
                 </h1>
                 <p className="text-sm sm:text-base text-gray-400">
@@ -816,7 +816,7 @@ export default function GoalsPage() {
             ) : (
               <>
             {/* Active Goals */}
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Active Goals</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-goals rounded-xl flex items-center justify-center">
@@ -835,7 +835,7 @@ export default function GoalsPage() {
             </div>
 
             {/* In Progress */}
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-400 font-medium text-xs sm:text-sm">In Progress</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -854,7 +854,7 @@ export default function GoalsPage() {
             </div>
 
             {/* Milestones */}
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Milestones</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-500 rounded-xl flex items-center justify-center">
@@ -873,7 +873,7 @@ export default function GoalsPage() {
             </div>
 
             {/* Completed */}
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Completed</h3>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
@@ -903,7 +903,7 @@ export default function GoalsPage() {
           </CollapsibleStatsGrid>
 
           {/* Goals/Milestones List */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6">
             {/* Search Bar - inside container */}
             <div className={`apple-search-container goals-search group mb-4 ${isSearchTyping ? 'apple-search-typing' : ''}`}>
               <Search className="apple-search-icon" />
@@ -1113,20 +1113,24 @@ export default function GoalsPage() {
             ) : viewMode === 'goals' ? (
               /* Goals View */
               filteredGoals.length === 0 ? (
-                <div className="text-center py-12">
-                  <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg mb-2">No goals found</p>
-                  <p className="text-gray-500 mb-6">
-                    {searchQuery ? 'Try adjusting your search' : 'Set your first goal to get started!'}
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4">
+                    <Target className="w-8 h-8 text-indigo-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {searchQuery ? 'No matching goals' : 'Every journey starts with a goal'}
+                  </h3>
+                  <p className="text-sm text-gray-400 max-w-sm mb-6">
+                    {searchQuery ? 'Try adjusting your search to find what you\'re looking for.' : 'Set your first goal and start tracking your progress.'}
                   </p>
                   {!searchQuery && (
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         onClick={handleOpenGoalModal}
-                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-lg inline-flex items-center gap-2"
+                        className="px-5 py-2.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-indigo-600/20"
                       >
                         <Plus className="w-5 h-5" />
-                        Create Goal
+                        Set a Goal
                       </button>
                     </div>
                   )}
@@ -1151,10 +1155,18 @@ export default function GoalsPage() {
             ) : viewMode === 'milestones' ? (
               /* Milestones View */
               filteredMilestones.length === 0 ? (
-                <div className="text-center py-12">
-                  <Award className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg mb-2">No milestones found</p>
-                  <p className="text-gray-500">Try adjusting your search</p>
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4">
+                    <Award className="w-8 h-8 text-indigo-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {searchQuery ? 'No matching milestones' : 'Break goals into milestones'}
+                  </h3>
+                  <p className="text-sm text-gray-400 max-w-sm mb-6">
+                    {searchQuery
+                      ? 'Try adjusting your search to find what you\'re looking for.'
+                      : 'Add milestones to your goals to track progress step by step.'}
+                  </p>
                 </div>
               ) : (
                 <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">

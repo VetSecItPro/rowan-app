@@ -281,6 +281,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="0"
                 max="100"
                 value={formData.progress}

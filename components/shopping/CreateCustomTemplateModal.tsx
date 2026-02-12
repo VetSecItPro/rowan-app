@@ -175,6 +175,7 @@ export function CreateCustomTemplateModal({ isOpen, onClose, onSave, spaceId }: 
               />
               <input
                 type="number"
+                inputMode="numeric"
                 min="1"
                 value={newItemQuantity}
                 onChange={(e) => setNewItemQuantity(parseInt(e.target.value) || 1)}

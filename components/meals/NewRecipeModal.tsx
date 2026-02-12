@@ -355,7 +355,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
         <div className="flex flex-col -mx-4 sm:-mx-6 -mt-4 sm:-mt-5">
           {/* Toggle Buttons - In Content Area */}
           {!editRecipe && (
-            <div className="px-4 sm:px-6 pt-4 pb-0 flex-shrink-0">
+            <div className="px-4 sm:px-5 md:px-6 pt-4 pb-0 flex-shrink-0">
               <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-xl border border-orange-700 w-full sm:w-auto sm:inline-flex">
                 <button
                   onClick={() => setActiveTab('manual')}
@@ -695,6 +695,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <label htmlFor="field-5" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Prep Time (min)</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     min="0"
                     step="1"
                     value={formData.prep_time ?? ''}
@@ -717,6 +718,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <label htmlFor="field-6" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Cook Time (min)</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     min="0"
                     step="1"
                     value={formData.cook_time ?? ''}
@@ -739,6 +741,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                   <label htmlFor="field-7" className="block text-sm font-medium mb-2 text-gray-300 cursor-pointer">Servings</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     min="1"
                     step="1"
                     value={formData.servings ?? ''}

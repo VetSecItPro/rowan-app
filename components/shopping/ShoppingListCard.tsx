@@ -85,7 +85,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
   };
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 sm:p-6 hover:shadow-md transition-colors group">
+    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 sm:p-4 md:p-6 hover:shadow-md transition-colors group">
       <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="flex-1 min-w-0">
           {/* Mobile: Stack checkbox + progress vertically, then title. Desktop: All inline */}
@@ -123,7 +123,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
 
             {/* Title and subtitle */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-white leading-tight">
+              <h3 className="text-base sm:text-base md:text-lg font-semibold text-white leading-tight">
                 {list.title}
               </h3>
               <p className="text-xs sm:text-sm text-gray-400 mt-0.5">
@@ -157,7 +157,7 @@ export function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompl
                           <button
                             onClick={() => onToggleItem?.(item.id, !item.checked)}
                             aria-label={`Toggle item: ${item.name}`}
-                            className={`flex-shrink-0 w-5 h-5 sm:w-4 sm:h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                            className={`flex-shrink-0 w-5 h-5 sm:w-4 sm:h-4 rounded border-2 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
                               item.checked
                                 ? 'bg-green-500 border-green-500'
                                 : 'border-gray-600 hover:border-emerald-500'

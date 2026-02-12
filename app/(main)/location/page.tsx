@@ -98,7 +98,7 @@ export default function LocationPage() {
       <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Family Location' }]}>
         <PageErrorBoundary>
           <PullToRefresh onRefresh={handleRefresh} disabled={isLoading}>
-            <div className="p-4 sm:p-8">
+            <div className="p-4 sm:p-6 md:p-8">
               <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -107,7 +107,7 @@ export default function LocationPage() {
                       <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div>
-                      <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold bg-gradient-location bg-clip-text text-transparent">
+                      <h1 className="text-xl sm:text-3xl md:text-3xl lg:text-4xl font-bold bg-gradient-location bg-clip-text text-transparent">
                         Family Location
                       </h1>
                       <p className="text-sm sm:text-base text-gray-400">
@@ -165,7 +165,7 @@ export default function LocationPage() {
                   iconGradient="bg-gradient-location"
                 >
                   {/* Active Members */}
-                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                       <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Active Now</h3>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-location rounded-xl flex items-center justify-center">
@@ -184,7 +184,7 @@ export default function LocationPage() {
                   </div>
 
                   {/* Total Members */}
-                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                       <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Total Members</h3>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -201,7 +201,7 @@ export default function LocationPage() {
                   </div>
 
                   {/* Saved Places */}
-                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                       <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Saved Places</h3>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl flex items-center justify-center">
@@ -220,7 +220,7 @@ export default function LocationPage() {
                   </div>
 
                   {/* Recent Activity */}
-                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
+                  <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-5 md:p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                       <h3 className="text-gray-400 font-medium text-xs sm:text-sm">Recent Activity</h3>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl flex items-center justify-center">
@@ -244,7 +244,7 @@ export default function LocationPage() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border border-cyan-700/50 rounded-xl p-4 sm:p-6"
+                    className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border border-cyan-700/50 rounded-xl p-4 sm:p-5 md:p-6"
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
@@ -279,7 +279,7 @@ export default function LocationPage() {
 
                       {/* Quick Actions */}
                       {places.length > 0 && (
-                        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {places.slice(0, 3).map((place) => (
                             <div
                               key={place.id}

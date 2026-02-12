@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Folder, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
+import { Folder, FolderKanban, Plus, Search, Wallet, Receipt, DollarSign, CheckCircle, Clock, FileText, FileCheck, X } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -494,7 +494,7 @@ export default function ProjectsPage() {
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Projects & Budget' }]}>
-      <div className="p-4 sm:p-8">
+      <div className="p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -502,7 +502,7 @@ export default function ProjectsPage() {
                 <Folder className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-amber-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-amber-600 bg-clip-text text-transparent">
                   Projects & Budget
                 </h1>
                 <p className="text-gray-400 mt-1">Manage projects, budgets, and expenses</p>
@@ -657,7 +657,7 @@ export default function ProjectsPage() {
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 overflow-visible min-h-content-panel">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-lg sm:text-xl font-bold text-white">
                   {activeTab === 'projects' && `All Projects (${filteredProjects.length})`}
                   {activeTab === 'budgets' && 'Budget Overview'}
                   {activeTab === 'bills' && `All Bills (${filteredBills.length})`}
@@ -706,7 +706,7 @@ export default function ProjectsPage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-gray-700 rounded-xl p-6 shadow-lg animate-pulse">
                     <div className="h-6 bg-gray-600 rounded w-3/4 mb-4" />
@@ -722,9 +722,12 @@ export default function ProjectsPage() {
               </div>
             ) : activeTab === 'projects' ? (
               filteredProjects.length === 0 ? (
-                <div className="text-center py-12">
-                  <Folder className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg mb-2">No projects found</p>
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-4">
+                    <FolderKanban className="w-8 h-8 text-amber-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Ready to tackle that project?</h3>
+                  <p className="text-sm text-gray-400 max-w-sm mb-6">Start tracking your home improvement projects.</p>
                   <CTAButton
                     onClick={() => setIsProjectModalOpen(true)}
                     feature="projects"
@@ -735,7 +738,7 @@ export default function ProjectsPage() {
                   </CTAButton>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                   {filteredProjects.map((project) => (
                     <ProjectCard key={project.id} project={project} onEdit={(p) => { setEditingProject(p); setIsProjectModalOpen(true); }} onDelete={handleDeleteProject} />
                   ))}
@@ -941,7 +944,7 @@ export default function ProjectsPage() {
                   </CTAButton>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                   {filteredExpenses.map((expense) => (
                     <ExpenseCard key={expense.id} expense={expense} onEdit={(e) => { setEditingExpense(e); setIsExpenseModalOpen(true); }} onDelete={handleDeleteExpense} onStatusChange={handleStatusChange} />
                   ))}

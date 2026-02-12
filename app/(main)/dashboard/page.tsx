@@ -410,6 +410,7 @@ export default function DashboardPage() {
       >
         <PullToRefresh onRefresh={refreshStats}>
           <div className="min-h-screen p-4 sm:p-6 md:p-8">
+            <h1 className="sr-only">Dashboard</h1>
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
               {/* Time-Aware Welcome Widget */}
               <div className="flex items-center justify-between">

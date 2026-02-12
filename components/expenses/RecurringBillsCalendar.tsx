@@ -207,7 +207,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
       </div>
 
       {/* Calendar Grid */}
-      <div className="p-6">
+      <div className="p-6 overflow-x-auto">
         {loading ? (
           <div className="text-center py-12 text-gray-400">
             Loading calendar...
@@ -215,7 +215,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
         ) : (
           <>
             {/* Week Day Headers */}
-            <div className="grid grid-cols-7 gap-2 mb-2">
+            <div className="grid grid-cols-7 gap-2 mb-2 min-w-[320px]">
               {weekDays.map((day) => (
                 <div
                   key={day}
@@ -227,7 +227,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
             </div>
 
             {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-2 min-w-[320px]">
               {calendarDays.map((day, index) => {
                 if (!day) {
                   return <div key={`empty-${index}`} className="aspect-square" />;

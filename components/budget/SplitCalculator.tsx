@@ -63,6 +63,7 @@ export function SplitCalculator({
               {splitType === 'fixed' ? (
                 <input
                   type="number"
+                  inputMode="numeric"
                   step="0.01"
                   min="0"
                   max={totalAmount}
@@ -87,6 +88,7 @@ export function SplitCalculator({
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     step="0.1"
                     min="0"
                     max="100"
@@ -137,6 +139,7 @@ export function SplitCalculator({
               {splitType === 'fixed' ? (
                 <input
                   type="number"
+                  inputMode="numeric"
                   step="0.01"
                   min="0"
                   max={totalAmount}
@@ -161,6 +164,7 @@ export function SplitCalculator({
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
+                    inputMode="numeric"
                     step="0.1"
                     min="0"
                     max="100"

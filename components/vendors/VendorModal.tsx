@@ -243,6 +243,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               </label>
               <input
                 type="email"
+                inputMode="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -260,6 +261,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               </label>
               <input
                 type="tel"
+                inputMode="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -322,6 +324,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 min="1"
                 max="5"
                 step="0.1"

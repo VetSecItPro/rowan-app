@@ -75,7 +75,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         <button
           onClick={handleStatusClick}
           title={getStatusTooltip()}
-          className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition-colors ${getCheckboxStyle()}`}
+          className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${getCheckboxStyle()}`}
         >
           {task.status === 'completed' && <CheckSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
           {task.status === 'in-progress' && <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
@@ -115,7 +115,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         <div className="relative flex-shrink-0">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 text-gray-400 hover:text-gray-300 rounded"
+            className="p-2 text-gray-400 hover:text-gray-300 rounded"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -163,7 +163,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
       {(task.description || task.due_date || task.category) && (
         <div className="mt-1 ml-7 sm:ml-8 flex items-center gap-2 text-[11px] text-gray-400">
           {task.description && (
-            <span className="truncate flex-1">{task.description}</span>
+            <span className="line-clamp-2 flex-1">{task.description}</span>
           )}
           {task.due_date && (
             <span className={`flex items-center gap-0.5 flex-shrink-0 ${isOverdue ? 'text-red-500 font-medium' : ''}`}>

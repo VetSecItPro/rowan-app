@@ -464,6 +464,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
                     </label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min="1"
                       max="365"
                       value={recurringData.interval}

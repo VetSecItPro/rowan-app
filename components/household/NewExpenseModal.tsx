@@ -84,6 +84,7 @@ export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId 
             <label className="block text-sm font-medium text-gray-300 mb-2">Amount *</label>
             <input
               type="number"
+              inputMode="numeric"
               required
               step="0.01"
               value={formData.amount}

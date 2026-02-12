@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { ActivityTimeline } from './ActivityTimeline';
 import { CommentsSection } from './CommentsSection';
 import { AttachmentList } from './AttachmentList';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 
 interface ReminderCardProps {
   reminder: Reminder;
@@ -41,6 +42,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMar
   const [showAttachments, setShowAttachments] = useState(false);
   const [showActivity, setShowActivity] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isOverdue = reminder.reminder_time && new Date(reminder.reminder_time) < new Date() && reminder.status === 'active';
   const priorityColor = priorityColors[reminder.priority as keyof typeof priorityColors] || 'bg-gray-500';
@@ -60,7 +62,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMar
   };
 
   return (
-    <div className={`bg-gray-800 border-2 rounded-lg p-2.5 sm:p-4 hover:shadow-lg transition-all duration-200 group ${
+    <div className={`bg-gray-800 border-2 rounded-lg p-2.5 sm:p-3 md:p-4 hover:shadow-lg transition-all duration-200 group ${
       selected ? 'border-blue-500 ring-2 ring-blue-800' : 'border-transparent'
     }`}>
       {/* Header */}
@@ -212,9 +214,7 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMar
                 </button>
                 <button
                   onClick={() => {
-                    if (confirm('Are you sure you want to delete this reminder?')) {
-                      onDelete(reminder.id);
-                    }
+                    setShowDeleteConfirm(true);
                     setShowMenu(false);
                   }}
                   className="w-full px-4 py-3 text-left text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-2 rounded-b-lg transition-colors"
@@ -316,6 +316,21 @@ export function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMar
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => {
+          onDelete(reminder.id);
+          setShowDeleteConfirm(false);
+        }}
+        title="Delete Reminder"
+        message="Are you sure you want to delete this reminder? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

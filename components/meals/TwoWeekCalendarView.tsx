@@ -367,7 +367,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
       </div>
 
       {/* Desktop: Two Week Grid - Two rows of 7 columns */}
-      <div className="hidden sm:block space-y-4">
+      <div className="hidden sm:block space-y-4 overflow-x-auto">
         {/* Week 1 */}
         <div>
           <h4 className="text-sm font-semibold text-gray-400 mb-2">

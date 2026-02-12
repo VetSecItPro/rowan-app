@@ -123,7 +123,7 @@ export const NotificationsPanel = memo(function NotificationsPanel() {
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
       {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="bg-gray-800 rounded-lg p-4 text-center">
           <div className="flex items-center justify-center gap-2 text-xs text-gray-400 mb-1">
             <Users className="w-3 h-3" />

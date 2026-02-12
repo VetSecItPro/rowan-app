@@ -265,6 +265,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
                 <Input
                   id="amount"
                   type="number"
+                  inputMode="numeric"
                   step="0.01"
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
@@ -398,6 +399,7 @@ export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProp
               <Input
                 id="amount-custom"
                 type="number"
+                inputMode="numeric"
                 step="0.01"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}

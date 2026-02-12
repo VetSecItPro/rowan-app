@@ -214,9 +214,14 @@ export function Modal({
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
-        <div
+        <motion.div
+          key="modal-wrapper"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
           data-testid={`${testId}-overlay`}
           onTouchStart={handleTouchStart}
@@ -359,7 +364,7 @@ export function Modal({
               </div>
             )}
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

@@ -278,6 +278,7 @@ export function ReceiptUploadModal({
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                         <input
                           type="number"
+                          inputMode="numeric"
                           step="0.01"
                           value={totalAmount}
                           onChange={(e) => setTotalAmount(e.target.value)}

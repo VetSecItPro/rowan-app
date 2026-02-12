@@ -367,6 +367,7 @@ export function BudgetVarianceCard({
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="number"
+                      inputMode="numeric"
                       step="100"
                       value={newBudget}
                       onChange={(e) => setNewBudget(e.target.value)}

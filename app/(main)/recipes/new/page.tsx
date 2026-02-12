@@ -525,6 +525,7 @@ export default function NewRecipePage() {
                   <input
                     id="recipe-prep-time"
                     type="number"
+                    inputMode="numeric"
                     value={prepTime}
                     onChange={(e) => setPrepTime(e.target.value)}
                     placeholder="30"
@@ -542,6 +543,7 @@ export default function NewRecipePage() {
                   <input
                     id="recipe-cook-time"
                     type="number"
+                    inputMode="numeric"
                     value={cookTime}
                     onChange={(e) => setCookTime(e.target.value)}
                     placeholder="45"
@@ -559,6 +561,7 @@ export default function NewRecipePage() {
                   <input
                     id="recipe-servings"
                     type="number"
+                    inputMode="numeric"
                     value={servings}
                     onChange={(e) => setServings(e.target.value)}
                     placeholder="4"

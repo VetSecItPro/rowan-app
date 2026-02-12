@@ -180,7 +180,7 @@ export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsD
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                 <div>
                   <p className="text-xs text-gray-400 mb-1">Avg/Month</p>
                   <p className="font-semibold text-white">

@@ -211,7 +211,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
                     Quick Start Templates
                   </h3>
                 </div>
-                <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2">
+                <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 md:grid-cols-2">
                   {/* Weekly Groceries */}
                   <button
                     onClick={async () => {

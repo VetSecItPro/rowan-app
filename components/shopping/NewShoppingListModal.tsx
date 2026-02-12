@@ -233,6 +233,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min="0"
                   step="0.01"
                   value={formData.budget || ''}

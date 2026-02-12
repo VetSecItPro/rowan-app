@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { useTimePeriod } from './SmartBackgroundCanvas';
 
 interface TimeAwareWelcomeBoxProps {
@@ -57,9 +58,14 @@ export function TimeAwareWelcomeBox({
           onLoad={() => setImageLoaded(true)}
         />
 
-        {/* Loading placeholder */}
+        {/* Loading placeholder — pulses 3 times then holds steady */}
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black animate-pulse" />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: [1, 0.6, 1] }}
+            transition={{ duration: 1.5, repeat: 2, ease: 'easeInOut' }}
+          />
         )}
 
         {/* Dark overlay for text readability */}
@@ -151,8 +157,14 @@ export function CompactTimeAwareWelcome({
           onLoad={() => setImageLoaded(true)}
         />
 
+        {/* Loading placeholder — pulses 3 times then holds steady */}
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 animate-pulse" />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: [1, 0.6, 1] }}
+            transition={{ duration: 1.5, repeat: 2, ease: 'easeInOut' }}
+          />
         )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
