@@ -21,12 +21,18 @@ const AIReceiptSchema = z.object({
 // GEMINI VISION OCR API ROUTE
 // =====================================================
 
-// SECURITY: Fail fast if API key missing — matches service layer pattern
-const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+// Lazy-init Gemini client to avoid build-time crash when env var is missing
+let _genAI: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+  if (!_genAI) {
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_GEMINI_API_KEY environment variable is not set');
+    }
+    _genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return _genAI;
 }
-const genAI = new GoogleGenerativeAI(apiKey);
 
 /**
  * POST /api/ocr/scan-receipt
@@ -141,7 +147,7 @@ Rules:
 Extract the data now:`;
 
     // Call Gemini Vision API
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: 'gemini-2.5-flash',
       generationConfig: { maxOutputTokens: 4096 },
     });
