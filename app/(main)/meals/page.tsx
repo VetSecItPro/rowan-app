@@ -3,16 +3,12 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { memo } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, X, CheckSquare } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import Link from 'next/link';
-import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
-import { CTAButton } from '@/components/ui/EnhancedButton';
-import { logger } from '@/lib/logger';
 // Dynamic imports for optimized bundle splitting
 import {
   MealCard,
@@ -25,20 +21,14 @@ import {
   TwoWeekCalendarView,
 } from '@/components/ui/DynamicMealComponents';
 import { MealCardSkeleton, CalendarDaySkeleton, RecipeCardSkeleton, MobileCalendarSkeleton } from '@/components/ui/Skeleton';
-import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { mealsService, Meal, CreateMealInput, Recipe, CreateRecipeInput } from '@/lib/services/meals-service';
-import { shoppingService } from '@/lib/services/shopping-service';
-import { createClient } from '@/lib/supabase/client';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth } from 'date-fns';
-import { showSuccess, showError } from '@/lib/utils/toast';
-import { toast } from 'sonner';
+import { Meal, Recipe } from '@/lib/services/meals-service';
+import { format, isSameDay, isSameMonth } from 'date-fns';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
-import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
-import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 
-type ViewMode = 'calendar' | 'list' | 'recipes';
-type CalendarViewMode = 'week' | '2weeks' | 'month';
-type RecipeWithStringIngredients = Omit<Recipe, 'ingredients'> & { ingredients: string[] };
+// Hooks
+import { useMealsData } from '@/lib/hooks/useMealsData';
+import { useMealsHandlers } from '@/lib/hooks/useMealsHandlers';
+import { useMealsModals } from '@/lib/hooks/useMealsModals';
 
 // Memoized meal card component with meal planning orange color
 const MemoizedMealCardWithColors = memo(({
@@ -153,694 +143,136 @@ const CalendarDayCell = memo(({
 CalendarDayCell.displayName = 'CalendarDayCell';
 
 export default function MealsPage() {
-  // SECURITY: Check feature access FIRST, before loading any data
-  const { hasAccess, isLoading: gateLoading } = useFeatureGate('mealPlanning');
+  // ─── Hook wiring ────────────────────────────────────────────────────────────
 
-  const { currentSpace, user } = useAuthWithSpaces();
-  const queryClient = useQueryClient();
-  const spaceId = currentSpace?.id;
+  const modals = useMealsModals();
 
-  // React Query: fetch meals + stats
-  // IMPORTANT: Only fetch if user has access (prevents data loading for free users)
-  const {
-    data: mealsData,
-    isLoading: mealsLoading,
-    refetch: refetchMeals,
-  } = useQuery({
-    queryKey: QUERY_KEYS.meals.all(spaceId || ''),
-    queryFn: async () => {
-      const [meals, stats] = await Promise.all([
-        mealsService.getMeals(spaceId!),
-        mealsService.getMealStats(spaceId!),
-      ]);
-      return { meals, stats };
-    },
-    enabled: !!spaceId && !!user && !gateLoading && hasAccess,
-    ...QUERY_OPTIONS.features,
+  const data = useMealsData(modals.showPastMeals);
+
+  const handlers = useMealsHandlers({
+    // Auth
+    spaceId: data.spaceId,
+
+    // Core data
+    meals: data.meals,
+    recipes: data.recipes,
+    stats: data.stats,
+
+    // React Query
+    queryClient: data.queryClient,
+    refetchMeals: data.refetchMeals,
+    refetchRecipes: data.refetchRecipes,
+    invalidateMeals: data.invalidateMeals,
+    invalidateRecipes: data.invalidateRecipes,
+
+    // Pending deletions
+    setPendingDeletions: data.setPendingDeletions,
+
+    // View / filter state setters
+    setViewMode: data.setViewMode,
+    setCalendarViewMode: data.setCalendarViewMode,
+    setSearchQuery: data.setSearchQuery,
+    setIsSearchTyping: data.setIsSearchTyping,
+    setCurrentMonth: data.setCurrentMonth,
+    setCurrentWeek: data.setCurrentWeek,
+
+    // Search ref
+    searchInputRef: data.searchInputRef,
+
+    // Modal state (from useMealsModals)
+    editingMeal: modals.editingMeal,
+    setEditingMeal: modals.setEditingMeal,
+    editingRecipe: modals.editingRecipe,
+    setEditingRecipe: modals.setEditingRecipe,
+    setIsModalOpen: modals.setIsModalOpen,
+    setIsRecipeModalOpen: modals.setIsRecipeModalOpen,
+    setRecipeModalInitialTab: modals.setRecipeModalInitialTab,
+    isIngredientReviewOpen: modals.isIngredientReviewOpen,
+    setIsIngredientReviewOpen: modals.setIsIngredientReviewOpen,
+    pendingMealData: modals.pendingMealData,
+    setPendingMealData: modals.setPendingMealData,
+    selectedRecipeForReview: modals.selectedRecipeForReview,
+    setSelectedRecipeForReview: modals.setSelectedRecipeForReview,
+    setIsGenerateListOpen: modals.setIsGenerateListOpen,
+    setShowPastMeals: modals.setShowPastMeals,
+
+    // Modal open/close callbacks
+    handleOpenMealModal: modals.handleOpenMealModal,
+    handleCloseMealModal: modals.handleCloseMealModal,
+    handleOpenRecipeModal: modals.handleOpenRecipeModal,
+    handleCloseRecipeModal: modals.handleCloseRecipeModal,
+    handleEscapeClose: modals.handleEscapeClose,
   });
 
-  const meals = mealsData?.meals ?? [];
-  const stats = mealsData?.stats ?? { thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 };
+  // ─── Destructure for clean JSX access ───────────────────────────────────────
 
-  // React Query: fetch recipes
   const {
-    data: recipes = [],
-    refetch: refetchRecipes,
-  } = useQuery({
-    queryKey: QUERY_KEYS.meals.recipes(spaceId || ''),
-    queryFn: () => mealsService.getRecipes(spaceId!),
-    enabled: !!spaceId && !gateLoading && hasAccess,
-    ...QUERY_OPTIONS.features,
-  });
+    spaceId,
+    stats,
+    loading,
+    viewMode,
+    calendarViewMode,
+    searchQuery,
+    isSearchTyping,
+    currentMonth,
+    currentWeek,
+    searchInputRef,
+    filteredMeals,
+    filteredRecipes,
+    calendarDays,
+    getMealsForDate,
+    meals,
+    recipes,
+    setCalendarViewMode,
+    setSearchQuery,
+    setIsSearchTyping,
+  } = data;
+
+  const {
+    isModalOpen,
+    editingMeal,
+    isRecipeModalOpen,
+    editingRecipe,
+    recipeModalInitialTab,
+    isIngredientReviewOpen,
+    selectedRecipeForReview,
+    isGenerateListOpen,
+    showPastMeals,
+    setShowPastMeals,
+  } = modals;
+
+  const {
+    handleCreateMeal,
+    handleDeleteMeal,
+    handleCreateRecipe,
+    handleDeleteRecipe,
+    handleSearchChange,
+    handleSetCalendarView,
+    handleSetListView,
+    handleSetRecipesView,
+    handlePreviousMonth,
+    handleNextMonth,
+    handleWeekChange,
+    handleAddMealForDate,
+    handleThisWeekClick,
+    handleNextTwoWeeksClick,
+    handleSavedRecipesClick,
+    handleMealClick,
+    handleAddMealClick,
+    handleEditRecipe,
+    handlePlanMealFromRecipe,
+    handleEditMeal,
+    handleRecipeAddedFromDiscover,
+    handleIngredientConfirm,
+    handleBulkDelete,
+    handleBulkGenerateList,
+    handlePullToRefresh,
+  } = handlers;
+
+  const { handleCloseMealModal, handleCloseRecipeModal, handleOpenRecipeModal, handleOpenMealModal, handleOpenRecipeDiscover } = modals;
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
 
-  const loading = mealsLoading;
-
-  // Invalidation helpers
-  const invalidateMeals = useCallback(() => {
-    if (!spaceId) return;
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.meals.all(spaceId) });
-  }, [spaceId, queryClient]);
-
-  const invalidateRecipes = useCallback(() => {
-    if (!spaceId) return;
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.meals.recipes(spaceId) });
-  }, [spaceId, queryClient]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMeal, setEditingMeal] = useState<Meal | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('calendar');
-  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>('week');
-  const [pendingDeletions, setPendingDeletions] = useState<Map<string, { type: 'meal' | 'recipe', data: Meal | Recipe, timeoutId: NodeJS.Timeout }>>(new Map());
-  // OPTIMIZATION: Use ref to avoid subscription recreation when pendingDeletions changes
-  const pendingDeletionsRef = useRef(pendingDeletions);
-  pendingDeletionsRef.current = pendingDeletions;
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
-  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
-  const [recipeModalInitialTab, setRecipeModalInitialTab] = useState<'manual' | 'ai' | 'discover'>('manual');
-  const [showPastMeals, setShowPastMeals] = useState(false);
-
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // Ingredient review modal state
-  const [isIngredientReviewOpen, setIsIngredientReviewOpen] = useState(false);
-  const [pendingMealData, setPendingMealData] = useState<CreateMealInput | null>(null);
-  const [selectedRecipeForReview, setSelectedRecipeForReview] = useState<RecipeWithStringIngredients | null>(null);
-
-  // Generate shopping list modal state
-  const [isGenerateListOpen, setIsGenerateListOpen] = useState(false);
-
-  // Memoized filtered meals based on search query and date (for list view)
-  const filteredMeals = useMemo(() => {
-    if (viewMode === 'recipes') return [];
-
-    let filtered = meals;
-
-    // List view: Filter out past meals unless showPastMeals is enabled
-    if (viewMode === 'list' && !showPastMeals) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Set to midnight local time
-      filtered = filtered.filter(m => {
-        const mealDate = new Date(m.scheduled_date);
-        // Reset meal date to midnight for fair comparison
-        mealDate.setHours(0, 0, 0, 0);
-        return mealDate >= today;
-      });
-    }
-
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(m =>
-        m.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.recipe?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.notes?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    return filtered;
-  }, [meals, searchQuery, viewMode, showPastMeals]);
-
-  // Memoized filtered recipes based on search query
-  const filteredRecipes = useMemo(() => {
-    if (viewMode !== 'recipes') return [];
-
-    let filtered = recipes;
-    if (searchQuery) {
-      filtered = filtered.filter(r =>
-        r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-    }
-    return filtered;
-  }, [recipes, searchQuery, viewMode]);
-
-  // Memoized calendar days calculation
-  const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart);
-    const calendarEnd = endOfWeek(monthEnd);
-
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  }, [currentMonth]);
-
-  // Memoized meals grouped by date for calendar view
-  const mealsByDate = useMemo(() => {
-    const grouped = new Map<string, Meal[]>();
-    filteredMeals.forEach(meal => {
-      const dateKey = format(new Date(meal.scheduled_date), 'yyyy-MM-dd');
-      if (!grouped.has(dateKey)) {
-        grouped.set(dateKey, []);
-      }
-      grouped.get(dateKey)!.push(meal);
-    });
-    return grouped;
-  }, [filteredMeals]);
-
-  // Optimized function to get meals for a specific date
-  const getMealsForDate = useCallback((date: Date) => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return mealsByDate.get(dateKey) || [];
-  }, [mealsByDate]);
-
-  // Real-time subscriptions — invalidate React Query cache on changes
-  useEffect(() => {
-    if (!spaceId) return;
-
-    const supabase = createClient();
-
-    const mealsChannel = mealsService.subscribeToMeals(spaceId, () => {
-      invalidateMeals();
-    });
-
-    const recipesChannel = mealsService.subscribeToRecipes(spaceId, () => {
-      invalidateRecipes();
-    });
-
-    return () => {
-      supabase.removeChannel(mealsChannel);
-      supabase.removeChannel(recipesChannel);
-
-      // Clear all pending deletion timeouts using ref
-      pendingDeletionsRef.current.forEach(({ timeoutId }) => clearTimeout(timeoutId));
-    };
-  }, [spaceId, invalidateMeals, invalidateRecipes]);
-
-  // Memoized handlers
-  const handleCreateMeal = useCallback(async (mealData: CreateMealInput, createShoppingList?: boolean) => {
-    // If space is not available, don't allow meal creation
-    if (!spaceId) {
-      logger.warn('Cannot create meal: space not loaded yet', { component: 'page' });
-      return;
-    }
-
-    try {
-      // If creating shopping list and recipe has ingredients, show review modal
-      // Check if this is a new meal (no editingMeal OR editingMeal has empty ID)
-      const isNewMeal = !editingMeal || !editingMeal.id;
-
-      if (createShoppingList && mealData.recipe_id && isNewMeal) {
-        const recipe = recipes.find(r => r.id === mealData.recipe_id);
-        if (recipe && recipe.ingredients && recipe.ingredients.length > 0) {
-          // Convert ingredients to strings if they're objects
-          const ingredientsAsStrings = recipe.ingredients.map((ingredient) => {
-            if (typeof ingredient === 'string') return ingredient;
-            if (ingredient && typeof ingredient === 'object') {
-              const typedIngredient = ingredient as {
-                name?: string;
-                amount?: string | number;
-                unit?: string;
-              };
-              const parts = [typedIngredient.amount, typedIngredient.unit, typedIngredient.name]
-                .filter((part) => part !== undefined && part !== null && String(part).trim() !== '')
-                .map((part) => String(part));
-              if (parts.length > 0) return parts.join(' ');
-            }
-            return String(ingredient ?? '');
-          });
-
-          // Store the meal data and recipe with formatted ingredients
-          setPendingMealData(mealData);
-          setSelectedRecipeForReview({ ...recipe, ingredients: ingredientsAsStrings });
-          setIsIngredientReviewOpen(true);
-          return; // Don't create the meal yet
-        }
-      }
-
-      // Otherwise, create/update meal directly (no shopping list or editing mode)
-      // Check if editingMeal has an actual ID (editing) or empty ID (new meal with pre-selected recipe)
-      if (editingMeal && editingMeal.id) {
-        await mealsService.updateMeal(editingMeal.id, mealData);
-      } else {
-        await mealsService.createMeal(mealData);
-      }
-
-      invalidateMeals();
-      setEditingMeal(null);
-    } catch (error) {
-      logger.error('Failed to save meal:', error, { component: 'page', action: 'execution' });
-    }
-  }, [editingMeal, invalidateMeals, spaceId, recipes]);
-
-  const handleDeleteMeal = useCallback(async (mealId: string) => {
-    const mealToDelete = meals.find(m => m.id === mealId);
-    if (!mealToDelete) return;
-
-    const mealsKey = QUERY_KEYS.meals.all(spaceId || '');
-
-    // Optimistically remove from UI via query cache
-    const previousData = queryClient.getQueryData<{ meals: Meal[]; stats: typeof stats }>(mealsKey);
-    queryClient.setQueryData<{ meals: Meal[]; stats: typeof stats } | undefined>(
-      mealsKey,
-      (old) => old ? { ...old, meals: old.meals.filter(m => m.id !== mealId) } : old,
-    );
-
-    // Schedule actual deletion after 5 seconds
-    const timeoutId = setTimeout(async () => {
-      try {
-        await mealsService.deleteMeal(mealId);
-        setPendingDeletions(prev => {
-          const newMap = new Map(prev);
-          newMap.delete(mealId);
-          return newMap;
-        });
-        invalidateMeals();
-      } catch (error) {
-        logger.error('Failed to delete meal:', error, { component: 'page', action: 'execution' });
-        showError('Failed to delete meal');
-        // Restore on failure
-        if (previousData) queryClient.setQueryData(mealsKey, previousData);
-      }
-    }, 5000);
-
-    // Store pending deletion
-    setPendingDeletions(prev => new Map(prev).set(mealId, { type: 'meal', data: mealToDelete, timeoutId }));
-
-    // Show toast with undo option
-    toast('Meal deleted', {
-      description: 'You have 5 seconds to undo this action.',
-      action: {
-        label: 'Undo',
-        onClick: () => {
-          clearTimeout(timeoutId);
-          setPendingDeletions(prev => {
-            const newMap = new Map(prev);
-            newMap.delete(mealId);
-            return newMap;
-          });
-          // Restore the meal via query cache
-          if (previousData) queryClient.setQueryData(mealsKey, previousData);
-          showSuccess('Meal restored!');
-        }
-      }
-    });
-  }, [meals, spaceId, queryClient, stats, invalidateMeals]);
-
-  const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
-    // If space is not available, don't allow recipe creation
-    if (!spaceId) {
-      logger.warn('Cannot create recipe: space not loaded yet', { component: 'page' });
-      return;
-    }
-
-    try {
-      if (editingRecipe) {
-        await mealsService.updateRecipe(editingRecipe.id, recipeData);
-      } else {
-        await mealsService.createRecipe(recipeData);
-      }
-      invalidateRecipes();
-      setEditingRecipe(null);
-    } catch (error) {
-      logger.error('Failed to save recipe:', error, { component: 'page', action: 'execution' });
-    }
-  }, [editingRecipe, invalidateRecipes, spaceId]);
-
-  const handleDeleteRecipe = useCallback(async (recipeId: string) => {
-    const recipeToDelete = recipes.find(r => r.id === recipeId);
-    if (!recipeToDelete) return;
-
-    const recipesKey = QUERY_KEYS.meals.recipes(spaceId || '');
-
-    // Optimistically remove from UI via query cache
-    const previousRecipes = queryClient.getQueryData<Recipe[]>(recipesKey);
-    queryClient.setQueryData<Recipe[]>(
-      recipesKey,
-      (old) => (old || []).filter(r => r.id !== recipeId),
-    );
-
-    // Schedule actual deletion after 5 seconds
-    const timeoutId = setTimeout(async () => {
-      try {
-        await mealsService.deleteRecipe(recipeId);
-        setPendingDeletions(prev => {
-          const newMap = new Map(prev);
-          newMap.delete(recipeId);
-          return newMap;
-        });
-        invalidateRecipes();
-      } catch (error) {
-        logger.error('Failed to delete recipe:', error, { component: 'page', action: 'execution' });
-        showError('Failed to delete recipe');
-        // Restore on failure
-        if (previousRecipes) queryClient.setQueryData(recipesKey, previousRecipes);
-      }
-    }, 5000);
-
-    // Store pending deletion
-    setPendingDeletions(prev => new Map(prev).set(recipeId, { type: 'recipe', data: recipeToDelete, timeoutId }));
-
-    // Show toast with undo option
-    toast('Recipe deleted', {
-      description: 'You have 5 seconds to undo this action.',
-      action: {
-        label: 'Undo',
-        onClick: () => {
-          clearTimeout(timeoutId);
-          setPendingDeletions(prev => {
-            const newMap = new Map(prev);
-            newMap.delete(recipeId);
-            return newMap;
-          });
-          // Restore the recipe via query cache
-          if (previousRecipes) queryClient.setQueryData(recipesKey, previousRecipes);
-          showSuccess('Recipe restored!');
-        }
-      }
-    });
-  }, [recipes, spaceId, queryClient, invalidateRecipes]);
-
-  // Search handler
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    // Handle typing animation
-    if (value.length > 0) {
-      setIsSearchTyping(true);
-      const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
-      return () => clearTimeout(timeoutId);
-    } else {
-      setIsSearchTyping(false);
-    }
-  }, []);
-
-  // View mode handlers
-  const handleSetCalendarView = useCallback(() => setViewMode('calendar'), []);
-  const handleSetListView = useCallback(() => setViewMode('list'), []);
-  const handleSetRecipesView = useCallback(() => setViewMode('recipes'), []);
-
-  // Calendar navigation handlers
-  const handlePreviousMonth = useCallback(() => {
-    setCurrentMonth(prev => subMonths(prev, 1));
-  }, []);
-
-  const handleNextMonth = useCallback(() => {
-    setCurrentMonth(prev => addMonths(prev, 1));
-  }, []);
-
-  // Week navigation handlers
-  const handleWeekChange = useCallback((newWeek: Date) => {
-    setCurrentWeek(newWeek);
-  }, []);
-
-  const handleAddMealForDate = useCallback((date: Date, mealType?: string) => {
-    if (!spaceId) return;
-
-    // Format date as yyyy-MM-dd to avoid timezone issues
-    const formattedDate = format(date, 'yyyy-MM-dd');
-
-    // Pre-populate meal modal with selected date and meal type
-    setEditingMeal({
-      id: '',
-      space_id: spaceId,
-      recipe_id: undefined,
-      recipe: undefined,
-      name: '',
-      meal_type: (mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack') || 'dinner',
-      scheduled_date: formattedDate,
-      notes: '',
-      created_by: '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    } as Meal);
-    setIsModalOpen(true);
-  }, [spaceId]);
-
-  // Modal handlers
-  const handleOpenMealModal = useCallback(() => setIsModalOpen(true), []);
-  const handleCloseMealModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingMeal(null);
-  }, []);
-
-  const handleOpenRecipeModal = useCallback(() => {
-    setRecipeModalInitialTab('manual');
-    setIsRecipeModalOpen(true);
-  }, []);
-
-  const handleCloseRecipeModal = useCallback(() => {
-    setIsRecipeModalOpen(false);
-    setEditingRecipe(null);
-    setRecipeModalInitialTab('manual');
-  }, []);
-
-  const handleOpenRecipeDiscover = useCallback(() => {
-    setRecipeModalInitialTab('discover');
-    setIsRecipeModalOpen(true);
-  }, []);
-
-  const handleRecipeAddedFromDiscover = useCallback(async (recipeData: CreateRecipeInput) => {
-    if (!spaceId) return;
-
-    try {
-      // Save the recipe to library
-      const savedRecipe = await mealsService.createRecipe(recipeData);
-
-      // Reload recipes to get the new one
-      await refetchRecipes();
-
-      // Close recipe modal
-      setIsRecipeModalOpen(false);
-      setRecipeModalInitialTab('manual');
-
-      // Format date as yyyy-MM-dd to avoid timezone issues
-      const formattedDate = format(new Date(), 'yyyy-MM-dd');
-
-      // Pre-populate the meal modal with the newly added recipe
-      setEditingMeal({
-        id: '', // Empty ID indicates this is a new meal
-        space_id: spaceId,
-        recipe_id: savedRecipe.id,
-        recipe: savedRecipe,
-        name: '',
-        meal_type: 'dinner',
-        scheduled_date: formattedDate,
-        notes: '',
-        created_by: '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      } as Meal);
-
-      // Keep meal modal open (it should already be open)
-      setIsModalOpen(true);
-
-      showSuccess('Recipe added to library and selected for your meal!');
-    } catch (error) {
-      logger.error('Failed to save discovered recipe:', error, { component: 'page', action: 'execution' });
-      showError('Failed to save recipe. Please try again.');
-    }
-  }, [spaceId, refetchRecipes]);
-
-  // Stat card click handlers
-  const handleThisWeekClick = useCallback(() => {
-    setViewMode('calendar');
-    setCalendarViewMode('week');
-    setCurrentWeek(new Date());
-  }, []);
-
-  const handleNextTwoWeeksClick = useCallback(() => {
-    setViewMode('calendar');
-    setCalendarViewMode('2weeks');
-    setCurrentWeek(new Date());
-  }, []);
-
-  const handleSavedRecipesClick = useCallback(() => {
-    setViewMode('recipes');
-  }, []);
-
-  // Calendar day click handlers
-  const handleMealClick = useCallback((meal: Meal) => {
-    setEditingMeal(meal);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleAddMealClick = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  // Recipe card handlers
-  const handleEditRecipe = useCallback((recipe: Recipe) => {
-    setEditingRecipe(recipe);
-    setIsRecipeModalOpen(true);
-  }, []);
-
-  const handlePlanMealFromRecipe = useCallback((recipe: Recipe) => {
-    if (!spaceId) return;
-
-    // Format date as yyyy-MM-dd to avoid timezone issues
-    const formattedDate = format(new Date(), 'yyyy-MM-dd');
-
-    // Create a new meal state with pre-selected recipe
-    setEditingMeal({
-      id: '', // Empty ID indicates this is a new meal
-      space_id: spaceId,
-      recipe_id: recipe.id,
-      recipe: recipe,
-      name: '',
-      meal_type: 'dinner',
-      scheduled_date: formattedDate,
-      notes: '',
-      created_by: '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    } as Meal);
-    setIsModalOpen(true);
-  }, [spaceId]);
-
-  // Meal card handlers
-  const handleEditMeal = useCallback((meal: Meal) => {
-    setEditingMeal(meal);
-    setIsModalOpen(true);
-  }, []);
-
-  // Handle ingredient selection confirmation from modal
-  // Bulk operations handlers
-  const handleBulkDelete = useCallback(async (mealIds: string[]) => {
-    toast('Delete selected meals?', {
-      description: `This will delete ${mealIds.length} meal${mealIds.length > 1 ? 's' : ''}. This action cannot be undone.`,
-      action: {
-        label: 'Delete All',
-        onClick: async () => {
-          try {
-            await Promise.all(mealIds.map(id => mealsService.deleteMeal(id)));
-            showSuccess(`${mealIds.length} meal${mealIds.length > 1 ? 's' : ''} deleted successfully!`);
-            invalidateMeals();
-          } catch (error) {
-            logger.error('Failed to delete meals:', error, { component: 'page', action: 'execution' });
-            showError('Failed to delete some meals. Please try again.');
-          }
-        }
-      },
-      cancel: {
-        label: 'Cancel',
-        onClick: () => {}
-      }
-    });
-  }, [invalidateMeals]);
-
-  const handleBulkGenerateList = useCallback(async (mealIds: string[]) => {
-    const selectedMeals = meals.filter(m => mealIds.includes(m.id));
-    const mealsWithRecipes = selectedMeals.filter(m => m.recipe && m.recipe.ingredients);
-
-    if (mealsWithRecipes.length === 0) {
-      showError('Selected meals must have recipes with ingredients.');
-      return;
-    }
-
-    setIsGenerateListOpen(true);
-  }, [meals]);
-
-  // Keyboard shortcuts
-  useKeyboardShortcuts([
-    {
-      key: 'n',
-      handler: handleOpenMealModal,
-      description: 'Create new meal'
-    },
-    {
-      key: 'r',
-      handler: handleOpenRecipeModal,
-      description: 'Create new recipe'
-    },
-    {
-      key: '/',
-      handler: () => searchInputRef.current?.focus(),
-      description: 'Focus search'
-    },
-    {
-      key: 'k',
-      ctrl: true,
-      handler: () => searchInputRef.current?.focus(),
-      description: 'Focus search (Ctrl+K)'
-    },
-    {
-      key: '1',
-      handler: handleSetCalendarView,
-      description: 'Switch to calendar view'
-    },
-    {
-      key: '2',
-      handler: handleSetListView,
-      description: 'Switch to list view'
-    },
-    {
-      key: '3',
-      handler: handleSetRecipesView,
-      description: 'Switch to recipes view'
-    },
-    {
-      key: 'Escape',
-      handler: () => {
-        if (isModalOpen) handleCloseMealModal();
-        if (isRecipeModalOpen) handleCloseRecipeModal();
-        if (isGenerateListOpen) setIsGenerateListOpen(false);
-        if (isIngredientReviewOpen) {
-          setIsIngredientReviewOpen(false);
-          setPendingMealData(null);
-          setSelectedRecipeForReview(null);
-        }
-      },
-      description: 'Close modals'
-    }
-  ]);
-
-  // Pull-to-refresh handler
-  const handlePullToRefresh = useCallback(async () => {
-    await Promise.all([refetchMeals(), refetchRecipes()]);
-  }, [refetchMeals, refetchRecipes]);
-
-  const handleIngredientConfirm = useCallback(async (selectedIngredients: string[]) => {
-    if (!pendingMealData || !selectedRecipeForReview || !spaceId) return;
-
-    try {
-      // Create the meal
-      await mealsService.createMeal(pendingMealData);
-
-      // Create shopping list with meal name and date
-      const formattedDate = format(new Date(pendingMealData.scheduled_date), 'MM/dd/yyyy');
-      const listTitle = `${pendingMealData.name || selectedRecipeForReview.name} - ${formattedDate}`;
-
-      const list = await shoppingService.createList({
-        space_id: spaceId,
-        title: listTitle,
-        description: `Ingredients for ${selectedRecipeForReview.name}`,
-        status: 'active',
-      });
-
-      // Add only selected ingredients to shopping list
-      await Promise.all(
-        selectedIngredients.map((ingredient) =>
-          shoppingService.createItem({
-            list_id: list.id,
-            name: ingredient,
-            quantity: 1,
-          })
-        )
-      );
-
-      // Close modal and reload meals
-      setIsIngredientReviewOpen(false);
-      setPendingMealData(null);
-      setSelectedRecipeForReview(null);
-      invalidateMeals();
-
-      // Show success notification with option to view
-      showSuccess(`Shopping list "${listTitle}" created with ${selectedIngredients.length} ingredient${selectedIngredients.length > 1 ? 's' : ''}!`, {
-        label: 'View Shopping Lists',
-        onClick: () => window.location.href = '/shopping'
-      });
-    } catch (error) {
-      logger.error('Failed to create meal with shopping list:', error, { component: 'page', action: 'execution' });
-      showError('Failed to create shopping list. Please try again.');
-    }
-  }, [pendingMealData, selectedRecipeForReview, spaceId, invalidateMeals]);
-
-  // Render feature gate wrapper (handles loading and blocked states)
   return (
     <FeatureGateWrapper
       feature="mealPlanning"
@@ -1195,7 +627,7 @@ export default function MealsPage() {
                     onAddMeal={handleAddMealForDate}
                     onBulkDelete={handleBulkDelete}
                     onBulkGenerateList={handleBulkGenerateList}
-                    onGenerateList={() => setIsGenerateListOpen(true)}
+                    onGenerateList={() => modals.setIsGenerateListOpen(true)}
                   />
                 ) : calendarViewMode === '2weeks' ? (
                   /* Two Week Calendar View */
@@ -1207,7 +639,7 @@ export default function MealsPage() {
                     onAddMeal={handleAddMealForDate}
                     onBulkDelete={handleBulkDelete}
                     onBulkGenerateList={handleBulkGenerateList}
-                    onGenerateList={() => setIsGenerateListOpen(true)}
+                    onGenerateList={() => modals.setIsGenerateListOpen(true)}
                   />
                 ) : (
                   /* Month Calendar View */
@@ -1408,9 +840,9 @@ export default function MealsPage() {
         <IngredientReviewModal
           isOpen={isIngredientReviewOpen}
           onClose={() => {
-            setIsIngredientReviewOpen(false);
-            setPendingMealData(null);
-            setSelectedRecipeForReview(null);
+            modals.setIsIngredientReviewOpen(false);
+            modals.setPendingMealData(null);
+            modals.setSelectedRecipeForReview(null);
           }}
           onConfirm={handleIngredientConfirm}
           ingredients={selectedRecipeForReview.ingredients}
@@ -1420,10 +852,10 @@ export default function MealsPage() {
       {spaceId && (
         <GenerateListModal
           isOpen={isGenerateListOpen}
-          onClose={() => setIsGenerateListOpen(false)}
+          onClose={() => modals.setIsGenerateListOpen(false)}
           meals={meals}
           spaceId={spaceId}
-          onSuccess={() => invalidateMeals()}
+          onSuccess={() => data.invalidateMeals()}
         />
       )}
       </PullToRefresh>

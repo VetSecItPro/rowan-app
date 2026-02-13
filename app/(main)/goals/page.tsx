@@ -3,19 +3,15 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, X } from 'lucide-react';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { FeatureGateWrapper } from '@/components/subscription/FeatureGateWrapper';
-import { useFeatureGate } from '@/lib/hooks/useFeatureGate';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { SortableGoalsList } from '@/components/goals/SortableGoalsList';
 import { MilestoneCard } from '@/components/goals/MilestoneCard';
 import dynamicImport from 'next/dynamic';
-import { logger } from '@/lib/logger';
 
 // Dynamic imports for heavy modal components (load only when opened)
 const NewGoalModal = dynamicImport(() => import('@/components/goals/NewGoalModal').then(mod => ({ default: mod.NewGoalModal })), {
@@ -58,648 +54,75 @@ const HabitTracker = dynamicImport(() => import('@/components/goals/HabitTracker
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { GoalCardSkeleton, MilestoneCardSkeleton, StatsCardSkeleton } from '@/components/ui/Skeleton';
-
-import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { goalsService, Goal, CreateGoalInput, Milestone, CreateMilestoneInput, GoalTemplate, CreateCheckInInput } from '@/lib/services/goals-service';
-import { createClient } from '@/lib/supabase/client';
-import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import { toast } from 'sonner';
-import { usePresence } from '@/lib/hooks/usePresence';
 import { OnlineUsersIndicator } from '@/components/shared/PresenceIndicator';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 
-type ViewMode = 'goals' | 'milestones' | 'habits' | 'activity';
-type SpaceMemberRow = {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    avatar_url?: string | null;
-  } | null;
-};
-
-type Habit = {
-  id: string;
-  title: string;
-  description?: string;
-  category?: string;
-  frequency_type: 'daily' | 'weekly' | 'monthly';
-  frequency_value?: number;
-  target_count?: number;
-  space_id: string;
-  created_at: string;
-  updated_at: string;
-};
-
-type CreateHabitInput = {
-  space_id: string;
-  title: string;
-  description?: string;
-  category?: string;
-  frequency_type: 'daily' | 'weekly' | 'monthly';
-  frequency_value?: number;
-  target_count?: number;
-};
+import { useGoalsData } from '@/lib/hooks/useGoalsData';
+import { useGoalsModals } from '@/lib/hooks/useGoalsModals';
+import { useGoalsHandlers } from '@/lib/hooks/useGoalsHandlers';
 
 export default function GoalsPage() {
-  // SECURITY: Check feature access FIRST, before loading any data
-  const { hasAccess, isLoading: gateLoading } = useFeatureGate('goals');
-
-  const { currentSpace, user } = useAuthWithSpaces();
-  const spaceId = currentSpace?.id;
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const goalsRef = useRef<Goal[]>([]);
-  const userActionsRef = useRef<Set<string>>(new Set()); // Track user-initiated actions
-  const [loading, setLoading] = useState(true);
-  const [spaceMembers, setSpaceMembers] = useState<Array<{ id: string; name: string; email: string; avatar_url?: string }>>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>('goals');
-  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
-  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
-  const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
-  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-  const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
-  const [isHistoryTimelineOpen, setIsHistoryTimelineOpen] = useState(false);
-  const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
-  const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
-  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplate | null>(null);
-  const [checkInGoal, setCheckInGoal] = useState<Goal | null>(null);
-  const [historyGoal, setHistoryGoal] = useState<Goal | null>(null);
-  const [frequencyGoal, setFrequencyGoal] = useState<Goal | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [assignmentFilter, setAssignmentFilter] = useState<'all' | 'assigned-to-me' | 'unassigned'>('all');
-  const [focusMode, setFocusMode] = useState(false);
-  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; action: 'delete-goal' | 'delete-milestone'; id: string }>({ isOpen: false, action: 'delete-goal', id: '' });
-
-  // Presence tracking for collaborative editing
-  const { onlineUsers, getUsersViewingGoal } = usePresence({
-    channelName: 'goals-presence',
-    spaceId: spaceId || '',
-    userId: user?.id || '',
-    userEmail: user?.email,
+  // ─── Hooks ─────────────────────────────────────────────────────────────────
+  const data = useGoalsData();
+  const modals = useGoalsModals();
+  const handlers = useGoalsHandlers({
+    goals: data.goals,
+    setGoals: data.setGoals,
+    milestones: data.milestones,
+    setMilestones: data.setMilestones,
+    userActionsRef: data.userActionsRef,
+    user: data.user,
+    currentSpace: data.currentSpace,
+    editingGoal: modals.editingGoal,
+    setEditingGoal: modals.setEditingGoal,
+    editingMilestone: modals.editingMilestone,
+    setEditingMilestone: modals.setEditingMilestone,
+    editingHabit: modals.editingHabit,
+    setEditingHabit: modals.setEditingHabit,
+    confirmDialog: modals.confirmDialog,
+    setConfirmDialog: modals.setConfirmDialog,
+    setSearchQuery: data.setSearchQuery,
+    setIsSearchTyping: data.setIsSearchTyping,
+    setViewMode: data.setViewMode,
+    loadData: data.loadData,
   });
 
-  // Memoized filtered goals with search, status, assignment, and focus mode
-  const filteredGoals = useMemo(() => {
-    let filtered = goals;
-
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(g => {
-        if (statusFilter === 'active') return g.status === 'active';
-        if (statusFilter === 'completed') return g.status === 'completed';
-        return true;
-      });
-    }
-
-    // Apply assignment filter
-    if (assignmentFilter !== 'all') {
-      filtered = filtered.filter(g => {
-        if (assignmentFilter === 'assigned-to-me') return g.assigned_to === user?.id;
-        if (assignmentFilter === 'unassigned') return !g.assigned_to;
-        return true;
-      });
-    }
-
-    // Apply search filter
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(g =>
-        g.title.toLowerCase().includes(lowerQuery) ||
-        g.description?.toLowerCase().includes(lowerQuery)
-      );
-    }
-
-    // Apply focus mode - show only top 3 goals (pinned + highest priority)
-    if (focusMode && filtered.length > 3) {
-      filtered = filtered.slice(0, 3);
-    }
-
-    return filtered;
-  }, [goals, searchQuery, statusFilter, assignmentFilter, focusMode, user?.id]);
-
-  // Memoized filtered milestones with search
-  const filteredMilestones = useMemo(() => {
-    if (!searchQuery) return milestones;
-
-    const lowerQuery = searchQuery.toLowerCase();
-    return milestones.filter(m =>
-      m.title.toLowerCase().includes(lowerQuery) ||
-      m.description?.toLowerCase().includes(lowerQuery)
-    );
-  }, [milestones, searchQuery]);
-
-  // Memoized stats calculation
-  const stats = useMemo(() => {
-    const active = goals.filter(g => g.status === 'active').length;
-    const completed = goals.filter(g => g.status === 'completed').length;
-    const inProgress = goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length;
-    const milestonesReached = milestones.filter(m => m.completed).length;
-
-    return { active, completed, inProgress, milestonesReached };
-  }, [goals, milestones]);
-
-  // Keep goalsRef in sync with goals state
-  useEffect(() => {
-    goalsRef.current = goals;
-  }, [goals]);
-
-  useEffect(() => {
-    // SECURITY: Only load data if user has access
-    if (!gateLoading && hasAccess) {
-      loadData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace, gateLoading, hasAccess]);
-
-  // Real-time subscription for goals and milestones
-  useEffect(() => {
-    // SECURITY: Only subscribe if user has access
-    if (!currentSpace || !hasAccess || gateLoading) return;
-
-    const supabase = createClient();
-
-    // Subscribe to goals changes
-    const goalsChannel = supabase
-      .channel(`goals-changes:${currentSpace.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'goals',
-          filter: `space_id=eq.${currentSpace.id}`
-        },
-        (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
-          const goalId = (payload.new as Record<string, unknown>)?.id || (payload.old as Record<string, unknown>)?.id;
-          const isUserAction = goalId && userActionsRef.current.has(goalId as string);
-
-          if (payload.eventType === 'INSERT') {
-            const newGoal = payload.new as unknown as Goal;
-            setGoals(prev => [...prev, newGoal]);
-            if (!isUserAction) {
-              toast.info(`New goal added: ${newGoal.title}`);
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedGoal = payload.new as unknown as Goal;
-            setGoals(prev => prev.map(g => g.id === updatedGoal.id ? updatedGoal : g));
-            if (!isUserAction) {
-              toast.info(`Goal updated: ${updatedGoal.title}`);
-            }
-            // Clean up action tracking
-            if (goalId) userActionsRef.current.delete(goalId as string);
-          } else if (payload.eventType === 'DELETE') {
-            const deletedId = (payload.old as Record<string, unknown>).id as string;
-            setGoals(prev => prev.filter(g => g.id !== deletedId));
-            if (!isUserAction) {
-              toast.info('A goal was removed');
-            }
-            if (deletedId) userActionsRef.current.delete(deletedId);
-          }
-        }
-      )
-      .subscribe();
-
-    // Subscribe to milestones changes
-    // Note: goal_milestones doesn't have space_id, so we check if the milestone belongs to a goal in current space
-    const milestonesChannel = supabase
-      .channel(`milestones-changes:${currentSpace.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'goal_milestones'
-        },
-        (payload: RealtimePostgresChangesPayload<{[key: string]: unknown}>) => {
-          // Check if milestone belongs to a goal in current space
-          const belongsToCurrentSpace = (milestone: Milestone) => {
-            return goalsRef.current.some(g => g.id === milestone.goal_id);
-          };
-
-          const milestoneId = (payload.new as Record<string, unknown>)?.id || (payload.old as Record<string, unknown>)?.id;
-          const isUserAction = milestoneId && userActionsRef.current.has(milestoneId as string);
-
-          if (payload.eventType === 'INSERT') {
-            const newMilestone = payload.new as unknown as Milestone;
-            if (belongsToCurrentSpace(newMilestone)) {
-              setMilestones(prev => [...prev, newMilestone]);
-              if (!isUserAction) {
-                toast.info(`New milestone added: ${newMilestone.title}`);
-              }
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedMilestone = payload.new as unknown as Milestone;
-            if (belongsToCurrentSpace(updatedMilestone)) {
-              setMilestones(prev => prev.map(m => m.id === updatedMilestone.id ? updatedMilestone : m));
-              if (!isUserAction) {
-                toast.info(`Milestone updated: ${updatedMilestone.title}`);
-              }
-            }
-            if (milestoneId) userActionsRef.current.delete(milestoneId as string);
-          } else if (payload.eventType === 'DELETE') {
-            const deletedId = (payload.old as Record<string, unknown>).id as string;
-            setMilestones(prev => prev.filter(m => m.id !== deletedId));
-            if (!isUserAction) {
-              toast.info('A milestone was removed');
-            }
-            if (deletedId) userActionsRef.current.delete(deletedId);
-          }
-        }
-      )
-      .subscribe();
-
-    // Cleanup function
-    return () => {
-      supabase.removeChannel(goalsChannel);
-      supabase.removeChannel(milestonesChannel);
-    };
-  }, [currentSpace]);
-
-  const loadData = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
-    if (!currentSpace || !user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const supabase = createClient();
-
-      const [goalsData, milestonesData, membersResult] = await Promise.all([
-        goalsService.getGoals(currentSpace.id),
-        goalsService.getAllMilestones(currentSpace.id),
-        supabase
-          .from('space_members')
-          .select('user:users(id, name, email, avatar_url)')
-          .eq('space_id', currentSpace.id)
-      ]);
-
-      setGoals(goalsData);
-      setMilestones(milestonesData);
-
-      // Map space members data
-      if (membersResult.data) {
-        const members = (membersResult.data as SpaceMemberRow[])
-          .map((member) => member.user)
-          .filter((member): member is NonNullable<SpaceMemberRow['user']> => member != null)
-          .map(member => ({
-            ...member,
-            avatar_url: member.avatar_url ?? undefined
-          }));
-        setSpaceMembers(members);
-      }
-
-    } catch (error) {
-      logger.error('Failed to load data:', error, { component: 'page', action: 'execution' });
-    } finally {
-      setLoading(false);
-    }
-  }, [currentSpace, user]);
-
-  const handleCreateGoal = useCallback(async (goalData: CreateGoalInput) => {
-    try {
-      if (editingGoal) {
-        await goalsService.updateGoal(editingGoal.id, goalData);
-        // Real-time subscription will handle the update
-      } else {
-        // Optimistic update - add to UI immediately
-        const optimisticGoal: Goal = {
-          id: `temp-${Date.now()}`, // Temporary ID
-          title: goalData.title,
-          status: goalData.status || 'active',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          space_id: goalData.space_id,
-          description: goalData.description || undefined,
-          category: goalData.category || undefined,
-          target_date: goalData.target_date || undefined,
-          progress: 0,
-          completed_at: undefined,
-          created_by: user?.id || '',
-        };
-
-        setGoals(prev => [optimisticGoal, ...prev]);
-
-        try {
-          await goalsService.createGoal(goalData);
-          // Real-time subscription will replace the optimistic goal with the real one
-        } catch (error) {
-          // Revert optimistic update on error
-          setGoals(prev => prev.filter(goal => goal.id !== optimisticGoal.id));
-          throw error;
-        }
-      }
-      setEditingGoal(null);
-    } catch (error) {
-      logger.error('Failed to save goal:', error, { component: 'page', action: 'execution' });
-    }
-  }, [editingGoal, setGoals, user]);
-
-  const handleDeleteGoal = useCallback(async (goalId: string) => {
-    setConfirmDialog({ isOpen: true, action: 'delete-goal', id: goalId });
-  }, []);
-
-  const handleCreateMilestone = useCallback(async (milestoneData: CreateMilestoneInput) => {
-    try {
-      if (editingMilestone) {
-        await goalsService.updateMilestone(editingMilestone.id, milestoneData);
-      } else {
-        await goalsService.createMilestone(milestoneData);
-      }
-      loadData();
-      setEditingMilestone(null);
-    } catch (error) {
-      logger.error('Failed to save milestone:', error, { component: 'page', action: 'execution' });
-    }
-  }, [editingMilestone, loadData]);
-
-  const handleCreateHabit = useCallback(async (habitData: CreateHabitInput) => {
-    try {
-      // TODO: Implement habit creation service when backend is ready
-      logger.info('Creating habit:', { component: 'page', data: habitData });
-      toast.success('Habit created successfully!');
-
-      // For now, just close the modal
-      setEditingHabit(null);
-    } catch (error) {
-      logger.error('Failed to save habit:', error, { component: 'page', action: 'execution' });
-      toast.error('Failed to create habit. Please try again.');
-    }
-  }, []);
-
-  const handleCreateCheckIn = useCallback(async (checkInData: CreateCheckInInput) => {
-    try {
-      await goalsService.createCheckIn(checkInData);
-      toast.success('Check-in saved successfully!');
-      loadData(); // Reload to update goal progress
-    } catch (error) {
-      logger.error('Failed to save check-in:', error, { component: 'page', action: 'execution' });
-      toast.error('Failed to save check-in. Please try again.');
-    }
-  }, [loadData]);
-
-  const handleDeleteMilestone = useCallback(async (milestoneId: string) => {
-    setConfirmDialog({ isOpen: true, action: 'delete-milestone', id: milestoneId });
-  }, []);
-
-  const handleConfirmDelete = useCallback(async () => {
-    const { action, id } = confirmDialog;
-    setConfirmDialog({ isOpen: false, action: 'delete-goal', id: '' });
-
-    // Optimistic update - remove from UI immediately
-    if (action === 'delete-goal') {
-      setGoals(prev => prev.filter(goal => goal.id !== id));
-    } else if (action === 'delete-milestone') {
-      setMilestones(prev => prev.filter(milestone => milestone.id !== id));
-    }
-
-    try {
-      if (action === 'delete-goal') {
-        await goalsService.deleteGoal(id);
-      } else if (action === 'delete-milestone') {
-        await goalsService.deleteMilestone(id);
-      }
-    } catch (error) {
-      logger.error('Failed to ${action}:', error, { component: 'page', action: 'execution' });
-      // Revert optimistic update on error
-      loadData();
-    }
-  }, [confirmDialog, loadData]);
-
-  const handleToggleMilestone = useCallback(async (milestoneId: string, completed: boolean) => {
-    // Mark as user action
-    userActionsRef.current.add(milestoneId);
-
-    // Optimistic update
-    const previousMilestones = milestones;
-    setMilestones(prev => prev.map(m =>
-      m.id === milestoneId
-        ? { ...m, completed, completed_at: completed ? new Date().toISOString() : undefined }
-        : m
-    ));
-
-    try {
-      await goalsService.toggleMilestone(milestoneId, completed);
-      // Real-time subscription will handle the update
-    } catch (error) {
-      logger.error('Failed to toggle milestone:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      setMilestones(previousMilestones);
-      userActionsRef.current.delete(milestoneId);
-    }
-  }, [milestones]);
-
-  const handleGoalStatusChange = useCallback(async (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => {
-    const statusMap = {
-      'not-started': 'active' as const,
-      'in-progress': 'active' as const,
-      'completed': 'completed' as const,
-    };
-    const progressMap = {
-      'not-started': 0,
-      'in-progress': 50,
-      'completed': 100,
-    };
-
-    // Mark as user action
-    userActionsRef.current.add(goalId);
-
-    // Optimistic update
-    const previousGoals = goals;
-    setGoals(prev => prev.map(g =>
-      g.id === goalId
-        ? { ...g, status: statusMap[status], progress: progressMap[status] }
-        : g
-    ));
-
-    try {
-      await goalsService.updateGoal(goalId, {
-        status: statusMap[status],
-        progress: progressMap[status],
-      });
-      // Real-time subscription will handle the update
-    } catch (error) {
-      logger.error('Failed to update goal status:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      setGoals(previousGoals);
-      userActionsRef.current.delete(goalId);
-    }
-  }, [goals]);
-
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setIsSearchTyping(true);
-    setTimeout(() => setIsSearchTyping(false), 300);
-  }, []);
-
-  const handleViewModeChange = useCallback((mode: ViewMode) => {
-    setViewMode(mode);
-  }, []);
-
-  const handleOpenGoalModal = useCallback(() => {
-    setIsGoalModalOpen(true);
-  }, []);
-
-  const handleOpenMilestoneModal = useCallback(() => {
-    setIsMilestoneModalOpen(true);
-  }, []);
-
-  const handleCloseGoalModal = useCallback(() => {
-    setIsGoalModalOpen(false);
-    setEditingGoal(null);
-    setSelectedTemplate(null);
-  }, []);
-
-  const handleCloseMilestoneModal = useCallback(() => {
-    setIsMilestoneModalOpen(false);
-    setEditingMilestone(null);
-  }, []);
-
-  const handleOpenHabitModal = useCallback(() => {
-    setIsHabitModalOpen(true);
-  }, []);
-
-  const handleCloseHabitModal = useCallback(() => {
-    setIsHabitModalOpen(false);
-    setEditingHabit(null);
-  }, []);
-
-  const handleOpenCheckInModal = useCallback((goal: Goal) => {
-    setCheckInGoal(goal);
-    setIsCheckInModalOpen(true);
-  }, []);
-
-  const handleCloseCheckInModal = useCallback(() => {
-    setIsCheckInModalOpen(false);
-    setCheckInGoal(null);
-  }, []);
-
-  const handleOpenHistoryTimeline = useCallback((goal: Goal) => {
-    setHistoryGoal(goal);
-    setIsHistoryTimelineOpen(true);
-  }, []);
-
-  const handleCloseHistoryTimeline = useCallback(() => {
-    setIsHistoryTimelineOpen(false);
-    setHistoryGoal(null);
-  }, []);
-
-  const handleOpenFrequencyModal = useCallback((goal: Goal) => {
-    setFrequencyGoal(goal);
-    setIsFrequencyModalOpen(true);
-  }, []);
-
-  const handleCloseFrequencyModal = useCallback(() => {
-    setIsFrequencyModalOpen(false);
-    setFrequencyGoal(null);
-  }, []);
-
-  const handleEditGoal = useCallback((goal: Goal) => {
-    setEditingGoal(goal);
-    setIsGoalModalOpen(true);
-  }, []);
-
-  const handleEditMilestone = useCallback((milestone: Milestone) => {
-    setEditingMilestone(milestone);
-    setIsMilestoneModalOpen(true);
-  }, []);
-
-  const handleNewButtonClick = useCallback(() => {
-    if (viewMode === 'goals') {
-      // Open template selection modal for goals
-      setIsTemplateModalOpen(true);
-    } else if (viewMode === 'milestones') {
-      handleOpenMilestoneModal();
-    } else if (viewMode === 'habits') {
-      handleOpenHabitModal();
-    } else if (viewMode === 'activity') {
-      // For activity view, default to creating a new goal
-      setIsTemplateModalOpen(true);
-    }
-  }, [viewMode, handleOpenMilestoneModal, handleOpenHabitModal]);
-
-  const handleSelectTemplate = useCallback((template: GoalTemplate) => {
-    // Set template data and open NewGoalModal for editing
-    setSelectedTemplate(template);
-    setIsTemplateModalOpen(false);
-    setIsGoalModalOpen(true);
-  }, []);
-
-  const handleCloseTemplateModal = useCallback(() => {
-    setIsTemplateModalOpen(false);
-  }, []);
-
-  const handleCreateFromScratch = useCallback(() => {
-    setIsTemplateModalOpen(false);
-    setIsGoalModalOpen(true);
-  }, []);
-
-  const handleReorderGoals = useCallback(async (goalIds: string[]) => {
-    if (!currentSpace) return;
-
-    try {
-      await goalsService.reorderGoals(currentSpace.id, goalIds);
-      // Optimistically update local state
-      const reorderedGoals = goalIds.map(id => goals.find(g => g.id === id)!).filter(Boolean);
-      setGoals(reorderedGoals);
-    } catch (error) {
-      logger.error('Failed to reorder goals:', error, { component: 'page', action: 'execution' });
-      loadData(); // Reload on error
-    }
-  }, [currentSpace, goals, loadData]);
-
-  const handlePriorityChange = useCallback(async (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => {
-    // Mark as user action
-    userActionsRef.current.add(goalId);
-
-    // Optimistic update
-    const previousGoals = goals;
-    setGoals(prev => prev.map(g =>
-      g.id === goalId ? { ...g, priority } : g
-    ));
-
-    try {
-      await goalsService.updateGoalPriority(goalId, priority);
-      // Real-time subscription will handle the update
-    } catch (error) {
-      logger.error('Failed to update goal priority:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      setGoals(previousGoals);
-      userActionsRef.current.delete(goalId);
-    }
-  }, [goals]);
-
-  const handleTogglePin = useCallback(async (goalId: string, isPinned: boolean) => {
-    // Mark as user action
-    userActionsRef.current.add(goalId);
-
-    // Optimistic update
-    const previousGoals = goals;
-    setGoals(prev => prev.map(g =>
-      g.id === goalId ? { ...g, is_pinned: isPinned } : g
-    ));
-
-    try {
-      await goalsService.toggleGoalPin(goalId, isPinned);
-      // Real-time subscription will handle the update
-    } catch (error) {
-      logger.error('Failed to toggle goal pin:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      setGoals(previousGoals);
-      userActionsRef.current.delete(goalId);
-    }
-  }, [goals]);
-
+  // ─── Destructure for JSX readability ───────────────────────────────────────
+  const {
+    spaceId, loading, goals, filteredGoals, filteredMilestones, stats,
+    viewMode, searchQuery, setSearchQuery, isSearchTyping,
+    statusFilter, setStatusFilter, assignmentFilter, setAssignmentFilter,
+    focusMode, setFocusMode, onlineUsers, getUsersViewingGoal,
+    spaceMembers, user, loadData,
+  } = data;
+
+  const {
+    isGoalModalOpen, isTemplateModalOpen, isMilestoneModalOpen,
+    isHabitModalOpen, isCheckInModalOpen, isHistoryTimelineOpen,
+    isFrequencyModalOpen, editingGoal, editingMilestone, editingHabit,
+    selectedTemplate, checkInGoal, historyGoal, frequencyGoal, confirmDialog,
+    setConfirmDialog, handleCloseGoalModal, handleOpenGoalModal,
+    handleEditGoal, handleCloseMilestoneModal, handleEditMilestone,
+    handleCloseHabitModal, handleSelectTemplate, handleCloseTemplateModal,
+    handleCreateFromScratch, handleOpenCheckInModal, handleCloseCheckInModal,
+    handleOpenHistoryTimeline, handleCloseHistoryTimeline,
+    handleOpenFrequencyModal, handleCloseFrequencyModal, handleNewButtonClick,
+  } = modals;
+
+  const {
+    handleCreateGoal, handleDeleteGoal, handleCreateMilestone,
+    handleDeleteMilestone, handleCreateHabit, handleCreateCheckIn,
+    handleConfirmDelete, handleToggleMilestone, handleGoalStatusChange,
+    handleSearchChange, handleViewModeChange, handleReorderGoals,
+    handlePriorityChange, handleTogglePin,
+  } = handlers;
+
+  // ─── Early returns ─────────────────────────────────────────────────────────
   if (!spaceId || !user) {
     return <SpacesLoadingState />;
   }
 
+  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <FeatureGateWrapper
       feature="goals"
@@ -782,7 +205,7 @@ export default function GoalsPage() {
                 </button>
               </div>
               <button
-                onClick={handleNewButtonClick}
+                onClick={() => handleNewButtonClick(viewMode)}
                 className="px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base font-medium"
               >
                 <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -935,7 +358,7 @@ export default function GoalsPage() {
                 </span>
                 {viewMode === 'goals' && (
                   <button
-                    onClick={handleNewButtonClick}
+                    onClick={() => handleNewButtonClick(viewMode)}
                     className="px-3 py-1 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all text-xs font-medium flex items-center gap-1 sm:hidden"
                   >
                     <Plus className="w-3 h-3" />
