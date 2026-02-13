@@ -90,7 +90,6 @@ const FAMILY_EXTRAS = [
   '3 spaces (vs 2)',
   'Up to 6 family members',
   '5GB storage',
-  'Priority support',
 ];
 
 export function UpgradeModal({

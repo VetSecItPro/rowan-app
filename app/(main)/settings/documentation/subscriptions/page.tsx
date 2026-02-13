@@ -433,12 +433,6 @@ export default function SubscriptionsDocumentationPage() {
                       <td className="py-3 px-4 text-center text-emerald-400">2</td>
                       <td className="py-3 px-4 text-center text-purple-400 font-semibold">6</td>
                     </tr>
-                    <tr>
-                      <td className="py-3 px-4 text-gray-300">Priority Support</td>
-                      <td className="py-3 px-4 text-center"><X className="w-5 h-5 text-gray-300 mx-auto" /></td>
-                      <td className="py-3 px-4 text-center"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                      <td className="py-3 px-4 text-center"><Check className="w-5 h-5 text-green-500 mx-auto" /></td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -540,7 +534,7 @@ export default function SubscriptionsDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">The Three Plans</h3>
                 <ul className="list-disc list-inside space-y-3 text-gray-400">
                   <li><strong>Free ($0/month):</strong> Essential features for basic household organization. Tasks, shopping lists, calendar, and messaging for up to 2 people.</li>
-                  <li><strong>Pro ($12/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and priority support.</li>
+                  <li><strong>Pro ($12/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and advanced analytics.</li>
                   <li><strong>Family ($18/month):</strong> Everything in Pro plus support for up to 6 household members, family-specific features, and additional storage.</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Who Is Each Plan For?</h3>
@@ -1121,7 +1115,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Limitations</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Free users don&apos;t have access to meal planning, goals, expense tracking, AI features, or priority support. These are reserved for Pro and Family subscribers.
+                  Free users don&apos;t have access to meal planning, goals, expense tracking, or AI features. These are reserved for Pro and Family subscribers.
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
@@ -1153,7 +1147,6 @@ export default function SubscriptionsDocumentationPage() {
                   <li><strong>Expense Tracking:</strong> Log expenses, create budgets, view spending analytics</li>
                   <li><strong>AI Receipt Scanning:</strong> Photograph receipts and auto-extract expense details</li>
                   <li><strong>Advanced Analytics:</strong> Deeper insights into tasks, budgets, and household patterns</li>
-                  <li><strong>Priority Support:</strong> Faster response times from our support team</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">

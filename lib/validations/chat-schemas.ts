@@ -9,10 +9,12 @@ import { sanitizePlainText } from '@/lib/sanitize';
 // Incoming chat message from user
 export const chatMessageSchema = z.object({
   message: z.string()
-    .min(1, 'Message cannot be empty')
     .max(2000, 'Message must be less than 2000 characters')
     .trim(),
-  conversationId: z.string().uuid('Invalid conversation ID'),
+  conversationId: z.union([
+    z.literal('new'),
+    z.string().uuid('Invalid conversation ID'),
+  ]),
   spaceId: z.string().uuid('Invalid space ID'),
   confirmAction: z.object({
     actionId: z.string().uuid('Invalid action ID'),

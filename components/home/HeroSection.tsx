@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Shield, Star, Award } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useRef } from 'react';
@@ -12,12 +12,6 @@ interface HeroSectionProps {
   onSignupClick: () => void;
   onPricingClick: () => void;
 }
-
-const trustSignals = [
-  { icon: Star, label: '4.9/5 rating' },
-  { icon: Shield, label: 'Encrypted' },
-  { icon: Award, label: 'Veteran-Owned' },
-];
 
 export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps) {
   const prefersReducedMotion = useReducedMotion();
@@ -111,20 +105,6 @@ export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps)
                 </a>
               </motion.div>
 
-              {/* Trust signals */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: dur, delay: prefersReducedMotion ? 0 : 0.4 }}
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-5"
-              >
-                {trustSignals.map((signal) => (
-                  <div key={signal.label} className="flex items-center gap-1.5">
-                    <signal.icon className="w-3.5 h-3.5 text-gray-500" />
-                    <span className="text-xs text-gray-500">{signal.label}</span>
-                  </div>
-                ))}
-              </motion.div>
             </div>
 
             {/* Right — Product Demo */}

@@ -19,19 +19,59 @@ import { QueryClient } from '@tanstack/react-query';
 import { get, set, del } from 'idb-keyval';
 
 const CACHE_KEY = 'rowan-query-cache';
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2; // Bumped: now includes userId for cross-user validation
 const MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours
+
+/**
+ * Module-level flag to prevent `beforeunload` from re-persisting
+ * cache data after signout cleanup has already run.
+ */
+let _isSigningOut = false;
 
 interface PersistedCache {
   version: number;
   timestamp: number;
+  userId?: string;
   clientState: unknown;
+}
+
+/**
+ * Mark that signout is in progress — prevents beforeunload from re-saving stale data.
+ */
+export function markSigningOut(): void {
+  _isSigningOut = true;
+}
+
+/**
+ * Get the current user ID from the auth session query in the cache.
+ * Returns undefined if no session exists.
+ */
+function getCurrentUserId(queryClient: QueryClient): string | undefined {
+  try {
+    // Look for the session query data that useAuthSession stores
+    const queries = queryClient.getQueryCache().getAll();
+    for (const query of queries) {
+      if (
+        Array.isArray(query.queryKey) &&
+        query.queryKey[0] === 'auth' &&
+        query.queryKey[1] === 'session'
+      ) {
+        const session = query.state.data as { user?: { id?: string } } | null;
+        return session?.user?.id;
+      }
+    }
+  } catch {
+    // Best-effort — if we can't determine user, cache will still work
+  }
+  return undefined;
 }
 
 /**
  * Save query cache to IndexedDB
  */
 export async function persistQueryCache(queryClient: QueryClient): Promise<void> {
+  if (_isSigningOut) return; // Don't persist during signout
+
   try {
     const state = queryClient.getQueryCache().getAll().map((query) => ({
       queryKey: query.queryKey,
@@ -42,6 +82,7 @@ export async function persistQueryCache(queryClient: QueryClient): Promise<void>
     const cache: PersistedCache = {
       version: CACHE_VERSION,
       timestamp: Date.now(),
+      userId: getCurrentUserId(queryClient),
       clientState: state,
     };
 
@@ -53,8 +94,16 @@ export async function persistQueryCache(queryClient: QueryClient): Promise<void>
 
 /**
  * Restore query cache from IndexedDB
+ *
+ * @param queryClient - The query client to restore into
+ * @param currentUserId - The currently authenticated user's ID. If provided,
+ *   the cache is only restored if it belongs to this user. This prevents
+ *   cross-user data leakage when a different user logs in on the same browser.
  */
-export async function restoreQueryCache(queryClient: QueryClient): Promise<boolean> {
+export async function restoreQueryCache(
+  queryClient: QueryClient,
+  currentUserId?: string,
+): Promise<boolean> {
   try {
     const cache = await get<PersistedCache>(CACHE_KEY);
 
@@ -70,6 +119,12 @@ export async function restoreQueryCache(queryClient: QueryClient): Promise<boole
 
     // Check if cache is too old
     if (Date.now() - cache.timestamp > MAX_AGE) {
+      await del(CACHE_KEY);
+      return false;
+    }
+
+    // Validate cache belongs to the current user — prevents cross-user data leakage
+    if (currentUserId && cache.userId && cache.userId !== currentUserId) {
       await del(CACHE_KEY);
       return false;
     }
@@ -97,13 +152,48 @@ export async function restoreQueryCache(queryClient: QueryClient): Promise<boole
 }
 
 /**
- * Clear persisted cache
+ * Clear persisted cache (IndexedDB + localStorage backup)
+ *
+ * MUST be called on logout to prevent cross-user data leakage.
+ * Also sets the signout flag to prevent beforeunload from re-saving.
  */
 export async function clearPersistedCache(): Promise<void> {
+  _isSigningOut = true;
   try {
     await del(CACHE_KEY);
-  } catch (error) {
-    // Clear failure is non-critical — stale cache expires via TTL
+  } catch {
+    // IndexedDB clear failure — stale cache expires via TTL
+  }
+  try {
+    localStorage.removeItem(CACHE_KEY + '-backup');
+  } catch {
+    // localStorage clear failure — backup expires in 5 min
+  }
+}
+
+/**
+ * Clear all Rowan-specific localStorage keys.
+ *
+ * Removes currentSpace entries, sidebar state, and any other
+ * app-scoped keys to prevent data leaking across user sessions.
+ */
+export function clearAllAppStorage(): void {
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (
+        key.startsWith('currentSpace_') ||
+        key.startsWith('rowan-') ||
+        key === 'sidebar-expanded' ||
+        key === 'dashboard-mode'
+      )) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+  } catch {
+    // Storage access failure — non-critical
   }
 }
 
@@ -139,6 +229,9 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
 
   // Sync backup to localStorage on unload (IndexedDB is async and unreliable here)
   const handleUnload = () => {
+    // Don't re-save during signout — cache was intentionally cleared
+    if (_isSigningOut) return;
+
     if (typeof navigator !== 'undefined') {
       try {
         const state = queryClient.getQueryCache().getAll().map((query) => ({
@@ -148,6 +241,7 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
         localStorage.setItem(CACHE_KEY + '-backup', JSON.stringify({
           version: CACHE_VERSION,
           timestamp: Date.now(),
+          userId: getCurrentUserId(queryClient),
           clientState: state,
         }));
       } catch {
@@ -158,7 +252,7 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
 
   // Save when user switches away from tab
   const handleVisibilityChange = () => {
-    if (document.visibilityState === 'hidden') {
+    if (!_isSigningOut && document.visibilityState === 'hidden') {
       persistQueryCache(queryClient);
     }
   };
@@ -180,8 +274,15 @@ export function setupCachePersistence(queryClient: QueryClient): () => void {
 
 /**
  * Restore from localStorage backup (used after page load)
+ *
+ * @param queryClient - The query client to restore into
+ * @param currentUserId - The currently authenticated user's ID. If provided,
+ *   the backup is only restored if it belongs to this user.
  */
-export async function restoreFromBackup(queryClient: QueryClient): Promise<boolean> {
+export async function restoreFromBackup(
+  queryClient: QueryClient,
+  currentUserId?: string,
+): Promise<boolean> {
   try {
     const backup = localStorage.getItem(CACHE_KEY + '-backup');
     if (!backup) return false;
@@ -190,6 +291,12 @@ export async function restoreFromBackup(queryClient: QueryClient): Promise<boole
 
     // Only use backup if it's recent (< 5 minutes)
     if (Date.now() - cache.timestamp > 5 * 60 * 1000) {
+      localStorage.removeItem(CACHE_KEY + '-backup');
+      return false;
+    }
+
+    // Validate backup belongs to the current user
+    if (currentUserId && cache.userId && cache.userId !== currentUserId) {
       localStorage.removeItem(CACHE_KEY + '-backup');
       return false;
     }

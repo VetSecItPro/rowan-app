@@ -8,8 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit, checkAISuggestionsRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
+import { checkAISuggestionsRateLimit } from '@/lib/ratelimit';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import { aiContextService } from '@/lib/services/ai/ai-context-service';
@@ -26,16 +25,6 @@ const suggestionsCache = new LRUCache<string, AISuggestion[]>({
 
 export async function GET(req: NextRequest) {
   try {
-    // Rate limiting
-    const ip = extractIP(req.headers);
-    const { success } = await checkGeneralRateLimit(ip);
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      );
-    }
-
     // Auth
     const supabase = await createClient();
     const {
@@ -64,26 +53,26 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Check cache FIRST — cached responses shouldn't consume rate limit tokens
+    const cacheKey = `${user.id}:${spaceId}`;
+    const cached = suggestionsCache.get(cacheKey);
+    if (cached) {
+      return NextResponse.json({ suggestions: cached });
+    }
+
     // AI access check (subscription tier — no budget check for rule-based suggestions)
     const aiAccess = await validateAIAccess(supabase, user.id, spaceId, false);
     if (!aiAccess.allowed) {
       return buildAIAccessDeniedResponse(aiAccess);
     }
 
-    // Per-user suggestions rate limit (10 per hour)
+    // Per-user suggestions rate limit (checked after cache to avoid consuming tokens on cache hits)
     const { success: suggestionsRateOk } = await checkAISuggestionsRateLimit(user.id);
     if (!suggestionsRateOk) {
       return NextResponse.json(
         { error: 'Too many suggestion requests. Try again later.' },
         { status: 429 }
       );
-    }
-
-    // Check cache
-    const cacheKey = `${user.id}:${spaceId}`;
-    const cached = suggestionsCache.get(cacheKey);
-    if (cached) {
-      return NextResponse.json({ suggestions: cached });
     }
 
     // Build context and generate suggestions

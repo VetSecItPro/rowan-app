@@ -7,8 +7,6 @@
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import {
   getUsageSummary,
@@ -20,12 +18,6 @@ import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai
 
 export async function GET(req: NextRequest) {
   try {
-    const ip = extractIP(req.headers);
-    const { success } = await checkGeneralRateLimit(ip);
-    if (!success) {
-      return Response.json({ error: 'Too many requests' }, { status: 429 });
-    }
-
     if (!featureFlags.isAICompanionEnabled()) {
       return Response.json({ error: 'AI companion is not enabled' }, { status: 403 });
     }

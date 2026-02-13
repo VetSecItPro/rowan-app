@@ -196,7 +196,7 @@ export async function executeTool(
         const event = await calendarService.createEvent(input);
         return {
           success: true,
-          message: `Created event "${event.title}"${event.start_time ? ` on ${event.start_time}` : ''}`,
+          message: `Created event "${event.title}"${event.start_time ? ` on ${formatDateForPreview(event.start_time)}` : ''}`,
           data: { id: event.id, title: event.title },
           featureType: 'event',
         };
@@ -291,7 +291,7 @@ export async function executeTool(
         const meal = await mealsService.createMeal(input);
         return {
           success: true,
-          message: `Planned ${meal.meal_type}${meal.name ? `: ${meal.name}` : ''} for ${meal.scheduled_date}`,
+          message: `Planned ${meal.meal_type}${meal.name ? `: ${meal.name}` : ''} for ${formatDateForPreview(meal.scheduled_date)}`,
           data: { id: meal.id, meal_type: meal.meal_type },
           featureType: 'meal',
         };
@@ -419,13 +419,36 @@ function getFeatureTypeFromTool(toolName: string): FeatureType {
 }
 
 /**
+ * Format a date/datetime string into a human-readable form.
+ * e.g. "2026-02-13T10:00:00" → "Feb 13, 2026 at 10:00 AM"
+ *      "2026-02-13" → "Feb 13, 2026"
+ */
+function formatDateForPreview(dateStr: string): string {
+  try {
+    // Date-only (YYYY-MM-DD) — parse parts to avoid timezone shift
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const date = new Date(y, m - 1, d);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      + ' at '
+      + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  } catch {
+    return dateStr;
+  }
+}
+
+/**
  * Get a human-readable preview of what a tool call would do.
  * Used in the confirmation UI before executing destructive or create actions.
  */
 export function getToolCallPreview(toolName: string, parameters: Record<string, unknown>): string {
   switch (toolName) {
     case 'create_task':
-      return `Create task: "${parameters.title}"${parameters.priority ? ` (${parameters.priority} priority)` : ''}${parameters.assigned_to ? ' assigned to a member' : ''}${parameters.due_date ? ` due ${parameters.due_date}` : ''}`;
+      return `Create task: "${parameters.title}"${parameters.priority ? ` (${parameters.priority} priority)` : ''}${parameters.assigned_to ? ' assigned to a member' : ''}${parameters.due_date ? ` due ${formatDateForPreview(String(parameters.due_date))}` : ''}`;
     case 'complete_task':
       return 'Mark task as completed';
     case 'list_tasks':
@@ -435,11 +458,11 @@ export function getToolCallPreview(toolName: string, parameters: Record<string, 
     case 'complete_chore':
       return 'Mark chore as completed';
     case 'create_event':
-      return `Create event: "${parameters.title}"${parameters.start_time ? ` at ${parameters.start_time}` : ''}${parameters.location ? ` at ${parameters.location}` : ''}`;
+      return `Create event: "${parameters.title}"${parameters.start_time ? ` at ${formatDateForPreview(String(parameters.start_time))}` : ''}${parameters.location ? ` at ${parameters.location}` : ''}`;
     case 'update_event':
       return 'Update event';
     case 'create_reminder':
-      return `Create reminder: "${parameters.title}"${parameters.due_date ? ` for ${parameters.due_date}` : ''}`;
+      return `Create reminder: "${parameters.title}"${parameters.due_date ? ` for ${formatDateForPreview(String(parameters.due_date))}` : ''}`;
     case 'complete_reminder':
       return 'Mark reminder as completed';
     case 'create_shopping_list':
@@ -447,9 +470,9 @@ export function getToolCallPreview(toolName: string, parameters: Record<string, 
     case 'add_shopping_item':
       return `Add "${parameters.name}"${parameters.quantity ? ` (${parameters.quantity})` : ''} to shopping list`;
     case 'plan_meal':
-      return `Plan ${parameters.meal_type}: ${parameters.recipe_name || 'meal'} for ${parameters.scheduled_date}`;
+      return `Plan ${parameters.meal_type}: ${parameters.recipe_name || 'meal'} for ${formatDateForPreview(String(parameters.scheduled_date))}`;
     case 'create_goal':
-      return `Create goal: "${parameters.title}"${parameters.target_date ? ` by ${parameters.target_date}` : ''}`;
+      return `Create goal: "${parameters.title}"${parameters.target_date ? ` by ${formatDateForPreview(String(parameters.target_date))}` : ''}`;
     case 'update_goal_progress':
       return `Update goal progress to ${parameters.progress}%`;
     case 'create_expense':

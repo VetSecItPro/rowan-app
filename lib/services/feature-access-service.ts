@@ -6,18 +6,24 @@
  */
 
 import { getUserTier } from './subscription-service';
+import { createClient } from '../supabase/server';
 import { getFeatureLimits } from '../config/feature-limits';
 import { canPerformAction, getTodayUsage } from './usage-service';
 import type { SubscriptionTier, UsageType } from '../types';
 
 /**
  * Check if user can access a boolean feature (tier-based)
+ *
+ * @param userId - The user ID to check
+ * @param feature - The feature to check access for
+ * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
  */
 export async function canAccessFeature(
   userId: string,
-  feature: 'canUploadPhotos' | 'canUseMealPlanning' | 'canUseReminders' | 'canUseGoals' | 'canUseHousehold' | 'canUseAI' | 'canUseIntegrations' | 'canUseEventProposals'
+  feature: 'canUploadPhotos' | 'canUseMealPlanning' | 'canUseReminders' | 'canUseGoals' | 'canUseHousehold' | 'canUseAI' | 'canUseIntegrations' | 'canUseEventProposals',
+  supabaseClient?: Awaited<ReturnType<typeof createClient>>
 ): Promise<{ allowed: boolean; reason?: string; tier?: SubscriptionTier }> {
-  const tier = await getUserTier(userId);
+  const tier = await getUserTier(userId, supabaseClient);
   const limits = getFeatureLimits(tier);
   const allowed = limits[feature] === true;
 

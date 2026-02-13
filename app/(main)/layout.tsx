@@ -2,7 +2,9 @@ import { ReactNode } from "react";
 import { AppWithOnboarding } from "@/components/app/AppWithOnboarding";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { Header } from "@/components/layout/Header";
+import { MainContent } from "@/components/layout/MainContent";
 import ChatFAB from "@/components/chat/ChatFAB";
+import { DesktopChatPanel } from "@/components/chat/DesktopChatPanel";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { ChatProvider } from "@/lib/contexts/chat-context";
 import { SubscriptionProvider } from "@/lib/contexts/subscription-context";
@@ -22,12 +24,13 @@ export default function MainLayout({ children }: { children: ReactNode }) {
           >
             Skip to main content
           </a>
-          <div className="flex min-h-screen">
+          <div className="flex min-h-screen w-full overflow-x-hidden">
             <Sidebar />
-            <main id="main-content" className="flex-1 overflow-auto flex flex-col pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0">
+            <MainContent>
               <Header />
               {children}
-            </main>
+            </MainContent>
+            <DesktopChatPanel />
           </div>
           <BottomNav />
           <ChatFAB />

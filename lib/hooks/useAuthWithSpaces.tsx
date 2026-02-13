@@ -26,6 +26,7 @@ export interface AuthWithSpacesState {
 
   // Combined loading states
   authLoading: ReturnType<typeof useAuth>['loading'];
+  profileLoading: ReturnType<typeof useAuth>['profileLoading'];
   spacesLoading: ReturnType<typeof useSpaces>['loading'];
   loading: boolean; // True if either auth or spaces is loading
 
@@ -61,6 +62,7 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
     const isAuthenticated = !!(auth.user && auth.session);
 
     const authLoading = auth.loading;
+    const profileLoading = auth.profileLoading;
     const spacesLoading = spaces.loading;
 
     const authError = auth.error;
@@ -84,6 +86,7 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
 
       // Combined loading states
       authLoading,
+      profileLoading,
       spacesLoading,
       loading,
 
@@ -111,6 +114,7 @@ export function useAuthWithSpaces(): AuthWithSpacesState {
     auth.user,
     auth.session,
     auth.loading,
+    auth.profileLoading,
     auth.error,
     auth.signUp,
     auth.signIn,

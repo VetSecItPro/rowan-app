@@ -187,9 +187,6 @@ export interface FeatureLimits {
 
   // Storage
   storageGB?: number;
-
-  // Support
-  prioritySupport?: boolean;
 }
 
 /**

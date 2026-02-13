@@ -13,7 +13,12 @@ export const taskBaseSchema = z.object({
     .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
-    .refine(val => val === null || val === undefined || z.string().datetime().safeParse(val).success, 'Invalid date format'),
+    .refine(val => {
+      if (val === null || val === undefined) return true;
+      // Accept full ISO datetime (2026-02-13T10:00:00Z) or date-only (2026-02-13) or datetime without tz (2026-02-13T10:00:00)
+      if (z.string().datetime().safeParse(val).success) return true;
+      return /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/.test(val);
+    }, 'Invalid date format'),
   category: z.string().max(100).trim().optional().nullable()
     .transform(val => val === '' ? null : val),
   estimated_hours: z.union([

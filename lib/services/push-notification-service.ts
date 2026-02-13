@@ -73,6 +73,7 @@ export interface NotificationResult {
 export type NotificationType =
   | 'location_arrival'
   | 'location_departure'
+  | 'location_emergency'
   | 'task_assigned'
   | 'task_due_soon'
   | 'task_overdue'
@@ -109,6 +110,7 @@ const sendNotificationSchema = z.object({
   type: z.enum([
     'location_arrival',
     'location_departure',
+    'location_emergency',
     'task_assigned',
     'task_due_soon',
     'task_overdue',

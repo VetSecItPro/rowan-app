@@ -37,7 +37,7 @@ interface StorageFile {
 
 export default function DataManagementPage() {
   const router = useRouter();
-  const { user, currentSpace, loading: authLoading } = useAuthWithSpaces();
+  const { user, currentSpace, authLoading } = useAuthWithSpaces();
 
   const [storageUsage, setStorageUsage] = useState<StorageUsage | null>(null);
   const [files, setFiles] = useState<StorageFile[]>([]);

@@ -51,9 +51,6 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Storage
     storageGB: 0.5,
-
-    // Support
-    prioritySupport: false,
   },
 
   pro: {
@@ -96,9 +93,6 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Storage
     storageGB: 2,
-
-    // Support
-    prioritySupport: false,
   },
 
   family: {
@@ -141,9 +135,6 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
 
     // Storage
     storageGB: 5,
-
-    // Support
-    prioritySupport: true,
   },
 };
 
@@ -239,7 +230,6 @@ export const FEATURE_NAMES: Record<string, string> = {
   maxUsers: 'Maximum Users',
   maxSpaces: 'Maximum Spaces',
   storageGB: 'Storage (GB)',
-  prioritySupport: 'Priority Support',
 };
 
 /**

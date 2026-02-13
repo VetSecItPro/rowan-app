@@ -9,6 +9,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { getUserPenalties, getPenaltyStats, getOverdueChores } from '@/lib/services/rewards/late-penalty-service';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 /**
  * GET /api/penalties
@@ -42,6 +44,12 @@ export async function GET(request: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for household management
+    const tierCheck = await canAccessFeature(user.id, 'canUseHousehold', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseHousehold', tierCheck.tier ?? 'free');
     }
 
     const { searchParams } = new URL(request.url);

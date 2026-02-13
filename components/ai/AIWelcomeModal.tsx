@@ -107,7 +107,7 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-                className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20"
+                className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-600/20"
               >
                 <Bot className="w-9 h-9 text-white" />
               </motion.div>
@@ -189,7 +189,7 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
 
               <button
                 onClick={handleNext}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/20 transition-all active:scale-95"
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl hover:shadow-lg hover:shadow-blue-600/20 transition-all active:scale-95"
               >
                 {isLastStep ? (
                   <>

@@ -9,8 +9,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -20,12 +18,6 @@ export const dynamic = 'force-dynamic';
 // ---------------------------------------------------------------------------
 
 export async function GET(req: NextRequest) {
-  const ip = extractIP(req.headers);
-  const { success } = await checkGeneralRateLimit(ip);
-  if (!success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-  }
-
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
@@ -108,12 +100,6 @@ export async function GET(req: NextRequest) {
 // ---------------------------------------------------------------------------
 
 export async function DELETE(req: NextRequest) {
-  const ip = extractIP(req.headers);
-  const { success } = await checkGeneralRateLimit(ip);
-  if (!success) {
-    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
-  }
-
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {

@@ -38,7 +38,6 @@ const SubscriptionWelcomeEmail = ({
     'Goals & milestones tracking',
     'Smart reminders',
     'Real-time collaboration',
-    'Priority support',
   ];
 
   const familyFeatures = [

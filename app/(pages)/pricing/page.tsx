@@ -191,7 +191,6 @@ export default function PricingPage() {
                 '5GB storage (vs 2GB)',
                 'AI Assistant (Full + Voice)',
                 'External integrations',
-                'Priority support',
                 'Advanced analytics',
               ]}
               cta="Upgrade to Family"

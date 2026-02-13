@@ -10,6 +10,8 @@ import { ZodError } from 'zod';
 import { extractIP, fallbackRateLimit } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 // Types for query options
 interface ChoreQueryOptions {
@@ -45,6 +47,12 @@ export async function GET(req: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for household management
+    const tierCheck = await canAccessFeature(user.id, 'canUseHousehold', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseHousehold', tierCheck.tier ?? 'free');
     }
 
     // Set user context for Sentry error tracking
@@ -157,6 +165,12 @@ export async function POST(req: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for household management
+    const tierCheck = await canAccessFeature(user.id, 'canUseHousehold', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseHousehold', tierCheck.tier ?? 'free');
     }
 
     // Set user context for Sentry error tracking

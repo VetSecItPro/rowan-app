@@ -21,12 +21,12 @@ const ArchiveRequestSchema = z.object({
 );
 
 /**
- * Archive Old Data API Endpoint
+ * Archive (Delete) Old Data API Endpoint
  *
  * GDPR COMPLIANCE:
  * - Article 5: Data Minimization
- * - Archives old data to reduce actively processed information
- * - Archived data remains accessible but not in default views
+ * - Deletes old data to reduce actively processed information
+ * Note: No archive columns exist on these tables, so archiving = permanent deletion.
  */
 
 export async function POST(request: NextRequest) {
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to this space
     const { data: membership } = await supabase
       .from('space_members')
-      .select('*')
+      .select('id')
       .eq('space_id', spaceId)
       .eq('user_id', user.id)
       .single();

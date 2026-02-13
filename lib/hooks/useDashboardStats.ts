@@ -212,9 +212,14 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
 
     const loadAllStats = useCallback(async () => {
         if (!currentSpace || !user || authLoading) {
-            if (!authLoading) setLoading(false);
+            // Only stop loading if we have a user but genuinely no space
+            // (e.g., zero-spaces scenario). Don't stop if we're still
+            // waiting for spaces to arrive.
+            if (!authLoading && user && !currentSpace) setLoading(false);
             return;
         }
+
+        setLoading(true);
 
         try {
             const supabase = createClient();

@@ -387,7 +387,7 @@ export async function getPartnershipBalance(spaceId: string): Promise<Partnershi
     .eq('space_id', spaceId)
     .single();
 
-  if (error && error.code !== 'PGRST116') throw error; // Ignore "no rows" error
+  if (error && error.code !== 'PGRST116') throw error;
   return data;
 }
 
@@ -410,19 +410,8 @@ export async function updateIncomes(
 ): Promise<void> {
   const supabase = createClient();
 
-  // Get partnership_id from space
-  const { data: space, error: spaceError } = await supabase
-    .from('spaces')
-    .select('partnership_id')
-    .eq('id', spaceId)
-    .single();
-
-  if (spaceError) throw spaceError;
-
-  // Upsert balance record
   const { error } = await supabase.from('partnership_balances').upsert(
     {
-      partnership_id: space.partnership_id,
       space_id: spaceId,
       user1_id: user1Id,
       user2_id: user2Id,
@@ -430,7 +419,7 @@ export async function updateIncomes(
       user2_income: user2Income,
       last_calculated_at: new Date().toISOString(),
     },
-    { onConflict: 'partnership_id,space_id' }
+    { onConflict: 'space_id' }
   );
 
   if (error) throw error;

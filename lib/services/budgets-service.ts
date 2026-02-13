@@ -15,6 +15,8 @@ export interface Expense {
   due_date?: string;
   paid_at?: string;
   recurring?: boolean;
+  notes?: string;
+  split_type?: string;
   created_by: string;
   created_at: string;
   updated_at: string;

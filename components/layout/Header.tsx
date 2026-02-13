@@ -103,7 +103,7 @@ export function Header() {
 
   return (
     <header className="bg-black/95 border-b border-gray-800/50 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-5">
         <div className="flex items-center justify-between py-2 sm:py-4">
           {/* Logo and Brand */}
           <Link href="/dashboard" className="flex items-center gap-2 sm:gap-3 group active:scale-95">

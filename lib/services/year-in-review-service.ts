@@ -479,7 +479,7 @@ export class YearInReviewService {
   private async getTasksForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
     const { data } = await supabase
       .from('tasks')
-      .select('id, space_id, title, description, category, priority, status, due_date, assigned_to, created_by, estimated_hours, calendar_sync, quick_note, tags, color, sort_order, archived, archived_at, is_snoozed, snoozed_until, snoozed_by, snooze_count, is_recurring, recurrence_pattern, recurrence_interval, recurrence_days_of_week, recurrence_day_of_month, recurrence_month, recurrence_end_date, recurrence_end_count, parent_recurrence_id, is_recurrence_template, recurrence_exceptions, recurrence_metadata, created_at, updated_at, completed_at')
+      .select('id, space_id, title, description, category, priority, status, due_date, assigned_to, created_by, estimated_hours, calendar_sync, quick_note, tags, color, sort_order, is_snoozed, snoozed_until, snoozed_by, snooze_count, is_recurring, recurrence_pattern, recurrence_interval, recurrence_days_of_week, recurrence_day_of_month, recurrence_month, recurrence_end_date, recurrence_end_count, parent_recurrence_id, is_recurrence_template, recurrence_exceptions, recurrence_metadata, archived, archived_at, created_at, updated_at, completed_at')
       .eq('space_id', spaceId)
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());
@@ -489,7 +489,7 @@ export class YearInReviewService {
   private async getGoalsForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
     const { data } = await supabase
       .from('goals')
-      .select('id, space_id, title, description, category, target_date, status, created_by, created_at, updated_at, completed_at, progress_percentage, current_amount, target_amount')
+      .select('id, space_id, title, description, category, target_date, status, created_by, created_at, updated_at, completed_at, progress, current_amount, target_amount')
       .eq('space_id', spaceId)
       .gte('created_at', yearStart.toISOString())
       .lte('created_at', yearEnd.toISOString());

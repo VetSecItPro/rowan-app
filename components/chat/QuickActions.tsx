@@ -51,12 +51,12 @@ export default function QuickActions({ onSend }: QuickActionsProps) {
   const actions = useMemo(() => ACTIONS[getTimeOfDay()], []);
 
   return (
-    <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1 px-1 -mx-1">
+    <div className="flex flex-wrap gap-2 py-1">
       {actions.map((action) => (
         <button
           key={action.label}
           onClick={() => onSend(action.message)}
-          className="flex-shrink-0 px-3 py-1.5 text-xs rounded-full border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white hover:border-gray-600 transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 text-xs rounded-full border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white hover:border-gray-600 transition-colors whitespace-nowrap"
         >
           {action.label}
         </button>

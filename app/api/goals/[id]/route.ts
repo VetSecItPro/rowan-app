@@ -10,6 +10,8 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { updateGoalSchema } from '@/lib/validations/goal-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 /**
  * GET /api/goals/[id]
@@ -40,6 +42,11 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       );
     }
 
+    // Verify subscription tier for goals
+    const tierCheck = await canAccessFeature(user.id, 'canUseGoals', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseGoals', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);
@@ -120,6 +127,11 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
+    // Verify subscription tier for goals
+    const tierCheck = await canAccessFeature(user.id, 'canUseGoals', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseGoals', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);
@@ -223,6 +235,11 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       );
     }
 
+    // Verify subscription tier for goals
+    const tierCheck = await canAccessFeature(user.id, 'canUseGoals', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseGoals', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);

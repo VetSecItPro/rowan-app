@@ -22,7 +22,7 @@ import { logger } from '@/lib/logger';
 import { showError } from '@/lib/utils/toast';
 
 export default function RemindersPage(): React.JSX.Element {
-  const { currentSpace, user, loading: authLoading } = useAuthWithSpaces();
+  const { currentSpace, user, authLoading } = useAuthWithSpaces();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [searchQuery, setSearchQuery] = useState('');

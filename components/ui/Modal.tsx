@@ -281,7 +281,7 @@ export function Modal({
               bg-gray-800
               border-t border-x sm:border border-gray-700/50
               rounded-t-2xl sm:rounded-xl
-              max-h-[92vh] sm:max-h-[90vh]
+              max-h-[80vh] sm:max-h-[90vh]
               overflow-hidden
               overscroll-contain
               shadow-2xl

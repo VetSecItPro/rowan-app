@@ -7,6 +7,8 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { uploadRecipeImage } from '@/lib/services/storage-service';
 import { validateImageMagicBytes, isFormatAllowed, ALLOWED_RECIPE_FORMATS } from '@/lib/utils/file-validation';
 import { logger } from '@/lib/logger';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 // Recipe image file size limit: 10MB
 const MAX_RECIPE_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -37,6 +39,12 @@ export async function POST(req: NextRequest) {
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify subscription tier for photo uploads
+    const tierCheck = await canAccessFeature(user.id, 'canUploadPhotos', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUploadPhotos', tierCheck.tier ?? 'free');
     }
 
     // Set user context for Sentry error tracking

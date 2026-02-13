@@ -147,13 +147,6 @@ function UpgradePageContent() {
                   <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-900/30 flex items-center justify-center mt-0.5">
                     <Check className="w-4 h-4 text-green-400" />
                   </div>
-                  <p className="text-gray-300">Priority support</p>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-900/30 flex items-center justify-center mt-0.5">
-                    <Check className="w-4 h-4 text-green-400" />
-                  </div>
                   <p className="text-gray-300">Early access to new features</p>
                 </div>
               </div>

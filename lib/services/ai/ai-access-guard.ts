@@ -9,7 +9,7 @@
  *   if (!access.allowed) return buildAIAccessDeniedResponse(access);
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { checkBudget } from '@/lib/services/ai/conversation-persistence-service';
 import type { SubscriptionTier } from '@/lib/types';
@@ -36,13 +36,13 @@ export interface AIAccessResult {
  *   Set to false for non-token-consuming routes like settings GET.
  */
 export async function validateAIAccess(
-  supabase: SupabaseClient,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   spaceId?: string,
   checkBudgetToo: boolean = true
 ): Promise<AIAccessResult> {
-  // 1. Check subscription tier
-  const featureAccess = await canAccessFeature(userId, 'canUseAI');
+  // 1. Check subscription tier (pass the route's authenticated client to avoid JWT race conditions)
+  const featureAccess = await canAccessFeature(userId, 'canUseAI', supabase);
 
   if (!featureAccess.allowed) {
     return {

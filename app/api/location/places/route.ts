@@ -8,6 +8,9 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
+import { getUserTier } from '@/lib/services/subscription-service';
+import { getFeatureLimits } from '@/lib/config/feature-limits';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 /**
  * GET /api/location/places
@@ -35,6 +38,13 @@ export async function GET(req: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for location features
+    const userTier = await getUserTier(user.id, supabase);
+    const limits = getFeatureLimits(userTier);
+    if (!limits.canUseLocation) {
+      return buildUpgradeResponse('canUseLocation', userTier);
     }
 
     setSentryUser(user);
@@ -109,6 +119,13 @@ export async function POST(req: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for location features
+    const userTier = await getUserTier(user.id, supabase);
+    const limits = getFeatureLimits(userTier);
+    if (!limits.canUseLocation) {
+      return buildUpgradeResponse('canUseLocation', userTier);
     }
 
     setSentryUser(user);
@@ -190,6 +207,13 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Verify subscription tier for location features
+    const userTier = await getUserTier(user.id, supabase);
+    const limits = getFeatureLimits(userTier);
+    if (!limits.canUseLocation) {
+      return buildUpgradeResponse('canUseLocation', userTier);
+    }
+
     setSentryUser(user);
 
     // Parse request body
@@ -267,6 +291,13 @@ export async function DELETE(req: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for location features
+    const userTier = await getUserTier(user.id, supabase);
+    const limits = getFeatureLimits(userTier);
+    if (!limits.canUseLocation) {
+      return buildUpgradeResponse('canUseLocation', userTier);
     }
 
     setSentryUser(user);

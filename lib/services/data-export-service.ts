@@ -113,88 +113,85 @@ export async function exportAllUserData(userId: string, supabaseClient?: Supabas
       .single();
     exportData.profile = profile;
 
-    // Get partnerships (spaces/relationships)
-    const { data: partnerships } = await supabase
-      .from('partnership_members')
-      .select(`
-        *,
-        partnership:partnerships(*)
-      `)
+    // Get user's space memberships
+    const { data: memberships } = await supabase
+      .from('space_members')
+      .select('space_id')
       .eq('user_id', userId);
-    exportData.partnerships = partnerships || [];
+    exportData.partnerships = memberships || [];
 
-    // Get partnership IDs for filtering other data
-    const partnershipIds = (partnerships || []).map((p: { partnership_id: string }) => p.partnership_id);
+    // Get space IDs for filtering other data
+    const spaceIds = (memberships || []).map((m: { space_id: string }) => m.space_id);
 
-    if (partnershipIds.length > 0) {
+    if (spaceIds.length > 0) {
       // Get expenses
       const { data: expenses } = await supabase
         .from('expenses')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.expenses = expenses || [];
 
       // Get budgets
       const { data: budgets } = await supabase
         .from('budgets')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.budgets = budgets || [];
 
       // Get bills
       const { data: bills } = await supabase
         .from('bills')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.bills = bills || [];
 
       // Get goals
       const { data: goals } = await supabase
         .from('goals')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.goals = goals || [];
 
       // Get projects
       const { data: projects } = await supabase
         .from('projects')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.projects = projects || [];
 
       // Get tasks
       const { data: tasks } = await supabase
         .from('tasks')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.tasks = tasks || [];
 
       // Get calendar events
       const { data: events } = await supabase
         .from('events')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.calendar_events = events || [];
 
       // Get reminders
       const { data: reminders } = await supabase
         .from('reminders')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.reminders = reminders || [];
 
       // Get messages
       const { data: messages } = await supabase
         .from('messages')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.messages = messages || [];
 
       // Get shopping lists
       const { data: shoppingLists } = await supabase
         .from('shopping_lists')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.shopping_lists = shoppingLists || [];
 
       // Get shopping items (if there are lists)
@@ -211,14 +208,14 @@ export async function exportAllUserData(userId: string, supabaseClient?: Supabas
       const { data: meals } = await supabase
         .from('meals')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.meals = meals || [];
 
       // Get recipes
       const { data: recipes } = await supabase
         .from('recipes')
         .select('*')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
       exportData.recipes = recipes || [];
     }
 
