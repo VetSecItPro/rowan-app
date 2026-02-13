@@ -3,27 +3,14 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useDebounce } from '@/lib/hooks/useDebounce';
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { TaskCard } from '@/components/tasks/TaskCard';
-import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { tasksService } from '@/lib/services/tasks-service';
-import { taskTemplatesService } from '@/lib/services/task-templates-service';
-import { choresService, CreateChoreInput, type UpdateChoreInput } from '@/lib/services/chores-service';
-import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { Task, Chore } from '@/lib/types';
-import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-schemas';
-import { useTaskRealtime } from '@/hooks/useTaskRealtime';
-import { useChoreRealtime } from '@/hooks/useChoreRealtime';
-import { TaskFilters } from '@/components/tasks/TaskFilterPanel';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { TaskCardSkeleton } from '@/components/ui/Skeleton';
-// Lazy-loaded components for better initial page load
 import {
   LazyUnifiedItemModal,
   LazyUnifiedDetailsModal,
@@ -34,527 +21,92 @@ import {
 } from '@/lib/utils/lazy-components';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { PointsDisplay } from '@/components/rewards';
-import { pointsService } from '@/lib/services/rewards';
-import { logger } from '@/lib/logger';
 
-type LinkedShoppingListMap = Awaited<ReturnType<typeof shoppingIntegrationService.getShoppingListsForTasks>>;
-type TaskOrChore = Task & {
-  type: 'task' | 'chore';
-  frequency?: Chore['frequency'];
-  notes?: Chore['notes'];
-  sort_order: number;
-};
+// Hooks
+import { useTasksData } from '@/lib/hooks/useTasksData';
+import { useTasksModals } from '@/lib/hooks/useTasksModals';
+import { useTasksHandlers } from '@/lib/hooks/useTasksHandlers';
 
 export default function TasksPage() {
-  const { currentSpace, user } = useAuthWithSpaces();
-  const spaceId = currentSpace?.id;
-
-  // Basic state
-  const [loading, setLoading] = useState(true);
-  const [choreLoading, setChoreLoading] = useState(false);
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce search for 300ms
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [statusFilter, setStatusFilter] = useState('all');
-  // Removed activeTab state - now showing all items together
-  const [linkedShoppingLists, setLinkedShoppingLists] = useState<LinkedShoppingListMap>({});
-
-  // Unified modal state (replacing separate task/chore modals)
-  const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);
-  const [modalDefaultType, setModalDefaultType] = useState<'task' | 'chore'>('task');
-  const [editingItem, setEditingItem] = useState<TaskOrChore | null>(null);
-
-  // Unified details modal state
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<TaskOrChore | null>(null);
-
-  // Advanced features state
-  const [filters, setFilters] = useState<TaskFilters>({});
-  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
-  const showFilters = false;
-  const enableDragDrop = true;
-
-  // Remaining modal states for features not yet unified
-  const [isTemplatePickerOpen, setIsTemplatePickerOpen] = useState(false);
-
-  // Pagination state
-  const [displayLimit, setDisplayLimit] = useState(20);
-  const ITEMS_PER_PAGE = 20;
-
-  // Real-time tasks with filters (only when currentSpace exists)
-  const { tasks: realtimeTasks, loading: realtimeLoading, refreshTasks, setTasks } = useTaskRealtime({
-    spaceId: spaceId || '',
-    filters: {
-      status: filters.status,
-      priority: filters.priority,
-      assignedTo: filters.assignees?.[0],
-    },
+  // --- Hook wiring ---
+  const data = useTasksData();
+  const modals = useTasksModals();
+  const handlers = useTasksHandlers({
+    user: data.user,
+    currentSpace: data.currentSpace,
+    spaceId: data.spaceId,
+    tasks: data.tasks,
+    setTasks: data.setTasks,
+    setChores: data.setChores,
+    setChoreLoading: data.setChoreLoading,
+    refreshTasks: data.refreshTasks,
+    refreshChores: data.refreshChores,
+    loadData: data.loadData,
+    editingItem: modals.editingItem,
+    modalDefaultType: modals.modalDefaultType,
+    closeUnifiedModal: modals.closeUnifiedModal,
+    closeTemplatePicker: modals.closeTemplatePicker,
+    clearSelectedTaskIds: modals.clearSelectedTaskIds,
   });
 
-  // Real-time chores with enhanced filters
-  const { chores: realtimeChores, loading: choreRealtimeLoading, refreshChores, setChores } = useChoreRealtime({
-    spaceId: spaceId || '',
-    filters: {
-      status: filters.status,
-      frequency: filters.frequency,
-      assignedTo: filters.assignees?.[0],
-      search: filters.search,
-    },
-  });
+  // --- Destructure for clean JSX access ---
+  const {
+    currentSpace,
+    user,
+    spaceId,
+    loading,
+    realtimeLoading,
+    choreRealtimeLoading,
+    choreLoading,
+    searchQuery,
+    setSearchQuery,
+    isSearchTyping,
+    setIsSearchTyping,
+    statusFilter,
+    setStatusFilter,
+    filters,
+    setFilters,
+    showFilters,
+    enableDragDrop,
+    stats,
+    filteredItems,
+    paginatedItems,
+    hasMoreItems,
+    remainingItemsCount,
+    ITEMS_PER_PAGE,
+    linkedShoppingLists,
+    handleLoadMore,
+    handleShowAll,
+    loadData,
+    handleSearchChange,
+  } = data;
 
-  // Always use realtime data
-  const tasks = realtimeTasks;
-  const chores = realtimeChores;
+  const {
+    isUnifiedModalOpen,
+    modalDefaultType,
+    editingItem,
+    isDetailsModalOpen,
+    selectedItem,
+    isTemplatePickerOpen,
+    selectedTaskIds,
+    openCreateModal,
+    openEditModal,
+    closeUnifiedModal,
+    openDetailsModal,
+    closeDetailsModal,
+    setSelectedTaskIds,
+  } = modals;
 
-  // Combine tasks and chores for unified display
-  const allItems = useMemo((): TaskOrChore[] => {
-    const tasksWithType = tasks.map((task, index) => ({
-      ...task,
-      type: 'task' as const,
-      sort_order: task.sort_order ?? 1000 + index,
-    }));
-    // Add missing fields for chores to match TaskCard expectations
-    const choresWithType = chores.map((chore, index) => ({
-      ...chore,
-      type: 'chore' as const,
-      priority: 'medium' as const, // Default priority for chores
-      category: 'household' as const, // Default category for chores
-      sort_order: chore.sort_order ?? (2000 + index + tasks.length) // Default sort order for chores
-    }));
-    return [...tasksWithType, ...choresWithType];
-  }, [tasks, chores]);
+  const {
+    handleSaveItem,
+    handleStatusChange,
+    handleDeleteItem,
+    handleSaveAsTemplate,
+    handleBulkActionComplete,
+    handleTemplateSelect,
+  } = handlers;
 
-  // Memoized stats - calculate from combined items with all status types
-  const stats = useMemo(() => ({
-    total: allItems.length,
-    pending: allItems.filter(item => item.status === 'pending').length,
-    inProgress: allItems.filter(item => item.status === 'in-progress').length,
-    blocked: allItems.filter(item => item.status === 'blocked').length,
-    completed: allItems.filter(item => item.status === 'completed').length,
-    // Active items = everything except completed
-    active: allItems.filter(item => item.status !== 'completed').length,
-  }), [allItems]);
-
-  // Memoized filtered items - show all tasks and chores together with enhanced filtering
-  const filteredItems = useMemo(() => {
-    // Start with all items
-    let filtered = allItems;
-
-    // Auto-hide completed items from main view (unless explicitly viewing completed)
-    if (statusFilter !== 'completed') {
-      filtered = filtered.filter(item => item.status !== 'completed');
-    }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(item => item.status === statusFilter);
-    }
-
-    // Enhanced search filter - includes type-specific fields (uses debounced value)
-    if (debouncedSearchQuery) {
-      const query = debouncedSearchQuery.toLowerCase();
-      filtered = filtered.filter(item => {
-        // Common fields for both tasks and chores
-        const matchesCommon =
-          item.title.toLowerCase().includes(query) ||
-          item.description?.toLowerCase().includes(query);
-
-        // Type-specific search enhancements
-        if (item.type === 'chore') {
-          const chore = item as (Chore & { type: 'chore' });
-          const matchesChoreFields =
-            chore.frequency?.toLowerCase().includes(query) ||
-            chore.notes?.toLowerCase().includes(query);
-          return matchesCommon || matchesChoreFields;
-        } else {
-          const task = item as (Task & { type: 'task' });
-          const matchesTaskFields =
-            task.category?.toLowerCase().includes(query) ||
-            task.tags?.toLowerCase().includes(query) ||
-            task.quick_note?.toLowerCase().includes(query);
-          return matchesCommon || matchesTaskFields;
-        }
-      });
-    }
-
-    // Type filter (from advanced filters)
-    if (filters.itemType) {
-      filtered = filtered.filter(item => item.type === filters.itemType);
-    }
-
-    // Frequency filter for chores (from advanced filters)
-    if (filters.frequency) {
-      filtered = filtered.filter(item => {
-        if (item.type === 'chore') {
-          const chore = item as (Chore & { type: 'chore' });
-          return filters.frequency?.includes(chore.frequency) ?? true;
-        }
-        return true; // Tasks don't have frequency, so include them when frequency filter is active
-      });
-    }
-
-    return filtered;
-  }, [allItems, statusFilter, debouncedSearchQuery, filters]);
-
-  // Paginated items for performance with large lists
-  const paginatedItems = useMemo(() => {
-    return filteredItems.slice(0, displayLimit);
-  }, [filteredItems, displayLimit]);
-
-  const hasMoreItems = filteredItems.length > displayLimit;
-  const remainingItemsCount = filteredItems.length - displayLimit;
-
-  // Pagination handlers
-  const handleLoadMore = useCallback(() => {
-    setDisplayLimit(prev => prev + ITEMS_PER_PAGE);
-  }, [ITEMS_PER_PAGE]);
-
-  const handleShowAll = useCallback(() => {
-    setDisplayLimit(filteredItems.length);
-  }, [filteredItems.length]);
-
-  // Reset pagination when filters change
-  useEffect(() => {
-    setDisplayLimit(ITEMS_PER_PAGE);
-  }, [statusFilter, debouncedSearchQuery, ITEMS_PER_PAGE]);
-
-  // Memoized loadData function to fetch both tasks and chores
-  const loadData = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
-    if (!currentSpace || !user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // Chores are now handled by useChoreRealtime hook
-
-      // Get tasks from realtime hook for shopping list integration
-      const tasksData = realtimeTasks;
-
-      // Load linked shopping lists for all tasks in a single batch query
-      // This replaces N individual queries with 1 query
-      try {
-        const taskIds = tasksData.map(task => task.id);
-        const linkedListsMap = await shoppingIntegrationService.getShoppingListsForTasks(taskIds);
-        setLinkedShoppingLists(linkedListsMap);
-      } catch (error) {
-        logger.error('Failed to load shopping lists for tasks', error, { component: 'page', action: 'load_shopping_lists' });
-        setLinkedShoppingLists({});
-      }
-
-    } catch (error) {
-      logger.error('Failed to load data', error, { component: 'page', action: 'load_data' });
-    } finally {
-      setLoading(false);
-    }
-  }, [currentSpace, realtimeTasks, user]);
-
-  // Load tasks when currentSpace.id changes
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Unified modal handlers
-  const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput): Promise<void | { id: string }> => {
-    // Debug logging removed - rely on structured logger for errors only
-
-    try {
-      if (editingItem) {
-        // Update existing item
-        if (editingItem.type === 'task') {
-          await tasksService.updateTask(editingItem.id, itemData as UpdateTaskInput);
-        } else {
-          await choresService.updateChore(editingItem.id, itemData as CreateChoreInput);
-        }
-        // Real-time subscription will handle the update
-        setEditingItem(null);
-        return; // Return void for updates
-      } else {
-        // Create new item with optimistic updates
-        if (modalDefaultType === 'task') {
-          // Optimistic update - add to UI immediately
-          const taskData = itemData as CreateTaskInput;
-          const tempId = `temp-${Date.now()}`;
-          const optimisticTask: Task = {
-            id: tempId, // Temporary ID
-            title: taskData.title,
-            status: taskData.status || 'pending',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            space_id: taskData.space_id,
-            assigned_to: taskData.assigned_to || undefined,
-            description: taskData.description || undefined,
-            category: taskData.category || undefined,
-            due_date: taskData.due_date || undefined,
-            tags: taskData.tags ?? undefined,
-            estimated_hours: taskData.estimated_hours ?? undefined,
-            priority: taskData.priority || 'medium',
-            calendar_sync: taskData.calendar_sync ?? false,
-            quick_note: taskData.quick_note ?? undefined,
-            created_by: taskData.created_by ?? user?.id ?? '',
-            sort_order: Date.now(), // Use timestamp for unique sort order
-          };
-
-          setTasks(prev => [optimisticTask, ...prev]);
-
-          try {
-            // Create task on server and get the real task back
-            const createdTask = await tasksService.createTask(itemData as CreateTaskInput);
-
-            // Immediately replace the optimistic task with the real one from database
-            setTasks(prev => prev.map(task =>
-              task.id === tempId ? createdTask : task
-            ));
-
-            return { id: createdTask.id }; // Return real ID to caller
-          } catch (error) {
-            // Revert optimistic update on error
-            setTasks(prev => prev.filter(task => task.id !== tempId));
-            logger.error('Failed to create task', error, { component: 'page', action: 'create_task' });
-            throw error;
-          }
-        } else {
-          // Optimistic update for chores - add to UI immediately
-          const choreData = itemData as CreateChoreInput;
-          const tempId = `temp-${Date.now()}`;
-          const optimisticChore: Chore = {
-            id: tempId, // Temporary ID
-            title: choreData.title,
-            status: choreData.status || 'pending',
-            frequency: choreData.frequency,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            space_id: choreData.space_id,
-            assigned_to: choreData.assigned_to || undefined,
-            description: choreData.description || undefined,
-            due_date: choreData.due_date || undefined,
-            created_by: choreData.created_by,
-            sort_order: Date.now(), // Use timestamp for unique sort order
-          };
-
-          setChores(prev => [optimisticChore, ...prev]);
-
-          try {
-            // Create chore on server and get the real chore back
-            const createdChore = await choresService.createChore(itemData as CreateChoreInput);
-
-            // Immediately replace the optimistic chore with the real one from database
-            setChores(prev => prev.map(chore =>
-              chore.id === tempId ? createdChore : chore
-            ));
-
-            return { id: createdChore.id }; // Return real ID to caller
-          } catch (error) {
-            // Revert optimistic update on error
-            setChores(prev => prev.filter(chore => chore.id !== tempId));
-            logger.error('Failed to create chore', error, { component: 'page', action: 'create_chore' });
-            throw error;
-          }
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to save item', error, { component: 'page', action: 'save_item', itemType: modalDefaultType });
-
-      // TODO: Replace with actual toast notification system (user-facing error shown via UI)
-
-      // Additional recovery actions
-      if (modalDefaultType === 'chore') {
-        // Reset chore loading state if still set
-        setChoreLoading(false);
-        // Refresh chores to ensure consistency
-        refreshChores();
-      } else {
-        // Refresh tasks to ensure consistency
-        refreshTasks();
-      }
-    }
-  }, [editingItem, modalDefaultType, refreshChores, refreshTasks, setChoreLoading, setChores, setTasks, user]);
-
-  const handleStatusChange = useCallback(async (itemId: string, status: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed', type?: 'task' | 'chore') => {
-    try {
-      if (type === 'chore') {
-        // Optimistic update for chores - update UI immediately
-        setChores(prevChores =>
-          prevChores.map(chore =>
-            chore.id === itemId
-              ? {
-                  ...chore,
-                  status,
-                  completed_at: status === 'completed' ? new Date().toISOString() : chore.completed_at,
-                  updated_at: new Date().toISOString()
-                }
-              : chore
-          )
-        );
-
-        try {
-          // If completing, use the rewards-enabled method
-          if (status === 'completed' && user) {
-            const result = await choresService.completeChoreWithRewards(itemId, user.id);
-            // Show points earned notification (if points were awarded)
-            // TODO: Show toast notification with points earned
-            if (result.pointsAwarded > 0) {
-              // Points awarded successfully - UI will be updated via real-time subscription
-            }
-          } else {
-            // For other status changes, use regular update
-            const updateData: UpdateChoreInput = { status };
-            if (status === 'completed') {
-              updateData.completed_at = new Date().toISOString();
-            }
-            await choresService.updateChore(itemId, updateData);
-          }
-          // Real-time subscription will handle the final sync
-        } catch (error) {
-          // Revert optimistic update on error - real-time will handle sync
-          refreshChores();
-          throw error;
-        }
-      } else {
-        // Get the task title for points awarding
-        const task = tasks.find(t => t.id === itemId);
-
-        // Optimistic update for tasks - update UI immediately
-        setTasks(prevTasks =>
-          prevTasks.map(t =>
-            t.id === itemId
-              ? {
-                  ...t,
-                  status,
-                  updated_at: new Date().toISOString()
-                }
-              : t
-          )
-        );
-
-        try {
-          // Update on server
-          await tasksService.updateTask(itemId, { status });
-
-          // Award points for completing tasks
-          if (status === 'completed' && user && spaceId && task) {
-            try {
-              await pointsService.awardTaskPoints(user.id, spaceId, itemId, task.title);
-              // TODO: Show toast notification with points earned
-            } catch (pointsError) {
-              // Points failed but task is still completed - don't fail the whole operation
-              logger.error('Failed to award points for task', pointsError, { component: 'page', action: 'award_points' });
-            }
-          }
-          // Real-time subscription will handle the final sync
-        } catch (error) {
-          // Revert optimistic update on error
-          refreshTasks();
-          throw error;
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to update item status', error, { component: 'page', action: 'update_status', itemId });
-
-      // TODO: Replace with actual toast notification system (user-facing error shown via UI)
-
-      // Additional recovery for chores
-      if (type === 'chore') {
-        // Force refresh chores on error to ensure consistency
-        refreshChores();
-      }
-    }
-  }, [refreshChores, refreshTasks, setChores, setTasks, spaceId, tasks, user]);
-
-  const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
-    try {
-      if (type === 'chore') {
-        setChoreLoading(true);
-        await choresService.deleteChore(itemId);
-        // Real-time subscription will handle the chore removal
-        setChoreLoading(false);
-      } else {
-        // Optimistic update for tasks (real-time will handle the actual removal)
-        setTasks(prev => prev.filter(task => task.id !== itemId));
-        await tasksService.deleteTask(itemId);
-      }
-    } catch (error) {
-      logger.error(`Failed to delete ${type || 'task'}`, error, { component: 'page', action: 'delete_item', itemId, type });
-
-      // TODO: Replace with actual toast notification system (user-facing error shown via UI)
-
-      if (type === 'chore') {
-        setChoreLoading(false);
-        // Force refresh chores to ensure UI consistency
-        refreshChores();
-      } else {
-        // Reload tasks to restore on error
-        refreshTasks();
-      }
-    }
-  }, [refreshChores, refreshTasks, setChoreLoading, setTasks]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleEditItem = useCallback((item: any) => {
-    setEditingItem({ ...item, type: item.type || 'task' } as TaskOrChore);
-    setIsUnifiedModalOpen(true);
-  }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleViewDetails = useCallback((item: any) => {
-    setSelectedItem({ ...item, type: item.type || 'task' } as TaskOrChore);
-    setIsDetailsModalOpen(true);
-  }, []);
-
-  const handleSaveAsTemplate = useCallback(async (item: Task & { type?: 'task' | 'chore' }) => {
-    if (item.type !== 'task' || !currentSpace || !user) return;
-
-    try {
-      await taskTemplatesService.createFromTask(item.id, `${item.title} Template`, user.id);
-      // Could show a success toast here
-    } catch (error) {
-      logger.error('Failed to save task as template', error, {
-        component: 'tasks-page',
-        action: 'save_as_template',
-        taskId: item.id
-      });
-    }
-  }, [currentSpace, user]);
-
-  const handleCloseModal = useCallback(() => {
-    setIsUnifiedModalOpen(false);
-    setEditingItem(null);
-  }, []);
-
-  const handleCloseDetailsModal = useCallback(() => {
-    setIsDetailsModalOpen(false);
-    setSelectedItem(null);
-  }, []);
-
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    // Handle typing animation
-    if (value.length > 0) {
-      setIsSearchTyping(true);
-      const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
-      return () => clearTimeout(timeoutId);
-    } else {
-      setIsSearchTyping(false);
-    }
-  }, []);
-
-
-  const handleOpenModal = useCallback((type: 'task' | 'chore') => {
-    setModalDefaultType(type);
-    setIsUnifiedModalOpen(true);
-  }, []);
-
-  const handleBulkActionComplete = useCallback(() => {
-    setSelectedTaskIds([]);
-    refreshTasks();
-    loadData();
-  }, [refreshTasks, loadData]);
-
+  // --- Early return guard ---
   if (!spaceId || !user) {
     return <SpacesLoadingState />;
   }
@@ -597,14 +149,14 @@ export default function TasksPage() {
               {/* Pill-shaped action buttons */}
               <button
                 data-testid="add-task-button"
-                onClick={() => handleOpenModal('task')}
+                onClick={() => openCreateModal('task')}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
               >
                 <CheckSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>New Task</span>
               </button>
               <button
-                onClick={() => handleOpenModal('chore')}
+                onClick={() => openCreateModal('chore')}
                 disabled={choreLoading}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-colors flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0 disabled:opacity-50"
               >
@@ -616,7 +168,7 @@ export default function TasksPage() {
                 <span>{choreLoading ? '...' : 'New Chore'}</span>
               </button>
               <button
-                onClick={() => setIsTemplatePickerOpen(true)}
+                onClick={() => modals.openTemplatePicker()}
                 className="p-1.5 sm:px-4 sm:py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors flex items-center gap-2 text-xs sm:text-sm font-medium flex-shrink-0"
                 title="Create task from template"
               >
@@ -800,7 +352,7 @@ export default function TasksPage() {
                     {!searchQuery && statusFilter === 'all' && (
                       <>
                         <button
-                          onClick={() => handleOpenModal('task')}
+                          onClick={() => openCreateModal('task')}
                           className="px-5 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-blue-600/20"
                         >
                           <Plus className="w-4 h-4" />
@@ -821,9 +373,9 @@ export default function TasksPage() {
                         spaceId={currentSpace.id}
                         initialItems={paginatedItems}
                         onStatusChange={handleStatusChange}
-                        onEdit={handleEditItem}
+                        onEdit={openEditModal}
                         onDelete={handleDeleteItem}
-                        onViewDetails={handleViewDetails}
+                        onViewDetails={openDetailsModal}
                       />
                     </div>
 
@@ -861,9 +413,9 @@ export default function TasksPage() {
                           key={item.id}
                           task={item}
                           onStatusChange={handleStatusChange}
-                          onEdit={handleEditItem}
+                          onEdit={openEditModal}
                           onDelete={handleDeleteItem}
-                          onViewDetails={handleViewDetails}
+                          onViewDetails={openDetailsModal}
                           onSaveAsTemplate={handleSaveAsTemplate}
                           linkedShoppingList={item.type === 'task' ? linkedShoppingLists[item.id] : undefined}
                         />
@@ -909,7 +461,7 @@ export default function TasksPage() {
         <>
           <LazyUnifiedItemModal
             isOpen={isUnifiedModalOpen}
-            onClose={handleCloseModal}
+            onClose={closeUnifiedModal}
             onSave={handleSaveItem}
             editItem={editingItem}
             spaceId={currentSpace?.id}
@@ -922,9 +474,9 @@ export default function TasksPage() {
             <>
               <LazyUnifiedDetailsModal
                 isOpen={isDetailsModalOpen}
-                onClose={handleCloseDetailsModal}
+                onClose={closeDetailsModal}
                 item={selectedItem}
-                onEdit={handleEditItem}
+                onEdit={openEditModal}
                 onDelete={handleDeleteItem}
                 onSave={handleSaveItem}
                 spaceId={currentSpace.id}
@@ -935,23 +487,8 @@ export default function TasksPage() {
 
               <LazyTaskTemplatePickerModal
                 isOpen={isTemplatePickerOpen}
-                onClose={() => setIsTemplatePickerOpen(false)}
-                onSelect={async (templateId) => {
-                  setIsTemplatePickerOpen(false);
-                  try {
-                    const newTask = await taskTemplatesService.createTaskFromTemplate(templateId);
-                    if (newTask) {
-                      // Refresh tasks to show the new task
-                      refreshTasks();
-                    }
-                  } catch (error) {
-                    logger.error('Failed to create task from template', error, {
-                      component: 'tasks-page',
-                      action: 'create_from_template',
-                      templateId
-                    });
-                  }
-                }}
+                onClose={() => modals.closeTemplatePicker()}
+                onSelect={handleTemplateSelect}
                 spaceId={currentSpace.id}
               />
             </>

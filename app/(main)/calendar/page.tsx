@@ -3,35 +3,26 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useDebounce } from '@/lib/hooks/useDebounce';
-import { useDevice } from '@/lib/contexts/DeviceContext';
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
 import nextDynamic from 'next/dynamic';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
-import { z } from 'zod';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
 import { ProposalsList } from '@/components/calendar/ProposalsList';
 import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
-import { logger } from '@/lib/logger';
-import { showError } from '@/lib/utils/toast';
 
 // Phase 9: Unified Calendar View imports
 import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFilters';
 import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalendarLegend';
 import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
-import { useUnifiedCalendar } from '@/lib/hooks/useUnifiedCalendar';
-import type { UnifiedCalendarItem } from '@/lib/types/unified-calendar-item';
 
 // Eagerly imported view components (rendered based on active view mode)
 import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
 import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
-import { geolocationService } from '@/lib/services/geolocation-service';
 
 // Lazy-load modals and dialogs (only rendered when opened)
 const NewEventModal = nextDynamic(() => import('@/components/calendar/NewEventModal').then(m => ({ default: m.NewEventModal })), { ssr: false });
@@ -41,769 +32,90 @@ const BulkEventManager = nextDynamic(() => import('@/components/calendar/BulkEve
 const TemplateLibrary = nextDynamic(() => import('@/components/calendar/TemplateLibrary').then(m => ({ default: m.TemplateLibrary })), { ssr: false });
 const UnifiedItemPreviewModal = nextDynamic(() => import('@/components/calendar/UnifiedItemPreviewModal').then(m => ({ default: m.UnifiedItemPreviewModal })), { ssr: false });
 const ConfirmDialog = nextDynamic(() => import('@/components/shared/ConfirmDialog').then(m => ({ default: m.ConfirmDialog })), { ssr: false });
-import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { useCalendarRealtime } from '@/lib/hooks/useCalendarRealtime';
-import { csrfFetch } from '@/lib/utils/csrf-fetch';
+
 import { useCalendarShortcuts } from '@/lib/hooks/useCalendarShortcuts';
 import { useCalendarGestures } from '@/lib/hooks/useCalendarGestures';
-import { useFeatureAccessSafe } from '@/lib/contexts/subscription-context';
-import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
-import type { EventTemplate } from '@/lib/services/calendar-service';
-import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isSameMonth, parseISO, addDays, subDays, addWeeks, subWeeks } from 'date-fns';
 
-type ViewMode = 'day' | 'week' | 'month' | 'agenda' | 'timeline' | 'proposal' | 'list';
+// Extracted hooks
+import { useCalendarData } from '@/lib/hooks/useCalendarData';
+import { useCalendarHandlers } from '@/lib/hooks/useCalendarHandlers';
+import { useCalendarModals } from '@/lib/hooks/useCalendarModals';
 
-// Schema for validating localStorage calendar connection data
-const CalendarConnectionSchema = z.object({
-  id: z.string(),
-  provider: z.string(),
-  last_sync_at: z.string().nullable(),
-});
-
-const CalendarConnectionsArraySchema = z.array(CalendarConnectionSchema);
-
-/**
- * Safely parse and validate localStorage data
- * Returns default value if parsing or validation fails
- */
-function safeParseLocalStorage<T>(
-  key: string,
-  schema: z.ZodType<T>,
-  defaultValue: T
-): T {
-  try {
-    const cached = localStorage.getItem(key);
-    if (!cached) return defaultValue;
-
-    const parsed = JSON.parse(cached);
-    const result = schema.safeParse(parsed);
-
-    if (result.success) {
-      return result.data;
-    }
-
-    // Validation failed - clear corrupted data and return default
-    logger.warn(`Invalid localStorage data for key "${key}", clearing cache`, { component: 'page' });
-    localStorage.removeItem(key);
-    return defaultValue;
-  } catch {
-    // JSON parse error - clear corrupted data and return default
-    logger.warn(`Failed to parse localStorage key "${key}", clearing cache`, { component: 'page' });
-    localStorage.removeItem(key);
-    return defaultValue;
-  }
-}
-
-/**
- * Safely get a simple string value from localStorage with optional validation
- */
-function safeGetLocalStorageString(
-  key: string,
-  validator?: (val: string) => boolean
-): string | null {
-  try {
-    const value = localStorage.getItem(key);
-    if (!value) return null;
-
-    if (validator && !validator(value)) {
-      logger.warn(`Invalid localStorage value for key "${key}", clearing cache`, { component: 'page' });
-      localStorage.removeItem(key);
-      return null;
-    }
-
-    return value;
-  } catch {
-    return null;
-  }
-}
+// Date-fns utilities used directly in JSX rendering
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, parseISO, addDays, startOfWeek } from 'date-fns';
 
 export default function CalendarPage() {
-  const { currentSpace, user } = useAuthWithSpaces();
-  const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccessSafe('canUseEventProposals');
-  const { isMobile } = useDevice();
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('month');
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  type LinkedShoppingList = {
-    id: string;
-    title: string;
-    items_count?: number;
-  };
+  // ---------------------------------------------------------------------------
+  // Hooks: data, modals, handlers
+  // ---------------------------------------------------------------------------
 
-  const [linkedShoppingLists, setLinkedShoppingLists] = useState<Record<string, LinkedShoppingList>>({});
-  const [detailEvent, setDetailEvent] = useState<CalendarEvent | null>(null);
-  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
-  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
-  const [isTemplateLibraryOpen, setIsTemplateLibraryOpen] = useState(false);
-  const [activeAction, setActiveAction] = useState<'quick-add' | 'templates' | 'propose' | 'new-event'>('new-event');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'not-started' | 'in-progress' | 'completed'>('all');
-  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, eventId: '' });
-  const [isBulkManagerOpen, setIsBulkManagerOpen] = useState(false);
-  const [viewModeLoaded, setViewModeLoaded] = useState(false); // Track if view mode has been loaded from localStorage
+  const data = useCalendarData();
+  const modals = useCalendarModals();
+  const handlers = useCalendarHandlers({
+    // Data
+    events: data.events,
+    setEvents: data.setEvents,
+    loadEvents: data.loadEvents,
+    syncState: data.syncState,
 
-  // Phase 9: Unified calendar items state (tasks, meals, reminders alongside events)
-  const [selectedUnifiedItem, setSelectedUnifiedItem] = useState<UnifiedCalendarItem | null>(null);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    // Modal state setters (from modals hook)
+    setEditingEvent: modals.setEditingEvent,
+    setIsModalOpen: modals.setIsModalOpen,
+    setDetailEvent: modals.setDetailEvent,
+    setConfirmDialog: modals.setConfirmDialog,
+    setSelectedUnifiedItem: modals.setSelectedUnifiedItem,
+    setIsPreviewModalOpen: modals.setIsPreviewModalOpen,
 
-  // Location state for weather display
-  const [userLocation, setUserLocation] = useState<string | null>(null);
-  const [locationLoading, setLocationLoading] = useState(true);
+    // Current modal read state
+    editingEvent: modals.editingEvent,
+    confirmDialog: modals.confirmDialog,
 
-  // Calendar sync state - initialize from localStorage for instant display
-  // Uses validated parsing to prevent corrupted/tampered data from causing issues
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [hasCalendarConnection, setHasCalendarConnection] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('rowan_calendar_connected') === 'true';
-    }
-    return false;
+    // Navigation setters
+    setCurrentMonth: data.setCurrentMonth,
+    setViewMode: data.setViewMode,
   });
-  // Store all active calendar connections (supports multiple providers)
-  // Validated with Zod schema to ensure data structure integrity
-  const [calendarConnections, setCalendarConnections] = useState<Array<{ id: string; provider: string; last_sync_at: string | null }>>(() => {
-    if (typeof window !== 'undefined') {
-      return safeParseLocalStorage(
-        'rowan_calendar_connections',
-        CalendarConnectionsArraySchema,
-        []
-      );
-    }
-    return [];
-  });
-  const [lastSyncTime, setLastSyncTime] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      // Validate that the stored value is a valid date string
-      return safeGetLocalStorageString(
-        'rowan_calendar_last_sync',
-        (val) => !isNaN(Date.parse(val))
-      );
-    }
-    return null;
-  });
-  const [connectionChecked, setConnectionChecked] = useState(false);
-  const [syncTooltipVisible, setSyncTooltipVisible] = useState(false);
 
-  // Ref for search input
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // Ref for gesture detection on calendar content
-  const calendarContentRef = useRef<HTMLDivElement>(null);
-
-  // Initialize realtime connection
-  const { events: realtimeEvents, isConnected: realtimeConnected } = useCalendarRealtime(
-    currentSpace?.id,
-    user?.id
-  );
-
-  // Phase 9: Unified calendar hook - fetches tasks, meals, reminders for calendar display
-  // Date range: from start of current month view to 3 months ahead
-  const unifiedDateRange = useMemo(() => {
-    const start = startOfMonth(currentMonth);
-    const end = endOfMonth(addMonths(currentMonth, 2));
-    return { start, end };
-  }, [currentMonth]);
+  // Destructure frequently-used values for cleaner JSX
+  const {
+    currentSpace, loading, events, filteredEvents, stats, calendarDays,
+    viewMode, setViewMode, currentMonth, setCurrentMonth,
+    searchQuery, setSearchQuery, isSearchTyping, setIsSearchTyping, searchInputRef,
+    statusFilter, setStatusFilter, activeAction, setActiveAction,
+    isMobile, canUseEventProposals, requestProposalUpgrade,
+    realtimeConnected, userLocation, locationLoading,
+    calendarContentRef, linkedShoppingLists,
+    getEventsForDate, getUnifiedItemsForDate, getCategoryColor,
+    unifiedFilters, setUnifiedFilters, unifiedCounts,
+  } = data;
 
   const {
-    items: unifiedItems,
-    counts: unifiedCounts,
-    filters: unifiedFilters,
-    setFilters: setUnifiedFilters,
-  } = useUnifiedCalendar({
-    spaceId: currentSpace?.id || '',
-    startDate: unifiedDateRange.start,
-    endDate: unifiedDateRange.end,
-    autoFetch: !!currentSpace?.id,
-  });
-
-  // Handler for clicking unified calendar items
-  const handleUnifiedItemClick = useCallback((item: UnifiedCalendarItem) => {
-    setSelectedUnifiedItem(item);
-    // For events, open the edit modal
-    if (item.itemType === 'event' && item.originalItem) {
-      setEditingEvent(item.originalItem as CalendarEvent);
-      setIsModalOpen(true);
-    } else {
-      // For tasks, meals, reminders, goals - open the preview modal
-      setIsPreviewModalOpen(true);
-    }
-  }, []);
-
-  // Memoize filtered events (consistent across all views)
-  const filteredEvents = useMemo(() => {
-    let filtered = events;
-
-    // Apply status filter consistently across all views
-    if (statusFilter !== 'all') {
-      filtered = events.filter(e => e.status === statusFilter);
-    }
-
-    // Apply search filter (uses debounced value for performance)
-    if (debouncedSearchQuery) {
-      filtered = filtered.filter(e =>
-        e.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        e.description?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        e.location?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-      );
-    }
-
-    return filtered;
-  }, [events, debouncedSearchQuery, statusFilter]);
-
-  // Memoize filtered unified items (tasks, meals, reminders, goals)
-  const filteredUnifiedItems = useMemo(() => {
-    if (statusFilter === 'all') {
-      return unifiedItems;
-    }
-
-    // Map filter values to unified item status values
-    // Status filter: 'not-started' | 'in-progress' | 'completed'
-    // Unified item statuses vary by type:
-    // - Tasks: 'pending', 'in-progress', 'completed', 'blocked', 'on-hold'
-    // - Reminders: 'pending', 'completed', 'snoozed'
-    // - Goals: 'not_started', 'in_progress', 'completed', 'cancelled'
-    // - Meals: typically no status (always shown)
-
-    return unifiedItems.filter(item => {
-      const itemStatus = item.status?.toLowerCase();
-
-      // Meals don't have status - show them in 'all' only, or treat as pending
-      if (item.itemType === 'meal') {
-        return statusFilter === 'not-started'; // Show meals as "pending" items
-      }
-
-      if (statusFilter === 'not-started') {
-        return itemStatus === 'pending' || itemStatus === 'not_started' || itemStatus === 'not-started' || !itemStatus;
-      }
-
-      if (statusFilter === 'in-progress') {
-        return itemStatus === 'in-progress' || itemStatus === 'in_progress' || itemStatus === 'active';
-      }
-
-      if (statusFilter === 'completed') {
-        return itemStatus === 'completed' || itemStatus === 'done';
-      }
-
-      return true;
-    });
-  }, [unifiedItems, statusFilter]);
-
-  // Create filtered unified items grouped by date
-  const filteredUnifiedItemsByDate = useMemo(() => {
-    const grouped = new Map<string, UnifiedCalendarItem[]>();
-    for (const item of filteredUnifiedItems) {
-      const dateKey = format(parseISO(item.startTime), 'yyyy-MM-dd');
-      const existing = grouped.get(dateKey) || [];
-      grouped.set(dateKey, [...existing, item]);
-    }
-    return grouped;
-  }, [filteredUnifiedItems]);
-
-  // Get unified items for a specific date (respects status filter)
-  const getUnifiedItemsForDate = useCallback((date: Date): UnifiedCalendarItem[] => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    // Use filtered items when status filter is active
-    return filteredUnifiedItemsByDate.get(dateKey) || [];
-  }, [filteredUnifiedItemsByDate]);
-
-  // Memoize stats calculations - use filteredEvents to match current view
-  const stats = useMemo(() => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay());
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    return {
-      total: filteredEvents.length,
-      today: filteredEvents.filter(e => {
-        const eventDate = parseISO(e.start_time);
-        return eventDate >= today && eventDate < new Date(today.getTime() + 86400000);
-      }).length,
-      thisWeek: filteredEvents.filter(e => {
-        const eventDate = parseISO(e.start_time);
-        return eventDate >= weekStart;
-      }).length,
-      thisMonth: filteredEvents.filter(e => {
-        const eventDate = parseISO(e.start_time);
-        return eventDate >= monthStart;
-      }).length,
-    };
-  }, [filteredEvents]);
-
-  // Memoize calendar days calculation
-  const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart);
-    const calendarEnd = endOfWeek(monthEnd);
-
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  }, [currentMonth]);
-
-  // Memoize events by date for calendar view
-  const eventsByDate = useMemo(() => {
-    const eventsMap = new Map<string, CalendarEvent[]>();
-
-    filteredEvents.forEach(event => {
-      const eventDate = parseISO(event.start_time);
-      const dateKey = format(eventDate, 'yyyy-MM-dd');
-
-      if (!eventsMap.has(dateKey)) {
-        eventsMap.set(dateKey, []);
-      }
-      eventsMap.get(dateKey)!.push(event);
-    });
-
-    return eventsMap;
-  }, [filteredEvents]);
-
-  // Memoize category colors lookup
-  const getCategoryColor = useCallback((category: string) => {
-    const colors = {
-      work: { bg: 'bg-blue-900/30', border: 'border-blue-500', text: 'text-blue-300', color: 'bg-blue-900 text-blue-100' },
-      personal: { bg: 'bg-purple-900/30', border: 'border-purple-500', text: 'text-purple-300', color: 'bg-purple-900 text-purple-100' },
-      family: { bg: 'bg-pink-900/30', border: 'border-pink-500', text: 'text-pink-300', color: 'bg-pink-900 text-pink-100' },
-      health: { bg: 'bg-green-900/30', border: 'border-green-500', text: 'text-green-300', color: 'bg-green-900 text-green-100' },
-      social: { bg: 'bg-orange-900/30', border: 'border-orange-500', text: 'text-orange-300', color: 'bg-orange-900 text-orange-100' },
-    };
-    return colors[category as keyof typeof colors] || colors.personal;
-  }, []);
-
-  // Stable callback for loading events
-  const loadEvents = useCallback(async () => {
-    // Don't load data if user doesn't have a space yet
-    if (!currentSpace || !user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // Use getEventsWithRecurring to expand recurring events into individual occurrences
-      // This generates virtual event instances for each occurrence in the date range
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 1); // Include past month
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 3); // Include next 3 months
-
-      const eventsData = await calendarService.getEventsWithRecurring(
-        currentSpace.id,
-        startDate,
-        endDate
-      );
-
-      setEvents(eventsData as CalendarEvent[]);
-
-      // Load linked shopping lists for all events
-      // For recurring event occurrences, use the series_id (master event ID) to lookup shopping lists
-      const linkedListsMap: Record<string, LinkedShoppingList> = {};
-      const processedEventIds = new Set<string>();
-
-      await Promise.all(
-        eventsData.map(async (event) => {
-          try {
-            // For recurring occurrences, use series_id; for regular events, use id
-            // Type assertion needed because recurring occurrences have extra properties
-            const lookupId = ('series_id' in event ? (event as unknown as { series_id: string }).series_id : null) || event.id;
-
-            // Skip if we've already processed this master event
-            if (processedEventIds.has(lookupId)) {
-              // Copy the shopping list reference for this occurrence
-              if (linkedListsMap[lookupId]) {
-                linkedListsMap[event.id] = linkedListsMap[lookupId];
-              }
-              return;
-            }
-            processedEventIds.add(lookupId);
-
-            const linkedLists = await shoppingIntegrationService.getShoppingListsForEvent(lookupId);
-            const validList = linkedLists?.find(list => list.id && list.title);
-            if (validList && validList.id && validList.title) {
-              const shoppingList: LinkedShoppingList = { id: validList.id, title: validList.title, items_count: validList.items_count };
-              linkedListsMap[event.id] = shoppingList;
-              linkedListsMap[lookupId] = shoppingList;
-            }
-          } catch (error) {
-            logger.error('Failed to load shopping list for event ${event.id}:', error, { component: 'page', action: 'execution' });
-          }
-        })
-      );
-      setLinkedShoppingLists(linkedListsMap);
-
-    } catch (error) {
-      logger.error('Failed to load events:', error, { component: 'page', action: 'execution' });
-    } finally {
-      setLoading(false);
-    }
-  }, [currentSpace, user]);
-
-  // Stable callback for creating/updating events
-  const handleCreateEvent = useCallback(async (eventData: CreateEventInput): Promise<CalendarEvent | void> => {
-    try {
-      let createdEvent: CalendarEvent | undefined;
-
-      if (editingEvent) {
-        await calendarService.updateEvent(editingEvent.id, eventData);
-      } else {
-        createdEvent = await calendarService.createEvent(eventData);
-      }
-
-      loadEvents();
-      setEditingEvent(null);
-
-      return createdEvent;
-    } catch (error) {
-      logger.error('Failed to save event:', error, { component: 'page', action: 'execution' });
-      throw error; // Re-throw so modal can handle it
-    }
-  }, [editingEvent, loadEvents]);
-
-  // Stable callback for deleting events
-  const handleDeleteEvent = useCallback(async (eventId: string) => {
-    setConfirmDialog({ isOpen: true, eventId });
-  }, []);
-
-  const handleConfirmDelete = useCallback(async () => {
-    const eventId = confirmDialog.eventId;
-    setConfirmDialog({ isOpen: false, eventId: '' });
-
-    // Optimistic update - remove from UI immediately
-    setEvents(prev => prev.filter(event => event.id !== eventId));
-
-    try {
-      await calendarService.deleteEvent(eventId);
-    } catch (error) {
-      logger.error('Failed to delete event:', error, { component: 'page', action: 'execution' });
-      // Revert optimistic update on error
-      loadEvents();
-    }
-  }, [confirmDialog, loadEvents]);
-
-  // Stable callback for status changes
-  const handleStatusChange = useCallback(async (eventId: string, status: 'not-started' | 'in-progress' | 'completed') => {
-    // Optimistic update - update UI immediately
-    setEvents(prevEvents =>
-      prevEvents.map(event =>
-        event.id === eventId ? { ...event, status } : event
-      )
-    );
-
-    // Update in background
-    try {
-      await calendarService.updateEventStatus(eventId, status);
-    } catch (error) {
-      logger.error('Failed to update event status:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      loadEvents();
-    }
-  }, [loadEvents]);
-
-  // Stable callback for editing events
-  const handleEditEvent = useCallback((event: CalendarEvent) => {
-    setEditingEvent(event);
-    setIsModalOpen(true);
-  }, []);
-
-  // Stable callback for closing modal
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingEvent(null);
-  }, []);
-
-  // Stable callback for template selection
-  const handleSelectTemplate = useCallback(async (template: EventTemplate) => {
-    try {
-      // Create event from template starting now (or could open modal to choose time)
-      const startTime = new Date().toISOString();
-      const event = await calendarService.createEventFromTemplate(template, startTime);
-
-      // Reload events to show the new one
-      loadEvents();
-
-      // Optionally open the event in edit mode so user can adjust time
-      setTimeout(() => {
-        handleEditEvent(event);
-      }, 100);
-    } catch (error) {
-      logger.error('Failed to create event from template:', error, { component: 'page', action: 'execution' });
-      showError('Failed to create event from template');
-    }
-  }, [loadEvents, handleEditEvent]);
-
-  // Stable callback for month navigation
-  const handlePrevMonth = useCallback(() => {
-    setCurrentMonth(prev => subMonths(prev, 1));
-  }, []);
-
-  const handleNextMonth = useCallback(() => {
-    setCurrentMonth(prev => addMonths(prev, 1));
-  }, []);
-
-  // Stable callback for week navigation
-  const handlePrevWeek = useCallback(() => {
-    setCurrentMonth(prev => subWeeks(prev, 1));
-  }, []);
-
-  const handleNextWeek = useCallback(() => {
-    setCurrentMonth(prev => addWeeks(prev, 1));
-  }, []);
-
-  // Stable callback for day navigation
-  const handlePrevDay = useCallback(() => {
-    setCurrentMonth(prev => subDays(prev, 1));
-  }, []);
-
-  const handleNextDay = useCallback(() => {
-    setCurrentMonth(prev => addDays(prev, 1));
-  }, []);
-
-  const handleJumpToToday = useCallback(() => {
-    setCurrentMonth(new Date());
-  }, []);
-
-  // Check for calendar connections - runs in background, caches to localStorage
-  // Fetches all providers (Google, Apple, Cozi) and stores active connections
-  const checkCalendarConnection = useCallback(async () => {
-    if (!currentSpace) return;
-
-    try {
-      // Fetch connections from all providers in parallel
-      const providers = ['google', 'apple'] as const; // Add 'cozi' when integrated
-      const responses = await Promise.all(
-        providers.map(provider =>
-          fetch(`/api/calendar/connect/${provider}?space_id=${currentSpace.id}`)
-            .then(res => res.ok ? res.json() : { connections: [] })
-            .catch(() => ({ connections: [] }))
-        )
-      );
-
-      // Collect all active connections across all providers
-      const activeConnections: Array<{ id: string; provider: string; last_sync_at: string | null }> = [];
-      let mostRecentSyncTime: string | null = null;
-
-      responses.forEach((data, index) => {
-        const provider = providers[index];
-        const providerConnections = data.connections || [];
-
-        providerConnections.forEach((c: { id: string; sync_status: string; last_sync_at: string | null }) => {
-          if (c.sync_status === 'active' || c.sync_status === 'syncing') {
-            activeConnections.push({
-              id: c.id,
-              provider,
-              last_sync_at: c.last_sync_at,
-            });
-
-            // Track most recent sync time across all connections
-            if (c.last_sync_at) {
-              if (!mostRecentSyncTime || new Date(c.last_sync_at) > new Date(mostRecentSyncTime)) {
-                mostRecentSyncTime = c.last_sync_at;
-              }
-            }
-          }
-        });
-      });
-
-      if (activeConnections.length > 0) {
-        setHasCalendarConnection(true);
-        setCalendarConnections(activeConnections);
-        setLastSyncTime(mostRecentSyncTime);
-        // Cache to localStorage for instant display on next visit
-        localStorage.setItem('rowan_calendar_connected', 'true');
-        localStorage.setItem('rowan_calendar_connections', JSON.stringify(activeConnections));
-        if (mostRecentSyncTime) {
-          localStorage.setItem('rowan_calendar_last_sync', mostRecentSyncTime);
-        }
-      } else {
-        setHasCalendarConnection(false);
-        setCalendarConnections([]);
-        // Clear cache
-        localStorage.removeItem('rowan_calendar_connected');
-        localStorage.removeItem('rowan_calendar_connections');
-        localStorage.removeItem('rowan_calendar_last_sync');
-      }
-    } catch (error) {
-      logger.error('Failed to check calendar connections:', error, { component: 'page', action: 'execution' });
-    } finally {
-      setConnectionChecked(true);
-    }
-  }, [currentSpace]);
-
-  // Sync all connected calendars (Google, Apple, etc.)
-  const handleSyncCalendar = useCallback(async () => {
-    if (calendarConnections.length === 0 || isSyncing) return;
-
-    setIsSyncing(true);
-    let totalEventsSynced = 0;
-    let hasError = false;
-
-    try {
-      // Sync all connections in parallel for efficiency
-      const syncPromises = calendarConnections.map(async (connection) => {
-        try {
-          const response = await csrfFetch('/api/calendar/sync', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              connection_id: connection.id,
-              sync_type: 'incremental',
-            }),
-          });
-
-          const data = await response.json();
-
-          if (response.ok && data.success) {
-            logger.info(`[${connection.provider}] Sync complete: ${data.events_synced} events processed`, { component: 'page' });
-            return { success: true, events: data.events_synced || 0, provider: connection.provider };
-          } else if (response.status === 429) {
-            logger.info(`[${connection.provider}] Rate limited - please wait before syncing again`, { component: 'page' });
-            return { success: false, events: 0, provider: connection.provider, rateLimited: true };
-          } else {
-            logger.error('[${connection.provider}] Sync failed:', undefined, { component: 'page', action: 'execution', details: data.error });
-            return { success: false, events: 0, provider: connection.provider, error: data.error };
-          }
-        } catch (error) {
-          logger.error('[${connection.provider}] Sync error:', error, { component: 'page', action: 'execution' });
-          return { success: false, events: 0, provider: connection.provider, error };
-        }
-      });
-
-      const results = await Promise.all(syncPromises);
-
-      // Aggregate results
-      results.forEach((result) => {
-        if (result.success) {
-          totalEventsSynced += result.events;
-        } else {
-          hasError = true;
-        }
-      });
-
-      // If at least one sync succeeded, reload events and update sync time
-      if (results.some(r => r.success)) {
-        loadEvents();
-        const syncTime = new Date().toISOString();
-        setLastSyncTime(syncTime);
-        localStorage.setItem('rowan_calendar_last_sync', syncTime);
-        logger.info(`Total sync complete: ${totalEventsSynced} events across ${calendarConnections.length} calendar(s)`, { component: 'page' });
-      }
-
-      if (hasError) {
-        logger.warn('Some calendars failed to sync - check individual provider logs above', { component: 'page' });
-      }
-    } catch (error) {
-      logger.error('Sync error:', error, { component: 'page', action: 'execution' });
-    } finally {
-      setIsSyncing(false);
-    }
-  }, [calendarConnections, isSyncing, loadEvents]);
-
-  // Helper to get events for a specific date
-  const getEventsForDate = useCallback((date: Date) => {
-    const dateKey = format(date, 'yyyy-MM-dd');
-    return eventsByDate.get(dateKey) || [];
-  }, [eventsByDate]);
-
-  // Helper to cycle event status with auto-deletion on completion
-  const handleEventStatusClick = useCallback((e: React.MouseEvent, eventId: string, currentStatus: 'not-started' | 'in-progress' | 'completed') => {
-    e.stopPropagation(); // Prevent opening edit modal
-
-    const states: Array<'not-started' | 'in-progress' | 'completed'> = ['not-started', 'in-progress', 'completed'];
-    const currentIndex = states.indexOf(currentStatus);
-    const nextStatus = states[(currentIndex + 1) % states.length];
-
-    // If the next status would be 'completed', automatically delete the event instead
-    if (nextStatus === 'completed') {
-      // Optimistic update - remove from UI immediately
-      setEvents(prev => prev.filter(event => event.id !== eventId));
-
-      // Delete in background
-      calendarService.deleteEvent(eventId).catch(error => {
-        logger.error('Failed to auto-delete completed event:', error, { component: 'page', action: 'execution' });
-        // Revert optimistic update on error
-        loadEvents();
-      });
-    } else {
-      // Normal status change
-      handleStatusChange(eventId, nextStatus);
-    }
-  }, [handleStatusChange, loadEvents]);
-
-  useEffect(() => {
-    loadEvents();
-  }, [loadEvents]);
-
-  // Check for calendar connections on mount
-  useEffect(() => {
-    checkCalendarConnection();
-  }, [checkCalendarConnection]);
-
-  // Merge realtime events with local events
-  useEffect(() => {
-    if (realtimeEvents.length > 0) {
-      setEvents(prevEvents => {
-        const eventMap = new Map(prevEvents.map(e => [e.id, e]));
-        realtimeEvents.forEach(rtEvent => {
-          eventMap.set(rtEvent.id, rtEvent);
-        });
-        return Array.from(eventMap.values());
-      });
-    }
-  }, [realtimeEvents]);
-
-  // Load saved view mode from localStorage on mount
-  useEffect(() => {
-    if (currentSpace?.id) {
-      const savedViewMode = localStorage.getItem(`calendar-view-${currentSpace.id}`);
-      if (savedViewMode && ['day', 'week', 'month', 'agenda', 'timeline', 'proposal', 'list'].includes(savedViewMode)) {
-        setViewMode(savedViewMode as ViewMode);
-      }
-      setViewModeLoaded(true);
-    }
-  }, [currentSpace?.id]);
-
-  // Save view mode to localStorage whenever it changes (only after initial load)
-  useEffect(() => {
-    if (currentSpace?.id && viewModeLoaded) {
-      localStorage.setItem(`calendar-view-${currentSpace.id}`, viewMode);
-    }
-  }, [viewMode, currentSpace?.id, viewModeLoaded]);
-
-  // Fetch user's location for weather display
-  useEffect(() => {
-    const fetchUserLocation = async () => {
-      try {
-        setLocationLoading(true);
-        const location = await geolocationService.getCurrentLocation();
-        if (location) {
-          const locationString = geolocationService.getLocationString(location);
-          setUserLocation(locationString);
-          logger.info('[Calendar] User location set:', { component: 'page', data: locationString });
-        }
-      } catch (error) {
-        logger.error('[Calendar] Failed to get user location:', error, { component: 'page', action: 'execution' });
-        // Set fallback location
-        setUserLocation('Dallas, Texas, United States');
-      } finally {
-        setLocationLoading(false);
-      }
-    };
-
-    fetchUserLocation();
-  }, []); // Only run once on mount
-
-  // Handler for viewing event details
-  const handleViewDetails = useCallback((event: CalendarEvent) => {
-    setDetailEvent(event);
-  }, []);
-
+    isSyncing, hasCalendarConnection, calendarConnections,
+    lastSyncTime, connectionChecked, syncTooltipVisible, setSyncTooltipVisible,
+  } = data.syncState;
+
+  const {
+    isModalOpen, editingEvent, detailEvent, isProposalModalOpen,
+    isQuickAddOpen, isTemplateLibraryOpen, isBulkManagerOpen,
+    confirmDialog, selectedUnifiedItem, isPreviewModalOpen,
+    setIsModalOpen, setDetailEvent, setIsProposalModalOpen,
+    setIsQuickAddOpen, setIsTemplateLibraryOpen, setIsBulkManagerOpen,
+    setConfirmDialog, setIsPreviewModalOpen, setSelectedUnifiedItem,
+  } = modals;
+
+  const {
+    handleCreateEvent, handleDeleteEvent, handleConfirmDelete,
+    handleStatusChange, handleEditEvent, handleCloseModal,
+    handleSelectTemplate, handleViewDetails, handleEventStatusClick,
+    handleUnifiedItemClick,
+    handlePrevMonth, handleNextMonth, handlePrevWeek, handleNextWeek,
+    handlePrevDay, handleNextDay, handleJumpToToday,
+    handleSyncCalendar,
+  } = handlers;
+
+  // ---------------------------------------------------------------------------
   // Keyboard shortcuts
+  // ---------------------------------------------------------------------------
+
   useCalendarShortcuts({
     jumpToToday: handleJumpToToday,
     previousPeriod: handlePrevMonth,
@@ -824,10 +136,12 @@ export default function CalendarPage() {
     },
   });
 
+  // ---------------------------------------------------------------------------
   // Touch gestures for mobile navigation
+  // ---------------------------------------------------------------------------
+
   useCalendarGestures(calendarContentRef, {
     onSwipeLeft: () => {
-      // Navigate to next period based on current view
       if (viewMode === 'week') {
         handleNextWeek();
       } else if (viewMode === 'month' || viewMode === 'timeline') {
@@ -837,7 +151,6 @@ export default function CalendarPage() {
       }
     },
     onSwipeRight: () => {
-      // Navigate to previous period based on current view
       if (viewMode === 'week') {
         handlePrevWeek();
       } else if (viewMode === 'month' || viewMode === 'timeline') {
@@ -849,10 +162,14 @@ export default function CalendarPage() {
     enabled: viewMode !== 'proposal' && viewMode !== 'list' && viewMode !== 'agenda',
   });
 
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
+
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calendar' }]}>
       <PageErrorBoundary>
-        <PullToRefresh onRefresh={loadEvents}>
+        <PullToRefresh onRefresh={data.loadEvents}>
         <div className="p-4 sm:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
@@ -2210,7 +1527,7 @@ export default function CalendarPage() {
           spaceId={currentSpace.id}
           onProposalCreated={() => {
             setIsProposalModalOpen(false);
-            loadEvents();
+            data.loadEvents();
           }}
         />
       )}
@@ -2242,7 +1559,7 @@ export default function CalendarPage() {
           onClose={() => setIsBulkManagerOpen(false)}
           spaceId={currentSpace.id}
           events={events}
-          onEventsDeleted={loadEvents}
+          onEventsDeleted={data.loadEvents}
         />
       )}
 

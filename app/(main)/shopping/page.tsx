@@ -3,9 +3,6 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useDebounce } from '@/lib/hooks/useDebounce';
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
@@ -14,9 +11,6 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ShoppingListCard } from '@/components/shopping/ShoppingListCard';
-import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
-import { logger } from '@/lib/logger';
-import { showError, showSuccess, showWarning, showInfo } from '@/lib/utils/toast';
 // Lazy-loaded components for better initial page load
 import {
   LazyNewShoppingListModal,
@@ -26,620 +20,59 @@ import {
   LazyFrequentItemsPanel,
   LazyConfirmDialog,
 } from '@/lib/utils/lazy-components';
-import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
-import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
-import { calendarService } from '@/lib/services/calendar-service';
-import { remindersService } from '@/lib/services/reminders-service';
-import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
+
+import { useShoppingData } from '@/lib/hooks/useShoppingData';
+import { useShoppingModals } from '@/lib/hooks/useShoppingModals';
+import { useShoppingHandlers } from '@/lib/hooks/useShoppingHandlers';
 
 export default function ShoppingPage() {
-  const { currentSpace, user } = useAuthWithSpaces();
-  const queryClient = useQueryClient();
-  const spaceId = currentSpace?.id;
-
-  // React Query: fetch shopping lists with stale-while-revalidate
-  const {
-    data: lists = [],
-    isLoading: listsLoading,
-    refetch: refetchLists,
-  } = useQuery({
-    queryKey: QUERY_KEYS.shopping.lists(spaceId || ''),
-    queryFn: () => shoppingService.getLists(spaceId!),
-    enabled: !!spaceId && !!user,
-    ...QUERY_OPTIONS.features,
+  // ─── Hooks ─────────────────────────────────────────────────────────────────
+  const data = useShoppingData();
+  const modals = useShoppingModals();
+  const handlers = useShoppingHandlers({
+    user: data.user,
+    currentSpace: data.currentSpace,
+    spaceId: data.spaceId,
+    lists: data.lists,
+    invalidateShopping: data.invalidateShopping,
+    editingList: modals.editingList,
+    setEditingList: modals.setEditingList,
+    confirmDialog: modals.confirmDialog,
+    setConfirmDialog: modals.setConfirmDialog,
+    listForTemplate: modals.listForTemplate,
+    setShowTemplateModal: modals.setShowTemplateModal,
+    setListForTemplate: modals.setListForTemplate,
+    listToSchedule: modals.listToSchedule,
+    setShowScheduleTripModal: modals.setShowScheduleTripModal,
+    setListToSchedule: modals.setListToSchedule,
+    setSearchQuery: data.setSearchQuery,
+    setIsSearchTyping: data.setIsSearchTyping,
+    setStatusFilter: data.setStatusFilter,
+    setTimeFilter: data.setTimeFilter,
   });
 
-  // React Query: fetch shopping stats
+  // ─── Destructure for clean JSX access ──────────────────────────────────────
   const {
-    data: stats = { totalLists: 0, activeLists: 0, itemsThisWeek: 0, completedLists: 0 },
-  } = useQuery({
-    queryKey: QUERY_KEYS.shopping.stats(spaceId || ''),
-    queryFn: () => shoppingService.getShoppingStats(spaceId!),
-    enabled: !!spaceId && !!user,
-    ...QUERY_OPTIONS.features,
-  });
-
-  const loading = listsLoading;
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingList, setEditingList] = useState<ShoppingList | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const [isSearchTyping, setIsSearchTyping] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('active');
-  const [timeFilter, setTimeFilter] = useState<'all' | 'week'>('all');
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [listForTemplate, setListForTemplate] = useState<ShoppingList | null>(null);
-  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
-  const [showScheduleTripModal, setShowScheduleTripModal] = useState(false);
-  const [listToSchedule, setListToSchedule] = useState<ShoppingList | null>(null);
-  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, listId: '' });
-
-  // Memoized filtered lists calculation
-  const filteredLists = useMemo(() => {
-    let filtered = lists;
-
-    // Filter by status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(l => l.status === statusFilter);
-    }
-
-    // Filter by time (this week)
-    if (timeFilter === 'week') {
-      const now = new Date();
-      const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
-      startOfWeek.setHours(0, 0, 0, 0);
-
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 7);
-      endOfWeek.setHours(23, 59, 59, 999);
-
-      filtered = filtered.filter(l => {
-        const createdDate = new Date(l.created_at);
-        return createdDate >= startOfWeek && createdDate <= endOfWeek;
-      });
-    }
-
-    // Filter by search (uses debounced value for performance)
-    if (debouncedSearchQuery) {
-      const query = debouncedSearchQuery.toLowerCase();
-      filtered = filtered.filter(l =>
-        l.title.toLowerCase().includes(query) ||
-        l.description?.toLowerCase().includes(query)
-      );
-    }
-
-    return filtered;
-  }, [lists, debouncedSearchQuery, statusFilter, timeFilter]);
-
-  // Invalidate both lists and stats caches
-  const invalidateShopping = useCallback(() => {
-    if (!spaceId) return;
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopping.lists(spaceId) });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.shopping.stats(spaceId) });
-  }, [spaceId, queryClient]);
-
-  // Real-time subscription — invalidates React Query cache on changes
-  useEffect(() => {
-    if (!spaceId) return;
-
-    const channel = shoppingService.subscribeToLists(spaceId, () => {
-      invalidateShopping();
-    });
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [spaceId, invalidateShopping]);
-
-  // Memoized callback for creating/updating lists
-  const handleCreateList = useCallback(async (listData: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => {
-    try {
-      if (editingList) {
-        // Extract items before updating the list
-        const { items, ...listDataOnly } = listData;
-
-        await shoppingService.updateList(editingList.id, listDataOnly);
-
-        // Only add NEW items (items without an ID)
-        if (items && items.length > 0) {
-          const newItems = items.filter(item => !item.id);
-          for (const item of newItems) {
-            const createdItem = await shoppingService.createItem({
-              list_id: editingList.id,
-              name: item.name,
-              quantity: item.quantity || 1,
-            });
-
-            // Update assigned_to if provided
-            if (item.assigned_to) {
-              await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to });
-            }
-          }
-        }
-        invalidateShopping();
-      } else {
-        // Extract items before creating the list
-        const { items, ...listDataOnly } = listData;
-
-        // Optimistic update via query cache
-        const optimisticList: ShoppingList = {
-          id: `temp-${Date.now()}`,
-          title: listDataOnly.title,
-          status: listDataOnly.status || 'active',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          space_id: listDataOnly.space_id,
-          description: listDataOnly.description || undefined,
-          store_name: listDataOnly.store_name || undefined,
-          budget: listDataOnly.budget || undefined,
-          created_by: user?.id || '',
-          completed_at: undefined,
-        };
-
-        queryClient.setQueryData<ShoppingList[]>(
-          QUERY_KEYS.shopping.lists(spaceId || ''),
-          (old) => [optimisticList, ...(old || [])],
-        );
-
-        try {
-          const newList = await shoppingService.createList(listDataOnly);
-
-          // Add items if provided
-          if (items && items.length > 0) {
-            for (const item of items) {
-              const createdItem = await shoppingService.createItem({
-                list_id: newList.id,
-                name: item.name,
-                quantity: item.quantity || 1,
-              });
-
-              // Update assigned_to if provided
-              if (item.assigned_to) {
-                await shoppingService.updateItem(createdItem.id, { assigned_to: item.assigned_to });
-              }
-            }
-          }
-
-          // Invalidate to replace optimistic data with real data
-          invalidateShopping();
-        } catch (error) {
-          // Revert optimistic update on error
-          queryClient.setQueryData<ShoppingList[]>(
-            QUERY_KEYS.shopping.lists(spaceId || ''),
-            (old) => (old || []).filter(list => list.id !== optimisticList.id),
-          );
-          throw error;
-        }
-      }
-
-      setEditingList(null);
-    } catch (error) {
-      logger.error('Failed to save list:', error, { component: 'page', action: 'execution' });
-      showError('Failed to save shopping list. Please try again.');
-    }
-  }, [editingList, user, spaceId, queryClient, invalidateShopping]);
-
-  // Memoized callback for deleting lists
-  const handleDeleteList = useCallback(async (listId: string) => {
-    // Prevent actions on optimistic lists (temp IDs)
-    if (listId.startsWith('temp-')) {
-      showInfo('Please wait for the list to finish saving before deleting.');
-      return;
-    }
-
-    setConfirmDialog({ isOpen: true, listId });
-  }, []);
-
-  const handleConfirmDelete = useCallback(async () => {
-    const listId = confirmDialog.listId;
-    setConfirmDialog({ isOpen: false, listId: '' });
-
-    // Optimistic update via query cache
-    const previousLists = queryClient.getQueryData<ShoppingList[]>(QUERY_KEYS.shopping.lists(spaceId || ''));
-    queryClient.setQueryData<ShoppingList[]>(
-      QUERY_KEYS.shopping.lists(spaceId || ''),
-      (old) => (old || []).filter(list => list.id !== listId),
-    );
-
-    try {
-      await shoppingService.deleteList(listId);
-      invalidateShopping();
-    } catch (error) {
-      logger.error('Failed to delete list:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      if (previousLists) {
-        queryClient.setQueryData(QUERY_KEYS.shopping.lists(spaceId || ''), previousLists);
-      }
-    }
-  }, [confirmDialog, spaceId, queryClient, invalidateShopping]);
-
-  // Memoized callback for completing lists
-  const handleCompleteList = useCallback(async (listId: string) => {
-    // Prevent actions on optimistic lists (temp IDs)
-    if (listId.startsWith('temp-')) {
-      showInfo('Please wait for the list to finish saving before completing.');
-      return;
-    }
-
-    try {
-      // Optimistic update via query cache
-      queryClient.setQueryData<ShoppingList[]>(
-        QUERY_KEYS.shopping.lists(spaceId || ''),
-        (old) => (old || []).map(list =>
-          list.id === listId ? { ...list, status: 'completed' as const } : list
-        ),
-      );
-
-      await shoppingService.updateList(listId, { status: 'completed' });
-      invalidateShopping();
-    } catch (error) {
-      logger.error('Failed to complete list:', error, { component: 'page', action: 'execution' });
-      invalidateShopping();
-    }
-  }, [spaceId, queryClient, invalidateShopping]);
-
-  // Memoized callback for toggling items
-  const handleToggleItem = useCallback(async (itemId: string, checked: boolean) => {
-    // Optimistic update via query cache
-    queryClient.setQueryData<ShoppingList[]>(
-      QUERY_KEYS.shopping.lists(spaceId || ''),
-      (old) => (old || []).map(list => ({
-        ...list,
-        items: list.items?.map(item =>
-          item.id === itemId ? { ...item, checked } : item
-        )
-      })),
-    );
-
-    try {
-      await shoppingService.toggleItem(itemId, checked);
-
-      // Check if all items in the list are now checked
-      const updatedList = lists.find(list =>
-        list.items?.some(item => item.id === itemId)
-      );
-
-      if (updatedList && updatedList.items && updatedList.items.length > 0) {
-        const allChecked = updatedList.items.every(item =>
-          item.id === itemId ? checked : item.checked
-        );
-
-        // Auto-complete the list if all items are checked
-        if (allChecked && checked) {
-          await handleCompleteList(updatedList.id);
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to toggle item:', error, { component: 'page', action: 'execution' });
-      invalidateShopping();
-    }
-  }, [lists, handleCompleteList, spaceId, queryClient, invalidateShopping]);
-
-  // Memoized callback for updating item quantity
-  const handleUpdateQuantity = useCallback(async (itemId: string, newQuantity: number) => {
-    // Optimistic update via query cache
-    queryClient.setQueryData<ShoppingList[]>(
-      QUERY_KEYS.shopping.lists(spaceId || ''),
-      (old) => (old || []).map(list => ({
-        ...list,
-        items: list.items?.map(item =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        )
-      })),
-    );
-
-    try {
-      await shoppingService.updateItem(itemId, { quantity: newQuantity });
-    } catch (error) {
-      logger.error('Failed to update quantity:', error, { component: 'page', action: 'execution' });
-      invalidateShopping();
-    }
-  }, [spaceId, queryClient, invalidateShopping]);
-
-  // Memoized callback for editing lists
-  const handleEditList = useCallback((list: ShoppingList) => {
-    // Prevent actions on optimistic lists (temp IDs)
-    if (list.id.startsWith('temp-')) {
-      showInfo('Please wait for the list to finish saving before editing.');
-      return;
-    }
-
-    setEditingList(list);
-    setIsModalOpen(true);
-  }, []);
-
-  // Memoized callback for closing modal
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setEditingList(null);
-  }, []);
-
-  // Memoized callback for opening new list modal - now opens directly to creation
-  const handleOpenNewListModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  // Open template picker separately
-  const handleOpenTemplatePicker = useCallback(() => {
-    setShowTemplatePicker(true);
-  }, []);
-
-  // Handle template selection
-  const handleSelectTemplate = useCallback(async (templateId: string) => {
-    if (!spaceId) return;
-    try {
-      await shoppingService.createListFromTemplate(templateId, spaceId);
-      invalidateShopping();
-    } catch (error) {
-      logger.error('Failed to create list from template:', error, { component: 'page', action: 'execution' });
-      throw error;
-    }
-  }, [spaceId, invalidateShopping]);
-
-  // Handle start fresh (open modal)
-  const handleStartFresh = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  // Memoized callback for search input change
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    // Handle typing animation
-    if (value.length > 0) {
-      setIsSearchTyping(true);
-      const timeoutId = setTimeout(() => setIsSearchTyping(false), 1000);
-      return () => clearTimeout(timeoutId);
-    } else {
-      setIsSearchTyping(false);
-    }
-  }, []);
-
-  // Memoized callback for clearing search
-  const handleClearSearch = useCallback(() => {
-    setSearchQuery('');
-    setIsSearchTyping(false);
-  }, []);
-
-  // Memoized callbacks for stat card clicks
-  const handleTotalListsClick = useCallback(() => {
-    setStatusFilter('all');
-    setTimeFilter('all');
-  }, []);
-
-  const handleActiveListsClick = useCallback(() => {
-    setStatusFilter('active');
-    setTimeFilter('all');
-  }, []);
-
-  const handleItemsThisWeekClick = useCallback(() => {
-    setStatusFilter('all');
-    setTimeFilter('week');
-  }, []);
-
-  const handleCompletedListsClick = useCallback(() => {
-    setStatusFilter('completed');
-    setTimeFilter('all');
-  }, []);
-
-  const handleSaveAsTemplate = useCallback((list: ShoppingList) => {
-    // Prevent actions on optimistic lists (temp IDs)
-    if (list.id.startsWith('temp-')) {
-      showInfo('Please wait for the list to finish saving before creating a template.');
-      return;
-    }
-
-    setListForTemplate(list);
-    setShowTemplateModal(true);
-  }, []);
-
-  const handleSaveTemplate = useCallback(async (name: string, description: string) => {
-    if (!currentSpace || !listForTemplate || !listForTemplate.items) return;
-
-    try {
-      await shoppingService.createTemplate(
-        currentSpace.id,
-        name,
-        description,
-        listForTemplate.items.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          category: item.category,
-        }))
-      );
-
-      // Show success message
-      showSuccess('Template saved successfully!');
-      setShowTemplateModal(false);
-      setListForTemplate(null);
-    } catch (error) {
-      logger.error('Failed to save template:', error, { component: 'page', action: 'execution' });
-      throw error;
-    }
-  }, [currentSpace, listForTemplate]);
-
-  const handleScheduleTrip = useCallback((list: ShoppingList) => {
-    // Prevent actions on optimistic lists (temp IDs)
-    if (list.id.startsWith('temp-')) {
-      showInfo('Please wait for the list to finish saving before scheduling a trip.');
-      return;
-    }
-
-    setListToSchedule(list);
-    setShowScheduleTripModal(true);
-  }, []);
-
-  const handleScheduleTripSubmit = useCallback(async (eventData: {
-    title: string;
-    date: string;
-    time: string;
-    duration: number;
-    reminderMinutes?: number;
-  }) => {
-    if (!currentSpace || !listToSchedule) {
-      logger.error('Missing required data: currentSpace or listToSchedule', undefined, { component: 'page', action: 'execution' });
-      showError('Unable to schedule trip. Please try again.');
-      return;
-    }
-
-    try {
-      logger.info('Starting trip scheduling...', { component: 'page', data: { eventData, listId: listToSchedule.id } });
-
-      // Combine date and time into a proper datetime
-      const startDateTime = new Date(`${eventData.date}T${eventData.time}`);
-      const endDateTime = new Date(startDateTime.getTime() + eventData.duration * 60000);
-
-      logger.info('Creating calendar event...', { component: 'page' });
-
-      // First, create the calendar event
-      const calendarEvent = await calendarService.createEvent({
-        space_id: currentSpace.id,
-        title: eventData.title,
-        start_time: startDateTime.toISOString(),
-        end_time: endDateTime.toISOString(),
-        description: `Shopping trip for list: ${listToSchedule.title}`,
-        category: 'personal',
-        location: listToSchedule.store_name || undefined,
-      });
-
-      logger.info('Calendar event created:', { component: 'page', data: calendarEvent.id });
-
-      // Create a reminder if reminderMinutes is specified
-      let reminder = null;
-      if (eventData.reminderMinutes && eventData.reminderMinutes > 0) {
-        logger.info('Creating reminder...', { component: 'page' });
-
-        // Calculate reminder time (event start time minus reminder minutes)
-        const reminderTime = new Date(startDateTime.getTime() - eventData.reminderMinutes * 60000);
-
-        reminder = await remindersService.createReminder({
-          space_id: currentSpace.id,
-          title: `Shopping Trip: ${listToSchedule.title}`,
-          description: `Reminder for shopping trip${listToSchedule.store_name ? ` at ${listToSchedule.store_name}` : ''}`,
-          emoji: '🛒',
-          category: 'personal',
-          reminder_type: 'time',
-          reminder_time: reminderTime.toISOString(),
-          location: listToSchedule.store_name || undefined,
-          priority: 'medium',
-          status: 'active',
-        });
-
-        logger.info('Reminder created:', { component: 'page', data: reminder.id });
-
-        // Link the reminder to the shopping list
-        await shoppingIntegrationService.linkToReminder(
-          reminder.id,
-          listToSchedule.id,
-          undefined,
-          'time'
-        );
-
-        logger.info('Reminder linked to shopping list', { component: 'page' });
-      }
-
-      // Link the shopping list to the calendar event
-      logger.info('Linking calendar event to shopping list...', { component: 'page' });
-      await shoppingIntegrationService.linkToCalendar(
-        listToSchedule.id,
-        calendarEvent.id,
-        eventData.reminderMinutes
-      );
-
-      logger.info('Trip scheduling completed successfully', { component: 'page' });
-
-      // Show success message
-      showSuccess(`Shopping trip scheduled for ${eventData.date} at ${eventData.time}!`);
-      setShowScheduleTripModal(false);
-      setListToSchedule(null);
-    } catch (error) {
-      logger.error('Failed to schedule trip:', error, { component: 'page', action: 'execution' });
-      let errorMessage = 'Failed to schedule shopping trip. ';
-
-      if (error instanceof Error) {
-        errorMessage += error.message;
-      } else {
-        errorMessage += 'Please try again.';
-      }
-
-      showError(errorMessage);
-      throw error;
-    }
-  }, [currentSpace, listToSchedule]);
-
-  const handleCreateTask = useCallback(async (list: ShoppingList) => {
-    if (!currentSpace) return;
-
-    // Prevent actions on optimistic lists (temp IDs)
-    if (list.id.startsWith('temp-')) {
-      showInfo('Please wait for the list to finish saving before creating a task.');
-      return;
-    }
-
-    try {
-      // Create a task linked to the shopping list
-      const { tasksService } = await import('@/lib/services/tasks-service');
-
-      const task = await tasksService.createTask({
-        space_id: currentSpace.id,
-        title: `Complete shopping: ${list.title}`,
-        description: `Shopping list with ${list.items?.length || 0} items${list.store_name ? ` at ${list.store_name}` : ''}`,
-        priority: 'medium',
-        status: 'pending',
-        assigned_to: null,
-        due_date: null,
-        category: 'shopping',
-        calendar_sync: false,
-        quick_note: null,
-        tags: null,
-        estimated_hours: null,
-        created_by: user?.id || '',
-      });
-
-      // Link the task to the shopping list
-      await shoppingIntegrationService.linkToTask(list.id, task.id);
-
-      // Show success message
-      showSuccess(`Task created: ${task.title}`);
-    } catch (error) {
-      logger.error('Failed to create task:', error, { component: 'page', action: 'execution' });
-      showError('Failed to create task. Please try again.');
-    }
-  }, [currentSpace, user?.id]);
-
-  // Handler for adding frequent items
-  const handleAddFrequentItem = useCallback(async (itemName: string, category: string) => {
-    if (!spaceId) return;
-
-    try {
-      // Find the first active list or create a "Quick Add" list
-      let targetList = lists.find(l => l.status === 'active');
-
-      if (!targetList) {
-        // Create a new "Quick Add" list
-        targetList = await shoppingService.createList({
-          space_id: spaceId,
-          title: 'Quick Add List',
-          description: 'Items added from frequent suggestions',
-        });
-      }
-
-      // Add the item to the list
-      await shoppingService.createItem({
-        list_id: targetList.id,
-        name: itemName,
-        quantity: 1,
-        category,
-      });
-
-      invalidateShopping();
-    } catch (error) {
-      logger.error('Failed to add frequent item:', error, { component: 'page', action: 'execution' });
-    }
-  }, [spaceId, lists, invalidateShopping]);
+    currentSpace, lists, stats, loading, refetchLists,
+    searchQuery, isSearchTyping, statusFilter, timeFilter, filteredLists,
+  } = data;
+
+  const {
+    isModalOpen, editingList, showTemplatePicker, showTemplateModal,
+    listForTemplate, showScheduleTripModal, listToSchedule, confirmDialog,
+    handleOpenNewListModal, handleCloseModal, handleEditList,
+    handleOpenTemplatePicker, handleSaveAsTemplate, handleScheduleTrip,
+    handleStartFresh, handleCloseConfirmDialog,
+  } = modals;
+
+  const {
+    handleCreateList, handleDeleteList, handleConfirmDelete, handleCompleteList,
+    handleToggleItem, handleUpdateQuantity, handleSelectTemplate,
+    handleSaveTemplate, handleScheduleTripSubmit, handleCreateTask,
+    handleAddFrequentItem, handleSearchChange, handleClearSearch,
+    handleTotalListsClick, handleActiveListsClick, handleItemsThisWeekClick,
+    handleCompletedListsClick,
+  } = handlers;
 
   return (
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
@@ -806,7 +239,7 @@ export default function ShoppingPage() {
               <div className="w-full sm:w-auto">
                 <div className="bg-gray-900/80 rounded-full p-1 flex w-full sm:w-auto gap-0.5">
                   <button
-                    onClick={() => { setStatusFilter('all'); setTimeFilter('all'); }}
+                    onClick={() => { data.setStatusFilter('all'); data.setTimeFilter('all'); }}
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'all' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
@@ -816,7 +249,7 @@ export default function ShoppingPage() {
                     All
                   </button>
                   <button
-                    onClick={() => { setTimeFilter('week'); setStatusFilter('all'); }}
+                    onClick={() => { data.setTimeFilter('week'); data.setStatusFilter('all'); }}
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       timeFilter === 'week'
                         ? 'bg-emerald-500 text-white shadow-sm'
@@ -826,7 +259,7 @@ export default function ShoppingPage() {
                     Week
                   </button>
                   <button
-                    onClick={() => { setStatusFilter('active'); setTimeFilter('all'); }}
+                    onClick={() => { data.setStatusFilter('active'); data.setTimeFilter('all'); }}
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'active' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
@@ -836,7 +269,7 @@ export default function ShoppingPage() {
                     Active
                   </button>
                   <button
-                    onClick={() => { setStatusFilter('completed'); setTimeFilter('all'); }}
+                    onClick={() => { data.setStatusFilter('completed'); data.setTimeFilter('all'); }}
                     className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'completed' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
@@ -922,7 +355,7 @@ export default function ShoppingPage() {
         <>
           <LazyShoppingTemplatePickerModal
             isOpen={showTemplatePicker}
-            onClose={() => setShowTemplatePicker(false)}
+            onClose={() => modals.setShowTemplatePicker(false)}
             onSelectTemplate={handleSelectTemplate}
             onStartFresh={handleStartFresh}
             spaceId={currentSpace.id}
@@ -932,8 +365,8 @@ export default function ShoppingPage() {
             <LazySaveTemplateModal
               isOpen={showTemplateModal}
               onClose={() => {
-                setShowTemplateModal(false);
-                setListForTemplate(null);
+                modals.setShowTemplateModal(false);
+                modals.setListForTemplate(null);
               }}
               onSave={handleSaveTemplate}
               list={listForTemplate}
@@ -943,8 +376,8 @@ export default function ShoppingPage() {
             <LazyScheduleTripModal
               isOpen={showScheduleTripModal}
               onClose={() => {
-                setShowScheduleTripModal(false);
-                setListToSchedule(null);
+                modals.setShowScheduleTripModal(false);
+                modals.setListToSchedule(null);
               }}
               onSchedule={handleScheduleTripSubmit}
               list={listToSchedule}
@@ -955,7 +388,7 @@ export default function ShoppingPage() {
 
       <LazyConfirmDialog
         isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, listId: '' })}
+        onClose={handleCloseConfirmDialog}
         onConfirm={handleConfirmDelete}
         title="Delete Shopping List"
         message="Are you sure you want to delete this shopping list? This action cannot be undone."
