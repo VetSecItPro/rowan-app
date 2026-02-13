@@ -11,6 +11,8 @@ import { z } from 'zod';
 import { createMealSchema } from '@/lib/validations/meal-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 /**
  * GET /api/meals
@@ -40,6 +42,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);
@@ -122,6 +129,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);

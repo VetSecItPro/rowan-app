@@ -180,6 +180,17 @@ export async function csrfFetch(input: RequestInfo | URL, init: RequestInit = {}
     });
 
     clearTimeout(timeoutId);
+
+    // After a state-changing request, the server rotates the CSRF cookie.
+    // Clear cached token so the next request fetches the fresh one.
+    if (MUTATION_METHODS.has(method)) {
+      try {
+        sessionStorage.removeItem('csrf_token');
+      } catch {
+        // sessionStorage unavailable
+      }
+    }
+
     return response;
   } catch (error: unknown) {
     clearTimeout(timeoutId);

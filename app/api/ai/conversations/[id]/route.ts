@@ -6,8 +6,6 @@
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import {
   getConversation,
@@ -22,12 +20,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const ip = extractIP(req.headers);
-    const { success } = await checkGeneralRateLimit(ip);
-    if (!success) {
-      return Response.json({ error: 'Too many requests' }, { status: 429 });
-    }
-
     if (!featureFlags.isAICompanionEnabled()) {
       return Response.json({ error: 'AI companion is not enabled' }, { status: 403 });
     }
@@ -77,12 +69,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const ip = extractIP(req.headers);
-    const { success } = await checkGeneralRateLimit(ip);
-    if (!success) {
-      return Response.json({ error: 'Too many requests' }, { status: 429 });
-    }
-
     if (!featureFlags.isAICompanionEnabled()) {
       return Response.json({ error: 'AI companion is not enabled' }, { status: 403 });
     }

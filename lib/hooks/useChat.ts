@@ -12,6 +12,7 @@
 'use client';
 
 import { useCallback, useReducer, useRef } from 'react';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import type {
   ChatMessage,
   ChatStreamEvent,
@@ -314,7 +315,7 @@ export function useChat(spaceId: string) {
         if (voiceDurationSeconds != null && voiceDurationSeconds > 0) {
           body.voiceDurationSeconds = voiceDurationSeconds;
         }
-        const response = await fetch('/api/ai/chat', {
+        const response = await csrfFetch('/api/ai/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -407,7 +408,7 @@ export function useChat(spaceId: string) {
       dispatch({ type: 'SEND_MESSAGE', message: '' });
 
       try {
-        const response = await fetch('/api/ai/chat', {
+        const response = await csrfFetch('/api/ai/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -8,6 +8,8 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 // Zod schema for meal updates
 const UpdateMealSchema = z.object({
@@ -48,6 +50,11 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       );
     }
 
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);
@@ -128,6 +135,11 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       );
     }
 
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);
@@ -224,6 +236,11 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
       );
     }
 
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);

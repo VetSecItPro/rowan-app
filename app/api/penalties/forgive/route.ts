@@ -10,6 +10,8 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { forgivePenalty, getSpacePenaltySettings } from '@/lib/services/rewards/late-penalty-service';
 import { z } from 'zod';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 const forgiveSchema = z.object({
   penaltyId: z.string().uuid(),
@@ -41,6 +43,12 @@ export async function POST(request: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for household management
+    const tierCheck = await canAccessFeature(user.id, 'canUseHousehold', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseHousehold', tierCheck.tier ?? 'free');
     }
 
     const body = await request.json();

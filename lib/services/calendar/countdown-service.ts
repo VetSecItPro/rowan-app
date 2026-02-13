@@ -2,9 +2,29 @@
 // Phase 11 + Phase 15: Manages unified countdowns from events AND important dates
 
 import { createClient } from '@/lib/supabase/client';
-import type { CalendarEvent } from '@/lib/services/calendar-service';
 import type { ImportantDate, ImportantDateType } from '@/lib/types/important-dates';
 import { logger } from '@/lib/logger';
+
+/**
+ * Row type for the `calendar_events` table (lightweight countdown/important-date links).
+ * NOT the same as CalendarEvent in calendar-service.ts which maps to the `events` table.
+ */
+export interface CalendarCountdownEvent {
+  id: string;
+  space_id: string;
+  title: string;
+  description?: string | null;
+  start_time: string;
+  end_time?: string | null;
+  all_day?: boolean;
+  location?: string | null;
+  created_by?: string | null;
+  show_countdown?: boolean;
+  countdown_label?: string | null;
+  important_date_id?: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 /**
  * Source type for countdown items
@@ -18,7 +38,7 @@ export type CountdownSource = 'event' | 'important_date';
 export interface CountdownItem {
   id: string;
   source: CountdownSource;
-  event?: CalendarEvent;
+  event?: CalendarCountdownEvent;
   importantDate?: ImportantDate;
   label: string;
   targetDate: Date;
@@ -128,7 +148,7 @@ function formatCountdown(
 /**
  * Transform an event into a countdown item
  */
-function eventToCountdown(event: CalendarEvent): CountdownItem {
+function eventToCountdown(event: CalendarCountdownEvent): CountdownItem {
   const targetDate = new Date(event.start_time);
   const { days, hours, minutes, isToday, isPast } = calculateTimeRemaining(targetDate);
 
@@ -227,7 +247,7 @@ export const countdownService = {
       // Fetch calendar events with show_countdown enabled
       const eventsPromise = supabase
         .from('calendar_events')
-        .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
+        .select('id, space_id, title, description, start_time, end_time, all_day, location, created_by, show_countdown, countdown_label, important_date_id, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
         .gte('start_time', now)
@@ -304,7 +324,7 @@ export const countdownService = {
 
       const { data: events, error } = await supabase
         .from('calendar_events')
-        .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
+        .select('id, space_id, title, description, start_time, end_time, all_day, location, created_by, show_countdown, countdown_label, important_date_id, created_at, updated_at')
         .eq('space_id', spaceId)
         .eq('show_countdown', true)
         .gte('start_time', todayStart.toISOString())
@@ -370,7 +390,7 @@ export const countdownService = {
 
       const { data: event, error } = await supabase
         .from('calendar_events')
-        .select('id, space_id, title, description, start_time, end_time, event_type, is_recurring, recurrence_pattern, location, category, status, assigned_to, created_by, custom_color, timezone, deleted_at, deleted_by, show_countdown, countdown_label, linked_bill_id, created_at, updated_at')
+        .select('id, space_id, title, description, start_time, end_time, all_day, location, created_by, show_countdown, countdown_label, important_date_id, created_at, updated_at')
         .eq('id', eventId)
         .single();
 

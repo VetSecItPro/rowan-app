@@ -645,7 +645,7 @@ export default function ShoppingPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Shopping Lists' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={async () => { await refetchLists(); }}>
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8 lg:p-5">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-row items-center gap-3 sm:gap-4">

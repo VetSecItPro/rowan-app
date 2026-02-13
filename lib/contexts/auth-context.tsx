@@ -42,7 +42,8 @@ interface AuthContextType {
   // Core authentication state
   user: UserProfile | null;
   session: Session | null;
-  loading: boolean;
+  loading: boolean; // Session loading only — components render immediately after auth session resolves
+  profileLoading: boolean; // True while the full user profile (name, avatar, etc.) is still loading
   error: string | null;
 
   // Authentication methods
@@ -72,20 +73,21 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
   const signOutMutation = useSignOut();
   const handleAuthStateChange = useAuthStateChange();
 
-  // Set up offline cache persistence
+  // Set up offline cache persistence — validate cache belongs to the current user
+  const currentUserId = authQuery.session?.user?.id;
   useEffect(() => {
-    // Restore cached data from IndexedDB on app load
+    if (!currentUserId) return; // Wait until we know who the user is
+
     const restoreCache = async () => {
-      const restoredFromIDB = await restoreQueryCache(queryClient);
+      const restoredFromIDB = await restoreQueryCache(queryClient, currentUserId);
       if (!restoredFromIDB) {
-        // Try localStorage backup (for page refreshes)
-        await restoreFromBackup(queryClient);
+        await restoreFromBackup(queryClient, currentUserId);
       }
     };
 
     restoreCache();
     // Note: setupCachePersistence is called in query-client-provider.tsx — not duplicated here
-  }, []);
+  }, [currentUserId]);
 
   // Set up real-time auth state change listener
   useEffect(() => {
@@ -160,11 +162,33 @@ function InnerAuthProvider({ children }: { children: ReactNode }) {
     // No-op for backward compatibility
   };
 
+  // Provide user as soon as session loads (with basic info from auth session).
+  // Full profile data (name, avatar, etc.) fills in once the profile query completes.
+  // This eliminates the ~300-600ms delay where the dashboard shows a full-screen spinner
+  // while waiting for the profile query after the session is already authenticated.
+  const sessionUser = authQuery.user;
+  const sessionBasedUser: UserProfile | null = sessionUser
+    ? {
+        id: sessionUser.id,
+        email: sessionUser.email || '',
+        name: null,
+        avatar_url: null,
+        created_at: sessionUser.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+    : null;
+
   const contextValue: AuthContextType = {
     // Core state from React Query
-    user: authQuery.profile || null,
+    // user is available immediately after session loads (with basic auth data).
+    // Once profile query completes, the full profile (name, avatar) fills in.
+    user: authQuery.profile ?? sessionBasedUser,
     session: authQuery.session || null,
+    // loading = session query only — components can render their shells immediately
+    // after auth session resolves, without waiting for the profile query
     loading: authQuery.isLoading,
+    // profileLoading = true while the profile query (name, avatar, etc.) is still fetching
+    profileLoading: authQuery.isProfileLoading,
     error: authQuery.error?.message || null,
 
     // Authentication methods

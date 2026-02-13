@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LayoutDashboard, Bot } from 'lucide-react';
 import { NAVIGATION_GROUPS, NAVIGATION_ITEMS, type NavItem } from '@/lib/navigation';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useSpaces } from '@/lib/contexts/spaces-context';
+import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
+import { useDevice } from '@/lib/contexts/DeviceContext';
 
 const SIDEBAR_STORAGE_KEY = 'sidebar-expanded';
 const HOVER_DELAY = 200; // ms delay before hover expand
@@ -30,6 +32,7 @@ const GRADIENT_GLOW_MAP: Record<string, string> = {
   'bg-gradient-to-r from-pink-500 to-purple-500': 'rgba(236, 72, 153, 0.15)',     // check-in (pink)
   'bg-gradient-to-r from-yellow-500 to-amber-500': 'rgba(234, 179, 8, 0.15)',     // year-in-review (yellow)
   'bg-gradient-to-r from-orange-500 to-amber-500': 'rgba(249, 115, 22, 0.15)',    // admin (orange)
+  'bg-gradient-to-r from-blue-500 to-indigo-500': 'rgba(59, 130, 246, 0.15)',    // AI assistant (blue)
 };
 
 function getGlowColor(gradient: string): string {
@@ -163,11 +166,14 @@ export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false); // Start collapsed, hover to expand
   const [isHoverExpanded, setIsHoverExpanded] = useState(false); // Temporary expansion on hover
   const [mounted, setMounted] = useState(false);
+  const [aiHovered, setAiHovered] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isAdmin } = useAdmin();
   const { currentSpace } = useSpaces();
+  const chatCtx = useChatContextSafe();
+  const { isDesktop } = useDevice();
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const collapseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
@@ -392,6 +398,91 @@ export function Sidebar() {
           ))}
         </div>
       </nav>
+
+      {/* Rowan AI — Show in sidebar only on non-desktop (chat panel is persistent on lg+) */}
+      {chatCtx?.enabled && !isDesktop && (
+        <div className={`pt-2 pb-2 border-t border-gray-700/30 ${effectivelyExpanded ? 'mx-2 px-2' : 'mx-1 px-1'}`}>
+          {effectivelyExpanded && (
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2.5 mb-2 block">
+              AI Assistant
+            </span>
+          )}
+          <button
+            onClick={chatCtx.toggleChat}
+            onMouseEnter={() => setAiHovered(true)}
+            onMouseLeave={() => setAiHovered(false)}
+            className={`group relative flex items-center w-full py-3 rounded-lg transition-colors duration-200 ${
+              effectivelyExpanded ? 'gap-3 px-2.5' : 'justify-center px-2'
+            } ${
+              chatCtx.isOpen
+                ? 'bg-gradient-to-r from-blue-900/20 to-indigo-900/10 shadow-sm border border-blue-800/30'
+                : 'border border-transparent hover:border-blue-800/20'
+            }`}
+            aria-label={chatCtx.isOpen ? 'Close Rowan AI chat' : 'Open Rowan AI chat'}
+          >
+            {/* Hover glow */}
+            <AnimatePresence>
+              {aiHovered && !chatCtx.isOpen && (
+                <motion.div
+                  className="absolute inset-0 rounded-lg pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)' }}
+                />
+              )}
+            </AnimatePresence>
+
+            {/* Icon with gradient background */}
+            <div
+              className={`relative flex-shrink-0 w-8 h-8 xl:w-10 xl:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg transition-all duration-200 group-hover:scale-110 group-hover:shadow-xl ${
+                chatCtx.isOpen ? 'shadow-2xl ring-2 ring-white/20 scale-105' : 'shadow-md'
+              }`}
+            >
+              <Bot className="w-4 h-4 xl:w-5 xl:h-5 text-white drop-shadow-md" aria-hidden="true" />
+
+              {/* Unread badge */}
+              {chatCtx.hasUnread && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-900" />
+              )}
+            </div>
+
+            {/* Label */}
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-out ${
+                effectivelyExpanded ? 'w-44 opacity-100' : 'w-0 opacity-0'
+              }`}
+            >
+              <p className={`text-sm font-semibold truncate ${chatCtx.isOpen ? 'text-white' : 'text-gray-300 group-hover:text-white'}`}>
+                Rowan AI
+              </p>
+              <p className="text-[11px] text-gray-400 truncate">
+                Your family assistant
+              </p>
+            </div>
+
+            {/* Tooltip when collapsed */}
+            {!effectivelyExpanded && aiHovered && (
+              <div className="pointer-events-none absolute left-full ml-3 px-3 py-2 bg-gray-800/95 backdrop-blur-sm text-white text-sm rounded-xl whitespace-nowrap z-50 shadow-xl border border-white/10 animate-in fade-in duration-150">
+                <p className="font-semibold">Rowan AI</p>
+                <p className="text-[11px] text-gray-400">Your family assistant</p>
+                <div className="absolute left-0 top-1/2 -translate-x-[5px] -translate-y-1/2 w-2.5 h-2.5 bg-gray-800/95 rotate-45 border-l border-b border-white/10" />
+              </div>
+            )}
+
+            {/* Active indicator bar */}
+            {chatCtx.isOpen && (
+              <motion.div
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-500 via-blue-600 to-indigo-600 rounded-r-full shadow-lg"
+                initial={{ opacity: 0, scaleY: 0 }}
+                animate={{ opacity: 1, scaleY: 1 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+              />
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Admin Section - separate from features */}
       {isAdmin && (

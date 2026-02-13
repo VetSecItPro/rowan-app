@@ -11,6 +11,8 @@ import { z } from 'zod';
 import { createGoalSchema } from '@/lib/validations/goal-schemas';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { withUserDataCache } from '@/lib/utils/cache-headers';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 /**
  * GET /api/goals
@@ -40,6 +42,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Verify subscription tier for goals
+    const tierCheck = await canAccessFeature(user.id, 'canUseGoals', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseGoals', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);
@@ -122,6 +129,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Verify subscription tier for goals
+    const tierCheck = await canAccessFeature(user.id, 'canUseGoals', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseGoals', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);

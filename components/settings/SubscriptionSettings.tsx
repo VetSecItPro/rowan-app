@@ -89,7 +89,6 @@ const TIER_DETAILS = {
       '3 spaces',
       '6 household members',
       '5GB storage',
-      'Priority support',
     ],
   },
 };

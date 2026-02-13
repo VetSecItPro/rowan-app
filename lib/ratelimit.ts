@@ -87,7 +87,7 @@ export const aiBriefingRateLimit = redis ? new Ratelimit({
 // AI suggestions: 10 per hour per user (across all tiers)
 export const aiSuggestionsRateLimit = redis ? new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(10, '1 h'),
+  limiter: Ratelimit.slidingWindow(30, '1 h'),
   analytics: true,
   prefix: 'rowan:ai:suggestions',
 }) : null;
@@ -119,7 +119,7 @@ export async function checkAIBriefingRateLimit(
 export async function checkAISuggestionsRateLimit(
   userId: string
 ): Promise<{ success: boolean }> {
-  return checkRateLimit(userId, aiSuggestionsRateLimit, 10, 3600000);
+  return checkRateLimit(userId, aiSuggestionsRateLimit, 30, 3600000);
 }
 
 /**

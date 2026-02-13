@@ -8,9 +8,8 @@
 
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit, checkAIChatRateLimit } from '@/lib/ratelimit';
+import { checkAIChatRateLimit } from '@/lib/ratelimit';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
-import { extractIP } from '@/lib/ratelimit-fallback';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { validateAndSanitizeChatMessage } from '@/lib/validations/chat-schemas';
@@ -35,17 +34,6 @@ export const maxDuration = 60; // Allow up to 60s for AI responses
 
 export async function POST(req: NextRequest) {
   try {
-    // -- Rate limiting ----------------------------------------------------
-    const ip = extractIP(req.headers);
-    const { success: rateLimitSuccess } = await checkGeneralRateLimit(ip);
-
-    if (!rateLimitSuccess) {
-      return new Response(
-        JSON.stringify({ error: 'Too many requests. Please try again later.' }),
-        { status: 429, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
     // -- Authentication ---------------------------------------------------
     const supabase = await createClient();
     const {
@@ -83,6 +71,14 @@ export async function POST(req: NextRequest) {
     }
 
     const { message, conversationId, spaceId, confirmAction, voiceDurationSeconds } = parsed;
+
+    // Require non-empty message unless this is a confirmation action
+    if (!message && !confirmAction) {
+      return new Response(
+        JSON.stringify({ error: 'Message cannot be empty' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     // -- Verify space access ----------------------------------------------
     try {

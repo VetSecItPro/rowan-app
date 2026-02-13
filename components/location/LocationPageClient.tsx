@@ -15,6 +15,10 @@ import {
   Clock,
   Home,
   RefreshCw,
+  History,
+  AlertTriangle,
+  X,
+  Loader2,
 } from 'lucide-react';
 import nextDynamic from 'next/dynamic';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -23,8 +27,9 @@ import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { useFamilyLocation } from '@/hooks/useFamilyLocation';
-import { isNative } from '@/lib/native';
+import { isNative, getCurrentPosition } from '@/lib/native';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // Lazy-load heavy map/location components to reduce First Load JS (FIX-016)
 const FamilyMapView = nextDynamic(
@@ -43,7 +48,15 @@ const LocationSettings = nextDynamic(
   }
 );
 
-type ViewMode = 'map' | 'settings';
+const LocationTimeline = nextDynamic(
+  () => import('@/components/location/LocationTimeline').then(mod => ({ default: mod.LocationTimeline })),
+  {
+    loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" />,
+    ssr: false,
+  }
+);
+
+type ViewMode = 'map' | 'activity' | 'settings';
 
 export default function LocationPageClient({ spaceId }: { spaceId: string }) {
   const [viewMode, setViewMode] = useState<ViewMode>('map');
@@ -77,6 +90,59 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
     setIsRefreshing(false);
   }, [refreshFamilyLocations]);
 
+  // Emergency / SOS state
+  const [showEmergencyConfirm, setShowEmergencyConfirm] = useState(false);
+  const [isSendingEmergency, setIsSendingEmergency] = useState(false);
+  const [emergencyResult, setEmergencyResult] = useState<'sent' | 'error' | null>(null);
+
+  const handleEmergency = useCallback(async () => {
+    setIsSendingEmergency(true);
+    setEmergencyResult(null);
+
+    try {
+      // Get current position for emergency
+      const position = await getCurrentPosition({ enableHighAccuracy: true });
+
+      if (!position) {
+        setEmergencyResult('error');
+        setIsSendingEmergency(false);
+        return;
+      }
+
+      const response = await fetch('/api/location/emergency', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          space_id: spaceId,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          accuracy: position.accuracy,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setEmergencyResult('sent');
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+          setShowEmergencyConfirm(false);
+          setEmergencyResult(null);
+        }, 3000);
+      } else {
+        setEmergencyResult('error');
+      }
+    } catch (err) {
+      logger.error('Emergency alert failed', err, {
+        component: 'LocationPageClient',
+        action: 'emergency_alert',
+      });
+      setEmergencyResult('error');
+    } finally {
+      setIsSendingEmergency(false);
+    }
+  }, [spaceId]);
+
   return (
     <FeatureGateWrapper
       feature="location"
@@ -86,7 +152,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
       <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Family Location' }]}>
         <PageErrorBoundary>
           <PullToRefresh onRefresh={handleRefresh} disabled={isLoading}>
-            <div className="p-4 sm:p-6 md:p-8">
+            <div className="p-4 sm:p-6 md:p-8 lg:p-5">
               <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -120,6 +186,18 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                         <span className="text-sm">Map</span>
                       </button>
                       <button
+                        onClick={() => setViewMode('activity')}
+                        className={cn(
+                          'px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1',
+                          viewMode === 'activity'
+                            ? 'bg-gradient-location text-white shadow-md'
+                            : 'text-gray-300 hover:bg-gray-800/50'
+                        )}
+                      >
+                        <History className="w-4 h-4" />
+                        <span className="text-sm">Activity</span>
+                      </button>
+                      <button
                         onClick={() => setViewMode('settings')}
                         className={cn(
                           'px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium flex-1',
@@ -133,15 +211,27 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                       </button>
                     </div>
 
-                    {/* Refresh Button */}
-                    <button
-                      onClick={handleRefresh}
-                      disabled={isRefreshing || isLoading}
-                      className="px-4 py-2.5 sm:py-3 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base font-medium disabled:opacity-50"
-                    >
-                      <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
-                      <span className="sm:inline hidden">Refresh</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Refresh Button */}
+                      <button
+                        onClick={handleRefresh}
+                        disabled={isRefreshing || isLoading}
+                        className="px-4 py-2.5 sm:py-3 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base font-medium disabled:opacity-50"
+                      >
+                        <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
+                        <span className="sm:inline hidden">Refresh</span>
+                      </button>
+
+                      {/* SOS Button */}
+                      <button
+                        onClick={() => setShowEmergencyConfirm(true)}
+                        className="px-4 py-2.5 sm:py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base font-bold"
+                        aria-label="Emergency alert"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                        <span>SOS</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -295,6 +385,16 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                         </div>
                       )}
                     </motion.div>
+                  ) : viewMode === 'activity' ? (
+                    <motion.div
+                      key="activity"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <LocationTimeline spaceId={spaceId} className="shadow-xl" />
+                    </motion.div>
                   ) : (
                     <motion.div
                       key="settings"
@@ -368,6 +468,102 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
           </PullToRefresh>
         </PageErrorBoundary>
       </FeatureLayout>
+
+      {/* Emergency Confirmation Modal */}
+      <AnimatePresence>
+        {showEmergencyConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={() => !isSendingEmergency && setShowEmergencyConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-900 border border-red-800/50 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {emergencyResult === 'sent' ? (
+                <div className="text-center py-4">
+                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+                    <Shield className="w-8 h-8 text-green-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Alert Sent</h3>
+                  <p className="text-gray-400 text-sm">
+                    Your family has been notified with your exact location.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Close button */}
+                  <button
+                    onClick={() => setShowEmergencyConfirm(false)}
+                    disabled={isSendingEmergency}
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
+                  {/* Icon */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                      <AlertTriangle className="w-8 h-8 text-red-400" />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-xl font-bold text-white text-center mb-2">
+                    Send Emergency Alert?
+                  </h3>
+                  <p className="text-gray-400 text-sm text-center mb-6">
+                    This will immediately share your exact location with all family members
+                    and send them an urgent notification, regardless of your privacy settings.
+                  </p>
+
+                  {emergencyResult === 'error' && (
+                    <div className="mb-4 p-3 bg-red-900/30 border border-red-800/50 rounded-lg">
+                      <p className="text-red-400 text-sm text-center">
+                        Failed to send alert. Please try again or call emergency services directly.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={handleEmergency}
+                      disabled={isSendingEmergency}
+                      className="w-full py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {isSendingEmergency ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="w-5 h-5" />
+                          Send Emergency Alert
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setShowEmergencyConfirm(false)}
+                      disabled={isSendingEmergency}
+                      className="w-full py-3 bg-gray-800 text-gray-300 font-medium rounded-xl hover:bg-gray-700 transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </FeatureGateWrapper>
   );
 }

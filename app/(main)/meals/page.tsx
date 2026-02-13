@@ -106,12 +106,12 @@ const CalendarDayCell = memo(({
         isCurrentMonth
           ? 'border-gray-700 bg-gray-800'
           : 'border-gray-800 bg-gray-900/50'
-      } ${isToday ? 'ring-2 ring-purple-500' : ''}`}
+      } ${isToday ? 'ring-2 ring-orange-500' : ''}`}
     >
       <div className={`text-sm font-medium mb-2 ${
         isCurrentMonth
           ? isToday
-            ? 'text-purple-400'
+            ? 'text-orange-400'
             : 'text-white'
           : 'text-gray-600'
       }`}>
@@ -857,7 +857,7 @@ export default function MealsPage() {
     >
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Meal Planning' }]}>
       <PullToRefresh onRefresh={handlePullToRefresh}>
-      <div className="p-4 sm:p-6 md:p-8">
+      <div className="p-4 sm:p-6 md:p-8 lg:p-5">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-row items-center gap-3">
@@ -1152,7 +1152,7 @@ export default function MealsPage() {
                   <div className="flex items-center w-auto inline-flex gap-0.5 sm:gap-1 p-1 sm:p-1.5 bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-full sm:rounded-xl border border-orange-700">
                     <button
                       onClick={() => setCalendarViewMode('week')}
-                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
                         calendarViewMode === 'week'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-300 hover:bg-orange-900/50'
@@ -1163,7 +1163,7 @@ export default function MealsPage() {
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('2weeks')}
-                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
                         calendarViewMode === '2weeks'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-300 hover:bg-orange-900/50'
@@ -1174,7 +1174,7 @@ export default function MealsPage() {
                     </button>
                     <button
                       onClick={() => setCalendarViewMode('month')}
-                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 ${
+                      className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full sm:rounded-lg transition-all font-medium text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
                         calendarViewMode === 'month'
                           ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md'
                           : 'text-gray-300 hover:bg-orange-900/50'

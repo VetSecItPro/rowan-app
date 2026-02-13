@@ -15,6 +15,11 @@ const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClien
 type EventReminderConfig = Record<string, unknown>;
 type EventRecurrenceConfig = Record<string, unknown>;
 
+/**
+ * Maps to the `events` table (full-featured calendar events).
+ * NOT the `calendar_events` table (lightweight countdown/important-date links).
+ * See CalendarCountdownEvent in countdown-service.ts for the latter.
+ */
 export interface CalendarEvent {
   id: string;
   space_id: string;

@@ -38,7 +38,7 @@ export interface RecurringExpensePattern {
 interface ExpenseForAnalysis {
   id: string;
   amount: number;
-  merchant_name: string | null;
+  title: string | null;
   category: string;
   date: string;
   description: string | null;
@@ -79,7 +79,7 @@ export async function analyzeRecurringPatterns(spaceId: string): Promise<Recurri
 
   const { data: expenses, error } = await supabase
     .from('expenses')
-    .select('id, amount, merchant_name, category, date, description')
+    .select('id, amount, category, date, description, title')
     .eq('space_id', spaceId)
     .gte('date', twoYearsAgo.toISOString().split('T')[0])
     .order('date', { ascending: true });
@@ -151,7 +151,7 @@ function detectPatterns(expenses: ExpenseForAnalysis[]): PatternCandidate[] {
     const confidence = calculateConfidence(intervals, frequency, variance, expenseGroup.length);
 
     patterns.push({
-      merchant_name: expenseGroup[0].merchant_name,
+      merchant_name: expenseGroup[0].title,
       category: expenseGroup[0].category,
       frequency,
       average_amount: Math.round(avgAmount * 100) / 100,
@@ -172,9 +172,9 @@ function groupExpenses(expenses: ExpenseForAnalysis[]): Record<string, ExpenseFo
   const groups: Record<string, ExpenseForAnalysis[]> = {};
 
   for (const expense of expenses) {
-    // Use merchant name if available, otherwise use category
-    const key = expense.merchant_name
-      ? `merchant:${expense.merchant_name.toLowerCase()}`
+    // Use title if available, otherwise use category
+    const key = expense.title
+      ? `merchant:${expense.title.toLowerCase()}`
       : `category:${expense.category.toLowerCase()}`;
 
     if (!groups[key]) groups[key] = [];

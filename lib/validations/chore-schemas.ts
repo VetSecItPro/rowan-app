@@ -12,7 +12,12 @@ export const choreBaseSchema = z.object({
     .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
-    .refine(val => val === null || z.string().datetime().safeParse(val).success, 'Invalid date format'),
+    .refine(val => {
+      if (val === null || val === undefined) return true;
+      // Accept full ISO datetime (2026-02-13T10:00:00Z) or date-only (2026-02-13) or datetime without tz (2026-02-13T10:00:00)
+      if (z.string().datetime().safeParse(val).success) return true;
+      return /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/.test(val);
+    }, 'Invalid date format'),
   notes: z.string().max(1000, 'Notes must be less than 1000 characters').trim().optional().nullable()
     .transform(val => val === '' ? null : val),
   sort_order: z.number().int().min(0).optional().nullable(),
@@ -93,7 +98,12 @@ export const bulkUpdateChoresSchema = z.object({
     status: z.enum(['pending', 'in-progress', 'blocked', 'on-hold', 'completed']).optional(),
     frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'once']).optional(),
     assigned_to: z.string().uuid().optional().nullable(),
-    due_date: z.string().datetime().optional().nullable(),
+    due_date: z.string().optional().nullable()
+      .refine(val => {
+        if (val === null || val === undefined) return true;
+        if (z.string().datetime().safeParse(val).success) return true;
+        return /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/.test(val);
+      }, 'Invalid date format'),
   }),
 });
 

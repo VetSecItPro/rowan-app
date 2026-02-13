@@ -1,13 +1,11 @@
 /**
  * ChatPanel — Main chat interface panel
  *
- * Slide-in panel from the right side with:
- * - Auto-scrolling message list
- * - Streaming text display
- * - Confirmation flow for tool calls
- * - Empty state with example prompts
- * - Error banner with retry
- * - New conversation button
+ * Two rendering modes:
+ * - **Persistent** (desktop lg+): Static right column in the flex layout.
+ *   No animation, no backdrop, no close button. Always visible.
+ * - **Overlay** (mobile/tablet): Slide-in from right with backdrop.
+ *   Toggled open/closed via BottomNav or Sidebar button.
  */
 
 'use client';
@@ -16,11 +14,11 @@ import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, RotateCcw, Bot } from 'lucide-react';
 import { useChat } from '@/lib/hooks/useChat';
+import { useAuth } from '@/lib/contexts/auth-context';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import EmptyState from './EmptyState';
 import ErrorBanner from './ErrorBanner';
-import QuickActions from './QuickActions';
 import SuggestionCards from './SuggestionCards';
 import MorningBriefing from './MorningBriefing';
 import { useAISuggestions } from '@/lib/hooks/useAISuggestions';
@@ -34,6 +32,8 @@ interface ChatPanelProps {
   onNewAssistantMessage?: () => void;
   /** Whether voice input is enabled in user settings */
   voiceEnabled?: boolean;
+  /** When true, renders as a static in-flow column (desktop persistent mode) */
+  persistent?: boolean;
 }
 
 export default function ChatPanel({
@@ -42,6 +42,7 @@ export default function ChatPanel({
   onClose,
   onNewAssistantMessage,
   voiceEnabled,
+  persistent,
 }: ChatPanelProps) {
   const {
     messages,
@@ -57,6 +58,7 @@ export default function ChatPanel({
     clearError,
   } = useChat(spaceId);
 
+  const { user } = useAuth();
   const { suggestions, dismiss: dismissSuggestion } = useAISuggestions(spaceId);
   const { briefing, dismiss: dismissBriefing } = useAIBriefing(spaceId);
 
@@ -74,15 +76,16 @@ export default function ChatPanel({
   }, [messages]);
 
   // Notify parent when a new assistant message arrives while panel is closed
+  const effectiveIsOpen = persistent || isOpen;
   useEffect(() => {
-    if (!isOpen && messages.length > prevMessageCountRef.current) {
+    if (!effectiveIsOpen && messages.length > prevMessageCountRef.current) {
       const newest = messages[messages.length - 1];
       if (newest?.role === 'assistant' && !newest.isStreaming && newest.content) {
         onNewAssistantMessage?.();
       }
     }
     prevMessageCountRef.current = messages.length;
-  }, [messages, isOpen, onNewAssistantMessage]);
+  }, [messages, effectiveIsOpen, onNewAssistantMessage]);
 
   // Auto-scroll to bottom on new messages or streaming text
   useEffect(() => {
@@ -114,6 +117,118 @@ export default function ChatPanel({
     }
   }, [conversationId]);
 
+  // ── Shared inner content (used by both persistent and overlay modes) ──
+
+  const panelContent = (
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gray-800/50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+            <Bot className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-white">Rowan</h2>
+            <p className="text-xs text-gray-400">Rowan AI</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button
+            onClick={clearChat}
+            className="p-2 rounded-lg hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 transition-colors"
+            aria-label="New conversation"
+            title="New conversation"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+          {!persistent && (
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 transition-colors"
+              aria-label="Close chat"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+      >
+        {/* Morning briefing — shown above empty state */}
+        {briefing && messages.length === 0 && (
+          <MorningBriefing
+            briefing={briefing}
+            onAskRowan={sendMessage}
+            onDismiss={dismissBriefing}
+          />
+        )}
+
+        {messages.length === 0 && <EmptyState onSend={sendMessage} userName={user?.name} />}
+
+        {/* Proactive suggestions */}
+        {suggestions.length > 0 && messages.length === 0 && (
+          <div className="mb-2">
+            <SuggestionCards
+              suggestions={suggestions}
+              onAction={sendMessage}
+              onDismiss={dismissSuggestion}
+            />
+          </div>
+        )}
+
+        <AnimatePresence initial={false}>
+          {messages.map((msg) => (
+            <ChatMessage
+              key={msg.id}
+              message={msg}
+              conversationId={conversationId}
+              onConfirm={handleConfirm}
+              onFeedback={handleFeedback}
+            />
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Error banner */}
+      <AnimatePresence>
+        {error && (
+          <ErrorBanner
+            message={error}
+            onDismiss={clearError}
+            onRetry={lastUserMessageRef.current ? handleRetry : undefined}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Input */}
+      <ChatInput
+        onSend={sendMessage}
+        onStop={stopStreaming}
+        isLoading={isLoading}
+        isStreaming={isStreaming}
+        disabled={!!pendingAction}
+        voiceEnabled={voiceEnabled}
+      />
+    </>
+  );
+
+  // ── Persistent mode: static in-flow column ──
+
+  if (persistent) {
+    return (
+      <div className="flex flex-col h-screen sticky top-0 bg-gray-900 border-l border-gray-700/50">
+        {panelContent}
+      </div>
+    );
+  }
+
+  // ── Overlay mode: slide-in panel with backdrop ──
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -134,106 +249,9 @@ export default function ChatPanel({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[420px] lg:w-[440px] flex flex-col bg-gray-900 border-l border-gray-700/50 shadow-2xl"
+            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[420px] flex flex-col bg-gray-900 border-l border-gray-700/50 shadow-2xl"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gray-800/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-white">Rowan</h2>
-                  <p className="text-xs text-gray-400">AI Assistant</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={clearChat}
-                  className="p-2 rounded-lg hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 transition-colors"
-                  aria-label="New conversation"
-                  title="New conversation"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={onClose}
-                  className="p-2 rounded-lg hover:bg-gray-700/50 text-gray-400 hover:text-gray-200 transition-colors"
-                  aria-label="Close chat"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
-            >
-              {/* Morning briefing — shown above empty state */}
-              {briefing && messages.length === 0 && (
-                <MorningBriefing
-                  briefing={briefing}
-                  onAskRowan={sendMessage}
-                  onDismiss={dismissBriefing}
-                />
-              )}
-
-              {messages.length === 0 && <EmptyState onSend={sendMessage} />}
-
-              {/* Proactive suggestions */}
-              {suggestions.length > 0 && messages.length === 0 && (
-                <div className="mb-2">
-                  <SuggestionCards
-                    suggestions={suggestions}
-                    onAction={sendMessage}
-                    onDismiss={dismissSuggestion}
-                  />
-                </div>
-              )}
-
-              <AnimatePresence initial={false}>
-                {messages.map((msg) => (
-                  <ChatMessage
-                    key={msg.id}
-                    message={msg}
-                    conversationId={conversationId}
-                    onConfirm={handleConfirm}
-                    onFeedback={handleFeedback}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-
-            {/* Error banner */}
-            <AnimatePresence>
-              {error && (
-                <ErrorBanner
-                  message={error}
-                  onDismiss={clearError}
-                  onRetry={lastUserMessageRef.current ? handleRetry : undefined}
-                />
-              )}
-            </AnimatePresence>
-
-            {/* Quick actions — show above input when conversation is empty */}
-            {messages.length === 0 && (
-              <div className="px-3 pb-1">
-                <QuickActions onSend={sendMessage} />
-              </div>
-            )}
-
-            {/* Input */}
-            <ChatInput
-              onSend={sendMessage}
-              onStop={stopStreaming}
-              isLoading={isLoading}
-              isStreaming={isStreaming}
-              disabled={!!pendingAction}
-              voiceEnabled={voiceEnabled}
-            />
+            {panelContent}
           </motion.div>
         </>
       )}

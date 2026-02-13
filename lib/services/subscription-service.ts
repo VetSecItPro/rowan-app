@@ -46,7 +46,7 @@ export async function getUserSubscription(
         .from('subscriptions')
         .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, is_founding_member, founding_member_number, founding_member_locked_price_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       const dbQueryDuration = Date.now() - dbQueryStart;
 
@@ -132,9 +132,15 @@ export async function getUserSubscription(
 
 /**
  * Get user's subscription tier
+ *
+ * @param userId - The user ID to fetch tier for
+ * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
  */
-export async function getUserTier(userId: string): Promise<SubscriptionTier> {
-  const subscription = await getUserSubscription(userId);
+export async function getUserTier(
+  userId: string,
+  supabaseClient?: Awaited<ReturnType<typeof createClient>>
+): Promise<SubscriptionTier> {
+  const subscription = await getUserSubscription(userId, supabaseClient);
 
   if (!subscription || subscription.status !== 'active') {
     return 'free';

@@ -9,6 +9,8 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +80,12 @@ export async function GET(request: NextRequest) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
     }
 
     const searchParams = request.nextUrl.searchParams;

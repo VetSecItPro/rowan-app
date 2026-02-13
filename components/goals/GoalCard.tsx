@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { Target, MoreVertical, Check, History, Settings } from 'lucide-react';
+import { MoreVertical, Check, Minus, History, Settings, Pin } from 'lucide-react';
 import { Goal } from '@/lib/services/goals-service';
 import { formatDate } from '@/lib/utils/date-utils';
-import { useState, memo } from 'react';
+import { useState, memo, type ReactNode } from 'react';
 
 interface GoalCardProps {
   goal: Goal;
@@ -14,9 +14,19 @@ interface GoalCardProps {
   onShowHistory?: (goal: Goal) => void;
   onFrequencySettings?: (goal: Goal) => void;
   onStatusChange?: (goalId: string, status: 'not-started' | 'in-progress' | 'completed') => void;
+  onPriorityChange?: (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => void;
+  onTogglePin?: (goalId: string, isPinned: boolean) => void;
+  extraActions?: ReactNode;
 }
 
-export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onFrequencySettings, onStatusChange }: GoalCardProps) {
+const priorityColors: Record<string, string> = {
+  p1: 'text-red-400',
+  p2: 'text-orange-400',
+  p3: 'text-yellow-400',
+  p4: 'text-blue-400',
+};
+
+export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheckIn, onShowHistory, onFrequencySettings, onStatusChange, onPriorityChange, onTogglePin, extraActions }: GoalCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   // Determine status based on goal.status and progress
@@ -59,95 +69,110 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
     <div className="group relative bg-gray-900 border border-gray-800 rounded-xl p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3 mb-4">
         {/* Three-state checkbox */}
-        <div className="relative group">
-          <button
-            onClick={handleCheckboxClick}
-            aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-            className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
-              goalState === 'completed'
-                ? 'bg-green-500 border-green-500'
-                : goalState === 'in-progress'
-                ? 'bg-amber-500 border-amber-500'
-                : 'bg-transparent border-gray-600'
-            }`}
-          >
-            {goalState === 'completed' && <Check className="w-4 h-4 text-white" />}
-            {goalState === 'in-progress' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-          </button>
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-            {goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}
-          </div>
-        </div>
+        <button
+          onClick={handleCheckboxClick}
+          aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
+          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
+            goalState === 'completed'
+              ? 'bg-green-500 border-green-500'
+              : goalState === 'in-progress'
+              ? 'border-amber-500'
+              : 'border-gray-600 hover:border-gray-500'
+          }`}
+        >
+          {goalState === 'completed' && <Check className="w-3 h-3 text-white" />}
+          {goalState === 'in-progress' && <Minus className="w-3 h-3 text-amber-500" />}
+        </button>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 bg-gradient-goals rounded-lg flex items-center justify-center flex-shrink-0">
-              <Target className="w-4 h-4 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold text-white line-clamp-2">{goal.title}</h3>
-          </div>
-          {goal.description && <p className="text-sm text-gray-400 ml-10 break-words line-clamp-2">{goal.description}</p>}
+          <h3 className="text-base font-semibold text-white line-clamp-2">{goal.title}</h3>
+          {goal.description && <p className="text-sm text-gray-400 break-words line-clamp-2 mt-0.5">{goal.description}</p>}
         </div>
 
-        {/* Three-dot menu */}
-        <div className="relative">
-          <div className="relative group">
+        {/* Right actions row */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {onTogglePin && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onTogglePin(goal.id, !goal.is_pinned); }}
+              className={`transition-colors ${goal.is_pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}
+              title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
+            >
+              <Pin className={`w-3.5 h-3.5 ${goal.is_pinned ? 'fill-current' : ''}`} />
+            </button>
+          )}
+
+          {onPriorityChange && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const priorities: Array<'none' | 'p1' | 'p2' | 'p3' | 'p4'> = ['none', 'p1', 'p2', 'p3', 'p4'];
+                const currentIndex = priorities.indexOf(goal.priority || 'none');
+                const nextIndex = (currentIndex + 1) % priorities.length;
+                onPriorityChange(goal.id, priorities[nextIndex]);
+              }}
+              className={`text-xs font-medium transition-colors ${priorityColors[goal.priority || ''] || 'text-gray-600 hover:text-gray-400'}`}
+              title="Click to change priority"
+            >
+              {goal.priority && goal.priority !== 'none' ? goal.priority.toUpperCase() : '—'}
+            </button>
+          )}
+
+          {extraActions}
+
+          <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label="Goal options menu"
-              className="p-2 text-gray-400 hover:text-gray-300 transition-colors"
+              className="text-gray-500 hover:text-gray-300 transition-colors"
             >
-              <MoreVertical className="w-5 h-5" />
+              <MoreVertical className="w-4 h-4" />
             </button>
-            <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-              Options
-            </div>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                <div className="w-48 absolute right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
+                  {onCheckIn && goal.status === 'active' && (
+                    <button
+                      onClick={() => { onCheckIn(goal); setShowMenu(false); }}
+                      className="w-full px-4 py-2 text-left text-sm text-blue-400 hover:bg-blue-900/20 transition-colors flex items-center gap-2"
+                    >
+                      Check In
+                    </button>
+                  )}
+                  {onShowHistory && (
+                    <button
+                      onClick={() => { onShowHistory(goal); setShowMenu(false); }}
+                      className="w-full px-4 py-2 text-left text-sm text-purple-400 hover:bg-purple-900/20 transition-colors flex items-center gap-2"
+                    >
+                      <History className="w-4 h-4" />
+                      Check-In History
+                    </button>
+                  )}
+                  {onFrequencySettings && goal.status === 'active' && (
+                    <button
+                      onClick={() => { onFrequencySettings(goal); setShowMenu(false); }}
+                      className="w-full px-4 py-2 text-left text-sm text-indigo-400 hover:bg-indigo-900/20 transition-colors flex items-center gap-2"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Check-In Settings
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { onEdit(goal); setShowMenu(false); }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  >
+                    Edit Goal
+                  </button>
+                  <button
+                    onClick={() => { onDelete(goal.id); setShowMenu(false); }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                  >
+                    Delete Goal
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="w-48 absolute right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
-                {onCheckIn && goal.status === 'active' && (
-                  <button
-                    onClick={() => { onCheckIn(goal); setShowMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-blue-400 hover:bg-blue-900/20 transition-colors flex items-center gap-2"
-                  >
-                    Check In
-                  </button>
-                )}
-                {onShowHistory && (
-                  <button
-                    onClick={() => { onShowHistory(goal); setShowMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-purple-400 hover:bg-purple-900/20 transition-colors flex items-center gap-2"
-                  >
-                    <History className="w-4 h-4" />
-                    Check-In History
-                  </button>
-                )}
-                {onFrequencySettings && goal.status === 'active' && (
-                  <button
-                    onClick={() => { onFrequencySettings(goal); setShowMenu(false); }}
-                    className="w-full px-4 py-2 text-left text-sm text-indigo-400 hover:bg-indigo-900/20 transition-colors flex items-center gap-2"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Check-In Settings
-                  </button>
-                )}
-                <button
-                  onClick={() => { onEdit(goal); setShowMenu(false); }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2"
-                >
-                  Edit Goal
-                </button>
-                <button
-                  onClick={() => { onDelete(goal.id); setShowMenu(false); }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 transition-colors flex items-center gap-2"
-                >
-                  Delete Goal
-                </button>
-              </div>
-            </>
-          )}
         </div>
       </div>
       <div className="space-y-3">

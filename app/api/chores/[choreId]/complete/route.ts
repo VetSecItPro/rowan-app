@@ -10,6 +10,8 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { applyLatePenalty, calculatePenalty, getSpacePenaltySettings } from '@/lib/services/rewards/late-penalty-service';
 import type { Chore } from '@/lib/types';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 interface RouteParams {
   params: Promise<{ choreId: string }>;
@@ -41,6 +43,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Verify subscription tier for household management
+    const tierCheck = await canAccessFeature(user.id, 'canUseHousehold', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseHousehold', tierCheck.tier ?? 'free');
     }
 
     // Get the chore

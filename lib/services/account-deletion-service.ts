@@ -74,15 +74,15 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
       method: 'user_requested'
     }, supabase);
 
-    // Get user partnerships for data cleanup
-    const { data: partnerships, error: partnershipsError } = await supabase
-      .from('partnership_members')
-      .select('partnership_id')
+    // Get user's spaces for data cleanup
+    const { data: memberships, error: membershipsError } = await supabase
+      .from('space_members')
+      .select('space_id')
       .eq('user_id', userId);
 
-    if (partnershipsError) throw partnershipsError;
+    if (membershipsError) throw membershipsError;
 
-    const partnershipIds = (partnerships || []).map((p: { partnership_id: string }) => p.partnership_id);
+    const spaceIds = (memberships || []).map((m: { space_id: string }) => m.space_id);
 
     // Set deletion timestamp (30 days from now)
     const deletionDate = new Date();
@@ -95,61 +95,60 @@ async function deleteUserAccount(userId: string, supabase: SupabaseClient): Prom
         user_id: userId,
         deletion_requested_at: new Date().toISOString(),
         permanent_deletion_at: deletionDate.toISOString(),
-        partnership_ids: partnershipIds,
       });
 
     if (deletionRecordError) throw deletionRecordError;
 
     // Cascade delete personal data across all tables
-    if (partnershipIds.length > 0) {
+    if (spaceIds.length > 0) {
       // Delete expenses
-      await supabase.from('expenses').delete().in('partnership_id', partnershipIds);
+      await supabase.from('expenses').delete().in('space_id', spaceIds);
 
       // Delete budgets
-      await supabase.from('budgets').delete().in('partnership_id', partnershipIds);
+      await supabase.from('budgets').delete().in('space_id', spaceIds);
 
       // Delete bills
-      await supabase.from('bills').delete().in('partnership_id', partnershipIds);
+      await supabase.from('bills').delete().in('space_id', spaceIds);
 
       // Delete goals
-      await supabase.from('goals').delete().in('partnership_id', partnershipIds);
+      await supabase.from('goals').delete().in('space_id', spaceIds);
 
       // Delete projects
-      await supabase.from('projects').delete().in('partnership_id', partnershipIds);
+      await supabase.from('projects').delete().in('space_id', spaceIds);
 
       // Delete tasks
-      await supabase.from('tasks').delete().in('partnership_id', partnershipIds);
+      await supabase.from('tasks').delete().in('space_id', spaceIds);
 
       // Delete calendar events
-      await supabase.from('events').delete().in('partnership_id', partnershipIds);
+      await supabase.from('events').delete().in('space_id', spaceIds);
 
       // Delete reminders
-      await supabase.from('reminders').delete().in('partnership_id', partnershipIds);
+      await supabase.from('reminders').delete().in('space_id', spaceIds);
 
       // Delete messages
-      await supabase.from('messages').delete().in('partnership_id', partnershipIds);
+      await supabase.from('messages').delete().in('space_id', spaceIds);
 
       // Delete shopping lists and items
       const { data: shoppingLists } = await supabase
         .from('shopping_lists')
         .select('id')
-        .in('partnership_id', partnershipIds);
+        .in('space_id', spaceIds);
 
       if (shoppingLists && shoppingLists.length > 0) {
         const listIds = shoppingLists.map((l: { id: string }) => l.id);
         await supabase.from('shopping_items').delete().in('list_id', listIds);
-        await supabase.from('shopping_lists').delete().in('partnership_id', partnershipIds);
+        await supabase.from('shopping_lists').delete().in('space_id', spaceIds);
       }
 
       // Delete meals
-      await supabase.from('meals').delete().in('partnership_id', partnershipIds);
+      await supabase.from('meals').delete().in('space_id', spaceIds);
 
       // Delete recipes
-      await supabase.from('recipes').delete().in('partnership_id', partnershipIds);
+      await supabase.from('recipes').delete().in('space_id', spaceIds);
     }
 
-    // Remove user from partnerships
-    await supabase.from('partnership_members').delete().eq('user_id', userId);
+    // Remove user from spaces
+    await supabase.from('space_members').delete().eq('user_id', userId);
 
     // Delete user profile
     await supabase.from('users').delete().eq('id', userId);

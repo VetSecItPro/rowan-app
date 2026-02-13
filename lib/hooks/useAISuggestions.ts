@@ -65,11 +65,14 @@ export function useAISuggestions(spaceId: string | undefined): UseAISuggestionsR
     }
   }, [spaceId]);
 
-  // Initial fetch + polling
+  // Initial fetch (delayed to avoid competing with page-load API calls) + polling
   useEffect(() => {
-    fetchSuggestions();
+    const delayTimer = setTimeout(fetchSuggestions, 1000);
     const interval = setInterval(fetchSuggestions, POLL_INTERVAL);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(delayTimer);
+      clearInterval(interval);
+    };
   }, [fetchSuggestions]);
 
   const dismiss = useCallback((id: string) => {

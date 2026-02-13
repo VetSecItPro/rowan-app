@@ -17,7 +17,6 @@ import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import { useDashboardStats } from '@/lib/hooks/useDashboardStats';
 import {
-  Bot,
   CheckSquare,
   Calendar,
   Bell,
@@ -179,7 +178,7 @@ const TrendIndicator = memo(function TrendIndicator({ value, label }: { value: n
 export default function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, currentSpace, loading: authLoading, refreshSpaces } = useAuthWithSpaces();
+  const { user, currentSpace, authLoading, spacesLoading, refreshSpaces } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -374,8 +373,8 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  // Show loading state while checking authentication
-  if (authLoading || !user) {
+  // Show loading state while checking authentication and loading spaces
+  if (authLoading || spacesLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
@@ -409,24 +408,11 @@ export default function DashboardPage() {
         enableTimeAware={true}
       >
         <PullToRefresh onRefresh={refreshStats}>
-          <div className="min-h-screen p-4 sm:p-6 md:p-8">
+          <div className="min-h-screen p-4 sm:p-6 md:p-8 lg:p-5">
             <h1 className="sr-only">Dashboard</h1>
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
-              {/* Time-Aware Welcome Widget */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <WelcomeWidget userName={user?.name ?? undefined} />
-                </div>
-                {FEATURE_FLAGS.AI_COMPANION && spaceId && (
-                  <button
-                    onClick={() => setDashboardMode('ai')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-lg transition-colors shrink-0 ml-3"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">AI Dashboard</span>
-                  </button>
-                )}
-              </div>
+              {/* Welcome Greeting */}
+              <WelcomeWidget userName={user?.name ?? undefined} />
 
               {/* Today at a Glance - Shows today's events, tasks, meals, reminders */}
               {spaceId && (

@@ -9,8 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkGeneralRateLimit, checkAIBriefingRateLimit } from '@/lib/ratelimit';
-import { extractIP } from '@/lib/ratelimit-fallback';
+import { checkAIBriefingRateLimit } from '@/lib/ratelimit';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 import { briefingService } from '@/lib/services/ai/briefing-service';
@@ -27,16 +26,6 @@ const briefingCache = new LRUCache<string, BriefingOutput>({
 
 export async function GET(req: NextRequest) {
   try {
-    // Rate limiting
-    const ip = extractIP(req.headers);
-    const { success } = await checkGeneralRateLimit(ip);
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      );
-    }
-
     // Auth
     const supabase = await createClient();
     const {

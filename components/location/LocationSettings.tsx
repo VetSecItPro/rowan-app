@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   Clock,
+  Moon,
   Trash2,
   Plus,
   Home,
@@ -272,6 +273,52 @@ export function LocationSettings({ spaceId, className }: LocationSettingsProps) 
                 )}
               />
             </button>
+          </div>
+          {/* Quiet Hours */}
+          <div className="pt-3 border-t border-gray-700/50">
+            <div className="flex items-center gap-2 mb-3">
+              <Moon className="w-4 h-4 text-indigo-400" />
+              <p className="text-sm font-medium text-gray-300">Quiet hours</p>
+            </div>
+            <p className="text-xs text-gray-500 mb-3">
+              Suppress location notifications during these hours
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">From</label>
+                <input
+                  type="time"
+                  value={settings?.quiet_hours_start ?? ''}
+                  onChange={(e) => handleSettingChange('quiet_hours_start', e.target.value || null as unknown as string)}
+                  disabled={isSaving}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white text-sm [color-scheme:dark]"
+                />
+              </div>
+              <span className="text-gray-500 pt-5">to</span>
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Until</label>
+                <input
+                  type="time"
+                  value={settings?.quiet_hours_end ?? ''}
+                  onChange={(e) => handleSettingChange('quiet_hours_end', e.target.value || null as unknown as string)}
+                  disabled={isSaving}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white text-sm [color-scheme:dark]"
+                />
+              </div>
+            </div>
+            {settings?.quiet_hours_start && settings?.quiet_hours_end && (
+              <button
+                onClick={async () => {
+                  setIsSaving(true);
+                  await updateSettings({ quiet_hours_start: null, quiet_hours_end: null });
+                  setIsSaving(false);
+                }}
+                disabled={isSaving}
+                className="mt-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                Clear quiet hours
+              </button>
+            )}
           </div>
         </div>
 

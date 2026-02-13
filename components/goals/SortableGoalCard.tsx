@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Goal } from '@/lib/services/goals-service';
 import { GoalCard } from './GoalCard';
-import { GripVertical, Pin } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { hapticLight, hapticSuccess } from '@/lib/utils/haptics';
 import { PresenceIndicator } from '@/components/shared/PresenceIndicator';
 import type { PresenceUser } from '@/lib/hooks/usePresence';
@@ -21,14 +21,6 @@ interface SortableGoalCardProps {
   onTogglePin?: (goalId: string, isPinned: boolean) => void;
   viewingUsers?: PresenceUser[];
 }
-
-const priorityConfig = {
-  p1: { label: 'P1', color: 'bg-red-500/20 text-red-400 border border-red-500/30', textColor: 'text-red-400' },
-  p2: { label: 'P2', color: 'bg-orange-500/20 text-orange-400 border border-orange-500/30', textColor: 'text-orange-400' },
-  p3: { label: 'P3', color: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30', textColor: 'text-yellow-400' },
-  p4: { label: 'P4', color: 'bg-blue-500/20 text-blue-400 border border-blue-500/30', textColor: 'text-blue-400' },
-  none: { label: '', color: '', textColor: '' },
-};
 
 export function SortableGoalCard({
   goal,
@@ -57,32 +49,19 @@ export function SortableGoalCard({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const handlePriorityClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!onPriorityChange) return;
-
-    hapticLight(); // Haptic feedback on priority change
-
-    // Cycle through priorities: none → p1 → p2 → p3 → p4 → none
-    const priorities: Array<'none' | 'p1' | 'p2' | 'p3' | 'p4'> = ['none', 'p1', 'p2', 'p3', 'p4'];
-    const currentIndex = priorities.indexOf(goal.priority || 'none');
-    const nextIndex = (currentIndex + 1) % priorities.length;
-    onPriorityChange(goal.id, priorities[nextIndex]);
+  const handlePriorityChange = (goalId: string, priority: 'none' | 'p1' | 'p2' | 'p3' | 'p4') => {
+    hapticLight();
+    onPriorityChange?.(goalId, priority);
   };
 
-  const handlePinClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onTogglePin) {
-      if (!goal.is_pinned) {
-        hapticSuccess(); // Success haptic when pinning
-      } else {
-        hapticLight(); // Light haptic when unpinning
-      }
-      onTogglePin(goal.id, !goal.is_pinned);
+  const handleTogglePin = (goalId: string, isPinned: boolean) => {
+    if (isPinned) {
+      hapticSuccess();
+    } else {
+      hapticLight();
     }
+    onTogglePin?.(goalId, isPinned);
   };
-
-  const priorityInfo = priorityConfig[goal.priority || 'none'];
 
   return (
     <div ref={setNodeRef} style={style} className="relative group/sortable">
@@ -95,44 +74,6 @@ export function SortableGoalCard({
         <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
           <GripVertical className="w-5 h-5 text-gray-400" />
         </div>
-      </div>
-
-      {/* Priority and Pin Badges - top right */}
-      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-1.5 sm:gap-2 z-10">
-        {/* Pin Badge */}
-        {onTogglePin && (
-          <button
-            onClick={handlePinClick}
-            className={`p-1.5 sm:p-2 flex items-center justify-center rounded-full transition-all ${
-              goal.is_pinned
-                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
-                : 'bg-gray-700/50 text-gray-500 hover:text-gray-300 hover:bg-gray-600/50'
-            }`}
-            title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
-          >
-            <Pin className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${goal.is_pinned ? 'fill-current' : ''}`} />
-          </button>
-        )}
-
-        {/* Priority Badge */}
-        {onPriorityChange && (
-          <button
-            onClick={handlePriorityClick}
-            className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-full font-medium text-[10px] sm:text-xs transition-all ${
-              priorityInfo.color
-                ? priorityInfo.color
-                : 'bg-gray-700/50 text-gray-500 hover:text-gray-300 hover:bg-gray-600/50'
-            }`}
-            title="Click to change priority"
-          >
-            {priorityInfo.label || 'Priority'}
-          </button>
-        )}
-
-        {/* Presence Indicator */}
-        {viewingUsers.length > 0 && (
-          <PresenceIndicator users={viewingUsers} maxDisplay={2} />
-        )}
       </div>
 
       {/* Pinned Indicator */}
@@ -150,6 +91,9 @@ export function SortableGoalCard({
           onShowHistory={onShowHistory}
           onFrequencySettings={onFrequencySettings}
           onStatusChange={onStatusChange}
+          onPriorityChange={onPriorityChange ? handlePriorityChange : undefined}
+          onTogglePin={onTogglePin ? handleTogglePin : undefined}
+          extraActions={viewingUsers.length > 0 ? <PresenceIndicator users={viewingUsers} maxDisplay={2} /> : undefined}
         />
       </div>
     </div>

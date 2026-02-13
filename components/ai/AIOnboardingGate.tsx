@@ -3,9 +3,12 @@
 /**
  * AIOnboardingGate — Shows the AI welcome modal on first visit
  *
- * Checks ai_onboarding_seen from the AI settings. If false and AI is enabled,
- * shows the AIWelcomeModal. On dismiss or "Try It", marks onboarding as seen
- * and optionally opens the chat panel.
+ * Uses localStorage as the primary guard (survives remounts, navigation,
+ * and API failures). Also persists to the server via AI settings so it
+ * syncs across devices.
+ *
+ * SAFETY: If the server returns 403 (user has no AI access), the gate
+ * silently renders nothing — no modal, no retries, no console spam.
  */
 
 import { useState, useEffect } from 'react';
@@ -14,22 +17,50 @@ import { useAISettings } from '@/lib/hooks/useAISettings';
 import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import { AIWelcomeModal } from './AIWelcomeModal';
 
+const STORAGE_KEY = 'rowan_ai_onboarding_seen';
+
+function isOnboardingSeen(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markOnboardingSeen(): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, '1');
+  } catch {
+    // Storage unavailable — still works via server setting
+  }
+}
+
 export function AIOnboardingGate() {
   const chatCtx = useChatContextSafe();
   const enabled = FEATURE_FLAGS.AI_COMPANION && !!chatCtx?.canAccessAI;
-  const { settings, isLoading, updateSetting } = useAISettings(enabled);
+  const { settings, isLoading, noAccess, updateSetting } = useAISettings(enabled);
   const [showModal, setShowModal] = useState(false);
+  const [dismissed, setDismissed] = useState(() => isOnboardingSeen());
+
+  // Sync: if server says seen but localStorage doesn't, update localStorage
+  useEffect(() => {
+    if (!isLoading && settings.ai_onboarding_seen && !isOnboardingSeen()) {
+      markOnboardingSeen();
+      setDismissed(true);
+    }
+  }, [isLoading, settings.ai_onboarding_seen]);
 
   // Show modal when settings are loaded and onboarding hasn't been seen
   useEffect(() => {
-    if (!isLoading && enabled && !settings.ai_onboarding_seen) {
-      // Small delay to let the page settle first
+    if (!isLoading && enabled && !noAccess && !settings.ai_onboarding_seen && !dismissed) {
       const timer = setTimeout(() => setShowModal(true), 800);
       return () => clearTimeout(timer);
     }
-  }, [isLoading, enabled, settings.ai_onboarding_seen]);
+  }, [isLoading, enabled, noAccess, settings.ai_onboarding_seen, dismissed]);
 
   const markSeen = () => {
+    setDismissed(true);
+    markOnboardingSeen();
     updateSetting({ ai_onboarding_seen: true });
   };
 
@@ -41,11 +72,12 @@ export function AIOnboardingGate() {
   const handleTryIt = () => {
     setShowModal(false);
     markSeen();
-    // Open the chat panel
     chatCtx?.openChat();
   };
 
-  if (!enabled || isLoading || settings.ai_onboarding_seen) {
+  // Don't render anything if: not enabled, still loading, no AI access,
+  // onboarding already seen, or already dismissed
+  if (!enabled || isLoading || noAccess || settings.ai_onboarding_seen || dismissed) {
     return null;
   }
 

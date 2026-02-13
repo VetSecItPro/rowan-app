@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS, QUERY_OPTIONS } from '@/lib/react-query/query-client';
 import { deduplicatedRequests } from '@/lib/react-query/request-deduplication';
 import { createClient } from '@/lib/supabase/client';
+import { clearPersistedCache, clearAllAppStorage, markSigningOut } from '@/lib/react-query/offline-persistence';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 /**
@@ -220,7 +221,15 @@ export function useUpdateProfile() {
 /**
  * Sign out mutation
  *
- * Handles sign out with proper cache cleanup
+ * Handles sign out with FULL cache cleanup:
+ * 1. Supabase session (cookies)
+ * 2. In-memory React Query cache
+ * 3. IndexedDB persisted cache
+ * 4. localStorage backup cache
+ * 5. All app-scoped localStorage keys (currentSpace, preferences)
+ *
+ * This prevents cross-user data leakage when a different user
+ * logs in on the same browser.
  */
 export function useSignOut() {
   const queryClient = useQueryClient();
@@ -231,9 +240,15 @@ export function useSignOut() {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     },
-    onSuccess: () => {
-      // Clear all auth-related cache
+    onSuccess: async () => {
+      // Flag signout to prevent beforeunload from re-saving stale cache
+      markSigningOut();
+      // 1. Clear in-memory React Query cache
       queryClient.clear();
+      // 2. Clear IndexedDB + localStorage backup cache
+      await clearPersistedCache();
+      // 3. Clear all app-scoped localStorage (currentSpace, preferences, etc.)
+      clearAllAppStorage();
     },
   });
 }
@@ -249,12 +264,21 @@ export function useAuthStateChange() {
   const handleAuthStateChange = useCallback((event: AuthChangeEvent, session: Session | null) => {
     switch (event) {
       case 'SIGNED_IN':
-        // Invalidate auth queries to refresh data
+        // Clear ALL persistent caches first — prevents cross-user data leakage
+        // when a different user logs in on the same browser. Then invalidate
+        // to refetch fresh data for the new user.
+        queryClient.clear();
+        clearPersistedCache();
+        clearAllAppStorage();
         queryClient.invalidateQueries({ queryKey: ['auth'] });
         break;
       case 'SIGNED_OUT':
-        // Clear all cache on sign out
+        // Flag signout to prevent beforeunload from re-saving stale cache
+        markSigningOut();
+        // Full cache cleanup — prevents cross-user data leakage
         queryClient.clear();
+        clearPersistedCache();
+        clearAllAppStorage();
         break;
       case 'TOKEN_REFRESHED':
         // Update session in cache

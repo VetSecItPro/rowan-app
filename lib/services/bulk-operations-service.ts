@@ -240,8 +240,8 @@ export async function bulkExportByDateRange(
 }
 
 /**
- * Archive old expenses (older than specified date)
- * Moves them to an archived state without deleting
+ * Archive (delete) old expenses older than specified date.
+ * The expenses table has no `archived` column, so archiving = deletion.
  */
 export async function archiveOldExpenses(
   spaceId: string,
@@ -251,15 +251,12 @@ export async function archiveOldExpenses(
   try {
     const supabase = getSupabaseClient(supabaseClient);
 
-    // Note: This requires an 'archived' column in the expenses table
-    // If it doesn't exist, we can add it via migration
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from('expenses')
-      .update({ archived: true, archived_at: new Date().toISOString() })
+      .delete()
       .eq('space_id', spaceId)
       .lt('date', olderThanDate)
-      .eq('archived', false)
-      .select('*');
+      .select('id');
 
     if (error) {
       logger.error('Error archiving expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -268,7 +265,7 @@ export async function archiveOldExpenses(
 
     return {
       success: true,
-      archived_count: count || data?.length || 0,
+      archived_count: data?.length || 0,
     };
   } catch (error) {
     logger.error('Error archiving expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -280,7 +277,8 @@ export async function archiveOldExpenses(
 }
 
 /**
- * Archive old tasks (completed and older than specified date)
+ * Archive (delete) old completed tasks older than specified date.
+ * The tasks table has no `archived` column, so archiving = deletion of completed tasks.
  */
 export async function archiveOldTasks(
   spaceId: string,
@@ -290,14 +288,13 @@ export async function archiveOldTasks(
   try {
     const supabase = getSupabaseClient(supabaseClient);
 
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from('tasks')
-      .update({ archived: true, archived_at: new Date().toISOString() })
+      .delete()
       .eq('space_id', spaceId)
       .eq('status', 'completed')
       .lt('completed_at', olderThanDate)
-      .eq('archived', false)
-      .select('*');
+      .select('id');
 
     if (error) {
       logger.error('Error archiving tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -306,7 +303,7 @@ export async function archiveOldTasks(
 
     return {
       success: true,
-      archived_count: count || data?.length || 0,
+      archived_count: data?.length || 0,
     };
   } catch (error) {
     logger.error('Error archiving tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -318,7 +315,9 @@ export async function archiveOldTasks(
 }
 
 /**
- * Archive old calendar events (past events older than specified date)
+ * Archive (delete) old past calendar events older than specified date.
+ * The calendar_events table has no `archived` column, so archiving = deletion.
+ * Uses start_time since end_time may be null on some events.
  */
 export async function archiveOldCalendarEvents(
   spaceId: string,
@@ -328,13 +327,12 @@ export async function archiveOldCalendarEvents(
   try {
     const supabase = getSupabaseClient(supabaseClient);
 
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
       .from('calendar_events')
-      .update({ archived: true, archived_at: new Date().toISOString() })
+      .delete()
       .eq('space_id', spaceId)
-      .lt('end_time', olderThanDate)
-      .eq('archived', false)
-      .select('*');
+      .lt('start_time', olderThanDate)
+      .select('id');
 
     if (error) {
       logger.error('Error archiving calendar events:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -343,7 +341,7 @@ export async function archiveOldCalendarEvents(
 
     return {
       success: true,
-      archived_count: count || data?.length || 0,
+      archived_count: data?.length || 0,
     };
   } catch (error) {
     logger.error('Error archiving calendar events:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -359,7 +357,7 @@ export async function archiveOldCalendarEvents(
  * Useful for confirmation dialogs
  */
 export async function getExpensesBulkDeleteCount(
-  partnershipId: string,
+  spaceId: string,
   options: {
     startDate?: string;
     endDate?: string;
@@ -374,8 +372,8 @@ export async function getExpensesBulkDeleteCount(
 
     let query = supabase
       .from('expenses')
-      .select('*')
-      .eq('partnership_id', partnershipId);
+      .select('id', { count: 'exact', head: true })
+      .eq('space_id', spaceId);
 
     if (options.selectedIds && options.selectedIds.length > 0) {
       query = query.in('id', options.selectedIds);

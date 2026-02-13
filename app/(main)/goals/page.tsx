@@ -709,7 +709,7 @@ export default function GoalsPage() {
     <FeatureLayout breadcrumbItems={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Goals & Milestones' }]}>
       <PageErrorBoundary>
         <PullToRefresh onRefresh={loadData} disabled={loading}>
-          <div className="p-4 sm:p-6 md:p-8">
+          <div className="p-4 sm:p-6 md:p-8 lg:p-5">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -735,59 +735,51 @@ export default function GoalsPage() {
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {/* Simplified Navigation - Core tabs only */}
-              <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-indigo-900/30 to-indigo-800/30 rounded-xl border border-indigo-700 sm:min-w-[380px]">
-                <Tooltip content="View and manage your goals" position="bottom">
-                  <button
-                    onClick={() => handleViewModeChange('goals')}
-                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                      viewMode === 'goals'
-                        ? 'bg-gradient-goals text-white'
-                        : 'text-gray-300 hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <LayoutGrid className="w-4 h-4" />
-                    <span className="text-sm">Goals</span>
-                  </button>
-                </Tooltip>
-                <Tooltip content="Celebrate completed achievements" position="bottom">
-                  <button
-                    onClick={() => handleViewModeChange('milestones')}
-                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                      viewMode === 'milestones'
-                        ? 'bg-gradient-goals text-white'
-                        : 'text-gray-300 hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <List className="w-4 h-4" />
-                    <span className="text-sm">Milestones</span>
-                  </button>
-                </Tooltip>
-                <Tooltip content="Track daily habits and streaks" position="bottom">
-                  <button
-                    onClick={() => handleViewModeChange('habits')}
-                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                      viewMode === 'habits'
-                        ? 'bg-gradient-goals text-white'
-                        : 'text-gray-300 hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <Target className="w-4 h-4" />
-                    <span className="text-sm">Habits</span>
-                  </button>
-                </Tooltip>
-                <Tooltip content="View recent goal updates and changes" position="bottom">
-                  <button
-                    onClick={() => handleViewModeChange('activity')}
-                    className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
-                      viewMode === 'activity'
-                        ? 'bg-gradient-goals text-white'
-                        : 'text-gray-300 hover:bg-gray-800/50'
-                    }`}
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span className="text-sm">Activity</span>
-                  </button>
-                </Tooltip>
+              <div className="flex items-center gap-1 p-1 bg-gray-900/60 rounded-xl border border-gray-700/50 sm:min-w-[380px]">
+                <button
+                  onClick={() => handleViewModeChange('goals')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'goals'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="text-sm">Goals</span>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('milestones')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'milestones'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span className="text-sm">Milestones</span>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('habits')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'habits'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                  }`}
+                >
+                  <Target className="w-4 h-4" />
+                  <span className="text-sm">Habits</span>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('activity')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-1 transition-all font-medium flex-1 sm:flex-initial sm:min-w-[90px] ${
+                    viewMode === 'activity'
+                      ? 'bg-gradient-goals text-white'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+                  }`}
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-sm">Activity</span>
+                </button>
               </div>
               <button
                 onClick={handleNewButtonClick}
@@ -938,7 +930,7 @@ export default function GoalsPage() {
                    viewMode === 'milestones' ? `Achievement Wall (${filteredMilestones.length})` :
                    'Activity Feed'}
                 </h2>
-                <span className="px-3 py-1 bg-indigo-900/30 border border-indigo-700 text-indigo-300 text-sm font-medium rounded-full">
+                <span className="px-3 py-1 bg-gray-800 border border-gray-700 text-gray-400 text-sm font-medium rounded-full">
                   {format(new Date(), 'MMM yyyy')}
                 </span>
                 {viewMode === 'goals' && (
@@ -956,7 +948,7 @@ export default function GoalsPage() {
               {viewMode === 'goals' && (
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   {/* Combined Filter - Mobile: single row with all options, Desktop: two separate rows */}
-                  <div className="bg-gray-900 border-2 border-indigo-700 rounded-lg p-1 w-full sm:w-auto">
+                  <div className="bg-gray-900/60 border border-gray-700 rounded-lg p-1 w-full sm:w-auto">
                     {/* Mobile: Combined single-row filter */}
                     <div className="grid grid-cols-5 gap-0.5 sm:hidden">
                       <button
@@ -1019,8 +1011,8 @@ export default function GoalsPage() {
                         onClick={() => setStatusFilter('all')}
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                           statusFilter === 'all'
-                            ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                            : 'text-gray-400 hover:bg-indigo-900/20'
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-gray-400 hover:bg-gray-800/60'
                         }`}
                       >
                         All
@@ -1029,8 +1021,8 @@ export default function GoalsPage() {
                         onClick={() => setStatusFilter('active')}
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
                           statusFilter === 'active'
-                            ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                            : 'text-gray-400 hover:bg-indigo-900/20'
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-gray-400 hover:bg-gray-800/60'
                         }`}
                       >
                         Active
@@ -1039,8 +1031,8 @@ export default function GoalsPage() {
                         onClick={() => setStatusFilter('completed')}
                         className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[80px] ${
                           statusFilter === 'completed'
-                            ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md'
-                            : 'text-gray-400 hover:bg-indigo-900/20'
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-gray-400 hover:bg-gray-800/60'
                         }`}
                       >
                         Completed
@@ -1049,7 +1041,7 @@ export default function GoalsPage() {
                   </div>
 
                   {/* Desktop: Assignment Filter */}
-                  <div className="hidden sm:flex bg-gray-900 border-2 border-indigo-700 rounded-lg p-1 gap-1">
+                  <div className="hidden sm:flex bg-gray-900/60 border border-gray-700 rounded-lg p-1 gap-1">
                     <button
                       onClick={() => setAssignmentFilter('all')}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap min-w-[60px] ${
@@ -1091,7 +1083,7 @@ export default function GoalsPage() {
                   className={`hidden sm:flex px-3 py-1.5 text-xs font-medium rounded-md transition-all whitespace-nowrap items-center gap-2 ${
                     focusMode
                       ? 'bg-indigo-600 text-white shadow-md'
-                      : 'text-gray-400 hover:bg-indigo-900/20 border border-indigo-700'
+                      : 'text-gray-400 hover:bg-gray-800/50 border border-gray-700'
                   }`}
                   title="Show only top 3 priority goals"
                 >
@@ -1196,7 +1188,7 @@ export default function GoalsPage() {
                         <h2 className="text-lg sm:text-xl font-bold text-white">
                           Habit Tracker
                         </h2>
-                        <span className="px-3 py-1 bg-indigo-900/30 border border-indigo-700 text-indigo-300 text-sm font-medium rounded-full">
+                        <span className="px-3 py-1 bg-gray-800 border border-gray-700 text-gray-400 text-sm font-medium rounded-full">
                           {format(new Date(), 'MMM yyyy')}
                         </span>
                       </div>

@@ -10,6 +10,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { notifyLocationArrival, notifyLocationDeparture } from '@/lib/services/push-notification-service';
 
 // =============================================
 // TYPES
@@ -819,7 +820,29 @@ async function checkGeofences(
 }
 
 /**
- * Create a geofence event
+ * Check if the current time falls within quiet hours
+ */
+function isWithinQuietHours(quietStart: string | null, quietEnd: string | null): boolean {
+  if (!quietStart || !quietEnd) return false;
+
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const [startH, startM] = quietStart.split(':').map(Number);
+  const [endH, endM] = quietEnd.split(':').map(Number);
+  const startMinutes = startH * 60 + startM;
+  const endMinutes = endH * 60 + endM;
+
+  // Handle overnight quiet hours (e.g., 22:00 - 07:00)
+  if (startMinutes > endMinutes) {
+    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+  }
+
+  return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+}
+
+/**
+ * Create a geofence event and send push notifications to family members
  */
 async function createGeofenceEvent(
   userId: string,
@@ -831,7 +854,7 @@ async function createGeofenceEvent(
   supabase: SupabaseClient
 ): Promise<void> {
   try {
-    const { error } = await supabase
+    const { data: eventData, error } = await supabase
       .from('geofence_events')
       .insert({
         user_id: userId,
@@ -841,17 +864,60 @@ async function createGeofenceEvent(
         latitude,
         longitude,
         notification_sent: false,
-      });
+      })
+      .select('id')
+      .single();
 
     if (error) {
       logger.error('createGeofenceEvent error', error instanceof Error ? error : new Error(JSON.stringify(error)), {
         component: 'family-location-service',
         action: 'create_geofence_event',
       });
+      return;
     }
 
-    // TODO: Trigger push notification to family members
-    logger.info(`Geofence event: User ${userId} ${eventType} at place ${placeId}`, {
+    // Fetch user name and place name for notification text
+    const [userResult, placeResult] = await Promise.all([
+      supabase.from('users').select('name').eq('id', userId).single(),
+      supabase.from('family_places').select('name').eq('id', placeId).single(),
+    ]);
+
+    const userName = userResult.data?.name ?? 'Someone';
+    const placeName = placeResult.data?.name ?? 'a saved place';
+
+    // Check the triggering user's quiet hours setting
+    const settings = await getSharingSettings(userId, spaceId, supabase);
+    const inQuietHours = settings
+      ? isWithinQuietHours(settings.quiet_hours_start, settings.quiet_hours_end)
+      : false;
+
+    if (inQuietHours) {
+      logger.info(`Geofence notification suppressed (quiet hours): ${userId} ${eventType} at ${placeName}`, {
+        component: 'family-location-service',
+        action: 'geofence_event',
+      });
+      return;
+    }
+
+    // Send push notification to family members
+    if (eventType === 'arrival') {
+      await notifyLocationArrival(spaceId, userId, userName, placeName);
+    } else {
+      await notifyLocationDeparture(spaceId, userId, userName, placeName);
+    }
+
+    // Mark the event as notified
+    if (eventData?.id) {
+      await supabase
+        .from('geofence_events')
+        .update({
+          notification_sent: true,
+          notification_sent_at: new Date().toISOString(),
+        })
+        .eq('id', eventData.id);
+    }
+
+    logger.info(`Geofence event: ${userName} ${eventType} at ${placeName}`, {
       component: 'family-location-service',
       action: 'geofence_event',
     });

@@ -94,7 +94,7 @@ export function withSubscriptionCheck(
       // Check subscription tier access
       const featureKey = getFeatureKey(feature);
       if (featureKey) {
-        const accessCheck = await canAccessFeature(user.id, featureKey);
+        const accessCheck = await canAccessFeature(user.id, featureKey, supabase);
 
         if (!accessCheck.allowed) {
           return NextResponse.json(
@@ -140,6 +140,81 @@ export function withSubscriptionCheck(
       );
     }
   };
+}
+
+/**
+ * Feature-specific upgrade nudge messages.
+ * Keys match the `feature` prop on UpgradeModal so the client
+ * can trigger the modal directly from the API response.
+ */
+const UPGRADE_NUDGES: Record<string, { feature: string; requiredTier: SubscriptionTier; message: string }> = {
+  canUseMealPlanning: {
+    feature: 'meals',
+    requiredTier: 'pro',
+    message: 'Unlock meal planning, recipes, and auto-generated shopping lists with Pro.',
+  },
+  canUseGoals: {
+    feature: 'goals',
+    requiredTier: 'pro',
+    message: 'Set family goals and track milestones together with Pro.',
+  },
+  canUseHousehold: {
+    feature: 'household',
+    requiredTier: 'pro',
+    message: 'Manage chores, penalties, and household tasks with Pro.',
+  },
+  canUploadPhotos: {
+    feature: 'photos',
+    requiredTier: 'pro',
+    message: 'Upload and share family photos with Pro.',
+  },
+  canUseLocation: {
+    feature: 'location',
+    requiredTier: 'pro',
+    message: 'Keep your family connected with real-time location sharing on Pro.',
+  },
+  canUseAI: {
+    feature: 'ai',
+    requiredTier: 'pro',
+    message: 'Get smart suggestions and AI-powered insights with Pro.',
+  },
+  canUseIntegrations: {
+    feature: 'integrations',
+    requiredTier: 'family',
+    message: 'Connect Google Calendar, Apple Calendar, and more with Family.',
+  },
+  canUseEventProposals: {
+    feature: 'calendar',
+    requiredTier: 'pro',
+    message: 'Propose events and find times that work for everyone with Pro.',
+  },
+};
+
+/**
+ * Build a professional upgrade nudge response for tier-gated features.
+ * Returns a 403 response with enough data for the client to show an UpgradeModal.
+ *
+ * @param featureKey - The feature access key (e.g. 'canUseMealPlanning')
+ * @param currentTier - The user's current subscription tier
+ */
+export function buildUpgradeResponse(featureKey: string, currentTier: SubscriptionTier): NextResponse {
+  const nudge = UPGRADE_NUDGES[featureKey] ?? {
+    feature: 'unknown',
+    requiredTier: 'pro' as SubscriptionTier,
+    message: 'This feature requires an upgraded subscription.',
+  };
+
+  return NextResponse.json(
+    {
+      error: 'upgrade_required',
+      feature: nudge.feature,
+      currentTier,
+      requiredTier: nudge.requiredTier,
+      message: nudge.message,
+      upgradeUrl: '/pricing',
+    },
+    { status: 403 }
+  );
 }
 
 /**

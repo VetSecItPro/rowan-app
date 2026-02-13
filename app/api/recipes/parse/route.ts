@@ -7,6 +7,8 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { canAccessFeature } from '@/lib/services/feature-access-service';
+import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
 
 // SECURITY: Zod schema to validate AI-generated recipe JSON
 const AIRecipeSchema = z.object({
@@ -69,6 +71,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Verify subscription tier for meal planning
+    const tierCheck = await canAccessFeature(user.id, 'canUseMealPlanning', supabase);
+    if (!tierCheck.allowed) {
+      return buildUpgradeResponse('canUseMealPlanning', tierCheck.tier ?? 'free');
+    }
 
     // Set user context for Sentry error tracking
     setSentryUser(user);

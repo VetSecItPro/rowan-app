@@ -116,7 +116,6 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
       "5GB storage",
       "AI features",
       "External integrations",
-      "Priority support",
     ],
   },
 };

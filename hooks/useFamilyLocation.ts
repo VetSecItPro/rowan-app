@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/lib/supabase';
 import {
   isGeolocationAvailable,
   getCurrentPosition,
@@ -368,7 +369,7 @@ export function useFamilyLocation(
     }
   }, [enableTracking, spaceId, isTracking, permissionStatus, startTracking]);
 
-  // Auto-refresh family locations
+  // Auto-refresh family locations (polling fallback)
   useEffect(() => {
     if (!autoRefresh || !spaceId) return;
 
@@ -380,6 +381,45 @@ export function useFamilyLocation(
       }
     };
   }, [autoRefresh, spaceId, refreshInterval, refreshFamilyLocations]);
+
+  // Real-time subscription for instant location updates
+  useEffect(() => {
+    if (!spaceId) return;
+
+    const channel = supabase
+      .channel(`location-updates-${spaceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_locations',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        () => {
+          // A family member's location changed — refresh immediately
+          refreshFamilyLocations();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'geofence_events',
+          filter: `space_id=eq.${spaceId}`,
+        },
+        () => {
+          // A geofence event occurred — refresh to update badges/status
+          refreshFamilyLocations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [spaceId, refreshFamilyLocations]);
 
   // Cleanup on unmount
   useEffect(() => {
