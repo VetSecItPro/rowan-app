@@ -567,7 +567,7 @@ export default function CalendarDocumentationPage() {
                     <span><strong>Recurring Events</strong> - Daily, weekly, monthly patterns</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Image className="w-4 h-4 mt-0.5 flex-shrink-0" alt="" />
+                    <Image className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span><strong>Attachments</strong> - Add images and documents to events</span>
                   </div>
                   <div className="flex items-start gap-2">

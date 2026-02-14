@@ -190,7 +190,7 @@ export async function resilientClick(
       return;
     } catch (_error) {
       if (attempt === retries) {
-        throw error;
+        throw _error;
       }
       // Wait before retry
       await page.waitForTimeout(1000);
@@ -216,7 +216,7 @@ export async function resilientFill(
       return;
     } catch (_error) {
       if (attempt === retries) {
-        throw error;
+        throw _error;
       }
       // Wait before retry
       await page.waitForTimeout(1000);
