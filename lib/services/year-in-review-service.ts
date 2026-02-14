@@ -133,6 +133,7 @@ export interface ProductivityMetrics {
 // YEAR IN REVIEW SERVICE
 // =====================================================
 
+/** Generates comprehensive year-in-review statistics across tasks, goals, budgets, and more. */
 export class YearInReviewService {
   /**
    * Generate comprehensive year in review for a user and space
@@ -596,4 +597,5 @@ export class YearInReviewService {
 }
 
 // Export singleton instance
+/** Singleton instance of the year-in-review statistics generator. */
 export const yearInReviewService = new YearInReviewService();

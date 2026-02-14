@@ -356,7 +356,7 @@ export async function unlinkReceiptFromExpense(
   return updateReceipt(receiptId, { expense_id: null });
 }
 
-// Export service object
+/** Aggregated service for receipt image upload, OCR processing, CRUD, and expense linking. */
 export const receiptsService = {
   uploadReceiptImage,
   getReceiptImageUrl,

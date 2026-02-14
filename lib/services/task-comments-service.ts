@@ -42,6 +42,7 @@ export interface TaskReaction {
   created_at: string;
 }
 
+/** Service for task comments, threaded replies, and emoji reactions. */
 export const taskCommentsService = {
   // ===== COMMENTS =====
 

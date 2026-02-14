@@ -16,6 +16,7 @@ interface AttachmentGalleryProps {
   canDelete?: boolean;
 }
 
+/** Renders a gallery of file attachments for a calendar event. */
 export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelete = true }: AttachmentGalleryProps) {
   const { user } = useAuth();
   const [attachments, setAttachments] = useState<EventAttachment[]>([]);
@@ -183,10 +184,10 @@ export function AttachmentGallery({ eventId, spaceId, canUpload = true, canDelet
       {/* Empty State */}
       {attachments.length === 0 && (
         <div className="text-center py-12">
-          <Paperclip className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+          <Paperclip className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-400">No attachments yet</p>
           {canUpload && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               Click the button above to add files
             </p>
           )}

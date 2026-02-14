@@ -26,6 +26,7 @@ interface ReportLibraryProps {
 
 type ReportWithFavorite = GeneratedReport & { is_favorite?: boolean };
 
+/** Displays a library of previously generated reports. */
 export function ReportLibrary({ reports, onViewReport, onReportUpdated }: ReportLibraryProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');

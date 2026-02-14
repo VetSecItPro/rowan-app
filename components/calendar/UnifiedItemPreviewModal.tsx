@@ -89,7 +89,7 @@ function TaskDetails({ item }: { item: UnifiedCalendarItem }) {
     <div className="space-y-3">
       {task.priority && (
         <div className="flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-gray-500" />
+          <AlertCircle className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-400">Priority:</span>
           <span className={`text-sm font-medium capitalize ${
             task.priority === 'urgent' ? 'text-red-600' :
@@ -102,7 +102,7 @@ function TaskDetails({ item }: { item: UnifiedCalendarItem }) {
       )}
       {task.estimated_hours && (
         <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-gray-500" />
+          <Clock className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-400">Estimated:</span>
           <span className="text-sm font-medium text-white">
             {task.estimated_hours} hours
@@ -122,7 +122,7 @@ function MealDetails({ item }: { item: UnifiedCalendarItem }) {
     <div className="space-y-3">
       {meal.meal_type && (
         <div className="flex items-center gap-2">
-          <UtensilsCrossed className="w-4 h-4 text-gray-500" />
+          <UtensilsCrossed className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-400">Meal Type:</span>
           <span className="text-sm font-medium text-white capitalize">
             {meal.meal_type}
@@ -153,7 +153,7 @@ function ReminderDetails({ item }: { item: UnifiedCalendarItem }) {
     <div className="space-y-3">
       {reminder.category && (
         <div className="flex items-center gap-2">
-          <Bell className="w-4 h-4 text-gray-500" />
+          <Bell className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-400">Category:</span>
           <span className="text-sm font-medium text-white capitalize">
             {reminder.category}
@@ -162,7 +162,7 @@ function ReminderDetails({ item }: { item: UnifiedCalendarItem }) {
       )}
       {reminder.recurrence_pattern && (
         <div className="flex items-center gap-2">
-          <Circle className="w-4 h-4 text-gray-500" />
+          <Circle className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-pink-400 font-medium">
             Recurring: {reminder.recurrence_pattern}
           </span>
@@ -195,7 +195,7 @@ function GoalDetails({ item }: { item: UnifiedCalendarItem }) {
       )}
       {goal.category && (
         <div className="flex items-center gap-2">
-          <Target className="w-4 h-4 text-gray-500" />
+          <Target className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-400">Category:</span>
           <span className="text-sm font-medium text-white capitalize">
             {goal.category}
@@ -206,6 +206,7 @@ function GoalDetails({ item }: { item: UnifiedCalendarItem }) {
   );
 }
 
+/** Renders a preview modal for any unified calendar item (event, task, reminder). */
 export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPreviewModalProps) {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -294,14 +295,14 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
         {/* Date & Time */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-500" />
+            <Calendar className="w-4 h-4 text-gray-400" />
             <span className="text-sm text-white">
               {formatDate(item.startTime)}
             </span>
           </div>
           {!item.isAllDay && (
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-500" />
+              <Clock className="w-4 h-4 text-gray-400" />
               <span className="text-sm text-white">
                 {formatTime(item.startTime)}
                 {item.endTime && ` - ${formatTime(item.endTime)}`}
@@ -322,7 +323,7 @@ export function UnifiedItemPreviewModal({ item, isOpen, onClose }: UnifiedItemPr
         {/* Location */}
         {item.location && (
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-gray-500" />
+            <MapPin className="w-4 h-4 text-gray-400" />
             <span className="text-sm text-gray-300">
               {item.location}
             </span>

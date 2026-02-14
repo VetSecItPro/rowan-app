@@ -45,6 +45,7 @@ interface ImageUploadProps {
   borderColor?: 'purple' | 'orange';
 }
 
+/** Provides image upload with preview, cropping, and size validation. */
 export default function ImageUpload({
   currentImageUrl,
   onUploadSuccess,

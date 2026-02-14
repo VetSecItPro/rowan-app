@@ -25,6 +25,7 @@ interface MessageCardProps {
   showReplyButton?: boolean;
 }
 
+/** Renders a single message card with content, reactions, and context menu. */
 export function MessageCard({
   message,
   onEdit,
@@ -101,7 +102,7 @@ export function MessageCard({
             <span className="text-sm">This message was deleted</span>
           </div>
           <div className={`flex items-center justify-end gap-1 mt-1 text-[11px] ${
-            isOwn ? 'text-emerald-200/70' : 'text-gray-500'
+            isOwn ? 'text-emerald-200/70' : 'text-gray-400'
           }`}>
             <span>{formatTimestamp(message.created_at, 'h:mm a')}</span>
           </div>

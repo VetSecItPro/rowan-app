@@ -28,6 +28,7 @@ interface ProjectPhotoGalleryProps {
 
 type SortBy = 'date' | 'type' | 'order';
 
+/** Renders a photo gallery of receipts and images attached to a budget project. */
 export function ProjectPhotoGallery({
   photos,
 }: ProjectPhotoGalleryProps) {
@@ -310,6 +311,7 @@ export function ProjectPhotoGallery({
           <div
             className="fixed inset-0 bg-black/90 z-50"
             onClick={() => setSelectedPhoto(null)}
+            aria-hidden="true"
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-800 rounded-xl shadow-2xl max-w-4xl max-h-[90vh] w-full overflow-hidden">
@@ -392,6 +394,7 @@ export function ProjectPhotoGallery({
           <div
             className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setShowUpload(false)}
+            aria-hidden="true"
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
@@ -406,7 +409,7 @@ export function ProjectPhotoGallery({
                   <p className="text-gray-400 mb-2">
                     Drop photos here or click to browse
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-400">
                     Supports JPG, PNG, WebP up to 10MB
                   </p>
                 </div>

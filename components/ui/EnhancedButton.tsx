@@ -117,6 +117,7 @@ function useMagneticAttraction(enabled: boolean, ref: React.RefObject<HTMLButton
   return { handleMouseEnter, handleMouseLeave };
 }
 
+/** Renders a feature-rich button with animations, loading states, and haptic feedback. */
 export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
   ({
     variant = 'primary',
@@ -286,18 +287,22 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
 EnhancedButton.displayName = 'EnhancedButton';
 
 // Convenience components for common use cases
+/** Renders a pre-configured primary variant of EnhancedButton. */
 export const PrimaryButton = React.forwardRef<HTMLButtonElement, Omit<EnhancedButtonProps, 'variant'>>((props, ref) => (
   <EnhancedButton ref={ref} variant="primary" {...props} />
 ));
 
+/** Renders a pre-configured secondary variant of EnhancedButton. */
 export const SecondaryButton = React.forwardRef<HTMLButtonElement, Omit<EnhancedButtonProps, 'variant'>>((props, ref) => (
   <EnhancedButton ref={ref} variant="secondary" {...props} />
 ));
 
+/** Renders a pre-configured call-to-action variant of EnhancedButton. */
 export const CTAButton = React.forwardRef<HTMLButtonElement, Omit<EnhancedButtonProps, 'variant' | 'breathing' | 'ripple'>>((props, ref) => (
   <EnhancedButton ref={ref} variant="primary" breathing ripple animationLevel="dynamic" {...props} />
 ));
 
+/** Renders a pre-configured premium variant of EnhancedButton with shine effect. */
 export const PremiumButton = React.forwardRef<HTMLButtonElement, Omit<EnhancedButtonProps, 'animationLevel' | 'magnetic' | 'gradientShift'>>((props, ref) => (
   <EnhancedButton ref={ref} animationLevel="premium" magnetic gradientShift {...props} />
 ));

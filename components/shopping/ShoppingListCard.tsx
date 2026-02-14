@@ -22,6 +22,7 @@ interface ShoppingListCardProps {
   onUpdateQuantity?: (itemId: string, newQuantity: number) => void;
 }
 
+/** Renders a shopping list card with item count, progress, and actions. */
 export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, onDelete, onToggleItem, onCompleteList, onSaveAsTemplate, onScheduleTrip, onCreateTask, onUpdateQuantity }: ShoppingListCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -166,7 +167,7 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
                             {item.checked && <Check className="w-3 h-3 text-white" />}
                           </button>
                         </Tooltip>
-                        <span className={`text-xs sm:text-sm truncate ${item.checked ? 'line-through text-gray-400' : 'text-gray-300'}`}>
+                        <span className={`text-xs sm:text-sm truncate ${item.checked ? 'line-through text-gray-500' : 'text-gray-300'}`}>
                           {item.name}
                         </span>
                       </div>
@@ -233,6 +234,7 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
+                aria-hidden="true"
               />
               <div className="absolute right-0 mt-2 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                 <button

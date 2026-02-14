@@ -19,6 +19,7 @@ interface EventDetailModalProps {
 
 type TabType = 'comments' | 'attachments';
 
+/** Renders a detailed modal view of a calendar event with full information. */
 export function EventDetailModal({ isOpen, onClose, event, onEdit, onDelete }: EventDetailModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('comments');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

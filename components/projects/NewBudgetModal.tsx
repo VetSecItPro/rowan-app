@@ -12,6 +12,7 @@ interface NewBudgetModalProps {
   spaceId: string;
 }
 
+/** Renders a modal form for creating or editing a project budget. */
 export function NewBudgetModal({
   isOpen,
   onClose,

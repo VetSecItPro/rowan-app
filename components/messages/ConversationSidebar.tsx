@@ -21,6 +21,7 @@ interface ConversationSidebarProps {
   className?: string;
 }
 
+/** Renders the sidebar listing all conversations with search and filters. */
 export function ConversationSidebar({
   conversations,
   activeConversationId,
@@ -177,7 +178,7 @@ export function ConversationSidebar({
       {/* Search */}
       <div className="p-3 border-b border-gray-700/30">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             value={searchQuery}

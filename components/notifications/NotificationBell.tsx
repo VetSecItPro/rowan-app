@@ -16,6 +16,7 @@ import {
 } from '@/lib/services/milestone-notification-service';
 import { formatDistanceToNow } from 'date-fns';
 
+/** Displays a notification bell icon with unread count badge in the header. */
 export default function NotificationBell() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -161,8 +162,10 @@ export default function NotificationBell() {
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-full hover:bg-gray-800 transition-colors"
         aria-label="Notifications"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
-        <Bell className="w-5 h-5 text-gray-400" />
+        <Bell className="w-5 h-5 text-gray-400" aria-hidden="true" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -177,6 +180,7 @@ export default function NotificationBell() {
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Notification Panel */}
@@ -229,6 +233,9 @@ export default function NotificationBell() {
                         <div className="flex-1 min-w-0">
                           <div
                             onClick={() => handleNotificationClick(notification)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNotificationClick(notification); } }}
+                            role="button"
+                            tabIndex={0}
                             className="cursor-pointer"
                           >
                             <h4 className="text-sm font-semibold text-white mb-1">
@@ -237,7 +244,7 @@ export default function NotificationBell() {
                             <p className="text-sm text-gray-400 mb-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-400">
                               {formatDistanceToNow(new Date(notification.created_at), {
                                 addSuffix: true,
                               })}
@@ -266,8 +273,9 @@ export default function NotificationBell() {
                             <button
                               onClick={() => handleDelete(notification.id)}
                               className="ml-auto text-gray-400 hover:text-red-500 transition-colors"
+                              aria-label={`Delete notification: ${notification.title}`}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" aria-hidden="true" />
                             </button>
                           </div>
                         </div>

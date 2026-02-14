@@ -110,7 +110,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
             key={index}
             className={`flex items-center gap-2 text-xs transition-colors ${req.met
                 ? 'text-green-400'
-                : 'text-gray-500'
+                : 'text-gray-400'
               }`}
           >
             {req.met ? (

@@ -9,6 +9,7 @@ interface AppWithOnboardingProps {
   children: React.ReactNode;
 }
 
+/** Wraps the main app content and conditionally displays the onboarding flow. */
 export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
   const {
     isAuthenticated,

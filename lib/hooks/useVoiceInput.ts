@@ -79,6 +79,7 @@ function getSpeechRecognition(): SpeechRecognitionConstructor | null {
   return w.SpeechRecognition || w.webkitSpeechRecognition || null;
 }
 
+/** Provides speech-to-text voice input using the Web Speech API with start/stop controls */
 export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInputReturn {
   const {
     onResult,

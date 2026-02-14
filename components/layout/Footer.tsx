@@ -29,10 +29,12 @@ const footerColumns = [
     links: [
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
+      { label: 'Cookies', href: '/cookies' },
     ],
   },
 ];
 
+/** Renders the authenticated app footer with links and legal information. */
 export function Footer() {
   return (
     <footer className="border-t border-gray-800/50">
@@ -53,7 +55,7 @@ export function Footer() {
                 Rowan
               </span>
             </Link>
-            <p className="text-xs text-gray-500 leading-relaxed max-w-[200px]">
+            <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
               One app for your entire household. Tasks, calendar, meals, budget, and more.
             </p>
           </div>
@@ -69,7 +71,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="block py-1.5 text-sm text-gray-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md"
+                      className="block py-1.5 text-sm text-gray-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md"
                     >
                       {link.label}
                     </Link>

@@ -54,6 +54,7 @@ export interface UseShoppingModalsReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Manages open/close state for shopping list creation, editing, and item modals */
 export function useShoppingModals(): UseShoppingModalsReturn {
   // ─── New/Edit list modal state ─────────────────────────────────────────────
   const [isModalOpen, setIsModalOpen] = useState(false);

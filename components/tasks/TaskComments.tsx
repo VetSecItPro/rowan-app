@@ -11,6 +11,7 @@ interface TaskCommentsProps {
   userId: string;
 }
 
+/** Displays a comment thread for discussing a specific task. */
 export function TaskComments({ taskId, userId }: TaskCommentsProps) {
   const [comments, setComments] = useState<TaskComment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -58,12 +59,12 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
     }
   }
 
-  if (loading) return <div className="text-sm text-gray-500">Loading comments...</div>;
+  if (loading) return <div className="text-sm text-gray-400">Loading comments...</div>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <MessageSquare className="w-4 h-4 text-gray-500" />
+        <MessageSquare className="w-4 h-4 text-gray-400" />
         <h4 className="text-sm font-medium text-gray-300">
           Comments ({comments.length})
         </h4>
@@ -88,7 +89,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
             <div className="flex items-center gap-2 mt-2">
               <button
                 onClick={() => addReaction(comment.id, '👍')}
-                className="text-xs text-gray-500 hover:text-gray-700"
+                className="text-xs text-gray-400 hover:text-gray-700"
                 title="React with thumbs up"
                 aria-label="React with thumbs up"
               >
@@ -96,7 +97,7 @@ export function TaskComments({ taskId, userId }: TaskCommentsProps) {
               </button>
               <button
                 onClick={() => addReaction(comment.id, '❤️')}
-                className="text-xs text-gray-500 hover:text-gray-700"
+                className="text-xs text-gray-400 hover:text-gray-700"
                 title="React with heart"
                 aria-label="React with heart"
               >

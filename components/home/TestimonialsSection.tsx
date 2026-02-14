@@ -71,6 +71,7 @@ const cardVariants = {
 // Component
 // ---------------------------------------------------------------------------
 
+/** Renders a carousel of user testimonial quotes. */
 export function TestimonialsSection() {
   const prefersReducedMotion = useReducedMotion();
 
@@ -132,7 +133,7 @@ export function TestimonialsSection() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-white">{t.author}</p>
-                  <p className="text-xs text-gray-500">{t.role}</p>
+                  <p className="text-xs text-gray-400">{t.role}</p>
                 </div>
               </div>
             </motion.div>

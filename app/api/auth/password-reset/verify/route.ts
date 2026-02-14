@@ -17,6 +17,7 @@ const PasswordResetVerifySchema = z.object({
     .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character (!@#$%^&*(),.?":{}|<>)')
 });
 
+/** Verifies a password reset token and sets a new password */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP (uses fallback if Redis unavailable)
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to check if a token is valid (without using it)
+/** Checks the validity of a password reset token without consuming it */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

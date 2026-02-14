@@ -33,6 +33,7 @@ interface AreaChartComponentProps {
   fillOpacity?: number;
 }
 
+/** Renders a Recharts area chart with configurable data series and styling. */
 export function AreaChartComponent({
   data,
   xDataKey,

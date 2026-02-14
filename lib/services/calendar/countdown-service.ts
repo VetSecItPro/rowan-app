@@ -233,6 +233,7 @@ function importantDateToCountdown(date: ImportantDate): CountdownItem {
   };
 }
 
+/** Service for managing unified countdowns from both calendar events and important dates. */
 export const countdownService = {
   /**
    * Get active countdowns for a space (UNIFIED)

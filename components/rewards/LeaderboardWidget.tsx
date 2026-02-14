@@ -18,6 +18,7 @@ interface LeaderboardWidgetProps {
   className?: string;
 }
 
+/** Displays a leaderboard ranking space members by reward points. */
 export function LeaderboardWidget({
   spaceId,
   currentUserId,

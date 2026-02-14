@@ -18,6 +18,7 @@ interface Ingredient {
 
 type TabType = 'manual' | 'ai';
 
+/** Renders the client-side new recipe creation page. */
 export default function NewRecipeClient({ spaceId }: { spaceId: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

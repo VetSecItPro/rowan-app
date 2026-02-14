@@ -6,6 +6,7 @@ interface PopoverProps {
   children: React.ReactNode;
 }
 
+/** Provides a popover container with open/close state management. */
 export const Popover: React.FC<PopoverProps> = ({ open, onOpenChange, children }) => {
   return (
     <div data-state={open ? 'open' : 'closed'}>
@@ -28,6 +29,7 @@ interface PopoverTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   onOpenChange?: (open: boolean) => void;
 }
 
+/** Renders a button that triggers the parent Popover to open. */
 export const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
   ({ className = '', children, open, onOpenChange, asChild, ...props }, ref) => {
     const handleClick = () => {
@@ -62,6 +64,7 @@ interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement> {
   side?: 'top' | 'right' | 'bottom' | 'left';
 }
 
+/** Renders the positioned content panel of a Popover. */
 export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
   ({ className = '', children, open, onOpenChange, align = 'center', side = 'bottom', ...props }, ref) => {
     if (!open) return null;
@@ -85,6 +88,7 @@ export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentPro
         <div
           className="fixed inset-0 z-40"
           onClick={() => onOpenChange?.(false)}
+          aria-hidden="true"
         />
         {/* Content */}
         <div

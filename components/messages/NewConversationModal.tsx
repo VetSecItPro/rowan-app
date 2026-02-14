@@ -13,6 +13,7 @@ interface NewConversationModalProps {
   spaceId: string;
 }
 
+/** Renders a modal for starting a new conversation with selected members. */
 export function NewConversationModal({
   isOpen,
   onClose,

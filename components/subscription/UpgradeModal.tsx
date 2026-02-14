@@ -92,6 +92,7 @@ const FAMILY_EXTRAS = [
   '5GB storage',
 ];
 
+/** Renders a modal showcasing premium features and upgrade options. */
 export function UpgradeModal({
   isOpen,
   onClose,
@@ -99,7 +100,7 @@ export function UpgradeModal({
   title: customTitle,
   description: customDescription,
 }: UpgradeModalProps) {
-  const subscription = useSubscriptionSafe();
+  const _subscription = useSubscriptionSafe();
 
   const featureInfo = feature ? FEATURE_MESSAGES[feature] : null;
   const title = customTitle || featureInfo?.title || 'Upgrade to Pro';

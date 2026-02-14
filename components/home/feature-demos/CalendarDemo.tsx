@@ -35,7 +35,7 @@ function WeekViewStep() {
       <div className="grid grid-cols-7 gap-1">
         {DAYS.map((day) => (
           <div key={day} className="text-center">
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider">{day}</span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider">{day}</span>
             <div
               className={`text-xs mt-0.5 font-medium mx-auto ${
                 day === 'Thu'
@@ -67,7 +67,7 @@ function WeekViewStep() {
                   <div className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full ${c.bar}`} />
                   <div className="pl-2">
                     <span className={`text-[9px] ${c.text} leading-tight block font-medium`}>{evt.name}</span>
-                    <span className="text-[8px] text-gray-500">{evt.time}</span>
+                    <span className="text-[8px] text-gray-400">{evt.time}</span>
                   </div>
                 </motion.div>
               );
@@ -87,12 +87,12 @@ function AddEventStep() {
       <div className="grid grid-cols-7 gap-1 mb-1">
         {DAYS.map((day) => (
           <div key={day} className="text-center">
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider">{day}</span>
+            <span className="text-[10px] text-gray-400 uppercase tracking-wider">{day}</span>
             <div
               className={`text-xs mt-0.5 font-medium mx-auto ${
                 day === 'Wed'
                   ? 'text-purple-300 bg-purple-500/20 rounded-full w-6 h-6 flex items-center justify-center'
-                  : 'text-gray-500'
+                  : 'text-gray-400'
               }`}
             >
               {day === 'Mon' ? '10' : day === 'Tue' ? '11' : day === 'Wed' ? '12' : day === 'Thu' ? '13' : day === 'Fri' ? '14' : day === 'Sat' ? '15' : '16'}
@@ -118,11 +118,11 @@ function AddEventStep() {
           </div>
           <div className="flex items-center gap-3 ml-[22px]">
             <div className="flex items-center gap-1">
-              <Calendar className="w-3 h-3 text-gray-500" />
+              <Calendar className="w-3 h-3 text-gray-400" />
               <span className="text-xs text-gray-400">Wed, Feb 12</span>
             </div>
             <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-gray-500" />
+              <Clock className="w-3 h-3 text-gray-400" />
               <span className="text-xs text-gray-400">4:00 PM</span>
             </div>
           </div>
@@ -145,7 +145,7 @@ function AddEventStep() {
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium capitalize ${
                 active
                   ? `${c.bg} ${c.text} border ${c.border}`
-                  : 'bg-gray-800/60 text-gray-500 border border-gray-700/50'
+                  : 'bg-gray-800/60 text-gray-400 border border-gray-700/50'
               }`}
             >
               <div className={`w-2 h-2 rounded-full ${c.bar}`} />
@@ -204,8 +204,8 @@ function WhoBusyStep() {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-gray-500" />
-                    <span className="text-[10px] text-gray-500">{evt.time}</span>
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <span className="text-[10px] text-gray-400">{evt.time}</span>
                   </div>
                 </div>
               </div>
@@ -249,14 +249,14 @@ function DayViewStep() {
             >
               {/* Timeline dot */}
               <div className={`absolute -left-[7px] top-1 w-3.5 h-3.5 rounded-full ${c.bar} border-2 border-gray-900`} />
-              <span className="text-[10px] text-gray-500 absolute -left-12 top-0.5">{slot.time}</span>
+              <span className="text-[10px] text-gray-400 absolute -left-12 top-0.5">{slot.time}</span>
 
               {/* Event card with category bar */}
               <div className={`${c.bg} border ${c.border} rounded-xl p-2.5 relative`}>
                 <div className={`absolute left-2 top-2 bottom-2 w-[3px] rounded-full ${c.bar}`} />
                 <div className="pl-3">
                   <span className={`text-sm ${c.text} font-medium block`}>{slot.name}</span>
-                  <span className="text-[10px] text-gray-500">{slot.duration}</span>
+                  <span className="text-[10px] text-gray-400">{slot.duration}</span>
                 </div>
               </div>
             </motion.div>
@@ -274,6 +274,7 @@ const steps: DemoStep[] = [
   { label: 'Day view details', content: <DayViewStep /> },
 ];
 
+/** Renders an animated calendar feature demonstration for the landing page. */
 export function CalendarDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

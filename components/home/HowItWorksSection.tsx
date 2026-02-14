@@ -28,6 +28,7 @@ const steps = [
     }
 ];
 
+/** Displays a step-by-step explanation of how Rowan works. */
 export function HowItWorksSection() {
     const prefersReducedMotion = useReducedMotion();
     const sectionRef = useRef(null);

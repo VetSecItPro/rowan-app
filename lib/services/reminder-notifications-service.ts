@@ -123,6 +123,7 @@ export type UpdatePreferencesInput = z.infer<typeof UpdatePreferencesSchema>;
 // SERVICE
 // =============================================
 
+/** Service for reminder notification preferences, quiet hours, and digest frequency management. */
 export const reminderNotificationsService = {
   /**
    * Check if current time is within quiet hours

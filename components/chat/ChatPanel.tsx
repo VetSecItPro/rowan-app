@@ -36,6 +36,7 @@ interface ChatPanelProps {
   persistent?: boolean;
 }
 
+/** Renders the full AI chat panel with message history, input, and suggestions. */
 export default function ChatPanel({
   spaceId,
   isOpen,
@@ -65,6 +66,9 @@ export default function ChatPanel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastUserMessageRef = useRef<string | null>(null);
   const prevMessageCountRef = useRef(0);
+
+  // Derive whether a retry is possible from messages (safe to read during render)
+  const hasLastUserMessage = messages.some((m) => m.role === 'user' && m.content);
 
   // Track the last user message for retry
   useEffect(() => {
@@ -200,7 +204,7 @@ export default function ChatPanel({
           <ErrorBanner
             message={error}
             onDismiss={clearError}
-            onRetry={lastUserMessageRef.current ? handleRetry : undefined}
+            onRetry={hasLastUserMessage ? handleRetry : undefined}
           />
         )}
       </AnimatePresence>
@@ -241,6 +245,7 @@ export default function ChatPanel({
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/40 z-40 lg:hidden"
             onClick={onClose}
+            aria-hidden="true"
           />
 
           {/* Panel */}

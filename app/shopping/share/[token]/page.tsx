@@ -198,7 +198,7 @@ export default function PublicShoppingListPage() {
               {data.list.description && (
                 <p className="text-gray-400">{data.list.description}</p>
               )}
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-400 mt-2">
                 Shared by {data.list.creatorName} •{' '}
                 {format(new Date(data.list.shared_at), 'MMM d, yyyy')}
               </p>
@@ -297,7 +297,7 @@ export default function PublicShoppingListPage() {
                             </p>
                           )}
                           {item.notes && (
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               {item.notes}
                             </p>
                           )}

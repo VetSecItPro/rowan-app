@@ -96,6 +96,7 @@ async function verifyAdminAccess(request: NextRequest): Promise<{
 // GET HANDLER
 // ============================================================================
 
+/** Queries monetization logs with filtering and pagination */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -215,6 +216,7 @@ export async function GET(request: NextRequest) {
 // POST HANDLER - Export logs to CSV
 // ============================================================================
 
+/** Exports monetization logs to CSV or JSON format */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

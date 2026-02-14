@@ -367,7 +367,7 @@ export default function ProjectTrackingPage() {
                 <div className="text-center py-12">
                   <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-400 mb-2">No expenses linked yet</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     Link expenses to this project from the main expenses page
                   </p>
                 </div>

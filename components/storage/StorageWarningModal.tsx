@@ -21,6 +21,7 @@ interface StorageWarningModalProps {
   onDismiss: () => Promise<void>;
 }
 
+/** Displays a warning modal when storage usage approaches the plan limit. */
 export function StorageWarningModal({
   isOpen,
   onClose,

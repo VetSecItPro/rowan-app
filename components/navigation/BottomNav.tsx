@@ -47,6 +47,7 @@ const TABS: BottomTab[] = [
 // Component
 // ---------------------------------------------------------------------------
 
+/** Renders the mobile bottom navigation bar with feature icons. */
 export function BottomNav() {
   const pathname = usePathname();
   const chatCtx = useChatContextSafe();
@@ -119,7 +120,7 @@ export function BottomNav() {
                 </motion.div>
 
                 {isLocked && (
-                  <span className="text-[8px] text-gray-500 mt-0.5">Pro</span>
+                  <span className="text-[8px] text-gray-400 mt-0.5">Pro</span>
                 )}
               </button>
             );
@@ -141,12 +142,12 @@ export function BottomNav() {
               >
                 <Icon
                   className={`w-5 h-5 transition-colors ${
-                    active ? tab.activeColor : 'text-gray-500'
+                    active ? tab.activeColor : 'text-gray-400'
                   }`}
                 />
                 <span
                   className={`text-[10px] font-medium transition-colors ${
-                    active ? tab.activeColor : 'text-gray-500'
+                    active ? tab.activeColor : 'text-gray-400'
                   }`}
                 >
                   {tab.label}

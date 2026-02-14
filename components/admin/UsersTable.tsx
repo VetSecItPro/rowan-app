@@ -20,6 +20,7 @@ interface UsersTableProps {
   filter: 'all' | 'active' | 'inactive';
 }
 
+/** Renders a sortable, filterable table of user accounts for admin management. */
 export function UsersTable({ users, isLoading, searchTerm, filter }: UsersTableProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [actionInProgress, setActionInProgress] = useState(false);

@@ -14,6 +14,7 @@ interface RecipePreviewModalProps {
   onAddToLibrary: (recipe: ExternalRecipe) => void;
 }
 
+/** Displays a detailed recipe preview with ingredients and instructions. */
 export function RecipePreviewModal({
   isOpen,
   onClose,

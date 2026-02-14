@@ -5,6 +5,7 @@ interface TypingIndicatorProps {
   userColor?: string;
 }
 
+/** Renders an animated typing indicator showing who is composing a message. */
 export function TypingIndicator({ userName = 'Someone', userColor = '#34D399' }: TypingIndicatorProps) {
   return (
     <div className="flex justify-start animate-fade-in">

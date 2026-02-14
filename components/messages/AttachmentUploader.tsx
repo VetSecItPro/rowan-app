@@ -11,6 +11,7 @@ interface AttachmentUploaderProps {
   onUploadComplete: (attachment: FileUploadResult) => void;
 }
 
+/** Provides file upload controls for attaching files to messages. */
 export function AttachmentUploader({
   messageId,
   spaceId,

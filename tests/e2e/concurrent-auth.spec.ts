@@ -16,12 +16,14 @@
 import { test as base, expect, Browser, BrowserContext } from '@playwright/test';
 
 // Override test to remove storage state dependency
+/* eslint-disable react-hooks/rules-of-hooks -- `use` is a Playwright test fixture callback, not a React hook */
 const test = base.extend({
   storageState: async ({}, use) => {
     // No storage state - each test creates fresh users
     await use(undefined);
   },
 });
+/* eslint-enable react-hooks/rules-of-hooks */
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;

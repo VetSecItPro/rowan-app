@@ -11,4 +11,5 @@ export const useRouter = () => ({
   events: { on: () => {}, off: () => {}, emit: () => {} },
 });
 
-export default { useRouter };
+const nextRouterStub = { useRouter };
+export default nextRouterStub;

@@ -82,7 +82,7 @@ export async function bulkDeleteExpenses(
       }
     }
 
-    const { data, error } = await query.select('*');
+    const { data, error } = await query.select('id');
     const count = data?.length || 0;
 
     if (error) {
@@ -92,7 +92,7 @@ export async function bulkDeleteExpenses(
 
     return {
       success: true,
-      deleted_count: count || data?.length || 0,
+      deleted_count: count,
     };
   } catch (error) {
     logger.error('Error bulk deleting expenses:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });
@@ -144,7 +144,7 @@ export async function bulkDeleteTasks(
       }
     }
 
-    const { data, error } = await query.select('*');
+    const { data, error } = await query.select('id');
     const count = data?.length || 0;
 
     if (error) {
@@ -154,7 +154,7 @@ export async function bulkDeleteTasks(
 
     return {
       success: true,
-      deleted_count: count || data?.length || 0,
+      deleted_count: count,
     };
   } catch (error) {
     logger.error('Error bulk deleting tasks:', error, { component: 'lib-bulk-operations-service', action: 'service_call' });

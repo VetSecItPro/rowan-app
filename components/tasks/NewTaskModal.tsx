@@ -516,6 +516,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
   );
 }
 
+/** Renders a modal form for creating or editing a task. */
 export function NewTaskModal(props: NewTaskModalProps) {
   const { editTask, isOpen, spaceId, userId } = props;
   const formKey = `${editTask?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId ?? 'none'}-${userId ?? 'anon'}`;

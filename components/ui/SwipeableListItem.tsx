@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Trash2, Check } from 'lucide-react';
 
 interface SwipeAction {
@@ -22,6 +22,7 @@ interface SwipeableListItemProps {
 
 const SWIPE_THRESHOLD = 80;
 
+/** Renders a list item with swipeable left/right action reveals. */
 export function SwipeableListItem({
   children,
   onSwipeLeft,
@@ -31,7 +32,7 @@ export function SwipeableListItem({
   disabled = false,
 }: SwipeableListItemProps) {
   const x = useMotionValue(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const [_isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Background opacity based on drag distance

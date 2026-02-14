@@ -39,6 +39,7 @@ const datePresets = [
   { label: 'Custom Range', value: 'custom' }
 ];
 
+/** Provides controls for generating a report from a selected template. */
 export function ReportGenerator({ template, spaceId, onReportGenerated, onCancel }: ReportGeneratorProps) {
   const [title, setTitle] = useState(template.name);
   const [description, setDescription] = useState(template.description || '');

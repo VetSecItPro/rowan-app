@@ -24,6 +24,7 @@ import type {
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
+/** Core goal service for CRUD, collaboration, templates, priority, ordering, and stats. */
 export const goalService = {
   /**
    * Retrieves all goals for a space with milestones and assignee data.

@@ -34,7 +34,7 @@ export async function dismissCookieBanner(page: Page): Promise<void> {
     await gotItButton.click();
     // Wait for banner to animate out
     await page.waitForTimeout(500);
-  } catch (error) {
+  } catch (_error) {
     // Silently fail - banner may not be present
     console.log('Cookie banner not found or already dismissed');
   }

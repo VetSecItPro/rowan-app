@@ -22,6 +22,7 @@ interface EventCardProps {
   linkedShoppingList?: LinkedShoppingList;
 }
 
+/** Renders a single calendar event card with time, title, and action controls. */
 export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onStatusChange, onViewDetails, onMarkBillPaid, linkedShoppingList }: EventCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const isBillEvent = Boolean(event.linked_bill_id);
@@ -189,6 +190,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
+                aria-hidden="true"
               />
               <div className="absolute right-0 mt-2 w-48 dropdown-mobile bg-gray-800/95 border border-gray-700/50 rounded-lg shadow-xl z-20">
                 {/* Mark Bill as Paid - Only show for bill-linked events that aren't completed */}

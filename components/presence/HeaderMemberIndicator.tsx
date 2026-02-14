@@ -12,6 +12,7 @@ interface HeaderMemberIndicatorProps {
   className?: string;
 }
 
+/** Displays online member avatars in the header area. */
 export function HeaderMemberIndicator({
   spaceId,
   spaceName,
@@ -65,6 +66,7 @@ export function HeaderMemberIndicator({
           <div
             className="fixed inset-0 z-10"
             onClick={() => setShowDropdown(false)}
+            aria-hidden="true"
           />
 
           {/* Dropdown */}

@@ -34,6 +34,7 @@ interface NewReminderModalProps {
   spaceId: string;
 }
 
+/** Renders a modal form for creating or editing a reminder. */
 export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceId }: NewReminderModalProps) {
   const [formData, setFormData] = useState<CreateReminderInput>({
     space_id: spaceId,
@@ -266,6 +267,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
                   <div
                     className="fixed inset-0 z-20"
                     onClick={() => setShowEmojiPicker(false)}
+                    aria-hidden="true"
                   />
                   <div className="absolute right-0 mt-2 p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-30 w-full sm:w-80 max-w-[calc(100vw-2rem)]">
                     <h4 className="text-base sm:text-sm font-medium text-gray-300 mb-3">Select an emoji</h4>

@@ -24,6 +24,7 @@ interface MiniCalendarProps {
   events: Event[];
 }
 
+/** Renders a compact month-view calendar for date navigation. */
 export function MiniCalendar({ currentDate, onDateSelect, events }: MiniCalendarProps) {
   const [viewMonth, setViewMonth] = useState(currentDate);
 

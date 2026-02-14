@@ -12,6 +12,7 @@ interface PartnerBalanceWidgetProps {
   className?: string;
 }
 
+/** Displays the running balance between partners for shared expenses. */
 export function PartnerBalanceWidget({
   balances,
   currentUserId,
@@ -35,7 +36,7 @@ export function PartnerBalanceWidget({
         bg: 'bg-gray-800',
         border: 'border-gray-700',
         text: 'text-gray-400',
-        icon: 'text-gray-500',
+        icon: 'text-gray-400',
       };
     }
     if (youOwe) {
@@ -68,7 +69,7 @@ export function PartnerBalanceWidget({
       <div className="mb-4">
         {balanced ? (
           <div className="text-center py-6">
-            <Minus className="w-12 h-12 mx-auto mb-3 text-gray-500" />
+            <Minus className="w-12 h-12 mx-auto mb-3 text-gray-400" />
             <div className="text-2xl font-bold text-white mb-1">All Settled Up!</div>
             <p className="text-sm text-gray-400">
               You and {partnerName} are even

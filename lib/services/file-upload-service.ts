@@ -104,6 +104,7 @@ async function validateMagicBytes(file: File): Promise<boolean> {
   }
 }
 
+/** Service for validating, uploading, and managing files in Supabase Storage. */
 export const fileUploadService = {
   /**
    * Validate file before upload

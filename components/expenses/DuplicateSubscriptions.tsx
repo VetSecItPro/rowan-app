@@ -16,6 +16,7 @@ interface DuplicateSubscriptionsProps {
   className?: string;
 }
 
+/** Detects and displays potentially duplicate subscription charges. */
 export function DuplicateSubscriptions({
   duplicates,
   onDismiss,

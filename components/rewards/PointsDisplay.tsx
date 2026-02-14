@@ -18,6 +18,7 @@ interface PointsDisplayProps {
   className?: string;
 }
 
+/** Displays the current reward points balance with animated counter. */
 export function PointsDisplay({
   userId,
   spaceId,

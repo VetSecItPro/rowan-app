@@ -50,6 +50,7 @@ interface YearInReviewDashboardProps {
 // YEAR IN REVIEW DASHBOARD
 // =====================================================
 
+/** Renders an annual review dashboard with yearly statistics and highlights. */
 export const YearInReviewDashboard = memo(function YearInReviewDashboard({ year, className }: YearInReviewDashboardProps) {
   const { currentSpace, spaces, switchSpace, user } = useAuth();
   const [data, setData] = useState<YearInReviewData | null>(null);

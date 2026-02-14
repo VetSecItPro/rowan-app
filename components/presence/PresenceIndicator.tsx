@@ -8,6 +8,7 @@ interface PresenceIndicatorProps {
   className?: string;
 }
 
+/** Renders online/offline presence status dots for space members. */
 export function PresenceIndicator({
   status,
   size = 'md',

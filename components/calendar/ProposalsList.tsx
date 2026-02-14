@@ -14,6 +14,7 @@ interface ProposalsListProps {
   onCreateProposal?: () => void;
 }
 
+/** Renders a list of pending event proposals for the space. */
 export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, onCreateProposal }: ProposalsListProps) {
   const [proposals, setProposals] = useState<EventProposal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -199,7 +200,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
             {selectedStatus === 'rejected' && 'No rejected proposals'}
             {selectedStatus === 'all' && 'No proposals yet'}
           </p>
-          <p className="text-gray-500 text-sm mb-6">
+          <p className="text-gray-400 text-sm mb-6">
             {selectedStatus === 'pending' && 'Create a new proposal to suggest event times to your space members'}
             {selectedStatus === 'approved' && 'Approved proposals will appear here once created'}
             {selectedStatus === 'rejected' && 'Rejected proposals will appear here'}

@@ -15,6 +15,7 @@ import { useScrollLock } from '@/lib/hooks/useScrollLock';
 import { useDevice } from '@/lib/contexts/DeviceContext';
 import { prefetchFeatureData, prefetchCriticalData, ROUTE_TO_FEATURE_MAP } from '@/lib/services/prefetch-service';
 
+/** Renders a hamburger menu with slide-out navigation drawer. */
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -138,6 +139,7 @@ export function HamburgerMenu() {
                 transition={{ duration: 0.2 }}
                 className="fixed inset-0 bg-black/60 z-[60] sm:hidden"
                 onClick={() => setIsOpen(false)}
+                aria-hidden="true"
               />
 
               {/* Mobile Menu Panel - Full Screen Slide-in */}

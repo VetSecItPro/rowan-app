@@ -196,4 +196,5 @@ Parse this text and return the JSON object:`;
   }
 }
 
+/** Singleton instance for parsing natural language into structured calendar event data. */
 export const eventParserService = new EventParserService();

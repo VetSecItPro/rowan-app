@@ -43,6 +43,7 @@ const budgetTabs = [
   },
 ] as const;
 
+/** Renders the tab navigation bar for switching between budget sub-views. */
 export function BudgetTabBar() {
   const pathname = usePathname();
   const router = useRouter();

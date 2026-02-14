@@ -18,7 +18,6 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
-  isSameMonth,
   addMonths,
   startOfWeek,
   endOfWeek,
@@ -192,6 +191,7 @@ function safeGetLocalStorageString(
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Provides calendar event data, date navigation, and event proposal state */
 export function useCalendarData(): CalendarDataReturn {
   const { currentSpace, user } = useAuthWithSpaces();
   const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccessSafe('canUseEventProposals');
@@ -221,7 +221,7 @@ export function useCalendarData(): CalendarDataReturn {
   const [locationLoading, setLocationLoading] = useState(true);
 
   // Calendar sync state
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, _setIsSyncing] = useState(false);
   const [hasCalendarConnection, setHasCalendarConnection] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('rowan_calendar_connected') === 'true';

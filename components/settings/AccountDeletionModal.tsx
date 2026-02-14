@@ -15,6 +15,7 @@ interface AccountDeletionModalProps {
   onClose: () => void;
 }
 
+/** Renders a modal with account deletion confirmation and data export option. */
 export function AccountDeletionModal({ isOpen, onClose }: AccountDeletionModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasExported, setHasExported] = useState(false);

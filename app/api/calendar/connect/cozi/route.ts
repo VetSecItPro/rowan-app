@@ -17,6 +17,7 @@ const CoziConnectSchema = z.object({
   family_member: z.string().min(1, 'Family member name is required').max(100, 'Name too long').optional(),
 });
 
+/** Connects a Cozi calendar via ICS feed URL */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
@@ -229,7 +230,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to check Cozi connection status
+/** Checks Cozi calendar connection status */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -291,7 +292,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// DELETE endpoint to remove a Cozi connection
+/** Disconnects and removes a Cozi calendar connection */
 export async function DELETE(request: NextRequest) {
   try {
     // Rate limiting

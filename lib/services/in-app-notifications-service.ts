@@ -68,6 +68,7 @@ export interface NotificationFilters {
   space_id?: string;
 }
 
+/** Manages in-app notifications (CRUD, read status, real-time subscriptions) via the in_app_notifications table. */
 export class InAppNotificationsService {
   private supabase: SupabaseClient;
 
@@ -385,5 +386,5 @@ export class InAppNotificationsService {
   }
 }
 
-// Export singleton instance
+/** Singleton instance of the in-app notifications service. */
 export const inAppNotificationsService = new InAppNotificationsService();

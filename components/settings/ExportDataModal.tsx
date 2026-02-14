@@ -16,6 +16,7 @@ interface ExportDataModalProps {
 type ExportFormat = 'json' | 'csv' | 'pdf';
 type DataType = 'all' | 'expenses' | 'tasks' | 'events' | 'shopping' | 'messages';
 
+/** Renders a modal for exporting user data in various formats. */
 export function ExportDataModal({ isOpen, onClose, userId }: ExportDataModalProps) {
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('json');
   const [selectedDataType, setSelectedDataType] = useState<DataType>('all');

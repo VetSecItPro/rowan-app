@@ -2,6 +2,7 @@ import React from 'react';
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
+/** Renders a styled text input field with dark mode support. */
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className = '', type, ...props }, ref) => {
     return (

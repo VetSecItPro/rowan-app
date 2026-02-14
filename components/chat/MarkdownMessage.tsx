@@ -157,6 +157,7 @@ const markdownComponents: Components = {
   },
 };
 
+/** Renders AI chat message content with markdown formatting support. */
 export default function MarkdownMessage({
   content,
   isStreaming,

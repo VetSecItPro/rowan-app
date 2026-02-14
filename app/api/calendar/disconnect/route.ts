@@ -9,6 +9,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+/** Disconnects and removes a calendar provider connection */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

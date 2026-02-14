@@ -22,6 +22,7 @@ const householdLabels: Record<HouseholdType, string> = {
   retired: 'Retired',
 };
 
+/** Displays a browsable gallery of budget templates for quick setup. */
 export function TemplateGallery({
   templates,
   selectedTemplateId,

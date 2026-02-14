@@ -158,6 +158,7 @@ export type UpdateHabitEntryInput = z.infer<typeof UpdateHabitEntrySchema>;
 // SERVICE
 // =============================================
 
+/** Service for managing recurring goal templates and auto-generating goal instances. */
 export const recurringGoalsService = {
   // ===== RECURRING GOAL TEMPLATES =====
 

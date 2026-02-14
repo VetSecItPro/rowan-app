@@ -37,6 +37,7 @@ const FEEDBACK_TYPE_OPTIONS = [
   { value: FeedbackType.GENERAL, label: 'General Feedback' },
 ];
 
+/** Displays a modal form for submitting user feedback and bug reports. */
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const { user } = useAuth();
   const { currentSpace } = useSpaces();

@@ -36,6 +36,7 @@ function saveDismissed(ids: Set<string>): void {
   }
 }
 
+/** Fetches and manages AI-powered task and activity suggestions for a space */
 export function useAISuggestions(spaceId: string | undefined): UseAISuggestionsReturn {
   const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);

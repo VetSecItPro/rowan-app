@@ -24,6 +24,7 @@ interface SpendingInsightsDashboardProps {
   spaceId: string;
 }
 
+/** Renders spending pattern analysis and AI-driven financial insights. */
 export default function SpendingInsightsDashboard({ spaceId }: SpendingInsightsDashboardProps) {
   const [patterns, setPatterns] = useState<SpendingPattern[]>([]);
   const [insights, setInsights] = useState<SpendingInsight[]>([]);

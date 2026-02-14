@@ -39,6 +39,7 @@ const StatusBadge = memo(function StatusBadge({ status }: { status: string }) {
   );
 });
 
+/** Displays user management controls with search, filtering, and user details. */
 export const UsersPanel = memo(function UsersPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);

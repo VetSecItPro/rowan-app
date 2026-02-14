@@ -18,7 +18,6 @@ import {
   goToPricingPage,
   togglePricingPeriod,
   isUpgradeModalVisible,
-  closeUpgradeModal,
   verifyFeatureAccess,
   ensureAuthenticated,
 } from './helpers/test-utils';

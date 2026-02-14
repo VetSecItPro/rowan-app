@@ -19,6 +19,7 @@ interface TrendLineChartProps {
   }>;
 }
 
+/** Renders a line chart showing goal progress trends over time. */
 export default function TrendLineChart({ data }: TrendLineChartProps) {
   if (!data || data.length === 0) {
     return (

@@ -11,6 +11,7 @@ interface TaskQuickActionsProps {
   onAction: (action: string) => void;
 }
 
+/** Renders quick action buttons for common task operations. */
 export function TaskQuickActions({ taskId, spaceId, userId, onAction }: TaskQuickActionsProps) {
   const actions = [
     { id: 'complete', label: 'Complete', icon: CheckCircle, color: 'text-green-600' },

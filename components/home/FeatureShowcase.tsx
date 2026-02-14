@@ -104,6 +104,7 @@ const featureGroups = [
   },
 ];
 
+/** Renders an interactive feature showcase with tabbed demos. */
 export function FeatureShowcase() {
   const prefersReducedMotion = useReducedMotion();
 

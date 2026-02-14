@@ -48,6 +48,7 @@ interface PushNotificationProviderProps {
   children: ReactNode;
 }
 
+/** Provides push notification registration and permission management. */
 export function PushNotificationProvider({ children }: PushNotificationProviderProps) {
   const { currentSpace } = useAuthWithSpaces();
   const spaceId = currentSpace?.id || '';

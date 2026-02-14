@@ -15,6 +15,7 @@ interface DateTimePickerProps {
   label?: string;
 }
 
+/** Renders a combined date and time picker input with calendar dropdown. */
 export function DateTimePicker({
   value,
   onChange,
@@ -259,7 +260,7 @@ export function DateTimePicker({
               className="p-1 hover:bg-gray-700 rounded transition-colors"
               title="Clear date"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-gray-400" />
             </button>
           )}
           <button
@@ -268,7 +269,7 @@ export function DateTimePicker({
             className="p-1 hover:bg-gray-700 rounded transition-colors"
             title="Open calendar"
           >
-            <Calendar className="w-4 h-4 text-gray-500" />
+            <Calendar className="w-4 h-4 text-gray-400" />
           </button>
         </div>
       </div>
@@ -281,6 +282,7 @@ export function DateTimePicker({
             <div
               className="fixed inset-0 bg-black/70 z-[70]"
               onClick={() => setIsOpen(false)}
+              aria-hidden="true"
             />
           )}
 

@@ -43,6 +43,7 @@ export interface CreateSubtaskInput {
   created_by: string;
 }
 
+/** Service for subtask CRUD with automatic completion tracking and sort order management. */
 export const taskSubtasksService = {
   /**
    * Retrieves all subtasks for a parent task.

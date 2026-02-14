@@ -117,7 +117,9 @@ export const goalsService = {
   markMentionAsRead: activityService.markMentionAsRead.bind(activityService),
 };
 
-// Named exports for compatibility
+/** Convenience alias for goalService.createGoal. */
 export const createGoal = goalService.createGoal.bind(goalService);
+/** Convenience alias for goalService.updateGoal. */
 export const updateGoal = goalService.updateGoal.bind(goalService);
+/** Convenience alias for milestoneService.createMilestone. */
 export const createMilestone = milestoneService.createMilestone.bind(milestoneService);

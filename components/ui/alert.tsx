@@ -4,6 +4,7 @@ interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'destructive';
 }
 
+/** Renders a styled alert container for displaying status messages. */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   ({ className = '', variant = 'default', ...props }, ref) => {
     const variants = {
@@ -26,6 +27,7 @@ Alert.displayName = 'Alert';
 
 type AlertTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
+/** Renders the title heading within an Alert component. */
 export const AlertTitle = React.forwardRef<HTMLHeadingElement, AlertTitleProps>(
   ({ className = '', ...props }, ref) => (
     <h5
@@ -40,6 +42,7 @@ AlertTitle.displayName = 'AlertTitle';
 
 type AlertDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
+/** Renders the description text within an Alert component. */
 export const AlertDescription = React.forwardRef<HTMLParagraphElement, AlertDescriptionProps>(
   ({ className = '', ...props }, ref) => (
     <div

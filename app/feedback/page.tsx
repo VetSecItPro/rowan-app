@@ -85,9 +85,9 @@ export default function MyFeedbackPage() {
       case FeedbackType.UI_UX:
         return <Palette className="w-4 h-4 text-purple-500" />;
       case FeedbackType.GENERAL:
-        return <MessageCircle className="w-4 h-4 text-gray-500" />;
+        return <MessageCircle className="w-4 h-4 text-gray-400" />;
       default:
-        return <MessageCircle className="w-4 h-4 text-gray-500" />;
+        return <MessageCircle className="w-4 h-4 text-gray-400" />;
     }
   };
 
@@ -100,7 +100,7 @@ export default function MyFeedbackPage() {
       case FeedbackStatus.RESOLVED:
         return <CheckCircle className="w-4 h-4 text-green-500" />;
       case FeedbackStatus.WONT_FIX:
-        return <XCircle className="w-4 h-4 text-gray-500" />;
+        return <XCircle className="w-4 h-4 text-gray-400" />;
     }
   };
 

@@ -63,6 +63,7 @@ const DEPENDENCY_TYPES: Array<{
   }
 ];
 
+/** Displays a modal for managing prerequisite dependencies between goals. */
 export function DependenciesModal({
   isOpen,
   onClose,
@@ -254,7 +255,7 @@ export function DependenciesModal({
                   }}
                   className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
                 >
-                  <X className="w-4 h-4 text-gray-500" />
+                  <X className="w-4 h-4 text-gray-400" />
                 </button>
               </div>
 

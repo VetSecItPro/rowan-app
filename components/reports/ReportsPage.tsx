@@ -27,6 +27,7 @@ interface ReportsPageProps {
   className?: string;
 }
 
+/** Renders the main reports page with template selection and report list. */
 export function ReportsPage({ className = '' }: ReportsPageProps) {
   const params = useParams();
   const spaceId = params?.spaceId as string;

@@ -9,6 +9,7 @@ interface PasswordRequirement {
   met: boolean;
 }
 
+/** Renders a form for changing the user's account password. */
 export function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');

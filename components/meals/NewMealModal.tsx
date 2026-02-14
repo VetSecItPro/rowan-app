@@ -18,6 +18,7 @@ interface NewMealModalProps {
   onOpenRecipeDiscover?: () => void;
 }
 
+/** Renders a modal form for creating or editing a meal plan entry. */
 export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recipes = [], onOpenRecipeDiscover }: NewMealModalProps) {
   type MealType = CreateMealInput['meal_type'];
   type MealOption = { value: MealType; label: string; icon: LucideIcon; color: string };
@@ -169,13 +170,13 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                   const Icon = selected?.icon || Moon;
                   return (
                     <>
-                      <Icon className={`w-4 h-4 ${selected?.color || 'text-gray-500'}`} />
+                      <Icon className={`w-4 h-4 ${selected?.color || 'text-gray-400'}`} />
                       <span>{selected?.label || 'Select meal type'}</span>
                     </>
                   );
                 })()}
               </div>
-              <svg className="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -212,7 +213,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
                 <ChefHat className="w-4 h-4 text-orange-500" />
                 <span>{selectedRecipe ? selectedRecipe.name : 'No recipe selected'}</span>
               </div>
-              <svg className="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>

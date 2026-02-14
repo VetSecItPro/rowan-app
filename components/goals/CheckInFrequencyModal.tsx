@@ -49,6 +49,7 @@ const REMINDER_DAYS_OPTIONS = [
   { value: 7, label: '1 week before' },
 ];
 
+/** Renders a modal for configuring how often a goal requires check-ins. */
 export function CheckInFrequencyModal({ isOpen, onClose, goalId, goalTitle }: CheckInFrequencyModalProps) {
   const [settings, setSettings] = useState<CheckInFrequencySettings>({
     frequency: 'weekly',

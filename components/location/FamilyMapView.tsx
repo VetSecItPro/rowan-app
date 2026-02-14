@@ -75,6 +75,7 @@ function getTimeAgo(minutesAgo: number): string {
   return `${days}d ago`;
 }
 
+/** Renders the family map view with member pins and location controls. */
 export function FamilyMapView({ spaceId, className }: FamilyMapViewProps) {
   const {
     familyLocations,
@@ -291,7 +292,7 @@ export function FamilyMapView({ spaceId, className }: FamilyMapViewProps) {
                   </div>
                 )}
                 <span className="text-sm text-gray-300">{member.name}</span>
-                <span className="text-xs text-gray-500">{getTimeAgo(member.minutes_ago)}</span>
+                <span className="text-xs text-gray-400">{getTimeAgo(member.minutes_ago)}</span>
               </button>
             ))}
           </div>
@@ -335,7 +336,7 @@ export function FamilyMapView({ spaceId, className }: FamilyMapViewProps) {
               onClick={() => setSelectedMember(null)}
               className="p-1 rounded hover:bg-gray-700"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>
           {selectedMember.current_place && (
@@ -416,7 +417,7 @@ function FamilyMemberMarker({
       <Popup>
         <div className="text-center">
           <p className="font-medium">{member.name}</p>
-          <p className="text-sm text-gray-500">{getTimeAgo(member.minutes_ago)}</p>
+          <p className="text-sm text-gray-400">{getTimeAgo(member.minutes_ago)}</p>
         </div>
       </Popup>
     </Marker>
@@ -464,7 +465,7 @@ function PlaceMarker({ place }: { place: FamilyPlace }) {
         <Popup>
           <div className="text-center">
             <p className="font-medium">{place.name}</p>
-            <p className="text-sm text-gray-500">{place.radius_meters}m radius</p>
+            <p className="text-sm text-gray-400">{place.radius_meters}m radius</p>
           </div>
         </Popup>
       </Marker>

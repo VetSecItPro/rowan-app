@@ -24,6 +24,7 @@ interface BadgeGalleryProps {
   defaultFilter?: BadgeCategory | 'all';
 }
 
+/** Displays a gallery grid of all available achievement badges. */
 export function BadgeGallery({
   badges,
   userAchievements,
@@ -121,7 +122,7 @@ export function BadgeGallery({
             <div className="flex flex-wrap gap-4">
               {/* Category Filter */}
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
+                <Filter className="w-4 h-4 text-gray-400" />
                 <span className="text-sm font-medium text-gray-300">Category:</span>
                 <select
                   value={selectedCategory}
@@ -194,7 +195,7 @@ export function BadgeGallery({
         <div className="text-center py-12">
           <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-400 text-lg mb-2">No badges found</p>
-          <p className="text-gray-500">
+          <p className="text-gray-400">
             {searchQuery || selectedCategory !== 'all' || selectedRarity !== 'all' || showEarnedOnly
               ? 'Try adjusting your filters'
               : 'Complete goals and milestones to start earning badges!'}

@@ -54,6 +54,7 @@ export interface CalendarModalsReturn {
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Manages open/close state for calendar-related modals and detail views */
 export function useCalendarModals(): CalendarModalsReturn {
   // New/Edit event modal
   const [isModalOpen, setIsModalOpen] = useState(false);

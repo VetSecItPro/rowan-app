@@ -42,6 +42,7 @@ const GetCountQuerySchema = z.object({
  * - Allows users to delete multiple expenses at once
  */
 
+/** Bulk deletes expenses matching the specified filters */
 export async function POST(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get count of expenses that would be deleted
+/** Returns the count of expenses matching a bulk delete filter */
 export async function GET(request: NextRequest) {
   try {
     // Rate limit check

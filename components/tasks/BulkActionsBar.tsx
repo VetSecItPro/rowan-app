@@ -13,6 +13,7 @@ interface BulkActionsBarProps {
   onActionComplete: () => void;
 }
 
+/** Renders a toolbar with bulk action buttons for selected tasks. */
 export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComplete }: BulkActionsBarProps) {
   const [loading, setLoading] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
@@ -165,6 +166,7 @@ export function BulkActionsBar({ selectedTaskIds, onClearSelection, onActionComp
                     <div
                       className="fixed inset-0 z-10"
                       onClick={() => setShowMoreActions(false)}
+                      aria-hidden="true"
                     />
                     <div className="absolute bottom-full mb-2 left-0 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                       {/* Status Options */}

@@ -165,7 +165,7 @@ export const UnifiedCalendarItemCard = memo(function UnifiedCalendarItemCard({
       )}
 
       {/* Item-specific metadata */}
-      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
         {/* Meal type */}
         {item.itemType === 'meal' && item.category && (
           <span className="rounded bg-gray-800 px-1.5 py-0.5 capitalize">

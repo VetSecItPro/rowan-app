@@ -14,6 +14,7 @@ interface PasswordConfirmModalProps {
   confirmButtonText?: string;
 }
 
+/** Displays a modal requiring password confirmation for sensitive actions. */
 export function PasswordConfirmModal({
   isOpen,
   onClose,

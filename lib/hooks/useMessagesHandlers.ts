@@ -91,6 +91,7 @@ export interface MessagesHandlersReturn {
 // HOOK
 // =============================================
 
+/** Provides handlers for sending, editing, deleting, and reacting to messages */
 export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandlersReturn {
   const {
     user,

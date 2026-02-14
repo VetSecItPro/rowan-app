@@ -108,7 +108,7 @@ function TrackProgressStep() {
         {/* Big amount display */}
         <div className="flex items-end justify-between mb-3">
           <div>
-            <p className="text-[10px] text-gray-500 mb-0.5">Saved so far</p>
+            <p className="text-[10px] text-gray-400 mb-0.5">Saved so far</p>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -119,7 +119,7 @@ function TrackProgressStep() {
             </motion.p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-gray-500">Goal</p>
+            <p className="text-[10px] text-gray-400">Goal</p>
             <p className="text-sm font-medium text-gray-400">$5,000</p>
           </div>
         </div>
@@ -142,7 +142,7 @@ function TrackProgressStep() {
           >
             35%
           </motion.span>
-          <span className="text-[10px] text-gray-500">$3,250 to go</span>
+          <span className="text-[10px] text-gray-400">$3,250 to go</span>
         </div>
       </div>
 
@@ -156,7 +156,7 @@ function TrackProgressStep() {
         <TrendingUp className="w-4 h-4 text-indigo-400 flex-shrink-0" />
         <div>
           <p className="text-xs font-medium text-indigo-300">Ahead of schedule</p>
-          <p className="text-[10px] text-gray-500">+2 weeks ahead of target</p>
+          <p className="text-[10px] text-gray-400">+2 weeks ahead of target</p>
         </div>
       </motion.div>
     </div>
@@ -196,7 +196,7 @@ function AddContributionStep() {
         {/* Updated progress */}
         <div className="flex items-end justify-between mb-2">
           <div>
-            <p className="text-[10px] text-gray-500">Updated total</p>
+            <p className="text-[10px] text-gray-400">Updated total</p>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -206,7 +206,7 @@ function AddContributionStep() {
               $1,950
             </motion.p>
           </div>
-          <span className="text-xs text-gray-500">of $5,000</span>
+          <span className="text-xs text-gray-400">of $5,000</span>
         </div>
 
         <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden">
@@ -219,7 +219,7 @@ function AddContributionStep() {
         </div>
         <div className="flex justify-between mt-1">
           <span className="text-xs font-medium text-indigo-400">39%</span>
-          <span className="text-[10px] text-gray-500">$3,050 to go</span>
+          <span className="text-[10px] text-gray-400">$3,050 to go</span>
         </div>
       </div>
 
@@ -230,14 +230,14 @@ function AddContributionStep() {
         transition={{ delay: 1.0 }}
         className="space-y-1.5"
       >
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider">Recent</p>
+        <p className="text-[10px] text-gray-400 uppercase tracking-wider">Recent</p>
         {[
           { amount: '+$200', date: 'Today', by: 'Dad' },
           { amount: '+$150', date: 'Feb 2', by: 'Mom' },
         ].map((c, i) => (
           <div key={i} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-gray-800/40">
             <div className="flex items-center gap-2">
-              <Clock className="w-3 h-3 text-gray-500" />
+              <Clock className="w-3 h-3 text-gray-400" />
               <span className="text-[10px] text-gray-400">{c.date}</span>
               <span className="text-[10px] text-indigo-300 px-1.5 py-0.5 bg-indigo-900/30 rounded-full">{c.by}</span>
             </div>
@@ -315,8 +315,8 @@ function MilestoneStep() {
         transition={{ delay: 1.0 }}
         className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-800/40 border border-gray-700/30"
       >
-        <Target className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-        <span className="text-[10px] text-gray-500">Next milestone: 50% ($2,500)</span>
+        <Target className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+        <span className="text-[10px] text-gray-400">Next milestone: 50% ($2,500)</span>
       </motion.div>
     </div>
   );
@@ -329,6 +329,7 @@ const steps: DemoStep[] = [
   { label: 'Hit milestones', content: <MilestoneStep /> },
 ];
 
+/** Renders an animated goals feature demonstration for the landing page. */
 export function GoalsDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

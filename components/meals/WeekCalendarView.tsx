@@ -24,6 +24,7 @@ const MEAL_TYPE_CONFIG = {
   snack: { icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-900/20', border: 'border-amber-700', label: 'Snack' },
 };
 
+/** Renders a single-week calendar grid for meal planning. */
 export const WeekCalendarView = memo(function WeekCalendarView({
   currentWeek,
   meals,
@@ -413,7 +414,7 @@ export const WeekCalendarView = memo(function WeekCalendarView({
               {dayMeals.length > 0 && (
                 <button
                   onClick={() => onAddMeal(day)}
-                  className="w-full mt-2 py-1.5 border-2 border-dashed border-gray-700 rounded-lg text-xs text-gray-500 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all flex items-center justify-center"
+                  className="w-full mt-2 py-1.5 border-2 border-dashed border-gray-700 rounded-lg text-xs text-gray-400 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all flex items-center justify-center"
                 >
                   + Add
                 </button>

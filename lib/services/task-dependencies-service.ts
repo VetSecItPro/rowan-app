@@ -20,6 +20,7 @@ type TaskDependency = {
   depends_on_task?: Record<string, unknown>;
 };
 
+/** Service for managing task dependency relationships (blocking and related-to links). */
 export const taskDependenciesService = {
   /**
    * Creates a dependency relationship between two tasks.

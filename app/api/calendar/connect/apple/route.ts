@@ -10,6 +10,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+/** Connects an Apple Calendar via CalDAV credentials */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
@@ -219,7 +220,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to check connection status
+/** Checks Apple Calendar connection status */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting

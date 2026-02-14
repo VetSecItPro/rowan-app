@@ -8,6 +8,7 @@ interface ClientErrorBoundaryProps {
   children: ReactNode;
 }
 
+/** Wraps children in a client-side error boundary with fallback UI. */
 export default function ClientErrorBoundary({ children }: ClientErrorBoundaryProps) {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
     // Log error for debugging

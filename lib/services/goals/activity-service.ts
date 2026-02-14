@@ -15,6 +15,7 @@ import type {
   CreateActivityInput,
 } from './types';
 
+/** Service for goal activity feeds, comments, reactions, and mentions. */
 export const activityService = {
   // Activity Feed methods
 

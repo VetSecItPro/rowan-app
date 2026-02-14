@@ -13,7 +13,8 @@ interface HeroSectionProps {
   onPricingClick: () => void;
 }
 
-export function HeroSection({ onSignupClick, onPricingClick }: HeroSectionProps) {
+/** Renders the hero section with headline, description, and CTA buttons. */
+export function HeroSection({ onSignupClick, onPricingClick: _onPricingClick }: HeroSectionProps) {
   const prefersReducedMotion = useReducedMotion();
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({

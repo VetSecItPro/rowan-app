@@ -18,6 +18,7 @@ interface SplitCalculatorProps {
   partnership: PartnershipBalance | null;
 }
 
+/** Calculates and displays how an expense should be split between members. */
 export function SplitCalculator({
   splitType,
   totalAmount,

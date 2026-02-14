@@ -50,6 +50,7 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(', ');
 
+/** Renders a keyboard shortcuts help overlay with available bindings. */
 export function KeyboardShortcuts() {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -190,7 +191,7 @@ export function KeyboardShortcuts() {
                             {shortcut.keys.map((key, i) => (
                               <span key={i} className="flex items-center gap-1">
                                 {i > 0 && (
-                                  <span className="text-gray-500 text-xs mx-0.5">+</span>
+                                  <span className="text-gray-400 text-xs mx-0.5">+</span>
                                 )}
                                 <kbd className="inline-flex items-center justify-center min-w-[28px] h-7 px-2 text-xs font-medium text-gray-300 bg-gray-900 border border-gray-600 rounded-md shadow-sm">
                                   {key}
@@ -207,7 +208,7 @@ export function KeyboardShortcuts() {
             </div>
 
             <div className="px-5 sm:px-6 py-3 border-t border-gray-700/50 bg-gray-800/80">
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-gray-400 text-center">
                 Press <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-medium text-gray-400 bg-gray-900 border border-gray-600 rounded">?</kbd> to toggle this panel
               </p>
             </div>

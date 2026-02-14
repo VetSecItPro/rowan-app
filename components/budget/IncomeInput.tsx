@@ -15,6 +15,7 @@ interface IncomeInputProps {
   showValidation?: boolean;
 }
 
+/** Provides an input form for entering and editing household income. */
 export function IncomeInput({
   value,
   onChange,

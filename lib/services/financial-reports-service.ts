@@ -920,41 +920,53 @@ class FinancialReportsService {
   }
 }
 
+/** Singleton instance for financial report template management, generation, sharing, and export. */
 export const financialReportsService = new FinancialReportsService();
 
-// Export individual functions for direct import
+/** Fetches report templates, optionally filtered by space and category. */
 export const getReportTemplates = (spaceId?: string, category?: string) =>
   financialReportsService.getReportTemplates(spaceId, category);
 
+/** Fetches a single report template by ID. */
 export const getReportTemplate = (id: string) =>
   financialReportsService.getReportTemplate(id);
 
+/** Creates a new financial report template. */
 export const createReportTemplate = (userId: string, input: CreateTemplateInput) =>
   financialReportsService.createReportTemplate(userId, input);
 
+/** Generates a financial report from a template for a given date range. */
 export const generateReport = (templateId: string, spaceId: string, title: string, description: string, startDate: Date, endDate: Date) =>
   financialReportsService.generateReport('user-id', { template_id: templateId, space_id: spaceId, title, description, date_range_start: startDate.toISOString(), date_range_end: endDate.toISOString() });
 
+/** Fetches previously generated reports for a space. */
 export const getGeneratedReports = (spaceId: string, limit?: number) =>
   financialReportsService.getGeneratedReports(spaceId, limit);
 
+/** Fetches a single generated report by ID. */
 export const getGeneratedReport = (id: string) =>
   financialReportsService.getGeneratedReport(id);
 
+/** Deletes a generated report by ID. */
 export const deleteReport = (id: string) =>
   financialReportsService.deleteGeneratedReport(id, 'user-id');
 
+/** Creates a shareable link for a generated report with optional expiry. */
 export const shareReport = (reportId: string, expiresInHours?: number) =>
   financialReportsService.shareReport(reportId, expiresInHours);
 
+/** Downloads a generated report as a PDF. */
 export const downloadReportPDF = (reportId: string) =>
   financialReportsService.downloadReportPDF(reportId);
 
+/** Gets the public share URL for a report. */
 export const getReportShareUrl = (reportId: string) =>
   financialReportsService.getReportShareUrl(reportId);
 
+/** Increments the view count for a generated report. */
 export const updateReportViews = (reportId: string) =>
   financialReportsService.updateReportViews(reportId);
 
+/** Toggles the favorite status of a generated report. */
 export const toggleReportFavorite = (reportId: string) =>
   financialReportsService.toggleReportFavorite(reportId, 'user-id');

@@ -903,6 +903,7 @@ export async function syncCalendar(
 // EXPORTED SERVICE OBJECT
 // =============================================================================
 
+/** Aggregated Outlook Calendar service for OAuth, event CRUD, and webhook subscriptions. */
 export const outlookCalendarService = {
   generateAuthUrl,
   exchangeCodeForTokens,

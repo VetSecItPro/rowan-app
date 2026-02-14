@@ -45,6 +45,7 @@ export interface CreateTemplateInput {
   created_by: string;
 }
 
+/** Service for managing reusable task templates with favorites, search, and task creation. */
 export const taskTemplatesService = {
   /**
    * Get all templates for a space

@@ -182,6 +182,7 @@ interface EmptyStateProps {
   className?: string;
 }
 
+/** Renders a contextual empty state with icon, message, and action button. */
 export function EmptyState({
   feature,
   icon: iconProp,

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { UtensilsCrossed, Search, Brain, Clock, Star, BookOpen, Globe, Sparkles, Heart, ChefHat, ArrowLeft } from 'lucide-react';
-import { Footer } from '@/components/layout/Footer';
+
 
 interface GuideSection {
   title: string;
@@ -350,7 +350,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-                <p><strong>Organize with collections:</strong> Create themed collections like "Quick Weeknight Meals" or "Holiday Desserts"</p>
+                <p><strong>Organize with collections:</strong> Create themed collections like &quot;Quick Weeknight Meals&quot; or &quot;Holiday Desserts&quot;</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
@@ -378,7 +378,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The Recipe Library is your personal cookbook within Rowan. It combines powerful discovery tools with thoughtful organization features, helping you build a collection of recipes that match your family's tastes and dietary needs.
+                  The Recipe Library is your personal cookbook within Rowan. It combines powerful discovery tools with thoughtful organization features, helping you build a collection of recipes that match your family&apos;s tastes and dietary needs.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Three Ways to Build Your Library</h3>
@@ -423,14 +423,14 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Recipe search in Rowan connects you to vast external databases with millions of recipes. Whether you're looking for a specific dish or browsing for inspiration, the search tools make discovery easy and enjoyable.
+                  Recipe search in Rowan connects you to vast external databases with millions of recipes. Whether you&apos;re looking for a specific dish or browsing for inspiration, the search tools make discovery easy and enjoyable.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Search for Recipes</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Navigate to the Recipes page from the main menu</li>
-                  <li>Click "Discover Recipes" or use the search bar</li>
-                  <li>Enter keywords like "chicken parmesan" or "vegetarian pasta"</li>
+                  <li>Click &quot;Discover Recipes&quot; or use the search bar</li>
+                  <li>Enter keywords like &quot;chicken parmesan&quot; or &quot;vegetarian pasta&quot;</li>
                   <li>Browse results with photos, ratings, and cook times</li>
                   <li>Click any recipe to see full details</li>
                   <li>Save recipes you like to your library</li>
@@ -438,10 +438,10 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Effective Search Tips</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Include main ingredients: "salmon lemon dill"</li>
-                  <li>Add cuisine type: "thai curry" or "italian pasta"</li>
-                  <li>Specify cooking method: "grilled chicken" or "slow cooker beef"</li>
-                  <li>Use dietary terms: "gluten-free pizza" or "vegan dessert"</li>
+                  <li>Include main ingredients: &quot;salmon lemon dill&quot;</li>
+                  <li>Add cuisine type: &quot;thai curry&quot; or &quot;italian pasta&quot;</li>
+                  <li>Specify cooking method: &quot;grilled chicken&quot; or &quot;slow cooker beef&quot;</li>
+                  <li>Use dietary terms: &quot;gluten-free pizza&quot; or &quot;vegan dessert&quot;</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Understanding Results</h3>
@@ -464,14 +464,14 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Found a great recipe on a cooking blog or news site? Rowan's AI import feature can extract the recipe directly from any URL, converting it into a structured format you can save, edit, and use for meal planning.
+                  Found a great recipe on a cooking blog or news site? Rowan&apos;s AI import feature can extract the recipe directly from any URL, converting it into a structured format you can save, edit, and use for meal planning.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How AI Import Works</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Copy the URL of any recipe page</li>
-                  <li>Click "Import from URL" in Rowan</li>
-                  <li>Paste the URL and click "Import"</li>
+                  <li>Click &quot;Import from URL&quot; in Rowan</li>
+                  <li>Paste the URL and click &quot;Import&quot;</li>
                   <li>AI analyzes the page and extracts recipe data</li>
                   <li>Review the extracted information</li>
                   <li>Make any corrections and save to your library</li>
@@ -490,7 +490,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Powered by Google Gemini</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan uses Google's Gemini AI to understand recipe pages, even when they're formatted in unusual ways or buried in long blog posts. The AI is smart enough to find and extract the actual recipe content.
+                  Rowan uses Google&apos;s Gemini AI to understand recipe pages, even when they&apos;re formatted in unusual ways or buried in long blog posts. The AI is smart enough to find and extract the actual recipe content.
                 </p>
 
                 <div className="p-4 bg-purple-900/30 border border-purple-800 rounded-lg mt-6">
@@ -538,7 +538,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Saving External Recipes</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  When you find a recipe you like from an external source, click "Save to Library" to add it to your personal collection. The recipe is then available offline and integrates with meal planning features.
+                  When you find a recipe you like from an external source, click &quot;Save to Library&quot; to add it to your personal collection. The recipe is then available offline and integrates with meal planning features.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-yellow-400 hover:underline text-sm font-medium">
@@ -556,7 +556,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Narrow your recipe searches using cuisine types, meal categories, and dietary preferences. These filters help you find exactly what you're looking for without scrolling through irrelevant results.
+                  Narrow your recipe searches using cuisine types, meal categories, and dietary preferences. These filters help you find exactly what you&apos;re looking for without scrolling through irrelevant results.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Cuisine Types</h3>
@@ -598,7 +598,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Find recipes that match your available time and cooking skill level. These practical filters ensure you discover recipes you can actually make, whether it's a busy weeknight or a leisurely weekend.
+                  Find recipes that match your available time and cooking skill level. These practical filters ensure you discover recipes you can actually make, whether it&apos;s a busy weeknight or a leisurely weekend.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Difficulty Levels</h3>
@@ -618,7 +618,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Combining Filters</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Use multiple filters together for precise results. For example, find "Easy Italian Dinner recipes under 30 minutes" by selecting all relevant filters. Results update automatically as you adjust filters.
+                  Use multiple filters together for precise results. For example, find &quot;Easy Italian Dinner recipes under 30 minutes&quot; by selecting all relevant filters. Results update automatically as you adjust filters.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-yellow-400 hover:underline text-sm font-medium">
@@ -636,12 +636,12 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Stuck in a cooking rut? Use random recipe suggestions to discover new dishes you might never have searched for. It's a fun way to expand your culinary horizons and try something unexpected.
+                  Stuck in a cooking rut? Use random recipe suggestions to discover new dishes you might never have searched for. It&apos;s a fun way to expand your culinary horizons and try something unexpected.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Get Suggestions</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
-                  <li>Click the "Surprise Me" or random recipe button</li>
+                  <li>Click the &quot;Surprise Me&quot; or random recipe button</li>
                   <li>A random recipe appears from external databases</li>
                   <li>Click again for a different suggestion</li>
                   <li>Save any recipes that catch your interest</li>
@@ -654,7 +654,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Weekly Inspiration</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Try making random recipes a weekly tradition. "Mystery Recipe Fridays" can add excitement to your meal routine and help family members discover new favorites they'd never have chosen themselves.
+                  Try making random recipes a weekly tradition. &quot;Mystery Recipe Fridays&quot; can add excitement to your meal routine and help family members discover new favorites they&apos;d never have chosen themselves.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-yellow-400 hover:underline text-sm font-medium">
@@ -672,12 +672,12 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  See what's popular in the cooking world right now. Trending recipes showcase dishes that are gaining attention, seasonal favorites, and crowd-pleasing classics that have stood the test of time.
+                  See what&apos;s popular in the cooking world right now. Trending recipes showcase dishes that are gaining attention, seasonal favorites, and crowd-pleasing classics that have stood the test of time.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Trending Sections</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>This Week's Hits:</strong> Recently popular recipes</li>
+                  <li><strong>This Week&apos;s Hits:</strong> Recently popular recipes</li>
                   <li><strong>Seasonal Favorites:</strong> Recipes perfect for the current season</li>
                   <li><strong>All-Time Classics:</strong> Highly rated recipes with staying power</li>
                   <li><strong>Quick & Easy:</strong> Popular recipes under 30 minutes</li>
@@ -710,16 +710,16 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The easiest way to add recipes from the web is by pasting a URL. Rowan's AI handles the complex task of finding and extracting recipe information from any cooking website, no matter how it's formatted.
+                  The easiest way to add recipes from the web is by pasting a URL. Rowan&apos;s AI handles the complex task of finding and extracting recipe information from any cooking website, no matter how it&apos;s formatted.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Import Steps</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Find a recipe you like on any cooking website</li>
                   <li>Copy the page URL from your browser</li>
-                  <li>In Rowan, click "Import Recipe" or "Add from URL"</li>
+                  <li>In Rowan, click &quot;Import Recipe&quot; or &quot;Add from URL&quot;</li>
                   <li>Paste the URL into the input field</li>
-                  <li>Click "Import" and wait for AI processing</li>
+                  <li>Click &quot;Import&quot; and wait for AI processing</li>
                   <li>Review the extracted recipe data</li>
                   <li>Make any necessary edits and save</li>
                 </ol>
@@ -747,7 +747,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan uses Google's Gemini AI to power recipe extraction. This advanced language model understands cooking content, recognizes recipe formats, and accurately extracts structured data from unstructured web pages.
+                  Rowan uses Google&apos;s Gemini AI to power recipe extraction. This advanced language model understands cooking content, recognizes recipe formats, and accurately extracts structured data from unstructured web pages.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How Gemini Processes Recipes</h3>
@@ -756,7 +756,7 @@ export default function RecipesDocumentationPage() {
                   <li>HTML is cleaned and simplified for processing</li>
                   <li>Gemini analyzes the content to find the recipe</li>
                   <li>AI identifies and extracts each component</li>
-                  <li>Data is formatted into Rowan's recipe structure</li>
+                  <li>Data is formatted into Rowan&apos;s recipe structure</li>
                   <li>Results are presented for your review</li>
                 </ol>
 
@@ -771,7 +771,7 @@ export default function RecipesDocumentationPage() {
 
                 <div className="p-4 bg-purple-900/30 border border-purple-800 rounded-lg mt-6">
                   <p className="text-purple-200 text-sm">
-                    <strong>Privacy Note:</strong> Recipe URLs are processed through Google's API. The content is used only for extraction and not stored beyond the processing session.
+                    <strong>Privacy Note:</strong> Recipe URLs are processed through Google&apos;s API. The content is used only for extraction and not stored beyond the processing session.
                   </p>
                 </div>
               </div>
@@ -828,7 +828,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  After AI extracts a recipe, you'll have the opportunity to review and correct any errors before saving. This step ensures your saved recipes are accurate and useful for cooking.
+                  After AI extracts a recipe, you&apos;ll have the opportunity to review and correct any errors before saving. This step ensures your saved recipes are accurate and useful for cooking.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What to Review</h3>
@@ -843,7 +843,7 @@ export default function RecipesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Common Corrections</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Fix ingredient quantities that were misread</li>
-                  <li>Add missing ingredients the AI didn't catch</li>
+                  <li>Add missing ingredients the AI didn&apos;t catch</li>
                   <li>Reorder steps that got shuffled</li>
                   <li>Correct unit conversions (tablespoons vs. teaspoons)</li>
                   <li>Add preparation notes that were missed</li>
@@ -851,7 +851,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Making Edits</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Use the editing interface to make corrections. You can edit any field, add or remove ingredients, and reorder instructions. Take your time - it's easier to fix now than after you've started cooking!
+                  Use the editing interface to make corrections. You can edit any field, add or remove ingredients, and reorder instructions. Take your time - it&apos;s easier to fix now than after you&apos;ve started cooking!
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-yellow-400 hover:underline text-sm font-medium">
@@ -869,7 +869,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan's AI can extract recipes from most cooking websites, but some formats work better than others. Understanding what works best helps you choose sources that import smoothly.
+                  Rowan&apos;s AI can extract recipes from most cooking websites, but some formats work better than others. Understanding what works best helps you choose sources that import smoothly.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Best Results From</h3>
@@ -929,7 +929,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Tagging Best Practices</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Use consistent tag names (don't mix "Italian" and "italian")</li>
+                  <li>Use consistent tag names (don&apos;t mix &quot;Italian&quot; and &quot;italian&quot;)</li>
                   <li>Add all applicable tags, not just one</li>
                   <li>Include cooking method tags (grilled, slow-cooker, one-pot)</li>
                   <li>Tag by main protein or primary ingredient</li>
@@ -964,7 +964,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Quick Access Features</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Recent recipes you've viewed or cooked</li>
+                  <li>Recent recipes you&apos;ve viewed or cooked</li>
                   <li>Your favorite recipes section</li>
                   <li>Filter by collection for themed browsing</li>
                   <li>Sort by name, date added, or rating</li>
@@ -1019,7 +1019,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  After cooking a recipe, add your rating and personal notes. This helps you remember how it turned out, what modifications worked, and whether you'd make it again.
+                  After cooking a recipe, add your rating and personal notes. This helps you remember how it turned out, what modifications worked, and whether you&apos;d make it again.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Rating System</h3>
@@ -1088,7 +1088,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Create your own recipes from scratch using Rowan's step-by-step recipe builder. Perfect for documenting family recipes, original creations, or dishes you've perfected over time.
+                  Create your own recipes from scratch using Rowan&apos;s step-by-step recipe builder. Perfect for documenting family recipes, original creations, or dishes you&apos;ve perfected over time.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Builder Sections</h3>
@@ -1106,7 +1106,7 @@ export default function RecipesDocumentationPage() {
                   <li>Write clear, specific ingredient quantities</li>
                   <li>Include preparation notes (chopped, diced, minced)</li>
                   <li>Break complex steps into smaller, manageable ones</li>
-                  <li>Add timing cues ("cook until golden, about 5 minutes")</li>
+                  <li>Add timing cues (&quot;cook until golden, about 5 minutes&quot;)</li>
                 </ul>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-yellow-400 hover:underline text-sm font-medium">
@@ -1138,7 +1138,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Ingredient Groups</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  For complex recipes, organize ingredients into groups like "For the sauce" or "For the marinade." This helps cooks gather ingredients in the order they'll be used.
+                  For complex recipes, organize ingredients into groups like &quot;For the sauce&quot; or &quot;For the marinade.&quot; This helps cooks gather ingredients in the order they&apos;ll be used.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-yellow-400 hover:underline text-sm font-medium">
@@ -1163,8 +1163,8 @@ export default function RecipesDocumentationPage() {
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Start each step with an action verb (Mix, Chop, Preheat)</li>
                   <li>Keep steps focused on one main action</li>
-                  <li>Include visual cues ("until golden brown")</li>
-                  <li>Add timing when relevant ("simmer for 20 minutes")</li>
+                  <li>Include visual cues (&quot;until golden brown&quot;)</li>
+                  <li>Add timing when relevant (&quot;simmer for 20 minutes&quot;)</li>
                   <li>Note temperature settings when they change</li>
                 </ul>
 
@@ -1269,7 +1269,7 @@ export default function RecipesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Plan a Recipe</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Find the recipe you want to make</li>
-                  <li>Click "Add to Meal Plan" or the calendar icon</li>
+                  <li>Click &quot;Add to Meal Plan&quot; or the calendar icon</li>
                   <li>Select the date and meal type (breakfast/lunch/dinner)</li>
                   <li>Adjust serving size if needed</li>
                   <li>The meal appears on your calendar</li>
@@ -1279,7 +1279,7 @@ export default function RecipesDocumentationPage() {
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Recipe details accessible from your meal plan</li>
                   <li>Automatic shopping list generation</li>
-                  <li>Track what you've planned for the week</li>
+                  <li>Track what you&apos;ve planned for the week</li>
                   <li>Avoid repeating meals unintentionally</li>
                 </ul>
               </div>
@@ -1304,7 +1304,7 @@ export default function RecipesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Generation Options</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Generate from a single recipe</li>
-                  <li>Generate from your entire week's meal plan</li>
+                  <li>Generate from your entire week&apos;s meal plan</li>
                   <li>Combine ingredients from multiple recipes</li>
                   <li>Adjust quantities based on serving sizes</li>
                 </ul>
@@ -1337,7 +1337,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Meal Prep Strategies</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Create a "Meal Prep" collection with make-ahead recipes</li>
+                  <li>Create a &quot;Meal Prep&quot; collection with make-ahead recipes</li>
                   <li>Use scaling to make larger batches</li>
                   <li>Generate one shopping list for your prep session</li>
                   <li>Note storage instructions and reheating tips</li>
@@ -1379,7 +1379,7 @@ export default function RecipesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Scaling Considerations</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Some items don't scale linearly (spices, leaveners)</li>
+                  <li>Some items don&apos;t scale linearly (spices, leaveners)</li>
                   <li>Cooking times may need adjustment for larger batches</li>
                   <li>Equipment size limits how much you can scale up</li>
                   <li>Review scaled amounts for reasonableness</li>
@@ -1404,17 +1404,17 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Create themed collections to organize recipes beyond basic categories. Collections are custom groups you define based on your family's needs and preferences.
+                  Create themed collections to organize recipes beyond basic categories. Collections are custom groups you define based on your family&apos;s needs and preferences.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Collection Ideas</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>"Quick Weeknight Dinners" - recipes under 30 minutes</li>
-                  <li>"Holiday Favorites" - special occasion dishes</li>
-                  <li>"Kids' Favorites" - recipes the whole family loves</li>
-                  <li>"Date Night" - impressive dishes for two</li>
-                  <li>"Summer Grilling" - outdoor cooking recipes</li>
-                  <li>"Meal Prep Champions" - great for batch cooking</li>
+                  <li>&quot;Quick Weeknight Dinners&quot; - recipes under 30 minutes</li>
+                  <li>&quot;Holiday Favorites&quot; - special occasion dishes</li>
+                  <li>&quot;Kids&apos; Favorites&quot; - recipes the whole family loves</li>
+                  <li>&quot;Date Night&quot; - impressive dishes for two</li>
+                  <li>&quot;Summer Grilling&quot; - outdoor cooking recipes</li>
+                  <li>&quot;Meal Prep Champions&quot; - great for batch cooking</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Managing Collections</h3>
@@ -1440,7 +1440,7 @@ export default function RecipesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Track which recipes you've cooked and when. Cooking history helps you remember past meals, avoid repetition, and identify family favorites based on how often you make them.
+                  Track which recipes you&apos;ve cooked and when. Cooking history helps you remember past meals, avoid repetition, and identify family favorites based on how often you make them.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">History Features</h3>
@@ -1454,7 +1454,7 @@ export default function RecipesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Using History for Planning</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Avoid cooking the same thing too often</li>
-                  <li>Rediscover recipes you haven't made in a while</li>
+                  <li>Rediscover recipes you haven&apos;t made in a while</li>
                   <li>See seasonal patterns in your cooking</li>
                   <li>Track progress on trying new recipes</li>
                 </ul>

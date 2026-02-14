@@ -61,6 +61,7 @@ export interface UseSpaceMembersReturn {
   handleRenameSpace: () => Promise<void>;
 }
 
+/** Fetches and manages space members, invitations, and role assignments */
 export function useSpaceMembers(spaceId: string | undefined, currentSpaceName: string | undefined, refreshSpaces: () => void): UseSpaceMembersReturn {
   // Members state
   const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>([]);

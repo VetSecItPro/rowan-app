@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 
+/** Service for tracking and retrieving quick action usage patterns from the quick_action_usage table. */
 export const quickActionsService = {
   async trackAction(spaceId: string, userId: string, actionType: string, context?: string): Promise<void> {
     const supabase = createClient();

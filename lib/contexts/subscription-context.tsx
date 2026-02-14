@@ -133,7 +133,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
                 attempt: attempt + 1,
               });
               if (isTest) {
-                console.log(`[SUBSCRIPTION-CONTEXT] API error - status ${response.status}, defaulting to FREE`);
+                logger.info(`[SUBSCRIPTION-CONTEXT] API error - status ${response.status}, defaulting to FREE`);
               }
 
               setTier('free');
@@ -148,7 +148,7 @@ export function SubscriptionProvider({ children }: SubscriptionProviderProps) {
             });
 
             if (isTest) {
-              console.log(`[SUBSCRIPTION-PROVIDER] Received from API:`, {
+              logger.info(`[SUBSCRIPTION-PROVIDER] Received from API:`, {
                 topLevelTier: data.tier,
                 subscriptionTier: data.subscription?.tier,
                 subscriptionStatus: data.subscription?.status,

@@ -311,6 +311,7 @@ function buildCardConfigs(stats: EnhancedDashboardStats): StatCardConfig[] {
 
 // ─── StatCardGrid Component ─────────────────────────────────────────────────
 
+/** Renders a responsive grid of dashboard stat cards with loading states. */
 export const StatCardGrid = memo(function StatCardGrid({
   stats,
   loading,

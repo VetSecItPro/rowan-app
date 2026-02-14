@@ -252,10 +252,10 @@ class CCPAService {
   }
 }
 
-// Export singleton instance
+/** Singleton CCPA compliance service for opt-out management, data portability, and action logging. */
 export const ccpaService = new CCPAService();
 
-// Export individual functions for flexibility
+/** Destructured CCPA service methods for direct import convenience. */
 export const {
   setOptOutStatus,
   getOptOutStatus,

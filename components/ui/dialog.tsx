@@ -12,6 +12,7 @@ type DialogChildProps = {
   onClick?: React.MouseEventHandler;
 };
 
+/** Provides a dialog container with open/close state management. */
 export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
   return (
     <div data-state={open ? 'open' : 'closed'}>
@@ -34,6 +35,7 @@ interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   onOpenChange?: (open: boolean) => void;
 }
 
+/** Renders a button that triggers the parent Dialog to open. */
 export const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   ({ className = '', children, open, onOpenChange, asChild, ...props }, ref) => {
     const handleClick = () => {
@@ -65,6 +67,7 @@ interface DialogPortalProps {
   children: React.ReactNode;
 }
 
+/** Renders Dialog children into a portal outside the DOM hierarchy. */
 export const DialogPortal: React.FC<DialogPortalProps> = ({ children }) => {
   // Simple portal implementation - in a real app you'd use createPortal
   return <>{children}</>;
@@ -75,6 +78,7 @@ interface DialogOverlayProps extends React.HTMLAttributes<HTMLDivElement> {
   onOpenChange?: (open: boolean) => void;
 }
 
+/** Renders a dimmed overlay backdrop behind the Dialog content. */
 export const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps>(
   ({ className = '', open, onOpenChange, ...props }, ref) => {
     if (!open) return null;
@@ -84,6 +88,7 @@ export const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps
         ref={ref}
         className={`fixed inset-0 z-50 bg-background/90 ${className}`}
         onClick={() => onOpenChange?.(false)}
+        aria-hidden="true"
         {...props}
       />
     );
@@ -112,6 +117,7 @@ interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   onOpenChange?: (open: boolean) => void;
 }
 
+/** Renders the main content panel of a Dialog with close button. */
 export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className = '', children, open, onOpenChange, ...props }, ref) => {
     const internalRef = useRef<HTMLDivElement>(null);
@@ -218,6 +224,7 @@ DialogContent.displayName = 'DialogContent';
 
 type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
+/** Renders the header section of a Dialog. */
 export const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
   ({ className = '', ...props }, ref) => (
     <div
@@ -232,6 +239,7 @@ DialogHeader.displayName = 'DialogHeader';
 
 type DialogFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
+/** Renders the footer section of a Dialog with action buttons. */
 export const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
   ({ className = '', ...props }, ref) => (
     <div
@@ -246,6 +254,7 @@ DialogFooter.displayName = 'DialogFooter';
 
 type DialogTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
 
+/** Renders the title heading within a Dialog header. */
 export const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ className = '', id = 'dialog-title', ...props }, ref) => (
     <h2
@@ -261,6 +270,7 @@ DialogTitle.displayName = 'DialogTitle';
 
 type DialogDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
+/** Renders a description paragraph within a Dialog. */
 export const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
   ({ className = '', ...props }, ref) => (
     <p

@@ -12,6 +12,7 @@ interface CreateSpaceModalProps {
   onSpaceCreated: (spaceId: string, spaceName: string) => void;
 }
 
+/** Renders a modal form for creating a new family/household space. */
 export function CreateSpaceModal({ isOpen, onClose, onSpaceCreated }: CreateSpaceModalProps) {
   const [spaceName, setSpaceName] = useState('');
   const [loading, setLoading] = useState(false);

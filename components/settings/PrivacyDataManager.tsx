@@ -23,6 +23,7 @@ import type {
   ExportWorkflowStatus,
 } from '@/lib/types/privacy';
 
+/** Provides privacy and data management controls including GDPR compliance. */
 export function PrivacyDataManager() {
   const { user } = useAuth();
   const [preferences, setPreferences] = useState<UserPrivacyPreferences | null>(null);

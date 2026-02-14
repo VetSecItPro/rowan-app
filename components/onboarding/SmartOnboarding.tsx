@@ -28,6 +28,7 @@ interface SmartOnboardingProps {
   onClose: () => void;
 }
 
+/** Renders a smart onboarding flow that adapts to user setup progress. */
 export function SmartOnboarding({ isOpen, onClose }: SmartOnboardingProps) {
   const [intent, setIntent] = useState<UserIntent>(null);
   const [loading, setLoading] = useState(false);

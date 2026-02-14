@@ -15,6 +15,7 @@ const NotificationLogSchema = z.object({
   errorMessage: z.string().max(1000).optional(),
 });
 
+/** Logs a notification delivery event for audit tracking */
 export async function POST(req: NextRequest) {
   try {
     const ip = extractIP(req.headers);

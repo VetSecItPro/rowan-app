@@ -24,6 +24,7 @@ interface NewProjectModalProps {
   spaceId: string;
 }
 
+/** Renders a modal form for creating or editing a household project. */
 export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId }: NewProjectModalProps) {
   const [formData, setFormData] = useState<CreateProjectInput>({
     space_id: spaceId,
@@ -353,7 +354,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                     <span
                       className={`flex-1 text-sm ${
                         milestone.is_completed
-                          ? 'text-gray-400 line-through'
+                          ? 'text-gray-500 line-through'
                           : 'text-white'
                       }`}
                     >
@@ -385,7 +386,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
                 }
               }}
               placeholder="Add a step..."
-              className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900 text-white placeholder:text-gray-400"
+              className="flex-1 px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900 text-white placeholder:text-gray-500"
             />
             <button
               type="button"

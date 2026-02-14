@@ -13,6 +13,7 @@ const REACTION_EMOJIS = [
   '❤️', '👍', '😂', '😮', '😢', '😡', '🎉', '🔥', '👏', '✨', '💯', '🙌'
 ];
 
+/** Renders an emoji reaction picker for responding to messages. */
 export function ReactionPicker({ onSelectEmoji, className = '' }: ReactionPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -38,6 +39,7 @@ export function ReactionPicker({ onSelectEmoji, className = '' }: ReactionPicker
           <div
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Picker Popup - Glassmorphism */}

@@ -24,6 +24,7 @@ type FeatureRoute = 'tasks' | 'calendar' | 'messages' | 'shopping' | 'meals' | '
 const featureRoutes: FeatureRoute[] = ['tasks', 'calendar', 'messages', 'shopping', 'meals', 'reminders', 'goals', 'budget', 'projects', 'dashboard'];
 const isFeatureRoute = (value: string): value is FeatureRoute => featureRoutes.includes(value as FeatureRoute);
 
+/** Provides the standard layout wrapper for feature pages with header and navigation. */
 export function FeatureLayout({
   children,
   breadcrumbItems,

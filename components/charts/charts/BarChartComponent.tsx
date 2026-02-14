@@ -32,6 +32,7 @@ interface BarChartComponentProps {
   showLegend?: boolean;
 }
 
+/** Renders a Recharts bar chart with configurable data series and styling. */
 export function BarChartComponent({
   data,
   xDataKey,

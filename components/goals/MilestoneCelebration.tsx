@@ -11,6 +11,7 @@ interface MilestoneCelebrationProps {
   autoCloseDelay?: number;
 }
 
+/** Renders a celebratory animation when a milestone is completed. */
 export default function MilestoneCelebration({
   goalTitle,
   milestoneTitle,

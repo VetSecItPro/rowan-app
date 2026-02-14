@@ -36,6 +36,7 @@ interface GoalCheckInModalProps {
   currentProgress?: number;
 }
 
+/** Renders a modal form for recording a goal progress check-in. */
 export function GoalCheckInModal({
   isOpen,
   onClose,

@@ -51,7 +51,7 @@ export function DocSearchGrid({ features }: { features: DocFeature[] }) {
     <>
       {/* Search Bar */}
       <div className="relative max-w-xl mx-auto mb-8">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
           type="text"
           placeholder="Search documentation... (e.g., 'expenses', 'billing', 'meal planning')"

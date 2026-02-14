@@ -17,6 +17,7 @@ import type {
   UpdateCheckInSettingsInput,
 } from './types';
 
+/** Service for goal check-in CRUD, settings, scheduled check-ins, and photo uploads. */
 export const checkinService = {
   /**
    * Creates a check-in for a goal to track progress and mood.

@@ -14,6 +14,7 @@ interface InvitePartnerModalProps {
   spaceName: string;
 }
 
+/** Renders a modal for inviting a partner to join the space via email. */
 export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: InvitePartnerModalProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'member' | 'admin'>('member');

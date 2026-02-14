@@ -60,6 +60,7 @@ const frequencyOptions = [
   { value: 'custom', label: 'Custom Schedule', description: 'Set your own pattern' },
 ];
 
+/** Renders a modal form for creating or editing a habit. */
 export function NewHabitModal({ isOpen, onClose, onSave, editHabit, spaceId }: NewHabitModalProps) {
   const [formData, setFormData] = useState<CreateHabitInput>({
     space_id: spaceId,

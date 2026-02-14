@@ -17,6 +17,7 @@ interface RecurringPatternsListProps {
 type SortOption = 'confidence' | 'amount' | 'frequency' | 'recent';
 type FilterOption = 'all' | 'unconfirmed' | 'confirmed' | 'ignored';
 
+/** Displays a list of detected recurring expense patterns with actions. */
 export function RecurringPatternsList({
   patterns,
   onPatternAction,
@@ -184,7 +185,7 @@ export function RecurringPatternsList({
         <div className="flex flex-wrap items-center gap-3">
           {/* Filter */}
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
+            <Filter className="w-4 h-4 text-gray-400" />
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value as FilterOption)}
@@ -199,7 +200,7 @@ export function RecurringPatternsList({
 
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <SortAsc className="w-4 h-4 text-gray-500" />
+            <SortAsc className="w-4 h-4 text-gray-400" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}

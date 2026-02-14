@@ -301,7 +301,7 @@ export async function getProjectedMonthEndVariance(
   };
 }
 
-// Export service object
+/** Service for budget variance analysis, trends, and category performance tracking. */
 export const varianceAnalysisService = {
   getCurrentMonthVariance,
   getMonthVariance,

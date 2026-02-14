@@ -29,6 +29,7 @@ interface BillsListProps {
 type SortOption = 'due_date' | 'amount' | 'name';
 type SortDirection = 'asc' | 'desc';
 
+/** Renders a list of recurring bills with due dates and payment status. */
 export function BillsList({
   spaceId,
   onEdit,

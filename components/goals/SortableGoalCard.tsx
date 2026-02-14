@@ -22,6 +22,7 @@ interface SortableGoalCardProps {
   viewingUsers?: PresenceUser[];
 }
 
+/** Renders a drag-and-drop sortable goal card for reordering. */
 export function SortableGoalCard({
   goal,
   onEdit,

@@ -24,6 +24,7 @@ interface NudgeCenterProps {
   onGoalClick?: (goalId: string) => void;
 }
 
+/** Renders the nudge center panel with prioritized AI suggestions. */
 export function NudgeCenter({
   className,
   limit = 10,

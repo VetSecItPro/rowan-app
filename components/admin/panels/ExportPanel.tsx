@@ -72,6 +72,7 @@ const ExportCard = memo(function ExportCard({
   );
 });
 
+/** Provides data export controls and format options for admin reports. */
 export const ExportPanel = memo(function ExportPanel() {
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [lastExport, setLastExport] = useState<{ name: string; time: Date } | null>(null);
@@ -209,7 +210,7 @@ export const ExportPanel = memo(function ExportPanel() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FileSpreadsheet className="w-5 h-5 text-gray-500" />
+          <FileSpreadsheet className="w-5 h-5 text-gray-400" />
           <span className="text-sm font-medium text-white">Data Export</span>
         </div>
         {lastExport && (
@@ -251,7 +252,7 @@ export const ExportPanel = memo(function ExportPanel() {
       {/* Recent Exports (placeholder for future enhancement) */}
       <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
         <div className="flex items-center gap-2 mb-3">
-          <Calendar className="w-4 h-4 text-gray-500" />
+          <Calendar className="w-4 h-4 text-gray-400" />
           <span className="text-sm font-medium text-white">Export History</span>
         </div>
         <div className="text-center py-4 text-gray-400 text-sm">

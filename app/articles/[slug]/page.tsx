@@ -58,6 +58,7 @@ export default async function ArticlePage({ params }: PageProps) {
   // SECURITY: Content sanitized via DOMPurify. Never bypass sanitizeHtml().
   // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml.react-dangerouslysetinnerhtml
   const renderedContent = sanitizedHtml
+    // eslint-disable-next-line react/no-danger -- content sanitized via DOMPurify
     ? <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
     : null
 

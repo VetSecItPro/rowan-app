@@ -44,6 +44,7 @@ const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 // Max file size: 10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
+/** Service for uploading, fetching, and deleting file attachments for calendar events. */
 export const eventAttachmentsService = {
   /**
    * Upload a file attachment to an event

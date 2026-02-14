@@ -27,6 +27,7 @@ interface PartnerBalanceWidgetProps {
   showTrends?: boolean;
 }
 
+/** Displays the expense balance and settlement status between partners. */
 export function PartnerBalanceWidget({
   spaceId,
   className = '',

@@ -684,7 +684,7 @@ async function updateTokenLastUsed(tokenId: string): Promise<void> {
       .from('push_tokens')
       .update({ last_used_at: new Date().toISOString() })
       .eq('id', tokenId);
-  } catch (error) {
+  } catch (_error) {
     // Non-critical, just log
     logger.warn('Failed to update token last_used_at', { tokenId });
   }
@@ -698,7 +698,7 @@ async function deactivateToken(tokenId: string): Promise<void> {
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('id', tokenId);
     logger.info('Deactivated invalid push token', { tokenId });
-  } catch (error) {
+  } catch (_error) {
     logger.warn('Failed to deactivate token', { tokenId });
   }
 }

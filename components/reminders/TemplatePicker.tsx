@@ -15,6 +15,7 @@ interface TemplatePickerProps {
   onClose: () => void;
 }
 
+/** Displays a picker for selecting from reminder templates. */
 export function TemplatePicker({ spaceId, onSelectTemplate, onClose }: TemplatePickerProps) {
   const [templates, setTemplates] = useState<ReminderTemplate[]>([]);
   const [loading, setLoading] = useState(true);

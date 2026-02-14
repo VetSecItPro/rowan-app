@@ -26,6 +26,7 @@ function getSupabaseClient(supabaseClient?: SupabaseClient) {
   return supabaseClient || createClient();
 }
 
+/** Service for queuing, batching, and processing notifications with quiet hours support. */
 export const notificationQueueService = {
   /**
    * Queue a notification for delivery

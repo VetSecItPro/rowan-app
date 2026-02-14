@@ -25,6 +25,7 @@ interface NewRecipeModalProps {
 type TabType = 'manual' | 'ai' | 'discover';
 type RecipeIngredientInput = string | { name: string; amount?: string | number; unit?: string };
 
+/** Renders a modal form for creating or editing a recipe. */
 export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, initialTab = 'manual', onRecipeAdded }: NewRecipeModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [formData, setFormData] = useState<CreateRecipeInput>({
@@ -562,6 +563,7 @@ export function NewRecipeModal({ isOpen, onClose, onSave, editRecipe, spaceId, i
                       <div
                         className="fixed inset-0 z-10"
                         onClick={() => setShowCuisineDropdown(false)}
+                        aria-hidden="true"
                       />
 
                       {/* Dropdown Menu */}

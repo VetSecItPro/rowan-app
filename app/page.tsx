@@ -31,6 +31,7 @@ export default function HomePage() {
       {/* SECURITY: JSON-LD structured data uses static literals only. Never inject dynamic/user data here. */}
       <script
         type="application/ld+json"
+        // eslint-disable-next-line react/no-danger -- static JSON-LD, no user data
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',

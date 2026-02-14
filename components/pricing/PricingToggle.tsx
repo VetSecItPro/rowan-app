@@ -10,6 +10,7 @@ interface PricingToggleProps {
   onChange: (period: 'monthly' | 'annual') => void;
 }
 
+/** Renders a monthly/yearly billing toggle for pricing display. */
 export function PricingToggle({ value, onChange }: PricingToggleProps) {
   return (
     <div className="flex items-center justify-center">

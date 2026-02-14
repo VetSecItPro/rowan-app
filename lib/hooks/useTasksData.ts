@@ -91,6 +91,7 @@ export interface TasksDataReturn {
 // HOOK
 // =============================================
 
+/** Loads and manages task data with filtering, sorting, and real-time updates */
 export function useTasksData(): TasksDataReturn {
   const { currentSpace, user } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;

@@ -53,6 +53,7 @@ export interface UseProjectsHandlersReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Provides CRUD handlers for household projects and their tasks */
 export function useProjectsHandlers(deps: UseProjectsHandlersDeps): UseProjectsHandlersReturn {
   const {
     user,

@@ -21,7 +21,7 @@ import {
   Calendar,
   AlertCircle,
 } from 'lucide-react';
-import { Footer } from '@/components/layout/Footer';
+
 
 interface GuideSection {
   title: string;
@@ -338,11 +338,11 @@ export default function RemindersDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Rowan's Reminders feature is your collaborative memory system, designed to help you and your partner never miss important moments together. Whether it's medication schedules, bill payments, or special dates, our reminders keep your household running smoothly.
+                Rowan&apos;s Reminders feature is your collaborative memory system, designed to help you and your partner never miss important moments together. Whether it&apos;s medication schedules, bill payments, or special dates, our reminders keep your household running smoothly.
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Why Reminders Are Different</h3>
               <p className="text-gray-300 mb-4">
-                Unlike simple alarm apps, Rowan's reminders are built for collaboration. You can assign reminders to specific people, discuss details in comments, use @mentions to get attention, and track the complete history of changes.
+                Unlike simple alarm apps, Rowan&apos;s reminders are built for collaboration. You can assign reminders to specific people, discuss details in comments, use @mentions to get attention, and track the complete history of changes.
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Key Features at a Glance</h3>
               <ul className="space-y-2 text-gray-300">
@@ -367,14 +367,14 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Creating Your First Reminder</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Let's walk through creating a reminder step by step:
+                Let&apos;s walk through creating a reminder step by step:
               </p>
               <ol className="space-y-4 text-gray-300">
                 <li>
-                  <strong>Navigate to Reminders:</strong> Click "Reminders" in your main navigation menu
+                  <strong>Navigate to Reminders:</strong> Click &quot;Reminders&quot; in your main navigation menu
                 </li>
                 <li>
-                  <strong>Click "New Reminder":</strong> Look for the pink "+ New Reminder" button in the top right
+                  <strong>Click &quot;New Reminder&quot;:</strong> Look for the pink &quot;+ New Reminder&quot; button in the top right
                 </li>
                 <li>
                   <strong>Add Emoji Icon (Optional):</strong> Click the smiley face icon to choose an emoji that represents your reminder (💊 for medication, 💰 for bills, 📅 for appointments)
@@ -382,10 +382,10 @@ export default function RemindersDocumentationPage() {
                 <li>
                   <strong>Enter Reminder Title:</strong> Give it a clear, specific name
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
-                    <li>Good: "Take blood pressure medication"</li>
-                    <li>Good: "Pay electric bill before 15th"</li>
-                    <li>Good: "Call Mom for her birthday"</li>
-                    <li>Avoid: "meds" (too vague)</li>
+                    <li>Good: &quot;Take blood pressure medication&quot;</li>
+                    <li>Good: &quot;Pay electric bill before 15th&quot;</li>
+                    <li>Good: &quot;Call Mom for her birthday&quot;</li>
+                    <li>Avoid: &quot;meds&quot; (too vague)</li>
                   </ul>
                 </li>
                 <li>
@@ -401,7 +401,7 @@ export default function RemindersDocumentationPage() {
                   <strong>Choose Category:</strong> Select from Bills (💰), Health (💊), Work (💼), Personal (👤), or Household (🏠)
                 </li>
                 <li>
-                  <strong>Assign to Someone (Optional):</strong> Pick who's responsible from your household members
+                  <strong>Assign to Someone (Optional):</strong> Pick who&apos;s responsible from your household members
                 </li>
                 <li>
                   <strong>Set Reminder Time:</strong> Pick the exact date and time you want to be reminded
@@ -413,13 +413,13 @@ export default function RemindersDocumentationPage() {
                   <strong>Set Repeat Pattern (Optional):</strong> Choose Daily, Weekly, or Monthly if this repeats
                 </li>
                 <li>
-                  <strong>Click "Create Reminder":</strong> Your reminder is now active and will alert at the scheduled time!
+                  <strong>Click &quot;Create Reminder&quot;:</strong> Your reminder is now active and will alert at the scheduled time!
                 </li>
               </ol>
 
               <div className="bg-pink-900/20 border border-pink-800 rounded-lg p-4 mt-6">
                 <p className="text-pink-300 text-sm">
-                  <strong>✨ Quick Start Tip:</strong> Don't want to fill out all fields? Just add a title and time – you can always add more details later! The emoji, description, and other fields are all optional.
+                  <strong>✨ Quick Start Tip:</strong> Don&apos;t want to fill out all fields? Just add a title and time – you can always add more details later! The emoji, description, and other fields are all optional.
                 </p>
               </div>
             </div>
@@ -515,7 +515,7 @@ export default function RemindersDocumentationPage() {
 
               <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4 mt-6">
                 <p className="text-purple-300 text-sm">
-                  <strong>🎯 Organization Tip:</strong> Use categories for visual organization (colors help you scan quickly) and priorities for urgency. A "Health" reminder can be Urgent (take meds now) or Low (schedule annual checkup).
+                  <strong>🎯 Organization Tip:</strong> Use categories for visual organization (colors help you scan quickly) and priorities for urgency. A &quot;Health&quot; reminder can be Urgent (take meds now) or Low (schedule annual checkup).
                 </p>
               </div>
             </div>
@@ -533,11 +533,11 @@ export default function RemindersDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Setting a Specific Date & Time</h3>
               <ol className="space-y-2 text-gray-300">
-                <li>In the reminder creation modal, find the "Reminder Time" field</li>
+                <li>In the reminder creation modal, find the &quot;Reminder Time&quot; field</li>
                 <li>Click the date/time picker</li>
                 <li>Select the date from the calendar</li>
                 <li>Set the specific time you want the notification</li>
-                <li>The system validates that you can't set times in the past</li>
+                <li>The system validates that you can&apos;t set times in the past</li>
               </ol>
 
               <div className="bg-amber-900/20 border border-amber-800 rounded-lg p-4 my-4">
@@ -549,7 +549,7 @@ export default function RemindersDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How Notifications Work</h3>
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Real-time Alerts:</strong> Get browser notifications at the scheduled time</li>
-                <li><strong>Overdue Indicators:</strong> Reminders show a red "Overdue" badge after the time passes</li>
+                <li><strong>Overdue Indicators:</strong> Reminders show a red &quot;Overdue&quot; badge after the time passes</li>
                 <li><strong>Dashboard Summary:</strong> See your Active, Overdue, and Completed counts at a glance</li>
                 <li><strong>Filter by Status:</strong> Quickly view just overdue reminders to catch up</li>
               </ul>
@@ -643,7 +643,7 @@ export default function RemindersDocumentationPage() {
 
               <div className="bg-green-900/20 border border-green-800 rounded-lg p-4 mt-4">
                 <p className="text-green-300 text-sm">
-                  <strong>✨ Productivity Tip:</strong> Start your day by viewing Active reminders only to focus on what's coming up. End your day by marking things Completed to feel accomplished. Use Snoozed view to check what you postponed!
+                  <strong>✨ Productivity Tip:</strong> Start your day by viewing Active reminders only to focus on what&apos;s coming up. End your day by marking things Completed to feel accomplished. Use Snoozed view to check what you postponed!
                 </p>
               </div>
             </div>
@@ -660,7 +660,7 @@ export default function RemindersDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                One of Rowan's most powerful features is the ability to assign reminders to specific people in your household. This creates clear responsibility and ensures everyone knows who needs to handle what.
+                One of Rowan&apos;s most powerful features is the ability to assign reminders to specific people in your household. This creates clear responsibility and ensures everyone knows who needs to handle what.
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How to Assign a Reminder</h3>
@@ -668,16 +668,16 @@ export default function RemindersDocumentationPage() {
                 <li>
                   <strong>During Creation:</strong>
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
-                    <li>Click the "Assigned To" dropdown in the reminder modal</li>
+                    <li>Click the &quot;Assigned To&quot; dropdown in the reminder modal</li>
                     <li>Select a household member from the list</li>
-                    <li>Or leave it unassigned if it's for everyone</li>
+                    <li>Or leave it unassigned if it&apos;s for everyone</li>
                   </ul>
                 </li>
                 <li>
                   <strong>After Creation:</strong>
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
                     <li>Open the reminder details</li>
-                    <li>Click "Assign" in the quick actions</li>
+                    <li>Click &quot;Assign&quot; in the quick actions</li>
                     <li>Choose the person who should handle it</li>
                   </ul>
                 </li>
@@ -685,7 +685,7 @@ export default function RemindersDocumentationPage() {
                   <strong>Bulk Assignment:</strong>
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
                     <li>Select multiple reminders using Bulk Select</li>
-                    <li>Click "Assign to"</li>
+                    <li>Click &quot;Assign to&quot;</li>
                     <li>Choose one person for all selected reminders</li>
                   </ul>
                 </li>
@@ -698,12 +698,12 @@ export default function RemindersDocumentationPage() {
               <ul className="space-y-2 text-gray-300">
                 <li><strong>All:</strong> See every reminder in the space</li>
                 <li><strong>My Reminders:</strong> Only reminders assigned to you</li>
-                <li><strong>Unassigned:</strong> Reminders that haven't been assigned yet</li>
+                <li><strong>Unassigned:</strong> Reminders that haven&apos;t been assigned yet</li>
               </ul>
 
               <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4 mt-6">
                 <p className="text-purple-300 text-sm">
-                  <strong>👥 Collaboration Tip:</strong> Assign medication reminders to the person taking them, bill reminders to whoever pays bills, and appointment reminders to who's attending. This keeps everyone accountable and prevents "I thought you were handling that!" moments.
+                  <strong>👥 Collaboration Tip:</strong> Assign medication reminders to the person taking them, bill reminders to whoever pays bills, and appointment reminders to who&apos;s attending. This keeps everyone accountable and prevents &quot;I thought you were handling that!&quot; moments.
                 </p>
               </div>
             </div>
@@ -716,15 +716,15 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Comments & Conversations</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Sometimes a reminder needs discussion. Rowan's comment system lets you have threaded conversations right on the reminder itself – no need to switch to messaging apps.
+                Sometimes a reminder needs discussion. Rowan&apos;s comment system lets you have threaded conversations right on the reminder itself – no need to switch to messaging apps.
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Adding Comments</h3>
               <ol className="space-y-2 text-gray-300">
-                <li>Open any reminder's details panel</li>
-                <li>Scroll to the "Comments" section at the bottom</li>
+                <li>Open any reminder&apos;s details panel</li>
+                <li>Scroll to the &quot;Comments&quot; section at the bottom</li>
                 <li>Type your comment in the input field</li>
-                <li>Click "Post" or press Enter</li>
+                <li>Click &quot;Post&quot; or press Enter</li>
                 <li>Your comment appears instantly for everyone</li>
               </ol>
 
@@ -737,26 +737,26 @@ export default function RemindersDocumentationPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <div className="p-4 bg-gray-900 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">💊 Health Reminders</h4>
-                  <p className="text-sm text-gray-300 mb-2">"Take blood pressure medication"</p>
+                  <p className="text-sm text-gray-300 mb-2">&quot;Take blood pressure medication&quot;</p>
                   <div className="space-y-1 text-xs text-gray-400">
-                    <p>"Took it at 8am, BP was 120/80"</p>
-                    <p>"Great! Keep tracking daily"</p>
+                    <p>&quot;Took it at 8am, BP was 120/80&quot;</p>
+                    <p>&quot;Great! Keep tracking daily&quot;</p>
                   </div>
                 </div>
 
                 <div className="p-4 bg-gray-900 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">💰 Bill Reminders</h4>
-                  <p className="text-sm text-gray-300 mb-2">"Pay electric bill"</p>
+                  <p className="text-sm text-gray-300 mb-2">&quot;Pay electric bill&quot;</p>
                   <div className="space-y-1 text-xs text-gray-400">
-                    <p>"Account number is 123456"</p>
-                    <p>"Paid! Confirmation #789"</p>
+                    <p>&quot;Account number is 123456&quot;</p>
+                    <p>&quot;Paid! Confirmation #789&quot;</p>
                   </div>
                 </div>
               </div>
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
-                  <strong>💬 Communication Tip:</strong> Use comments to add context that doesn't fit in the description, coordinate timing with your partner, or leave notes for future recurrences of the reminder.
+                  <strong>💬 Communication Tip:</strong> Use comments to add context that doesn&apos;t fit in the description, coordinate timing with your partner, or leave notes for future recurrences of the reminder.
                 </p>
               </div>
             </div>
@@ -769,7 +769,7 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">@Mentions</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Need to get someone's attention on a specific reminder? Use @mentions to tag them directly in comments!
+                Need to get someone&apos;s attention on a specific reminder? Use @mentions to tag them directly in comments!
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How to @Mention Someone</h3>
@@ -784,15 +784,15 @@ export default function RemindersDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">When to Use @Mentions</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Asking for Help:</strong> "@Alex can you pick up my prescription?"</li>
-                <li><strong>Delegating:</strong> "@Jamie you're better at calling insurance companies"</li>
-                <li><strong>Getting Confirmation:</strong> "@Sam did you take your medication?"</li>
-                <li><strong>Sharing Information:</strong> "@Taylor the appointment time changed to 3pm"</li>
+                <li><strong>Asking for Help:</strong> &quot;@Alex can you pick up my prescription?&quot;</li>
+                <li><strong>Delegating:</strong> &quot;@Jamie you&apos;re better at calling insurance companies&quot;</li>
+                <li><strong>Getting Confirmation:</strong> &quot;@Sam did you take your medication?&quot;</li>
+                <li><strong>Sharing Information:</strong> &quot;@Taylor the appointment time changed to 3pm&quot;</li>
               </ul>
 
               <div className="bg-pink-900/20 border border-pink-800 rounded-lg p-4 mt-6">
                 <p className="text-pink-300 text-sm">
-                  <strong>🔔 Notification Tip:</strong> @Mentions trigger instant notifications, so use them when you need someone's immediate attention. For general comments, skip the @ and they'll see it when they check the reminder.
+                  <strong>🔔 Notification Tip:</strong> @Mentions trigger instant notifications, so use them when you need someone&apos;s immediate attention. For general comments, skip the @ and they&apos;ll see it when they check the reminder.
                 </p>
               </div>
             </div>
@@ -808,45 +808,45 @@ export default function RemindersDocumentationPage() {
                 Every reminder has a complete activity timeline showing who did what and when. This creates accountability and helps you track history.
               </p>
 
-              <h3 className="text-xl font-semibold text-white mt-6 mb-3">What's Tracked</h3>
+              <h3 className="text-xl font-semibold text-white mt-6 mb-3">What&apos;s Tracked</h3>
               <div className="space-y-2 text-gray-300">
                 <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
                   <Activity className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <strong>Creation:</strong> "John created this reminder" with timestamp
+                    <strong>Creation:</strong> &quot;John created this reminder&quot; with timestamp
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
                   <Users className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <strong>Assignment Changes:</strong> "Sarah assigned to Alex" with when
+                    <strong>Assignment Changes:</strong> &quot;Sarah assigned to Alex&quot; with when
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
                   <Flag className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <strong>Status Updates:</strong> "Alex marked as completed" with time
+                    <strong>Status Updates:</strong> &quot;Alex marked as completed&quot; with time
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
                   <Timer className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <strong>Snooze Actions:</strong> "Jamie snoozed for 1 hour" with when
+                    <strong>Snooze Actions:</strong> &quot;Jamie snoozed for 1 hour&quot; with when
                   </div>
                 </div>
               </div>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Viewing Activity</h3>
               <ol className="space-y-2 text-gray-300">
-                <li>Open any reminder's details panel</li>
-                <li>Look for the "Activity" section</li>
+                <li>Open any reminder&apos;s details panel</li>
+                <li>Look for the &quot;Activity&quot; section</li>
                 <li>See the full timeline in chronological order</li>
                 <li>Most recent activities appear at the top</li>
               </ol>
 
               <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mt-6">
                 <p className="text-gray-300 text-sm">
-                  <strong>📊 Accountability Benefit:</strong> Activity tracking answers "who changed this?" and "when was this done?" without anyone having to remember or explain. Perfect for medication tracking, bill payment history, and resolving "did you do it?" questions!
+                  <strong>📊 Accountability Benefit:</strong> Activity tracking answers &quot;who changed this?&quot; and &quot;when was this done?&quot; without anyone having to remember or explain. Perfect for medication tracking, bill payment history, and resolving &quot;did you do it?&quot; questions!
                 </p>
               </div>
             </div>
@@ -877,7 +877,7 @@ export default function RemindersDocumentationPage() {
                   <p className="text-gray-300 mb-3 text-sm">
                     Perfect for daily medications, morning routines, or tasks that happen every single day.
                   </p>
-                  <p className="text-xs text-gray-400"><strong>Example:</strong> "Take vitamin D supplement" at 8:00 AM every day</p>
+                  <p className="text-xs text-gray-400"><strong>Example:</strong> &quot;Take vitamin D supplement&quot; at 8:00 AM every day</p>
                 </div>
 
                 <div className="p-4 bg-purple-900/20 rounded-xl border border-purple-800">
@@ -898,7 +898,7 @@ export default function RemindersDocumentationPage() {
                       <span className="px-2 py-1 bg-pink-500 text-white rounded text-xs">Fri</span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400"><strong>Example:</strong> "Physical therapy exercises" on Mon, Wed, Fri</p>
+                  <p className="text-xs text-gray-400"><strong>Example:</strong> &quot;Physical therapy exercises&quot; on Mon, Wed, Fri</p>
                 </div>
 
                 <div className="p-4 bg-green-900/20 rounded-xl border border-green-800">
@@ -918,7 +918,7 @@ export default function RemindersDocumentationPage() {
                       <span className="px-2 py-1 bg-pink-500 text-white rounded text-xs text-center">15</span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400"><strong>Example:</strong> "Pay rent" on the 1st and "Pay credit card" on the 15th</p>
+                  <p className="text-xs text-gray-400"><strong>Example:</strong> &quot;Pay rent&quot; on the 1st and &quot;Pay credit card&quot; on the 15th</p>
                 </div>
               </div>
 
@@ -937,13 +937,13 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Snooze Functionality</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Sometimes you see a reminder but can't handle it right that second. That's where snooze comes in!
+                Sometimes you see a reminder but can&apos;t handle it right that second. That&apos;s where snooze comes in!
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How to Snooze</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Click on any active reminder</li>
-                <li>Click the "Snooze" button in quick actions</li>
+                <li>Click the &quot;Snooze&quot; button in quick actions</li>
                 <li>Choose your snooze duration:
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
                     <li>15 minutes - Quick pause</li>
@@ -952,8 +952,8 @@ export default function RemindersDocumentationPage() {
                     <li>2 hours - Deal with this afternoon</li>
                   </ul>
                 </li>
-                <li>The reminder moves to "Snoozed" status</li>
-                <li>After the snooze time, it automatically returns to "Active"</li>
+                <li>The reminder moves to &quot;Snoozed&quot; status</li>
+                <li>After the snooze time, it automatically returns to &quot;Active&quot;</li>
               </ol>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Collaborative Snooze Tracking</h3>
@@ -961,8 +961,8 @@ export default function RemindersDocumentationPage() {
                 Rowan tracks who snoozed what and when, so your partner can see:
               </p>
               <ul className="space-y-2 text-gray-300">
-                <li>"Alex snoozed for 1 hour at 2:00 PM"</li>
-                <li>"Will be active again at 3:00 PM"</li>
+                <li>&quot;Alex snoozed for 1 hour at 2:00 PM&quot;</li>
+                <li>&quot;Will be active again at 3:00 PM&quot;</li>
                 <li>Complete snooze history in the activity timeline</li>
               </ul>
 
@@ -971,7 +971,7 @@ export default function RemindersDocumentationPage() {
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
                   <h4 className="font-semibold text-green-100 mb-2">✅ Good Uses</h4>
                   <ul className="space-y-1 text-sm text-green-200">
-                    <li>• Quick tasks you'll do soon</li>
+                    <li>• Quick tasks you&apos;ll do soon</li>
                     <li>• Waiting for right timing</li>
                     <li>• Need to finish current task first</li>
                     <li>• Reminder came too early</li>
@@ -982,7 +982,7 @@ export default function RemindersDocumentationPage() {
                   <ul className="space-y-1 text-sm text-red-200">
                     <li>• Repeatedly snoozing instead of doing</li>
                     <li>• Snoozing long-term tasks</li>
-                    <li>• Using snooze as "delete"</li>
+                    <li>• Using snooze as &quot;delete&quot;</li>
                     <li>• Snoozing critical medication</li>
                   </ul>
                 </div>
@@ -1060,7 +1060,7 @@ export default function RemindersDocumentationPage() {
                 <li>
                   <strong>Customize Before Saving:</strong>
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
-                    <li>Add specific details to the title ("Pay electric bill" → "Pay electric bill - Account #123")</li>
+                    <li>Add specific details to the title (&quot;Pay electric bill&quot; → &quot;Pay electric bill - Account #123&quot;)</li>
                     <li>Set the reminder time</li>
                     <li>Assign to a specific person</li>
                     <li>Add description with notes</li>
@@ -1068,13 +1068,13 @@ export default function RemindersDocumentationPage() {
                   </ul>
                 </li>
                 <li>
-                  <strong>Save Your Reminder:</strong> Click "Create Reminder" and it's added to your list
+                  <strong>Save Your Reminder:</strong> Click &quot;Create Reminder&quot; and it&apos;s added to your list
                 </li>
               </ol>
 
               <div className="bg-pink-900/20 border border-pink-800 rounded-lg p-4 mt-6">
                 <p className="text-pink-300 text-sm">
-                  <strong>✨ Template Power Move:</strong> Templates save you time by pre-filling common settings. The "Pay Bill" template automatically sets Bills category and High priority, so you just need to add the bill name, amount, and due date!
+                  <strong>✨ Template Power Move:</strong> Templates save you time by pre-filling common settings. The &quot;Pay Bill&quot; template automatically sets Bills category and High priority, so you just need to add the bill name, amount, and due date!
                 </p>
               </div>
             </div>
@@ -1087,7 +1087,7 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Real-time Notifications</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Rowan's notification system ensures you never miss important reminders, with alerts delivered at exactly the right time.
+                Rowan&apos;s notification system ensures you never miss important reminders, with alerts delivered at exactly the right time.
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Types of Notifications</h3>
@@ -1140,13 +1140,13 @@ export default function RemindersDocumentationPage() {
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Enable/Disable Browser Notifications:</strong> Turn on/off all browser alerts</li>
                 <li><strong>Notification Channels:</strong> Choose which types of notifications you want</li>
-                <li><strong>Quiet Hours:</strong> Set times when you don't want to be disturbed</li>
+                <li><strong>Quiet Hours:</strong> Set times when you don&apos;t want to be disturbed</li>
                 <li><strong>Sound Preferences:</strong> Enable or disable notification sounds</li>
               </ul>
 
               <div className="bg-amber-900/20 border border-amber-800 rounded-lg p-4 mt-6">
                 <p className="text-amber-300 text-sm">
-                  <strong>🔔 Notification Strategy:</strong> Enable browser notifications for time-sensitive reminders (medications, appointments) but consider muting less urgent categories during work hours. You can always check the Reminders page to see what's pending!
+                  <strong>🔔 Notification Strategy:</strong> Enable browser notifications for time-sensitive reminders (medications, appointments) but consider muting less urgent categories during work hours. You can always check the Reminders page to see what&apos;s pending!
                 </p>
               </div>
             </div>
@@ -1168,8 +1168,8 @@ export default function RemindersDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Entering Bulk Select Mode</h3>
               <ol className="space-y-2 text-gray-300">
-                <li>Click the "Bulk Select" button in the top right of the Reminders page</li>
-                <li>A tooltip explains: "Select multiple reminders for bulk actions"</li>
+                <li>Click the &quot;Bulk Select&quot; button in the top right of the Reminders page</li>
+                <li>A tooltip explains: &quot;Select multiple reminders for bulk actions&quot;</li>
                 <li>Checkboxes appear on all reminder cards</li>
                 <li>The action bar appears at the bottom with available bulk operations</li>
               </ol>
@@ -1177,14 +1177,14 @@ export default function RemindersDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Selecting Reminders</h3>
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Individual Selection:</strong> Click checkbox on any reminder card</li>
-                <li><strong>Select All:</strong> Click "Select All" to check every visible reminder</li>
-                <li><strong>Deselect All:</strong> Click "Deselect All" to uncheck everything</li>
+                <li><strong>Select All:</strong> Click &quot;Select All&quot; to check every visible reminder</li>
+                <li><strong>Deselect All:</strong> Click &quot;Deselect All&quot; to uncheck everything</li>
                 <li><strong>Filter First:</strong> Apply filters (status, category, assigned) before selecting to narrow down your choices</li>
               </ul>
 
               <div className="bg-green-900/20 border border-green-800 rounded-lg p-4 mt-6">
                 <p className="text-green-300 text-sm">
-                  <strong>🎯 Selection Strategy:</strong> Filter to see only what you want to act on (like all completed reminders from last week), then "Select All" to grab them all at once. Way faster than clicking one by one!
+                  <strong>🎯 Selection Strategy:</strong> Filter to see only what you want to act on (like all completed reminders from last week), then &quot;Select All&quot; to grab them all at once. Way faster than clicking one by one!
                 </p>
               </div>
             </div>
@@ -1197,14 +1197,14 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Bulk Complete</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Mark multiple reminders as completed with one click – perfect for end-of-day cleanup or when you've tackled several tasks at once.
+                Mark multiple reminders as completed with one click – perfect for end-of-day cleanup or when you&apos;ve tackled several tasks at once.
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How to Bulk Complete</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Enter Bulk Select mode</li>
-                <li>Check the boxes for reminders you've completed</li>
-                <li>Click "Complete" in the bulk actions bar</li>
+                <li>Check the boxes for reminders you&apos;ve completed</li>
+                <li>Click &quot;Complete&quot; in the bulk actions bar</li>
                 <li>Confirm the action if prompted</li>
                 <li>All selected reminders move to Completed status</li>
               </ol>
@@ -1234,7 +1234,7 @@ export default function RemindersDocumentationPage() {
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
-                  <strong>✅ Completion Tip:</strong> Filter by category first (like "Health" or "Bills") to see related reminders together, then bulk complete them all. This keeps similar tasks organized and prevents you from accidentally completing unrelated reminders!
+                  <strong>✅ Completion Tip:</strong> Filter by category first (like &quot;Health&quot; or &quot;Bills&quot;) to see related reminders together, then bulk complete them all. This keeps similar tasks organized and prevents you from accidentally completing unrelated reminders!
                 </p>
               </div>
             </div>
@@ -1303,7 +1303,7 @@ export default function RemindersDocumentationPage() {
 
               <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4 mt-6">
                 <p className="text-purple-300 text-sm">
-                  <strong>🎨 Organization Power Move:</strong> At the start of each month, review last month's reminders, bulk complete what you forgot to mark done, and bulk delete old ones. Then bulk reassign responsibilities if household duties need rebalancing!
+                  <strong>🎨 Organization Power Move:</strong> At the start of each month, review last month&apos;s reminders, bulk complete what you forgot to mark done, and bulk delete old ones. Then bulk reassign responsibilities if household duties need rebalancing!
                 </p>
               </div>
             </div>
@@ -1322,14 +1322,14 @@ export default function RemindersDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How to Export</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Go to Settings → Data & Privacy</li>
-                <li>Find the "Export Reminders" section</li>
+                <li>Find the &quot;Export Reminders&quot; section</li>
                 <li>Choose your format:
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
                     <li><strong>JSON:</strong> Complete data with all fields, great for backups</li>
                     <li><strong>CSV:</strong> Spreadsheet-friendly format for Excel/Google Sheets analysis</li>
                   </ul>
                 </li>
-                <li>Click "Export"</li>
+                <li>Click &quot;Export&quot;</li>
                 <li>File downloads to your computer</li>
               </ol>
 
@@ -1337,7 +1337,7 @@ export default function RemindersDocumentationPage() {
               <ul className="space-y-2 text-gray-300">
                 <li>All reminder details (title, description, category, priority)</li>
                 <li>Timing information (reminder time, repeat pattern)</li>
-                <li>Assignment data (who it's assigned to)</li>
+                <li>Assignment data (who it&apos;s assigned to)</li>
                 <li>Status and completion dates</li>
                 <li>Creation timestamps</li>
                 <li>Metadata (IDs for reference)</li>
@@ -1464,7 +1464,7 @@ export default function RemindersDocumentationPage() {
 
               <div className="bg-amber-900/20 border border-amber-800 rounded-lg p-4 mt-6">
                 <p className="text-amber-300 text-sm">
-                  <strong>🎯 Organization Strategy:</strong> Think of categories as "buckets" that group similar life areas together. This lets you focus on one area at a time (handle all bills at once, all health items together) rather than jumping between different types of reminders!
+                  <strong>🎯 Organization Strategy:</strong> Think of categories as &quot;buckets&quot; that group similar life areas together. This lets you focus on one area at a time (handle all bills at once, all health items together) rather than jumping between different types of reminders!
                 </p>
               </div>
             </div>
@@ -1477,7 +1477,7 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Using Priorities Effectively</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Priority levels help you focus on what actually matters. Here's how to use each level strategically:
+                Priority levels help you focus on what actually matters. Here&apos;s how to use each level strategically:
               </p>
 
               <div className="space-y-4">
@@ -1508,7 +1508,7 @@ export default function RemindersDocumentationPage() {
                     <li>• Bills due within a week</li>
                     <li>• Doctor appointments this week</li>
                     <li>• Important work deadlines</li>
-                    <li>• Follow-ups that can't wait long</li>
+                    <li>• Follow-ups that can&apos;t wait long</li>
                   </ul>
                   <div className="mt-3 p-3 bg-gray-800 rounded-lg">
                     <p className="text-xs text-gray-300"><strong>✅ Best Practice:</strong> Most of your actionable reminders should be High priority – important enough to do soon but not drop-everything urgent.</p>
@@ -1539,7 +1539,7 @@ export default function RemindersDocumentationPage() {
                   </div>
                   <p className="text-green-200 mb-3 font-semibold">Use for: Nice-to-have items with no urgency</p>
                   <ul className="space-y-1 text-sm text-green-200">
-                    <li>• "Someday" tasks with no deadline</li>
+                    <li>• &quot;Someday&quot; tasks with no deadline</li>
                     <li>• Annual renewals 6+ months away</li>
                     <li>• Ideas and considerations</li>
                     <li>• Long-term planning reminders</li>
@@ -1552,7 +1552,7 @@ export default function RemindersDocumentationPage() {
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-6">
                 <p className="text-blue-300 text-sm">
-                  <strong>⚡ Priority Wisdom:</strong> Think of Urgent as "do now," High as "do today/this week," Medium as "do when you can," and Low as "nice to remember." Review and adjust priorities weekly – what's Medium on Monday might be Urgent by Friday!
+                  <strong>⚡ Priority Wisdom:</strong> Think of Urgent as &quot;do now,&quot; High as &quot;do today/this week,&quot; Medium as &quot;do when you can,&quot; and Low as &quot;nice to remember.&quot; Review and adjust priorities weekly – what&apos;s Medium on Monday might be Urgent by Friday!
                 </p>
               </div>
             </div>
@@ -1565,7 +1565,7 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Template Workflow</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Templates are more than just shortcuts – they're consistency builders. Here's how to maximize their power:
+                Templates are more than just shortcuts – they&apos;re consistency builders. Here&apos;s how to maximize their power:
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">When Templates Shine</h3>
@@ -1576,7 +1576,7 @@ export default function RemindersDocumentationPage() {
                     <li>• Reminders you create often</li>
                     <li>• Standardized formats (bills, meds)</li>
                     <li>• Onboarding new household members</li>
-                    <li>• Quick entry when you're busy</li>
+                    <li>• Quick entry when you&apos;re busy</li>
                   </ul>
                 </div>
                 <div className="p-4 bg-gray-900 rounded-lg border border-gray-700">
@@ -1605,14 +1605,14 @@ export default function RemindersDocumentationPage() {
                 <li><strong>Click Template:</strong> Opens modal with pre-filled data</li>
                 <li><strong>Add Specifics:</strong> Name, dosage, account number, etc.</li>
                 <li><strong>Set Time:</strong> When you want to be reminded</li>
-                <li><strong>Assign Person:</strong> Who's responsible (if not you)</li>
+                <li><strong>Assign Person:</strong> Who&apos;s responsible (if not you)</li>
                 <li><strong>Add Repeat if Needed:</strong> Daily meds, monthly bills</li>
                 <li><strong>Save:</strong> Reminder created in seconds!</li>
               </ol>
 
               <div className="bg-pink-900/20 border border-pink-800 rounded-lg p-4 mt-6">
                 <p className="text-pink-300 text-sm">
-                  <strong>🚀 Power User Tip:</strong> Create your morning medication routine in under 2 minutes using templates: "Take Medication" template × 3 different meds = 3 perfect reminders with Health category, Urgent priority, and proper timing. No thinking required!</p>
+                  <strong>🚀 Power User Tip:</strong> Create your morning medication routine in under 2 minutes using templates: &quot;Take Medication&quot; template × 3 different meds = 3 perfect reminders with Health category, Urgent priority, and proper timing. No thinking required!</p>
               </div>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-pink-400 hover:text-pink-300 text-sm font-medium mt-6">
@@ -1624,13 +1624,13 @@ export default function RemindersDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Managing Overdue Reminders</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Life happens, and sometimes reminders slip through the cracks. Here's how to prevent and handle reminder backlog:
+                Life happens, and sometimes reminders slip through the cracks. Here&apos;s how to prevent and handle reminder backlog:
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Identifying Overdue Reminders</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Dashboard Cards:</strong> "Overdue" stat shows count at a glance</li>
-                <li><strong>Red Badges:</strong> Overdue reminders show red "Overdue" label</li>
+                <li><strong>Dashboard Cards:</strong> &quot;Overdue&quot; stat shows count at a glance</li>
+                <li><strong>Red Badges:</strong> Overdue reminders show red &quot;Overdue&quot; label</li>
                 <li><strong>Filter View:</strong> Use filters to see ONLY overdue items</li>
                 <li><strong>Sort by Date:</strong> Oldest overdue items appear first</li>
               </ul>
@@ -1644,7 +1644,7 @@ export default function RemindersDocumentationPage() {
 
                 <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-800">
                   <h4 className="font-semibold text-blue-100 mb-2">2️⃣ Reschedule (If Still Relevant)</h4>
-                  <p className="text-sm text-blue-200">Edit the reminder time to when you'll actually do it – be realistic!</p>
+                  <p className="text-sm text-blue-200">Edit the reminder time to when you&apos;ll actually do it – be realistic!</p>
                 </div>
 
                 <div className="p-4 bg-amber-900/20 rounded-lg border border-amber-800">
@@ -1660,22 +1660,22 @@ export default function RemindersDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Preventing Future Backlog</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Daily Review:</strong> Spend 2 minutes each morning checking today's reminders</li>
-                <li><strong>Mark as Complete Immediately:</strong> Don't wait – complete reminders right after doing them</li>
-                <li><strong>Realistic Timing:</strong> Set reminder times when you'll actually be available</li>
-                <li><strong>Use Snooze Wisely:</strong> If you can't do it now, snooze to a realistic time (not "later")</li>
+                <li><strong>Daily Review:</strong> Spend 2 minutes each morning checking today&apos;s reminders</li>
+                <li><strong>Mark as Complete Immediately:</strong> Don&apos;t wait – complete reminders right after doing them</li>
+                <li><strong>Realistic Timing:</strong> Set reminder times when you&apos;ll actually be available</li>
+                <li><strong>Use Snooze Wisely:</strong> If you can&apos;t do it now, snooze to a realistic time (not &quot;later&quot;)</li>
                 <li><strong>Weekly Cleanup:</strong> Every Sunday, review and triage any overdue items</li>
               </ul>
 
               <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 mt-6">
                 <p className="text-red-300 text-sm">
-                  <strong>⚠️ Backlog Warning Signs:</strong> If you have 10+ overdue reminders, your system needs adjustment. Either you're creating too many reminders, setting unrealistic times, or not checking daily. Pick one issue to fix first!
+                  <strong>⚠️ Backlog Warning Signs:</strong> If you have 10+ overdue reminders, your system needs adjustment. Either you&apos;re creating too many reminders, setting unrealistic times, or not checking daily. Pick one issue to fix first!
                 </p>
               </div>
 
               <div className="bg-green-900/20 border border-green-800 rounded-lg p-4 mt-4">
                 <p className="text-green-300 text-sm">
-                  <strong>✅ Fresh Start:</strong> Feeling overwhelmed? Bulk complete everything over a week old (you either did it or it wasn't important), delete obvious non-starters, and reschedule anything still relevant. Clean slate, new habits!
+                  <strong>✅ Fresh Start:</strong> Feeling overwhelmed? Bulk complete everything over a week old (you either did it or it wasn&apos;t important), delete obvious non-starters, and reschedule anything still relevant. Clean slate, new habits!
                 </p>
               </div>
             </div>

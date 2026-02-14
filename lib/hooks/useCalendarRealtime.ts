@@ -17,6 +17,7 @@ export interface CalendarRealtimeState {
   isConnected: boolean;
 }
 
+/** Subscribes to real-time calendar event updates and user presence for a space */
 export function useCalendarRealtime(spaceId: string | undefined, userId: string | undefined) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [presence, setPresence] = useState<Record<string, PresenceUser>>({});

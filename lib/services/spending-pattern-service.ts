@@ -436,7 +436,7 @@ export async function detectSpendingAnomalies(
   return anomalies;
 }
 
-// Export service object
+/** Service for spending pattern analysis, forecasting, day-of-week patterns, and anomaly detection. */
 export const spendingPatternService = {
   analyzeSpendingPatterns,
   forecastNextMonthSpending,

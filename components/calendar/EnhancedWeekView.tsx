@@ -18,6 +18,7 @@ interface EnhancedWeekViewProps {
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (6-23)
 const HOUR_HEIGHT = 80; // pixels per hour
 
+/** Renders an enhanced weekly calendar view with multi-day event support. */
 export function EnhancedWeekView({
   date,
   events,

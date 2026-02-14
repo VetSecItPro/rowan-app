@@ -2,6 +2,7 @@ import React from 'react';
 
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
+/** Renders a styled multi-line text area input. */
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className = '', ...props }, ref) => {
     return (

@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 };
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Footer } from '@/components/layout/Footer';
@@ -98,7 +97,7 @@ export default function PrivacyPage() {
                     Processing necessary for our legitimate business interests, balanced against your rights:
                   </p>
                   <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
-                    <li>Analytics to improve service quality and user experience</li>
+                    <li>Service improvement through aggregated, anonymized usage data</li>
                     <li>Security monitoring and fraud prevention</li>
                     <li>Debugging and error tracking</li>
                     <li>Service performance optimization</li>
@@ -115,7 +114,7 @@ export default function PrivacyPage() {
                   </p>
                   <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
                     <li>Marketing emails and promotional communications (opt-in only)</li>
-                    <li>Non-essential cookies and analytics (via cookie consent)</li>
+                    <li>Marketing emails and newsletters (opt-in only)</li>
                     <li>Optional AI-powered features that process your content</li>
                   </ul>
                   <p className="text-gray-400 text-xs mt-2">
@@ -200,9 +199,24 @@ export default function PrivacyPage() {
                 </div>
               </div>
 
+                <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-800">
+                  <h4 className="font-semibold text-white mb-2">AI Chat Companion (Google Gemini AI)</h4>
+                  <p className="text-gray-300 text-sm">
+                    Rowan includes an AI chat assistant that helps you manage your household. When you use the chat feature,
+                    your messages and relevant household context (such as task summaries, calendar events, and meal plans)
+                    are sent to Google's Gemini AI service for processing. This processing is:
+                  </p>
+                  <ul className="list-disc list-inside text-gray-300 text-sm mt-2 space-y-1">
+                    <li>Only triggered when you explicitly send a message in the chat</li>
+                    <li>Subject to automatic PII detection and redaction before being sent to Google</li>
+                    <li>Not stored by Google for training purposes (per our API agreement)</li>
+                    <li>Conversation history is stored in your account and can be deleted at any time</li>
+                  </ul>
+                </div>
+
               <p className="text-gray-300 mt-4">
                 <strong>Your Choice:</strong> AI features are optional. You can always manually enter recipes and expenses
-                without using AI processing.
+                without using AI processing, and you can choose not to use the AI chat companion.
               </p>
             </section>
 
@@ -278,6 +292,12 @@ export default function PrivacyPage() {
                       <td className="px-4 py-2 text-gray-300">Rate Limiting & Caching</td>
                       <td className="px-4 py-2 text-gray-300">United States</td>
                       <td className="px-4 py-2 text-gray-300">IP addresses, request counts</td>
+                    </tr>
+                    <tr className="bg-gray-900">
+                      <td className="px-4 py-2 text-gray-300">Sentry</td>
+                      <td className="px-4 py-2 text-gray-300">Error Tracking & Monitoring</td>
+                      <td className="px-4 py-2 text-gray-300">United States</td>
+                      <td className="px-4 py-2 text-gray-300">Error reports, user ID, performance metrics</td>
                     </tr>
                   </tbody>
                 </table>
@@ -491,17 +511,9 @@ export default function PrivacyPage() {
                 <li>Cookie consent preferences</li>
               </ul>
 
-              <h3 className="text-xl font-semibold text-white mb-3 mt-6">Analytics Cookies (Optional)</h3>
-              <p className="text-gray-300 mb-4">
-                With your consent, we use analytics to understand how you use Rowan:
-              </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-1 mb-4">
-                <li>Page views and feature usage</li>
-                <li>Performance monitoring</li>
-                <li>Error tracking</li>
-              </ul>
-              <p className="text-gray-300">
-                You can control cookies through our consent banner or your browser settings.
+              <p className="text-gray-300 mt-4">
+                Rowan does not use analytics, advertising, or third-party tracking cookies.
+                You can manage your cookie consent through our consent banner or your browser settings.
               </p>
             </section>
 

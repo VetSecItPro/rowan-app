@@ -244,7 +244,7 @@ const DauMauPanel = memo(function DauMauPanel() {
             <p className="text-xs text-green-300">Excellent engagement</p>
           </div>
         </div>
-        <p className="text-xs text-gray-500 mt-4">
+        <p className="text-xs text-gray-400 mt-4">
           Social apps like Facebook have ~50% stickiness. Productivity apps typically range 15-25%.
         </p>
       </div>
@@ -411,7 +411,7 @@ const CohortsPanel = memo(function CohortsPanel() {
             </table>
           </div>
         ) : (
-          <div className="py-8 text-center text-gray-500">
+          <div className="py-8 text-center text-gray-400">
             <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p>No cohort data yet</p>
             <p className="text-xs mt-1">Cohorts will appear as users sign up over time</p>
@@ -457,7 +457,7 @@ const ChurnPanel = memo(function ChurnPanel() {
           <p className="text-3xl font-bold text-white">
             {totalUsers > 0 ? `${churnRate}%` : '--'}
           </p>
-          <p className="text-xs text-gray-500 mt-1">Users inactive 30+ days</p>
+          <p className="text-xs text-gray-400 mt-1">Users inactive 30+ days</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -466,7 +466,7 @@ const ChurnPanel = memo(function ChurnPanel() {
             <span className="text-sm font-medium text-gray-400">Churned Users</span>
           </div>
           <p className="text-3xl font-bold text-white">{churned}</p>
-          <p className="text-xs text-gray-500 mt-1">No activity in 30 days</p>
+          <p className="text-xs text-gray-400 mt-1">No activity in 30 days</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -475,7 +475,7 @@ const ChurnPanel = memo(function ChurnPanel() {
             <span className="text-sm font-medium text-gray-400">Retained Users</span>
           </div>
           <p className="text-3xl font-bold text-white">{retained}</p>
-          <p className="text-xs text-gray-500 mt-1">Active in last 30 days</p>
+          <p className="text-xs text-gray-400 mt-1">Active in last 30 days</p>
         </div>
       </div>
 
@@ -542,6 +542,7 @@ const ChurnPanel = memo(function ChurnPanel() {
   );
 });
 
+/** Displays user retention cohort analysis and churn metrics. */
 export const RetentionPanel = memo(function RetentionPanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('dau-mau');
 

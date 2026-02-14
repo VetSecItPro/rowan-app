@@ -14,6 +14,7 @@ interface CreateCustomTemplateModalProps {
   spaceId: string;
 }
 
+/** Renders a modal for creating a custom shopping list template. */
 export function CreateCustomTemplateModal({ isOpen, onClose, onSave, spaceId }: CreateCustomTemplateModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');

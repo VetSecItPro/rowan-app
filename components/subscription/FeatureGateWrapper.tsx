@@ -188,11 +188,11 @@ function FeatureGateBlockedInline({
 
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center rounded-xl border-2 border-dashed border-gray-700 bg-gray-800/50">
-      <Lock className="h-8 w-8 text-gray-500 mb-3" />
+      <Lock className="h-8 w-8 text-gray-400 mb-3" />
       <p className="text-sm font-medium text-gray-400 mb-1">
         {featureName}
       </p>
-      <p className="text-xs text-gray-500 mb-4">
+      <p className="text-xs text-gray-400 mb-4">
         Requires {tierDisplay} Plan
       </p>
       <button
@@ -284,6 +284,7 @@ export function ProBadge({ className }: { className?: string }) {
   );
 }
 
+/** Renders a badge indicating the Family tier subscription status. */
 export function FamilyBadge({ className }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-1 rounded-full bg-purple-900/30 px-2 py-0.5 text-xs font-medium text-purple-300 ${className || ''}`}>

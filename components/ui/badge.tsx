@@ -4,6 +4,7 @@ interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
+/** Renders a small status badge with configurable variant styling. */
 export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   ({ className = '', variant = 'default', ...props }, ref) => {
     const variants = {

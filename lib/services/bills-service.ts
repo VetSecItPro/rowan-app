@@ -450,7 +450,7 @@ export async function markOverdueBills(): Promise<void> {
   await supabase.rpc('mark_bills_overdue');
 }
 
-// Export service object
+/** Aggregated service for bill CRUD, payment tracking, and statistics. */
 export const billsService = {
   getBills,
   getBillById,

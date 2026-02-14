@@ -10,6 +10,7 @@ interface CircularProgressProps {
   className?: string;
 }
 
+/** Renders an SVG circular progress indicator with customizable size and color. */
 export function CircularProgress({
   progress,
   size = 48,

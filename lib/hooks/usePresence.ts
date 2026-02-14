@@ -17,6 +17,7 @@ interface UsePresenceOptions {
   userEmail?: string;
 }
 
+/** Tracks online user presence via Supabase Realtime channels for a space */
 export function usePresence({ channelName, spaceId, userId, userEmail }: UsePresenceOptions) {
   const [presenceState, setPresenceState] = useState<Record<string, PresenceUser[]>>({});
   const channelRef = useRef<RealtimeChannel | null>(null);

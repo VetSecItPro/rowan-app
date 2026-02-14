@@ -30,6 +30,7 @@ export interface CreateTimeEntryInput {
   is_manual?: boolean;
 }
 
+/** Service for task time tracking with start/stop timer and manual time entry support. */
 export const taskTimeTrackingService = {
   /**
    * Get all time entries for a task

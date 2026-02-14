@@ -49,6 +49,7 @@ const CAPABILITIES = [
   },
 ];
 
+/** Renders a welcome modal introducing the AI companion and its capabilities. */
 export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const isLastStep = currentStep === CAPABILITIES.length - 1;
@@ -174,7 +175,7 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
             </div>
 
             {/* Privacy notice */}
-            <p className="px-6 text-[11px] text-gray-500 leading-relaxed text-center">
+            <p className="px-6 text-[11px] text-gray-400 leading-relaxed text-center">
               Rowan AI uses Google Gemini. First names and household data (tasks, events, lists) are shared with Google to personalize responses. Passwords and financial accounts are never shared.
             </p>
 
@@ -182,7 +183,7 @@ export function AIWelcomeModal({ isOpen, onClose, onTryIt }: AIWelcomeModalProps
             <div className="px-6 pb-6 pt-2 flex items-center justify-between">
               <button
                 onClick={handleSkip}
-                className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
               >
                 Skip
               </button>

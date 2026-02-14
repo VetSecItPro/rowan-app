@@ -419,7 +419,7 @@ export async function triggerDependentGoals(goalId: string): Promise<string[]> {
   return triggeredGoalIds;
 }
 
-// Export service object
+/** Aggregated service for goal dependency CRUD, validation, tree traversal, and cascade triggers. */
 export const goalDependenciesService = {
   createDependency,
   getDependencies,

@@ -148,7 +148,7 @@ const Section = memo(function Section({
         </div>
         <div className="flex-1 space-y-1.5">
           {isEmpty ? (
-            <p className="text-sm text-gray-500 italic py-2">
+            <p className="text-sm text-gray-400 italic py-2">
               Nothing scheduled
             </p>
           ) : (
@@ -286,6 +286,7 @@ const OverdueSection = memo(function OverdueSection({
   );
 });
 
+/** Displays a summary of today's events, tasks, and reminders. */
 export const TodayAtAGlance = memo(function TodayAtAGlance({
   spaceId,
   className = ''
@@ -494,7 +495,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
         {!hasAnyContent ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
-              <Calendar className="w-8 h-8 text-gray-500" />
+              <Calendar className="w-8 h-8 text-gray-400" />
             </div>
             <h4 className="text-lg font-medium text-gray-300 mb-1">
               Your day is clear!

@@ -35,6 +35,7 @@ function markOnboardingSeen(): void {
   }
 }
 
+/** Gates AI feature access behind an onboarding flow for first-time users. */
 export function AIOnboardingGate() {
   const chatCtx = useChatContextSafe();
   const enabled = FEATURE_FLAGS.AI_COMPANION && !!chatCtx?.canAccessAI;
@@ -42,10 +43,13 @@ export function AIOnboardingGate() {
   const [showModal, setShowModal] = useState(false);
   const [dismissed, setDismissed] = useState(() => isOnboardingSeen());
 
-  // Sync: if server says seen but localStorage doesn't, update localStorage
+  // Sync: if server says seen but localStorage doesn't, update localStorage.
+  // This reacts to async server data (external system) — setState in the
+  // subscription callback pattern is appropriate here.
   useEffect(() => {
     if (!isLoading && settings.ai_onboarding_seen && !isOnboardingSeen()) {
       markOnboardingSeen();
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing server state to local; necessary for cross-device consistency
       setDismissed(true);
     }
   }, [isLoading, settings.ai_onboarding_seen]);

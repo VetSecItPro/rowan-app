@@ -16,6 +16,7 @@ interface NewBillModalProps {
   spaceId: string;
 }
 
+/** Renders a modal form for creating or editing a project bill. */
 export function NewBillModal({
   isOpen,
   onClose,
@@ -197,7 +198,7 @@ export function NewBillModal({
                   Amount <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                   <input
                     id="amount"
                     type="number"

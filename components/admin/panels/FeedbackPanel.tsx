@@ -29,7 +29,7 @@ const getTypeIcon = (type: FeedbackType | null) => {
     case FeedbackType.UI_UX:
       return <Palette className="w-3 h-3 text-purple-500" />;
     default:
-      return <MessageCircle className="w-3 h-3 text-gray-500" />;
+      return <MessageCircle className="w-3 h-3 text-gray-400" />;
   }
 };
 
@@ -51,6 +51,7 @@ const getStatusBadge = (status: FeedbackStatus) => {
   );
 };
 
+/** Displays user feedback submissions and sentiment analysis in the admin dashboard. */
 export const FeedbackPanel = memo(function FeedbackPanel() {
   const [filter, setFilter] = useState<'all' | 'new' | 'in_progress'>('all');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');

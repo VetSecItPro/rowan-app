@@ -17,6 +17,7 @@ interface BadgeModalProps {
   onClose: () => void;
 }
 
+/** Renders a modal with detailed information about a specific achievement badge. */
 export function BadgeModal({
   badge,
   userAchievement,

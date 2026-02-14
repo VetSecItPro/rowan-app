@@ -4,6 +4,7 @@ import { apiRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+/** Signs out the authenticated user and invalidates their session */
 export async function POST(request: NextRequest) {
   try {
     // Extract IP for rate limiting

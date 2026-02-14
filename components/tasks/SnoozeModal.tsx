@@ -24,6 +24,7 @@ interface SnoozeHistory {
   created_at: string;
 }
 
+/** Renders a modal for snoozing a task to a later date. */
 export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: SnoozeModalProps) {
   const [loading, setLoading] = useState(false);
   const [customDate, setCustomDate] = useState('');
@@ -197,7 +198,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
         {showHistory && (
           <div className="mt-4 p-4 bg-gray-900 rounded-lg max-h-48 overflow-y-auto">
             {history.length === 0 ? (
-              <p className="text-xs text-gray-500 text-center">No snooze history</p>
+              <p className="text-xs text-gray-400 text-center">No snooze history</p>
             ) : (
               <div className="space-y-2">
                 {history.map((item) => (
@@ -211,7 +212,7 @@ export function SnoozeModal({ isOpen, onClose, taskId, userId, onSnooze }: Snooz
                       </span>
                     </div>
                     {item.reason && (
-                      <p className="text-gray-500 mt-1">Reason: {item.reason}</p>
+                      <p className="text-gray-400 mt-1">Reason: {item.reason}</p>
                     )}
                     <p className="text-gray-400 mt-1">
                       Set on {new Date(item.created_at).toLocaleDateString()}

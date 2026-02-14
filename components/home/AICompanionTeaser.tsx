@@ -73,6 +73,7 @@ function VoiceWave({ reduced }: { reduced: boolean | null }) {
 // Component
 // ---------------------------------------------------------------------------
 
+/** Renders a teaser section showcasing the AI companion feature on the landing page. */
 export function AICompanionTeaser() {
   const prefersReducedMotion = useReducedMotion();
   const [convoIndex, setConvoIndex] = useState(0);
@@ -149,7 +150,7 @@ export function AICompanionTeaser() {
                 <Bot className="w-5 h-5 text-blue-400" />
               </div>
               <VoiceWave reduced={prefersReducedMotion} />
-              <span className="text-xs text-gray-500">Voice commands supported</span>
+              <span className="text-xs text-gray-400">Voice commands supported</span>
             </div>
 
             <Link
@@ -241,7 +242,7 @@ export function AICompanionTeaser() {
 
               {/* Input mock */}
               <div className="mt-4 flex items-center gap-2 bg-gray-800/50 rounded-full px-3.5 py-2 border border-gray-700/30">
-                <span className="text-xs text-gray-500 flex-1">Ask Rowan anything...</span>
+                <span className="text-xs text-gray-400 flex-1">Ask Rowan anything...</span>
                 <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
                   <ArrowRight className="w-3 h-3 text-white" />
                 </div>

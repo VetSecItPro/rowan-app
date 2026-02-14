@@ -42,6 +42,7 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(', ');
 
+/** Renders a modal dialog overlay with backdrop, close button, and animation. */
 export function Modal({
   isOpen,
   onClose,

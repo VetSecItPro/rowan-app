@@ -14,6 +14,7 @@ interface NewChoreModalProps {
   userId: string;
 }
 
+/** Renders a modal form for creating or editing a household chore. */
 export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, userId }: NewChoreModalProps) {
   type ChoreFrequency = CreateChoreInput['frequency'];
   const [formData, setFormData] = useState<CreateChoreInput>({

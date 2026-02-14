@@ -376,4 +376,5 @@ class AIContextService {
   }
 }
 
+/** Singleton instance for building AI context from space data (tasks, events, goals, etc.). */
 export const aiContextService = new AIContextService();

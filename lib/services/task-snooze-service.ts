@@ -10,6 +10,7 @@ interface TaskSnoozeHistory {
   created_at: string;
 }
 
+/** Service for snoozing, unsnoozing, and tracking snooze history for tasks. */
 export const taskSnoozeService = {
   async snoozeTask(taskId: string, snoozedUntil: string, userId: string, _reason?: string): Promise<Task> {
     const supabase = createClient();

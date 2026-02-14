@@ -66,6 +66,7 @@ export type UpdateTemplateInput = z.infer<typeof UpdateTemplateSchema>;
 // SERVICE
 // =============================================
 
+/** Service for managing reusable reminder templates (system and user-created) from the reminder_templates table. */
 export const reminderTemplatesService = {
   /**
    * Get all templates available to user (system + space templates)

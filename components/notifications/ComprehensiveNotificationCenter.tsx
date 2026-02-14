@@ -19,6 +19,7 @@ interface ComprehensiveNotificationCenterProps {
   spaceId?: string;
 }
 
+/** Renders a full notification center with categorized notification feeds. */
 export function ComprehensiveNotificationCenter({ userId, spaceId }: ComprehensiveNotificationCenterProps) {
   void spaceId;
   const [isOpen, setIsOpen] = useState(false);
@@ -241,6 +242,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Panel with Glassmorphism */}
@@ -335,7 +337,7 @@ export function ComprehensiveNotificationCenter({ userId, spaceId }: Comprehensi
                   <p className="text-gray-400 font-medium mb-1">
                     {selectedFilter === 'unread' ? 'No unread notifications' : 'No notifications'}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     {selectedFilter === 'unread'
                       ? "You're all caught up!"
                       : "We'll notify you when something happens"

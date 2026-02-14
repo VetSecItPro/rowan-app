@@ -15,6 +15,7 @@ export interface CreateReactionInput {
   message?: string;
 }
 
+/** Service for creating, fetching, and deleting emoji reactions on daily check-ins. */
 export const reactionsService = {
   /**
    * Send a reaction to a check-in

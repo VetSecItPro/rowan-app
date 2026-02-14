@@ -23,6 +23,7 @@ export interface SplitResult {
   user2Percentage: number;
 }
 
+/** Calculates and previews expense split amounts between members. */
 export function SplitCalculator({
   totalAmount,
   splitType,

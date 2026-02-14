@@ -50,6 +50,7 @@ export interface TasksModalsReturn {
 // HOOK
 // =============================================
 
+/** Manages open/close state for task creation, editing, and detail view modals */
 export function useTasksModals(): TasksModalsReturn {
   // Unified modal state (create/edit)
   const [isUnifiedModalOpen, setIsUnifiedModalOpen] = useState(false);

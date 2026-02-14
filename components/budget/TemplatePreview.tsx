@@ -13,6 +13,7 @@ interface TemplatePreviewProps {
   className?: string;
 }
 
+/** Renders a detailed preview of a budget template with its categories and allocations. */
 export function TemplatePreview({
   categories,
   monthlyIncome,

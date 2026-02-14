@@ -197,6 +197,7 @@ async function tryGeocodingWithFallbacks(location: string): Promise<GeocodeResul
   return null;
 }
 
+/** Geocodes a location string into geographic coordinates */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting

@@ -15,6 +15,7 @@ interface ExportModalProps {
   currentFilters?: TaskFilters;
 }
 
+/** Renders a modal for exporting tasks to CSV, PDF, or calendar format. */
 export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: ExportModalProps) {
   const [loading, setLoading] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([
@@ -120,7 +121,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
               <FileText className="w-5 h-5 text-green-500" />
               <div>
                 <p className="text-sm font-medium text-white">CSV (Comma Separated Values)</p>
-                <p className="text-xs text-gray-500">Compatible with Excel, Google Sheets, and other spreadsheet apps</p>
+                <p className="text-xs text-gray-400">Compatible with Excel, Google Sheets, and other spreadsheet apps</p>
               </div>
             </div>
           </div>
@@ -131,7 +132,7 @@ export function ExportModal({ isOpen, onClose, spaceId, currentFilters }: Export
               <h3 className="text-sm font-medium text-gray-300">
                 Select Columns to Export
               </h3>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-400">
                 {selectedColumns.length} of {availableColumns.length} selected
               </span>
             </div>

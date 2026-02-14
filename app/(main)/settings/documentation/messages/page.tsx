@@ -19,7 +19,7 @@ import {
   Clock,
   Lightbulb,
 } from 'lucide-react';
-import { Footer } from '@/components/layout/Footer';
+
 
 interface GuideSection {
   title: string;
@@ -288,16 +288,16 @@ export default function MessagesDocumentationPage() {
                   Stay Connected with Powerful Messaging
                 </h3>
                 <p className="text-green-200 mb-2">
-                  Rowan's messaging system is designed to keep couples and families in sync with everything they need:
+                  Rowan&apos;s messaging system is designed to keep couples and families in sync with everything they need:
                 </p>
                 <ul className="text-sm text-green-300 space-y-1 ml-4">
                   <li>• <strong>Real-time sync</strong> - Messages appear instantly for everyone</li>
-                  <li>• <strong>Voice messages</strong> - Record audio when typing isn't convenient</li>
+                  <li>• <strong>Voice messages</strong> - Record audio when typing isn&apos;t convenient</li>
                   <li>• <strong>File sharing</strong> - Send photos, documents, and files up to 50MB</li>
                   <li>• <strong>Emoji reactions</strong> - Quick responses with 30+ family-friendly emojis</li>
                   <li>• <strong>Message threads</strong> - Reply to specific messages to stay organized</li>
                   <li>• <strong>Pinned messages</strong> - Keep important info at the top</li>
-                  <li>• <strong>Mentions & @tagging</strong> - Get someone's attention in group chats</li>
+                  <li>• <strong>Mentions & @tagging</strong> - Get someone&apos;s attention in group chats</li>
                   <li>• <strong>Search history</strong> - Find any message in seconds</li>
                   <li>• <strong>Typing indicators</strong> - See when others are composing</li>
                   <li>• <strong>Multiple conversations</strong> - Organize topics in separate threads</li>
@@ -360,8 +360,8 @@ export default function MessagesDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 text-lg leading-relaxed mb-4">
-                Think of Messages as your family's private chat hub - it's where quick check-ins, important updates, and daily conversations happen.
-                Whether you're coordinating dinner plans, sharing photos, or just saying "I love you," Messages keeps everyone connected in real-time.
+                Think of Messages as your family&apos;s private chat hub - it&apos;s where quick check-ins, important updates, and daily conversations happen.
+                Whether you&apos;re coordinating dinner plans, sharing photos, or just saying &quot;I love you,&quot; Messages keeps everyone connected in real-time.
               </p>
               <p className="text-gray-300 leading-relaxed mb-4">
                 <strong>Why use Messages instead of texting?</strong> Unlike SMS or other messaging apps, Rowan Messages is designed specifically
@@ -371,7 +371,7 @@ export default function MessagesDocumentationPage() {
               <div className="bg-green-900/20 border-l-4 border-green-500 p-4 rounded-r-lg">
                 <p className="text-green-200 font-medium mb-2">💡 Pro Tip:</p>
                 <p className="text-green-300 text-sm">
-                  Create separate conversations for different topics (like "Meal Planning" or "House Projects") to keep discussions organized and easy to find later!
+                  Create separate conversations for different topics (like &quot;Meal Planning&quot; or &quot;House Projects&quot;) to keep discussions organized and easy to find later!
                 </p>
               </div>
             </div>
@@ -384,26 +384,26 @@ export default function MessagesDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Ready to start chatting? Here's how to create a conversation:
+                Ready to start chatting? Here&apos;s how to create a conversation:
               </p>
               <ol className="space-y-3 text-gray-300">
                 <li className="pl-2">
-                  <strong className="text-white">1. Click the "+ New Conversation" button</strong> - You'll find this at the top of the Messages page or in the conversation sidebar.
+                  <strong className="text-white">1. Click the &quot;+ New Conversation&quot; button</strong> - You&apos;ll find this at the top of the Messages page or in the conversation sidebar.
                 </li>
                 <li className="pl-2">
-                  <strong className="text-white">2. Give it a name</strong> - Choose something descriptive like "Family Chat," "Weekend Plans," or "Home Renovation."
+                  <strong className="text-white">2. Give it a name</strong> - Choose something descriptive like &quot;Family Chat,&quot; &quot;Weekend Plans,&quot; or &quot;Home Renovation.&quot;
                 </li>
                 <li className="pl-2">
                   <strong className="text-white">3. Add participants</strong> - Select family members you want to include. You can always add more people later!
                 </li>
                 <li className="pl-2">
-                  <strong className="text-white">4. Start messaging!</strong> - That's it! Your conversation is ready to use.
+                  <strong className="text-white">4. Start messaging!</strong> - That&apos;s it! Your conversation is ready to use.
                 </li>
               </ol>
               <div className="bg-blue-900/20 border-l-4 border-blue-500 p-4 rounded-r-lg mt-6">
                 <p className="text-blue-200 font-medium mb-2">🎯 Quick Tip:</p>
                 <p className="text-blue-300 text-sm">
-                  Your first conversation is automatically created as "General" - perfect for everyday family chat. Create additional conversations as needed for specific topics or projects.
+                  Your first conversation is automatically created as &quot;General&quot; - perfect for everyday family chat. Create additional conversations as needed for specific topics or projects.
                 </p>
               </div>
             </div>
@@ -416,13 +416,13 @@ export default function MessagesDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Sending messages is as easy as typing and hitting Enter. But there's more to discover:
+                Sending messages is as easy as typing and hitting Enter. But there&apos;s more to discover:
               </p>
               <div className="space-y-4">
                 <div className="bg-gray-900 rounded-lg p-4">
                   <h4 className="font-semibold text-white mb-2">Type Your Message</h4>
                   <p className="text-gray-300 text-sm">
-                    Click in the message box at the bottom and start typing. You'll see a typing indicator appear for other participants, so they know you're composing a response.
+                    Click in the message box at the bottom and start typing. You&apos;ll see a typing indicator appear for other participants, so they know you&apos;re composing a response.
                   </p>
                 </div>
                 <div className="bg-gray-900 rounded-lg p-4">
@@ -436,7 +436,7 @@ export default function MessagesDocumentationPage() {
                 <div className="bg-gray-900 rounded-lg p-4">
                   <h4 className="font-semibold text-white mb-2">Receiving Messages</h4>
                   <p className="text-gray-300 text-sm">
-                    New messages appear instantly at the bottom of the conversation - no refresh needed! You'll see a notification badge on the Messages icon when you have unread messages in other conversations.
+                    New messages appear instantly at the bottom of the conversation - no refresh needed! You&apos;ll see a notification badge on the Messages icon when you have unread messages in other conversations.
                   </p>
                 </div>
               </div>
@@ -465,7 +465,7 @@ export default function MessagesDocumentationPage() {
                 <div className="bg-purple-900/20 border-l-4 border-purple-500 p-4 rounded-r-lg">
                   <p className="text-purple-200 font-medium mb-2">✨ Fun Fact:</p>
                   <p className="text-purple-300 text-sm">
-                    Multiple people can react with the same emoji - you'll see a count next to each reaction showing how many people agreed!
+                    Multiple people can react with the same emoji - you&apos;ll see a count next to each reaction showing how many people agreed!
                   </p>
                 </div>
               </div>
@@ -529,7 +529,7 @@ export default function MessagesDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Sometimes speaking is faster than typing! Record voice messages when you're driving, cooking, or just want to add a personal touch.
+                Sometimes speaking is faster than typing! Record voice messages when you&apos;re driving, cooking, or just want to add a personal touch.
               </p>
               <div className="space-y-4">
                 <div>
@@ -537,8 +537,8 @@ export default function MessagesDocumentationPage() {
                   <ol className="space-y-2 text-gray-300">
                     <li className="pl-2">1. Click the 🎤 microphone icon next to the message box</li>
                     <li className="pl-2">2. Allow microphone access when prompted (first time only)</li>
-                    <li className="pl-2">3. Speak your message - you'll see a timer and waveform animation</li>
-                    <li className="pl-2">4. Click "Send" to share or "Cancel" to discard</li>
+                    <li className="pl-2">3. Speak your message - you&apos;ll see a timer and waveform animation</li>
+                    <li className="pl-2">4. Click &quot;Send&quot; to share or &quot;Cancel&quot; to discard</li>
                   </ol>
                 </div>
                 <div className="bg-green-900/20 border-l-4 border-green-500 p-4 rounded-r-lg">
@@ -568,7 +568,7 @@ export default function MessagesDocumentationPage() {
                   <h4 className="font-semibold text-white mb-3">How to Reply to a Message:</h4>
                   <ol className="space-y-2 text-gray-300">
                     <li className="pl-2">1. Hover over the message you want to reply to</li>
-                    <li className="pl-2">2. Click the "Reply" button that appears</li>
+                    <li className="pl-2">2. Click the &quot;Reply&quot; button that appears</li>
                     <li className="pl-2">3. Type your response in the thread view</li>
                     <li className="pl-2">4. Your reply is connected to the original message!</li>
                   </ol>
@@ -576,13 +576,13 @@ export default function MessagesDocumentationPage() {
                 <div>
                   <h4 className="font-semibold text-white mb-3">Viewing Thread Replies:</h4>
                   <p className="text-gray-300">
-                    Messages with replies show a small "X replies" indicator. Click it to expand the thread and see all responses in context.
+                    Messages with replies show a small &quot;X replies&quot; indicator. Click it to expand the thread and see all responses in context.
                   </p>
                 </div>
                 <div className="bg-indigo-900/20 border-l-4 border-indigo-500 p-4 rounded-r-lg">
                   <p className="text-indigo-200 font-medium mb-2">💡 Best Practice:</p>
                   <p className="text-indigo-300 text-sm">
-                    Use threads when responding to an older message in an active conversation. This keeps discussions clear and prevents confusion about what you're referencing!
+                    Use threads when responding to an older message in an active conversation. This keeps discussions clear and prevents confusion about what you&apos;re referencing!
                   </p>
                 </div>
               </div>
@@ -596,7 +596,7 @@ export default function MessagesDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Important information shouldn't get lost in the conversation! Pin messages to keep them at the top for easy reference.
+                Important information shouldn&apos;t get lost in the conversation! Pin messages to keep them at the top for easy reference.
               </p>
               <div className="space-y-4">
                 <div>
@@ -613,15 +613,15 @@ export default function MessagesDocumentationPage() {
                   <h4 className="font-semibold text-white mb-3">How to Pin:</h4>
                   <ol className="space-y-2 text-gray-300">
                     <li className="pl-2">1. Find the message you want to pin</li>
-                    <li className="pl-2">2. Click the "..." menu on the message</li>
-                    <li className="pl-2">3. Select "Pin Message"</li>
+                    <li className="pl-2">2. Click the &quot;...&quot; menu on the message</li>
+                    <li className="pl-2">3. Select &quot;Pin Message&quot;</li>
                     <li className="pl-2">4. The message appears in the pinned section at the top!</li>
                   </ol>
                 </div>
                 <div className="bg-pink-900/20 border-l-4 border-pink-500 p-4 rounded-r-lg">
                   <p className="text-pink-200 font-medium mb-2">📌 Pro Tip:</p>
                   <p className="text-pink-300 text-sm">
-                    You can pin multiple messages, but we recommend keeping it to 3-5 most important items so they stay easy to scan. Unpin messages when they're no longer relevant!
+                    You can pin multiple messages, but we recommend keeping it to 3-5 most important items so they stay easy to scan. Unpin messages when they&apos;re no longer relevant!
                   </p>
                 </div>
               </div>
@@ -635,16 +635,16 @@ export default function MessagesDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Get someone's attention in a group conversation by mentioning them! Type @ followed by their name to tag them directly.
+                Get someone&apos;s attention in a group conversation by mentioning them! Type @ followed by their name to tag them directly.
               </p>
               <div className="space-y-4">
                 <div>
                   <h4 className="font-semibold text-white mb-3">How Mentions Work:</h4>
                   <ol className="space-y-2 text-gray-300">
                     <li className="pl-2">1. Type <code className="bg-gray-700 px-2 py-1 rounded">@</code> in your message</li>
-                    <li className="pl-2">2. Start typing a name - you'll see autocomplete suggestions</li>
+                    <li className="pl-2">2. Start typing a name - you&apos;ll see autocomplete suggestions</li>
                     <li className="pl-2">3. Select the person you want to mention</li>
-                    <li className="pl-2">4. They'll get a notification and their name is highlighted in the message!</li>
+                    <li className="pl-2">4. They&apos;ll get a notification and their name is highlighted in the message!</li>
                   </ol>
                 </div>
                 <div>
@@ -683,7 +683,7 @@ export default function MessagesDocumentationPage() {
                   <p className="text-teal-200 font-medium mb-2">🔍 Search Tips:</p>
                   <ul className="text-teal-300 text-sm space-y-1 ml-4">
                     <li>• Search works across ALL conversations</li>
-                    <li>• Use quotes for exact phrases: "dinner tonight"</li>
+                    <li>• Use quotes for exact phrases: &quot;dinner tonight&quot;</li>
                     <li>• Search by sender name to find messages from specific people</li>
                     <li>• Clear your search to return to normal view</li>
                   </ul>
@@ -703,7 +703,7 @@ export default function MessagesDocumentationPage() {
               </p>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-white mb-3">What's Real-Time?</h4>
+                  <h4 className="font-semibold text-white mb-3">What&apos;s Real-Time?</h4>
                   <ul className="space-y-2 text-gray-300 ml-4">
                     <li>• <strong>New messages</strong> appear instantly for everyone</li>
                     <li>• <strong>Typing indicators</strong> show when someone is composing</li>

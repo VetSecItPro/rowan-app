@@ -10,6 +10,7 @@ interface BadgeNotificationProps {
   autoCloseDelay?: number;
 }
 
+/** Shows an animated notification when a new goal badge is earned. */
 export default function BadgeNotification({
   badge,
   onClose,
@@ -214,6 +215,7 @@ export default function BadgeNotification({
           ${isVisible && !isLeaving ? 'opacity-100' : 'opacity-0'}
         `}
         onClick={handleClose}
+        aria-hidden="true"
       />
 
       {/* Notification Card */}

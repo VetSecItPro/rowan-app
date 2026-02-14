@@ -58,8 +58,8 @@ function ReminderListStep() {
                     {cat.emoji} {cat.label}
                   </span>
                   <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-gray-500" />
-                    <span className="text-[10px] text-gray-500">{r.time}</span>
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <span className="text-[10px] text-gray-400">{r.time}</span>
                   </div>
                 </div>
               </div>
@@ -114,7 +114,7 @@ function SetReminderStep() {
             <div
               key={key}
               className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium ${
-                active ? `${cat.bg} ${cat.text} border border-current/20` : 'bg-gray-800/60 text-gray-500 border border-gray-700/50'
+                active ? `${cat.bg} ${cat.text} border border-current/20` : 'bg-gray-800/60 text-gray-400 border border-gray-700/50'
               }`}
             >
               {cat.emoji} {cat.label}
@@ -132,7 +132,7 @@ function SetReminderStep() {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 text-gray-500" />
+            <Clock className="w-3.5 h-3.5 text-gray-400" />
             <span className="text-xs text-gray-400">Remind at</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500/30">
@@ -283,6 +283,7 @@ const steps: DemoStep[] = [
   { label: 'Mark it done', content: <MarkDoneStep /> },
 ];
 
+/** Renders an animated reminders feature demonstration for the landing page. */
 export function RemindersDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

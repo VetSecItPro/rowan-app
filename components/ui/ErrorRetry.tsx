@@ -103,7 +103,7 @@ export function ErrorRetry({
       <div
         className={`
           ${classes.icon}
-          text-gray-500
+          text-gray-400
           mb-4
         `}
       >

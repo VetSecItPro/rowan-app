@@ -67,6 +67,7 @@ export interface MessagesModalsReturn {
 // HOOK
 // =============================================
 
+/** Manages open/close state for message editing and thread detail modals */
 export function useMessagesModals(): MessagesModalsReturn {
   // Edit message modal
   const [isModalOpen, setIsModalOpen] = useState(false);

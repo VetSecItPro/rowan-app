@@ -87,7 +87,7 @@ export async function persistQueryCache(queryClient: QueryClient): Promise<void>
     };
 
     await set(CACHE_KEY, cache);
-  } catch (error) {
+  } catch (_error) {
     // Persistence failure is non-critical — cache will be rebuilt on next load
   }
 }
@@ -145,7 +145,7 @@ export async function restoreQueryCache(
     }
 
     return true;
-  } catch (error) {
+  } catch (_error) {
     // Restore failure is non-critical — cache will be rebuilt from network
     return false;
   }

@@ -208,7 +208,7 @@ export async function resetMonthlyAlerts(spaceId: string): Promise<void> {
     .eq('space_id', spaceId);
 }
 
-// Export service object
+/** Aggregated service for budget threshold alerts, safe-to-spend calculations, and monthly resets. */
 export const budgetAlertsService = {
   checkBudgetThreshold,
   triggerBudgetAlert,

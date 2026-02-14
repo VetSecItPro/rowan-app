@@ -24,6 +24,7 @@ const COLOR_THEMES = {
   amber: 'bg-amber-500',
 };
 
+/** Displays a compact indicator showing active space member count and avatars. */
 export function SpaceMembersIndicator() {
   const { currentSpace, user } = useAuth();
   const [members, setMembers] = useState<SpaceMember[]>([]);

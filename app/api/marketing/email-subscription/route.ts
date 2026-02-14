@@ -27,6 +27,7 @@ async function resolveRequestUser(req: NextRequest) {
   return user;
 }
 
+/** Updates the user's marketing email subscription preference */
 export async function POST(req: NextRequest) {
   try {
     const ip = extractIP(req.headers);

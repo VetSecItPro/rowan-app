@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+/** Renders a full-page loading state during authentication checks. */
 export function AuthLoadingState() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">
@@ -117,6 +118,7 @@ export function DashboardSkeleton() {
   );
 }
 
+/** Renders a loading state while space data is being fetched. */
 export function SpacesLoadingState() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0a0f] via-[#0c0c12] to-[#0f0f14]">

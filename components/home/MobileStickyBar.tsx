@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 
+/** Renders a sticky bottom bar with CTA on mobile landing page views. */
 export function MobileStickyBar() {
   const prefersReducedMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);

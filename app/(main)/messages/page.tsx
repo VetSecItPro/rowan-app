@@ -127,7 +127,7 @@ export default function MessagesPage() {
     handleSelectConversation, handleDeleteConversation,
     handleRenameConversationFromSidebar, handleCreateConversation,
     handleSendVoice, handleEditConversationTitle,
-    handleSaveConversationTitle, handleCancelEdit, handleTitleKeyDown,
+    handleSaveConversationTitle, handleCancelEdit: _handleCancelEdit, handleTitleKeyDown,
   } = handlers;
 
   // =============================================
@@ -333,7 +333,7 @@ export default function MessagesPage() {
                       onClick={() => setShowMembersPanel(false)}
                       className="p-1 hover:bg-gray-700 rounded-full"
                     >
-                      <X className="w-4 h-4 text-gray-500" />
+                      <X className="w-4 h-4 text-gray-400" />
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -506,7 +506,7 @@ export default function MessagesPage() {
                     {/* Emoji Picker */}
                     {showEmojiPicker && (
                       <>
-                        <div className="fixed inset-0 z-10" onClick={closeEmojiPicker} />
+                        <div className="fixed inset-0 z-10" onClick={closeEmojiPicker} aria-hidden="true" />
                         <div className="absolute bottom-full mb-2 left-0 bg-gray-800 rounded-2xl shadow-xl p-3 grid grid-cols-6 gap-1 z-20 min-w-[240px] border border-gray-700">
                           {EMOJIS.map((emoji, idx) => (
                             <button
@@ -618,6 +618,7 @@ export default function MessagesPage() {
               <div
                 className="fixed inset-0 bg-black/50 z-40 md:hidden"
                 onClick={() => setShowConversationSidebar(false)}
+                aria-hidden="true"
               />
 
               {/* Drawer - Narrower and more transparent */}

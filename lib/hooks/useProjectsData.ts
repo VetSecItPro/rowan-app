@@ -83,6 +83,7 @@ export interface UseProjectsDataReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Loads and manages household projects data with filtering and search support */
 export function useProjectsData(): UseProjectsDataReturn {
   const { currentSpace, user } = useAuthWithSpaces();
   const searchParams = useSearchParams();

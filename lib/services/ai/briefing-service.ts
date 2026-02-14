@@ -163,4 +163,5 @@ class BriefingService {
   }
 }
 
+/** Singleton instance for generating AI-powered daily briefings for a space. */
 export const briefingService = new BriefingService();

@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 };
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowLeft, Shield, Lock, Eye, Database, AlertTriangle, CheckCircle } from 'lucide-react';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Footer } from '@/components/layout/Footer';

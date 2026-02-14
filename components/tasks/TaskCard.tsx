@@ -75,6 +75,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
         <button
           onClick={handleStatusClick}
           title={getStatusTooltip()}
+          aria-label={`${task.title}: ${getStatusTooltip()}`}
           className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${getCheckboxStyle()}`}
         >
           {task.status === 'completed' && <CheckSquare className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" />}
@@ -116,6 +117,8 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
           <button
             onClick={() => setShowMenu(!showMenu)}
             aria-label="Task options"
+            aria-expanded={showMenu}
+            aria-haspopup="menu"
             className="p-2 text-gray-400 hover:text-gray-300 rounded"
           >
             <MoreVertical className="w-4 h-4" />
@@ -123,8 +126,8 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
 
           {showMenu && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full mt-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden">
+              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} aria-hidden="true" />
+              <div className="absolute right-0 top-full mt-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20 overflow-hidden" role="menu">
                 {onViewDetails && task.type === 'task' && (
                   <button
                     onClick={() => { onViewDetails(task); setShowMenu(false); }}

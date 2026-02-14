@@ -24,6 +24,7 @@ export interface AIAccessState {
   promptUpgrade: () => void;
 }
 
+/** Checks whether the current user's tier grants access to AI features */
 export function useCanAccessAI(): AIAccessState {
   const gate = useFeatureGateSafe('ai');
 

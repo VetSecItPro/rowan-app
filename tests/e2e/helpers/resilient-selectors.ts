@@ -36,7 +36,7 @@ export async function getResilient(
   testId: string,
   options: ResilientOptions = {}
 ): Promise<Locator> {
-  const { role, text, name, timeout = 5000 } = options;
+  const { role, text, name, timeout: _timeout = 5000 } = options;
 
   // Strategy 1: Try testid first (primary)
   try {
@@ -46,7 +46,7 @@ export async function getResilient(
     if (count > 0) {
       return testIdLocator;
     }
-  } catch (error) {
+  } catch (_error) {
     // Continue to fallback
   }
 
@@ -65,7 +65,7 @@ export async function getResilient(
         await createTestIdSuggestion(testId, { role, text, name });
         return roleLocator;
       }
-    } catch (error) {
+    } catch (_error) {
       // Continue to next fallback
     }
   }
@@ -81,7 +81,7 @@ export async function getResilient(
         await createTestIdSuggestion(testId, { role, text, name }, 'high');
         return textLocator;
       }
-    } catch (error) {
+    } catch (_error) {
       // Element not found
     }
   }
@@ -188,9 +188,9 @@ export async function resilientClick(
       const element = await getResilient(page, testId, resilientOptions);
       await element.click();
       return;
-    } catch (error) {
+    } catch (_error) {
       if (attempt === retries) {
-        throw error;
+        throw _error;
       }
       // Wait before retry
       await page.waitForTimeout(1000);
@@ -214,9 +214,9 @@ export async function resilientFill(
       const element = await getResilient(page, testId, resilientOptions);
       await element.fill(value);
       return;
-    } catch (error) {
+    } catch (_error) {
       if (attempt === retries) {
-        throw error;
+        throw _error;
       }
       // Wait before retry
       await page.waitForTimeout(1000);
@@ -249,7 +249,7 @@ export async function elementExists(
     const element = await getResilient(page, testId, options);
     const count = await element.count();
     return count > 0;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 }
@@ -270,7 +270,7 @@ export function createResilientSelector(
       if (count > 0) {
         return testIdLocator;
       }
-    } catch (error) {
+    } catch (_error) {
       // Continue
     }
 
@@ -286,7 +286,7 @@ export function createResilientSelector(
           await createTestIdSuggestion(testId, { customFallback: true });
           return locator;
         }
-      } catch (error) {
+      } catch (_error) {
         // Continue to next strategy
       }
     }

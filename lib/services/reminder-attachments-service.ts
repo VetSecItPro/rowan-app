@@ -38,7 +38,7 @@ export interface ReminderAttachment {
 // ZOD SCHEMAS
 // =============================================
 
-const attachmentTypeSchema = z.enum(['file', 'url', 'link_task', 'link_shopping', 'link_event']);
+const _attachmentTypeSchema = z.enum(['file', 'url', 'link_task', 'link_shopping', 'link_event']);
 
 const createFileAttachmentSchema = z.object({
   reminder_id: z.string().uuid(),
@@ -81,6 +81,7 @@ const ALLOWED_MIME_TYPES = [
 // SERVICE FUNCTIONS
 // =============================================
 
+/** Service for uploading, fetching, and deleting file attachments on reminders. */
 export const reminderAttachmentsService = {
   /**
    * Get all attachments for a reminder

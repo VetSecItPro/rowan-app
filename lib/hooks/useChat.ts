@@ -246,6 +246,7 @@ async function* parseSSEStream(
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Manages AI chat conversations including message streaming, history, and conversation lifecycle */
 export function useChat(spaceId: string) {
   const conversationIdRef = useRef('new');
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -393,15 +394,6 @@ export function useChat(spaceId: string) {
       }
 
       dispatch({ type: 'CONFIRM_ACTION', actionId });
-
-      // Create a placeholder assistant message for the confirmation result
-      const placeholderMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: '',
-        timestamp: new Date().toISOString(),
-        isStreaming: true,
-      };
 
       // We need to add the streaming assistant message manually
       // since CONFIRM_ACTION doesn't add one

@@ -25,12 +25,13 @@ const statusConfig = {
 };
 
 const priorityConfig = {
-  low: { label: 'Low', color: 'text-gray-500', icon: '⬇️' },
+  low: { label: 'Low', color: 'text-gray-400', icon: '⬇️' },
   medium: { label: 'Medium', color: 'text-blue-500', icon: '➡️' },
   high: { label: 'High', color: 'text-orange-500', icon: '⬆️' },
   urgent: { label: 'Urgent', color: 'text-red-500', icon: '🔥' },
 };
 
+/** Renders a project overview card with progress, budget, and member info. */
 export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }: ProjectCardProps) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -125,7 +126,7 @@ export const ProjectCard = memo(({ project, onEdit, onDelete, showLink = false }
             </button>
             {showMenu && (
               <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} aria-hidden="true" />
                 <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20" onClick={(e) => e.stopPropagation()}>
                   {onEdit && (
                     <button

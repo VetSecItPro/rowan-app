@@ -12,6 +12,7 @@ interface SwipeableConversationItemProps {
   children: React.ReactNode;
 }
 
+/** Renders a swipeable conversation list item with delete/archive actions. */
 export function SwipeableConversationItem({
   conversation,
   isSelected: _isSelected,

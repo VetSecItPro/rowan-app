@@ -61,6 +61,7 @@ export interface VoteOnProposalInput {
   comment?: string;
 }
 
+/** Service for event time proposals, voting, approval, and real-time subscription. */
 export const eventProposalsService = {
   /**
    * Create a new event proposal

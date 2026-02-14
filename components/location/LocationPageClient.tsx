@@ -58,6 +58,7 @@ const LocationTimeline = nextDynamic(
 
 type ViewMode = 'map' | 'activity' | 'settings';
 
+/** Renders the main location tracking page with map and member list. */
 export default function LocationPageClient({ spaceId }: { spaceId: string }) {
   const [viewMode, setViewMode] = useState<ViewMode>('map');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -372,13 +373,13 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-white truncate">{place.name}</p>
-                                  <p className="text-xs text-gray-500">
+                                  <p className="text-xs text-gray-400">
                                     {familyLocations.filter(m =>
                                       m.current_place?.id === place.id
                                     ).length} members here
                                   </p>
                                 </div>
-                                <ChevronRight className="w-5 h-5 text-gray-500" />
+                                <ChevronRight className="w-5 h-5 text-gray-400" />
                               </div>
                             </div>
                           ))}
@@ -425,7 +426,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                             </div>
                             <div>
                               <p className="font-medium text-gray-300 text-sm">Family-Only Access</p>
-                              <p className="text-xs text-gray-500">Only your family members can see your location</p>
+                              <p className="text-xs text-gray-400">Only your family members can see your location</p>
                             </div>
                           </div>
 
@@ -435,7 +436,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                             </div>
                             <div>
                               <p className="font-medium text-gray-300 text-sm">Full Control</p>
-                              <p className="text-xs text-gray-500">Adjust precision or turn off sharing anytime</p>
+                              <p className="text-xs text-gray-400">Adjust precision or turn off sharing anytime</p>
                             </div>
                           </div>
 
@@ -445,7 +446,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                             </div>
                             <div>
                               <p className="font-medium text-gray-300 text-sm">Auto-Delete History</p>
-                              <p className="text-xs text-gray-500">Location history is automatically cleaned up</p>
+                              <p className="text-xs text-gray-400">Location history is automatically cleaned up</p>
                             </div>
                           </div>
 
@@ -455,7 +456,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                             </div>
                             <div>
                               <p className="font-medium text-gray-300 text-sm">Encrypted & Secure</p>
-                              <p className="text-xs text-gray-500">All data is encrypted in transit and at rest</p>
+                              <p className="text-xs text-gray-400">All data is encrypted in transit and at rest</p>
                             </div>
                           </div>
                         </div>
@@ -502,7 +503,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
                   <button
                     onClick={() => setShowEmergencyConfirm(false)}
                     disabled={isSendingEmergency}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-300 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>

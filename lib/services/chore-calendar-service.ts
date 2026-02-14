@@ -31,6 +31,7 @@ type ChoreCalendarPreferences = {
   calendar_chore_filter?: string | null;
 };
 
+/** Service for syncing chores to calendar events and managing chore-calendar preferences. */
 export const choreCalendarService = {
   /**
    * Sync a chore to calendar as events

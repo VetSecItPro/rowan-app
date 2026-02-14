@@ -77,6 +77,7 @@ export interface UseGoalsModalsReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Manages open/close state for goal creation, editing, and milestone modals */
 export function useGoalsModals(): UseGoalsModalsReturn {
   // ─── Goal modal state ───────────────────────────────────────────────────────
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);

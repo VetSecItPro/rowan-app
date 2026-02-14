@@ -12,6 +12,7 @@ interface ChoreCardProps {
   onDelete: (choreId: string) => void;
 }
 
+/** Renders a household chore card with assignee, status toggle, and actions. */
 export const ChoreCard = memo(function ChoreCard({ chore, onStatusChange, onEdit, onDelete }: ChoreCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 

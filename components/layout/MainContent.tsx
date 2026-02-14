@@ -7,6 +7,7 @@
 
 import { ReactNode } from 'react';
 
+/** Wraps the main content area with appropriate padding and layout constraints. */
 export function MainContent({ children }: { children: ReactNode }) {
   return (
     <main

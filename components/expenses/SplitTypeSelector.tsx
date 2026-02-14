@@ -49,6 +49,7 @@ const splitTypeOptions: SplitTypeOption[] = [
   },
 ];
 
+/** Provides split type options (equal, percentage, custom) for expense sharing. */
 export function SplitTypeSelector({
   selectedType,
   onSelect,

@@ -39,6 +39,7 @@ interface NotificationCategory {
   enabled: boolean;
 }
 
+/** Renders push notification preference controls for each notification type. */
 export function PushNotificationSettings({ spaceId, className }: PushNotificationSettingsProps) {
   const {
     isAvailable,

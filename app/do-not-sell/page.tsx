@@ -135,7 +135,7 @@ export default function DoNotSellPage() {
           <p className="text-xl text-gray-400 mb-2">
             California Consumer Privacy Act (CCPA) Rights
           </p>
-          <p className="text-lg text-gray-500">
+          <p className="text-lg text-gray-400">
             Exercise your right to opt-out of personal information sales
           </p>
         </div>

@@ -19,6 +19,7 @@ export const maxDuration = 60;
 // This endpoint should be called by a cron job (e.g., Vercel Cron, or external service)
 // Authorization should be via a secret token
 
+/** Processes queued notification emails for delivery */
 export async function GET(request: NextRequest) {
   try {
     // SECURITY: Fail-closed if CRON_SECRET is not configured

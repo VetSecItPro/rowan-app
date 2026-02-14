@@ -128,6 +128,7 @@ interface EmptyStateProps {
   userName?: string | null;
 }
 
+/** Displays the empty state with suggestions when no chat messages exist. */
 export default function EmptyState({ onSend, userName }: EmptyStateProps) {
   const timeOfDay = useMemo(() => getTimeOfDay(), []);
 

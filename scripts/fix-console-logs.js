@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars, no-console */
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
 /**
  * Automated Console.log Replacement Script
  *

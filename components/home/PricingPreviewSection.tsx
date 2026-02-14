@@ -58,6 +58,7 @@ const containerVariants = {
   },
 };
 
+/** Renders a pricing tier preview section on the landing page. */
 export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionProps) {
   const prefersReducedMotion = useReducedMotion();
 

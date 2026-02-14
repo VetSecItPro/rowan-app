@@ -5,6 +5,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+/** Deletes the authenticated user's own feedback submission */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

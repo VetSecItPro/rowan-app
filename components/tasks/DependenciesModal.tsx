@@ -32,6 +32,7 @@ interface TaskDependency {
   created_at?: string;
 }
 
+/** Displays a modal for managing prerequisite dependencies between tasks. */
 export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: DependenciesModalProps) {
   const [dependencies, setDependencies] = useState<TaskDependency[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,7 +141,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
     >
       <div className="space-y-6">
         {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading dependencies...</div>
+            <div className="text-center py-8 text-gray-400">Loading dependencies...</div>
           ) : (
             <>
               {/* Add Dependency Section */}
@@ -235,7 +236,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                           <p className="font-medium text-white">
                             {(dep.dependent_task as Task | undefined)?.title || 'Unknown Task'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             This task blocks the dependent task
                           </p>
                         </div>
@@ -267,7 +268,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
                           <p className="font-medium text-white">
                             {(dep.dependent_task as Task | undefined)?.title || 'Unknown Task'}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             Related to this task
                           </p>
                         </div>
@@ -284,7 +285,7 @@ export function DependenciesModal({ isOpen, onClose, taskId, spaceId }: Dependen
               )}
 
               {dependencies.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-400">
                   No dependencies yet. Add dependencies to organize task relationships.
                 </div>
               )}

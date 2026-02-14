@@ -47,6 +47,7 @@ const ACTIONS: Record<'morning' | 'afternoon' | 'evening', QuickAction[]> = {
   ],
 };
 
+/** Renders a grid of quick action buttons for common AI chat commands. */
 export default function QuickActions({ onSend }: QuickActionsProps) {
   const actions = useMemo(() => ACTIONS[getTimeOfDay()], []);
 

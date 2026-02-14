@@ -19,6 +19,7 @@ interface ThreadViewProps {
   onClose: () => void;
 }
 
+/** Displays a threaded reply view for a specific message. */
 export function ThreadView({
   parentMessage,
   conversationId,
@@ -198,7 +199,7 @@ export function ThreadView({
           {!loading && replies.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-400 text-sm">No replies yet</p>
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-gray-400 text-xs mt-1">
                 Be the first to reply
               </p>
             </div>
@@ -260,7 +261,7 @@ export function ThreadView({
               )}
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-400 mt-2">
             Press Enter to send, Shift+Enter for new line
           </p>
         </form>

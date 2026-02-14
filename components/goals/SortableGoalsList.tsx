@@ -35,6 +35,7 @@ interface SortableGoalsListProps {
   getUsersViewingGoal?: (goalId: string) => PresenceUser[];
 }
 
+/** Renders a drag-and-drop sortable list of goal cards. */
 export function SortableGoalsList({
   goals,
   onReorder,

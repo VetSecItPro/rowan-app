@@ -17,6 +17,7 @@ interface GenerateListModalProps {
   onSuccess?: (listId: string) => void;
 }
 
+/** Renders a modal for generating a shopping list from selected meal plans. */
 export function GenerateListModal({
   isOpen,
   onClose,
@@ -200,7 +201,7 @@ export function GenerateListModal({
                 <p className="text-gray-400 font-medium">
                   No meals with recipes found
                 </p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                   Plan some meals with recipes first
                 </p>
               </div>

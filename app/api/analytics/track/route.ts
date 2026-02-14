@@ -113,6 +113,7 @@ function parseUserAgent(userAgent: string | null): {
   return { deviceType, browser, os };
 }
 
+/** Records feature usage analytics events */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting - slightly higher limit for analytics

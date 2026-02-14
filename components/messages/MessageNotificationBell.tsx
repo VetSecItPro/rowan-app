@@ -11,6 +11,7 @@ interface MessageNotificationBellProps {
   onBellClick?: () => void;
 }
 
+/** Displays a notification bell icon with unread message count badge. */
 export function MessageNotificationBell({
   userId,
   spaceId,

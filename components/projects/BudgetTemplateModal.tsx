@@ -18,6 +18,7 @@ interface BudgetTemplateModalProps {
   templateCategories: Record<string, BudgetTemplateCategory[]>;
 }
 
+/** Renders a modal for selecting and applying budget templates to a project. */
 export function BudgetTemplateModal({
   isOpen,
   onClose,
@@ -116,7 +117,7 @@ export function BudgetTemplateModal({
                     Monthly Income <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                     <input
                       type="number"
                       inputMode="numeric"
@@ -146,7 +147,7 @@ export function BudgetTemplateModal({
                       {householdFilter === 'all' ? 'All Templates' : householdLabels[householdFilter]}
                     </button>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </div>
 
                     {/* Custom Dropdown Menu */}
@@ -155,6 +156,7 @@ export function BudgetTemplateModal({
                         <div
                           className="fixed inset-0 z-40"
                           onClick={() => setIsDropdownOpen(false)}
+                          aria-hidden="true"
                         />
                         <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
                           <div className="py-2">

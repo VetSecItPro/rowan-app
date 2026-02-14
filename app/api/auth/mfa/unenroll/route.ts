@@ -16,6 +16,7 @@ const UnenrollSchema = z.object({
   factorId: z.string(),
 });
 
+/** Removes an MFA factor from the user's account */
 export async function DELETE(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth
@@ -84,6 +85,7 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
+/** Removes an MFA factor (alias for DELETE, kept for compatibility) */
 export async function POST(request: NextRequest) {
   // Also support POST for compatibility
   return DELETE(request);

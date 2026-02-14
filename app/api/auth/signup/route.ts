@@ -13,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * the database trigger: provision_new_user()
  */
 
+/** Creates a new user account with email verification */
 export async function POST(request: NextRequest) {
   // CRITICAL: Prevent any execution during build time
   if (!request ||

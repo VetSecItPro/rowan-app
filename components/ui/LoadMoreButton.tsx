@@ -8,6 +8,7 @@ interface LoadMoreButtonProps {
   onClick: () => void;
 }
 
+/** Renders a button for loading additional paginated content. */
 export function LoadMoreButton({ remaining, onClick }: LoadMoreButtonProps) {
   return (
     <motion.button

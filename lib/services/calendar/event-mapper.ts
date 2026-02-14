@@ -12,6 +12,7 @@ import type {
 // ROWAN → GOOGLE CALENDAR
 // =============================================================================
 
+/** Converts a Rowan event snapshot to Google Calendar event format. */
 export function mapRowanToGoogle(event: RowanEventSnapshot): Partial<GoogleCalendarEvent> {
   const startDateTime = event.start_time || '';
   const endDateTime = event.end_time || null;
@@ -42,6 +43,7 @@ export function mapRowanToGoogle(event: RowanEventSnapshot): Partial<GoogleCalen
 // GOOGLE CALENDAR → ROWAN
 // =============================================================================
 
+/** Converts a Google Calendar event to Rowan database column format. */
 export function mapGoogleToRowan(
   event: GoogleCalendarEvent,
   spaceId: string
@@ -74,6 +76,7 @@ export function mapGoogleToRowan(
 // ROWAN → ICALENDAR (CalDAV)
 // =============================================================================
 
+/** Converts a Rowan event snapshot to iCalendar (VCALENDAR/VEVENT) string format. */
 export function mapRowanToICalendar(event: RowanEventSnapshot): string {
   const uid = `${event.id}@rowan.app`;
   const dtstamp = formatICalDateTime(new Date().toISOString());
@@ -130,6 +133,7 @@ export function mapRowanToICalendar(event: RowanEventSnapshot): string {
 // ICALENDAR → ROWAN
 // =============================================================================
 
+/** Converts a parsed iCalendar event to Rowan event snapshot format. */
 export function mapICalendarToRowan(
   event: ParsedICalEvent,
   spaceId: string
@@ -158,6 +162,7 @@ export function mapICalendarToRowan(
 // EXTERNAL EVENT SNAPSHOT CREATION
 // =============================================================================
 
+/** Creates a normalized external event snapshot from a Google or iCalendar event. */
 export function createExternalSnapshot(
   event: GoogleCalendarEvent | ParsedICalEvent,
   _source: 'google' | 'apple' | 'cozi'
@@ -447,6 +452,7 @@ function escapeICalText(text: string): string {
 // EXPORTS
 // =============================================================================
 
+/** Aggregated event format mapper for bidirectional conversion between Rowan and external calendars. */
 export const eventMapper = {
   // Rowan → External
   mapRowanToGoogle,

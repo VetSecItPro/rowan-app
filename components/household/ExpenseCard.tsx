@@ -11,6 +11,7 @@ interface ExpenseCardProps {
   onDelete: (expenseId: string) => void;
 }
 
+/** Renders a household expense card with amount, payer, and split details. */
 export const ExpenseCard = memo(function ExpenseCard({ expense, onEdit, onDelete }: ExpenseCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 

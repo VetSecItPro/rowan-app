@@ -18,6 +18,7 @@ const DeleteRequestSchema = z.object({
   fileIds: z.array(z.string()).min(1),
 });
 
+/** Deletes files from storage and recalculates usage */
 export async function DELETE(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth

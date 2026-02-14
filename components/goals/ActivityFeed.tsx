@@ -61,11 +61,12 @@ const activityColors = {
   check_in_updated: 'text-indigo-500',
   goal_shared: 'text-orange-500',
   goal_collaborated: 'text-orange-500',
-  goal_commented: 'text-gray-500',
+  goal_commented: 'text-gray-400',
 };
 
 const emojiReactions = ['👍', '❤️', '🎉', '🔥', '💪', '👏', '🚀', '✨'];
 
+/** Displays a chronological feed of goal-related activities and check-ins. */
 export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedProps) {
   const [activities, setActivities] = useState<GoalActivity[]>([]);
   const [comments, setComments] = useState<Record<string, GoalComment[]>>({});
@@ -211,7 +212,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
 
   const getActivityIcon = (activityType: string) => {
     const IconComponent = activityIcons[activityType as keyof typeof activityIcons] || MessageCircle;
-    const colorClass = activityColors[activityType as keyof typeof activityColors] || 'text-gray-500';
+    const colorClass = activityColors[activityType as keyof typeof activityColors] || 'text-gray-400';
     return <IconComponent className={`h-4 w-4 ${colorClass}`} />;
   };
 

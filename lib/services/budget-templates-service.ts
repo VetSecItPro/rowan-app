@@ -310,7 +310,7 @@ export async function getCategoryBudgetStats(spaceId: string): Promise<{
   };
 }
 
-// Export service object
+/** Aggregated service for budget template management and category operations. */
 export const budgetTemplatesService = {
   // Templates
   getBudgetTemplates,

@@ -58,7 +58,7 @@ export interface ApplyPenaltyResult {
   error?: string;
 }
 
-// Default settings
+/** Default configuration for late chore penalty point deductions. */
 export const DEFAULT_PENALTY_SETTINGS: LatePenaltySettings = {
   enabled: false,
   default_penalty_points: 5,
@@ -676,7 +676,6 @@ export async function getOverdueChores(
 
     if (error) throw error;
 
-    const now = new Date();
     const overdueChores: Array<{ choreId: string; userId: string; daysLate: number; dueDate: string }> = [];
 
     for (const chore of chores || []) {

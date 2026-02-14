@@ -66,6 +66,7 @@ export type CreateActivityInput = z.infer<typeof CreateActivitySchema>;
 // SERVICE
 // =============================================
 
+/** Service for logging and retrieving activity history for reminders. */
 export const reminderActivityService = {
   /**
    * Log an activity for a reminder

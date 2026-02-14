@@ -31,6 +31,7 @@ interface ProjectLineItemsProps {
   onRefresh: () => void;
 }
 
+/** Displays individual line-item expenses within a budget project. */
 export function ProjectLineItems({
   lineItems,
   costBreakdown,

@@ -157,7 +157,7 @@ const SettingRow = memo(function SettingRow({
     <div className="flex items-center justify-between gap-4 py-2">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {Icon && (
-          <Icon className="w-5 h-5 text-gray-500 flex-shrink-0" />
+          <Icon className="w-5 h-5 text-gray-400 flex-shrink-0" />
         )}
         <div className="min-w-0">
           <p className="text-sm font-medium text-white">{label}</p>
@@ -242,6 +242,7 @@ const TimezoneSelector = memo(function TimezoneSelector({
 });
 
 
+/** Renders notification preference controls for all notification categories. */
 export const NotificationSettings = memo(function NotificationSettings() {
   const { user, currentSpace } = useAuthWithSpaces();
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);

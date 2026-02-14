@@ -25,6 +25,7 @@ interface AnalyticsData {
   category_breakdown: Record<string, number>;
 }
 
+/** Displays analytics on nudge engagement and effectiveness. */
 export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
   const { user, currentSpace } = useAuth();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
@@ -89,7 +90,7 @@ export function NudgeAnalytics({ isOpen, onClose }: NudgeAnalyticsProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">

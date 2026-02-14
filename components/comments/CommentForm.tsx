@@ -22,6 +22,7 @@ interface SpaceMember {
   };
 }
 
+/** Renders a form for composing and submitting new comments. */
 export default function CommentForm({
   onSubmit,
   onCancel,

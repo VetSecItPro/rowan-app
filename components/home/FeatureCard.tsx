@@ -12,6 +12,7 @@ interface FeatureCardProps {
   href: string;
 }
 
+/** Renders a single feature highlight card with icon, title, and description. */
 export function FeatureCard({ title, description, icon: Icon, gradient, href }: FeatureCardProps) {
   return (
     <Link href={href} className="block group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-xl">

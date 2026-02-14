@@ -19,6 +19,7 @@ interface EnhancedMemberManagementProps {
   onInviteClick: () => void;
 }
 
+/** Provides advanced member management with roles, permissions, and invitations. */
 export function EnhancedMemberManagement({
   spaceId,
   currentUserId,

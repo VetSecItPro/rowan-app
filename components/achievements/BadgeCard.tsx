@@ -62,6 +62,7 @@ const rarityColors = {
 
 const getRarityColors = (rarity: BadgeRarity) => rarityColors[rarity] || rarityColors.common;
 
+/** Renders an individual achievement badge with its icon, title, and unlock status. */
 export function BadgeCard({
   badge,
   userAchievement,

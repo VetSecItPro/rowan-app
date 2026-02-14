@@ -11,6 +11,7 @@ interface PageErrorBoundaryProps {
   pageDescription?: string;
 }
 
+/** Wraps a page in an error boundary with page-level error fallback UI. */
 export default function PageErrorBoundary({
   children,
   pageName = 'Page',

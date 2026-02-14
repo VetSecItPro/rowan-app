@@ -37,6 +37,7 @@ const categoryConfig = {
   household: { label: 'Household', icon: '🏠', color: 'bg-amber-500', textColor: 'text-amber-300', bgColor: 'bg-amber-900/30' },
 };
 
+/** Renders a reminder card with due date, status, and action controls. */
 export const ReminderCard = memo(function ReminderCard({ reminder, onStatusChange, onEdit, onDelete, onMarkBillPaid, selectionMode, selected, onSelectionChange }: ReminderCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
@@ -185,6 +186,7 @@ export const ReminderCard = memo(function ReminderCard({ reminder, onStatusChang
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
+                aria-hidden="true"
               />
               <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                 {/* Mark Bill as Paid - Only show for bill-linked reminders */}

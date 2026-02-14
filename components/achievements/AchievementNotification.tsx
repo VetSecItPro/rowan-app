@@ -13,6 +13,7 @@ interface AchievementNotificationProps {
   duration?: number; // Auto-close duration in ms
 }
 
+/** Displays a toast notification when a user earns a new achievement. */
 export function AchievementNotification({
   achievement,
   isVisible,

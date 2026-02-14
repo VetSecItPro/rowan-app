@@ -34,6 +34,7 @@ interface ReceiptLibraryProps {
 type ViewMode = 'grid' | 'list';
 type SortOption = 'date' | 'amount' | 'merchant' | 'confidence';
 
+/** Displays a searchable library of uploaded receipt images. */
 export function ReceiptLibrary({
   onCreateExpense,
   className

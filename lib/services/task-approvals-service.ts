@@ -14,6 +14,7 @@ type TaskApproval = {
   task?: Record<string, unknown>;
 };
 
+/** Service for task approval workflows (request, approve, reject, review) via the task_approvals table. */
 export const taskApprovalsService = {
   async requestApproval(taskId: string, approverId: string, requestedBy: string): Promise<TaskApproval> {
     const supabase = createClient();

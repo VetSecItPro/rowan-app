@@ -17,6 +17,7 @@ interface EditSeriesModalProps {
 
 export type EditAction = 'this' | 'future' | 'all' | 'delete-this' | 'delete-future' | 'delete-all';
 
+/** Renders a modal for editing a recurring event series with scope options. */
 export function EditSeriesModal({
   isOpen,
   onClose,

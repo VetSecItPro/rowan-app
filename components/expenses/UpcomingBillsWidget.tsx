@@ -12,6 +12,7 @@ interface UpcomingBillsWidgetProps {
   showOverdue?: boolean;
 }
 
+/** Displays upcoming bill payments with due dates and amounts. */
 export default function UpcomingBillsWidget({
   spaceId,
   daysAhead = 30,

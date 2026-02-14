@@ -44,6 +44,7 @@ function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number
   return debounced;
 }
 
+/** Subscribes to real-time reminder updates for a space and manages reminder state */
 export function useRemindersRealtime({
   spaceId,
   filters,
@@ -54,7 +55,7 @@ export function useRemindersRealtime({
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [timeoutReached, setTimeoutReached] = useState(false);
+  const [_timeoutReached, setTimeoutReached] = useState(false);
 
   // Performance optimizations
   const updateQueueRef = useRef<{

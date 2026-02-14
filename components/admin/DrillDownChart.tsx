@@ -33,6 +33,7 @@ const CHART_COLORS = {
   text: '#9ca3af',
 };
 
+/** Renders an interactive chart that supports drill-down into detailed data segments. */
 export const DrillDownChart = memo(function DrillDownChart({
   data,
   previousData,

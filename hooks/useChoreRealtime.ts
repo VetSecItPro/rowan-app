@@ -51,6 +51,7 @@ function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number
   return debounced;
 }
 
+/** Subscribes to real-time chore updates for a space and manages chore state */
 export function useChoreRealtime({
   spaceId,
   filters,
@@ -301,7 +302,7 @@ export function useChoreRealtime({
       debouncedBatchUpdateRef.current?.cancel();
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId]); // Only spaceId triggers teardown/rebuild
+  }, [spaceId, debouncedBatchUpdate]); // spaceId triggers teardown/rebuild; debouncedBatchUpdate is stable (ref-initialized once)
 
   function refreshChores() {
     setLoading(true);
@@ -317,7 +318,7 @@ export function useChoreRealtime({
   };
 }
 
-// Hook for chore completion history real-time updates
+/** Subscribes to real-time chore completion history updates for a specific chore */
 export function useChoreCompletionRealtime(choreId: string) {
   const [completions, setCompletions] = useState<ChoreCompletion[]>([]);
   const [loading, setLoading] = useState(true);

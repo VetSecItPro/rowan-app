@@ -38,6 +38,7 @@ interface ProjectDashboardProps {
   onRefresh: () => void;
 }
 
+/** Renders a project-specific budget dashboard with expenses and progress. */
 export function ProjectDashboard({
   project,
   lineItems,

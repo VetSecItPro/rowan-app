@@ -9,6 +9,7 @@ interface TooltipProps {
   delay?: number;
 }
 
+/** Renders a tooltip popup on hover with configurable content and position. */
 export function Tooltip({ content, children, position = 'top', delay = 0 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState(position);

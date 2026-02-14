@@ -6,6 +6,7 @@ import { Plus, List } from 'lucide-react';
 import { FeedbackModal } from './FeedbackModal';
 import { useAuth } from '@/lib/contexts/auth-context';
 
+/** Renders a floating button that opens the feedback submission modal. */
 export function FeedbackButton() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);

@@ -25,6 +25,7 @@ interface VoiceInputButtonProps {
   voiceEnabled?: boolean;
 }
 
+/** Renders a microphone button for voice-to-text input in AI chat. */
 export default function VoiceInputButton({ onTranscript, disabled, voiceEnabled = true }: VoiceInputButtonProps) {
   const listenStartRef = useRef<number>(0);
   const handleVoiceResult = useCallback((text: string) => {

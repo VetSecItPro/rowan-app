@@ -14,6 +14,7 @@ interface CalendarPreferences {
   calendar_task_filter?: string;
 }
 
+/** Service for syncing tasks to calendar events and managing task-calendar preferences. */
 export const taskCalendarService = {
   async syncTaskToCalendar(taskId: string): Promise<TaskCalendarEvent | null> {
     const supabase = createClient();

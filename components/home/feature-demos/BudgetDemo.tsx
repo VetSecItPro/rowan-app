@@ -29,7 +29,7 @@ function MonthlyOverviewStep() {
         </div>
         <div>
           <h4 className="text-sm font-semibold text-white">February Budget</h4>
-          <p className="text-[10px] text-gray-500">18 days remaining</p>
+          <p className="text-[10px] text-gray-400">18 days remaining</p>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ function MonthlyOverviewStep() {
             transition={{ delay: 0.15 + i * 0.1, duration: 0.3 }}
             className="p-2.5 rounded-lg bg-gray-800/60 border border-gray-700/50 text-center"
           >
-            <p className="text-[10px] text-gray-500 mb-0.5">{stat.label}</p>
+            <p className="text-[10px] text-gray-400 mb-0.5">{stat.label}</p>
             <p className={`text-sm font-bold ${stat.color}`}>{stat.value}</p>
           </motion.div>
         ))}
@@ -57,7 +57,7 @@ function MonthlyOverviewStep() {
       <div>
         <div className="flex justify-between items-center mb-1.5">
           <span className="text-xs text-gray-400">{percent}% used</span>
-          <span className="text-xs text-gray-500">$75/day remaining</span>
+          <span className="text-xs text-gray-400">$75/day remaining</span>
         </div>
         <div className="h-2.5 bg-gray-700/50 rounded-full overflow-hidden">
           <motion.div
@@ -118,7 +118,7 @@ function TrackExpensesStep() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-gray-200">{expense.name}</p>
-            <p className="text-[10px] text-gray-500">{expense.time}</p>
+            <p className="text-[10px] text-gray-400">{expense.time}</p>
           </div>
           <span className={`text-sm font-bold ${i === 0 ? 'text-amber-400' : 'text-gray-400'}`}>
             {expense.amount}
@@ -132,7 +132,7 @@ function TrackExpensesStep() {
         transition={{ delay: 0.7, duration: 0.3 }}
         className="flex justify-between items-center pt-2 border-t border-gray-800"
       >
-        <span className="text-xs text-gray-500">Total spent today</span>
+        <span className="text-xs text-gray-400">Total spent today</span>
         <span className="text-sm font-bold text-white">$85.00</span>
       </motion.div>
     </div>
@@ -288,6 +288,7 @@ const steps: DemoStep[] = [
   { label: 'Budget alerts', content: <BudgetAlertsStep /> },
 ];
 
+/** Renders an animated budget feature demonstration for the landing page. */
 export function BudgetDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

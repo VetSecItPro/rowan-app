@@ -18,6 +18,7 @@ export const maxDuration = 60;
 
 const RETENTION_DAYS = 90;
 
+/** Deletes AI conversations and usage data older than the retention period */
 export async function GET(req: NextRequest) {
   // Verify cron secret
   const authHeader = req.headers.get('authorization');

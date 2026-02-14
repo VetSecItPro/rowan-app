@@ -7,34 +7,41 @@
 
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useCanAccessAI } from '@/lib/hooks/useCanAccessAI';
 
 export type DashboardMode = 'traditional' | 'ai';
 
 const STORAGE_KEY = 'rowan_dashboard_mode';
 
+/** Manages the dashboard display mode (standard vs AI-enhanced) with localStorage persistence */
 export function useDashboardMode() {
-  const { canAccess: hasAIAccess } = useCanAccessAI();
-  const [mode, setMode] = useState<DashboardMode>('traditional');
-  const [mounted, setMounted] = useState(false);
+  const { canAccess: hasAIAccess, isLoading: aiLoading } = useCanAccessAI();
 
-  // Hydrate from localStorage after mount
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'ai' && hasAIAccess) {
-      setMode('ai');
+  // Hydrate from localStorage via lazy initializer (avoids setState in effect)
+  const [mode, setMode] = useState<DashboardMode>(() => {
+    if (typeof window === 'undefined') return 'traditional';
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored === 'ai' ? 'ai' : 'traditional';
+    } catch {
+      return 'traditional';
     }
-    setMounted(true);
-  }, [hasAIAccess]);
+  });
+  const [mounted] = useState(() => typeof window !== 'undefined');
 
-  // If access is revoked (e.g. downgrade), revert to traditional
-  useEffect(() => {
-    if (mounted && !hasAIAccess && mode === 'ai') {
-      setMode('traditional');
+  // If access is revoked (e.g. downgrade), revert to traditional.
+  // Uses React "adjusting state based on props" pattern during render
+  // (https://react.dev/learn/you-might-not-need-an-effect).
+  // Only check after AI access state has loaded to avoid premature revert.
+  if (mounted && !aiLoading && !hasAIAccess && mode === 'ai') {
+    setMode('traditional');
+    try {
       localStorage.setItem(STORAGE_KEY, 'traditional');
+    } catch {
+      // localStorage may be unavailable
     }
-  }, [mounted, hasAIAccess, mode]);
+  }
 
   const toggleMode = useCallback(() => {
     setMode((prev) => {

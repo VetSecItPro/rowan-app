@@ -313,7 +313,7 @@ export async function scanReceipt(imageFile: File): Promise<OCRResult> {
   return await processReceiptOCR(imageFile);
 }
 
-// Export service object
+/** Service for receipt OCR scanning and text extraction. */
 export const ocrService = {
   scanReceipt,
   processReceiptOCR,

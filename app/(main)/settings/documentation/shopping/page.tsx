@@ -310,7 +310,7 @@ export default function ShoppingDocumentation() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Rowan's Shopping Lists feature helps you organize household shopping with powerful collaboration tools, smart categorization, and seamless integration with your calendar and tasks.
+                Rowan&apos;s Shopping Lists feature helps you organize household shopping with powerful collaboration tools, smart categorization, and seamless integration with your calendar and tasks.
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Key Features</h3>
               <ul className="space-y-2 text-gray-300">
@@ -333,10 +333,10 @@ export default function ShoppingDocumentation() {
             <div className="prose prose-invert max-w-none">
               <ol className="space-y-4 text-gray-300">
                 <li>
-                  <strong>Navigate to Shopping Lists:</strong> Click "Shopping Lists" in the main navigation
+                  <strong>Navigate to Shopping Lists:</strong> Click &quot;Shopping Lists&quot; in the main navigation
                 </li>
                 <li>
-                  <strong>Click "Create Shopping List":</strong> You'll see two options:
+                  <strong>Click &quot;Create Shopping List&quot;:</strong> You&apos;ll see two options:
                   <ul className="mt-2 space-y-1 ml-4">
                     <li><strong>Start with Empty List:</strong> Create a new list from scratch</li>
                     <li><strong>Choose a Template:</strong> Use a saved template as your starting point</li>
@@ -345,23 +345,23 @@ export default function ShoppingDocumentation() {
                 <li>
                   <strong>Fill in Details:</strong>
                   <ul className="mt-2 space-y-1 ml-4">
-                    <li><strong>Title:</strong> Give your list a descriptive name (e.g., "Weekly Groceries", "Biryan Dinner")</li>
+                    <li><strong>Title:</strong> Give your list a descriptive name (e.g., &quot;Weekly Groceries&quot;, &quot;Biryan Dinner&quot;)</li>
                     <li><strong>Description (optional):</strong> Add notes about the shopping trip</li>
-                    <li><strong>Store (optional):</strong> Specify where you'll shop</li>
+                    <li><strong>Store (optional):</strong> Specify where you&apos;ll shop</li>
                     <li><strong>Budget (optional):</strong> Set a spending limit</li>
                   </ul>
                 </li>
                 <li>
-                  <strong>Add Items:</strong> Click "Add Item" and enter:
+                  <strong>Add Items:</strong> Click &quot;Add Item&quot; and enter:
                   <ul className="mt-2 space-y-1 ml-4">
-                    <li>Item name (e.g., "milk", "tomatoes", "chicken breast")</li>
+                    <li>Item name (e.g., &quot;milk&quot;, &quot;tomatoes&quot;, &quot;chicken breast&quot;)</li>
                     <li>Quantity (defaults to 1)</li>
                     <li>Estimated price (optional)</li>
                     <li>Category is auto-detected but can be changed</li>
                   </ul>
                 </li>
                 <li>
-                  <strong>Save Your List:</strong> Click "Create List" and you're done!
+                  <strong>Save Your List:</strong> Click &quot;Create List&quot; and you&apos;re done!
                 </li>
               </ol>
             </div>
@@ -399,7 +399,7 @@ export default function ShoppingDocumentation() {
                 </div>
               </div>
               <p className="text-gray-300 mt-4">
-                <strong>Auto-detection covers 100+ common items</strong> including milk, bread, chicken, tomatoes, and more. If the category isn't detected correctly, you can manually change it when adding or editing items.
+                <strong>Auto-detection covers 100+ common items</strong> including milk, bread, chicken, tomatoes, and more. If the category isn&apos;t detected correctly, you can manually change it when adding or editing items.
               </p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-medium mt-6">
@@ -414,16 +414,16 @@ export default function ShoppingDocumentation() {
                 You can add items when creating a new list or edit existing lists to add more items:
               </p>
               <ol className="space-y-3 text-gray-300">
-                <li><strong>Click "Add Item"</strong> in the item section</li>
-                <li><strong>Enter the item name</strong> - as you type common items like "milk" or "chicken", the category is automatically detected</li>
+                <li><strong>Click &quot;Add Item&quot;</strong> in the item section</li>
+                <li><strong>Enter the item name</strong> - as you type common items like &quot;milk&quot; or &quot;chicken&quot;, the category is automatically detected</li>
                 <li><strong>Set quantity</strong> - specify how many you need (e.g., 2 liters, 3 pounds)</li>
                 <li><strong>Add estimated price (optional)</strong> - helps track against your budget</li>
                 <li><strong>Review the auto-detected category</strong> - change if needed</li>
-                <li><strong>Click "Add"</strong> to add the item to your list</li>
+                <li><strong>Click &quot;Add&quot;</strong> to add the item to your list</li>
               </ol>
               <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-4 mt-4">
                 <p className="text-emerald-300 text-sm">
-                  <strong>💡 Pro Tip:</strong> When adding items, be specific (e.g., "2% milk" vs "milk") to make shopping easier for everyone in your household.
+                  <strong>💡 Pro Tip:</strong> When adding items, be specific (e.g., &quot;2% milk&quot; vs &quot;milk&quot;) to make shopping easier for everyone in your household.
                 </p>
               </div>
             </div>
@@ -449,7 +449,7 @@ export default function ShoppingDocumentation() {
                 <li><strong>🍿 Snacks:</strong> Chips, cookies, candy, crackers</li>
                 <li><strong>🧴 Personal Care:</strong> Soap, shampoo, toothpaste</li>
                 <li><strong>🧹 Household:</strong> Cleaning supplies, paper products</li>
-                <li><strong>📦 Other:</strong> Anything that doesn't fit above categories</li>
+                <li><strong>📦 Other:</strong> Anything that doesn&apos;t fit above categories</li>
               </ul>
               <p className="text-gray-300 mt-4">
                 When viewing a list, items are displayed grouped by category with section headers, making it easy to navigate the store efficiently.
@@ -469,8 +469,8 @@ export default function ShoppingDocumentation() {
               <ol className="space-y-3 text-gray-300">
                 <li><strong>Set a Budget:</strong> When creating or editing a list, enter your budget amount</li>
                 <li><strong>Add Estimated Prices:</strong> As you add items, include estimated prices</li>
-                <li><strong>Monitor Your Total:</strong> The list card shows "💰 $X.XX / $XX.XX" (estimated vs budget)</li>
-                <li><strong>Get Visual Feedback:</strong> The budget display changes color if you're approaching or exceeding your limit</li>
+                <li><strong>Monitor Your Total:</strong> The list card shows &quot;💰 $X.XX / $XX.XX&quot; (estimated vs budget)</li>
+                <li><strong>Get Visual Feedback:</strong> The budget display changes color if you&apos;re approaching or exceeding your limit</li>
               </ol>
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
@@ -492,8 +492,8 @@ export default function ShoppingDocumentation() {
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Individual Items:</strong> Click the checkbox next to any item to mark it as purchased (checked items show with a green checkmark and strikethrough)</li>
                 <li><strong>Complete List:</strong> Click the checkbox at the top of the list card to mark all items as complete at once</li>
-                <li><strong>Progress Bar:</strong> A visual progress bar shows how many items you've checked off</li>
-                <li><strong>Item Count:</strong> The card displays "X of Y items" checked</li>
+                <li><strong>Progress Bar:</strong> A visual progress bar shows how many items you&apos;ve checked off</li>
+                <li><strong>Item Count:</strong> The card displays &quot;X of Y items&quot; checked</li>
               </ul>
               <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-4 mt-4">
                 <p className="text-emerald-300 text-sm">
@@ -517,12 +517,12 @@ export default function ShoppingDocumentation() {
                 <li><strong>Real-Time Updates:</strong> The ring animates smoothly as you check off items</li>
                 <li><strong>Percentage Display:</strong> Shows exact completion % inside the ring</li>
                 <li><strong>Color-Coded:</strong> Emerald green matches your shopping list theme</li>
-                <li><strong>Hover for Details:</strong> Tooltip shows "X of Y items checked"</li>
+                <li><strong>Hover for Details:</strong> Tooltip shows &quot;X of Y items checked&quot;</li>
                 <li><strong>Apple-Style Design:</strong> Smooth animations with perfect timing</li>
               </ul>
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
-                  <strong>💡 Pro Tip:</strong> The progress ring makes it easy to see which lists need attention. An empty ring (0%) means you haven't started, while a full ring (100%) means you're done!
+                  <strong>💡 Pro Tip:</strong> The progress ring makes it easy to see which lists need attention. An empty ring (0%) means you haven&apos;t started, while a full ring (100%) means you&apos;re done!
                 </p>
               </div>
             </div>
@@ -535,7 +535,7 @@ export default function ShoppingDocumentation() {
             <h2 className="text-3xl font-bold text-white mb-4">Drag & Drop Reordering</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Rearrange your shopping list items by dragging them to match your store's layout or your personal priorities:
+                Rearrange your shopping list items by dragging them to match your store&apos;s layout or your personal priorities:
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">How to Reorder Items</h3>
               <ol className="space-y-3 text-gray-300">
@@ -548,13 +548,13 @@ export default function ShoppingDocumentation() {
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Why Reorder?</h3>
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Match Store Layout:</strong> Arrange items in the order you encounter them in your store</li>
-                <li><strong>Priority Items First:</strong> Put must-have items at the top so you don't forget them</li>
+                <li><strong>Priority Items First:</strong> Put must-have items at the top so you don&apos;t forget them</li>
                 <li><strong>Group Related Items:</strong> Keep similar items together even across categories</li>
                 <li><strong>Personal Preference:</strong> Organize however makes sense for you!</li>
               </ul>
               <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4 mt-4">
                 <p className="text-purple-300 text-sm">
-                  <strong>✨ Design Note:</strong> Dragging provides smooth visual feedback with shadows and scale effects, making reordering feel natural and responsive—just like Apple's interfaces.
+                  <strong>✨ Design Note:</strong> Dragging provides smooth visual feedback with shadows and scale effects, making reordering feel natural and responsive—just like Apple&apos;s interfaces.
                 </p>
               </div>
             </div>
@@ -573,7 +573,7 @@ export default function ShoppingDocumentation() {
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Analyzes Last 30 Days:</strong> Looks at your most recent shopping history</li>
                 <li><strong>Shows Top 12 Items:</strong> Displays your most frequently added items</li>
-                <li><strong>Purchase Count Badges:</strong> Small badges show how many times you've bought each item</li>
+                <li><strong>Purchase Count Badges:</strong> Small badges show how many times you&apos;ve bought each item</li>
                 <li><strong>One-Click Add:</strong> Click any item to instantly add it to your active list</li>
                 <li><strong>Auto-Categorized:</strong> Items maintain their category for proper organization</li>
               </ul>
@@ -582,7 +582,7 @@ export default function ShoppingDocumentation() {
                 <li><strong>Updates Dynamically:</strong> Your frequent items change as your shopping habits evolve</li>
                 <li><strong>Fades Out Old Items:</strong> Items you stop buying gradually disappear after 30 days</li>
                 <li><strong>Promotes New Habits:</strong> Items you start buying frequently will appear in the panel</li>
-                <li><strong>Creates List if Needed:</strong> If you have no active lists, clicking an item creates a "Quick Add List"</li>
+                <li><strong>Creates List if Needed:</strong> If you have no active lists, clicking an item creates a &quot;Quick Add List&quot;</li>
                 <li><strong>Adds to Active List:</strong> If you have active lists, items are added to the first one</li>
               </ul>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Panel Features</h3>
@@ -612,10 +612,10 @@ export default function ShoppingDocumentation() {
               <ol className="space-y-3 text-gray-300">
                 <li><strong>Create a complete shopping list</strong> with all the items you typically need</li>
                 <li><strong>Open the list menu</strong> (⋮ button) on the list card</li>
-                <li><strong>Click "Save as Template"</strong></li>
-                <li><strong>Enter a template name</strong> (e.g., "Weekly Groceries", "Monthly Costco Run")</li>
+                <li><strong>Click &quot;Save as Template&quot;</strong></li>
+                <li><strong>Enter a template name</strong> (e.g., &quot;Weekly Groceries&quot;, &quot;Monthly Costco Run&quot;)</li>
                 <li><strong>Add a description (optional)</strong> to help identify the template later</li>
-                <li><strong>Click "Save Template"</strong></li>
+                <li><strong>Click &quot;Save Template&quot;</strong></li>
               </ol>
               <p className="text-gray-300 mt-4">
                 Your template will save all items with their categories and quantities, making it perfect for recurring shopping trips.
@@ -633,8 +633,8 @@ export default function ShoppingDocumentation() {
                 Start new shopping lists from your saved templates in seconds:
               </p>
               <ol className="space-y-3 text-gray-300">
-                <li><strong>Click "Create Shopping List"</strong></li>
-                <li><strong>Choose "Choose a Template"</strong> instead of starting fresh</li>
+                <li><strong>Click &quot;Create Shopping List&quot;</strong></li>
+                <li><strong>Choose &quot;Choose a Template&quot;</strong> instead of starting fresh</li>
                 <li><strong>Browse your templates</strong> - each shows the number of items included</li>
                 <li><strong>Click a template</strong> to create a new list with all those items pre-filled</li>
                 <li><strong>Review and adjust</strong> the list (add/remove items, change quantities)</li>
@@ -642,7 +642,7 @@ export default function ShoppingDocumentation() {
               </ol>
               <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4 mt-4">
                 <p className="text-purple-300 text-sm">
-                  <strong>⚡ Time Saver:</strong> Create templates for different scenarios: "Weekly Groceries", "Party Supplies", "Holiday Baking", "Camping Trip". You'll never start from scratch again!
+                  <strong>⚡ Time Saver:</strong> Create templates for different scenarios: &quot;Weekly Groceries&quot;, &quot;Party Supplies&quot;, &quot;Holiday Baking&quot;, &quot;Camping Trip&quot;. You&apos;ll never start from scratch again!
                 </p>
               </div>
             </div>
@@ -658,7 +658,7 @@ export default function ShoppingDocumentation() {
                 Templates can be updated or removed as your shopping needs change:
               </p>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>View Templates:</strong> When creating a new list, you'll see all your saved templates</li>
+                <li><strong>View Templates:</strong> When creating a new list, you&apos;ll see all your saved templates</li>
                 <li><strong>Update a Template:</strong> Create a new list from the template, modify it, and save it as a template again with the same name (it will replace the old one)</li>
                 <li><strong>Delete a Template:</strong> Templates can be managed through the template picker modal</li>
               </ul>
@@ -679,19 +679,19 @@ export default function ShoppingDocumentation() {
               </p>
               <ol className="space-y-3 text-gray-300">
                 <li><strong>Open the list menu</strong> (⋮ button) on any shopping list</li>
-                <li><strong>Click "📅 Schedule Shopping Trip"</strong></li>
+                <li><strong>Click &quot;📅 Schedule Shopping Trip&quot;</strong></li>
                 <li><strong>Fill in the details:</strong>
                   <ul className="mt-2 space-y-1 ml-4">
-                    <li>Event title (defaults to "Shopping Trip: [List Name]")</li>
+                    <li>Event title (defaults to &quot;Shopping Trip: [List Name]&quot;)</li>
                     <li>Date and time for your shopping trip</li>
                     <li>Duration (how long you expect it to take)</li>
                     <li>Reminder (15 min, 30 min, 1 hour, etc. before the trip)</li>
                   </ul>
                 </li>
-                <li><strong>Click "Schedule Trip"</strong></li>
+                <li><strong>Click &quot;Schedule Trip&quot;</strong></li>
               </ol>
               <p className="text-gray-300 mt-4">
-                The shopping trip will appear as a calendar event with your shopping list linked. If your list has a store name, it's automatically added as the event location!
+                The shopping trip will appear as a calendar event with your shopping list linked. If your list has a store name, it&apos;s automatically added as the event location!
               </p>
               <div className="bg-indigo-900/20 border border-indigo-800 rounded-lg p-4 mt-4">
                 <p className="text-indigo-300 text-sm">
@@ -712,8 +712,8 @@ export default function ShoppingDocumentation() {
               </p>
               <ol className="space-y-3 text-gray-300">
                 <li><strong>Open the list menu</strong> (⋮ button) on any shopping list</li>
-                <li><strong>Click "✓ Create Task"</strong></li>
-                <li><strong>A task is instantly created</strong> titled "Complete shopping: [List Name]"</li>
+                <li><strong>Click &quot;✓ Create Task&quot;</strong></li>
+                <li><strong>A task is instantly created</strong> titled &quot;Complete shopping: [List Name]&quot;</li>
                 <li><strong>The task includes:</strong>
                   <ul className="mt-2 space-y-1 ml-4">
                     <li>Item count in the description</li>
@@ -799,7 +799,7 @@ export default function ShoppingDocumentation() {
                 <li><strong>Filter by store</strong> to see which lists are for specific stores</li>
               </ul>
               <p className="text-gray-300 mt-4">
-                Examples: "Whole Foods", "Costco", "Target", "Trader Joe's"
+                Examples: &quot;Whole Foods&quot;, &quot;Costco&quot;, &quot;Target&quot;, &quot;Trader Joe&apos;s&quot;
               </p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-medium mt-6">
@@ -812,8 +812,8 @@ export default function ShoppingDocumentation() {
             <div className="prose prose-invert max-w-none">
               <h3 className="text-xl font-semibold text-white mb-3">Best Practices</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Use descriptive titles:</strong> "Weekly Groceries - June 15" is better than "Shopping"</li>
-                <li><strong>Include quantities:</strong> "2 gallons" instead of just "milk"</li>
+                <li><strong>Use descriptive titles:</strong> &quot;Weekly Groceries - June 15&quot; is better than &quot;Shopping&quot;</li>
+                <li><strong>Include quantities:</strong> &quot;2 gallons&quot; instead of just &quot;milk&quot;</li>
                 <li><strong>Add store names:</strong> Helps differentiate lists when you shop at multiple stores</li>
                 <li><strong>Set realistic budgets:</strong> Review past lists to set appropriate spending limits</li>
                 <li><strong>Add prices as you shop:</strong> Build a price database for better budgeting</li>
@@ -855,11 +855,11 @@ export default function ShoppingDocumentation() {
               <h3 className="text-xl font-semibold text-white mb-3">Template Ideas</h3>
               <ul className="space-y-2 text-gray-300">
                 <li><strong>Weekly Groceries:</strong> Your standard weekly shopping items</li>
-                <li><strong>Monthly Bulk Run:</strong> Costco/Sam's Club bulk items you buy monthly</li>
+                <li><strong>Monthly Bulk Run:</strong> Costco/Sam&apos;s Club bulk items you buy monthly</li>
                 <li><strong>Party Supplies:</strong> Standard items for hosting parties</li>
                 <li><strong>Holiday Baking:</strong> Ingredients you need for holiday baking</li>
                 <li><strong>Breakfast Restock:</strong> Weekly breakfast essentials</li>
-                <li><strong>Kids' Lunch Items:</strong> School lunch supplies</li>
+                <li><strong>Kids&apos; Lunch Items:</strong> School lunch supplies</li>
                 <li><strong>Camping Trip:</strong> Everything you need for camping</li>
               </ul>
               <div className="bg-yellow-900/20 border border-yellow-800 rounded-lg p-4 mt-4">
@@ -878,7 +878,7 @@ export default function ShoppingDocumentation() {
             <h2 className="text-3xl font-bold text-white mb-4">Complete Category Reference</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-6">
-                Here's your complete visual guide to all 11 shopping categories with common items in each:
+                Here&apos;s your complete visual guide to all 11 shopping categories with common items in each:
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
@@ -1008,7 +1008,7 @@ export default function ShoppingDocumentation() {
                   <h4 className="font-bold text-xl text-white mb-2">Other</h4>
                   <p className="text-sm text-gray-400 mb-3">Miscellaneous items</p>
                   <div className="text-xs text-gray-300 space-y-1">
-                    <div>Items that don't fit into other categories</div>
+                    <div>Items that don&apos;t fit into other categories</div>
                     <div><strong>Examples:</strong> pet food, office supplies, batteries, gift wrap</div>
                   </div>
                 </div>
@@ -1042,7 +1042,7 @@ export default function ShoppingDocumentation() {
                     <span className="text-sm font-mono text-green-300">💰 $45.50 / $100.00</span>
                   </div>
                   <p className="text-sm text-green-300">
-                    You're well within budget! The green indicator means you have plenty of room for additional items. This is the ideal state—you're spending wisely.
+                    You&apos;re well within budget! The green indicator means you have plenty of room for additional items. This is the ideal state—you&apos;re spending wisely.
                   </p>
                 </div>
 
@@ -1053,7 +1053,7 @@ export default function ShoppingDocumentation() {
                     <span className="text-sm font-mono text-yellow-300">💰 $87.25 / $100.00</span>
                   </div>
                   <p className="text-sm text-yellow-300">
-                    Yellow warning! You're getting close to your limit. Time to review your list and prioritize essential items. Consider removing or postponing nice-to-have items.
+                    Yellow warning! You&apos;re getting close to your limit. Time to review your list and prioritize essential items. Consider removing or postponing nice-to-have items.
                   </p>
                 </div>
 
@@ -1064,7 +1064,7 @@ export default function ShoppingDocumentation() {
                     <span className="text-sm font-mono text-red-300">💰 $124.80 / $100.00</span>
                   </div>
                   <p className="text-sm text-red-300">
-                    Red alert! You've exceeded your budget by $24.80. Review your list and either remove items or adjust your budget if the spending is necessary.
+                    Red alert! You&apos;ve exceeded your budget by $24.80. Review your list and either remove items or adjust your budget if the spending is necessary.
                   </p>
                 </div>
               </div>
@@ -1088,14 +1088,14 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-pink-900/20 rounded-lg border border-pink-800">
                   <h4 className="font-semibold text-pink-100 mb-2">💡 Price It Right</h4>
                   <p className="text-sm text-pink-300">
-                    As you shop, update estimated prices with actual costs. Over time, you'll build a personal price database that makes budgeting more accurate.
+                    As you shop, update estimated prices with actual costs. Over time, you&apos;ll build a personal price database that makes budgeting more accurate.
                   </p>
                 </div>
 
                 <div className="p-4 bg-indigo-900/20 rounded-lg border border-indigo-800">
                   <h4 className="font-semibold text-indigo-100 mb-2">🏷️ Include Sales</h4>
                   <p className="text-sm text-indigo-300">
-                    Review store circulars before shopping. Adjust your budget down if you're planning to take advantage of major sales or coupons.
+                    Review store circulars before shopping. Adjust your budget down if you&apos;re planning to take advantage of major sales or coupons.
                   </p>
                 </div>
               </div>
@@ -1103,7 +1103,7 @@ export default function ShoppingDocumentation() {
               <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-5 mt-6">
                 <h4 className="font-semibold text-emerald-100 mb-2">🏡 Household Budgeting Tip</h4>
                 <p className="text-emerald-300 text-sm mb-3">
-                  For families, try setting weekly or monthly shopping budgets and track them consistently. After 2-3 months, you'll have valuable data to optimize spending:
+                  For families, try setting weekly or monthly shopping budgets and track them consistently. After 2-3 months, you&apos;ll have valuable data to optimize spending:
                 </p>
                 <ul className="text-emerald-300 text-sm space-y-1 ml-4">
                   <li>• Identify expensive patterns (eating out vs. cooking)</li>
@@ -1155,7 +1155,7 @@ export default function ShoppingDocumentation() {
                   <div className="flex items-start gap-4">
                     <div className="text-4xl">📦</div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">Monthly Bulk Run (Costco/Sam's)</h3>
+                      <h3 className="text-xl font-bold text-white mb-2">Monthly Bulk Run (Costco/Sam&apos;s)</h3>
                       <p className="text-sm text-gray-400 mb-3">Stock up on bulk items • Budget: $250-350</p>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-gray-300">
                         <div><strong>Pantry:</strong> 20lb rice, 10lb pasta, olive oil</div>
@@ -1276,9 +1276,9 @@ export default function ShoppingDocumentation() {
                 <ul className="text-indigo-300 text-sm space-y-2">
                   <li><strong>Start Simple:</strong> Begin with 1-2 templates and refine them based on actual shopping trips</li>
                   <li><strong>Update Regularly:</strong> Review templates quarterly to add new favorites and remove items you no longer buy</li>
-                  <li><strong>Share with Household:</strong> Templates are shared in your space—create templates for different family members' shopping responsibilities</li>
-                  <li><strong>Combine Templates:</strong> Start with a template, then add items from another. Perfect for "Weekly Groceries + Party Supplies"</li>
-                  <li><strong>Seasonal Templates:</strong> Create specific templates for seasons: "Summer BBQ", "Back to School", "Winter Comfort Foods"</li>
+                  <li><strong>Share with Household:</strong> Templates are shared in your space—create templates for different family members&apos; shopping responsibilities</li>
+                  <li><strong>Combine Templates:</strong> Start with a template, then add items from another. Perfect for &quot;Weekly Groceries + Party Supplies&quot;</li>
+                  <li><strong>Seasonal Templates:</strong> Create specific templates for seasons: &quot;Summer BBQ&quot;, &quot;Back to School&quot;, &quot;Winter Comfort Foods&quot;</li>
                 </ul>
               </div>
             </div>
@@ -1291,7 +1291,7 @@ export default function ShoppingDocumentation() {
             <h2 className="text-3xl font-bold text-white mb-4">Mobile Shopping Experience</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-6">
-                Rowan is designed for in-store shopping on your mobile device. Here's how to make the most of it:
+                Rowan is designed for in-store shopping on your mobile device. Here&apos;s how to make the most of it:
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-4">Before You Leave Home</h3>
@@ -1311,7 +1311,7 @@ export default function ShoppingDocumentation() {
                   <div>
                     <h4 className="font-semibold text-white mb-1">Reorder by Store Layout</h4>
                     <p className="text-sm text-gray-300">
-                      Use drag-and-drop to arrange items in the order you'll encounter them at your store. This prevents backtracking and saves time.
+                      Use drag-and-drop to arrange items in the order you&apos;ll encounter them at your store. This prevents backtracking and saves time.
                     </p>
                   </div>
                 </div>
@@ -1364,7 +1364,7 @@ export default function ShoppingDocumentation() {
                   <div>
                     <h4 className="font-semibold text-white mb-1">Add Forgotten Items</h4>
                     <p className="text-sm text-gray-300">
-                      Spotted something you forgot? Tap "Add Item" right from your phone. It syncs instantly to all devices, so your partner sees it too.
+                      Spotted something you forgot? Tap &quot;Add Item&quot; right from your phone. It syncs instantly to all devices, so your partner sees it too.
                     </p>
                   </div>
                 </div>
@@ -1414,10 +1414,10 @@ export default function ShoppingDocumentation() {
               <div className="bg-pink-900/20 border border-pink-800 rounded-lg p-5">
                 <h4 className="font-semibold text-pink-100 mb-2">🏡 Household Shopping Tip</h4>
                 <p className="text-pink-300 text-sm mb-3">
-                  For families, here's a pro workflow:
+                  For families, here&apos;s a pro workflow:
                 </p>
                 <ul className="text-pink-300 text-sm space-y-1 ml-4">
-                  <li><strong>Monday-Thursday:</strong> Anyone in the household adds items to "This Week's Shopping" as they run out</li>
+                  <li><strong>Monday-Thursday:</strong> Anyone in the household adds items to &quot;This Week&apos;s Shopping&quot; as they run out</li>
                   <li><strong>Friday Morning:</strong> Review the list together, add forgotten items, set budget</li>
                   <li><strong>Saturday:</strong> Shop together or split up. Each person checks off items on their phone</li>
                   <li><strong>After Shopping:</strong> Update actual prices for better budgeting next time</li>
@@ -1441,8 +1441,8 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
                   <h4 className="font-semibold text-red-100 mb-2">Not Being Specific Enough</h4>
                   <div className="text-sm text-red-300">
-                    <p className="mb-2"><strong>❌ Wrong:</strong> "milk", "cheese", "chips"</p>
-                    <p><strong>✓ Right:</strong> "2% milk - gallon", "sharp cheddar - 8oz block", "Doritos nacho cheese - family size"</p>
+                    <p className="mb-2"><strong>❌ Wrong:</strong> &quot;milk&quot;, &quot;cheese&quot;, &quot;chips&quot;</p>
+                    <p><strong>✓ Right:</strong> &quot;2% milk - gallon&quot;, &quot;sharp cheddar - 8oz block&quot;, &quot;Doritos nacho cheese - family size&quot;</p>
                     <p className="mt-2 italic">Why: Specific descriptions prevent confusion and ensure you get exactly what you need, especially when someone else is shopping.</p>
                   </div>
                 </div>
@@ -1450,8 +1450,8 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
                   <h4 className="font-semibold text-red-100 mb-2">Creating Too Many Small Lists</h4>
                   <div className="text-sm text-red-300">
-                    <p className="mb-2"><strong>❌ Wrong:</strong> "Tuesday List", "Wednesday Items", "Thursday Shopping" (all for same store)</p>
-                    <p><strong>✓ Right:</strong> One "This Week - Whole Foods" list that you add to throughout the week</p>
+                    <p className="mb-2"><strong>❌ Wrong:</strong> &quot;Tuesday List&quot;, &quot;Wednesday Items&quot;, &quot;Thursday Shopping&quot; (all for same store)</p>
+                    <p><strong>✓ Right:</strong> One &quot;This Week - Whole Foods&quot; list that you add to throughout the week</p>
                     <p className="mt-2 italic">Why: Consolidating items into one weekly list gives you a complete picture and prevents multiple trips to the same store.</p>
                   </div>
                 </div>
@@ -1459,7 +1459,7 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
                   <h4 className="font-semibold text-red-100 mb-2">Ignoring Categories</h4>
                   <div className="text-sm text-red-300">
-                    <p className="mb-2"><strong>❌ Wrong:</strong> Letting everything fall into "Other" category</p>
+                    <p className="mb-2"><strong>❌ Wrong:</strong> Letting everything fall into &quot;Other&quot; category</p>
                     <p><strong>✓ Right:</strong> Reviewing and correcting miscategorized items before shopping</p>
                     <p className="mt-2 italic">Why: Proper categories organize your list by store layout, making shopping significantly faster and preventing forgotten items in different sections.</p>
                   </div>
@@ -1470,7 +1470,7 @@ export default function ShoppingDocumentation() {
                   <div className="text-sm text-red-300">
                     <p className="mb-2"><strong>❌ Wrong:</strong> $50 budget for 30 items including meat and produce</p>
                     <p><strong>✓ Right:</strong> $120-150 budget based on past shopping trips for similar items</p>
-                    <p className="mt-2 italic">Why: Unrealistic budgets cause stress while shopping. After 2-3 trips, you'll know your average spend—use that as your baseline.</p>
+                    <p className="mt-2 italic">Why: Unrealistic budgets cause stress while shopping. After 2-3 trips, you&apos;ll know your average spend—use that as your baseline.</p>
                   </div>
                 </div>
 
@@ -1478,7 +1478,7 @@ export default function ShoppingDocumentation() {
                   <h4 className="font-semibold text-red-100 mb-2">Not Using Templates for Recurring Shopping</h4>
                   <div className="text-sm text-red-300">
                     <p className="mb-2"><strong>❌ Wrong:</strong> Typing the same 25 items every week from memory</p>
-                    <p><strong>✓ Right:</strong> Creating a "Weekly Groceries" template and starting from there</p>
+                    <p><strong>✓ Right:</strong> Creating a &quot;Weekly Groceries&quot; template and starting from there</p>
                     <p className="mt-2 italic">Why: Templates save 10-15 minutes per list. You start with 80% of what you need, then just add unique items for that week.</p>
                   </div>
                 </div>
@@ -1499,7 +1499,7 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
                   <h4 className="font-semibold text-green-100 mb-2">🎯 Store-Specific Lists</h4>
                   <p className="text-sm text-green-300 mb-2">
-                    Create separate lists for different stores (Whole Foods, Target, Costco). This prevents "Oh, I should have gotten that at Costco" moments.
+                    Create separate lists for different stores (Whole Foods, Target, Costco). This prevents &quot;Oh, I should have gotten that at Costco&quot; moments.
                   </p>
                   <p className="text-xs text-green-400 italic">
                     Saves money and prevents extra trips
@@ -1509,7 +1509,7 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
                   <h4 className="font-semibold text-green-100 mb-2">🔄 Reorder Before Shopping</h4>
                   <p className="text-sm text-green-300 mb-2">
-                    Take 2 minutes to drag items into store order before you leave. You'll shop 30-40% faster by not backtracking through aisles.
+                    Take 2 minutes to drag items into store order before you leave. You&apos;ll shop 30-40% faster by not backtracking through aisles.
                   </p>
                   <p className="text-xs text-green-400 italic">
                     Time Saved: 10-15 minutes at store
@@ -1539,7 +1539,7 @@ export default function ShoppingDocumentation() {
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
                   <h4 className="font-semibold text-green-100 mb-2">💾 Update Prices Post-Shop</h4>
                   <p className="text-sm text-green-300 mb-2">
-                    Spend 3 minutes after shopping to update estimated prices with actual costs. After 3-4 trips, you'll have a personal price database for accurate budgets.
+                    Spend 3 minutes after shopping to update estimated prices with actual costs. After 3-4 trips, you&apos;ll have a personal price database for accurate budgets.
                   </p>
                   <p className="text-xs text-green-400 italic">
                     Better budgeting long-term
@@ -1553,11 +1553,11 @@ export default function ShoppingDocumentation() {
                   Follow this workflow for maximum efficiency:
                 </p>
                 <ol className="text-yellow-300 text-sm space-y-2 ml-4">
-                  <li><strong>1. Use templates:</strong> Start with your "Weekly Groceries" template (saves 5-7 min)</li>
+                  <li><strong>1. Use templates:</strong> Start with your &quot;Weekly Groceries&quot; template (saves 5-7 min)</li>
                   <li><strong>2. Add from Quick Add:</strong> Click items from your frequent panel (saves 3-4 min)</li>
                   <li><strong>3. Add unique items:</strong> Manually add any one-off needs for this week</li>
                   <li><strong>4. Reorder by store layout:</strong> Drag items to match your store (saves 10-15 min while shopping)</li>
-                  <li><strong>5. Schedule it:</strong> Add to calendar with reminder so you don't forget</li>
+                  <li><strong>5. Schedule it:</strong> Add to calendar with reminder so you don&apos;t forget</li>
                   <li><strong>6. Shop efficiently:</strong> Use mobile app, check off as you go</li>
                   <li><strong>7. Update prices:</strong> Quick review after shopping for better budgets next time</li>
                 </ol>
@@ -1644,7 +1644,7 @@ export default function ShoppingDocumentation() {
                       Automatically create shopping list from your meal plan:
                     </p>
                     <ul className="text-sm text-gray-300 space-y-1 ml-4">
-                      <li>• Click "Generate Shopping List from Meals"</li>
+                      <li>• Click &quot;Generate Shopping List from Meals&quot;</li>
                       <li>• Select date range (e.g., Monday-Sunday)</li>
                       <li>• System extracts ALL ingredients from selected meals</li>
                       <li>• Items are auto-categorized and quantities are calculated</li>
@@ -1671,7 +1671,7 @@ export default function ShoppingDocumentation() {
                     </p>
                     <ul className="text-sm text-gray-300 space-y-1 ml-4">
                       <li>• Open shopping list menu (⋮ button)</li>
-                      <li>• Click "📅 Schedule Shopping Trip"</li>
+                      <li>• Click &quot;📅 Schedule Shopping Trip&quot;</li>
                       <li>• Pick date/time (e.g., Saturday 10:00 AM)</li>
                       <li>• Set duration and reminder</li>
                       <li>• Calendar event is created with shopping list linked</li>
@@ -1697,8 +1697,8 @@ export default function ShoppingDocumentation() {
                     </p>
                     <ul className="text-sm text-gray-300 space-y-1 ml-4">
                       <li>• Open shopping list menu (⋮ button)</li>
-                      <li>• Click "✓ Create Task"</li>
-                      <li>• Task is created: "Complete shopping: [List Name]"</li>
+                      <li>• Click &quot;✓ Create Task&quot;</li>
+                      <li>• Task is created: &quot;Complete shopping: [List Name]&quot;</li>
                       <li>• Includes item count and shopping list link</li>
                       <li>• Assign to household member and set priority</li>
                     </ul>
@@ -1743,10 +1743,10 @@ export default function ShoppingDocumentation() {
                     <strong>Scenario:</strong> Planning a birthday party next Saturday
                   </p>
                   <ol className="text-xs text-amber-300 space-y-1 ml-4">
-                    <li>1. Create "Birthday Party Shopping" list</li>
-                    <li>2. Schedule calendar event: "Birthday Party Prep"</li>
+                    <li>1. Create &quot;Birthday Party Shopping&quot; list</li>
+                    <li>2. Schedule calendar event: &quot;Birthday Party Prep&quot;</li>
                     <li>3. Link shopping list to calendar event</li>
-                    <li>4. Create task: "Shop for party - due Friday"</li>
+                    <li>4. Create task: &quot;Shop for party - due Friday&quot;</li>
                     <li>5. Get reminders, shop Friday, mark complete</li>
                   </ol>
                 </div>
@@ -1757,8 +1757,8 @@ export default function ShoppingDocumentation() {
                     <strong>Scenario:</strong> Regular household restocking
                   </p>
                   <ol className="text-xs text-teal-300 space-y-1 ml-4">
-                    <li>1. Create template: "Household Essentials"</li>
-                    <li>2. Set up recurring task: "Check household supplies - every Sunday"</li>
+                    <li>1. Create template: &quot;Household Essentials&quot;</li>
+                    <li>2. Set up recurring task: &quot;Check household supplies - every Sunday&quot;</li>
                     <li>3. When task pops up, create list from template</li>
                     <li>4. Schedule shopping trip for Monday</li>
                     <li>5. Complete task when items are restocked</li>
@@ -1773,7 +1773,7 @@ export default function ShoppingDocumentation() {
                   <ol className="text-xs text-rose-300 space-y-1 ml-4">
                     <li>1. Plan Thanksgiving meals in Meal Planning (turkey, sides, desserts)</li>
                     <li>2. Generate comprehensive shopping list from all meals</li>
-                    <li>3. Split into two lists: "Thanksgiving - 1 week early" and "Thanksgiving - fresh items"</li>
+                    <li>3. Split into two lists: &quot;Thanksgiving - 1 week early&quot; and &quot;Thanksgiving - fresh items&quot;</li>
                     <li>4. Schedule both shopping trips in calendar</li>
                     <li>5. Create tasks for each trip assigned to different family members</li>
                   </ol>
@@ -1787,9 +1787,9 @@ export default function ShoppingDocumentation() {
                   <ol className="text-xs text-cyan-300 space-y-1 ml-4">
                     <li>1. Plan 5 meal prep recipes in Meal Planning</li>
                     <li>2. Generate shopping list (includes bulk proteins, veggies)</li>
-                    <li>3. Schedule "Grocery Shopping" Saturday 9 AM</li>
-                    <li>4. Schedule "Meal Prep Session" Sunday 2 PM (3 hours)</li>
-                    <li>5. Create tasks: "Shop for meal prep" and "Complete meal prep"</li>
+                    <li>3. Schedule &quot;Grocery Shopping&quot; Saturday 9 AM</li>
+                    <li>4. Schedule &quot;Meal Prep Session&quot; Sunday 2 PM (3 hours)</li>
+                    <li>5. Create tasks: &quot;Shop for meal prep&quot; and &quot;Complete meal prep&quot;</li>
                   </ol>
                 </div>
               </div>
@@ -1802,7 +1802,7 @@ export default function ShoppingDocumentation() {
                 <ul className="text-purple-300 text-sm space-y-2">
                   <li><strong>⏱️ Save Time:</strong> Generate shopping lists automatically from meal plans—no manual copying</li>
                   <li><strong>📅 Never Forget:</strong> Calendar reminders ensure you shop on time</li>
-                  <li><strong>✓ Accountability:</strong> Tasks track who's responsible for shopping</li>
+                  <li><strong>✓ Accountability:</strong> Tasks track who&apos;s responsible for shopping</li>
                   <li><strong>🔄 Real-Time Sync:</strong> Changes anywhere update everywhere instantly</li>
                   <li><strong>🏡 Family Coordination:</strong> Everyone sees the same info—no miscommunication</li>
                 </ul>

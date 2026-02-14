@@ -21,6 +21,7 @@ const FREQUENCY_LABELS: Record<string, string> = {
   annual: 'Yearly',
 };
 
+/** Renders a card showing a detected recurring expense pattern. */
 export function PatternCard({ pattern, onAction, isProcessing = false, className = '' }: PatternCardProps) {
   // Determine confidence level and colors
   const getConfidenceLevel = (score: number) => {

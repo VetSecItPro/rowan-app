@@ -10,7 +10,6 @@ import {
   Zap,
   TrendingUp,
   Clock,
-  ArrowUpRight,
   AlertTriangle,
 } from 'lucide-react';
 import {
@@ -116,7 +115,7 @@ const CostCard = memo(function CostCard({
         <div>
           <p className="text-xs font-medium text-gray-400">{title}</p>
           <p className="text-2xl font-bold text-white mt-1">{value}</p>
-          {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
         </div>
         <div className={`w-10 h-10 ${color} rounded-lg flex items-center justify-center`}>
           <Icon className="w-5 h-5 text-white" />
@@ -146,6 +145,7 @@ function formatFeatureName(name: string): string {
 // Main Panel
 // ---------------------------------------------------------------------------
 
+/** Displays AI feature usage metrics and trends in the admin dashboard. */
 export const AIUsagePanel = memo(function AIUsagePanel() {
   const [range, setRange] = useState('today');
 
@@ -365,7 +365,7 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="text-gray-500 border-b border-gray-700/50">
+                <tr className="text-gray-400 border-b border-gray-700/50">
                   <th className="text-left pb-2 font-medium">User</th>
                   <th className="text-left pb-2 font-medium">Tier</th>
                   <th className="text-right pb-2 font-medium">Cost</th>
@@ -397,7 +397,7 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
                 ))}
                 {(data?.top_users?.length ?? 0) === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-gray-500">
+                    <td colSpan={4} className="py-6 text-center text-gray-400">
                       No AI usage data yet
                     </td>
                   </tr>
@@ -409,7 +409,7 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
       </div>
 
       {/* Last Updated */}
-      <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+      <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
         <Clock className="w-3 h-3" />
         <span>
           Auto-refreshes every 60s

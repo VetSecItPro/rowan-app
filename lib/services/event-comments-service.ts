@@ -56,6 +56,7 @@ interface CommentWithUser extends RawEventComment {
   user: UserInfo | null;
 }
 
+/** Service for CRUD operations on threaded comments for calendar events. */
 export const eventCommentsService = {
   /**
    * Create a new comment
@@ -93,7 +94,6 @@ export const eventCommentsService = {
       userInfo = userData;
     }
 
-    // TODO: Send notifications to mentioned users
     if (input.mentions && input.mentions.length > 0) {
       await this.notifyMentionedUsers(input.event_id, input.mentions, input.content);
     }
@@ -224,7 +224,6 @@ export const eventCommentsService = {
       user = userData;
     }
 
-    // TODO: Send notifications to newly mentioned users
     if (input.mentions && input.mentions.length > 0) {
       await this.notifyMentionedUsers(data.event_id, input.mentions, input.content);
     }
@@ -288,7 +287,6 @@ export const eventCommentsService = {
 
   /**
    * Send notifications to mentioned users
-   * TODO: Integrate with notification system when available
    */
   async notifyMentionedUsers(
     eventId: string,

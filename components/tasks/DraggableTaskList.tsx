@@ -209,7 +209,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
         <div className="flex items-center gap-3 mt-2">
           {getPriorityIcon(task.priority)}
           {task.due_date && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-400">
               Due: {new Date(task.due_date).toLocaleDateString()}
             </span>
           )}
@@ -233,6 +233,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
             <div
               className="fixed inset-0 z-10"
               onClick={() => setShowMenu(false)}
+              aria-hidden="true"
             />
             <div className="absolute right-0 mt-1 w-40 dropdown-mobile bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20">
               {onViewDetails && (
@@ -275,6 +276,7 @@ function SortableTaskItem({ task, onTaskClick, onStatusChange, onEdit, onDelete,
   );
 }
 
+/** Renders a drag-and-drop reorderable task list with status sections. */
 export function DraggableTaskList({
   spaceId,
   initialTasks,
@@ -375,7 +377,7 @@ export function DraggableTaskList({
       <SortableContext items={tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-2">
           {tasks.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-400">
               <p>No tasks yet. Create your first task to get started!</p>
             </div>
           ) : (

@@ -93,6 +93,7 @@ const TIER_DETAILS = {
   },
 };
 
+/** Renders subscription plan management with upgrade/downgrade options. */
 export function SubscriptionSettings() {
   const subscription = useSubscriptionSafe();
 
@@ -262,7 +263,7 @@ export function SubscriptionSettings() {
                 }`}>
                   <Check aria-hidden="true" className={`h-3 w-3 ${
                     effectiveTier === 'family' ? 'text-purple-400' :
-                    effectiveTier === 'pro' ? 'text-emerald-400' : 'text-gray-500'
+                    effectiveTier === 'pro' ? 'text-emerald-400' : 'text-gray-400'
                   }`} />
                 </div>
                 {feature}

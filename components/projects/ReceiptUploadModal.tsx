@@ -15,6 +15,7 @@ interface ReceiptUploadModalProps {
   onSuccess?: () => void;
 }
 
+/** Renders a modal for uploading and processing receipt images. */
 export function ReceiptUploadModal({
   isOpen,
   onClose,
@@ -167,7 +168,7 @@ export function ReceiptUploadModal({
                   <p className="text-gray-400 mb-2">
                     Drag and drop your receipt here, or click to browse
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     Supports JPG, PNG, and PDF up to 10MB
                   </p>
                 </div>
@@ -275,7 +276,7 @@ export function ReceiptUploadModal({
                         Total Amount
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                         <input
                           type="number"
                           inputMode="numeric"

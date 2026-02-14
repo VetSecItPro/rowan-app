@@ -134,7 +134,7 @@ const EnergySelector = memo(function EnergySelector({
         Energy (Optional)
       </label>
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-500 w-7 shrink-0">Low</span>
+        <span className="text-xs text-gray-400 w-7 shrink-0">Low</span>
         <div className="flex items-end gap-1 flex-1">
           {[1, 2, 3, 4, 5].map((level) => {
             const isActive = value !== null && level <= value;
@@ -153,7 +153,7 @@ const EnergySelector = memo(function EnergySelector({
             );
           })}
         </div>
-        <span className="text-xs text-gray-500 w-8 shrink-0 text-right">High</span>
+        <span className="text-xs text-gray-400 w-8 shrink-0 text-right">High</span>
       </div>
     </div>
   );
@@ -657,7 +657,7 @@ const JournalListView = memo(function JournalListView({
       <div className="text-center py-12">
         <Heart className="w-12 h-12 text-gray-600 mx-auto mb-3" />
         <p className="text-sm text-gray-400">No check-ins yet</p>
-        <p className="text-xs text-gray-500 mt-1">Start checking in to build your journal</p>
+        <p className="text-xs text-gray-400 mt-1">Start checking in to build your journal</p>
       </div>
     );
   }
@@ -785,9 +785,9 @@ const StreakBadges = memo(function StreakBadges({
           }`}
         >
           <div className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-gray-800/50 to-slate-800/50 rounded-full cursor-help border border-gray-700">
-            <Clock className="w-3.5 h-3.5 text-gray-500" />
+            <Clock className="w-3.5 h-3.5 text-gray-400" />
             <span className="text-sm font-bold text-gray-400">{checkInStats.daysSinceLastCheckIn}</span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-400">
               day{checkInStats.daysSinceLastCheckIn === 1 ? '' : 's'} ago
             </span>
           </div>
@@ -823,6 +823,7 @@ const scaleIn = {
 
 // ─── Main CheckInSection Component ────────────────────────────────────────────
 
+/** Renders the daily check-in section with mood selector and streak tracking. */
 export const CheckInSection = memo(function CheckInSection({
   userId,
   spaceId,

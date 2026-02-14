@@ -26,6 +26,7 @@ const COMMON_REACTIONS = [
   '💡',
 ];
 
+/** Displays an emoji picker popover for adding reactions to comments. */
 export default function ReactionPicker({ onSelect, onClose }: ReactionPickerProps) {
   const pickerRef = useRef<HTMLDivElement>(null);
 

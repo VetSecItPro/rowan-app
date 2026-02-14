@@ -424,13 +424,13 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Expense tracking in Rowan helps you maintain complete visibility over your household spending. Whether you're tracking everyday purchases, monitoring budget categories, or preparing for tax season, our expense system provides the tools you need.
+                  Expense tracking in Rowan helps you maintain complete visibility over your household spending. Whether you&apos;re tracking everyday purchases, monitoring budget categories, or preparing for tax season, our expense system provides the tools you need.
                 </p>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What Makes Rowan's Expense Tracking Special</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What Makes Rowan&apos;s Expense Tracking Special</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>AI-Powered Receipt Scanning:</strong> Take a photo of any receipt and let AI extract the merchant, amount, date, and even individual items</li>
                   <li><strong>Smart Categorization:</strong> Automatic category suggestions based on merchant data and your past spending patterns</li>
-                  <li><strong>Real-time Sync:</strong> All expenses sync instantly across family members' devices</li>
+                  <li><strong>Real-time Sync:</strong> All expenses sync instantly across family members&apos; devices</li>
                   <li><strong>Budget Integration:</strong> Expenses automatically update your budget tracking and analytics</li>
                   <li><strong>Historical Records:</strong> Maintain a complete digital archive of all receipts and spending</li>
                 </ul>
@@ -454,7 +454,7 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Our AI receipt scanning uses Google Gemini to extract information from your receipts. Here's how to get the best results from the start.
+                  Our AI receipt scanning uses Google Gemini to extract information from your receipts. Here&apos;s how to get the best results from the start.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Step-by-Step Setup</h3>
                 <ol className="list-decimal list-inside space-y-3 text-gray-400">
@@ -484,7 +484,7 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  You can create expenses manually when you don't have a receipt, or want to quickly log a purchase without scanning.
+                  You can create expenses manually when you don&apos;t have a receipt, or want to quickly log a purchase without scanning.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Expense Fields Explained</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -497,7 +497,7 @@ export default function ExpensesDocumentationPage() {
                 </ul>
                 <div className="mt-6 p-4 bg-blue-900/20 rounded-xl border border-blue-800">
                   <p className="text-sm text-blue-200">
-                    <strong>Quick Tip:</strong> Use consistent merchant names for the same stores. This helps with analytics and makes searching easier. For example, always use "Costco" instead of varying between "Costco Wholesale" and "COSTCO #123".
+                    <strong>Quick Tip:</strong> Use consistent merchant names for the same stores. This helps with analytics and makes searching easier. For example, always use &quot;Costco&quot; instead of varying between &quot;Costco Wholesale&quot; and &quot;COSTCO #123&quot;.
                   </p>
                 </div>
               </div>
@@ -516,7 +516,7 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The camera scanner lets you capture receipts instantly. Here's how to get the clearest scans for accurate AI extraction.
+                  The camera scanner lets you capture receipts instantly. Here&apos;s how to get the clearest scans for accurate AI extraction.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Best Practices for Scanning</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -524,11 +524,11 @@ export default function ExpensesDocumentationPage() {
                   <li><strong>Flat Surface:</strong> Place the receipt on a flat, contrasting background (dark receipt on light surface or vice versa)</li>
                   <li><strong>Full Frame:</strong> Capture the entire receipt in frame without cutting off edges</li>
                   <li><strong>Steady Hands:</strong> Hold still while the camera focuses to avoid blur</li>
-                  <li><strong>Avoid Shadows:</strong> Position yourself so you don't cast shadows on the receipt</li>
+                  <li><strong>Avoid Shadows:</strong> Position yourself so you don&apos;t cast shadows on the receipt</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Troubleshooting Scans</h3>
                 <p className="text-gray-400">
-                  If a scan doesn't extract data correctly, try these steps:
+                  If a scan doesn&apos;t extract data correctly, try these steps:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400 mt-2">
                   <li>Re-scan with better lighting conditions</li>
@@ -562,7 +562,7 @@ export default function ExpensesDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">File Size Limits</h3>
                 <p className="text-gray-400">
-                  Images up to 10MB are supported. For larger files, the image will be automatically compressed before processing. Very high resolution images don't improve extraction accuracy - a clear, readable image is more important than maximum resolution.
+                  Images up to 10MB are supported. For larger files, the image will be automatically compressed before processing. Very high resolution images don&apos;t improve extraction accuracy - a clear, readable image is more important than maximum resolution.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-red-400 hover:underline text-sm font-medium">
@@ -591,7 +591,7 @@ export default function ExpensesDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How AI Processing Works</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
-                  <li>Image is securely sent to Google Gemini's vision API</li>
+                  <li>Image is securely sent to Google Gemini&apos;s vision API</li>
                   <li>AI analyzes the image and identifies receipt structure</li>
                   <li>Key data points are extracted and structured</li>
                   <li>Results are returned and displayed for your review</li>
@@ -624,7 +624,7 @@ export default function ExpensesDocumentationPage() {
                   <li><strong>Merchant Name:</strong> AI might capture abbreviated names - expand to full names for consistency</li>
                   <li><strong>Amount:</strong> Verify the total matches your receipt, especially if there were discounts or split payments</li>
                   <li><strong>Date:</strong> Check that the date was parsed correctly, especially for international date formats</li>
-                  <li><strong>Category:</strong> Override the suggested category if it doesn't match your organizational system</li>
+                  <li><strong>Category:</strong> Override the suggested category if it doesn&apos;t match your organizational system</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">When AI Might Struggle</h3>
                 <p className="text-gray-400">
@@ -703,8 +703,8 @@ export default function ExpensesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Category Tips</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Be consistent - always use the same category for similar purchases</li>
-                  <li>Don't over-categorize - too many categories makes analysis harder</li>
-                  <li>Use "Other" sparingly - try to fit expenses into standard categories when possible</li>
+                  <li>Don&apos;t over-categorize - too many categories makes analysis harder</li>
+                  <li>Use &quot;Other&quot; sparingly - try to fit expenses into standard categories when possible</li>
                 </ul>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-red-400 hover:underline text-sm font-medium">
@@ -721,14 +721,14 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Not every expense comes with a receipt. Manual entry is quick and easy for cash purchases, online transactions, or when you simply don't have a receipt handy.
+                  Not every expense comes with a receipt. Manual entry is quick and easy for cash purchases, online transactions, or when you simply don&apos;t have a receipt handy.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">When to Use Manual Entry</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Cash purchases without receipts</li>
                   <li>Online purchases (though you can screenshot email receipts)</li>
                   <li>Recurring expenses you know the amount of</li>
-                  <li>Quick logging when you don't have time to scan</li>
+                  <li>Quick logging when you don&apos;t have time to scan</li>
                   <li>Expenses from bank statements you want to track</li>
                 </ul>
               </div>
@@ -757,7 +757,7 @@ export default function ExpensesDocumentationPage() {
                 </ol>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Deleting Expenses</h3>
                 <p className="text-gray-400">
-                  To delete an expense, open the expense details and tap Delete. You'll be asked to confirm before the expense is permanently removed. Deleted expenses cannot be recovered, so make sure you want to remove it permanently.
+                  To delete an expense, open the expense details and tap Delete. You&apos;ll be asked to confirm before the expense is permanently removed. Deleted expenses cannot be recovered, so make sure you want to remove it permanently.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-red-400 hover:underline text-sm font-medium">
@@ -974,7 +974,7 @@ export default function ExpensesDocumentationPage() {
                   <li><strong>CSV:</strong> Universal format for spreadsheets and accounting software</li>
                   <li><strong>PDF:</strong> Formatted report for printing or sharing</li>
                 </ul>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What's Included</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What&apos;s Included</h3>
                 <p className="text-gray-400">
                   Exports include date, merchant, amount, category, notes, and receipt attachment status for all selected expenses.
                 </p>
@@ -1017,7 +1017,7 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan's expense tracking makes tax preparation much easier with organized records and exports.
+                  Rowan&apos;s expense tracking makes tax preparation much easier with organized records and exports.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Tax-Ready Features</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -1071,7 +1071,7 @@ export default function ExpensesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Set up approval workflows to review large expenses before they're recorded, helping maintain budget discipline.
+                  Set up approval workflows to review large expenses before they&apos;re recorded, helping maintain budget discipline.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Coming Soon</h3>
                 <p className="text-gray-400">

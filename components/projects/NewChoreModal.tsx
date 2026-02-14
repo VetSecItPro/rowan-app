@@ -396,6 +396,7 @@ function ChoreForm({
   );
 }
 
+/** Renders a modal form for creating or editing a project chore. */
 export function NewChoreModal(props: NewChoreModalProps) {
   const { editChore, isOpen, spaceId, userId } = props;
   const formKey = `${editChore?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId}-${userId}`;

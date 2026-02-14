@@ -15,6 +15,7 @@ interface EventCommentThreadProps {
   onClose?: () => void;
 }
 
+/** Displays a threaded comment section for a calendar event. */
 export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentThreadProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<EventComment[]>([]);
@@ -222,7 +223,7 @@ export function EventCommentThread({ eventId, spaceId, onClose }: EventCommentTh
         {onClose && (
           <button
             onClick={onClose}
-            className="text-gray-500 text-gray-400 hover:text-gray-200"
+            className="text-gray-400 hover:text-gray-200"
           >
             Close
           </button>

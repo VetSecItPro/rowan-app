@@ -25,6 +25,7 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: string; tooltip: st
   other: { label: 'Other', icon: '🎁', tooltip: 'Miscellaneous rewards and surprises' },
 };
 
+/** Renders a catalog of available rewards that can be redeemed with points. */
 export function RewardsCatalog({
   spaceId,
   userId,
@@ -219,13 +220,13 @@ export function RewardsCatalog({
                         className={`font-bold text-sm ${
                           canAfford
                             ? 'text-amber-400'
-                            : 'text-gray-500'
+                            : 'text-gray-400'
                         }`}
                       >
                         {reward.cost_points} pts
                       </span>
                       {!canAfford && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           Need {reward.cost_points - userPoints} more
                         </span>
                       )}
@@ -283,7 +284,7 @@ export function RewardsCatalog({
               <p className="text-gray-400 mb-4">
                 This will cost <span className="font-bold text-amber-400">{showConfirm.cost_points} points</span>
               </p>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-gray-400 mb-6">
                 You&apos;ll have {userPoints - showConfirm.cost_points} points remaining
               </p>
               <div className="flex gap-3">

@@ -558,7 +558,7 @@ class ChatOrchestratorService {
       if (followUpText) {
         history.push({ role: 'model', parts: [{ text: followUpText }] });
       }
-    } catch (followUpError) {
+    } catch (_followUpError) {
       logger.warn('[ChatOrchestrator] Follow-up response failed', {
         component: 'ai-chat-orchestrator',
         action: 'confirmation_followup',
@@ -597,4 +597,5 @@ class ChatOrchestratorService {
   }
 }
 
+/** Singleton instance for orchestrating AI chat conversations with tool execution. */
 export const chatOrchestratorService = new ChatOrchestratorService();

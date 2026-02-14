@@ -166,6 +166,7 @@ docs/
 
 # EXCEPTIONS: Public-facing files we DO commit
 !README.md
+!CHANGELOG.md
 !.github/pull_request_template.md
 
 # CI/CD documentation
@@ -179,3 +180,10 @@ docs/CI-CD-SETUP.md
 .cleancode-audit.json
 .deps-reports/
 .db/
+
+# Launch readiness reports
+.launch-reports/
+
+# Root-level screenshots (session artifacts)
+dashboard-state.png
+session-state-screenshot.png

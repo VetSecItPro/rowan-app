@@ -79,6 +79,7 @@ const POPULAR_ICONS = [
   'Gift', 'Palette', 'Scissors', 'Wrench', 'Smartphone', 'Laptop',
 ];
 
+/** Provides category and tag management controls for project items. */
 export function CategoryTagManager({ spaceId, userId, onClose }: CategoryTagManagerProps) {
   const [activeTab, setActiveTab] = useState<TabType>('categories');
   const [categories, setCategories] = useState<CustomCategory[]>([]);

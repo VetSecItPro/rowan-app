@@ -13,6 +13,7 @@ interface SecurityTabProps {
   userEmail: string;
 }
 
+/** Renders the security settings tab with password and 2FA controls. */
 export const SecurityTab = React.memo(({ userEmail }: SecurityTabProps) => {
   const [isRequestingReset, setIsRequestingReset] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -212,7 +213,7 @@ export const SecurityTab = React.memo(({ userEmail }: SecurityTabProps) => {
                 </div>
                 <h3 className="text-xl font-bold text-white">Revoke Session</h3>
               </div>
-              <button onClick={() => setShowRevokeSessionModal(false)} className="text-gray-500 text-gray-400 hover:text-gray-200">
+              <button onClick={() => setShowRevokeSessionModal(false)} className="text-gray-400 hover:text-gray-200">
                 <X className="w-5 h-5" />
               </button>
             </div>

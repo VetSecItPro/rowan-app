@@ -14,7 +14,6 @@ import {
   requestPushPermissions,
   registerForPush,
   setupNotificationListeners,
-  type PushNotificationToken,
 } from '@/lib/native/push-notifications';
 import { isNative } from '@/lib/native';
 import { logger } from '@/lib/logger';
@@ -58,6 +57,7 @@ interface UsePushNotificationsResult {
   unregister: () => Promise<boolean>;
 }
 
+/** Manages push notification registration, permissions, and token handling via Capacitor */
 export function usePushNotifications(
   options: UsePushNotificationsOptions
 ): UsePushNotificationsResult {

@@ -124,7 +124,7 @@ const MetricCard = memo(function MetricCard({
           <p className="text-xs font-medium text-gray-400 truncate">{title}</p>
           <p className="text-2xl font-bold text-white mt-1">{value}</p>
           {previousValue !== undefined && (
-            <p className="text-xs text-gray-500 mt-0.5">Previous: {previousValue}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Previous: {previousValue}</p>
           )}
           {subtitle && (
             <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
@@ -327,6 +327,7 @@ const HourlyActivityChart = memo(function HourlyActivityChart({
   );
 });
 
+/** Renders the main analytics overview panel with key platform metrics. */
 export const AnalyticsPanel = memo(function AnalyticsPanel() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const { compareEnabled } = useComparison();
@@ -645,7 +646,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
       </div>
 
       {/* Data Note */}
-      <div className="text-xs text-gray-500 text-center py-2">
+      <div className="text-xs text-gray-400 text-center py-2">
         Analytics data is cached for 15 minutes. Click refresh to get latest data.
       </div>
 

@@ -15,6 +15,7 @@ const TOOLBAR_BUTTONS = [
   { icon: Link2, label: 'Link', before: '[', after: '](url)', placeholder: 'link text' },
 ];
 
+/** Renders a formatting toolbar with bold, italic, and link controls. */
 export function RichTextToolbar({ textareaRef, onFormatApplied }: RichTextToolbarProps) {
   const insertFormatting = (before: string, after: string, placeholder: string = '') => {
      

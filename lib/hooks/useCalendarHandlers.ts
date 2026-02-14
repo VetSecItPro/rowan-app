@@ -75,9 +75,10 @@ export interface CalendarHandlersReturn {
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Provides CRUD event handlers for calendar events, RSVPs, and event proposals */
 export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandlersReturn {
   const {
-    events,
+    events: _events,
     setEvents,
     loadEvents,
     syncState,
@@ -90,7 +91,7 @@ export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandler
     editingEvent,
     confirmDialog,
     setCurrentMonth,
-    setViewMode,
+    setViewMode: _setViewMode,
   } = deps;
 
   // ---------------------------------------------------------------------------

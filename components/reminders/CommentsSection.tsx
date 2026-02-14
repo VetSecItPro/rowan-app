@@ -17,6 +17,7 @@ interface CommentsSectionProps {
   spaceId: string;
 }
 
+/** Displays a comment section for discussing a reminder. */
 export function CommentsSection({ reminderId, spaceId }: CommentsSectionProps) {
   const { user } = useAuth();
   const [comments, setComments] = useState<ReminderComment[]>([]);

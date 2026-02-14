@@ -33,6 +33,7 @@ const mobileCardAnimation = {
 
 // ─── Sub-Components ──────────────────────────────────────────────────────────
 
+/** Renders a horizontal progress bar with percentage fill and label. */
 export const ProgressBar = memo(function ProgressBar({
   value,
   max,
@@ -72,6 +73,7 @@ export const ProgressBar = memo(function ProgressBar({
   );
 });
 
+/** Displays an up/down trend arrow with percentage change value. */
 export const TrendIndicator = memo(function TrendIndicator({
   value,
   label,
@@ -155,6 +157,7 @@ const alertIcons: Record<string, LucideIcon> = {
 
 // ─── StatCard Component ──────────────────────────────────────────────────────
 
+/** Renders a dashboard statistics card with value, trend, and optional progress bar. */
 export const StatCard = memo(function StatCard({
   config,
   index,

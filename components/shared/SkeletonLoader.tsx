@@ -5,6 +5,7 @@ interface SkeletonLoaderProps {
   width?: string;
 }
 
+/** Renders animated skeleton loading placeholders. */
 export function SkeletonLoader({ count = 1, className = '', height = 'h-20', width = '' }: SkeletonLoaderProps) {
   return (
     <div className={`space-y-4 ${className}`}>
@@ -18,6 +19,7 @@ export function SkeletonLoader({ count = 1, className = '', height = 'h-20', wid
   );
 }
 
+/** Renders a skeleton loading placeholder shaped like a content card. */
 export function SkeletonCard() {
   return (
     <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6 animate-pulse">
@@ -30,6 +32,7 @@ export function SkeletonCard() {
   );
 }
 
+/** Renders a skeleton loading placeholder shaped like a data table. */
 export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-2">
@@ -43,6 +46,7 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   );
 }
 
+/** Renders skeleton loading placeholder lines for text content. */
 export function SkeletonText({ lines = 3 }: { lines?: number }) {
   return (
     <div className="space-y-2">

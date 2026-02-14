@@ -16,6 +16,7 @@ import type {
   MilestoneUpdatePayload,
 } from './types';
 
+/** Service for goal milestone CRUD with completion tracking and badge awarding. */
 export const milestoneService = {
   /**
    * Creates a new milestone for a goal.

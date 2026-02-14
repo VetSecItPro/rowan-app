@@ -71,6 +71,7 @@ export interface UseProjectsModalsReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Manages open/close state for project creation, editing, and task assignment modals */
 export function useProjectsModals(): UseProjectsModalsReturn {
   // ─── Project modal state ──────────────────────────────────────────────────
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);

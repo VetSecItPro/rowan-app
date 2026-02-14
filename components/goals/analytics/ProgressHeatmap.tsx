@@ -9,6 +9,7 @@ interface ProgressHeatmapProps {
   }>;
 }
 
+/** Renders a heatmap visualization of daily goal progress activity. */
 export default function ProgressHeatmap({ data }: ProgressHeatmapProps) {
   const [hoveredDay, setHoveredDay] = useState<{ date: string; count: number } | null>(null);
 

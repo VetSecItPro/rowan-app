@@ -34,6 +34,7 @@ interface UseAIBriefingReturn {
   dismiss: () => void;
 }
 
+/** Fetches and caches an AI-generated daily briefing for the given space */
 export function useAIBriefing(spaceId: string | undefined): UseAIBriefingReturn {
   const [briefing, setBriefing] = useState<BriefingOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);

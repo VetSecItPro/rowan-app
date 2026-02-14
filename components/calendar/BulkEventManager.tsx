@@ -26,6 +26,7 @@ interface EventSourceInfo {
   icon: string;
 }
 
+/** Provides bulk selection and batch operations for calendar events. */
 export function BulkEventManager({
   isOpen,
   onClose,

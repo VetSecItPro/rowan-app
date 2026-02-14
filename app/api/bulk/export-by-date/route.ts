@@ -24,6 +24,7 @@ export const dynamic = 'force-dynamic';
  * - Allows users to export data for specific date ranges
  */
 
+/** Exports user data for a specific date range in JSON or CSV format */
 export async function GET(request: NextRequest) {
   try {
     // Rate limit check - expensive operation (5 per hour)

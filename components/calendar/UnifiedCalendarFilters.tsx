@@ -51,7 +51,7 @@ const FilterButton = memo(function FilterButton({
           ${
             isActive
               ? `${colors.bg} ${colors.border} ${colors.text}`
-              : 'border-gray-700 text-gray-500'
+              : 'border-gray-700 text-gray-400'
           }
           hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2
           ${isActive ? 'focus:ring-purple-500' : 'focus:ring-gray-400'}
