@@ -13,6 +13,7 @@ interface ToggleProps {
   description?: string;
 }
 
+/** Renders a toggle switch input for boolean settings. */
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   ({ id, checked, onChange, disabled = false, size = 'md', color = 'purple', label, description }, ref) => {
     // iOS-style toggle sizing (width should be about 2x height)

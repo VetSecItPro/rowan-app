@@ -78,4 +78,5 @@ function ChoreCardComponent({ chore, onStatusChange, onEdit, onDelete, onUpdateP
   );
 }
 
+/** Renders a project chore card with status, assignee, and actions. */
 export const ChoreCard = memo(ChoreCardComponent);

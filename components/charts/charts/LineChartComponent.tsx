@@ -33,6 +33,7 @@ interface LineChartComponentProps {
   strokeWidth?: number;
 }
 
+/** Renders a Recharts line chart with configurable data series and styling. */
 export function LineChartComponent({
   data,
   xDataKey,

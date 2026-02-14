@@ -16,6 +16,7 @@ interface CCPANoticeBannerProps {
   autoDetect?: boolean;
 }
 
+/** Displays a CCPA privacy rights notice banner for California users. */
 export function CCPANoticeBanner({ onDismiss, autoDetect = true }: CCPANoticeBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(autoDetect);
@@ -167,6 +168,7 @@ export function CCPANoticeBanner({ onDismiss, autoDetect = true }: CCPANoticeBan
 }
 
 // Compact version for smaller screens or less prominent placement
+/** Renders a compact inline CCPA privacy notice. */
 export function CCPACompactNotice({ onDismiss }: { onDismiss?: () => void }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -227,6 +229,7 @@ export function CCPACompactNotice({ onDismiss }: { onDismiss?: () => void }) {
 }
 
 // Provider component to automatically manage CCPA notices across the app
+/** Provides CCPA notice state management to child components. */
 export function CCPANoticeProvider({ children }: { children: React.ReactNode }) {
   const [showBanner, setShowBanner] = useState(false);
   const [showCompact, setShowCompact] = useState(false);

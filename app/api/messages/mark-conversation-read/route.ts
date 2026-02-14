@@ -10,6 +10,7 @@ const markConversationReadSchema = z.object({
   conversationId: z.string().uuid('Invalid conversation ID'),
 });
 
+/** Marks all unread messages in a conversation as read */
 export async function POST(request: NextRequest) {
   try {
     const ip = extractIP(request.headers);

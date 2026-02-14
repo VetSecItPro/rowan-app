@@ -246,6 +246,7 @@ async function* parseSSEStream(
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Manages AI chat conversations including message streaming, history, and conversation lifecycle */
 export function useChat(spaceId: string) {
   const conversationIdRef = useRef('new');
   const abortControllerRef = useRef<AbortController | null>(null);

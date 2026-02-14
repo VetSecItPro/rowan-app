@@ -251,6 +251,7 @@ function ExpenseForm({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpen
   );
 }
 
+/** Renders a modal form for creating or editing a project expense. */
 export function NewExpenseModal(props: NewExpenseModalProps) {
   const { editExpense, isOpen, spaceId } = props;
   const formKey = `${editExpense?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId}`;

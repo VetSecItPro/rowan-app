@@ -11,6 +11,7 @@ interface DrillDownModalProps {
   children: ReactNode;
 }
 
+/** Displays a modal overlay with a drill-down chart for detailed metric exploration. */
 export const DrillDownModal = memo(function DrillDownModal({
   isOpen,
   onClose,

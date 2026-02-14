@@ -72,4 +72,5 @@ function ExpenseCardComponent({ expense, onEdit, onDelete, onStatusChange }: Exp
   );
 }
 
+/** Renders a project expense card with amount, category, and receipt status. */
 export const ExpenseCard = memo(ExpenseCardComponent);

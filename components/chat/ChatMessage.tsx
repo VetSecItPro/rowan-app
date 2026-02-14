@@ -25,7 +25,8 @@ interface ChatMessageProps {
   onFeedback?: (messageId: string, feedback: 'positive' | 'negative') => void;
 }
 
-export default function ChatMessage({ message, conversationId, onConfirm, onFeedback }: ChatMessageProps) {
+/** Displays a single AI chat message with markdown rendering and action buttons. */
+export default function ChatMessage({ message, conversationId: _conversationId, onConfirm, onFeedback }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const [localFeedback, setLocalFeedback] = useState<'positive' | 'negative' | null>(message.feedback ?? null);
 
@@ -121,7 +122,7 @@ export default function ChatMessage({ message, conversationId, onConfirm, onFeed
               className={`p-1 rounded-md transition-colors ${
                 localFeedback === 'positive'
                   ? 'text-emerald-400 bg-emerald-500/10'
-                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+                  : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700/50'
               }`}
               aria-label="Helpful"
               title="Helpful"
@@ -133,7 +134,7 @@ export default function ChatMessage({ message, conversationId, onConfirm, onFeed
               className={`p-1 rounded-md transition-colors ${
                 localFeedback === 'negative'
                   ? 'text-red-400 bg-red-500/10'
-                  : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+                  : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700/50'
               }`}
               aria-label="Not helpful"
               title="Not helpful"

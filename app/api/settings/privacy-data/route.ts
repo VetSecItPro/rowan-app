@@ -25,6 +25,7 @@ const PrivacyDataSettingsSchema = z.object({
   }).strict(),
 }).strict();
 
+/** Retrieves the user's privacy and data processing settings */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -73,6 +74,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Updates the user's privacy and data processing settings */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

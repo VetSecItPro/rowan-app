@@ -436,7 +436,7 @@ export default function GoalsDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Rowan's Goals & Milestones feature is your comprehensive goal achievement system. Whether you're pursuing personal growth, shared relationship goals, or building consistent habits, we've created powerful tools to help you succeed together.
+                Rowan&apos;s Goals & Milestones feature is your comprehensive goal achievement system. Whether you&apos;re pursuing personal growth, shared relationship goals, or building consistent habits, we&apos;ve created powerful tools to help you succeed together.
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Key Features at a Glance</h3>
               <ul className="space-y-2 text-gray-300">
@@ -574,7 +574,7 @@ export default function GoalsDocumentationPage() {
                   </div>
                   <div className="mt-4 p-3 bg-blue-800/30 rounded-lg">
                     <p className="text-blue-200 text-sm">
-                      <strong>How to:</strong> Click "New Goal" → Browse templates → Select category → Choose template → Customize details → Create goal
+                      <strong>How to:</strong> Click &quot;New Goal&quot; → Browse templates → Select category → Choose template → Customize details → Create goal
                     </p>
                   </div>
                 </div>
@@ -596,7 +596,7 @@ export default function GoalsDocumentationPage() {
                   </div>
                   <div className="mt-4 p-3 bg-green-800/30 rounded-lg">
                     <p className="text-green-200 text-sm">
-                      <strong>How to:</strong> Visit Goals page → Click "New Goal" → Choose from templates or create manually
+                      <strong>How to:</strong> Visit Goals page → Click &quot;New Goal&quot; → Choose from templates or create manually
                     </p>
                   </div>
                 </div>
@@ -619,7 +619,7 @@ export default function GoalsDocumentationPage() {
                   </div>
                   <div className="mt-4 p-3 bg-purple-800/30 rounded-lg">
                     <p className="text-purple-200 text-sm">
-                      <strong>How to:</strong> Click "New Goal" → "Create from Scratch" → Fill in custom details → Save goal
+                      <strong>How to:</strong> Click &quot;New Goal&quot; → &quot;Create from Scratch&quot; → Fill in custom details → Save goal
                     </p>
                   </div>
                 </div>
@@ -737,7 +737,7 @@ export default function GoalsDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-6">
-                Voice check-ins provide a natural, conversational way to track your goal progress. Rowan's advanced voice recorder includes professional features like waveform visualization, templates, and automatic transcription.
+                Voice check-ins provide a natural, conversational way to track your goal progress. Rowan&apos;s advanced voice recorder includes professional features like waveform visualization, templates, and automatic transcription.
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-4">Voice Note Templates</h3>
@@ -748,7 +748,7 @@ export default function GoalsDocumentationPage() {
                     <h4 className="text-lg font-bold text-white">Progress Update</h4>
                   </div>
                   <p className="text-gray-300 mb-3 text-sm">
-                    Share what progress you've made since your last check-in
+                    Share what progress you&apos;ve made since your last check-in
                   </p>
                   <div className="space-y-1 text-xs text-gray-400">
                     <div>• What specific actions did you take?</div>
@@ -763,11 +763,11 @@ export default function GoalsDocumentationPage() {
                     <h4 className="text-lg font-bold text-white">Challenges & Blockers</h4>
                   </div>
                   <p className="text-gray-300 mb-3 text-sm">
-                    Reflect on any challenges or obstacles you've encountered
+                    Reflect on any challenges or obstacles you&apos;ve encountered
                   </p>
                   <div className="space-y-1 text-xs text-gray-400">
                     <div>• What challenges are you facing?</div>
-                    <div>• What's preventing you from moving forward?</div>
+                    <div>• What&apos;s preventing you from moving forward?</div>
                     <div>• What support or resources do you need?</div>
                   </div>
                 </div>
@@ -856,7 +856,7 @@ export default function GoalsDocumentationPage() {
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
                   <div>
-                    <p><strong>Start Check-in:</strong> Click "Check In" on any goal card</p>
+                    <p><strong>Start Check-in:</strong> Click &quot;Check In&quot; on any goal card</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -880,13 +880,13 @@ export default function GoalsDocumentationPage() {
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
                   <div>
-                    <p><strong>Transcribe (Optional):</strong> Click "Transcribe" for text conversion</p>
+                    <p><strong>Transcribe (Optional):</strong> Click &quot;Transcribe&quot; for text conversion</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-indigo-500 text-white rounded-full flex items-center justify-center text-sm font-bold">6</span>
                   <div>
-                    <p><strong>Save:</strong> Click "Send Check-In" to save with your progress update</p>
+                    <p><strong>Save:</strong> Click &quot;Send Check-In&quot; to save with your progress update</p>
                   </div>
                 </div>
               </div>
@@ -923,9 +923,9 @@ export default function GoalsDocumentationPage() {
                     Track progress as a percentage of completion (0-100%)
                   </p>
                   <div className="space-y-1 text-xs text-gray-400">
-                    <div>• "Complete 25% of home renovation"</div>
-                    <div>• "Finish 50% of online course"</div>
-                    <div>• "Reach 75% of fundraising goal"</div>
+                    <div>• &quot;Complete 25% of home renovation&quot;</div>
+                    <div>• &quot;Finish 50% of online course&quot;</div>
+                    <div>• &quot;Reach 75% of fundraising goal&quot;</div>
                   </div>
                 </div>
 
@@ -938,9 +938,9 @@ export default function GoalsDocumentationPage() {
                     Track specific numbers or quantities
                   </p>
                   <div className="space-y-1 text-xs text-gray-400">
-                    <div>• "Read 5 of 12 books"</div>
-                    <div>• "Complete 10 of 20 workouts"</div>
-                    <div>• "Visit 3 of 8 museums"</div>
+                    <div>• &quot;Read 5 of 12 books&quot;</div>
+                    <div>• &quot;Complete 10 of 20 workouts&quot;</div>
+                    <div>• &quot;Visit 3 of 8 museums&quot;</div>
                   </div>
                 </div>
 
@@ -953,9 +953,9 @@ export default function GoalsDocumentationPage() {
                     Track financial targets and amounts
                   </p>
                   <div className="space-y-1 text-xs text-gray-400">
-                    <div>• "Save $2,500 of $10,000"</div>
-                    <div>• "Pay off $5,000 of debt"</div>
-                    <div>• "Raise $1,000 for charity"</div>
+                    <div>• &quot;Save $2,500 of $10,000&quot;</div>
+                    <div>• &quot;Pay off $5,000 of debt&quot;</div>
+                    <div>• &quot;Raise $1,000 for charity&quot;</div>
                   </div>
                 </div>
 
@@ -968,9 +968,9 @@ export default function GoalsDocumentationPage() {
                     Track completion by specific target dates
                   </p>
                   <div className="space-y-1 text-xs text-gray-400">
-                    <div>• "Submit application by March 15"</div>
-                    <div>• "Complete phase 1 by quarter end"</div>
-                    <div>• "Launch product by December"</div>
+                    <div>• &quot;Submit application by March 15&quot;</div>
+                    <div>• &quot;Complete phase 1 by quarter end&quot;</div>
+                    <div>• &quot;Launch product by December&quot;</div>
                   </div>
                 </div>
               </div>
@@ -980,13 +980,13 @@ export default function GoalsDocumentationPage() {
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
                   <div>
-                    <p><strong>Access Milestones View:</strong> Click the "Milestones" tab in the Goals page</p>
+                    <p><strong>Access Milestones View:</strong> Click the &quot;Milestones&quot; tab in the Goals page</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
                   <div>
-                    <p><strong>Create New Milestone:</strong> Click "New Milestone" button</p>
+                    <p><strong>Create New Milestone:</strong> Click &quot;New Milestone&quot; button</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -1010,7 +1010,7 @@ export default function GoalsDocumentationPage() {
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">6</span>
                   <div>
-                    <p><strong>Save Milestone:</strong> Click "Create Milestone" to add to your goal</p>
+                    <p><strong>Save Milestone:</strong> Click &quot;Create Milestone&quot; to add to your goal</p>
                   </div>
                 </div>
               </div>
@@ -1070,7 +1070,7 @@ export default function GoalsDocumentationPage() {
                 <div className="p-4 bg-green-900/20 rounded-xl border border-green-800">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    <h4 className="font-bold text-white">Today's Progress</h4>
+                    <h4 className="font-bold text-white">Today&apos;s Progress</h4>
                   </div>
                   <p className="text-2xl font-bold text-white">8/12</p>
                   <p className="text-xs text-gray-400">Completed today</p>
@@ -1184,13 +1184,13 @@ export default function GoalsDocumentationPage() {
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
                   <div>
-                    <p><strong>Access Habits View:</strong> Click the "Habits" tab in the Goals page</p>
+                    <p><strong>Access Habits View:</strong> Click the &quot;Habits&quot; tab in the Goals page</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
                   <div>
-                    <p><strong>Review Today's Habits:</strong> See all habits scheduled for today in card format</p>
+                    <p><strong>Review Today&apos;s Habits:</strong> See all habits scheduled for today in card format</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -1215,7 +1215,7 @@ export default function GoalsDocumentationPage() {
 
               <div className="mt-6 p-4 bg-orange-900/20 border border-orange-800 rounded-lg">
                 <p className="text-orange-200 text-sm">
-                  <strong>🔥 Streak Building:</strong> Consistency beats perfection! Focus on building small streaks first. Missing one day won't break your progress - just get back on track the next day.
+                  <strong>🔥 Streak Building:</strong> Consistency beats perfection! Focus on building small streaks first. Missing one day won&apos;t break your progress - just get back on track the next day.
                 </p>
               </div>
             </div>
@@ -1231,7 +1231,7 @@ export default function GoalsDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-6">
-                Goals are more achievable when you work together. Rowan's real-time collaboration features keep you and your partner connected throughout your goal journey.
+                Goals are more achievable when you work together. Rowan&apos;s real-time collaboration features keep you and your partner connected throughout your goal journey.
               </p>
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-4">Live Presence Indicators</h3>
@@ -1239,7 +1239,7 @@ export default function GoalsDocumentationPage() {
                 <div className="p-6 bg-emerald-900/20 rounded-xl border border-emerald-800">
                   <h4 className="text-lg font-bold text-white mb-3">Online Users Display</h4>
                   <ul className="space-y-2 text-gray-300 text-sm">
-                    <li>• See who's currently viewing the Goals page</li>
+                    <li>• See who&apos;s currently viewing the Goals page</li>
                     <li>• User count indicator in page header</li>
                     <li>• Real-time updates when users join/leave</li>
                     <li>• Partner activity notifications</li>
@@ -1249,7 +1249,7 @@ export default function GoalsDocumentationPage() {
                 <div className="p-6 bg-blue-900/20 rounded-xl border border-blue-800">
                   <h4 className="text-lg font-bold text-white mb-3">Goal-Level Presence</h4>
                   <ul className="space-y-2 text-gray-300 text-sm">
-                    <li>• See who's viewing the same goal as you</li>
+                    <li>• See who&apos;s viewing the same goal as you</li>
                     <li>• Avatar indicators on goal cards</li>
                     <li>• Collaborative editing awareness</li>
                     <li>• Prevent conflicting updates</li>
@@ -1321,7 +1321,7 @@ export default function GoalsDocumentationPage() {
 
               <div className="mt-6 p-4 bg-emerald-900/20 border border-emerald-800 rounded-lg">
                 <p className="text-emerald-200 text-sm">
-                  <strong>🤝 Collaboration Tip:</strong> Regular check-ins and encouragement make a huge difference! Use the activity feed to celebrate each other's progress and offer support during challenges.
+                  <strong>🤝 Collaboration Tip:</strong> Regular check-ins and encouragement make a huge difference! Use the activity feed to celebrate each other&apos;s progress and offer support during challenges.
                 </p>
               </div>
             </div>

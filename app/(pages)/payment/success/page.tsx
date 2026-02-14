@@ -222,7 +222,7 @@ function PaymentSuccessContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="mt-6 text-xs text-gray-500"
+            className="mt-6 text-xs text-gray-400"
           >
             A receipt has been sent to your email address.
           </motion.p>

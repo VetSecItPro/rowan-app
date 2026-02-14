@@ -53,6 +53,7 @@ const ALLOWED_FILE_TYPES = [
 
 const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv', '.zip'];
 
+/** Renders a modal form for creating or editing a calendar event. */
 export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSave, onDelete, editEvent, spaceId }: NewEventModalProps) {
   type RecurringFrequency = 'daily' | 'weekly' | 'monthly';
   type EventCategory = NonNullable<CreateEventInput['category']>;

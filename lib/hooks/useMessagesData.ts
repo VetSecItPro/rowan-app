@@ -68,6 +68,7 @@ export interface MessagesDataReturn {
 // HOOK
 // =============================================
 
+/** Loads message threads and conversations for the current space with real-time updates */
 export function useMessagesData(): MessagesDataReturn {
   const { currentSpace, user } = useAuthWithSpaces();
 
@@ -250,9 +251,11 @@ export function useMessagesData(): MessagesDataReturn {
 
   // Cleanup typing indicator on unmount
   useEffect(() => {
+    // Capture ref value inside effect so cleanup uses the correct timer ID
+    const currentTimeout = typingTimeoutRef.current;
     return () => {
-      if (conversationId && user && typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
+      if (conversationId && user && currentTimeout) {
+        clearTimeout(currentTimeout);
         messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
           logger.error('Failed to cleanup typing indicator:', error, { component: 'page', action: 'service_call' });
         });

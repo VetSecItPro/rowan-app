@@ -30,6 +30,7 @@ export interface RecurringTaskInput {
   recurrence: RecurrencePattern;
 }
 
+/** Service for creating recurring task templates and generating task instances from recurrence patterns. */
 export const taskRecurrenceService = {
   /**
    * Create a recurring task template

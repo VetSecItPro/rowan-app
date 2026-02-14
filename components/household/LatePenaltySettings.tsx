@@ -45,6 +45,7 @@ const DEFAULT_SETTINGS: PenaltySettings = {
   forgiveness_allowed: true,
 };
 
+/** Provides configuration controls for late chore completion penalty rules. */
 export function LatePenaltySettings({ className, onSettingsChange }: LatePenaltySettingsProps) {
   const { currentSpace } = useSpaces();
   const [settings, setSettings] = useState<PenaltySettings>(DEFAULT_SETTINGS);
@@ -319,7 +320,7 @@ export function LatePenaltySettings({ className, onSettingsChange }: LatePenalty
                 className="w-full flex items-center justify-between py-3 px-4 rounded-xl bg-gray-700/50 hover:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Settings2 className="w-5 h-5 text-gray-500" />
+                  <Settings2 className="w-5 h-5 text-gray-400" />
                   <span className="font-medium text-gray-300">
                     Advanced Settings
                   </span>

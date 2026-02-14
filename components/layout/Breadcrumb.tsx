@@ -42,6 +42,7 @@ const getIconForLabel = (label: string) => {
   return iconMap[label] || FileText; // Default to FileText if no match
 };
 
+/** Renders breadcrumb navigation showing the current page hierarchy. */
 export function Breadcrumb({ items = [] }: BreadcrumbProps) {
   // Filter out Dashboard from items since we always show it as root
   const filteredItems = items.filter(item => item.label !== 'Dashboard');

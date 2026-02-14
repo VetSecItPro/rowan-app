@@ -93,6 +93,7 @@ const DEFAULT_TEMPLATES: VoiceNoteTemplate[] = [
   }
 ];
 
+/** Renders a voice recorder with waveform visualization for goal check-in notes. */
 export function AdvancedVoiceRecorder({
   onSendVoice,
   onCancel,
@@ -581,7 +582,7 @@ export function AdvancedVoiceRecorder({
             <div className="flex items-center gap-4">
               {/* Speed Control */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">Speed:</span>
+                <span className="text-xs text-gray-400">Speed:</span>
                 <select
                   value={playbackSpeed}
                   onChange={(e) => handleSpeedChange(Number(e.target.value))}
@@ -598,7 +599,7 @@ export function AdvancedVoiceRecorder({
 
               {/* Volume Control */}
               <div className="flex items-center gap-2">
-                <Volume2 className="w-4 h-4 text-gray-500" />
+                <Volume2 className="w-4 h-4 text-gray-400" />
                 <input
                   type="range"
                   min="0"

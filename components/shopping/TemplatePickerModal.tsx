@@ -25,6 +25,7 @@ interface TemplatePickerModalProps {
   spaceId: string;
 }
 
+/** Displays a modal for selecting a shopping list template. */
 export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStartFresh, spaceId }: TemplatePickerModalProps) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
@@ -397,7 +398,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelectTemplate, onStart
               <div className="text-center py-6 px-4 border border-gray-700 rounded-lg bg-gray-900/50">
                 <ShoppingCart className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-400 mb-2">No templates saved yet</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-400">
                   Create a shopping list and save it as a template, or try one of our quick-start templates below!
                 </p>
               </div>

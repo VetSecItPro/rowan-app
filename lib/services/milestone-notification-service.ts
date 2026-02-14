@@ -349,7 +349,7 @@ export function subscribeToMilestoneCompletions(
   return channel;
 }
 
-// Export service object
+/** Service for milestone notifications, celebrations, and real-time subscription. */
 export const milestoneNotificationService = {
   getUserNotifications,
   getUnreadNotificationCount,

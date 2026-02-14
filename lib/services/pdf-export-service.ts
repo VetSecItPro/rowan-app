@@ -533,7 +533,7 @@ export async function exportProjectCostReport(projectId: string): Promise<void> 
   printToPDF(html);
 }
 
-// Export service object
+/** Service for generating PDF exports of monthly expense summaries and project cost reports. */
 export const pdfExportService = {
   exportMonthlyExpenseSummary,
   exportProjectCostReport,

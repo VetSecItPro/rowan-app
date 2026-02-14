@@ -14,6 +14,7 @@ interface ProposalCardProps {
   onReject?: () => void;
 }
 
+/** Displays a single event proposal with voting and approval controls. */
 export function ProposalCard({ proposal, onVote, onApprove, onReject }: ProposalCardProps) {
   const { user } = useAuth();
   const [voting, setVoting] = useState(false);

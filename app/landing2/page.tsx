@@ -471,7 +471,7 @@ export default function Landing2Page() {
                     >
                       <div className="h-full w-full rounded-2xl bg-gray-950/70" />
                     </div>
-                    <span className="text-xs font-semibold text-gray-500 transition-colors text-gray-400 group-hover:text-gray-200">
+                    <span className="text-xs font-semibold text-gray-400 transition-colors text-gray-400 group-hover:text-gray-200">
                       Explore
                     </span>
                   </div>

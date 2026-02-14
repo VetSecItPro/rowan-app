@@ -23,6 +23,7 @@ export interface PricingCardProps {
   onSelect: () => void;
 }
 
+/** Renders a pricing tier card with features, price, and subscribe button. */
 export function PricingCard({
   tier,
   title,

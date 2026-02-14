@@ -12,6 +12,7 @@ interface AttachmentPreviewProps {
   compact?: boolean;
 }
 
+/** Renders a preview thumbnail for a message file attachment. */
 export function AttachmentPreview({ attachment, onDelete, compact = false }: AttachmentPreviewProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);

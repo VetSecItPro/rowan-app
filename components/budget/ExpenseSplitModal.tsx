@@ -36,6 +36,7 @@ interface ExpenseSplitModalProps {
   onSave: () => void;
 }
 
+/** Renders a modal for splitting an expense between space members. */
 export function ExpenseSplitModal({
   isOpen,
   onClose,

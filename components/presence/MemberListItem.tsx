@@ -32,7 +32,7 @@ const MemberListItem = memo(function MemberListItem({
       case 'admin':
         return <Shield className="w-4 h-4 text-blue-500" />;
       default:
-        return <User className="w-4 h-4 text-gray-500" />;
+        return <User className="w-4 h-4 text-gray-400" />;
     }
   };
 
@@ -93,7 +93,7 @@ const MemberListItem = memo(function MemberListItem({
           <div className="flex items-center gap-2">
             <h4 className="text-sm font-medium text-white">
               {member.name}
-              {isCurrentUser && <span className="text-gray-500"> (You)</span>}
+              {isCurrentUser && <span className="text-gray-400"> (You)</span>}
             </h4>
             {getRoleIcon(member.role)}
           </div>

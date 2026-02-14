@@ -12,6 +12,7 @@ interface GoalProgressCardProps {
   onClick?: () => void;
 }
 
+/** Renders a compact goal progress card with circular progress indicator. */
 export default function GoalProgressCard({ goal, onClick }: GoalProgressCardProps) {
   const [projectedDate, setProjectedDate] = useState<string | null>(null);
   const [recentContributions, setRecentContributions] = useState<GoalContribution[]>([]);

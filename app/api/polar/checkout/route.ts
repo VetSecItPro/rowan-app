@@ -23,6 +23,7 @@ const CreateCheckoutSchema = z.object({
   billingInterval: z.enum(['monthly', 'annual']).default('monthly'),
 });
 
+/** Creates a Polar checkout session for subscription purchase */
 export async function POST(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth

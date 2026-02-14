@@ -18,6 +18,7 @@ interface RewardsSectionProps {
   spaceId: string;
 }
 
+/** Displays the rewards points summary and recent earnings on the dashboard. */
 export function RewardsSection({ userId, spaceId }: RewardsSectionProps) {
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -17,6 +17,7 @@ const ICSConnectSchema = z.object({
   name: z.string().min(1, 'Feed name is required').max(100, 'Feed name too long'),
 });
 
+/** Connects a generic ICS calendar feed */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint to check connection status
+/** Checks ICS feed connection status */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -273,7 +274,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// DELETE endpoint to remove an ICS connection
+/** Disconnects and removes an ICS calendar feed connection */
 export async function DELETE(request: NextRequest) {
   try {
     // Rate limiting

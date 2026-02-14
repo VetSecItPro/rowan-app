@@ -22,6 +22,7 @@ interface BillCardProps {
   onMarkPaid: (billId: string) => void;
 }
 
+/** Renders a bill card with amount, due date, and payment status. */
 export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -119,6 +120,7 @@ export function BillCard({ bill, onEdit, onDelete, onMarkPaid }: BillCardProps) 
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowMenu(false)}
+                aria-hidden="true"
               />
               <div className="absolute right-0 mt-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                 <button

@@ -13,6 +13,7 @@ export interface BulkOperationResult {
   errors: string[];
 }
 
+/** Service for batch operations on reminders (bulk complete, snooze, delete, reassign). */
 export const remindersBulkService = {
   /**
    * Complete multiple reminders at once

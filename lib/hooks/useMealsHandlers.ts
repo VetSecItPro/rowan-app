@@ -125,6 +125,7 @@ export interface UseMealsHandlersReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Provides CRUD handlers for meal plans, recipes, and meal scheduling */
 export function useMealsHandlers(deps: UseMealsHandlersDeps): UseMealsHandlersReturn {
   const {
     spaceId,
@@ -218,8 +219,8 @@ export function useMealsHandlers(deps: UseMealsHandlersDeps): UseMealsHandlersRe
 
     const mealsKey = QUERY_KEYS.meals.all(spaceId || '');
 
-    const previousData = queryClient.getQueryData<{ meals: Meal[]; stats: typeof stats }>(mealsKey);
-    queryClient.setQueryData<{ meals: Meal[]; stats: typeof stats } | undefined>(
+    const previousData = queryClient.getQueryData<{ meals: Meal[]; stats: MealsStats }>(mealsKey);
+    queryClient.setQueryData<{ meals: Meal[]; stats: MealsStats } | undefined>(
       mealsKey,
       (old) => old ? { ...old, meals: old.meals.filter(m => m.id !== mealId) } : old,
     );
@@ -258,7 +259,7 @@ export function useMealsHandlers(deps: UseMealsHandlersDeps): UseMealsHandlersRe
         }
       }
     });
-  }, [meals, spaceId, queryClient, stats, invalidateMeals, setPendingDeletions]);
+  }, [meals, spaceId, queryClient, invalidateMeals, setPendingDeletions]);
 
   const handleCreateRecipe = useCallback(async (recipeData: CreateRecipeInput) => {
     if (!spaceId) {

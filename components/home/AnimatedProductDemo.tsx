@@ -119,7 +119,7 @@ function CalendarScene() {
       >
         {days.map((d, i) => (
           <div key={d} className="text-center">
-            <div className="text-[9px] text-gray-500 mb-1">{d}</div>
+            <div className="text-[9px] text-gray-400 mb-1">{d}</div>
             <div className="h-12 rounded bg-gray-800/60 relative flex items-end p-0.5">
               {events
                 .filter((e) => e.day === i)
@@ -182,7 +182,7 @@ function ShoppingScene() {
               {item.label}
             </span>
           </div>
-          <span className="text-[10px] text-gray-500">${item.price.toFixed(2)}</span>
+          <span className="text-[10px] text-gray-400">${item.price.toFixed(2)}</span>
         </motion.div>
       ))}
     </div>
@@ -244,6 +244,7 @@ const SCENE_COMPONENTS = [TaskScene, CalendarScene, ShoppingScene, ChatScene];
 // Main Component
 // ---------------------------------------------------------------------------
 
+/** Renders an animated product walkthrough demo for the landing page. */
 export function AnimatedProductDemo() {
   const prefersReducedMotion = useReducedMotion();
   const [activeScene, setActiveScene] = useState(0);
@@ -310,7 +311,7 @@ export function AnimatedProductDemo() {
       >
         {/* Status bar */}
         <div className="flex items-center justify-between px-5 py-1.5 bg-black">
-          <span className="text-[9px] text-gray-500">9:41</span>
+          <span className="text-[9px] text-gray-400">9:41</span>
           <div className="w-16 h-4 rounded-full bg-gray-900" />
           <div className="flex gap-0.5">
             <div className="w-3 h-2 rounded-sm bg-gray-600" />

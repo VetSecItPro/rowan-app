@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
           <p className="text-xl text-gray-400">
             Effective Date: {new Date().toLocaleDateString()}
           </p>
-          <p className="text-lg text-gray-500 mt-2">
+          <p className="text-lg text-gray-400 mt-2">
             Compliant with GDPR, CCPA, and other privacy regulations
           </p>
         </div>

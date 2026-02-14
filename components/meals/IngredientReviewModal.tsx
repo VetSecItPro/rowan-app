@@ -12,6 +12,7 @@ interface IngredientReviewModalProps {
   recipeName: string;
 }
 
+/** Displays a modal for reviewing and editing auto-extracted recipe ingredients. */
 export function IngredientReviewModal({
   isOpen,
   onClose,

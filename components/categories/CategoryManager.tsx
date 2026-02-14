@@ -74,6 +74,7 @@ const PRESET_ICONS = [
   '🔧', '🎵', '📝', '🌟', '🔥', '💡', '🚀', '🎲'
 ];
 
+/** Provides full category and tag management with create, edit, and delete operations. */
 export function CategoryManager({ domain, showTags = true, showBudgets = true, className }: CategoryManagerProps) {
   const { currentSpace, user } = useAuth();
   const [categories, setCategories] = useState<CustomCategory[]>([]);

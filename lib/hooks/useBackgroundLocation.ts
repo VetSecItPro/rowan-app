@@ -53,6 +53,7 @@ interface UseBackgroundLocationReturn {
   stop: () => Promise<boolean>;
 }
 
+/** Manages background geolocation tracking via Capacitor for native mobile devices */
 export function useBackgroundLocation({
   spaceId,
   autoStart = false,
@@ -66,7 +67,8 @@ export function useBackgroundLocation({
 
   // Ref to keep spaceId current inside the listener callback
   const spaceIdRef = useRef(spaceId);
-  spaceIdRef.current = spaceId;
+  // Sync ref in effect to avoid writing refs during render
+  useEffect(() => { spaceIdRef.current = spaceId; }, [spaceId]);
 
   // Track if we've already initialized to avoid double-start
   const initializedRef = useRef(false);

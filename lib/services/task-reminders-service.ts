@@ -15,6 +15,7 @@ export interface TaskReminder {
   updated_at: string;
 }
 
+/** Service for creating and managing task-specific reminders with configurable time offsets. */
 export const taskRemindersService = {
   async createReminder(taskId: string, userId: string, offsetType: string, reminderType: string = 'notification', customOffset?: number): Promise<TaskReminder> {
     const supabase = createClient();

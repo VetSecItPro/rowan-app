@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 
+/** Displays common family management pain points that Rowan solves. */
 export function PainPointsSection() {
     const prefersReducedMotion = useReducedMotion();
 

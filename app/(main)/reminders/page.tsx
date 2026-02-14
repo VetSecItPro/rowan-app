@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, Search, Plus, CheckCircle2, AlertCircle, Clock, ChevronDown, TrendingUp, X } from 'lucide-react';
+import nextDynamic from 'next/dynamic';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -12,8 +13,10 @@ import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { ReminderCard } from '@/components/reminders/ReminderCard';
-import { NewReminderModal } from '@/components/reminders/NewReminderModal';
-import { BulkActionsToolbar } from '@/components/reminders/BulkActionsToolbar';
+
+// Lazy-load heavy components (only rendered when modal opens / bulk selection active)
+const NewReminderModal = nextDynamic(() => import('@/components/reminders/NewReminderModal').then(m => ({ default: m.NewReminderModal })), { ssr: false });
+const BulkActionsToolbar = nextDynamic(() => import('@/components/reminders/BulkActionsToolbar').then(m => ({ default: m.BulkActionsToolbar })), { ssr: false });
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { remindersService, Reminder, CreateReminderInput } from '@/lib/services/reminders-service';
 import { CTAButton } from '@/components/ui/EnhancedButton';
@@ -557,7 +560,7 @@ export default function RemindersPage(): React.JSX.Element {
                       <option value="created_date">Sort: Newest</option>
                       <option value="title">Sort: A-Z</option>
                     </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
 
@@ -873,7 +876,7 @@ export default function RemindersPage(): React.JSX.Element {
                   <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-700">
                     <p className="text-sm text-gray-400">
                       Showing {paginatedReminders.length} of {filteredReminders.length} reminders
-                      <span className="ml-1 text-gray-500">({remainingCount} more)</span>
+                      <span className="ml-1 text-gray-400">({remainingCount} more)</span>
                     </p>
                     <div className="flex gap-3">
                       <button
@@ -913,7 +916,7 @@ export default function RemindersPage(): React.JSX.Element {
         /* Show a message if no space exists */
         isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/80" onClick={handleCloseModal} />
+            <div className="absolute inset-0 bg-black/80" onClick={handleCloseModal} aria-hidden="true" />
             <div className="relative bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
               <h3 className="text-xl font-bold text-white mb-4">No Space Available</h3>
               <p className="text-gray-400 mb-6">

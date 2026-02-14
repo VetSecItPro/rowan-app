@@ -40,6 +40,7 @@ const commonTrades = [
   'Other'
 ];
 
+/** Renders a modal form for creating or editing a vendor record. */
 export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModalProps) {
   const [formData, setFormData] = useState<VendorFormData>({
     name: '',

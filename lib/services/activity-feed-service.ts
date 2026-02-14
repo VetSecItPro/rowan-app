@@ -15,6 +15,7 @@ export interface ActivityItem {
   metadata?: Record<string, string | number | boolean | null>;
 }
 
+/** Service for fetching and subscribing to real-time activity feeds across a space. */
 export const activityFeedService = {
   /**
    * Get recent activities for a space

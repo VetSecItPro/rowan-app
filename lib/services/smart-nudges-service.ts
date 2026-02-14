@@ -424,4 +424,5 @@ class SmartNudgesService {
   }
 }
 
+/** Singleton instance for generating contextual smart nudges based on user activity patterns. */
 export const smartNudgesService = new SmartNudgesService();

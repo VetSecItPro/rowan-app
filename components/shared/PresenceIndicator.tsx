@@ -8,6 +8,7 @@ interface PresenceIndicatorProps {
   maxDisplay?: number;
 }
 
+/** Renders avatar stack showing online users with overflow count. */
 export function PresenceIndicator({ users, maxDisplay = 3 }: PresenceIndicatorProps) {
   if (users.length === 0) return null;
 
@@ -44,6 +45,7 @@ interface OnlineUsersIndicatorProps {
   count: number;
 }
 
+/** Displays a compact count of currently online space members. */
 export function OnlineUsersIndicator({ count }: OnlineUsersIndicatorProps) {
   if (count === 0) return null;
 

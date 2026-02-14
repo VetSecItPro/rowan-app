@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useSpaceMembers } from '@/lib/hooks/useSpaceMembers';
 import { useNumericLimit } from '@/lib/hooks/useFeatureGate';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
-import { showError, showSuccess, showWarning } from '@/lib/utils/toast';
+import { showError, showWarning } from '@/lib/utils/toast';
 import { logger } from '@/lib/logger';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import {
@@ -45,6 +45,7 @@ interface ProfileTabProps {
   onShowDeleteAccountModal: () => void;
 }
 
+/** Renders the profile settings tab with avatar, name, and bio editing. */
 export const ProfileTab = memo(function ProfileTab({
   onShowCreateSpaceModal,
   onShowInviteModal,
@@ -304,7 +305,7 @@ export const ProfileTab = memo(function ProfileTab({
             >
               Change profile picture
             </button>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               Max 2MB • JPG, PNG, WebP • 100-2000px
             </p>
           </div>
@@ -539,7 +540,7 @@ export const ProfileTab = memo(function ProfileTab({
                           {/* Copy URL Button */}
                           <button
                             onClick={() => handleCopyInvitationUrl(invitation.id, invitation.invitation_url)}
-                            className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-900/20 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-900/20 rounded-lg transition-colors"
                             title="Copy invitation link"
                           >
                             {copiedInvitationId === invitation.id ? (
@@ -553,7 +554,7 @@ export const ProfileTab = memo(function ProfileTab({
                           <button
                             onClick={() => handleResendInvitation(invitation.id)}
                             disabled={resendingInvitationId === invitation.id}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
                             title="Resend invitation"
                           >
                             {resendingInvitationId === invitation.id ? (
@@ -567,7 +568,7 @@ export const ProfileTab = memo(function ProfileTab({
                           <button
                             onClick={() => handleCancelInvitationWithConfirm(invitation.id)}
                             disabled={cancellingInvitationId === invitation.id}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
                             title="Cancel invitation"
                           >
                             {cancellingInvitationId === invitation.id ? (
@@ -702,7 +703,7 @@ export const ProfileTab = memo(function ProfileTab({
             <p className="text-sm text-gray-400 mb-3">
               Start a new space for work or a different purpose
               {maxSpaces !== Infinity && (
-                <span className="ml-2 text-xs text-gray-500">
+                <span className="ml-2 text-xs text-gray-400">
                   ({ownedSpacesCount}/{maxSpaces} spaces used)
                 </span>
               )}

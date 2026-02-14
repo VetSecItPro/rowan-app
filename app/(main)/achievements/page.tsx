@@ -268,7 +268,7 @@ export default function AchievementsPage() {
                     <div className="text-center py-12">
                       <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-400 text-lg mb-2">No achievements yet</p>
-                      <p className="text-gray-500">Start completing goals to earn your first badges!</p>
+                      <p className="text-gray-400">Start completing goals to earn your first badges!</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -294,7 +294,7 @@ export default function AchievementsPage() {
                     <div className="text-center py-12">
                       <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                       <p className="text-gray-400 text-lg mb-2">No progress to show</p>
-                      <p className="text-gray-500">Complete goals and milestones to start earning badges!</p>
+                      <p className="text-gray-400">Complete goals and milestones to start earning badges!</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

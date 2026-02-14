@@ -167,6 +167,7 @@ function TagInput({ onTagAdd, existingTagIds, placeholder = "Add tags...", class
   );
 }
 
+/** Manages tags for a specific item with add, remove, and search functionality. */
 export function TagManager({ itemId, itemType, className, compact = false }: TagManagerProps) {
   const [tags, setTags] = useState<TagType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -370,6 +371,7 @@ interface TagDisplayProps {
   className?: string;
 }
 
+/** Displays a compact list of assigned tags with optional remove actions. */
 export function TagDisplay({ tags, onRemoveTag, maxDisplay = 3, className }: TagDisplayProps) {
   const displayTags = maxDisplay ? tags.slice(0, maxDisplay) : tags;
   const remainingCount = tags.length - displayTags.length;

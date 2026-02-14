@@ -22,6 +22,7 @@ interface SwipeableProps {
   disabled?: boolean;
 }
 
+/** Wraps children with horizontal swipe gesture detection and action reveals. */
 export function Swipeable({
   children,
   onSwipeLeft,

@@ -17,6 +17,7 @@ interface SplitTypeSelectorProps {
   partnership: PartnershipBalance | null;
 }
 
+/** Provides options for selecting how to split an expense (equal, percentage, custom). */
 export function SplitTypeSelector({
   selectedType,
   onTypeChange,
@@ -146,7 +147,7 @@ export function SplitTypeSelector({
                       ? 'text-gray-400'
                       : isSelected
                       ? 'text-purple-400'
-                      : 'text-gray-500'
+                      : 'text-gray-400'
                   }`}>
                     {type.example}
                   </p>

@@ -26,6 +26,7 @@ interface WeatherBadgeProps {
   display?: 'compact' | 'medium' | 'full' | 'header';
 }
 
+/** Displays weather forecast information for a calendar event location and time. */
 export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherBadgeProps) {
   const [weather, setWeather] = useState<WeatherForecast | null>(null);
   const [alert, setAlert] = useState<WeatherAlert | null>(null);
@@ -169,8 +170,8 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
         <span className="font-semibold text-white">{tempF}°F</span>
         <span className="text-gray-400 text-xs">feels {feelsLikeF}°</span>
         <span className="text-gray-400 text-xs capitalize">{weather.description}</span>
-        <span className="text-gray-500 text-xs">💧{weather.humidity}%</span>
-        <span className="text-gray-500 text-xs">💨{windMph}mph</span>
+        <span className="text-gray-400 text-xs">💧{weather.humidity}%</span>
+        <span className="text-gray-400 text-xs">💨{windMph}mph</span>
         {alert && (
           <span title={alert.title}>
             <AlertTriangle

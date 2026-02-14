@@ -12,6 +12,7 @@ interface SettlementTrackerProps {
   className?: string;
 }
 
+/** Tracks and displays expense settlement status between space members. */
 export function SettlementTracker({
   settlements,
   currentUserId,
@@ -124,7 +125,7 @@ export function SettlementTracker({
           <div key={month}>
             {/* Month Header */}
             <div className="flex items-center gap-2 mb-2 sticky top-0 bg-gray-900 py-2 z-10">
-              <Calendar className="w-4 h-4 text-gray-500" />
+              <Calendar className="w-4 h-4 text-gray-400" />
               <h4 className="text-sm font-semibold text-gray-300">{month}</h4>
               <div className="text-xs text-gray-400">
                 ({monthSettlements.length})

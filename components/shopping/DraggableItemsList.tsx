@@ -96,7 +96,7 @@ function SortableItem({ item, onToggle }: SortableItemProps) {
           aria-label="Drag to reorder item (long-press on mobile)"
         >
           <GripVertical className={`w-6 h-6 md:w-4 md:h-4 transition-colors ${
-            isDragReady ? 'text-emerald-400' : 'text-gray-500'
+            isDragReady ? 'text-emerald-400' : 'text-gray-400'
           }`} />
         </button>
       </Tooltip>
@@ -154,6 +154,7 @@ interface DraggableItemsListProps {
   onToggleItem: (itemId: string, checked: boolean) => void;
 }
 
+/** Renders a drag-and-drop reorderable shopping list items view. */
 export function DraggableItemsList({ items, onReorder, onToggleItem }: DraggableItemsListProps) {
   const [localItems, setLocalItems] = useState(items);
 

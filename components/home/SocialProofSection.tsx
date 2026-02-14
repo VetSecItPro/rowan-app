@@ -63,6 +63,7 @@ const productStats = [
   },
 ];
 
+/** Displays social proof indicators like user counts and ratings. */
 export function SocialProofSection() {
   const prefersReducedMotion = useReducedMotion();
 
@@ -127,7 +128,7 @@ export function SocialProofSection() {
                 <h3 className="text-sm font-semibold text-white mb-1">
                   {badge.label}
                 </h3>
-                <p className="text-xs text-gray-500">{badge.detail}</p>
+                <p className="text-xs text-gray-400">{badge.detail}</p>
               </motion.div>
             );
           })}

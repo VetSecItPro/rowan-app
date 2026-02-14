@@ -12,6 +12,7 @@ import { ArrowRight } from 'lucide-react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 import Link from 'next/link';
 
+/** Renders the final call-to-action section at the bottom of the landing page. */
 export function FinalCTASection() {
   const prefersReducedMotion = useReducedMotion();
 
@@ -54,7 +55,7 @@ export function FinalCTASection() {
           </Link>
         </MagneticButton>
 
-        <p className="text-xs text-gray-500 mt-4">
+        <p className="text-xs text-gray-400 mt-4">
           No credit card required. Cancel anytime.
         </p>
       </motion.div>

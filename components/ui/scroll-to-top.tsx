@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
 
+/** Renders a floating button that scrolls the page back to the top. */
 export function ScrollToTop() {
     const [isVisible, setIsVisible] = useState(false);
 

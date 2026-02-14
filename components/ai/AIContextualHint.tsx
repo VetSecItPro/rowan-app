@@ -8,7 +8,7 @@
  * hasn't dismissed it (localStorage-based per feature key).
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Bot, X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FEATURE_FLAGS } from '@/lib/constants/feature-flags';
@@ -25,21 +25,27 @@ interface AIContextualHintProps {
 
 const STORAGE_PREFIX = 'rowan_ai_hint_dismissed_';
 
+/** Check localStorage dismissal status (safe for SSR) */
+function isDismissedForKey(featureKey: string): boolean {
+  if (typeof window === 'undefined') return true; // Default hidden during SSR
+  try {
+    return localStorage.getItem(`${STORAGE_PREFIX}${featureKey}`) === 'true';
+  } catch {
+    return true;
+  }
+}
+
+/** Displays a contextual AI suggestion hint based on the current feature area. */
 export function AIContextualHint({
   featureKey,
   prompt,
   label = 'Try Rowan AI',
 }: AIContextualHintProps) {
   const chatCtx = useChatContextSafe();
-  const [dismissed, setDismissed] = useState(true); // Default hidden until we check
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const key = `${STORAGE_PREFIX}${featureKey}`;
-    const wasDismissed = localStorage.getItem(key) === 'true';
-    setDismissed(wasDismissed);
-  }, [featureKey]);
+  // Lazy initializer reads localStorage once — no effect needed
+  const [dismissed, setDismissed] = useState(() => isDismissedForKey(featureKey));
+  // Client-side component: safe to assume mounted after hydration
+  const [mounted] = useState(() => typeof window !== 'undefined');
 
   if (!mounted || !FEATURE_FLAGS.AI_COMPANION || !chatCtx?.enabled || dismissed) {
     return null;
@@ -69,7 +75,7 @@ export function AIContextualHint({
             {/* Dismiss */}
             <button
               onClick={handleDismiss}
-              className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-700/50 text-gray-500 hover:text-gray-300 transition-colors"
+              className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 transition-colors"
               aria-label="Dismiss AI hint"
             >
               <X className="w-3 h-3" />

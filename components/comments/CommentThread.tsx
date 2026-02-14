@@ -23,6 +23,7 @@ interface CommentThreadProps {
   showActivityLog?: boolean;
 }
 
+/** Renders a threaded comment section with nested replies and reactions. */
 export default function CommentThread({
   commentableType,
   commentableId,

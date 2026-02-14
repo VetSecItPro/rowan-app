@@ -40,6 +40,7 @@ interface PenaltyHistoryProps {
   limit?: number;
 }
 
+/** Displays a history of late penalties applied to household members. */
 export function PenaltyHistory({ className, userId, limit = 20 }: PenaltyHistoryProps) {
   const { currentSpace } = useSpaces();
   const { user: _currentUser } = useAuth();
@@ -305,18 +306,18 @@ export function PenaltyHistory({ className, userId, limit = 20 }: PenaltyHistory
                         >
                           <div className="text-sm space-y-1 text-gray-400">
                             <p>
-                              <span className="text-gray-500">Due:</span>{' '}
+                              <span className="text-gray-400">Due:</span>{' '}
                               {format(new Date(penalty.due_date), 'MMM d, yyyy h:mm a')}
                             </p>
                             {penalty.completion_date && (
                               <p>
-                                <span className="text-gray-500">Completed:</span>{' '}
+                                <span className="text-gray-400">Completed:</span>{' '}
                                 {format(new Date(penalty.completion_date), 'MMM d, yyyy h:mm a')}
                               </p>
                             )}
                             {penalty.is_forgiven && penalty.forgiven_reason && (
                               <p>
-                                <span className="text-gray-500">Reason:</span>{' '}
+                                <span className="text-gray-400">Reason:</span>{' '}
                                 {penalty.forgiven_reason}
                               </p>
                             )}

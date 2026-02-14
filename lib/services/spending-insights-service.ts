@@ -353,7 +353,7 @@ export async function getMonthOverMonthComparison(
   };
 }
 
-// Export service object
+/** Service for spending trend analysis, category breakdowns, and budget variance reporting. */
 export const spendingInsightsService = {
   getSpendingTrends,
   getCategorySpending,

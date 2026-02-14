@@ -11,6 +11,7 @@ interface MagneticButtonProps {
     testId?: string;
 }
 
+/** Renders a button with magnetic cursor-following hover animation. */
 export function MagneticButton({
     children,
     className = "",

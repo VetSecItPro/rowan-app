@@ -25,6 +25,7 @@ interface MentionInputProps {
   disabled?: boolean;
 }
 
+/** Renders a text input with @ mention autocomplete for reminder assignees. */
 export function MentionInput({
   value,
   onChange,

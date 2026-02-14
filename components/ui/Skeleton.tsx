@@ -20,6 +20,7 @@ interface SkeletonProps {
   height?: string | number;
 }
 
+/** Renders a base animated skeleton placeholder with shimmer effect. */
 export function Skeleton({
   className = '',
   variant = 'rectangular',
@@ -61,6 +62,7 @@ interface SkeletonTextProps {
   className?: string;
 }
 
+/** Renders skeleton placeholder lines mimicking text content. */
 export function SkeletonText({ lines = 3, className = '' }: SkeletonTextProps) {
   // Consistent widths that look natural
   const lineWidths = ['100%', '92%', '76%', '88%', '64%', '80%', '72%', '96%'];
@@ -90,6 +92,7 @@ interface SkeletonCardProps {
   lines?: number;
 }
 
+/** Renders a skeleton placeholder shaped like a content card. */
 export function SkeletonCard({
   className = '',
   withImage = true,
@@ -127,6 +130,7 @@ interface SkeletonAvatarProps {
   className?: string;
 }
 
+/** Renders a circular skeleton placeholder for avatar loading states. */
 export function SkeletonAvatar({ size = 40, className = '' }: SkeletonAvatarProps) {
   return (
     <Skeleton
@@ -140,6 +144,7 @@ export function SkeletonAvatar({ size = 40, className = '' }: SkeletonAvatarProp
 
 // ─── Feature-specific skeletons (preserved from original) ────────────
 
+/** Renders a skeleton placeholder shaped like a meal plan card. */
 export function MealCardSkeleton() {
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-xl p-4">
@@ -159,6 +164,7 @@ export function MealCardSkeleton() {
   );
 }
 
+/** Renders a skeleton placeholder for a calendar day cell. */
 export function CalendarDaySkeleton() {
   return (
     <div className="min-h-[300px] rounded-lg border-2 border-gray-700 bg-gray-800 p-3">
@@ -176,6 +182,7 @@ export function CalendarDaySkeleton() {
 }
 
 // Mobile-optimized day card skeleton that matches the vertical card layout
+/** Renders a skeleton placeholder for a mobile calendar day card. */
 export function MobileDayCardSkeleton() {
   return (
     <div className="rounded-xl border-2 border-gray-700 bg-gray-800 p-4">
@@ -199,6 +206,7 @@ export function MobileDayCardSkeleton() {
 }
 
 // Mobile calendar loading skeleton with day strip + stacked cards
+/** Renders a skeleton placeholder for the mobile calendar view. */
 export function MobileCalendarSkeleton() {
   return (
     <div className="space-y-4">
@@ -218,6 +226,7 @@ export function MobileCalendarSkeleton() {
   );
 }
 
+/** Renders a skeleton placeholder shaped like a recipe card. */
 export function RecipeCardSkeleton() {
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
@@ -235,6 +244,7 @@ export function RecipeCardSkeleton() {
   );
 }
 
+/** Renders a skeleton placeholder shaped like a goal card. */
 export function GoalCardSkeleton() {
   return (
     <div className="bg-black/50 border border-white/10 rounded-xl p-6">
@@ -265,6 +275,7 @@ export function GoalCardSkeleton() {
   );
 }
 
+/** Renders a skeleton placeholder shaped like a milestone card. */
 export function MilestoneCardSkeleton() {
   return (
     <div className="bg-black/50 border border-white/10 rounded-xl p-6">
@@ -292,6 +303,7 @@ export function MilestoneCardSkeleton() {
   );
 }
 
+/** Renders a skeleton placeholder shaped like a statistics card. */
 export function StatsCardSkeleton() {
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 sm:p-6">
@@ -307,6 +319,7 @@ export function StatsCardSkeleton() {
   );
 }
 
+/** Renders a skeleton placeholder shaped like a task card. */
 export function TaskCardSkeleton() {
   return (
     <div className="bg-gray-800/80 border border-gray-700/50 rounded-lg p-4 sm:p-4">

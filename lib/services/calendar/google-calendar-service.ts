@@ -146,6 +146,7 @@ async function storeTokens(
   }
 }
 
+/** Refreshes the Google OAuth2 access token and stores updated credentials. */
 export async function refreshAccessToken(connectionId: string): Promise<TokenRefreshResult> {
   try {
     const oauth2Client = await getAuthenticatedClient(connectionId);
@@ -187,6 +188,7 @@ export async function refreshAccessToken(connectionId: string): Promise<TokenRef
 // OAUTH FLOW
 // =============================================================================
 
+/** Generates a Google OAuth2 authorization URL for calendar access consent. */
 export function generateAuthUrl(state: string, loginHint?: string): string {
   const oauth2Client = createOAuth2Client();
 
@@ -213,6 +215,7 @@ export function generateAuthUrl(state: string, loginHint?: string): string {
   return oauth2Client.generateAuthUrl(authUrlOptions);
 }
 
+/** Exchanges an OAuth2 authorization code for access/refresh tokens and stores them. */
 export async function exchangeCodeForTokens(
   code: string,
   connectionId: string
@@ -263,6 +266,7 @@ export async function exchangeCodeForTokens(
 // CALENDAR OPERATIONS
 // =============================================================================
 
+/** Lists all Google Calendar calendars for a connection. */
 export async function listCalendars(connectionId: string): Promise<GoogleCalendarList[]> {
   const oauth2Client = await getAuthenticatedClient(connectionId);
   const calendar = googleCalendar({ version: 'v3', auth: oauth2Client });
@@ -282,6 +286,7 @@ export async function listCalendars(connectionId: string): Promise<GoogleCalenda
   }));
 }
 
+/** Fetches Google Calendar events with support for incremental sync via sync tokens. */
 export async function getEvents(
   connectionId: string,
   options: {
@@ -349,6 +354,7 @@ export async function getEvents(
   }
 }
 
+/** Creates a new event on Google Calendar. */
 export async function createEvent(
   connectionId: string,
   event: Partial<GoogleCalendarEvent>,
@@ -374,6 +380,7 @@ export async function createEvent(
   return mapGoogleEvent(data);
 }
 
+/** Updates an existing event on Google Calendar. */
 export async function updateEvent(
   connectionId: string,
   eventId: string,
@@ -401,6 +408,7 @@ export async function updateEvent(
   return mapGoogleEvent(data);
 }
 
+/** Deletes an event from Google Calendar by its event ID. */
 export async function deleteEvent(
   connectionId: string,
   eventId: string,
@@ -415,6 +423,7 @@ export async function deleteEvent(
   });
 }
 
+/** Fetches a single event from Google Calendar by its event ID. */
 export async function getEvent(
   connectionId: string,
   eventId: string,
@@ -442,6 +451,7 @@ export async function getEvent(
 // WEBHOOK MANAGEMENT
 // =============================================================================
 
+/** Registers a webhook (push notification channel) for Google Calendar event changes. */
 export async function setupWebhook(
   connectionId: string,
   webhookUrl: string,
@@ -472,6 +482,7 @@ export async function setupWebhook(
   };
 }
 
+/** Stops (unregisters) an active Google Calendar webhook channel. */
 export async function stopWebhook(
   connectionId: string,
   channelId: string,
@@ -554,6 +565,7 @@ function mapGoogleEvent(event: calendar_v3.Schema$Event): GoogleCalendarEvent {
 // EXPORTS
 // =============================================================================
 
+/** Aggregated Google Calendar service for OAuth, event CRUD, and webhook management. */
 export const googleCalendarService = {
   // OAuth
   generateAuthUrl,

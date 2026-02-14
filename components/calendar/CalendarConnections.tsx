@@ -88,6 +88,7 @@ const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle; color: string; l
   },
 };
 
+/** Manages external calendar service connections (Google, Apple, etc.). */
 export const CalendarConnections = memo(function CalendarConnections() {
   const { currentSpace } = useAuthWithSpaces();
   const [connections, setConnections] = useState<CalendarConnection[]>([]);
@@ -819,7 +820,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </div>
                 <button
                   onClick={() => setShowEmailModal(false)}
-                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -832,12 +833,12 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 <p className="text-sm text-gray-400 mb-4">
                   Enter the email address associated with the {PROVIDER_CONFIG[selectedProvider].name} account you want to connect.
                   {selectedProvider === 'google' && (
-                    <span className="block mt-2 text-xs text-gray-500">
+                    <span className="block mt-2 text-xs text-gray-400">
                       This can be a Gmail address or a Google Workspace account.
                     </span>
                   )}
                   {selectedProvider === 'outlook' && (
-                    <span className="block mt-2 text-xs text-gray-500">
+                    <span className="block mt-2 text-xs text-gray-400">
                       This can be an Outlook.com, Hotmail, Live, or Microsoft 365 account.
                     </span>
                   )}
@@ -915,7 +916,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </div>
                 <button
                   onClick={() => setShowAppleModal(false)}
-                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -1041,7 +1042,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </div>
                 <button
                   onClick={() => setShowIcsModal(false)}
-                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -1244,7 +1245,7 @@ export const CalendarConnections = memo(function CalendarConnections() {
                 </div>
                 <button
                   onClick={() => setShowCoziModal(false)}
-                  className="p-1 text-gray-500 text-gray-400 hover:text-gray-200 transition-colors"
+                  className="p-1 text-gray-400 hover:text-gray-200 transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>

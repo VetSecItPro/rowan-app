@@ -18,6 +18,7 @@ interface MFAFactor {
   status: string;
 }
 
+/** Provides two-factor authentication setup and management controls. */
 export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
@@ -242,7 +243,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
               <p className="text-xs sm:text-sm text-gray-400">
                 Add an extra layer of security to your account
               </p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-2">
+              <p className="text-xs sm:text-sm text-gray-400 mt-2">
                 Status: {' '}
                 <span className={`font-medium ${
                   isEnabled
@@ -328,7 +329,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
                   </div>
                 ) : (
                   <div className="bg-gray-900 rounded-xl p-8 flex items-center justify-center">
-                    <div className="text-center text-gray-500 text-sm">
+                    <div className="text-center text-gray-400 text-sm">
                       Loading QR code...
                     </div>
                   </div>

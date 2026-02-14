@@ -12,6 +12,7 @@ const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ classNa
   { id: 'export', label: 'Export', icon: Download },
 ];
 
+/** Renders system configuration and platform settings in the admin dashboard. */
 export const SystemPanel = memo(function SystemPanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('health');
 

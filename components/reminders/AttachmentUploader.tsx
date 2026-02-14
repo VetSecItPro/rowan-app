@@ -14,6 +14,7 @@ interface AttachmentUploaderProps {
   onUploadComplete: () => void;
 }
 
+/** Provides file upload controls for attaching files to a reminder. */
 export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentUploaderProps) {
   const { user } = useAuth();
   const [isDragging, setIsDragging] = useState(false);
@@ -163,7 +164,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
                   browse
                 </button>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Max 2MB • Images, PDFs, Documents
               </p>
             </>
@@ -197,7 +198,7 @@ export function AttachmentUploader({ reminderId, onUploadComplete }: AttachmentU
               }}
               className="p-1 hover:bg-gray-700 rounded transition-colors"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-gray-400" />
             </button>
           </div>
 

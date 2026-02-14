@@ -206,6 +206,7 @@ const initialStats: EnhancedDashboardStats = {
     },
 };
 
+/** Fetches and aggregates dashboard statistics (tasks, events, meals, budgets, goals) for a space */
 export function useDashboardStats(user: { id: string } | null, currentSpace: Space | null, authLoading: boolean) {
     const [stats, setStats] = useState<EnhancedDashboardStats>(initialStats);
     const [loading, setLoading] = useState(true);
@@ -224,16 +225,13 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
         try {
             const supabase = createClient();
 
-            // TODO: Create migration for get_dashboard_summary RPC function
-            // For now, gracefully handle missing RPC (production hotfix)
             const { data, error } = await supabase.rpc('get_dashboard_summary', {
                 p_space_id: currentSpace.id,
                 p_user_id: user.id,
             });
 
             if (error) {
-                // RPC doesn't exist in production yet — log and use default stats
-                logger.error('RPC get_dashboard_summary not found (expected during migration)', error, {
+                logger.error('RPC get_dashboard_summary failed', error, {
                     component: 'useDashboardStats',
                     action: 'rpc_call',
                     errorCode: error.code,

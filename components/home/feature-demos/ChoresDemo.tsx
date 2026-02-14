@@ -56,7 +56,7 @@ function ChoreListStep() {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   {/* Frequency badge */}
-                  <span className="flex items-center gap-0.5 text-[10px] text-gray-500">
+                  <span className="flex items-center gap-0.5 text-[10px] text-gray-400">
                     <RefreshCw className="w-2.5 h-2.5" />
                     {chore.freq}
                   </span>
@@ -98,7 +98,7 @@ function StatusCycleStep() {
         </div>
       </div>
 
-      <p className="text-[10px] text-gray-500 uppercase tracking-wider">Tap to cycle status</p>
+      <p className="text-[10px] text-gray-400 uppercase tracking-wider">Tap to cycle status</p>
 
       <div className="space-y-1.5">
         {statuses.map((s, i) => {
@@ -118,7 +118,7 @@ function StatusCycleStep() {
               <div className="flex-1">
                 <span className="text-xs text-gray-200">{s.label}</span>
               </div>
-              <span className="text-[10px] text-gray-500">{s.desc}</span>
+              <span className="text-[10px] text-gray-400">{s.desc}</span>
             </motion.div>
           );
         })}
@@ -166,7 +166,7 @@ function EarnPointsStep() {
         transition={{ delay: 0.5, duration: 0.3 }}
         className="space-y-1.5"
       >
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider">This week</p>
+        <p className="text-[10px] text-gray-400 uppercase tracking-wider">This week</p>
         {[
           { name: 'Alex', initial: 'A', color: 'blue', pts: 85 },
           { name: 'Sam', initial: 'S', color: 'purple', pts: 72 },
@@ -259,6 +259,7 @@ const steps: DemoStep[] = [
   { label: 'Leaderboard', content: <LeaderboardStep /> },
 ];
 
+/** Renders an animated chores feature demonstration for the landing page. */
 export function ChoresDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

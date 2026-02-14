@@ -92,6 +92,7 @@ const FAMILY_EXTRAS = [
   '5GB storage',
 ];
 
+/** Renders a modal showcasing premium features and upgrade options. */
 export function UpgradeModal({
   isOpen,
   onClose,

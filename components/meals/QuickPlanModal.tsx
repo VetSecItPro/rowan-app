@@ -20,6 +20,7 @@ const mealTypeOptions = [
   { value: 'snack', label: 'Snack', icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-900/20' },
 ];
 
+/** Renders a modal for quickly assigning a recipe to a meal slot. */
 export function QuickPlanModal({ isOpen, onClose, onPlan, recipeName }: QuickPlanModalProps) {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [selectedMealType, setSelectedMealType] = useState('dinner');

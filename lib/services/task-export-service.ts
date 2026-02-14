@@ -26,6 +26,7 @@ const COLUMN_CONFIG: Record<ColumnKey, { header: string; getValue: (task: TaskRo
 
 const DEFAULT_COLUMNS: ColumnKey[] = ['title', 'description', 'status', 'priority', 'category', 'due_date', 'assigned_to', 'created_at'];
 
+/** Service for exporting tasks to CSV with optional filters and column selection. */
 export const taskExportService = {
   async exportToCSV(spaceId: string, filters?: { status?: string; category?: string; assigned_to?: string; columns?: string[] }): Promise<string> {
     const supabase = createClient();

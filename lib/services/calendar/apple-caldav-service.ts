@@ -81,6 +81,7 @@ async function getAuthenticatedClient(connectionId: string): Promise<DAVClient> 
 // CREDENTIAL STORAGE
 // =============================================================================
 
+/** Stores Apple CalDAV credentials (app-specific password) securely in the vault. */
 export async function storeAppleCredentials(
   connectionId: string,
   email: string,
@@ -120,6 +121,7 @@ export async function storeAppleCredentials(
 // CREDENTIAL VALIDATION
 // =============================================================================
 
+/** Validates Apple CalDAV credentials by attempting to fetch calendars from iCloud. */
 export async function validateAppleCredentials(
   email: string,
   appSpecificPassword: string
@@ -172,6 +174,7 @@ export async function validateAppleCredentials(
 // CALENDAR OPERATIONS
 // =============================================================================
 
+/** Lists all CalDAV calendars for an Apple Calendar connection. */
 export async function listCalendars(connectionId: string): Promise<CalDAVCalendar[]> {
   const client = await getAuthenticatedClient(connectionId);
   const calendars = await client.fetchCalendars();
@@ -179,6 +182,7 @@ export async function listCalendars(connectionId: string): Promise<CalDAVCalenda
   return calendars.map(mapDAVCalendar);
 }
 
+/** Fetches CalDAV events for a connection within an optional time range. */
 export async function getEvents(
   connectionId: string,
   options: {
@@ -230,6 +234,7 @@ export async function getEvents(
   };
 }
 
+/** Fetches changed CalDAV events since the last sync token (ctag comparison). */
 export async function getEventsDelta(
   connectionId: string,
   calendarUrl: string,
@@ -264,6 +269,7 @@ export async function getEventsDelta(
   };
 }
 
+/** Creates a new event on Apple Calendar via CalDAV from a Rowan event snapshot. */
 export async function createEvent(
   connectionId: string,
   event: RowanEventSnapshot,
@@ -299,6 +305,7 @@ export async function createEvent(
   };
 }
 
+/** Updates an existing CalDAV event with new Rowan event data. */
 export async function updateEvent(
   connectionId: string,
   eventUrl: string,
@@ -325,6 +332,7 @@ export async function updateEvent(
   };
 }
 
+/** Deletes a CalDAV event by URL from Apple Calendar. */
 export async function deleteEvent(
   connectionId: string,
   eventUrl: string,
@@ -340,6 +348,7 @@ export async function deleteEvent(
   });
 }
 
+/** Fetches a single CalDAV event by its URL. */
 export async function getEvent(
   connectionId: string,
   eventUrl: string
@@ -517,6 +526,7 @@ function mapDAVCalendar(calendar: DAVCalendar): CalDAVCalendar {
 // EXPORTS
 // =============================================================================
 
+/** Aggregated Apple CalDAV service for credential management, calendar and event operations. */
 export const appleCalDAVService = {
   // Credentials
   validateAppleCredentials,

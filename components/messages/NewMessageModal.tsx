@@ -46,6 +46,7 @@ const ALLOWED_FILE_TYPES = [
 
 const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt', '.csv', '.zip'];
 
+/** Renders a modal form for composing and sending a new message. */
 export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId, conversationId }: NewMessageModalProps) {
   const [content, setContent] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);

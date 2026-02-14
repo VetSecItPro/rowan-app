@@ -13,6 +13,7 @@ interface NewExpenseModalProps {
   spaceId: string;
 }
 
+/** Renders a modal form for creating or editing a household expense. */
 export function NewExpenseModal({ isOpen, onClose, onSave, editExpense, spaceId }: NewExpenseModalProps) {
   const [formData, setFormData] = useState<CreateExpenseInput>({
     space_id: spaceId,

@@ -13,6 +13,7 @@ interface TimeAwareWelcomeBoxProps {
   children?: React.ReactNode;
 }
 
+/** Renders a welcome box with time-of-day greeting and daily summary. */
 export function TimeAwareWelcomeBox({
   greetingText,
   userName,
@@ -120,6 +121,7 @@ export function TimeAwareWelcomeBox({
 }
 
 // Alternative compact version for smaller screens or different contexts
+/** Renders a compact time-aware greeting without the summary content. */
 export function CompactTimeAwareWelcome({
   greetingText,
   userName,

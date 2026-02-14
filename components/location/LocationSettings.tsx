@@ -63,6 +63,7 @@ const PRECISION_OPTIONS = [
   { value: 'hidden', label: 'Hidden', description: 'Don\'t share location' },
 ] as const;
 
+/** Provides location sharing preferences and privacy controls. */
 export function LocationSettings({ spaceId, className }: LocationSettingsProps) {
   const {
     places,
@@ -280,12 +281,12 @@ export function LocationSettings({ spaceId, className }: LocationSettingsProps) 
               <Moon className="w-4 h-4 text-indigo-400" />
               <p className="text-sm font-medium text-gray-300">Quiet hours</p>
             </div>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-gray-400 mb-3">
               Suppress location notifications during these hours
             </p>
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">From</label>
+                <label className="block text-xs text-gray-400 mb-1">From</label>
                 <input
                   type="time"
                   value={settings?.quiet_hours_start ?? ''}
@@ -294,9 +295,9 @@ export function LocationSettings({ spaceId, className }: LocationSettingsProps) 
                   className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white text-sm [color-scheme:dark]"
                 />
               </div>
-              <span className="text-gray-500 pt-5">to</span>
+              <span className="text-gray-400 pt-5">to</span>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">Until</label>
+                <label className="block text-xs text-gray-400 mb-1">Until</label>
                 <input
                   type="time"
                   value={settings?.quiet_hours_end ?? ''}
@@ -314,7 +315,7 @@ export function LocationSettings({ spaceId, className }: LocationSettingsProps) 
                   setIsSaving(false);
                 }}
                 disabled={isSaving}
-                className="mt-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                className="mt-2 text-xs text-gray-400 hover:text-gray-300 transition-colors"
               >
                 Clear quiet hours
               </button>
@@ -521,7 +522,7 @@ export function LocationSettings({ spaceId, className }: LocationSettingsProps) 
                     onChange={(e) => setNewPlace((prev) => ({ ...prev, radius_meters: parseInt(e.target.value) }))}
                     className="w-full"
                   />
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-gray-400">
                     <span>50m</span>
                     <span>1000m</span>
                   </div>

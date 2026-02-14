@@ -30,6 +30,7 @@ type VoteSummary = Record<number, {
   total: number;
 }>;
 
+/** Displays a modal for proposing a new event time to space members. */
 export function EventProposalModal({
   isOpen,
   onClose,
@@ -402,7 +403,7 @@ export function EventProposalModal({
                           <div className="text-sm text-gray-400 mt-1">
                             {format(new Date(slot.start_time), 'EEEE, MMMM d')}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-400">
                             {format(new Date(slot.start_time), 'h:mm a')} {slot.end_time && `- ${format(new Date(slot.end_time), 'h:mm a')}`}
                           </div>
                         </div>

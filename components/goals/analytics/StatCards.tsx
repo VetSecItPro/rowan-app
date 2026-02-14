@@ -15,6 +15,7 @@ interface StatCardsProps {
   } | null;
 }
 
+/** Displays summary statistic cards for goal analytics metrics. */
 export default function StatCards({
   totalGoals,
   completionRate,

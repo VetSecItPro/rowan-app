@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Wifi, WifiOff, CloudOff, RefreshCw, AlertCircle, SignalLow, Database } from 'lucide-react';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useOfflineQueue } from '@/lib/hooks/useOfflineQueue';
@@ -19,25 +19,30 @@ export function NetworkStatus() {
   const { pendingCount, failedCount, isProcessing } = useOfflineQueue();
 
   const [showBanner, setShowBanner] = useState(false);
-  const [wasOffline, setWasOffline] = useState(false);
+  const wasOfflineRef = useRef(false);
   const [showPoorConnectionWarning, setShowPoorConnectionWarning] = useState(false);
 
+  // Respond to network status changes from useNetworkStatus (external browser API).
+  // Uses ref for previous-offline tracking to avoid cascading setState in effect.
+  // setState calls below react to external network events — necessary for UI feedback.
   useEffect(() => {
-    if (isOnline && wasOffline) {
+    if (isOnline && wasOfflineRef.current) {
       // Show "back online" message briefly if we were offline
-      setShowBanner(true);
-      setTimeout(() => setShowBanner(false), 3000);
-      setWasOffline(false);
+      wasOfflineRef.current = false;
+      setShowBanner(true); // eslint-disable-line react-hooks/set-state-in-effect -- reacting to external network reconnection event
+      const timer = setTimeout(() => setShowBanner(false), 3000);
+      return () => clearTimeout(timer);
     } else if (!isOnline) {
       setShowBanner(true);
-      setWasOffline(true);
+      wasOfflineRef.current = true;
     }
-  }, [isOnline, wasOffline]);
+  }, [isOnline]);
 
-  // Show poor connection warning briefly
+  // Show poor connection warning briefly when connection quality degrades.
+  // Reacting to external network quality state from useNetworkStatus.
   useEffect(() => {
     if (quality === 'poor' && isOnline) {
-      setShowPoorConnectionWarning(true);
+      setShowPoorConnectionWarning(true); // eslint-disable-line react-hooks/set-state-in-effect -- reacting to external network quality change
       const timer = setTimeout(() => setShowPoorConnectionWarning(false), 5000);
       return () => clearTimeout(timer);
     }

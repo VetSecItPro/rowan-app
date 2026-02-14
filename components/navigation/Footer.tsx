@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+/** Renders the app footer with navigation links and app info. */
 export function Footer() {
   const currentYear = new Date().getFullYear();
 

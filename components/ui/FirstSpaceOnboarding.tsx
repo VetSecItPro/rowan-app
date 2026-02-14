@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+/** Renders the first-time space creation onboarding flow. */
 export function FirstSpaceOnboarding() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">

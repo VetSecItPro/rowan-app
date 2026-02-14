@@ -21,6 +21,7 @@ const ICSFileImportSchema = z.object({
 // Maximum file size: 1MB
 const MAX_FILE_SIZE = 1024 * 1024;
 
+/** Imports calendar events from an uploaded ICS file */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

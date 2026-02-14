@@ -35,6 +35,7 @@ interface BudgetGoalsDashboardProps {
   className?: string;
 }
 
+/** Displays a dashboard combining budget progress with linked goal tracking. */
 export function BudgetGoalsDashboard({ className }: BudgetGoalsDashboardProps) {
   const { currentSpace } = useAuth();
   const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);

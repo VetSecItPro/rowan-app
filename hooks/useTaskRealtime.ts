@@ -63,6 +63,7 @@ function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number
   return debounced;
 }
 
+/** Subscribes to real-time task updates for a space and manages task state */
 export function useTaskRealtime({
   spaceId,
   filters,
@@ -325,7 +326,7 @@ export function useTaskRealtime({
       debouncedBatchUpdateRef.current?.cancel();
       updateQueueRef.current = { inserts: [], updates: [], deletes: [] };
     };
-  }, [spaceId]); // Only spaceId triggers teardown/rebuild
+  }, [spaceId, debouncedBatchUpdate]); // spaceId triggers teardown/rebuild; debouncedBatchUpdate is stable (ref-initialized once)
 
   function refreshTasks() {
     setLoading(true);
@@ -341,7 +342,7 @@ export function useTaskRealtime({
   };
 }
 
-// Separate hook for subtask real-time updates
+/** Subscribes to real-time subtask updates for a specific task */
 export function useSubtaskRealtime(taskId: string) {
   const [subtasks, setSubtasks] = useState<SubtaskRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -400,7 +401,7 @@ export function useSubtaskRealtime(taskId: string) {
   return { subtasks, loading, setSubtasks };
 }
 
-// Hook for task comments real-time updates
+/** Subscribes to real-time comment updates for a specific task */
 export function useCommentsRealtime(taskId: string) {
   const [comments, setComments] = useState<CommentRecord[]>([]);
   const [loading, setLoading] = useState(true);

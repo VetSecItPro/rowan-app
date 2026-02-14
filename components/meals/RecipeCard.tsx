@@ -11,6 +11,7 @@ interface RecipeCardProps {
   onPlanMeal: (recipe: Recipe) => void;
 }
 
+/** Renders a recipe card with image, ingredients count, and action buttons. */
 export const RecipeCard = memo(function RecipeCard({ recipe, onEdit, onDelete, onPlanMeal }: RecipeCardProps) {
   return (
     <div className="bg-gray-800/80 border border-gray-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">

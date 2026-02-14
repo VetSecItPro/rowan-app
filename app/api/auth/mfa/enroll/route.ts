@@ -12,6 +12,7 @@ import { logger } from '@/lib/logger';
  * Supports TOTP (Time-based One-Time Password) authentication
  */
 
+/** Enrolls the authenticated user in TOTP-based multi-factor authentication */
 export async function POST(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/** Lists MFA factors enrolled for the authenticated user */
 export async function GET(request: NextRequest) {
   try {
     // Rate limit check

@@ -12,6 +12,7 @@ interface BadgesWidgetProps {
   spaceId: string;
 }
 
+/** Displays a compact widget showing recent badges and badge count. */
 export default function BadgesWidget({ userId, spaceId }: BadgesWidgetProps) {
   const [recentBadges, setRecentBadges] = useState<UserBadge[]>([]);
   const [stats, setStats] = useState({ totalBadges: 0, totalPoints: 0 });

@@ -9,6 +9,7 @@ interface SpendingInsightsCardProps {
   spaceId: string;
 }
 
+/** Displays AI-generated spending insights and recommendations for a project. */
 export function SpendingInsightsCard({ spaceId }: SpendingInsightsCardProps) {
   const [insights, setInsights] = useState<SpendingInsights | null>(null);
   const [timeRange, setTimeRange] = useState<TimeRange>('monthly');
@@ -168,7 +169,7 @@ export function SpendingInsightsCard({ spaceId }: SpendingInsightsCardProps) {
                       )}
                     </div>
                   </div>
-                  <div className="w-20 text-xs text-gray-500 text-right">
+                  <div className="w-20 text-xs text-gray-400 text-right">
                     {trend.transaction_count} txns
                   </div>
                 </div>

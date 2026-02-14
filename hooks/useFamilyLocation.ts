@@ -42,6 +42,7 @@ interface UseFamilyLocationReturn {
   deletePlace: (placeId: string) => Promise<boolean>;
 }
 
+/** Tracks and subscribes to real-time family member locations within a space */
 export function useFamilyLocation(
   spaceId: string | null,
   options: UseFamilyLocationOptions = {}
@@ -57,23 +58,21 @@ export function useFamilyLocation(
   const [places, setPlaces] = useState<FamilyPlace[]>([]);
   const [settings, setSettings] = useState<LocationSharingSettings | null>(null);
   const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Only start in loading state if we have a spaceId to fetch data for
+  const [isLoading, setIsLoading] = useState(!!spaceId);
   const [isTracking, setIsTracking] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [permissionStatus, setPermissionStatus] = useState<'granted' | 'denied' | 'prompt' | 'unavailable'>('prompt');
+  // Lazy initializer detects geolocation availability (avoids setState in effect)
+  const [error, setError] = useState<string | null>(() =>
+    !isGeolocationAvailable() ? 'Location services are not available on this device' : null
+  );
+  const [permissionStatus, setPermissionStatus] = useState<'granted' | 'denied' | 'prompt' | 'unavailable'>(() =>
+    !isGeolocationAvailable() ? 'unavailable' : 'prompt'
+  );
 
   // Refs for cleanup
   const stopWatchingRef = useRef<(() => void) | null>(null);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastUpdateRef = useRef<number>(0);
-
-  // Check geolocation availability
-  useEffect(() => {
-    if (!isGeolocationAvailable()) {
-      setPermissionStatus('unavailable');
-      setError('Location services are not available on this device');
-    }
-  }, []);
 
   // Fetch family locations
   const refreshFamilyLocations = useCallback(async () => {
@@ -339,12 +338,9 @@ export function useFamilyLocation(
     }
   }, [spaceId]);
 
-  // Initial data fetch
+  // Initial data fetch — async fetching setState is a standard pattern
   useEffect(() => {
-    if (!spaceId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!spaceId) return;
 
     const initialize = async () => {
       setIsLoading(true);
@@ -362,10 +358,11 @@ export function useFamilyLocation(
     initialize();
   }, [spaceId, refreshFamilyLocations, fetchPlaces, fetchSettings]);
 
-  // Auto-start tracking if enabled
+  // Auto-start tracking if enabled — startTracking interacts with the Geolocation
+  // API (external system) and sets state based on the permission/position result.
   useEffect(() => {
     if (enableTracking && spaceId && !isTracking && permissionStatus !== 'unavailable') {
-      startTracking();
+      startTracking(); // eslint-disable-line react-hooks/set-state-in-effect -- async geolocation API interaction; setState occurs in async callbacks
     }
   }, [enableTracking, spaceId, isTracking, permissionStatus, startTracking]);
 

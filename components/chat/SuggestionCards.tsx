@@ -37,6 +37,7 @@ interface SuggestionCardsProps {
   onDismiss: (id: string) => void;
 }
 
+/** Displays contextual suggestion cards for AI chat conversation starters. */
 export default function SuggestionCards({
   suggestions,
   onAction,
@@ -71,7 +72,7 @@ export default function SuggestionCards({
                 </span>
                 <button
                   onClick={() => onDismiss(suggestion.id)}
-                  className="p-0.5 rounded hover:bg-gray-700/50 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="p-0.5 rounded hover:bg-gray-700/50 text-gray-400 hover:text-gray-300 transition-colors"
                   aria-label="Dismiss suggestion"
                 >
                   <X className="w-3.5 h-3.5" />

@@ -13,11 +13,6 @@ export interface UserPrivacyPreferences {
   marketing_emails_enabled: boolean;
   marketing_sms_enabled?: boolean;
 
-  // Cookie Preferences
-  analytics_cookies_enabled: boolean;
-  performance_cookies_enabled?: boolean;
-  advertising_cookies_enabled?: boolean;
-
   // Third-party sharing
   share_data_with_partners?: boolean;
   third_party_analytics_enabled?: boolean;
@@ -31,9 +26,6 @@ export interface PrivacyPreferenceUpdate {
   ccpa_do_not_sell?: boolean;
   marketing_emails_enabled?: boolean;
   marketing_sms_enabled?: boolean;
-  analytics_cookies_enabled?: boolean;
-  performance_cookies_enabled?: boolean;
-  advertising_cookies_enabled?: boolean;
   share_data_with_partners?: boolean;
   third_party_analytics_enabled?: boolean;
 }
@@ -132,19 +124,6 @@ export interface PrivacySettingsForm {
     ccpaDoNotSell: boolean;
     marketingEmailsEnabled: boolean;
   };
-  cookiePreferences: {
-    analyticsCookiesEnabled: boolean;
-  };
-}
-
-// Cookie management types
-export interface CookieConsentState {
-  analytics: boolean;
-  performance: boolean;
-  advertising: boolean;
-  essential: boolean; // Always true, not configurable
-  timestamp: string;
-  version: string;
 }
 
 // Account deletion workflow types
@@ -260,7 +239,6 @@ export interface PrivacyMetrics {
   optOutRates: {
     ccpaDoNotSell: number;
     marketingEmails: number;
-    analyticsCookies: number;
     dataSharing: number;
   };
   exportRequests: {

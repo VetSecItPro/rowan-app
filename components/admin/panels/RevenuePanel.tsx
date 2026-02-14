@@ -124,7 +124,7 @@ const MrrPanel = memo(function MrrPanel() {
         <div className="bg-gray-800 rounded-lg p-5">
           <p className="text-sm font-medium text-gray-400">ARR</p>
           <p className="text-2xl font-bold text-white mt-1">{formatCurrency(arr)}</p>
-          <p className="text-xs text-gray-500 mt-1">Annual run rate</p>
+          <p className="text-xs text-gray-400 mt-1">Annual run rate</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -132,13 +132,13 @@ const MrrPanel = memo(function MrrPanel() {
           <p className={`text-2xl font-bold mt-1 ${mrrGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {mrrGrowth >= 0 ? '+' : ''}{mrrGrowth}%
           </p>
-          <p className="text-xs text-gray-500 mt-1">Month over month</p>
+          <p className="text-xs text-gray-400 mt-1">Month over month</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
           <p className="text-sm font-medium text-gray-400">ARPU</p>
           <p className="text-2xl font-bold text-white mt-1">{formatCurrency(arpu)}</p>
-          <p className="text-xs text-gray-500 mt-1">Per paying user</p>
+          <p className="text-xs text-gray-400 mt-1">Per paying user</p>
         </div>
       </div>
 
@@ -262,7 +262,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
           <p className="text-3xl font-bold text-white">
             {conversionRate > 0 ? `${conversionRate}%` : '--'}
           </p>
-          <p className="text-xs text-gray-500 mt-1">Conversion rate</p>
+          <p className="text-xs text-gray-400 mt-1">Conversion rate</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -273,7 +273,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
           <p className="text-3xl font-bold text-white">
             {recentEvents?.upgraded || 0}
           </p>
-          <p className="text-xs text-gray-500 mt-1">This month</p>
+          <p className="text-xs text-gray-400 mt-1">This month</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -284,7 +284,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
           <p className="text-3xl font-bold text-white">
             {recentEvents?.downgraded || 0}
           </p>
-          <p className="text-xs text-gray-500 mt-1">This month</p>
+          <p className="text-xs text-gray-400 mt-1">This month</p>
         </div>
       </div>
 
@@ -376,21 +376,21 @@ const ConversionsPanel = memo(function ConversionsPanel() {
             <p className="text-2xl font-bold text-white mt-1">
               {totalSubscribers > 0 ? formatCurrency(metrics?.arpu || 0 * 12) : '--'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Estimated (ARPU x 12)</p>
+            <p className="text-xs text-gray-400 mt-1">Estimated (ARPU x 12)</p>
           </div>
           <div className="p-4 bg-gray-700 rounded-lg border border-gray-600">
             <p className="text-sm text-gray-400">Churn Rate</p>
             <p className="text-2xl font-bold text-white mt-1">
               {metrics?.churnRate !== undefined ? `${metrics.churnRate}%` : '--'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Monthly</p>
+            <p className="text-xs text-gray-400 mt-1">Monthly</p>
           </div>
           <div className="p-4 bg-gray-700 rounded-lg border border-gray-600">
             <p className="text-sm text-gray-400">Net Subscriber Growth</p>
             <p className={`text-2xl font-bold mt-1 ${(metrics?.netGrowth || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               {metrics?.netGrowth !== undefined ? (metrics.netGrowth >= 0 ? `+${metrics.netGrowth}` : metrics.netGrowth) : '--'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">This month</p>
+            <p className="text-xs text-gray-400 mt-1">This month</p>
           </div>
         </div>
       </div>
@@ -407,6 +407,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
   );
 });
 
+/** Renders revenue metrics, MRR trends, and subscription analytics. */
 export const RevenuePanel = memo(function RevenuePanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('subscriptions');
 

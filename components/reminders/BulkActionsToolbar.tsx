@@ -14,6 +14,7 @@ interface BulkActionsToolbarProps {
   onComplete: () => void;
 }
 
+/** Renders a toolbar with bulk action buttons for selected reminders. */
 export function BulkActionsToolbar({
   selectedCount,
   selectedReminders,
@@ -171,6 +172,7 @@ export function BulkActionsToolbar({
                 <div
                   className="fixed inset-0 z-10"
                   onClick={() => setShowPriorityMenu(false)}
+                  aria-hidden="true"
                 />
                 <div className="absolute bottom-full mb-2 left-0 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                   {(['low', 'medium', 'high', 'urgent'] as const).map((priority) => (
@@ -204,6 +206,7 @@ export function BulkActionsToolbar({
                 <div
                   className="fixed inset-0 z-10"
                   onClick={() => setShowCategoryMenu(false)}
+                  aria-hidden="true"
                 />
                 <div className="absolute bottom-full mb-2 left-0 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
                   {(['bills', 'health', 'work', 'personal', 'household'] as const).map(

@@ -37,6 +37,7 @@ const DEFAULT_FORM = {
   max_redemptions_per_week: null as number | null,
 };
 
+/** Provides admin controls for managing rewards, point values, and approvals. */
 export function RewardsManagement({
   spaceId,
   userId,
@@ -297,11 +298,11 @@ export function RewardsManagement({
                         <span className="text-sm font-semibold text-amber-400">
                           {reward.cost_points} pts
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           {CATEGORY_OPTIONS.find(c => c.value === reward.category)?.label || reward.category}
                         </span>
                         {reward.max_redemptions_per_week && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-400">
                             {reward.max_redemptions_per_week}/wk
                           </span>
                         )}
@@ -324,7 +325,7 @@ export function RewardsManagement({
                     <Tooltip content="Edit reward" position="top">
                       <button
                         onClick={() => openEditModal(reward)}
-                        className="p-1.5 text-gray-500 hover:text-blue-400 transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-blue-400 transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
@@ -332,7 +333,7 @@ export function RewardsManagement({
                     <Tooltip content="Delete reward" position="top">
                       <button
                         onClick={() => setDeleteConfirm(reward.id)}
-                        className="p-1.5 text-gray-500 hover:text-red-400 transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -348,18 +349,19 @@ export function RewardsManagement({
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => !saving && setShowModal(false)} />
-          <div className="relative bg-gray-800 rounded-xl max-w-lg w-full shadow-xl">
+          <div className="absolute inset-0 bg-black/50" onClick={() => !saving && setShowModal(false)} aria-hidden="true" />
+          <div className="relative bg-gray-800 rounded-xl max-w-lg w-full shadow-xl" role="dialog" aria-modal="true" aria-labelledby="reward-modal-title">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
-              <h3 className="text-lg font-semibold text-white">
+              <h3 id="reward-modal-title" className="text-lg font-semibold text-white">
                 {editingReward ? 'Edit Reward' : 'Create New Reward'}
               </h3>
               <button
                 onClick={() => !saving && setShowModal(false)}
                 className="text-gray-400 hover:text-gray-300"
+                aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
@@ -544,12 +546,12 @@ export function RewardsManagement({
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => !saving && setDeleteConfirm(null)} />
-          <div className="relative bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-white mb-2">
+          <div className="absolute inset-0 bg-black/50" onClick={() => !saving && setDeleteConfirm(null)} aria-hidden="true" />
+          <div className="relative bg-gray-800 rounded-xl max-w-sm w-full p-6 shadow-xl" role="alertdialog" aria-modal="true" aria-labelledby="delete-reward-title" aria-describedby="delete-reward-desc">
+            <h3 id="delete-reward-title" className="text-lg font-semibold text-white mb-2">
               Delete Reward?
             </h3>
-            <p className="text-gray-400 mb-4">
+            <p id="delete-reward-desc" className="text-gray-400 mb-4">
               This reward will be permanently removed. Any pending redemptions will be cancelled.
             </p>
             <div className="flex items-center justify-end gap-3">

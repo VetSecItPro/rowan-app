@@ -141,8 +141,10 @@ export interface OfflineQueueContextValue {
   enqueue: (type: string, endpoint: string, method: QueuedAction['method'], data: unknown) => string;
 }
 
+/** React context for the offline action queue provider */
 export const OfflineQueueContext = createContext<OfflineQueueContextValue | null>(null);
 
+/** Consumes the OfflineQueueContext and throws if used outside the provider */
 export function useOfflineQueueContext() {
   const context = useContext(OfflineQueueContext);
   if (!context) {

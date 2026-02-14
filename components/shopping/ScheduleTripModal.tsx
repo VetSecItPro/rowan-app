@@ -20,6 +20,7 @@ interface ScheduleTripModalProps {
   list: ShoppingList;
 }
 
+/** Renders a modal for scheduling a shopping trip with date and store. */
 export function ScheduleTripModal({ isOpen, onClose, onSchedule, list }: ScheduleTripModalProps) {
   const [title, setTitle] = useState(`Shopping Trip: ${list.title}`);
   const [date, setDate] = useState('');

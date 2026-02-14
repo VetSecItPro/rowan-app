@@ -24,6 +24,7 @@ export interface UseActiveSessionsReturn {
   handleRevokeSession: () => Promise<void>;
 }
 
+/** Fetches and manages the user's active authentication sessions */
 export function useActiveSessions(): UseActiveSessionsReturn {
   const [activeSessions, setActiveSessions] = useState<ActiveSession[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);

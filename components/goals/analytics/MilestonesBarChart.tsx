@@ -19,6 +19,7 @@ interface MilestonesBarChartProps {
   }>;
 }
 
+/** Renders a bar chart showing milestone completion counts per goal. */
 export default function MilestonesBarChart({ data }: MilestonesBarChartProps) {
   if (!data || data.length === 0) {
     return (

@@ -11,6 +11,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+/** Returns storage usage statistics for a space */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting

@@ -532,7 +532,7 @@ export default function CalendarDocumentationPage() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span><strong>Quick Add</strong> - Natural language parsing ("dinner tomorrow at 7pm")</span>
+                    <span><strong>Quick Add</strong> - Natural language parsing (&quot;dinner tomorrow at 7pm&quot;)</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <FileText className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -640,7 +640,7 @@ export default function CalendarDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Rowan's Calendar is your unified scheduling hub for managing personal events, family activities, and collaborative planning. With 6 powerful view modes and smart proposal features, you can organize everything from doctor appointments to family gatherings with ease.
+                Rowan&apos;s Calendar is your unified scheduling hub for managing personal events, family activities, and collaborative planning. With 6 powerful view modes and smart proposal features, you can organize everything from doctor appointments to family gatherings with ease.
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Key Features at a Glance</h3>
               <ul className="space-y-2 text-gray-300">
@@ -665,13 +665,13 @@ export default function CalendarDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Creating Your First Event</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Creating events in Rowan is quick and intuitive. Here's your step-by-step guide:
+                Creating events in Rowan is quick and intuitive. Here&apos;s your step-by-step guide:
               </p>
 
               <div className="bg-purple-900/20 rounded-xl p-6 border border-purple-800 mb-6">
                 <h4 className="text-lg font-semibold text-purple-100 mb-3">Step-by-Step: Create an Event</h4>
                 <ol className="space-y-3 text-gray-300">
-                  <li><strong>1. Click "New Event" button</strong> in the top right corner (or press N key)</li>
+                  <li><strong>1. Click &quot;New Event&quot; button</strong> in the top right corner (or press N key)</li>
                   <li><strong>2. Enter event title</strong> - Click the smile icon to add emojis (🎉 ☕ 🏠 etc.)</li>
                   <li><strong>3. Add description</strong> (optional) - Include details, notes, or instructions</li>
                   <li><strong>4. Set start date & time</strong> - Required field, click to open date/time picker</li>
@@ -681,7 +681,7 @@ export default function CalendarDocumentationPage() {
                   <li><strong>8. Pick custom color</strong> (optional) - 8 presets or enter hex code (#9333ea)</li>
                   <li><strong>9. Enable recurring</strong> (optional) - Set daily, weekly, or monthly pattern</li>
                   <li><strong>10. Attach files</strong> (optional) - Add images or documents</li>
-                  <li><strong>11. Click "Create Event"</strong> - Your event appears immediately in all views!</li>
+                  <li><strong>11. Click &quot;Create Event&quot;</strong> - Your event appears immediately in all views!</li>
                 </ol>
               </div>
 
@@ -689,7 +689,7 @@ export default function CalendarDocumentationPage() {
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-100">
-                    <strong>Pro Tip:</strong> Use emojis in titles for quick visual identification! Try "🏥 Doctor Appointment" or "🍕 Pizza Night with Family"
+                    <strong>Pro Tip:</strong> Use emojis in titles for quick visual identification! Try &quot;🏥 Doctor Appointment&quot; or &quot;🍕 Pizza Night with Family&quot;
                   </div>
                 </div>
               </div>
@@ -715,7 +715,7 @@ export default function CalendarDocumentationPage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-white mb-2">Day View (Press D)</h3>
-                      <p className="text-gray-300 mb-3">See a single day in complete detail with all events listed chronologically. Perfect for daily planning and reviewing today's schedule.</p>
+                      <p className="text-gray-300 mb-3">See a single day in complete detail with all events listed chronologically. Perfect for daily planning and reviewing today&apos;s schedule.</p>
                       <p className="text-sm text-blue-300"><strong>Best for:</strong> Daily planning, hourly schedules, detailed event review</p>
                     </div>
                   </div>
@@ -743,7 +743,7 @@ export default function CalendarDocumentationPage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-white mb-2">Month View (Press M)</h3>
-                      <p className="text-gray-300 mb-3">Traditional calendar grid showing entire month. Color-coded event dots show what's happening each day. Today is highlighted with purple accent.</p>
+                      <p className="text-gray-300 mb-3">Traditional calendar grid showing entire month. Color-coded event dots show what&apos;s happening each day. Today is highlighted with purple accent.</p>
                       <p className="text-sm text-purple-300"><strong>Best for:</strong> Long-term planning, spotting patterns, overview of busy periods</p>
                     </div>
                   </div>
@@ -757,8 +757,8 @@ export default function CalendarDocumentationPage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-white mb-2">Agenda View (Press A)</h3>
-                      <p className="text-gray-300 mb-3">Upcoming events grouped by date in chronological order. Shows "Today", "Tomorrow", or specific dates. Focus on what's coming next without calendar grid clutter.</p>
-                      <p className="text-sm text-amber-300"><strong>Best for:</strong> Checking what's next, preparing for upcoming events, quick glance</p>
+                      <p className="text-gray-300 mb-3">Upcoming events grouped by date in chronological order. Shows &quot;Today&quot;, &quot;Tomorrow&quot;, or specific dates. Focus on what&apos;s coming next without calendar grid clutter.</p>
+                      <p className="text-sm text-amber-300"><strong>Best for:</strong> Checking what&apos;s next, preparing for upcoming events, quick glance</p>
                     </div>
                   </div>
                 </div>
@@ -921,14 +921,14 @@ export default function CalendarDocumentationPage() {
   </h2>
   <div className="prose prose-invert max-w-none">
     <p className="text-gray-300 leading-relaxed mb-6">
-      Agenda View lists upcoming events chronologically, grouped by date. Focus on what's coming next without calendar grid clutter. Perfect for morning prep and weekly planning.
+      Agenda View lists upcoming events chronologically, grouped by date. Focus on what&apos;s coming next without calendar grid clutter. Perfect for morning prep and weekly planning.
     </p>
 
     <div className="bg-amber-900/20 rounded-xl p-6 border border-amber-800 mb-6">
       <h4 className="text-lg font-semibold text-amber-100 mb-4">Agenda View Benefits</h4>
       <ul className="space-y-3 text-gray-300">
         <li><strong>📋 Chronological List:</strong> Events listed in time order, grouped by date</li>
-        <li><strong>🗓️ Date Headers:</strong> "Today", "Tomorrow", or specific dates for easy scanning</li>
+        <li><strong>🗓️ Date Headers:</strong> &quot;Today&quot;, &quot;Tomorrow&quot;, or specific dates for easy scanning</li>
         <li><strong>🌦️ Inline Weather:</strong> Weather forecasts displayed directly with events</li>
         <li><strong>✅ Status Management:</strong> Click checkboxes to update event status</li>
         <li><strong>📍 Full Details:</strong> See time, location, category, and status at a glance</li>
@@ -939,7 +939,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-emerald-100">
-          <strong>Household Tip:</strong> Check Agenda View each morning to prep for the day. It's like your personal assistant showing what's ahead!
+          <strong>Household Tip:</strong> Check Agenda View each morning to prep for the day. It&apos;s like your personal assistant showing what&apos;s ahead!
         </div>
       </div>
     </div>
@@ -999,8 +999,8 @@ export default function CalendarDocumentationPage() {
     <div className="bg-purple-900/20 rounded-xl p-6 border border-purple-800 mb-6">
       <h4 className="text-lg font-semibold text-purple-100 mb-4">Event Creation Steps</h4>
       <ol className="space-y-3 text-gray-300">
-        <li><strong>1. Open Modal:</strong> Press <kbd>N</kbd> or click "New Event" button</li>
-        <li><strong>2. Enter Title:</strong> Required field - what's the event?</li>
+        <li><strong>1. Open Modal:</strong> Press <kbd>N</kbd> or click &quot;New Event&quot; button</li>
+        <li><strong>2. Enter Title:</strong> Required field - what&apos;s the event?</li>
         <li><strong>3. Set Date & Time:</strong> Pick date, start time, and optional end time</li>
         <li><strong>4. Add Location:</strong> Optional but enables weather forecasts</li>
         <li><strong>5. Choose Category:</strong> Work, Personal, Family, Health, or Social</li>
@@ -1091,7 +1091,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-emerald-100">
-          <strong>Household Tip:</strong> Consistent category usage makes visual scanning effortless. At a glance, you'll know if your week is work-heavy or family-balanced!
+          <strong>Household Tip:</strong> Consistent category usage makes visual scanning effortless. At a glance, you&apos;ll know if your week is work-heavy or family-balanced!
         </div>
       </div>
     </div>
@@ -1125,12 +1125,12 @@ export default function CalendarDocumentationPage() {
     <div className="grid gap-4 mb-6">
       <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">
         <h4 className="font-semibold text-white mb-2">✏️ Editing Series vs. Single</h4>
-        <p className="text-sm text-gray-300">When editing recurring events, choose "Edit this event" to change one occurrence or "Edit series" to update all future occurrences.</p>
+        <p className="text-sm text-gray-300">When editing recurring events, choose &quot;Edit this event&quot; to change one occurrence or &quot;Edit series&quot; to update all future occurrences.</p>
       </div>
       
       <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
         <h4 className="font-semibold text-white mb-2">🗑️ Deletion Options</h4>
-        <p className="text-sm text-gray-300">Delete "This event only" to skip one occurrence or "All events in series" to cancel the recurring pattern entirely.</p>
+        <p className="text-sm text-gray-300">Delete &quot;This event only&quot; to skip one occurrence or &quot;All events in series&quot; to cancel the recurring pattern entirely.</p>
       </div>
     </div>
 
@@ -1138,7 +1138,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Pro Tip:</strong> Use Quick Add to create recurring events naturally: "gym every Tuesday at 6pm" auto-creates a weekly recurring pattern!
+          <strong>Pro Tip:</strong> Use Quick Add to create recurring events naturally: &quot;gym every Tuesday at 6pm&quot; auto-creates a weekly recurring pattern!
         </div>
       </div>
     </div>
@@ -1164,19 +1164,19 @@ export default function CalendarDocumentationPage() {
         <li><strong>1. Open Event:</strong> Click event card or press <kbd>Eye icon</kbd></li>
         <li><strong>2. Click Edit:</strong> Click the <kbd>Edit</kbd> button (pencil icon)</li>
         <li><strong>3. Modify Fields:</strong> Update title, date, time, location, category, or description</li>
-        <li><strong>4. Save Changes:</strong> Click "Update Event" or press <kbd>Enter</kbd></li>
+        <li><strong>4. Save Changes:</strong> Click &quot;Update Event&quot; or press <kbd>Enter</kbd></li>
       </ol>
     </div>
 
     <div className="grid gap-4 mb-6">
       <div className="p-4 bg-red-900/20 rounded-lg border border-red-800">
         <h4 className="font-semibold text-white mb-2">🗑️ Deleting Events</h4>
-        <p className="text-sm text-gray-300">Click "Delete Event" in the edit modal. Confirmation required for irreversible deletion. Deletes attachments and comments too.</p>
+        <p className="text-sm text-gray-300">Click &quot;Delete Event&quot; in the edit modal. Confirmation required for irreversible deletion. Deletes attachments and comments too.</p>
       </div>
       
       <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
         <h4 className="font-semibold text-white mb-2">🔄 Real-time Sync</h4>
-        <p className="text-sm text-gray-300">All changes sync instantly to your partner's view with the "Live" indicator showing active connection.</p>
+        <p className="text-sm text-gray-300">All changes sync instantly to your partner&apos;s view with the &quot;Live&quot; indicator showing active connection.</p>
       </div>
     </div>
 
@@ -1208,7 +1208,7 @@ export default function CalendarDocumentationPage() {
       <h4 className="text-lg font-semibold text-emerald-100 mb-4">Using Attachments</h4>
       <ol className="space-y-3 text-gray-300">
         <li><strong>1. Open Event Details:</strong> Click event to open detail modal</li>
-        <li><strong>2. Go to Attachments Tab:</strong> Click "Attachments" tab</li>
+        <li><strong>2. Go to Attachments Tab:</strong> Click &quot;Attachments&quot; tab</li>
         <li><strong>3. Upload Files:</strong> Drag & drop or click to browse files</li>
         <li><strong>4. View Gallery:</strong> Thumbnails for images, icons for documents</li>
         <li><strong>5. Download/Delete:</strong> Click attachments to download or delete</li>
@@ -1274,7 +1274,7 @@ export default function CalendarDocumentationPage() {
         </div>
         <div>
           <div className="text-green-400 font-semibold mb-1">Celebrations</div>
-          <div className="text-gray-400">🎂 Birthday Party • 🎉 Anniversary • 🎊 Celebration • 💝 Valentine's</div>
+          <div className="text-gray-400">🎂 Birthday Party • 🎉 Anniversary • 🎊 Celebration • 💝 Valentine&apos;s</div>
         </div>
         <div>
           <div className="text-pink-400 font-semibold mb-1">Health & Wellness</div>
@@ -1377,7 +1377,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Pro Tip:</strong>  Search is perfect for finding that doctor appointment you scheduled months ago. Just type 'doctor' and find it instantly!
+          <strong>Pro Tip:</strong>  Search is perfect for finding that doctor appointment you scheduled months ago. Just type &apos;doctor&apos; and find it instantly!
         </div>
       </div>
     </div>
@@ -1437,7 +1437,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Pro Tip:</strong>  Conflict detection warns you about overlapping events but doesn't block creation - sometimes double-booking is intentional!
+          <strong>Pro Tip:</strong>  Conflict detection warns you about overlapping events but doesn&apos;t block creation - sometimes double-booking is intentional!
         </div>
       </div>
     </div>
@@ -1453,7 +1453,7 @@ export default function CalendarDocumentationPage() {
   </h2>
   <div className="prose prose-invert max-w-none">
     <p className="text-gray-300 leading-relaxed mb-6">
-      All calendar changes sync instantly across devices. The Live indicator (green dot with 'Live' badge) shows active real-time connection. No manual refresh needed.
+      All calendar changes sync instantly across devices. The Live indicator (green dot with &apos;Live&apos; badge) shows active real-time connection. No manual refresh needed.
     </p>
 
     <div className="bg-yellow-900/20 rounded-xl p-6 border border-yellow-800 mb-6">
@@ -1519,7 +1519,7 @@ export default function CalendarDocumentationPage() {
     <div className="bg-purple-900/20 rounded-xl p-6 border border-purple-800 mb-6">
       <h4 className="text-lg font-semibold text-purple-100 mb-4">Key Features</h4>
       <p className="text-gray-300">
-        Click 'Propose Event' from toolbar. Enter event details and add multiple time slot options. Participants automatically notified to vote on proposal.
+        Click &apos;Propose Event&apos; from toolbar. Enter event details and add multiple time slot options. Participants automatically notified to vote on proposal.
       </p>
     </div>
 
@@ -1543,13 +1543,13 @@ export default function CalendarDocumentationPage() {
   </h2>
   <div className="prose prose-invert max-w-none">
     <p className="text-gray-300 leading-relaxed mb-6">
-      Vote on time slots with three levels: Preferred ⭐ (best choice), Available 👍 (works), Unavailable 👎 (can't make it). See everyone's votes in real-time.
+      Vote on time slots with three levels: Preferred ⭐ (best choice), Available 👍 (works), Unavailable 👎 (can&apos;t make it). See everyone&apos;s votes in real-time.
     </p>
 
     <div className="bg-amber-900/20 rounded-xl p-6 border border-amber-800 mb-6">
       <h4 className="text-lg font-semibold text-amber-100 mb-4">Key Features</h4>
       <p className="text-gray-300">
-        Open proposal and click time slots to cycle through votes. Your vote shows in your color. Partner's votes visible too. Proposal updates instantly.
+        Open proposal and click time slots to cycle through votes. Your vote shows in your color. Partner&apos;s votes visible too. Proposal updates instantly.
       </p>
     </div>
 
@@ -1557,7 +1557,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Household Tip:</strong>  Be honest with votes! 'Available' when you mean 'Unavailable' leads to conflicts. Better to find a time that truly works!
+          <strong>Household Tip:</strong>  Be honest with votes! &apos;Available&apos; when you mean &apos;Unavailable&apos; leads to conflicts. Better to find a time that truly works!
         </div>
       </div>
     </div>
@@ -1579,7 +1579,7 @@ export default function CalendarDocumentationPage() {
     <div className="bg-green-900/20 rounded-xl p-6 border border-green-800 mb-6">
       <h4 className="text-lg font-semibold text-green-100 mb-4">Key Features</h4>
       <p className="text-gray-300">
-        Click 'Approve' on proposal, select time slot with most Preferred votes, confirm. Event auto-creates with all details from proposal.
+        Click &apos;Approve&apos; on proposal, select time slot with most Preferred votes, confirm. Event auto-creates with all details from proposal.
       </p>
     </div>
 
@@ -1603,13 +1603,13 @@ export default function CalendarDocumentationPage() {
   </h2>
   <div className="prose prose-invert max-w-none">
     <p className="text-gray-300 leading-relaxed mb-6">
-      Can't make any proposed times? Add comments suggesting alternatives. Discussion thread helps find times that work for everyone.
+      Can&apos;t make any proposed times? Add comments suggesting alternatives. Discussion thread helps find times that work for everyone.
     </p>
 
     <div className="bg-blue-900/20 rounded-xl p-6 border border-blue-800 mb-6">
       <h4 className="text-lg font-semibold text-blue-100 mb-4">Key Features</h4>
       <p className="text-gray-300">
-        Use comments section in proposal to suggest different times. Add '@partner' to notify them. Proposer can add suggested times as new slots.
+        Use comments section in proposal to suggest different times. Add &apos;@partner&apos; to notify them. Proposer can add suggested times as new slots.
       </p>
     </div>
 
@@ -1633,7 +1633,7 @@ export default function CalendarDocumentationPage() {
   </h2>
   <div className="prose prose-invert max-w-none">
     <p className="text-gray-300 leading-relaxed mb-6">
-      AI analyzes everyone's availability and calendar patterns to suggest optimal meeting times. Considers work hours, typical free times, and existing commitments.
+      AI analyzes everyone&apos;s availability and calendar patterns to suggest optimal meeting times. Considers work hours, typical free times, and existing commitments.
     </p>
 
     <div className="bg-indigo-900/20 rounded-xl p-6 border border-indigo-800 mb-6">
@@ -1827,7 +1827,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Household Tip:</strong>  Weekly category review shows balance. Too much Work, not enough Family? Adjust next week's schedule proactively!
+          <strong>Household Tip:</strong>  Weekly category review shows balance. Too much Work, not enough Family? Adjust next week&apos;s schedule proactively!
         </div>
       </div>
     </div>
@@ -1879,7 +1879,7 @@ export default function CalendarDocumentationPage() {
     <div className="bg-blue-900/20 rounded-xl p-6 border border-blue-800 mb-6">
       <h4 className="text-lg font-semibold text-blue-100 mb-4">Key Features</h4>
       <p className="text-gray-300">
-        Morning routine: Check Today in Agenda view. Evening routine: Add tomorrow's events. Weekly: Review proposals, approve or comment.
+        Morning routine: Check Today in Agenda view. Evening routine: Add tomorrow&apos;s events. Weekly: Review proposals, approve or comment.
       </p>
     </div>
 
@@ -1887,7 +1887,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Household Tip:</strong>  'Calendar first' rule: Nothing is scheduled until it's in calendar. Prevents double-booking and miscommunication!
+          <strong>Household Tip:</strong>  &apos;Calendar first&apos; rule: Nothing is scheduled until it&apos;s in calendar. Prevents double-booking and miscommunication!
         </div>
       </div>
     </div>
@@ -1903,7 +1903,7 @@ export default function CalendarDocumentationPage() {
   </h2>
   <div className="prose prose-invert max-w-none">
     <p className="text-gray-300 leading-relaxed mb-6">
-      Advanced recurring patterns: Skip single occurrence by deleting just that instance. Change time for one occurrence with 'Edit this event'.
+      Advanced recurring patterns: Skip single occurrence by deleting just that instance. Change time for one occurrence with &apos;Edit this event&apos;.
     </p>
 
     <div className="bg-green-900/20 rounded-xl p-6 border border-green-800 mb-6">
@@ -1917,7 +1917,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Pro Tip:</strong>  Recurring events save tons of time! Instead of creating 'Gym' 52 times, create once with 'Weekly on Tuesday' pattern.
+          <strong>Pro Tip:</strong>  Recurring events save tons of time! Instead of creating &apos;Gym&apos; 52 times, create once with &apos;Weekly on Tuesday&apos; pattern.
         </div>
       </div>
     </div>
@@ -1977,7 +1977,7 @@ export default function CalendarDocumentationPage() {
       <div className="flex items-start gap-2">
         <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-100">
-          <strong>Household Tip:</strong>  Shared family calendar = everyone on same page. No more 'I forgot about soccer practice!' moments. Life-changing for busy families!
+          <strong>Household Tip:</strong>  Shared family calendar = everyone on same page. No more &apos;I forgot about soccer practice!&apos; moments. Life-changing for busy families!
         </div>
       </div>
     </div>
@@ -1995,9 +1995,9 @@ export default function CalendarDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                The Unified Calendar View combines all your scheduled items - events, tasks, meals, and reminders - into a single, comprehensive calendar view. Instead of switching between different sections of Rowan, you can now see everything that's happening in your life at a glance.
+                The Unified Calendar View combines all your scheduled items - events, tasks, meals, and reminders - into a single, comprehensive calendar view. Instead of switching between different sections of Rowan, you can now see everything that&apos;s happening in your life at a glance.
               </p>
-              <h3 className="text-xl font-semibold text-white mt-6 mb-3">What's Included</h3>
+              <h3 className="text-xl font-semibold text-white mt-6 mb-3">What&apos;s Included</h3>
               <div className="grid gap-4 mb-6">
                 <div className="flex items-start gap-3 p-4 bg-purple-900/20 rounded-lg border border-purple-800">
                   <span className="text-2xl">📅</span>
@@ -2049,7 +2049,7 @@ export default function CalendarDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Each item type has its own distinctive color to help you quickly identify what's on your calendar:
+                Each item type has its own distinctive color to help you quickly identify what&apos;s on your calendar:
               </p>
               <div className="grid sm:grid-cols-2 gap-4 mb-6">
                 <div className="p-4 rounded-lg bg-purple-900/30 border-2 border-purple-500">
@@ -2109,8 +2109,8 @@ export default function CalendarDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Filter Controls</h3>
               <ul className="space-y-3 text-gray-300 mb-6">
                 <li><strong>Individual Toggles:</strong> Click on Events, Tasks, Meals, or Reminders buttons to show/hide that type</li>
-                <li><strong>Show All:</strong> Click "Show All" to display all item types at once</li>
-                <li><strong>Hide All:</strong> Click "Hide All" to hide all item types (button toggles between Show/Hide based on state)</li>
+                <li><strong>Show All:</strong> Click &quot;Show All&quot; to display all item types at once</li>
+                <li><strong>Hide All:</strong> Click &quot;Hide All&quot; to hide all item types (button toggles between Show/Hide based on state)</li>
                 <li><strong>Item Counts:</strong> Each filter button shows the count of items in the current view</li>
               </ul>
               <div className="bg-blue-900/20 rounded-xl p-6 border border-blue-800 mb-6">
@@ -2118,7 +2118,7 @@ export default function CalendarDocumentationPage() {
                 <div className="space-y-2 text-sm text-blue-200">
                   <p><strong>Active (colored):</strong> Item type is visible on calendar</p>
                   <p><strong>Inactive (gray):</strong> Item type is hidden from calendar</p>
-                  <p><strong>Hover tooltips:</strong> Instant tooltips show "Show [type]s" or "Hide [type]s"</p>
+                  <p><strong>Hover tooltips:</strong> Instant tooltips show &quot;Show [type]s&quot; or &quot;Hide [type]s&quot;</p>
                 </div>
               </div>
               <div className="bg-amber-900/20 rounded-xl p-4 border border-amber-800">
@@ -2148,8 +2148,8 @@ export default function CalendarDocumentationPage() {
               <ul className="space-y-2 text-gray-300 mb-6">
                 <li><strong>Icon:</strong> Type indicator (📅 event, ✓ task, 🍽️ meal, 🔔 reminder)</li>
                 <li><strong>Title:</strong> Item name or description</li>
-                <li><strong>Time:</strong> Start time, end time, or "All day" for full-day items</li>
-                <li><strong>Priority:</strong> "Urgent" or "High" badges for high-priority items</li>
+                <li><strong>Time:</strong> Start time, end time, or &quot;All day&quot; for full-day items</li>
+                <li><strong>Priority:</strong> &quot;Urgent&quot; or &quot;High&quot; badges for high-priority items</li>
                 <li><strong>Status:</strong> Task status (pending, in-progress, blocked, completed)</li>
                 <li><strong>Category:</strong> Meal type or item category</li>
                 <li><strong>Location:</strong> Event location if available</li>
@@ -2242,7 +2242,7 @@ export default function CalendarDocumentationPage() {
                   <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 text-white font-bold">1</div>
                   <div>
                     <h4 className="font-semibold text-white mb-1">Not Started (Default)</h4>
-                    <p className="text-sm text-gray-300">Event is created but hasn't begun yet. Shows on calendar with standard styling.</p>
+                    <p className="text-sm text-gray-300">Event is created but hasn&apos;t begun yet. Shows on calendar with standard styling.</p>
                   </div>
                 </div>
 
@@ -2284,7 +2284,7 @@ export default function CalendarDocumentationPage() {
                 <div className="p-4 bg-pink-900/20 rounded-lg border border-pink-800">
                   <div className="text-3xl mb-2">👨‍👩‍👧‍👦</div>
                   <h4 className="font-semibold text-pink-100 mb-1">Family</h4>
-                  <p className="text-sm text-pink-200">Family gatherings, kids' activities, date nights, family outings, celebrations</p>
+                  <p className="text-sm text-pink-200">Family gatherings, kids&apos; activities, date nights, family outings, celebrations</p>
                 </div>
 
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
@@ -2309,7 +2309,7 @@ export default function CalendarDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Quick Navigation & Shortcuts</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-6">
-                Master these keyboard shortcuts for lightning-fast calendar navigation. All shortcuts work when you're not typing in an input field:
+                Master these keyboard shortcuts for lightning-fast calendar navigation. All shortcuts work when you&apos;re not typing in an input field:
               </p>
 
               <div className="grid gap-4 mb-6">
@@ -2402,14 +2402,14 @@ export default function CalendarDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-6">
-                Quick Add lets you create events by typing naturally, just like you'd tell a friend. Powered by intelligent natural language parsing, it understands dates, times, locations, and event types automatically.
+                Quick Add lets you create events by typing naturally, just like you&apos;d tell a friend. Powered by intelligent natural language parsing, it understands dates, times, locations, and event types automatically.
               </p>
 
               <div className="bg-pink-900/20 rounded-xl p-6 border border-pink-800 mb-6">
                 <h4 className="text-lg font-semibold text-pink-100 mb-4">How to Use Quick Add</h4>
                 <ol className="space-y-3 text-gray-300">
-                  <li><strong>1. Select "Quick Add" from the toolbar</strong> - Click the Quick Add toggle, then click the action button (or press Q)</li>
-                  <li><strong>2. Type naturally</strong> - Examples: "dinner with Sarah tomorrow at 7pm", "doctor appointment next Monday at 2pm", "team meeting Friday at 10am"</li>
+                  <li><strong>1. Select &quot;Quick Add&quot; from the toolbar</strong> - Click the Quick Add toggle, then click the action button (or press Q)</li>
+                  <li><strong>2. Type naturally</strong> - Examples: &quot;dinner with Sarah tomorrow at 7pm&quot;, &quot;doctor appointment next Monday at 2pm&quot;, &quot;team meeting Friday at 10am&quot;</li>
                   <li><strong>3. See the preview</strong> - Quick Add shows what it understood before creating</li>
                   <li><strong>4. Create or adjust</strong> - Click Create if it looks good, or manually adjust if needed</li>
                 </ol>
@@ -2420,33 +2420,33 @@ export default function CalendarDocumentationPage() {
                 <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">
                   <h4 className="font-semibold text-white mb-2">📅 Dates & Times</h4>
                   <ul className="text-sm text-gray-300 space-y-1">
-                    <li>• "tomorrow", "next Monday", "in 3 days", "June 15th"</li>
-                    <li>• "at 7pm", "at 2:30pm", "from 9am to 11am"</li>
-                    <li>• "next week Tuesday", "this Friday"</li>
+                    <li>• &quot;tomorrow&quot;, &quot;next Monday&quot;, &quot;in 3 days&quot;, &quot;June 15th&quot;</li>
+                    <li>• &quot;at 7pm&quot;, &quot;at 2:30pm&quot;, &quot;from 9am to 11am&quot;</li>
+                    <li>• &quot;next week Tuesday&quot;, &quot;this Friday&quot;</li>
                   </ul>
                 </div>
 
                 <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-800">
                   <h4 className="font-semibold text-white mb-2">📍 Locations</h4>
                   <ul className="text-sm text-gray-300 space-y-1">
-                    <li>• "at Olive Garden", "at the park", "at home"</li>
-                    <li>• Location is automatically extracted from "at [place]" or "@ [place]"</li>
+                    <li>• &quot;at Olive Garden&quot;, &quot;at the park&quot;, &quot;at home&quot;</li>
+                    <li>• Location is automatically extracted from &quot;at [place]&quot; or &quot;@ [place]&quot;</li>
                   </ul>
                 </div>
 
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
                   <h4 className="font-semibold text-white mb-2">🏷️ Event Types</h4>
                   <ul className="text-sm text-gray-300 space-y-1">
-                    <li>• "meeting", "call", "appointment" → Work category</li>
-                    <li>• "dinner", "lunch", "birthday", "party" → Social category</li>
-                    <li>• "doctor", "gym", "therapy" → Health category</li>
+                    <li>• &quot;meeting&quot;, &quot;call&quot;, &quot;appointment&quot; → Work category</li>
+                    <li>• &quot;dinner&quot;, &quot;lunch&quot;, &quot;birthday&quot;, &quot;party&quot; → Social category</li>
+                    <li>• &quot;doctor&quot;, &quot;gym&quot;, &quot;therapy&quot; → Health category</li>
                   </ul>
                 </div>
 
                 <div className="p-4 bg-amber-900/20 rounded-lg border border-amber-800">
                   <h4 className="font-semibold text-white mb-2">🔁 Recurring Events</h4>
                   <ul className="text-sm text-gray-300 space-y-1">
-                    <li>• "every Monday", "every day", "weekly meeting"</li>
+                    <li>• &quot;every Monday&quot;, &quot;every day&quot;, &quot;weekly meeting&quot;</li>
                     <li>• Automatically sets up recurring patterns</li>
                   </ul>
                 </div>
@@ -2456,19 +2456,19 @@ export default function CalendarDocumentationPage() {
               <div className="bg-gray-900 rounded-xl p-6 border border-gray-700">
                 <div className="grid sm:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-pink-400 font-mono mb-1">"dinner with Sarah tomorrow at 7pm"</div>
+                    <div className="text-pink-400 font-mono mb-1">&quot;dinner with Sarah tomorrow at 7pm&quot;</div>
                     <div className="text-gray-400 text-xs">→ Dinner event, tomorrow 7:00 PM, Social category</div>
                   </div>
                   <div>
-                    <div className="text-pink-400 font-mono mb-1">"team meeting Friday at 2pm"</div>
+                    <div className="text-pink-400 font-mono mb-1">&quot;team meeting Friday at 2pm&quot;</div>
                     <div className="text-gray-400 text-xs">→ Team Meeting, this Friday 2:00 PM, Work category</div>
                   </div>
                   <div>
-                    <div className="text-pink-400 font-mono mb-1">"doctor appointment next Monday at 10am"</div>
+                    <div className="text-pink-400 font-mono mb-1">&quot;doctor appointment next Monday at 10am&quot;</div>
                     <div className="text-gray-400 text-xs">→ Doctor Appointment, next Monday 10:00 AM, Health category</div>
                   </div>
                   <div>
-                    <div className="text-pink-400 font-mono mb-1">"gym every Tuesday at 6pm"</div>
+                    <div className="text-pink-400 font-mono mb-1">&quot;gym every Tuesday at 6pm&quot;</div>
                     <div className="text-gray-400 text-xs">→ Gym event, recurring weekly Tuesdays 6:00 PM, Health category</div>
                   </div>
                 </div>
@@ -2478,7 +2478,7 @@ export default function CalendarDocumentationPage() {
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-indigo-100">
-                    <strong>Pro Tip:</strong> The more natural you type, the better! "coffee with mom tomorrow morning at 9" works just as well as formal phrasing. Quick Add is designed to understand how you normally speak.
+                    <strong>Pro Tip:</strong> The more natural you type, the better! &quot;coffee with mom tomorrow morning at 9&quot; works just as well as formal phrasing. Quick Add is designed to understand how you normally speak.
                   </div>
                 </div>
               </div>
@@ -2501,7 +2501,7 @@ export default function CalendarDocumentationPage() {
               <div className="bg-pink-900/20 rounded-xl p-6 border border-pink-800 mb-6">
                 <h4 className="text-lg font-semibold text-pink-100 mb-4">How to Use Templates</h4>
                 <ol className="space-y-3 text-gray-300">
-                  <li><strong>1. Select "Templates" from the toolbar</strong> - Click the Templates toggle, then click the action button</li>
+                  <li><strong>1. Select &quot;Templates&quot; from the toolbar</strong> - Click the Templates toggle, then click the action button</li>
                   <li><strong>2. Browse available templates</strong> - See system templates (pre-built) and your custom templates</li>
                   <li><strong>3. Click a template</strong> - Event is created instantly with pre-filled details</li>
                   <li><strong>4. Edit the event</strong> - Automatically opens in edit mode so you can adjust the time and details</li>
@@ -2604,7 +2604,7 @@ export default function CalendarDocumentationPage() {
 
                 <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">
                   <h4 className="font-semibold text-white mb-2">📍 Precise Event Positioning</h4>
-                  <p className="text-sm text-gray-300">Events appear exactly at their scheduled time. A 2:30pm event appears at 2:30, not just "afternoon".</p>
+                  <p className="text-sm text-gray-300">Events appear exactly at their scheduled time. A 2:30pm event appears at 2:30, not just &quot;afternoon&quot;.</p>
                 </div>
 
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
@@ -2614,7 +2614,7 @@ export default function CalendarDocumentationPage() {
 
                 <div className="p-4 bg-amber-900/20 rounded-lg border border-amber-800">
                   <h4 className="font-semibold text-white mb-2">🔴 Current Time Indicator</h4>
-                  <p className="text-sm text-gray-300">Red line shows exactly what time it is right now (updates every minute). Only visible for today's date.</p>
+                  <p className="text-sm text-gray-300">Red line shows exactly what time it is right now (updates every minute). Only visible for today&apos;s date.</p>
                 </div>
 
                 <div className="p-4 bg-pink-900/20 rounded-lg border border-pink-800">
@@ -2651,7 +2651,7 @@ export default function CalendarDocumentationPage() {
               <div className="grid gap-4 mb-6">
                 <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">
                   <h4 className="font-semibold text-white mb-2">📅 7-Day Grid with Hours</h4>
-                  <p className="text-sm text-gray-300">Monday through Sunday columns, each with the same 6am-11pm hourly grid. See your entire week's schedule at once.</p>
+                  <p className="text-sm text-gray-300">Monday through Sunday columns, each with the same 6am-11pm hourly grid. See your entire week&apos;s schedule at once.</p>
                 </div>
 
                 <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-800">
@@ -2661,12 +2661,12 @@ export default function CalendarDocumentationPage() {
 
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
                   <h4 className="font-semibold text-white mb-2">🎯 Today Highlighting</h4>
-                  <p className="text-sm text-gray-300">Today's column has a purple tint and shows the current time indicator, making it easy to spot where you are in the week.</p>
+                  <p className="text-sm text-gray-300">Today&apos;s column has a purple tint and shows the current time indicator, making it easy to spot where you are in the week.</p>
                 </div>
 
                 <div className="p-4 bg-amber-900/20 rounded-lg border border-amber-800">
                   <h4 className="font-semibold text-white mb-2">📝 Event Count Headers</h4>
-                  <p className="text-sm text-gray-300">Each day's header shows the date and how many events are scheduled. "3 events", "No events", etc.</p>
+                  <p className="text-sm text-gray-300">Each day&apos;s header shows the date and how many events are scheduled. &quot;3 events&quot;, &quot;No events&quot;, etc.</p>
                 </div>
 
                 <div className="p-4 bg-pink-900/20 rounded-lg border border-pink-800">
@@ -2719,21 +2719,21 @@ export default function CalendarDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Why Overlaps Are Allowed</h3>
               <p className="text-gray-300 mb-4">
-                Rowan doesn't block overlapping events because there are many valid reasons to schedule them:
+                Rowan doesn&apos;t block overlapping events because there are many valid reasons to schedule them:
               </p>
               <ul className="space-y-2 text-gray-300 mb-6">
-                <li><strong>• Optional events:</strong> "I might go to the gym OR meet Sarah for coffee"</li>
+                <li><strong>• Optional events:</strong> &quot;I might go to the gym OR meet Sarah for coffee&quot;</li>
                 <li><strong>• Backup plans:</strong> Schedule multiple options and cancel one later</li>
-                <li><strong>• Different people:</strong> Partner's doctor appointment overlaps with your gym session (you're in different places)</li>
-                <li><strong>• Flexible timing:</strong> "Dinner sometime between 6-8pm" with another event at 7pm</li>
-                <li><strong>• Ambitious scheduling:</strong> See what you WANT to accomplish, even if it's tight</li>
+                <li><strong>• Different people:</strong> Partner&apos;s doctor appointment overlaps with your gym session (you&apos;re in different places)</li>
+                <li><strong>• Flexible timing:</strong> &quot;Dinner sometime between 6-8pm&quot; with another event at 7pm</li>
+                <li><strong>• Ambitious scheduling:</strong> See what you WANT to accomplish, even if it&apos;s tight</li>
               </ul>
 
               <div className="bg-blue-900/20 rounded-xl p-4 border border-blue-800">
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-100">
-                    <strong>Power User Tip:</strong> The purple shades make overlaps visually obvious without being alarming. If you see purple, take a second look—but you're always in control. Rowan trusts you to manage your own time!
+                    <strong>Power User Tip:</strong> The purple shades make overlaps visually obvious without being alarming. If you see purple, take a second look—but you&apos;re always in control. Rowan trusts you to manage your own time!
                   </div>
                 </div>
               </div>
@@ -2762,7 +2762,7 @@ export default function CalendarDocumentationPage() {
 
                 <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">
                   <h4 className="font-semibold text-white mb-2">@ Mentions</h4>
-                  <p className="text-sm text-gray-300">Type @ to mention space members. They'll get notified and can respond quickly to your questions.</p>
+                  <p className="text-sm text-gray-300">Type @ to mention space members. They&apos;ll get notified and can respond quickly to your questions.</p>
                 </div>
 
                 <div className="p-4 bg-green-900/20 rounded-lg border border-green-800">
@@ -2790,7 +2790,7 @@ export default function CalendarDocumentationPage() {
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-emerald-100">
-                    <strong>Household Tip:</strong> Use comments for event coordination! "Can someone pick up the cake?" "@John can you bring the decorations?" "Should we move this to 6pm instead?" Perfect for family gatherings and parties!
+                    <strong>Household Tip:</strong> Use comments for event coordination! &quot;Can someone pick up the cake?&quot; &quot;@John can you bring the decorations?&quot; &quot;Should we move this to 6pm instead?&quot; Perfect for family gatherings and parties!
                   </div>
                 </div>
               </div>
@@ -2829,7 +2829,7 @@ export default function CalendarDocumentationPage() {
 
                 <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">
                   <h4 className="font-semibold text-white mb-2">💡 Recommendations</h4>
-                  <p className="text-sm text-gray-300">Get helpful suggestions: "Bring umbrellas", "Consider rescheduling", "Stay hydrated", "Dress warmly".</p>
+                  <p className="text-sm text-gray-300">Get helpful suggestions: &quot;Bring umbrellas&quot;, &quot;Consider rescheduling&quot;, &quot;Stay hydrated&quot;, &quot;Dress warmly&quot;.</p>
                 </div>
               </div>
 
@@ -2878,12 +2878,12 @@ export default function CalendarDocumentationPage() {
               <div className="grid gap-4 mb-6">
                 <div className="p-4 bg-red-900/20 rounded-lg border border-red-800">
                   <h4 className="font-semibold text-white mb-2">🔴 Time Overlaps (High Severity)</h4>
-                  <p className="text-sm text-gray-300">Two events scheduled at the exact same time. Can't physically be in two places at once!</p>
+                  <p className="text-sm text-gray-300">Two events scheduled at the exact same time. Can&apos;t physically be in two places at once!</p>
                 </div>
 
                 <div className="p-4 bg-orange-900/20 rounded-lg border border-orange-800">
                   <h4 className="font-semibold text-white mb-2">🟠 Travel Time Issues (Medium Severity)</h4>
-                  <p className="text-sm text-gray-300">Not enough time to travel between locations. "Doctor at 2pm, Meeting at 2:30pm across town" = warning.</p>
+                  <p className="text-sm text-gray-300">Not enough time to travel between locations. &quot;Doctor at 2pm, Meeting at 2:30pm across town&quot; = warning.</p>
                 </div>
 
                 <div className="p-4 bg-yellow-900/20 rounded-lg border border-yellow-800">
@@ -2903,7 +2903,7 @@ export default function CalendarDocumentationPage() {
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-100">
-                    <strong>Power User Tip:</strong> Rowan warns about conflicts but doesn't block them. Sometimes overlaps are intentional (optional events, backup plans, different people in household). You stay in control!
+                    <strong>Power User Tip:</strong> Rowan warns about conflicts but doesn&apos;t block them. Sometimes overlaps are intentional (optional events, backup plans, different people in household). You stay in control!
                   </div>
                 </div>
               </div>
@@ -2935,7 +2935,7 @@ export default function CalendarDocumentationPage() {
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-purple-100">
-                    <strong>Use Case:</strong> Grandparents in different timezone? Set their timezone on family video call events. You'll see "3pm" while they see "6pm" - everyone views in their local time!
+                    <strong>Use Case:</strong> Grandparents in different timezone? Set their timezone on family video call events. You&apos;ll see &quot;3pm&quot; while they see &quot;6pm&quot; - everyone views in their local time!
                   </div>
                 </div>
               </div>
@@ -2964,7 +2964,7 @@ export default function CalendarDocumentationPage() {
 
                 <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-800">
                   <h4 className="font-semibold text-white mb-2">🏠 Per-Space Memory</h4>
-                  <p className="text-sm text-gray-300">Each space remembers its own view. "Family" space can be Agenda while "Work" space stays in Week view.</p>
+                  <p className="text-sm text-gray-300">Each space remembers its own view. &quot;Family&quot; space can be Agenda while &quot;Work&quot; space stays in Week view.</p>
                 </div>
 
                 <div className="p-4 bg-purple-900/20 rounded-lg border border-purple-800">

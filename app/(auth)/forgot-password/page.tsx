@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
           <motion.p className="text-center text-gray-400 mb-8 text-lg" variants={itemVariants}>
             We&apos;ve sent a password reset link to <span className="font-bold text-emerald-400">{email}</span>
           </motion.p>
-          <motion.p className="text-center text-sm text-gray-500 mb-8 leading-relaxed" variants={itemVariants}>
+          <motion.p className="text-center text-sm text-gray-400 mb-8 leading-relaxed" variants={itemVariants}>
             Didn&apos;t receive the email? Check your spam folder or try again with a different email address.
           </motion.p>
           <motion.div className="flex justify-center" variants={itemVariants}>

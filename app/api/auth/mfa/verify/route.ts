@@ -18,6 +18,7 @@ const VerifyCodeSchema = z.object({
   challengeId: z.string().optional(),
 });
 
+/** Verifies a TOTP code for MFA enrollment or login */
 export async function POST(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth

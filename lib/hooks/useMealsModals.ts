@@ -51,6 +51,7 @@ export interface UseMealsModalsReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Manages open/close state for meal creation, editing, and recipe detail modals */
 export function useMealsModals(): UseMealsModalsReturn {
   // Meal modal state
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -12,6 +12,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   touchOptimized?: boolean;
 }
 
+/** Renders a styled button with size, variant, and loading state support. */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({
     className = '',

@@ -47,6 +47,7 @@ type SplitUpdatePayload = {
   is_split: boolean;
 };
 
+/** Renders a modal for splitting expenses between household members. */
 export function ExpenseSplitModal({
   isOpen,
   onClose,

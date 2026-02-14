@@ -78,6 +78,7 @@ const EventBadge = memo(function EventBadge({ type }: { type: string }) {
   );
 });
 
+/** Displays subscription tier distribution and plan management data. */
 export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
   const [activeView, setActiveView] = useState<'overview' | 'events'>('overview');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');

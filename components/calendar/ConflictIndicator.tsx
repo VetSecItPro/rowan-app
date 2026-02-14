@@ -8,6 +8,7 @@ interface ConflictIndicatorProps {
   compact?: boolean;
 }
 
+/** Displays a visual indicator when calendar events have scheduling conflicts. */
 export function ConflictIndicator({ conflicts, compact = false }: ConflictIndicatorProps) {
   if (conflicts.length === 0) return null;
 

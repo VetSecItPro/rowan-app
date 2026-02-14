@@ -546,12 +546,12 @@ export default function TasksChoresDocumentationPage() {
             </h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed mb-4">
-                Rowan's Tasks & Chores feature is your household command center for managing daily life. Whether it's one-time errands or recurring household duties, we've built powerful yet simple tools to keep everyone organized and on track.
+                Rowan&apos;s Tasks & Chores feature is your household command center for managing daily life. Whether it&apos;s one-time errands or recurring household duties, we&apos;ve built powerful yet simple tools to keep everyone organized and on track.
               </p>
               <h3 className="text-xl font-semibold text-white mt-6 mb-3">Key Features at a Glance</h3>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Tasks for Projects & Errands:</strong> One-time activities like "Pick up dry cleaning" or "Finish quarterly report"</li>
-                <li><strong>Chores for Recurring Duties:</strong> Household tasks that repeat like "Take out trash" or "Clean bathrooms"</li>
+                <li><strong>Tasks for Projects & Errands:</strong> One-time activities like &quot;Pick up dry cleaning&quot; or &quot;Finish quarterly report&quot;</li>
+                <li><strong>Chores for Recurring Duties:</strong> Household tasks that repeat like &quot;Take out trash&quot; or &quot;Clean bathrooms&quot;</li>
                 <li><strong>Smart Status System:</strong> Visual colored checkboxes show Pending (red), In Progress (amber), and Completed (green)</li>
                 <li><strong>Priority Management:</strong> Urgent, High, Medium, Low priorities with visual icons</li>
                 <li><strong>Automatic Chore Rotation:</strong> Fair distribution of household duties among family members</li>
@@ -568,7 +568,7 @@ export default function TasksChoresDocumentationPage() {
           </section>
 
           <section id="tasks-vs-chores" className="scroll-mt-24">
-            <h2 className="text-3xl font-bold text-white mb-4">Tasks vs Chores - What's the Difference?</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">Tasks vs Chores - What&apos;s the Difference?</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
                 Understanding when to use Tasks versus Chores helps keep your household organized efficiently:
@@ -591,7 +591,7 @@ export default function TasksChoresDocumentationPage() {
                     <li>✓ Errands to run</li>
                   </ul>
                   <div className="mt-4 p-3 bg-gray-800 rounded-lg">
-                    <p className="text-xs text-gray-400"><strong>Example:</strong> "Buy birthday gift for Mom" - happens once, has a deadline</p>
+                    <p className="text-xs text-gray-400"><strong>Example:</strong> &quot;Buy birthday gift for Mom&quot; - happens once, has a deadline</p>
                   </div>
                 </div>
 
@@ -611,14 +611,14 @@ export default function TasksChoresDocumentationPage() {
                     <li>✓ Feed pets (daily)</li>
                   </ul>
                   <div className="mt-4 p-3 bg-gray-800 rounded-lg">
-                    <p className="text-xs text-gray-400"><strong>Example:</strong> "Take out trash" - repeats every week, rotates between family members</p>
+                    <p className="text-xs text-gray-400"><strong>Example:</strong> &quot;Take out trash&quot; - repeats every week, rotates between family members</p>
                   </div>
                 </div>
               </div>
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
-                  <strong>💡 Pro Tip:</strong> Chores support automatic rotation, so you can set up "Clean kitchen" to rotate between household members weekly. Tasks are great for one-off items that need specific due dates!
+                  <strong>💡 Pro Tip:</strong> Chores support automatic rotation, so you can set up &quot;Clean kitchen&quot; to rotate between household members weekly. Tasks are great for one-off items that need specific due dates!
                 </p>
               </div>
             </div>
@@ -631,21 +631,21 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Creating Your First Task</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Let's walk through creating a task step by step:
+                Let&apos;s walk through creating a task step by step:
               </p>
               <ol className="space-y-4 text-gray-300">
                 <li>
-                  <strong>Navigate to Tasks:</strong> Click "Tasks & Chores" in your main navigation menu
+                  <strong>Navigate to Tasks:</strong> Click &quot;Tasks & Chores&quot; in your main navigation menu
                 </li>
                 <li>
-                  <strong>Click "Create Task":</strong> Look for the "+ Create Task" button at the top
+                  <strong>Click &quot;Create Task&quot;:</strong> Look for the &quot;+ Create Task&quot; button at the top
                 </li>
                 <li>
                   <strong>Enter Task Title:</strong> Give it a clear, actionable name
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
-                    <li>Good: "Schedule dentist appointment for next month"</li>
-                    <li>Good: "Buy groceries for dinner party"</li>
-                    <li>Avoid: "dentist" (too vague)</li>
+                    <li>Good: &quot;Schedule dentist appointment for next month&quot;</li>
+                    <li>Good: &quot;Buy groceries for dinner party&quot;</li>
+                    <li>Avoid: &quot;dentist&quot; (too vague)</li>
                   </ul>
                 </li>
                 <li>
@@ -672,16 +672,16 @@ export default function TasksChoresDocumentationPage() {
                   <strong>Choose Category (Optional):</strong> Tag with a color-coded category for organization
                 </li>
                 <li>
-                  <strong>Assign to Someone (Optional):</strong> Pick who's responsible from your household members
+                  <strong>Assign to Someone (Optional):</strong> Pick who&apos;s responsible from your household members
                 </li>
                 <li>
-                  <strong>Click "Create Task":</strong> Your task is now live and visible to everyone!
+                  <strong>Click &quot;Create Task&quot;:</strong> Your task is now live and visible to everyone!
                 </li>
               </ol>
 
               <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-4 mt-6">
                 <p className="text-emerald-300 text-sm">
-                  <strong>✨ Power Tip:</strong> After creating a task, you can add subtasks, comments, attachments, and even link it to your calendar. We'll cover these advanced features below!
+                  <strong>✨ Power Tip:</strong> After creating a task, you can add subtasks, comments, attachments, and even link it to your calendar. We&apos;ll cover these advanced features below!
                 </p>
               </div>
             </div>
@@ -698,21 +698,21 @@ export default function TasksChoresDocumentationPage() {
               </p>
               <ol className="space-y-4 text-gray-300">
                 <li>
-                  <strong>Navigate to Tasks Page:</strong> Click "Tasks & Chores" in your navigation
+                  <strong>Navigate to Tasks Page:</strong> Click &quot;Tasks & Chores&quot; in your navigation
                 </li>
                 <li>
-                  <strong>Switch to Chores Tab:</strong> Click the "Chores" tab at the top
+                  <strong>Switch to Chores Tab:</strong> Click the &quot;Chores&quot; tab at the top
                 </li>
                 <li>
-                  <strong>Click "Create Chore":</strong> The button changes when you're on the Chores tab
+                  <strong>Click &quot;Create Chore&quot;:</strong> The button changes when you&apos;re on the Chores tab
                 </li>
                 <li>
                   <strong>Enter Chore Name:</strong> Be specific about what needs doing
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
-                    <li>"Take out trash and recycling"</li>
-                    <li>"Clean all bathrooms"</li>
-                    <li>"Vacuum entire house"</li>
-                    <li>"Mow front and back lawn"</li>
+                    <li>&quot;Take out trash and recycling&quot;</li>
+                    <li>&quot;Clean all bathrooms&quot;</li>
+                    <li>&quot;Vacuum entire house&quot;</li>
+                    <li>&quot;Mow front and back lawn&quot;</li>
                   </ul>
                 </li>
                 <li>
@@ -741,7 +741,7 @@ export default function TasksChoresDocumentationPage() {
                   </ul>
                 </li>
                 <li>
-                  <strong>Click "Create Chore":</strong> The system automatically assigns the first person!
+                  <strong>Click &quot;Create Chore&quot;:</strong> The system automatically assigns the first person!
                 </li>
               </ol>
 
@@ -818,7 +818,7 @@ export default function TasksChoresDocumentationPage() {
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
-                  <strong>🎯 Quick Tip:</strong> The color-coding means you can scan your task list instantly and see what needs attention (red), what's being worked on (amber), and what's done (green). No reading required!
+                  <strong>🎯 Quick Tip:</strong> The color-coding means you can scan your task list instantly and see what needs attention (red), what&apos;s being worked on (amber), and what&apos;s done (green). No reading required!
                 </p>
               </div>
             </div>
@@ -839,7 +839,7 @@ export default function TasksChoresDocumentationPage() {
                 Tasks can be created from multiple places in Rowan:
               </p>
               <ul className="space-y-2 text-gray-300">
-                <li><strong>Tasks Page:</strong> The main "+ Create Task" button</li>
+                <li><strong>Tasks Page:</strong> The main &quot;+ Create Task&quot; button</li>
                 <li><strong>Calendar:</strong> Click any date to create a task with that due date</li>
                 <li><strong>Shopping Lists:</strong> Convert a shopping trip into a task</li>
                 <li><strong>Meal Plans:</strong> Automatically create cooking tasks from recipes</li>
@@ -854,16 +854,16 @@ export default function TasksChoresDocumentationPage() {
                   <strong>Quick Edit from Card:</strong>
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
                     <li>Click the three-dot menu (⋮) on any task card</li>
-                    <li>Select "Edit"</li>
+                    <li>Select &quot;Edit&quot;</li>
                     <li>Make your changes in the modal</li>
-                    <li>Click "Save Changes"</li>
+                    <li>Click &quot;Save Changes&quot;</li>
                   </ul>
                 </li>
                 <li>
                   <strong>Full Edit from Details Panel:</strong>
                   <ul className="mt-2 space-y-1 ml-4 text-sm">
-                    <li>Click "View Details" from the three-dot menu</li>
-                    <li>Click "Edit Task" button in the details panel</li>
+                    <li>Click &quot;View Details&quot; from the three-dot menu</li>
+                    <li>Click &quot;Edit Task&quot; button in the details panel</li>
                     <li>Access all fields including advanced options</li>
                     <li>Save when done</li>
                   </ul>
@@ -903,7 +903,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Status Management with Colored Checkboxes</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                The colored checkbox system is designed for speed and clarity. Here's everything you can do:
+                The colored checkbox system is designed for speed and clarity. Here&apos;s everything you can do:
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3">Single Task Status Change</h3>
@@ -934,7 +934,7 @@ export default function TasksChoresDocumentationPage() {
 
               <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-4 mt-6">
                 <p className="text-emerald-300 text-sm">
-                  <strong>⚡ Power User Tip:</strong> Start your day by filtering to "Pending" tasks to see what needs attention. Move important items to "In Progress" so your household knows you're working on them!
+                  <strong>⚡ Power User Tip:</strong> Start your day by filtering to &quot;Pending&quot; tasks to see what needs attention. Move important items to &quot;In Progress&quot; so your household knows you&apos;re working on them!
                 </p>
               </div>
             </div>
@@ -960,7 +960,7 @@ export default function TasksChoresDocumentationPage() {
                     <strong>When to use:</strong> Critical tasks that need immediate attention, emergencies, or time-sensitive deadlines.
                   </p>
                   <p className="text-sm text-gray-400">
-                    <strong>Examples:</strong> "Car registration expires today", "Fix broken water heater", "Submit tax return by midnight"
+                    <strong>Examples:</strong> &quot;Car registration expires today&quot;, &quot;Fix broken water heater&quot;, &quot;Submit tax return by midnight&quot;
                   </p>
                 </div>
 
@@ -973,7 +973,7 @@ export default function TasksChoresDocumentationPage() {
                     <strong>When to use:</strong> Important tasks that should be done soon, significant commitments, or tasks blocking others.
                   </p>
                   <p className="text-sm text-gray-400">
-                    <strong>Examples:</strong> "Buy groceries for dinner tonight", "Prepare for tomorrow's presentation", "Schedule doctor appointment"
+                    <strong>Examples:</strong> &quot;Buy groceries for dinner tonight&quot;, &quot;Prepare for tomorrow&apos;s presentation&quot;, &quot;Schedule doctor appointment&quot;
                   </p>
                 </div>
 
@@ -986,7 +986,7 @@ export default function TasksChoresDocumentationPage() {
                     <strong>When to use:</strong> Regular tasks that should be done this week, routine errands, or nice-to-have items.
                   </p>
                   <p className="text-sm text-gray-400">
-                    <strong>Examples:</strong> "Clean out garage", "Call electrician for estimate", "Buy new running shoes"
+                    <strong>Examples:</strong> &quot;Clean out garage&quot;, &quot;Call electrician for estimate&quot;, &quot;Buy new running shoes&quot;
                   </p>
                 </div>
 
@@ -999,14 +999,14 @@ export default function TasksChoresDocumentationPage() {
                     <strong>When to use:</strong> Tasks that can wait, ideas for someday, or things to do when you have extra time.
                   </p>
                   <p className="text-sm text-gray-400">
-                    <strong>Examples:</strong> "Organize photo albums", "Research new vacuum cleaners", "Paint accent wall in bedroom"
+                    <strong>Examples:</strong> &quot;Organize photo albums&quot;, &quot;Research new vacuum cleaners&quot;, &quot;Paint accent wall in bedroom&quot;
                   </p>
                 </div>
               </div>
 
               <div className="bg-indigo-900/20 border border-indigo-800 rounded-lg p-4 mt-6">
                 <p className="text-indigo-300 text-sm">
-                  <strong>🎯 Priority Strategy:</strong> Don't make everything urgent! Reserve urgent for true emergencies. Most tasks should be High or Medium. This keeps your urgent items visible and actionable when they really matter.
+                  <strong>🎯 Priority Strategy:</strong> Don&apos;t make everything urgent! Reserve urgent for true emergencies. Most tasks should be High or Medium. This keeps your urgent items visible and actionable when they really matter.
                 </p>
               </div>
             </div>
@@ -1037,7 +1037,7 @@ export default function TasksChoresDocumentationPage() {
                     <strong className="text-blue-300">📅 Future Due Date:</strong> Shows as regular text with calendar icon
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Example: "Due Jun 15, 2025"
+                    Example: &quot;Due Jun 15, 2025&quot;
                   </p>
                 </div>
 
@@ -1046,7 +1046,7 @@ export default function TasksChoresDocumentationPage() {
                     <strong className="text-yellow-300">⚠️ Due Soon (Today):</strong> Highlighted in amber/yellow
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Example: "Due Today" - time to get moving!
+                    Example: &quot;Due Today&quot; - time to get moving!
                   </p>
                 </div>
 
@@ -1055,7 +1055,7 @@ export default function TasksChoresDocumentationPage() {
                     <strong className="text-red-300">🚨 Overdue:</strong> Red badge with days overdue count
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Example: "Overdue by 3 days" - needs immediate attention!
+                    Example: &quot;Overdue by 3 days&quot; - needs immediate attention!
                   </p>
                 </div>
               </div>
@@ -1108,7 +1108,7 @@ export default function TasksChoresDocumentationPage() {
 
               <div className="bg-purple-900/20 border border-purple-800 rounded-lg p-4 mt-6">
                 <p className="text-purple-300 text-sm">
-                  <strong>🎨 Organization Tip:</strong> Use categories for broad grouping (Home, Work, Errands) and priorities for urgency. Together, they make it easy to find exactly what you need: "Show me High priority Home tasks"!
+                  <strong>🎨 Organization Tip:</strong> Use categories for broad grouping (Home, Work, Errands) and priorities for urgency. Together, they make it easy to find exactly what you need: &quot;Show me High priority Home tasks&quot;!
                 </p>
               </div>
             </div>
@@ -1121,7 +1121,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Drag & Drop Reordering</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Sometimes priority and due date aren't enough—you need tasks in a specific order. Drag and drop lets you organize your list visually.
+                Sometimes priority and due date aren&apos;t enough—you need tasks in a specific order. Drag and drop lets you organize your list visually.
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3">How to Reorder Tasks</h3>
@@ -1135,7 +1135,7 @@ export default function TasksChoresDocumentationPage() {
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-6">
                 <p className="text-blue-300 text-sm">
-                  <strong>✨ Pro Tip:</strong> Combine drag-and-drop with the "In Progress" status to show your household exactly what order you're working through tasks. It's like a visual work plan!
+                  <strong>✨ Pro Tip:</strong> Combine drag-and-drop with the &quot;In Progress&quot; status to show your household exactly what order you&apos;re working through tasks. It&apos;s like a visual work plan!
                 </p>
               </div>
             </div>
@@ -1154,7 +1154,7 @@ export default function TasksChoresDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mb-3">Delete Single Task</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Click the three-dot menu (⋮) on the task card</li>
-                <li>Select "Delete Task" from the menu</li>
+                <li>Select &quot;Delete Task&quot; from the menu</li>
                 <li>Confirm deletion in the popup dialog</li>
                 <li>Task is permanently removed for all household members</li>
               </ol>
@@ -1164,7 +1164,7 @@ export default function TasksChoresDocumentationPage() {
                   <strong>⚠️ Important:</strong> Deletion is permanent! Tasks cannot be recovered once deleted.
                 </p>
                 <p className="text-yellow-300 text-sm">
-                  <strong>💡 Alternative:</strong> Instead of deleting, consider marking tasks as "Completed" so you have a history!
+                  <strong>💡 Alternative:</strong> Instead of deleting, consider marking tasks as &quot;Completed&quot; so you have a history!
                 </p>
               </div>
             </div>
@@ -1188,7 +1188,7 @@ export default function TasksChoresDocumentationPage() {
               <ol className="space-y-2 text-gray-300">
                 <li>Find the task card you want to view</li>
                 <li>Click the three-dot menu (⋮) on the card</li>
-                <li>Select "View Details" from the dropdown</li>
+                <li>Select &quot;View Details&quot; from the dropdown</li>
                 <li>The details panel opens showing all task information</li>
               </ol>
             </div>
@@ -1248,15 +1248,15 @@ export default function TasksChoresDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3">Using the Timer</h3>
               <ol className="space-y-3 text-gray-300">
-                <li><strong>Start Timer:</strong> Click "Start Timer" when you begin working</li>
+                <li><strong>Start Timer:</strong> Click &quot;Start Timer&quot; when you begin working</li>
                 <li><strong>Timer runs in background:</strong> Close the panel, timer keeps running</li>
-                <li><strong>Stop Timer:</strong> Click "Stop Timer" when finished</li>
+                <li><strong>Stop Timer:</strong> Click &quot;Stop Timer&quot; when finished</li>
                 <li><strong>Auto-logged:</strong> Time is automatically saved to the task</li>
               </ol>
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-6">
                 <p className="text-blue-300 text-sm">
-                  <strong>📊 Productivity Insight:</strong> After tracking for a few weeks, you'll know exactly how long tasks take. Use this to set realistic deadlines!
+                  <strong>📊 Productivity Insight:</strong> After tracking for a few weeks, you&apos;ll know exactly how long tasks take. Use this to set realistic deadlines!
                 </p>
               </div>
             </div>
@@ -1275,15 +1275,15 @@ export default function TasksChoresDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mb-3">Creating Subtasks</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Open task details panel</li>
-                <li>Go to "Subtasks" tab</li>
-                <li>Click "+ Add Subtask"</li>
+                <li>Go to &quot;Subtasks&quot; tab</li>
+                <li>Click &quot;+ Add Subtask&quot;</li>
                 <li>Enter subtask title and press Enter</li>
                 <li>Repeat for each step</li>
               </ol>
 
               <div className="bg-emerald-900/20 border border-emerald-800 rounded-lg p-4 mt-6">
                 <p className="text-emerald-300 text-sm">
-                  <strong>🎯 Project Tip:</strong> When a task feels overwhelming, break it into subtasks immediately. You'll feel progress with each checkbox!
+                  <strong>🎯 Project Tip:</strong> When a task feels overwhelming, break it into subtasks immediately. You&apos;ll feel progress with each checkbox!
                 </p>
               </div>
             </div>
@@ -1302,9 +1302,9 @@ export default function TasksChoresDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mb-3">Adding Comments</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Open task details</li>
-                <li>Go to "Comments" tab</li>
+                <li>Go to &quot;Comments&quot; tab</li>
                 <li>Type your message</li>
-                <li>Click "Post Comment"</li>
+                <li>Click &quot;Post Comment&quot;</li>
                 <li>Everyone sees it instantly</li>
               </ol>
 
@@ -1337,7 +1337,7 @@ export default function TasksChoresDocumentationPage() {
               <h3 className="text-xl font-semibold text-white mb-3">Enabling Calendar Sync</h3>
               <ol className="space-y-2 text-gray-300">
                 <li>Open a task with a due date</li>
-                <li>Find "Calendar Sync" toggle</li>
+                <li>Find &quot;Calendar Sync&quot; toggle</li>
                 <li>Turn it ON</li>
                 <li>Task appears in calendar immediately</li>
               </ol>
@@ -1435,12 +1435,12 @@ export default function TasksChoresDocumentationPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3">How It Works</h3>
               <div className="p-5 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-xl my-4">
-                <p className="text-gray-300 mb-3"><strong>Example: "Take out trash" (Weekly)</strong></p>
+                <p className="text-gray-300 mb-3"><strong>Example: &quot;Take out trash&quot; (Weekly)</strong></p>
                 <ul className="space-y-2 text-gray-300 text-sm">
-                  <li>Week 1: Alex's turn</li>
-                  <li>Week 2: Jamie's turn</li>
-                  <li>Week 3: Alex's turn again</li>
-                  <li>Week 4: Jamie's turn again</li>
+                  <li>Week 1: Alex&apos;s turn</li>
+                  <li>Week 2: Jamie&apos;s turn</li>
+                  <li>Week 3: Alex&apos;s turn again</li>
+                  <li>Week 4: Jamie&apos;s turn again</li>
                   <li>...continues in order</li>
                 </ul>
               </div>
@@ -1478,19 +1478,19 @@ export default function TasksChoresDocumentationPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <div className="p-4 bg-gray-900 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">📅 Daily</h4>
-                  <p className="text-sm text-gray-300">New person every day (e.g., "Feed pets", "Dishes")</p>
+                  <p className="text-sm text-gray-300">New person every day (e.g., &quot;Feed pets&quot;, &quot;Dishes&quot;)</p>
                 </div>
                 <div className="p-4 bg-gray-900 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">📆 Weekly</h4>
-                  <p className="text-sm text-gray-300">New person every week (e.g., "Trash", "Vacuum")</p>
+                  <p className="text-sm text-gray-300">New person every week (e.g., &quot;Trash&quot;, &quot;Vacuum&quot;)</p>
                 </div>
                 <div className="p-4 bg-gray-900 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">🗓️ Bi-weekly</h4>
-                  <p className="text-sm text-gray-300">New person every 2 weeks (e.g., "Clean bathrooms")</p>
+                  <p className="text-sm text-gray-300">New person every 2 weeks (e.g., &quot;Clean bathrooms&quot;)</p>
                 </div>
                 <div className="p-4 bg-gray-900 rounded-lg">
                   <h4 className="font-semibold text-white mb-2">📊 Monthly</h4>
-                  <p className="text-sm text-gray-300">New person every month (e.g., "Deep clean", "Yard work")</p>
+                  <p className="text-sm text-gray-300">New person every month (e.g., &quot;Deep clean&quot;, &quot;Yard work&quot;)</p>
                 </div>
               </div>
             </div>
@@ -1508,7 +1508,7 @@ export default function TasksChoresDocumentationPage() {
 
               <div className="bg-green-900/20 border border-green-800 rounded-lg p-4 mt-4">
                 <p className="text-green-300 text-sm">
-                  <strong>✅ Completion Tip:</strong> Complete chores promptly so everyone can see who's pulling their weight. It builds household accountability!
+                  <strong>✅ Completion Tip:</strong> Complete chores promptly so everyone can see who&apos;s pulling their weight. It builds household accountability!
                 </p>
               </div>
             </div>
@@ -1556,7 +1556,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Pending Tasks Indicator</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                The orange "Needs attention" badge on the Pending card shows tasks waiting to be started. This is your daily action list!
+                The orange &quot;Needs attention&quot; badge on the Pending card shows tasks waiting to be started. This is your daily action list!
               </p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium mt-6">
@@ -1568,7 +1568,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">In Progress Tracking</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                The blue "Active" badge with trending arrow shows currently worked-on tasks. Great for seeing what your household is actively doing!
+                The blue &quot;Active&quot; badge with trending arrow shows currently worked-on tasks. Great for seeing what your household is actively doing!
               </p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium mt-6">
@@ -1580,7 +1580,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Completion Percentage</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                The green completion card shows the percentage of finished tasks (e.g., "67% complete"). Aim for that 100%!
+                The green completion card shows the percentage of finished tasks (e.g., &quot;67% complete&quot;). Aim for that 100%!
               </p>
 
               <div className="bg-green-900/20 border border-green-800 rounded-lg p-4 mt-4">
@@ -1619,7 +1619,7 @@ export default function TasksChoresDocumentationPage() {
 
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mt-4">
                 <p className="text-blue-300 text-sm">
-                  <strong>🔍 Search Tip:</strong> Type partial words! Searching "gro" finds "groceries", "grow flowers", "grout"
+                  <strong>🔍 Search Tip:</strong> Type partial words! Searching &quot;gro&quot; finds &quot;groceries&quot;, &quot;grow flowers&quot;, &quot;grout&quot;
                 </p>
               </div>
             </div>
@@ -1656,7 +1656,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Combined Task Count</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                See the total count of filtered items displayed in the header. Helps you understand the scope of what you're viewing.
+                See the total count of filtered items displayed in the header. Helps you understand the scope of what you&apos;re viewing.
               </p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium mt-6">
@@ -1742,7 +1742,7 @@ export default function TasksChoresDocumentationPage() {
             <h2 className="text-3xl font-bold text-white mb-4">Assigning Tasks</h2>
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 mb-4">
-                Assign tasks to specific household members with clear ownership. They'll see it in their filtered view.
+                Assign tasks to specific household members with clear ownership. They&apos;ll see it in their filtered view.
               </p>
             </div>
             <a href="#" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium mt-6">
@@ -1871,7 +1871,7 @@ export default function TasksChoresDocumentationPage() {
 
               <ul className="space-y-2 text-gray-300">
                 <li>Reserve Urgent for true emergencies (max 2-3 at a time)</li>
-                <li>High priority for this week's important work</li>
+                <li>High priority for this week&apos;s important work</li>
                 <li>Medium for general to-dos</li>
                 <li>Low for someday/maybe items</li>
               </ul>

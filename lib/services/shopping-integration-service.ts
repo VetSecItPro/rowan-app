@@ -9,6 +9,7 @@ type LinkedListRow = {
   };
 };
 
+/** Service for linking shopping lists to calendar events, tasks, and meals. */
 export const shoppingIntegrationService = {
   // Calendar Integration
   async linkToCalendar(listId: string, eventId: string, reminderMinutes?: number) {

@@ -458,6 +458,7 @@ function DetailsModalContent({
   );
 }
 
+/** Renders a unified detail modal for viewing any item type (task, event, reminder). */
 export function UnifiedDetailsModal(props: UnifiedDetailsModalProps) {
   const { item, isOpen } = props;
   const modalKey = `${item?.id ?? 'none'}-${isOpen ? 'open' : 'closed'}`;

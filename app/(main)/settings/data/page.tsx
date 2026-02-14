@@ -334,7 +334,7 @@ export default function DataManagementPage() {
               <div className="text-center py-12">
                 <FileImage className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-400">No files found</p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                   Files you upload will appear here
                 </p>
               </div>

@@ -56,6 +56,7 @@ const arrowStyles: Record<string, string> = {
   right: 'top-1/2 right-full -translate-y-1/2 border-t-transparent border-b-transparent border-l-transparent border-r-gray-700',
 };
 
+/** Displays a one-time tooltip hint on first use of a feature. */
 export default function FirstUseTooltip({
   id,
   content,

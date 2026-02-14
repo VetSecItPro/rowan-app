@@ -41,19 +41,20 @@ export default function DashboardPage() {
   const { user, currentSpace, authLoading, spacesLoading, refreshSpaces } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const [showCreateSpaceModal, setShowCreateSpaceModal] = useState(false);
-  const [showInviteModal, setShowInviteModal] = useState(false);
+  // Derive initial invite modal state from URL params (avoids setState in effect)
+  const hasInviteParam = searchParams?.get('invite') === 'true' && !!spaceId;
+  const [showInviteModal, setShowInviteModal] = useState(hasInviteParam);
   const { mode: dashboardMode, setDashboardMode, mounted: dashModeMounted } = useDashboardMode();
 
   // Prefetch all feature data immediately for instant navigation
   usePrefetchAllData({ delay: 300 });
 
-  // Handle ?invite=true query parameter from header dropdown
+  // Clean up the ?invite=true query parameter after processing it
   useEffect(() => {
-    if (searchParams?.get('invite') === 'true' && spaceId) {
-      setShowInviteModal(true);
+    if (hasInviteParam) {
       router.replace('/dashboard', { scroll: false });
     }
-  }, [searchParams, spaceId, router]);
+  }, [hasInviteParam, router]);
 
   const { stats, loading: statsLoading, refreshStats } = useDashboardStats(user, currentSpace, authLoading);
 

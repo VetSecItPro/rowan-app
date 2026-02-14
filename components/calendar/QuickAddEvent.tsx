@@ -32,6 +32,7 @@ interface PreviewData {
   confidence?: number;
 }
 
+/** Provides a streamlined form for quickly adding a new calendar event. */
 export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: QuickAddEventProps) {
   const [input, setInput] = useState('');
   const [parseMode, setParseMode] = useState<ParseMode>('quick');
@@ -324,7 +325,7 @@ export function QuickAddEvent({ onCreateEvent, isOpen, onClose, spaceId }: Quick
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder='Try: "Doctor appointment next Tuesday at 2pm" or "Weekly team meeting every Monday at 10am"'
-                className="w-full px-4 py-4 bg-gray-900 border-2 border-purple-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white text-lg placeholder:text-gray-400"
+                className="w-full px-4 py-4 bg-gray-900 border-2 border-purple-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white text-lg placeholder:text-gray-500"
                 autoComplete="off"
               />
             </div>
@@ -346,7 +347,7 @@ Please confirm your attendance.
 
 Best,
 Sarah"
-                className="w-full px-4 py-4 bg-gray-900 border-2 border-purple-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white text-sm placeholder:text-gray-400 min-h-[200px] resize-y"
+                className="w-full px-4 py-4 bg-gray-900 border-2 border-purple-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white text-sm placeholder:text-gray-500 min-h-[200px] resize-y"
               />
               {isAILoading && (
                 <div className="absolute bottom-4 right-4 flex items-center gap-2 text-purple-400">

@@ -31,6 +31,7 @@ interface SpaceMember {
   };
 }
 
+/** Provides configuration controls for automatic chore rotation schedules. */
 export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProps) {
   const [rotation, setRotation] = useState<RotationConfig | null>(null);
   const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>([]);
@@ -164,7 +165,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
   }
 
   if (loading) {
-    return <div className="text-sm text-gray-500">Loading rotation config...</div>;
+    return <div className="text-sm text-gray-400">Loading rotation config...</div>;
   }
 
   const isConfigured = rotation !== null;
@@ -220,13 +221,13 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
           <div className="p-4 bg-gray-900 rounded-lg">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-gray-500">Rotation Type</p>
+                <p className="text-xs text-gray-400">Rotation Type</p>
                 <p className="text-sm font-medium text-white capitalize">
                   {rotation.rotation_type.replace('-', ' ')}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Interval</p>
+                <p className="text-xs text-gray-400">Interval</p>
                 <p className="text-sm font-medium text-white">
                   Every {rotation.interval_value} {rotation.interval_type.replace('ly', '')}
                   {rotation.interval_value > 1 ? 's' : ''}
@@ -235,7 +236,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
             </div>
 
             <div className="mt-4">
-              <p className="text-xs text-gray-500 mb-2">Members in Rotation ({rotation.member_ids.length})</p>
+              <p className="text-xs text-gray-400 mb-2">Members in Rotation ({rotation.member_ids.length})</p>
               <div className="flex flex-wrap gap-2">
                 {spaceMembers
                   .filter(m => rotation.member_ids.includes(m.user_id))
@@ -269,7 +270,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                 }`}
               >
                 <p className="text-sm font-medium text-white">Round Robin</p>
-                <p className="text-xs text-gray-500">Rotate in order</p>
+                <p className="text-xs text-gray-400">Rotate in order</p>
               </button>
               <button
                 onClick={() => setFormData(prev => ({ ...prev, rotation_type: 'random' }))}
@@ -280,7 +281,7 @@ export function ChoreRotationConfig({ taskId, spaceId }: ChoreRotationConfigProp
                 }`}
               >
                 <p className="text-sm font-medium text-white">Random</p>
-                <p className="text-xs text-gray-500">Random assignment</p>
+                <p className="text-xs text-gray-400">Random assignment</p>
               </button>
             </div>
           </div>

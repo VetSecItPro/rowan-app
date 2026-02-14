@@ -24,6 +24,7 @@ const COLOR_THEMES = {
   amber: 'bg-amber-500',
 };
 
+/** Renders the main app header with navigation, notifications, and user menu. */
 export function Header() {
   const { user, signOut } = useAuth();
   const { currentSpace } = useSpaces();

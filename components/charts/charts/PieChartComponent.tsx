@@ -38,6 +38,7 @@ const defaultColors = [
   '#0088fe',
 ];
 
+/** Renders a Recharts pie/donut chart with configurable segments. */
 export function PieChartComponent({
   data,
   colors = defaultColors,

@@ -18,6 +18,7 @@ interface BillOccurrence {
   amount: number;
 }
 
+/** Renders a calendar view of upcoming recurring bill due dates. */
 export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [billOccurrences, setBillOccurrences] = useState<BillOccurrence[]>([]);
@@ -286,7 +287,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
             </h4>
             <button
               onClick={() => setSelectedDate(null)}
-              className="text-gray-500 hover:text-gray-300"
+              className="text-gray-400 hover:text-gray-300"
             >
               Close
             </button>

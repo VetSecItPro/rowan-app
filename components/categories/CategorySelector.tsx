@@ -51,6 +51,7 @@ interface TagSelectorProps {
   className?: string;
 }
 
+/** Renders a dropdown selector for choosing a category from available options. */
 export function CategorySelector({
   value,
   onChange,
@@ -275,6 +276,7 @@ export function CategorySelector({
   );
 }
 
+/** Renders a multi-select tag picker for assigning tags to items. */
 export function TagSelector({
   values = [],
   onChange,

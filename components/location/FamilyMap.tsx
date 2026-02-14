@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useFamilyLocation } from '@/hooks/useFamilyLocation';
 import { formatDistance, isNative } from '@/lib/native';
-import type { FamilyMemberLocation, FamilyPlace } from '@/lib/services/family-location-service';
+import type { FamilyMemberLocation } from '@/lib/services/family-location-service';
 import { cn } from '@/lib/utils';
 
 interface FamilyMapProps {
@@ -67,6 +67,7 @@ function getTimeAgo(minutesAgo: number): string {
   return `${days}d ago`;
 }
 
+/** Renders an interactive map showing family member locations. */
 export function FamilyMap({ spaceId, className }: FamilyMapProps) {
   const {
     familyLocations,
@@ -416,7 +417,7 @@ function MemberDetails({ member }: MemberDetailsProps) {
               {member.is_charging ? (
                 <BatteryCharging className="w-4 h-4 text-green-500" />
               ) : (
-                <Battery className={cn('w-4 h-4', member.battery_level < 0.2 ? 'text-red-500' : 'text-gray-500')} />
+                <Battery className={cn('w-4 h-4', member.battery_level < 0.2 ? 'text-red-500' : 'text-gray-400')} />
               )}
               <span className="text-sm font-medium text-white">
                 {Math.round(member.battery_level * 100)}%

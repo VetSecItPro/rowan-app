@@ -13,6 +13,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 export const maxDuration = 60;
 
 // This should be called by a cron job (Vercel Cron or external)
+/** Processes scheduled account deletion reminders and executions */
 export async function POST(request: NextRequest) {
   try {
     // SECURITY: Fail-closed if CRON_SECRET is not configured

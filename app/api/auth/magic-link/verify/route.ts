@@ -11,6 +11,7 @@ const MagicLinkVerifySchema = z.object({
   token: z.string().min(1, 'Magic link token is required')
 });
 
+/** Verifies a magic link token and returns a Supabase auth URL */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: Use API rate limit (10/10s) instead of auth rate limit (10/hour)
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to check token validity (optional pre-check)
+/** Checks the validity of a magic link token without consuming it */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

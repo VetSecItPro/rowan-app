@@ -25,6 +25,7 @@ interface ChatInputProps {
   voiceEnabled?: boolean;
 }
 
+/** Renders the message input area with send button and voice input for AI chat. */
 export default function ChatInput({
   onSend,
   onStop,
@@ -89,9 +90,10 @@ export default function ChatInput({
         onKeyDown={handleKeyDown}
         onInput={handleInput}
         placeholder={placeholder}
+        aria-label="Message to Rowan AI"
         disabled={disabled || isLoading}
         rows={1}
-        className="flex-1 resize-none rounded-xl bg-gray-900 border border-gray-700/50 px-4 py-2.5 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex-1 resize-none rounded-xl bg-gray-900 border border-gray-700/50 px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
       />
 
       {/* Voice input — hidden when streaming */}

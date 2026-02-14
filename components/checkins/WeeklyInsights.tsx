@@ -10,6 +10,7 @@ interface WeeklyInsightsProps {
   checkIns: DailyCheckIn[];
 }
 
+/** Renders weekly mood and check-in trend insights from recent data. */
 export function WeeklyInsights({ checkIns }: WeeklyInsightsProps) {
   const summary = useMemo(() => {
     return moodInsightsService.getWeeklySummary(checkIns);
@@ -61,7 +62,7 @@ export function WeeklyInsights({ checkIns }: WeeklyInsightsProps) {
         <div className="text-center py-8">
           <Heart className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-sm text-gray-400">No check-ins this week yet</p>
-          <p className="text-xs text-gray-500 mt-1">Start checking in to see weekly insights</p>
+          <p className="text-xs text-gray-400 mt-1">Start checking in to see weekly insights</p>
         </div>
       </div>
     );

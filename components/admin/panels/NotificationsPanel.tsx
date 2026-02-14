@@ -62,6 +62,7 @@ const SourceBadge = memo(function SourceBadge({ source }: { source: string }) {
 
 const ITEMS_PER_PAGE = 25;
 
+/** Manages admin notification settings and delivery configuration. */
 export const NotificationsPanel = memo(function NotificationsPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'all' | 'subscribed' | 'unsubscribed'>('all');

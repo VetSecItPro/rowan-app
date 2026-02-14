@@ -9,6 +9,7 @@ export type KeyboardShortcutHandler = {
   description: string;
 };
 
+/** Registers global keyboard shortcut listeners with support for modifier keys */
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcutHandler[], enabled: boolean = true) {
   useEffect(() => {
     if (!enabled) return;

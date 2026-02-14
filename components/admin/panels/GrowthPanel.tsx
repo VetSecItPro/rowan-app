@@ -192,9 +192,9 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
           <p className="text-sm font-medium text-gray-400">Total Signups</p>
           <p className="text-2xl font-bold text-white mt-1">{totalSignups}</p>
           {compareEnabled && prevPeriod && (
-            <p className="text-xs text-gray-500 mt-0.5">Previous: {prevPeriod.totalSignups}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Previous: {prevPeriod.totalSignups}</p>
           )}
-          <p className="text-xs text-gray-500 mt-1">Registered users</p>
+          <p className="text-xs text-gray-400 mt-1">Registered users</p>
         </div>
 
         <div
@@ -208,7 +208,7 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
           <p className="text-2xl font-bold text-white mt-1">
             {conversionRate > 0 ? `${conversionRate}%` : '--'}
           </p>
-          <p className="text-xs text-gray-500 mt-1">Visitor to signup</p>
+          <p className="text-xs text-gray-400 mt-1">Visitor to signup</p>
         </div>
       </div>
 
@@ -230,7 +230,7 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-white">{source.count}</span>
-                    <span className="text-xs text-gray-500">({source.percentage}%)</span>
+                    <span className="text-xs text-gray-400">({source.percentage}%)</span>
                   </div>
                 </div>
               ))}
@@ -256,7 +256,7 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-white">{ref.count}</span>
-                    <span className="text-xs text-gray-500">({ref.percentage}%)</span>
+                    <span className="text-xs text-gray-400">({ref.percentage}%)</span>
                   </div>
                 </div>
               ))}
@@ -352,6 +352,7 @@ const SignupsPanel = memo(function SignupsPanel() {
   return <NotificationsPanel />;
 });
 
+/** Renders user growth metrics, signup trends, and acquisition data. */
 export const GrowthPanel = memo(function GrowthPanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('funnel');
 

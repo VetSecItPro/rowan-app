@@ -78,7 +78,7 @@ const TABS: Tab[] = [
   { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-orange-500', description: 'Subscriptions & MRR' },
   { id: 'ai', label: 'AI Costs', icon: Bot, color: 'text-sky-500', description: 'AI usage & cost monitoring' },
   { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-amber-500', description: 'User feedback & bugs' },
-  { id: 'system', label: 'System', icon: Settings, color: 'text-gray-500', description: 'Health & settings' },
+  { id: 'system', label: 'System', icon: Settings, color: 'text-gray-400', description: 'Health & settings' },
 ];
 
 // Memoized StatCard component
@@ -127,7 +127,7 @@ const StatCard = memo(function StatCard({
               <TrendingUp className={`w-3 h-3 mr-1 ${
                 trend === 'up' ? 'text-green-500 rotate-0' :
                 trend === 'down' ? 'text-red-500 rotate-180' :
-                'text-gray-500'
+                'text-gray-400'
               }`} />
               <span className={`text-xs ${
                 trend === 'up' ? 'text-green-600' :
@@ -520,28 +520,28 @@ function AdminDashboardContent() {
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
                 <p className="text-sm font-medium text-white">Database</p>
-                <p className="text-xs text-gray-500">Operational</p>
+                <p className="text-xs text-gray-400">Operational</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
                 <p className="text-sm font-medium text-white">API</p>
-                <p className="text-xs text-gray-500">Running</p>
+                <p className="text-xs text-gray-400">Running</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
               <div>
                 <p className="text-sm font-medium text-white">Rate Limit</p>
-                <p className="text-xs text-gray-500">Active</p>
+                <p className="text-xs text-gray-400">Active</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               <div>
                 <p className="text-sm font-medium text-white">Email</p>
-                <p className="text-xs text-gray-500">Connected</p>
+                <p className="text-xs text-gray-400">Connected</p>
               </div>
             </div>
           </div>
@@ -554,7 +554,7 @@ function AdminDashboardContent() {
               <Activity className="w-4 h-4 text-blue-500" />
               Recent Activity
             </h3>
-            <span className="text-xs text-gray-500">Last 24 hours</span>
+            <span className="text-xs text-gray-400">Last 24 hours</span>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-1">
             {activityData && activityData.length > 0 ? (

@@ -43,6 +43,7 @@ interface NudgeCardProps {
   size?: 'small' | 'medium' | 'large';
 }
 
+/** Renders a single AI nudge card with actionable suggestion. */
 export function NudgeCard({
   nudge,
   onAction,
@@ -177,7 +178,7 @@ export function NudgeCard({
             onClick={() => setShowMenu(!showMenu)}
             className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
           >
-            <MoreHorizontal className="w-4 h-4 text-gray-500" />
+            <MoreHorizontal className="w-4 h-4 text-gray-400" />
           </button>
 
           {showMenu && (

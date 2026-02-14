@@ -112,6 +112,7 @@ const FALLBACK_CATEGORIES = [
   { category: 'career', count: 3, icon: '💼' },
 ];
 
+/** Displays a modal for browsing and selecting goal templates. */
 export function TemplateSelectionModal({
   isOpen,
   onClose,

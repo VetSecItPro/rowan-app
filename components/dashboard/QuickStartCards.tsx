@@ -83,6 +83,7 @@ const cardVariants = {
   },
 };
 
+/** Displays quick-start action cards for common tasks on the dashboard. */
 export function QuickStartCards() {
   const router = useRouter();
 
@@ -125,7 +126,7 @@ export function QuickStartCards() {
               </div>
 
               {/* Arrow */}
-              <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition-colors flex-shrink-0" />
+              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-300 transition-colors flex-shrink-0" />
             </motion.button>
           );
         })}

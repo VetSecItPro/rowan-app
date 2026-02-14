@@ -23,6 +23,7 @@ interface CalendarPreferences {
   calendar_task_filter?: string;
 }
 
+/** Renders a toggle for syncing a task with the calendar. */
 export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) {
   const router = useRouter();
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({ isSynced: false });
@@ -96,7 +97,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-gray-400">
         <Calendar className="w-4 h-4 animate-pulse" />
         <span>Loading...</span>
       </div>
@@ -114,7 +115,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
               Calendar Sync
             </p>
             {syncStatus.isSynced && syncStatus.lastSyncedAt && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Last synced: {new Date(syncStatus.lastSyncedAt).toLocaleString()}
               </p>
             )}
@@ -182,7 +183,7 @@ export function CalendarSyncToggle({ taskId, userId }: CalendarSyncToggleProps) 
               <p className="text-sm font-medium text-white">
                 Auto-sync new tasks
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Automatically sync all new tasks to calendar
               </p>
             </div>

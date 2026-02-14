@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 
+/** Deletes an orphaned auth user that failed during signup provisioning */
 export async function POST(req: Request) {
   try {
     // SECURITY: Rate limiting to prevent abuse

@@ -10,6 +10,7 @@ import {
   updateCookiePreferences,
 } from '@/lib/utils/cookies';
 
+/** Renders a GDPR-compliant cookie consent banner with accept/reject options. */
 export function CookieConsentBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const [mounted, setMounted] = useState(false);

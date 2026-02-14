@@ -84,6 +84,7 @@ export interface UseMealsDataReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Loads and manages meal plan data with feature gate enforcement and date filtering */
 export function useMealsData(showPastMeals: boolean): UseMealsDataReturn {
   // SECURITY: Check feature access FIRST, before loading any data
   const { hasAccess, isLoading: gateLoading } = useFeatureGate('mealPlanning');
@@ -110,8 +111,9 @@ export function useMealsData(showPastMeals: boolean): UseMealsDataReturn {
     ...QUERY_OPTIONS.features,
   });
 
-  const meals = mealsData?.meals ?? [];
-  const stats = mealsData?.stats ?? { thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 };
+  // Memoize derived arrays to prevent new references on every render when mealsData is undefined
+  const meals = useMemo(() => mealsData?.meals ?? [], [mealsData?.meals]);
+  const stats = useMemo(() => mealsData?.stats ?? { thisWeek: 0, nextWeek: 0, savedRecipes: 0, shoppingItems: 0 }, [mealsData?.stats]);
 
   // React Query: fetch recipes
   const {
@@ -140,7 +142,7 @@ export function useMealsData(showPastMeals: boolean): UseMealsDataReturn {
   // Pending deletions state
   const [pendingDeletions, setPendingDeletions] = useState<Map<string, PendingDeletion>>(new Map());
   const pendingDeletionsRef = useRef(pendingDeletions);
-  pendingDeletionsRef.current = pendingDeletions;
+  useEffect(() => { pendingDeletionsRef.current = pendingDeletions; }, [pendingDeletions]);
 
   // View / filter state
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');

@@ -22,6 +22,7 @@ const PrivacySettingsSchema = z.object({
   analytics: z.boolean().optional(),
 });
 
+/** Retrieves the user's privacy preference settings */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -85,6 +86,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Updates the user's privacy preference settings */
 export async function PATCH(request: NextRequest) {
   try {
     // CSRF validation for defense-in-depth

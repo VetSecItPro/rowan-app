@@ -372,7 +372,7 @@ export default function ProjectsDocumentationPage() {
                 </ul>
                 <div className="mt-6 p-4 bg-cyan-900/20 rounded-xl border border-cyan-800">
                   <p className="text-sm text-cyan-200">
-                    <strong>Pro Tip:</strong> If something has a budget and multiple expenses spread over time, it's a good candidate for a project rather than just expense tracking.
+                    <strong>Pro Tip:</strong> If something has a budget and multiple expenses spread over time, it&apos;s a good candidate for a project rather than just expense tracking.
                   </p>
                 </div>
               </div>
@@ -390,13 +390,13 @@ export default function ProjectsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Setting up your first project is straightforward. Here's what you need to get started.
+                  Setting up your first project is straightforward. Here&apos;s what you need to get started.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Step-by-Step Guide</h3>
                 <ol className="list-decimal list-inside space-y-3 text-gray-400">
                   <li>Navigate to <strong>Projects</strong> from the main navigation</li>
                   <li>Tap <strong>+ New Project</strong></li>
-                  <li>Enter a descriptive project name (e.g., "Kitchen Renovation 2024")</li>
+                  <li>Enter a descriptive project name (e.g., &quot;Kitchen Renovation 2024&quot;)</li>
                   <li>Set your total budget amount</li>
                   <li>Choose a category (Home, Travel, Event, etc.)</li>
                   <li>Set start and target completion dates</li>
@@ -433,7 +433,7 @@ export default function ProjectsDocumentationPage() {
                   <li>You have a specific, time-bound goal with a defined budget</li>
                   <li>Multiple expenses will contribute to one objective</li>
                   <li>You need to track budget vs actual spending in real-time</li>
-                  <li>You're working with vendors or contractors</li>
+                  <li>You&apos;re working with vendors or contractors</li>
                   <li>You want to archive completed work for future reference</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Use Regular Budgets When:</h3>
@@ -578,7 +578,7 @@ export default function ProjectsDocumentationPage() {
                   <li><strong>Research First:</strong> Get quotes and estimates before setting your budget</li>
                   <li><strong>Include Everything:</strong> Materials, labor, permits, taxes, delivery</li>
                   <li><strong>Add Contingency:</strong> 10-20% buffer for unexpected costs</li>
-                  <li><strong>Be Realistic:</strong> Quality work costs money - don't underbudget</li>
+                  <li><strong>Be Realistic:</strong> Quality work costs money - don&apos;t underbudget</li>
                 </ul>
                 <div className="mt-6 p-4 bg-green-900/20 rounded-xl border border-green-800">
                   <p className="text-sm text-green-200">
@@ -638,7 +638,7 @@ export default function ProjectsDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Key Metrics</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Budget:</strong> Your planned total spending</li>
-                  <li><strong>Actual:</strong> What you've spent so far</li>
+                  <li><strong>Actual:</strong> What you&apos;ve spent so far</li>
                   <li><strong>Remaining:</strong> Budget minus actual</li>
                   <li><strong>Percentage Used:</strong> How much of budget is consumed</li>
                 </ul>
@@ -745,7 +745,7 @@ export default function ProjectsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Track payments to vendors to ensure you're staying on budget and meeting payment schedules.
+                  Track payments to vendors to ensure you&apos;re staying on budget and meeting payment schedules.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Payment Best Practices</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -891,7 +891,7 @@ export default function ProjectsDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Understand how efficiently you're using your project budgets.
+                  Understand how efficiently you&apos;re using your project budgets.
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Utilization Insights</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
@@ -964,7 +964,7 @@ export default function ProjectsDocumentationPage() {
                 <p className="text-gray-400 leading-relaxed mb-4">
                   Projects are automatically shared with all members of your space.
                 </p>
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What's Shared</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">What&apos;s Shared</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Project details and budget</li>
                   <li>All expenses and receipts</li>

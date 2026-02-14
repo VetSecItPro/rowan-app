@@ -124,7 +124,7 @@ export default function ProjectDetailPage() {
   };
 
   const priorityConfig = {
-    low: { label: 'Low', color: 'text-gray-500', icon: '⬇️' },
+    low: { label: 'Low', color: 'text-gray-400', icon: '⬇️' },
     medium: { label: 'Medium', color: 'text-blue-500', icon: '➡️' },
     high: { label: 'High', color: 'text-orange-500', icon: '⬆️' },
     urgent: { label: 'Urgent', color: 'text-red-500', icon: '🔥' },

@@ -343,7 +343,7 @@ export async function processMessageMentions(
   return await createMentions(mentionInputs);
 }
 
-// Export service object for consistency
+/** Aggregated service for @mention extraction, resolution, tracking, and notification. */
 export const mentionsService = {
   extractMentions,
   resolveMentions,

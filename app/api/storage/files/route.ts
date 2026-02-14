@@ -10,6 +10,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
+/** Lists files in a space's storage */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting

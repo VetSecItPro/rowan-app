@@ -254,7 +254,7 @@ export async function exportCategoryBreakdown(
   downloadCSV(csvContent, filename);
 }
 
-// Export service object
+/** Aggregated CSV export service for expenses, budgets, projects, and category breakdowns. */
 export const exportService = {
   exportExpenses,
   exportYearlyExpenses,

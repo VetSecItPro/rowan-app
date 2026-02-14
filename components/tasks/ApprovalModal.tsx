@@ -52,6 +52,7 @@ interface TaskApproval {
   task?: Record<string, unknown>;
 }
 
+/** Renders a modal for approving or rejecting a task completion request. */
 export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId }: ApprovalModalProps) {
   const [approvals, setApprovals] = useState<TaskApproval[]>([]);
   const [spaceMembers, setSpaceMembers] = useState<SpaceMember[]>([]);
@@ -186,7 +187,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
     >
       <div className="space-y-6">
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading approvals...</div>
+            <div className="text-center py-8 text-gray-400">Loading approvals...</div>
           ) : (
             <>
               {/* Request Approval Section */}
@@ -234,7 +235,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                             <p className="text-sm text-gray-300">
                               Requested by: <span className="font-medium">{approval.requested_by_user?.email}</span>
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               {approval.requested_at ? new Date(approval.requested_at).toLocaleString() : 'Unknown'}
                             </p>
                           </div>
@@ -294,7 +295,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                             <p className="text-sm font-medium text-white">
                               {approval.approver_user?.full_name || approval.approver_user?.email}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               Requested {approval.requested_at ? new Date(approval.requested_at).toLocaleDateString() : 'Unknown'}
                             </p>
                           </div>
@@ -331,7 +332,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                             </p>
                           </div>
                         )}
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs text-gray-400 mt-2">
                           {approval.reviewed_at && new Date(approval.reviewed_at).toLocaleString()}
                         </p>
                       </div>
@@ -341,7 +342,7 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
               )}
 
               {approvals.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-400">
                   No approvals yet. Request approval from team members to proceed with this task.
                 </div>
               )}

@@ -4,6 +4,7 @@ interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
+/** Renders a command palette container for searchable command lists. */
 export const Command = React.forwardRef<HTMLDivElement, CommandProps>(
   ({ className = '', children, ...props }, ref) => {
     return (
@@ -24,6 +25,7 @@ interface CommandInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   onValueChange?: (value: string) => void;
 }
 
+/** Renders the search input field within a Command palette. */
 export const CommandInput = React.forwardRef<HTMLInputElement, CommandInputProps>(
   ({ className = '', onValueChange, ...props }, ref) => {
     return (
@@ -46,6 +48,7 @@ CommandInput.displayName = 'CommandInput';
 
 type CommandListProps = React.HTMLAttributes<HTMLDivElement>;
 
+/** Renders the scrollable list container within a Command palette. */
 export const CommandList = React.forwardRef<HTMLDivElement, CommandListProps>(
   ({ className = '', children, ...props }, ref) => {
     return (
@@ -64,6 +67,7 @@ CommandList.displayName = 'CommandList';
 
 type CommandEmptyProps = React.HTMLAttributes<HTMLDivElement>;
 
+/** Renders the empty state message when no Command items match. */
 export const CommandEmpty = React.forwardRef<HTMLDivElement, CommandEmptyProps>(
   ({ className = '', children, ...props }, ref) => {
     return (
@@ -84,6 +88,7 @@ interface CommandGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   heading?: React.ReactNode;
 }
 
+/** Renders a labeled group of items within a Command palette. */
 export const CommandGroup = React.forwardRef<HTMLDivElement, CommandGroupProps>(
   ({ className = '', children, heading, ...props }, ref) => {
     return (
@@ -109,6 +114,7 @@ interface CommandItemProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'o
   value?: string;
 }
 
+/** Renders a single selectable item within a Command palette. */
 export const CommandItem = React.forwardRef<HTMLDivElement, CommandItemProps>(
   ({ className = '', children, disabled, onSelect, value, ...props }, ref) => {
     const handleClick = () => {
@@ -137,6 +143,7 @@ CommandItem.displayName = 'CommandItem';
 
 type CommandSeparatorProps = React.HTMLAttributes<HTMLDivElement>;
 
+/** Renders a visual separator between Command palette groups. */
 export const CommandSeparator = React.forwardRef<HTMLDivElement, CommandSeparatorProps>(
   ({ className = '', ...props }, ref) => {
     return (

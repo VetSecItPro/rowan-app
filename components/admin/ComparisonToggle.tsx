@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 import { useComparison } from './ComparisonContext';
 
+/** Renders a toggle control for enabling/disabling period-over-period comparison in admin analytics. */
 export const ComparisonToggle = memo(function ComparisonToggle() {
   const { compareEnabled, toggleCompare } = useComparison();
 

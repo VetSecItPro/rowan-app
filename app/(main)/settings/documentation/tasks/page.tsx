@@ -351,7 +351,7 @@ export default function TasksDocumentationPage() {
                   Welcome to Advanced Task Management
                 </h3>
                 <p className="text-blue-200 mb-2">
-                  Rowan's task system includes everything you need to organize daily tasks and household chores:
+                  Rowan&apos;s task system includes everything you need to organize daily tasks and household chores:
                 </p>
                 <ul className="text-sm text-blue-300 space-y-1 ml-4">
                   <li>• <strong>Recurring tasks</strong> - Auto-generate tasks daily, weekly, or monthly</li>

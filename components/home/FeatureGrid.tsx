@@ -214,6 +214,7 @@ function FeatureSection({
 
 // ── Main Component ──────────────────────────────────────────────
 
+/** Displays a responsive grid of feature cards on the landing page. */
 export function FeatureGrid() {
   const [showAll, setShowAll] = useState(false);
   const prefersReducedMotion = useReducedMotion();

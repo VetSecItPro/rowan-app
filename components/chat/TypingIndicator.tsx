@@ -14,6 +14,7 @@ const dotVariants = {
   animate: { y: [0, -4, 0] },
 };
 
+/** Renders an animated typing indicator while the AI is generating a response. */
 export default function TypingIndicator() {
   return (
     <div className="flex items-center gap-2">
@@ -35,7 +36,7 @@ export default function TypingIndicator() {
           />
         ))}
       </div>
-      <span className="text-xs text-gray-500">Rowan is typing...</span>
+      <span className="text-xs text-gray-400">Rowan is typing...</span>
     </div>
   );
 }

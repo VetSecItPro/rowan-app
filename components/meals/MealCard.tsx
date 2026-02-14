@@ -69,16 +69,16 @@ function MealCardComponent({ meal, onEdit, onDelete }: MealCardProps) {
             <p className="text-sm text-gray-400 mb-2 break-words line-clamp-2">{meal.recipe.description}</p>
           )}
           {meal.notes && (
-            <p className="text-sm text-gray-500 italic break-words line-clamp-2">{meal.notes}</p>
+            <p className="text-sm text-gray-400 italic break-words line-clamp-2">{meal.notes}</p>
           )}
         </div>
         <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} aria-label="Meal options menu" className="p-2 text-gray-400 hover:text-gray-300 transition-colors">
+          <button onClick={() => setShowMenu(!showMenu)} aria-label="Meal options menu" aria-expanded={showMenu} aria-haspopup="menu" className="p-2 text-gray-400 hover:text-gray-300 transition-colors">
             <MoreVertical className="w-5 h-5" />
           </button>
           {showMenu && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} aria-hidden="true" />
               <div className="absolute right-0 mt-2 w-32 dropdown-mobile bg-gray-800 border border-gray-700 rounded-2xl shadow-xl z-20 overflow-hidden">
                 <button onClick={() => { onEdit(meal); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm hover:bg-gray-700 transition-colors">Edit</button>
                 <button onClick={() => { onDelete(meal.id); setShowMenu(false); }} className="btn-touch w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-900/20 transition-colors">Delete</button>
@@ -91,4 +91,5 @@ function MealCardComponent({ meal, onEdit, onDelete }: MealCardProps) {
   );
 }
 
+/** Renders a meal plan card with date, recipe, and meal type information. */
 export const MealCard = memo(MealCardComponent);

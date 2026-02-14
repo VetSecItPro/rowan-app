@@ -162,6 +162,7 @@ const NavItemComponent = memo(function NavItemComponent({
   );
 });
 
+/** Renders the desktop sidebar navigation with feature links and space selector. */
 export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false); // Start collapsed, hover to expand
   const [isHoverExpanded, setIsHoverExpanded] = useState(false); // Temporary expansion on hover
@@ -348,7 +349,7 @@ export function Sidebar() {
       {/* Header with subtle branding */}
       <div className={`flex items-center h-14 px-3 border-b border-gray-700/30 ${effectivelyExpanded ? 'justify-between' : 'justify-center'}`}>
         {effectivelyExpanded && (
-          <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
             Features
           </span>
         )}
@@ -379,7 +380,7 @@ export function Sidebar() {
               )}
               {/* Group label — only when expanded */}
               {effectivelyExpanded && (
-                <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2.5 pt-1 pb-1.5">
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 px-2.5 pt-1 pb-1.5">
                   {group.label}
                 </span>
               )}
@@ -403,7 +404,7 @@ export function Sidebar() {
       {chatCtx?.enabled && !isDesktop && (
         <div className={`pt-2 pb-2 border-t border-gray-700/30 ${effectivelyExpanded ? 'mx-2 px-2' : 'mx-1 px-1'}`}>
           {effectivelyExpanded && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2.5 mb-2 block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-2.5 mb-2 block">
               AI Assistant
             </span>
           )}
@@ -488,7 +489,7 @@ export function Sidebar() {
       {isAdmin && (
         <div className={`mb-2 pt-2 pb-3 border-t border-gray-700/30 ${effectivelyExpanded ? 'mx-2 px-2' : 'mx-1 px-1'}`}>
           {effectivelyExpanded && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 px-2.5 mb-2 block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-2.5 mb-2 block">
               Admin
             </span>
           )}

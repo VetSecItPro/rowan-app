@@ -79,17 +79,19 @@ const slideVariants = {
   }),
 };
 
+/** Renders a step-by-step onboarding carousel introducing app features. */
 export function OnboardingCarousel({ onComplete }: OnboardingCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    const completed = localStorage.getItem(STORAGE_KEY);
-    if (completed === 'true') {
-      setIsVisible(false);
+  // Lazy initializer checks localStorage once — avoids setState in effect
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem(STORAGE_KEY) !== 'true';
+    } catch {
+      return true;
     }
-  }, []);
+  });
 
   const markComplete = useCallback(() => {
     localStorage.setItem(STORAGE_KEY, 'true');

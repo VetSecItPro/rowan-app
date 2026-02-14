@@ -42,7 +42,7 @@ function WeekCalendarStep() {
         >
           {/* Day header */}
           <div className="text-center mb-1.5">
-            <span className="text-[9px] text-gray-500 uppercase block">{d.day}</span>
+            <span className="text-[9px] text-gray-400 uppercase block">{d.day}</span>
             <span className={`text-xs font-medium ${d.isToday ? 'text-orange-300' : 'text-gray-400'}`}>
               {d.date}
             </span>
@@ -144,8 +144,8 @@ function AddMealStep() {
                   : 'bg-gray-800/60 border border-gray-700/50'
               }`}
             >
-              <Icon className={`w-4 h-4 ${active ? mt.color : 'text-gray-500'}`} />
-              <span className={`text-[9px] capitalize font-medium ${active ? mt.color : 'text-gray-500'}`}>
+              <Icon className={`w-4 h-4 ${active ? mt.color : 'text-gray-400'}`} />
+              <span className={`text-[9px] capitalize font-medium ${active ? mt.color : 'text-gray-400'}`}>
                 {type}
               </span>
             </div>
@@ -201,7 +201,7 @@ function RecipeDetailsStep() {
             <span className="text-xs text-gray-300">25 min</span>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-700/40">
-            <span className="text-xs text-gray-500">Serves</span>
+            <span className="text-xs text-gray-400">Serves</span>
             <span className="text-xs text-gray-300 font-medium">4</span>
           </div>
         </div>
@@ -213,7 +213,7 @@ function RecipeDetailsStep() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.3 }}
       >
-        <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide mb-2">Ingredients</p>
+        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-2">Ingredients</p>
         <div className="space-y-1">
           {ingredients.map((item, i) => (
             <motion.div
@@ -246,7 +246,7 @@ function AutoShoppingListStep() {
         </div>
         <div>
           <h4 className="text-sm font-semibold text-white">Meal Plan</h4>
-          <p className="text-xs text-gray-500">5 meals this week</p>
+          <p className="text-xs text-gray-400">5 meals this week</p>
         </div>
       </div>
 
@@ -314,6 +314,7 @@ const steps: DemoStep[] = [
   { label: 'Auto shopping list', content: <AutoShoppingListStep /> },
 ];
 
+/** Renders an animated meals feature demonstration for the landing page. */
 export function MealsDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

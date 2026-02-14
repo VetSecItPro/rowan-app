@@ -51,6 +51,7 @@ const ACTIVITY_COLORS: Record<ActivityType, string> = {
   date_changed: 'text-violet-600 text-violet-400 bg-violet-900/20',
 };
 
+/** Displays a chronological feed of comments and activity for an item. */
 export default function ActivityFeed({
   spaceId,
   entityType,

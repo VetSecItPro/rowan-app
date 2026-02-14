@@ -164,7 +164,7 @@ export default function FeatureUsagePage() {
             title={`Tablet: ${breakdown.tablet}`}
           />
         </div>
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-gray-400">
           <span className="flex items-center gap-1">
             <Smartphone className="w-3 h-3" /> {mobilePercent.toFixed(0)}%
           </span>
@@ -426,7 +426,7 @@ export default function FeatureUsagePage() {
                                     ? 'text-green-600'
                                     : feature.trendDirection === 'down'
                                     ? 'text-red-600'
-                                    : 'text-gray-500'
+                                    : 'text-gray-400'
                                 }`}
                               >
                                 {feature.trend > 0 ? '+' : ''}{feature.trend}%

@@ -70,6 +70,7 @@ const statusTextColors = {
   critical: 'text-red-400',
 };
 
+/** Displays system health indicators and infrastructure status. */
 export const HealthPanel = memo(function HealthPanel() {
   // React Query for health data with caching
   const { data, isLoading, refetch, isFetching } = useQuery({

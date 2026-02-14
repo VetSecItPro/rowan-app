@@ -13,6 +13,7 @@ interface RestoreAccountModalProps {
   permanentDeletionAt: string;
 }
 
+/** Renders a modal for restoring a previously deleted account. */
 export function RestoreAccountModal({
   isOpen,
   onClose,

@@ -36,6 +36,7 @@ interface BudgetGoalLinkerProps {
 type LinkType = 'budget_limit' | 'savings_target' | 'spending_reduction' | 'expense_tracking';
 type CreationMode = 'template' | 'custom';
 
+/** Provides controls to link budget categories with savings goals. */
 export function BudgetGoalLinker({ onComplete, className }: BudgetGoalLinkerProps) {
   const { currentSpace, user } = useAuth();
   const [mode, setMode] = useState<CreationMode>('template');

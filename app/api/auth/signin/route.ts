@@ -17,6 +17,7 @@ const SignInSchema = z.object({
     .max(128, 'Password too long'),
 });
 
+/** Authenticates a user with email and password */
 export async function POST(request: NextRequest) {
   try {
     // Extract IP for rate limiting

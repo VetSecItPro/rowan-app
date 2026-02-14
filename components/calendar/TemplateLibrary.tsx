@@ -14,6 +14,7 @@ interface TemplateLibraryProps {
   onSelectTemplate: (template: EventTemplate) => void;
 }
 
+/** Displays a library of reusable event templates for quick creation. */
 export function TemplateLibrary({ isOpen, onClose, spaceId, onSelectTemplate }: TemplateLibraryProps) {
   const [templates, setTemplates] = useState<EventTemplate[]>([]);
   const [loading, setLoading] = useState(true);

@@ -18,6 +18,7 @@ interface NewMilestoneModalProps {
   availableGoals?: Goal[]; // Goals that can be selected as dependencies
 }
 
+/** Renders a modal form for creating or editing a goal milestone. */
 export function NewMilestoneModal({ isOpen, onClose, onSave, editMilestone, goalId, availableGoals = [] }: NewMilestoneModalProps) {
   type MilestoneType = CreateMilestoneInput['type'];
   const [formData, setFormData] = useState<CreateMilestoneInput>({

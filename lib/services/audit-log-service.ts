@@ -240,6 +240,7 @@ export async function logDataExport(userId: string, format: 'json' | 'csv', data
   });
 }
 
+/** Logs an account login event to the user_audit_log table. */
 export async function logAccountLogin(userId: string, ipAddress?: string, userAgent?: string) {
   return logAuditEvent({
     user_id: userId,
@@ -250,6 +251,7 @@ export async function logAccountLogin(userId: string, ipAddress?: string, userAg
   });
 }
 
+/** Logs an account logout event to the user_audit_log table. */
 export async function logAccountLogout(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -258,6 +260,7 @@ export async function logAccountLogout(userId: string) {
   });
 }
 
+/** Logs a password change event to the user_audit_log table. */
 export async function logPasswordChange(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -266,6 +269,7 @@ export async function logPasswordChange(userId: string) {
   });
 }
 
+/** Logs an email change event to the user_audit_log table. */
 export async function logEmailChange(userId: string, newEmail: string) {
   return logAuditEvent({
     user_id: userId,
@@ -275,6 +279,7 @@ export async function logEmailChange(userId: string, newEmail: string) {
   });
 }
 
+/** Logs a 2FA enable event to the user_audit_log table. */
 export async function log2FAEnable(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -283,6 +288,7 @@ export async function log2FAEnable(userId: string) {
   });
 }
 
+/** Logs a 2FA disable event to the user_audit_log table. */
 export async function log2FADisable(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -291,6 +297,7 @@ export async function log2FADisable(userId: string) {
   });
 }
 
+/** Logs a GDPR Article 17 deletion initiation event to the user_audit_log table. */
 export async function logDeletionInitiated(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -300,6 +307,7 @@ export async function logDeletionInitiated(userId: string) {
   });
 }
 
+/** Logs a deletion cancellation event to the user_audit_log table. */
 export async function logDeletionCancelled(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -308,6 +316,7 @@ export async function logDeletionCancelled(userId: string) {
   });
 }
 
+/** Logs a profile view event to the user_audit_log table. */
 export async function logProfileView(userId: string) {
   return logAuditEvent({
     user_id: userId,
@@ -317,6 +326,7 @@ export async function logProfileView(userId: string) {
   });
 }
 
+/** Logs a profile update event with changed field names to the user_audit_log table. */
 export async function logProfileUpdate(userId: string, fields: string[]) {
   return logAuditEvent({
     user_id: userId,

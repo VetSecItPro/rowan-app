@@ -277,7 +277,7 @@ const DocumentationTab = React.memo(() => {
 
       {/* Search Bar */}
       <div className="relative max-w-xl">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
           type="text"
           placeholder="Search feature manuals... (e.g., 'expenses', 'billing', 'meal planning')"
@@ -348,7 +348,7 @@ const DocumentationTab = React.memo(() => {
       ) : (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4">
-            <BookOpen className="w-8 h-8 text-gray-500" />
+            <BookOpen className="w-8 h-8 text-gray-400" />
           </div>
           <h3 className="text-lg font-semibold text-white mb-2">No documentation found</h3>
           <p className="text-sm text-gray-400 text-center max-w-md">

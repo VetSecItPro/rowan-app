@@ -69,6 +69,7 @@ async function checkRateLimit(userId: string): Promise<{ success: boolean; remai
   }
 }
 
+/** Parses natural language text into a structured calendar event using AI */
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user

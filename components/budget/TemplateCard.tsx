@@ -20,6 +20,7 @@ const householdLabels: Record<HouseholdType, string> = {
   retired: 'Retired',
 };
 
+/** Renders a selectable budget template card with category preview. */
 export function TemplateCard({
   template,
   isSelected = false,

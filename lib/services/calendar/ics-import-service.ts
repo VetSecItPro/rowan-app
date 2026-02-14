@@ -697,6 +697,7 @@ async function testICSFeed(url: string): Promise<{
   }
 }
 
+/** Service for validating, parsing, and syncing ICS calendar feeds. */
 export const icsImportService = {
   validateICSUrl,
   validateICSContent,

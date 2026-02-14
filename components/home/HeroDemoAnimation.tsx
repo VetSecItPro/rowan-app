@@ -25,6 +25,14 @@ interface FamilyMember {
 
 type Frame = 'tasks' | 'task-complete' | 'calendar' | 'shopping' | 'budget' | 'family';
 
+// Pre-computed random confetti animation targets (module-level to keep render pure)
+const CONFETTI_ANIMATIONS = Array.from({ length: 12 }, () => ({
+    x: `${50 + (Math.random() - 0.5) * 100}%`,
+    y: `${20 + (Math.random() - 0.5) * 100}%`,
+    rotate: Math.random() * 360,
+}));
+
+/** Renders an animated hero demo showing the app interface in action. */
 export default function HeroDemoAnimation() {
     const prefersReducedMotion = useReducedMotion();
     const [currentFrame, setCurrentFrame] = useState<Frame>('tasks');
@@ -307,10 +315,10 @@ export default function HeroDemoAnimation() {
                                                         }}
                                                         animate={{
                                                             opacity: 0,
-                                                            x: `${50 + (Math.random() - 0.5) * 100}%`,
-                                                            y: `${20 + (Math.random() - 0.5) * 100}%`,
+                                                            x: CONFETTI_ANIMATIONS[i].x,
+                                                            y: CONFETTI_ANIMATIONS[i].y,
                                                             scale: 1,
-                                                            rotate: Math.random() * 360,
+                                                            rotate: CONFETTI_ANIMATIONS[i].rotate,
                                                         }}
                                                         exit={{ opacity: 0 }}
                                                         transition={{
@@ -348,7 +356,7 @@ export default function HeroDemoAnimation() {
                                 <div className="flex gap-2 mb-6">
                                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => (
                                         <div key={day} className="flex-1 text-center">
-                                            <div className="text-xs text-gray-500 mb-2">{day}</div>
+                                            <div className="text-xs text-gray-400 mb-2">{day}</div>
                                             <div className="w-full aspect-square rounded-lg bg-gray-800/60 border border-gray-700/50 flex items-center justify-center">
                                                 {index === 2 && (
                                                     <div className="w-2 h-2 rounded-full bg-purple-500" />
@@ -448,7 +456,7 @@ export default function HeroDemoAnimation() {
                                     <div>
                                         <div className="flex justify-between items-end mb-3">
                                             <span className="text-sm text-gray-300">Groceries</span>
-                                            <span className="text-xs text-gray-500">
+                                            <span className="text-xs text-gray-400">
                                                 ${Math.round(400 * (budgetProgress / 100))} / $400
                                             </span>
                                         </div>

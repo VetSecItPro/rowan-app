@@ -102,7 +102,7 @@ const KPICard = memo(function KPICard({
           <p className="text-sm font-medium text-gray-400">{title}</p>
           <p className="text-3xl font-bold text-white mt-2">{value}</p>
           {previousValue !== undefined && (
-            <p className="text-xs text-gray-500 mt-0.5">Previous: {previousValue}</p>
+            <p className="text-xs text-gray-400 mt-0.5">Previous: {previousValue}</p>
           )}
           {trend !== undefined && (
             <div className={`flex items-center gap-1 mt-2 text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
@@ -152,7 +152,7 @@ const HealthStatus = memo(function HealthStatus({
       </div>
       <div className="text-right">
         <p className="text-2xl font-bold text-white">{uptime}%</p>
-        <p className="text-xs text-gray-500">Last 30 days</p>
+        <p className="text-xs text-gray-400">Last 30 days</p>
       </div>
     </div>
   );
@@ -177,6 +177,7 @@ const QuickStat = memo(function QuickStat({
   );
 });
 
+/** Renders the admin dashboard overview with summary cards and key metrics. */
 export const OverviewPanel = memo(function OverviewPanel() {
   const { compareEnabled } = useComparison();
 

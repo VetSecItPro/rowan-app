@@ -22,6 +22,7 @@ interface SwipeableListItemProps {
 
 const SWIPE_THRESHOLD = 80;
 
+/** Renders a list item with swipeable left/right action reveals. */
 export function SwipeableListItem({
   children,
   onSwipeLeft,

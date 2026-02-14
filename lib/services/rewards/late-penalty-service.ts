@@ -58,7 +58,7 @@ export interface ApplyPenaltyResult {
   error?: string;
 }
 
-// Default settings
+/** Default configuration for late chore penalty point deductions. */
 export const DEFAULT_PENALTY_SETTINGS: LatePenaltySettings = {
   enabled: false,
   default_penalty_points: 5,

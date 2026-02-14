@@ -15,6 +15,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
+/** Creates a Polar customer portal session for subscription management */
 export async function POST(request: NextRequest) {
   try {
     // CSRF validation

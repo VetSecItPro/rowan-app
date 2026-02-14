@@ -54,6 +54,7 @@ interface AIDashboardProps {
 // Component
 // ---------------------------------------------------------------------------
 
+/** Renders an AI-powered dashboard view with smart insights and recommendations. */
 export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
   const {
     messages,
@@ -77,10 +78,11 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // First name for greeting
+  const userName = user?.name;
   const firstName = useMemo(() => {
-    if (!user?.name) return '';
-    return user.name.split(' ')[0];
-  }, [user?.name]);
+    if (!userName) return '';
+    return userName.split(' ')[0];
+  }, [userName]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -124,7 +126,7 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
             <h1 className="text-base sm:text-lg font-semibold text-white truncate">
               {getGreeting()}{firstName ? `, ${firstName}` : ''}
             </h1>
-            <p className="text-xs text-gray-500">{formatDate()}</p>
+            <p className="text-xs text-gray-400">{formatDate()}</p>
           </div>
         </div>
 

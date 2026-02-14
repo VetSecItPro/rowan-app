@@ -6,6 +6,7 @@ interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultValue?: string;
 }
 
+/** Provides a tabbed interface container with value state management. */
 export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
   ({ className = '', value, onValueChange, defaultValue, children, ...props }, ref) => {
     const [activeValue, setActiveValue] = React.useState(value || defaultValue || '');
@@ -51,6 +52,7 @@ interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
   onValueChange?: (value: string) => void;
 }
 
+/** Renders the tab button list within a Tabs component. */
 export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
   ({ className = '', children, value, onValueChange, ...props }, ref) => {
     return (
@@ -81,6 +83,7 @@ interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
   onValueChange?: (value: string) => void;
 }
 
+/** Renders a single tab trigger button within a TabsList. */
 export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ className = '', value, currentValue, onValueChange, children, ...props }, ref) => {
     const isActive = currentValue === value;
@@ -109,6 +112,7 @@ interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
   currentValue?: string;
 }
 
+/** Renders the content panel for a specific tab value. */
 export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className = '', value, currentValue, children, ...props }, ref) => {
     if (currentValue !== value) {

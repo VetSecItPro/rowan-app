@@ -21,9 +21,10 @@ export interface AnimatedFeatureDemoProps {
   className?: string;
 }
 
+/** Renders an animated demo of a single feature for the landing page. */
 export function AnimatedFeatureDemo({
-  featureName,
-  colorScheme,
+  featureName: _featureName,
+  colorScheme: _colorScheme,
   steps,
   className = ""
 }: AnimatedFeatureDemoProps) {
@@ -113,7 +114,7 @@ export function AnimatedFeatureDemo({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: prefersReducedMotion ? 0.01 : 0.2 }}
-              className="text-xs text-gray-500"
+              className="text-xs text-gray-400"
             >
               {currentStep.label}
             </motion.p>

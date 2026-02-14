@@ -192,6 +192,7 @@ function safeGetLocalStorageString(
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Provides calendar event data, date navigation, and event proposal state */
 export function useCalendarData(): CalendarDataReturn {
   const { currentSpace, user } = useAuthWithSpaces();
   const { hasAccess: canUseEventProposals, requestUpgrade: requestProposalUpgrade } = useFeatureAccessSafe('canUseEventProposals');

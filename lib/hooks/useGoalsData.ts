@@ -88,6 +88,7 @@ export interface UseGoalsDataReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Loads and manages goals data with feature gate enforcement and space filtering */
 export function useGoalsData(): UseGoalsDataReturn {
   // SECURITY: Check feature access FIRST, before loading any data
   const { hasAccess, isLoading: gateLoading } = useFeatureGate('goals');
@@ -339,7 +340,7 @@ export function useGoalsData(): UseGoalsDataReturn {
       supabase.removeChannel(goalsChannel);
       supabase.removeChannel(milestonesChannel);
     };
-  }, [currentSpace]);
+  }, [currentSpace, gateLoading, hasAccess]);
 
   return {
     // Auth / access

@@ -72,6 +72,7 @@ const AggregateRequestSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 }).strict();
 
+/** Retrieves feature usage analytics for the admin dashboard */
 export async function GET(req: NextRequest) {
   try {
     // Rate limiting

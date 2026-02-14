@@ -120,10 +120,10 @@ export async function withCache<T>(
   return result;
 }
 
-// Export cache TTL constants for consistent usage
+/** Cache TTL constants (in seconds) for admin dashboard data. */
 export const ADMIN_CACHE_TTL = CACHE_TTL;
 
-// Export cache keys for dashboard
+/** Cache key builders for admin dashboard data (stats, users, analytics, etc.). */
 export const ADMIN_CACHE_KEYS = {
   dashboardStats: 'dashboard:stats',
   usersList: (page: number, limit: number) => `users:list:${page}:${limit}`,

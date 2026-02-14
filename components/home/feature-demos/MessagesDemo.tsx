@@ -28,7 +28,7 @@ function FamilyChatStep() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.3 }}
         >
-          <p className="text-xs text-gray-500 mb-1">Dad</p>
+          <p className="text-xs text-gray-400 mb-1">Dad</p>
           <div className="px-3.5 py-2.5 rounded-2xl rounded-tl-sm bg-gray-700">
             <p className="text-sm text-gray-200">Running 10 min late from work</p>
           </div>
@@ -69,7 +69,7 @@ function QuickRepliesStep() {
           D
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Dad</p>
+          <p className="text-xs text-gray-400 mb-1">Dad</p>
           <div className="px-3.5 py-2.5 rounded-2xl rounded-tl-sm bg-gray-700">
             <p className="text-sm text-gray-200">Running 10 min late from work</p>
           </div>
@@ -128,7 +128,7 @@ function ReactToMessagesStep() {
           D
         </div>
         <div className="relative">
-          <p className="text-xs text-gray-500 mb-1">Dad</p>
+          <p className="text-xs text-gray-400 mb-1">Dad</p>
           <div className="px-3.5 py-2.5 rounded-2xl rounded-tl-sm bg-gray-700">
             <p className="text-sm text-gray-200">Running 10 min late from work</p>
           </div>
@@ -222,7 +222,7 @@ function PinImportantStep() {
             D
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Dad</p>
+            <p className="text-xs text-gray-400 mb-1">Dad</p>
             <div className="px-3.5 py-2.5 rounded-2xl rounded-tl-sm bg-gray-700">
               <p className="text-sm text-gray-200">Running 10 min late from work</p>
             </div>
@@ -252,6 +252,7 @@ const steps: DemoStep[] = [
   { label: 'Pin important info', content: <PinImportantStep /> },
 ];
 
+/** Renders an animated messaging feature demonstration for the landing page. */
 export function MessagesDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

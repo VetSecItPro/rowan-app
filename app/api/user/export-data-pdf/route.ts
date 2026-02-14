@@ -4,6 +4,7 @@ import { exportAllUserData, getDataSubset } from '@/lib/services/data-export-ser
 import type { UserDataExport } from '@/lib/services/data-export-service';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import type { Table } from 'jspdf-autotable';
 import { checkExpensiveOperationRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
@@ -177,8 +178,8 @@ export async function GET(request: NextRequest) {
         margin: { top: 10, left: 14, right: 14 },
       });
 
-      // @ts-expect-error - autoTable modifies the doc object
-      yPosition = doc.lastAutoTable.finalY + 15;
+      const lastTable = (doc as unknown as { lastAutoTable: Table }).lastAutoTable;
+      yPosition = (lastTable.finalY ?? yPosition) + 15;
     }
 
     // Add footer with metadata

@@ -20,6 +20,7 @@ interface NudgeSettingsModalProps {
   onSettingsUpdate?: (settings: NudgeSettings) => void;
 }
 
+/** Renders a modal for configuring nudge preferences and frequency. */
 export function NudgeSettingsModal({
   isOpen,
   onClose,

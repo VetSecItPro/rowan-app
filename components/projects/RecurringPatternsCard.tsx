@@ -31,6 +31,7 @@ const FREQUENCY_LABELS: Record<string, string> = {
   annual: 'Annual',
 };
 
+/** Displays detected recurring expense patterns within a project. */
 export function RecurringPatternsCard({ spaceId, userId }: RecurringPatternsCardProps) {
   const [patterns, setPatterns] = useState<RecurringExpensePattern[]>([]);
   const [upcomingPatterns, setUpcomingPatterns] = useState<RecurringExpensePattern[]>([]);

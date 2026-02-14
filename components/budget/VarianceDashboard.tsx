@@ -13,6 +13,7 @@ interface VarianceDashboardProps {
   spaceId: string;
 }
 
+/** Displays a full-page budget variance analysis across all categories. */
 export default function VarianceDashboard({ spaceId }: VarianceDashboardProps) {
   const [currentVariance, setCurrentVariance] = useState<MonthlyVariance | null>(null);
   const [projectedVariance, setProjectedVariance] = useState<MonthlyVariance | null>(null);

@@ -13,6 +13,7 @@ interface MilestoneCardProps {
   onToggle: (milestoneId: string, completed: boolean) => void;
 }
 
+/** Displays a single milestone card with completion status and actions. */
 export function MilestoneCard({ milestone, goalTitle, onEdit, onDelete, onToggle }: MilestoneCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const getProgressPercentage = () => {

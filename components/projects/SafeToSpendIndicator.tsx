@@ -9,6 +9,7 @@ interface SafeToSpendIndicatorProps {
   spaceId: string;
 }
 
+/** Renders an indicator showing the safe-to-spend amount after bills and savings. */
 export function SafeToSpendIndicator({ spaceId }: SafeToSpendIndicatorProps) {
   const [loading, setLoading] = useState(true);
   const [safeToSpendInfo, setSafeToSpendInfo] = useState<{

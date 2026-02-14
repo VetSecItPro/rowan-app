@@ -13,6 +13,7 @@ export interface TaskCategory {
   updated_at: string;
 }
 
+/** Service for CRUD operations on task categories from the task_categories table. */
 export const taskCategoriesService = {
   async getCategories(spaceId: string): Promise<TaskCategory[]> {
     const supabase = createClient();

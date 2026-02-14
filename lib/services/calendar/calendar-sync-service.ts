@@ -24,6 +24,7 @@ import type {
 // SYNC ORCHESTRATION
 // =============================================================================
 
+/** Performs a bidirectional calendar sync (full or incremental) for a calendar connection. */
 export async function performSync(
   connectionId: string,
   syncType: SyncType = 'incremental'
@@ -1418,6 +1419,7 @@ function getSyncInterval(provider: CalendarProvider): number {
 // EXPORTS
 // =============================================================================
 
+/** Aggregated service for bidirectional calendar synchronization and outbound queue processing. */
 export const calendarSyncService = {
   performSync,
   processOutboundQueue,

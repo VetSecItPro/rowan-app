@@ -21,6 +21,7 @@ type FilterCategory = 'all' | string;
 type FilterRarity = 'all' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 type FilterStatus = 'all' | 'earned' | 'locked';
 
+/** Displays a complete collection of earned and available goal badges. */
 export default function BadgeCollection({ userId, spaceId }: BadgeCollectionProps) {
   const [allBadges, setAllBadges] = useState<AchievementBadge[]>([]);
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);

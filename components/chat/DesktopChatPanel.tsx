@@ -12,6 +12,7 @@ import { useDevice } from '@/lib/contexts/DeviceContext';
 import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import ChatPanel from './ChatPanel';
 
+/** Renders a persistent desktop sidebar chat panel for the AI companion. */
 export function DesktopChatPanel() {
   const { isDesktop } = useDevice();
   const ctx = useChatContextSafe();

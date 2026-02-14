@@ -7,6 +7,7 @@ interface BreadcrumbProps {
   currentPage: string;
 }
 
+/** Renders breadcrumb navigation for the admin panel pages. */
 export function Breadcrumbs({ currentPage }: BreadcrumbProps) {
   const router = useRouter();
 

@@ -166,6 +166,7 @@ docs/
 
 # EXCEPTIONS: Public-facing files we DO commit
 !README.md
+!CHANGELOG.md
 !.github/pull_request_template.md
 
 # CI/CD documentation

@@ -19,6 +19,7 @@ interface CCPAStatus {
   opt_out_date?: string;
 }
 
+/** Renders a modal for CCPA data sale opt-out preferences. */
 export function CCPAOptOutModal({ isOpen, onClose }: CCPAOptOutModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

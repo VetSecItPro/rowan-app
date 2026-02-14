@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import nextDynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
@@ -16,16 +17,41 @@ import {
   ExportDataModal,
   PrivacyDataManager,
 } from '@/components/ui/DynamicSettingsComponents';
-import { DataManagementTab } from '@/components/settings/DataManagementTab';
-import { NotificationSettings } from '@/components/settings/NotificationSettings';
-import { SubscriptionSettings } from '@/components/settings/SubscriptionSettings';
-import { CalendarConnections } from '@/components/calendar/CalendarConnections';
 import { SpacesLoadingState } from '@/components/ui/LoadingStates';
 import { ProfileTab } from '@/components/settings/ProfileTab';
-import { SecurityTab } from '@/components/settings/SecurityTab';
-import DocumentationTab from '@/components/settings/DocumentationTab';
-import AnalyticsTab from '@/components/settings/AnalyticsTab';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Lazy-load non-default tab components (only loaded when that tab is active)
+const TabLoader = () => <div className="animate-pulse space-y-4"><div className="h-8 bg-gray-700 rounded w-1/3" /><div className="h-32 bg-gray-700 rounded" /><div className="h-32 bg-gray-700 rounded" /></div>;
+
+const SecurityTab = nextDynamic(
+  () => import('@/components/settings/SecurityTab').then(m => ({ default: m.SecurityTab })),
+  { loading: TabLoader }
+);
+const SubscriptionSettings = nextDynamic(
+  () => import('@/components/settings/SubscriptionSettings').then(m => ({ default: m.SubscriptionSettings })),
+  { loading: TabLoader }
+);
+const NotificationSettings = nextDynamic(
+  () => import('@/components/settings/NotificationSettings').then(m => ({ default: m.NotificationSettings })),
+  { loading: TabLoader }
+);
+const DataManagementTab = nextDynamic(
+  () => import('@/components/settings/DataManagementTab').then(m => ({ default: m.DataManagementTab })),
+  { loading: TabLoader }
+);
+const CalendarConnections = nextDynamic(
+  () => import('@/components/calendar/CalendarConnections').then(m => ({ default: m.CalendarConnections })),
+  { loading: TabLoader }
+);
+const DocumentationTab = nextDynamic(
+  () => import('@/components/settings/DocumentationTab'),
+  { loading: TabLoader }
+);
+const AnalyticsTab = nextDynamic(
+  () => import('@/components/settings/AnalyticsTab'),
+  { loading: TabLoader }
+);
 import {
   Settings,
   User,
@@ -54,7 +80,7 @@ const tabs = [
 ];
 
 export default function SettingsPage() {
-  const { user, currentSpace, spaces, refreshSpaces } = useAuthWithSpaces();
+  const { user, currentSpace, spaces: _spaces, refreshSpaces } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
   const router = useRouter();
   const searchParams = useSearchParams();

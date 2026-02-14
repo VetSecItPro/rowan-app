@@ -188,7 +188,7 @@ export function subscribeToUpcomingBills(
   return channel;
 }
 
-// Export service object
+/** Aggregated service for bill-calendar integration (upcoming bills, overdue tracking, payments). */
 export const billCalendarService = {
   createBillCalendarEvent,
   getUpcomingBills,

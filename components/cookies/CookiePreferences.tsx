@@ -27,6 +27,7 @@ const COOKIE_CATEGORIES: CookieCategory[] = [
   },
 ];
 
+/** Provides granular cookie preference controls for different tracking categories. */
 export function CookiePreferences() {
   const [preferences, setPreferences] = useState<CookiePrefs>(getCookiePreferences());
 

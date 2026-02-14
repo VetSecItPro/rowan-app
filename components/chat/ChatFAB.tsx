@@ -12,6 +12,7 @@ import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import { useDevice } from '@/lib/contexts/DeviceContext';
 import ChatPanel from './ChatPanel';
 
+/** Renders a floating action button to open the AI chat panel. */
 export default function ChatFAB() {
   const ctx = useChatContextSafe();
   const { isDesktop } = useDevice();

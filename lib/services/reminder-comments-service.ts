@@ -39,6 +39,7 @@ export type UpdateCommentInput = z.infer<typeof UpdateCommentSchema>;
 // SERVICE
 // =============================================
 
+/** Service for CRUD operations on reminder comments with user info from the reminder_comments table. */
 export const reminderCommentsService = {
   /**
    * Get comments for a reminder

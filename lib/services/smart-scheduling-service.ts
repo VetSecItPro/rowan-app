@@ -38,6 +38,7 @@ export interface AvailabilityBlock {
   created_at: string;
 }
 
+/** Predefined duration options for the smart scheduling time slot finder. */
 export const DURATION_PRESETS = [
   { label: '15 min', value: 15, icon: '⚡' },
   { label: '30 min', value: 30, icon: '☕' },

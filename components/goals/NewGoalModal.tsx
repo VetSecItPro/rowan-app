@@ -36,6 +36,7 @@ const CATEGORY_OPTIONS = [
   { value: '📌 Other', label: '📌 Other' },
 ];
 
+/** Renders a modal form for creating or editing a goal. */
 export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, availableGoals = [], selectedTemplate, spaceMembers = [] }: NewGoalModalProps) {
   const [formData, setFormData] = useState<CreateGoalInput>({
     space_id: spaceId,

@@ -25,7 +25,7 @@ function MoodSelectorStep() {
         >
           How are you today?
         </motion.p>
-        <p className="text-xs text-gray-500 mt-1">Tap to select your mood</p>
+        <p className="text-xs text-gray-400 mt-1">Tap to select your mood</p>
       </div>
 
       {/* Mood face grid */}
@@ -289,6 +289,7 @@ const steps: DemoStep[] = [
   { label: 'Family wellness', content: <FamilyWellnessStep /> },
 ];
 
+/** Renders an animated check-in feature demonstration for the landing page. */
 export function CheckInDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

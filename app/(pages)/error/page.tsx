@@ -67,7 +67,7 @@ function ErrorContent() {
         </div>
 
         {code !== 'default' && (
-          <p className="mt-8 text-xs text-gray-500">
+          <p className="mt-8 text-xs text-gray-400">
             Error code: {code}
           </p>
         )}

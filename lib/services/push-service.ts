@@ -511,7 +511,7 @@ class PushNotificationService {
   }
 }
 
-// Export singleton instance
+/** Singleton instance for managing web push notification subscriptions and delivery. */
 export const pushService = new PushNotificationService();
 
 // Types are already exported above where they are defined

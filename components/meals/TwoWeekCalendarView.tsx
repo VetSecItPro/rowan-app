@@ -24,6 +24,7 @@ const MEAL_TYPE_CONFIG = {
   snack: { icon: Cookie, color: 'text-amber-500', bg: 'bg-amber-900/20', border: 'border-amber-700', label: 'Snack' },
 };
 
+/** Renders a two-week calendar grid for meal planning. */
 export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
   currentWeek,
   meals,
@@ -456,7 +457,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
                   {dayMeals.length > 0 && (
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="w-full mt-1.5 py-1 border-2 border-dashed border-gray-700 rounded-lg text-[10px] text-gray-500 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all"
+                      className="w-full mt-1.5 py-1 border-2 border-dashed border-gray-700 rounded-lg text-[10px] text-gray-400 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all"
                     >
                       + Add
                     </button>
@@ -555,7 +556,7 @@ export const TwoWeekCalendarView = memo(function TwoWeekCalendarView({
                   {dayMeals.length > 0 && (
                     <button
                       onClick={() => onAddMeal(day)}
-                      className="w-full mt-1.5 py-1 border-2 border-dashed border-gray-700 rounded-lg text-[10px] text-gray-500 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all"
+                      className="w-full mt-1.5 py-1 border-2 border-dashed border-gray-700 rounded-lg text-[10px] text-gray-400 hover:text-orange-400 hover:border-orange-600 hover:bg-orange-900/20 transition-all"
                     >
                       + Add
                     </button>

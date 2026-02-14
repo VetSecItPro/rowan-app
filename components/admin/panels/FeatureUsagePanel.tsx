@@ -74,6 +74,7 @@ const DeviceBar = memo(function DeviceBar({ breakdown }: { breakdown: { mobile: 
   );
 });
 
+/** Displays per-feature usage statistics and adoption rates. */
 export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
 
@@ -220,7 +221,7 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
                       <span className={`text-xs font-medium ${
                         feature.trendDirection === 'up' ? 'text-green-600' :
                         feature.trendDirection === 'down' ? 'text-red-600' :
-                        'text-gray-500'
+                        'text-gray-400'
                       }`}>
                         {feature.trend > 0 ? '+' : ''}{feature.trend}%
                       </span>

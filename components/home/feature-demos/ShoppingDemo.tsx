@@ -26,7 +26,7 @@ function CreateListStep() {
         </div>
         <div className="flex-1">
           <h4 className="text-sm font-semibold text-white">Weekly Groceries</h4>
-          <p className="text-xs text-gray-500">0 items</p>
+          <p className="text-xs text-gray-400">0 items</p>
         </div>
         {/* Status badge (real pattern) */}
         <span className="px-2.5 py-1 text-[10px] font-medium rounded-full bg-blue-900/30 text-blue-300">Active</span>
@@ -64,7 +64,7 @@ function AddItemsStep() {
         </div>
         <div>
           <h4 className="text-sm font-semibold text-white">Weekly Groceries</h4>
-          <p className="text-xs text-gray-500">5 items</p>
+          <p className="text-xs text-gray-400">5 items</p>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ function AddItemsStep() {
         >
           <div className="flex items-center gap-1.5 mb-1.5">
             <span className="text-xs">{cat.emoji}</span>
-            <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{cat.name}</span>
+            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{cat.name}</span>
           </div>
           <div className="space-y-1.5">
             {cat.items.map((item, i) => (
@@ -117,7 +117,7 @@ function ShopTogetherStep() {
         </div>
         <div className="flex-1">
           <h4 className="text-sm font-semibold text-white">Weekly Groceries</h4>
-          <p className="text-xs text-gray-500">2 of 4 done</p>
+          <p className="text-xs text-gray-400">2 of 4 done</p>
         </div>
         <div className="flex -space-x-2">
           <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white border-2 border-gray-900">D</div>
@@ -226,6 +226,7 @@ const steps: DemoStep[] = [
   { label: 'Track spending', content: <TrackSpendingStep /> },
 ];
 
+/** Renders an animated shopping list feature demonstration for the landing page. */
 export function ShoppingDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

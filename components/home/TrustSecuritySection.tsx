@@ -34,6 +34,7 @@ const trustPoints = [
   },
 ];
 
+/** Displays trust and security badges highlighting data protection measures. */
 export function TrustSecuritySection() {
   const prefersReducedMotion = useReducedMotion();
 

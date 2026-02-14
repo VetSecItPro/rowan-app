@@ -12,6 +12,7 @@ interface BadgeProgressProps {
   limit?: number;
 }
 
+/** Renders progress toward unlocking a specific goal badge. */
 export default function BadgeProgress({
   userId,
   spaceId,

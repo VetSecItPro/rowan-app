@@ -27,6 +27,7 @@ interface PendingRedemptionsProps {
   className?: string;
 }
 
+/** Renders a list of pending reward redemption requests awaiting approval. */
 export function PendingRedemptions({
   spaceId,
   currentUserId,
@@ -193,7 +194,7 @@ export function PendingRedemptions({
         <button
           onClick={loadRedemptions}
           disabled={loading}
-          className="p-1.5 text-gray-500 hover:text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
+          className="p-1.5 text-gray-400 hover:text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -217,7 +218,7 @@ export function PendingRedemptions({
             <p className="text-gray-400">
               No pending reward requests
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               Requests will appear here when family members redeem rewards
             </p>
           </div>
@@ -264,7 +265,7 @@ export function PendingRedemptions({
                           </span>
                         </p>
                       </div>
-                      <span className="text-xs text-gray-500 flex-shrink-0">
+                      <span className="text-xs text-gray-400 flex-shrink-0">
                         {formatTimeAgo(redemption.created_at)}
                       </span>
                     </div>

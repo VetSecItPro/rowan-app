@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
+/** Service for submitting, fetching, and managing user feedback with screenshot support. */
 export const feedbackService = {
   /**
    * Submit new feedback

@@ -15,6 +15,7 @@ const QueryParamsSchema = z.object({
 // Force dynamic rendering for this route since it uses request.url
 export const dynamic = 'force-dynamic';
 
+/** Fetches weather forecast data for a geographic location */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting

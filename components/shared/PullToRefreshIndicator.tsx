@@ -8,6 +8,7 @@ interface PullToRefreshIndicatorProps {
   pullProgress: number;
 }
 
+/** Renders the visual pull-to-refresh spinner and status indicator. */
 export function PullToRefreshIndicator({
   isVisible,
   isRefreshing,

@@ -14,6 +14,7 @@ const ComparisonContext = createContext<ComparisonContextValue>({
   toggleCompare: () => {},
 });
 
+/** Provides period comparison state and controls to admin dashboard children. */
 export function ComparisonProvider({ children }: { children: ReactNode }) {
   const [compareEnabled, setCompareEnabled] = useState(false);
 

@@ -64,7 +64,7 @@ function FAQItem({ question, answer, isOpen, onToggle, index }: {
           {question}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-500 flex-shrink-0 transition-transform duration-200 ${
+          className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
             isOpen ? 'rotate-180 text-blue-400' : ''
           }`}
         />
@@ -105,6 +105,7 @@ function FAQItem({ question, answer, isOpen, onToggle, index }: {
   );
 }
 
+/** Renders an expandable FAQ section for the landing page. */
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const prefersReducedMotion = useReducedMotion();

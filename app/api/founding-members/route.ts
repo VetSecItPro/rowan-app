@@ -14,6 +14,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
+/** Returns founding member count and remaining spots */
 export async function GET(request: NextRequest) {
   try {
     const ip = extractIP(request.headers);

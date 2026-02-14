@@ -39,6 +39,7 @@ const emojiCategories = {
   fun: ['😄', '😊', '🤩', '😎', '🤗', '😋', '🙂', '😉']
 };
 
+/** Renders emoji reaction buttons for responding to goal check-in entries. */
 export function CheckInReactions({ checkInId, className = '' }: CheckInReactionsProps) {
   const [reactions, setReactions] = useState<CheckInReaction[]>([]);
   const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
@@ -308,6 +309,7 @@ export function CheckInReactions({ checkInId, className = '' }: CheckInReactions
         <div
           className="fixed inset-0 z-40"
           onClick={() => setShowEmojiPicker(false)}
+          aria-hidden="true"
         />
       )}
     </div>

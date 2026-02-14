@@ -19,6 +19,7 @@ const OptOutRequestSchema = z.object({
   verificationMethod: z.enum(['geolocation', 'user_declaration', 'admin']).optional(),
 });
 
+/** Retrieves the user's CCPA data sale opt-out status */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -61,6 +62,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Updates the user's CCPA data sale opt-out preference */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

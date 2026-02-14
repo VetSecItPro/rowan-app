@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { label: 'Pricing', href: '/pricing' },
 ];
 
+/** Renders a minimal public header for simplified public pages. */
 export function PublicHeaderLite({ animated = false }: PublicHeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

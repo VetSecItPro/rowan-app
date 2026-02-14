@@ -58,6 +58,7 @@ export interface CheckInActions {
   handleSendReaction: (checkinId: string, reactionType: 'heart' | 'hug' | 'strength') => Promise<void>;
 }
 
+/** Manages daily mood check-in form state, submission, and history for a user */
 export function useCheckIn({ spaceId, userId }: UseCheckInProps): CheckInState & CheckInActions {
   // Form state
   const [selectedMood, setSelectedMood] = useState<string | null>(null);

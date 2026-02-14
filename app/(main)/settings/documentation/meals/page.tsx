@@ -1261,13 +1261,13 @@ export default function MealPlanningDocumentation() {
                 <li>If you navigate far into the past or future</li>
                 <li>Look for the Today button above the calendar</li>
                 <li>Click Today to return to the current week or month</li>
-                <li>The calendar centers on today's date</li>
+                <li>The calendar centers on today&apos;s date</li>
                 <li>This helps you reorient quickly</li>
               </ol>
               <h3 className="text-lg font-semibold text-white mb-4">Understanding the Calendar Display</h3>
               <ol className="list-decimal list-inside space-y-3 text-gray-300 mb-6">
                 <li>Each day shows its date at the top</li>
-                <li>Today's date is highlighted with a special color</li>
+                <li>Today&apos;s date is highlighted with a special color</li>
                 <li>Meals appear as cards under their scheduled date</li>
                 <li>Multiple meals on one day stack vertically</li>
                 <li>Each meal card shows time, type, and name</li>
@@ -1312,7 +1312,7 @@ export default function MealPlanningDocumentation() {
                 <li>Plan simpler meals for busy weeknights</li>
                 <li>Save elaborate recipes for weekends</li>
                 <li>Then plan breakfasts and lunches if needed</li>
-                <li>Consider leftovers from dinner for next day's lunch</li>
+                <li>Consider leftovers from dinner for next day&apos;s lunch</li>
               </ol>
               <h3 className="text-lg font-semibold text-white mb-4">Creating Your Shopping List</h3>
               <ol className="list-decimal list-inside space-y-3 text-gray-300 mb-6">
@@ -1502,7 +1502,7 @@ export default function MealPlanningDocumentation() {
                 <li>One person plans Monday, Wednesday, Friday</li>
                 <li>The other person plans Tuesday, Thursday, Saturday</li>
                 <li>Discuss who will cook on which nights</li>
-                <li>Accommodate each person's schedule and preferences</li>
+                <li>Accommodate each person&apos;s schedule and preferences</li>
               </ol>
               <h3 className="text-lg font-semibold text-white mb-4">Dividing Responsibilities</h3>
               <ol className="list-decimal list-inside space-y-3 text-gray-300 mb-6">
@@ -1516,7 +1516,7 @@ export default function MealPlanningDocumentation() {
               <h3 className="text-lg font-semibold text-white mb-4">Handling Different Preferences</h3>
               <ol className="list-decimal list-inside space-y-3 text-gray-300 mb-6">
                 <li>Save recipes for meals each person enjoys</li>
-                <li>Plan some nights with each person's favorites</li>
+                <li>Plan some nights with each person&apos;s favorites</li>
                 <li>Try new cuisines together</li>
                 <li>If one person dislikes a recipe, note it and avoid planning it again</li>
                 <li>Build your recipe collection with meals you both like</li>
@@ -1585,7 +1585,7 @@ export default function MealPlanningDocumentation() {
         <div className="mt-8 p-6 bg-orange-900/20 border border-orange-800 rounded-xl">
           <h3 className="text-lg font-semibold text-white mb-2">Still Have Questions?</h3>
           <p className="text-sm text-gray-400 mb-4">
-            Can't find what you're looking for? Our support team is here to help you get the most out of meal planning.
+            Can&apos;t find what you&apos;re looking for? Our support team is here to help you get the most out of meal planning.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link

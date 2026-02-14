@@ -227,7 +227,7 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
 
           {showMenu && typeof document !== 'undefined' && createPortal(
             <>
-              <div className="fixed inset-0 z-[60]" onClick={() => setShowMenu(false)} />
+              <div className="fixed inset-0 z-[60]" onClick={() => setShowMenu(false)} aria-hidden="true" />
               <div
                 className="fixed w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-[70] overflow-hidden"
                 style={{ top: menuPosition.top, left: menuPosition.left }}
@@ -277,6 +277,7 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
   );
 }
 
+/** Renders a drag-and-drop reorderable list of task items. */
 export function DraggableItemList({
   spaceId,
   initialItems,
@@ -418,7 +419,7 @@ export function DraggableItemList({
       <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-2">
           {items.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-gray-400">
               <p>No tasks or chores yet. Create your first item to get started!</p>
             </div>
           ) : (

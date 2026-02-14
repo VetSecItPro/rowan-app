@@ -18,6 +18,7 @@ interface FrequentItemsPanelProps {
   onAddItem: (name: string, category: string) => void;
 }
 
+/** Displays frequently purchased items for quick addition to shopping lists. */
 export function FrequentItemsPanel({ spaceId, onAddItem }: FrequentItemsPanelProps) {
   const [frequentItems, setFrequentItems] = useState<FrequentItem[]>([]);
   const [loading, setLoading] = useState(true);

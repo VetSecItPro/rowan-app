@@ -24,6 +24,7 @@ interface GoalCommentsProps {
 
 const emojiReactions = ['👍', '❤️', '🎉', '🔥', '💪', '👏', '🚀', '✨'];
 
+/** Displays a comment thread for discussing a specific goal. */
 export function GoalComments({ goalId, className }: GoalCommentsProps) {
   const [comments, setComments] = useState<GoalComment[]>([]);
   const [newComment, setNewComment] = useState('');

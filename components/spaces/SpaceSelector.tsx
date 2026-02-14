@@ -15,6 +15,7 @@ interface SpaceSelectorProps {
   variant?: 'default' | 'header';
 }
 
+/** Renders a dropdown selector for switching between user spaces. */
 export function SpaceSelector({
   spaces,
   currentSpace,

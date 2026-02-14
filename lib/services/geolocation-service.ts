@@ -27,6 +27,7 @@ const CACHE_VERSION_KEY = 'user-location-cache-version';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const CURRENT_CACHE_VERSION = '3.0'; // Force cache clear for Dallas location fix
 
+/** Service for IP-based geolocation with 24-hour localStorage caching. */
 export const geolocationService = {
   /**
    * Get user's current location based on IP address

@@ -16,6 +16,7 @@ interface ErrorBannerProps {
   onRetry?: () => void;
 }
 
+/** Renders an error banner with retry option for chat connection failures. */
 export default function ErrorBanner({
   message,
   onDismiss,

@@ -205,7 +205,7 @@ async function cancelAccountDeletion(userId: string, supabase: SupabaseClient): 
   }
 }
 
-// Export all functions as a service object (this was the issue before)
+/** Aggregated account deletion service with all deletion-related operations. */
 export const accountDeletionService = {
   deleteUserAccount,
   isAccountMarkedForDeletion,

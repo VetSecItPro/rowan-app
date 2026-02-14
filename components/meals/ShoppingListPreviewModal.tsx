@@ -18,6 +18,7 @@ interface ShoppingListPreviewModalProps {
   onSuccess?: () => void;
 }
 
+/** Renders a preview of the generated shopping list before creation. */
 export function ShoppingListPreviewModal({
   isOpen,
   onClose,
@@ -271,7 +272,7 @@ export function ShoppingListPreviewModal({
                     <p className={`font-medium text-sm ${
                       item.selected
                         ? 'text-white'
-                        : 'text-gray-400 line-through'
+                        : 'text-gray-500 line-through'
                     }`}>
                       {item.simplified}
                     </p>

@@ -45,6 +45,7 @@ const DEFAULT_PATTERN: EnhancedRecurrencePattern = {
   days_of_week: []
 };
 
+/** Provides advanced recurrence pattern configuration for calendar events. */
 export function EnhancedRecurrencePattern({
   value,
   onChange,

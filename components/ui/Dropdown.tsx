@@ -18,6 +18,7 @@ interface DropdownProps {
   disabled?: boolean;
 }
 
+/** Renders a portal-based dropdown menu with positioning logic. */
 export function Dropdown({
   value,
   onChange,
@@ -186,7 +187,7 @@ export function Dropdown({
         <span className="block truncate min-h-[1.25rem] flex items-center">
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+        <ChevronDown aria-hidden="true" className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
       </button>
     );
   }
@@ -221,7 +222,7 @@ export function Dropdown({
         <ChevronDown
           aria-hidden="true"
           className={`
-            absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none
+            absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none
             transition-transform duration-200
             ${isOpen ? 'rotate-180' : ''}
           `}

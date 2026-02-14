@@ -355,10 +355,10 @@ class GeographicDetectionService {
   }
 }
 
-// Export singleton instance
+/** Singleton instance for IP-based geographic detection (state/country for CCPA compliance). */
 export const geographicDetectionService = new GeographicDetectionService();
 
-// Export individual functions for flexibility
+/** Destructured geographic detection methods for direct import convenience. */
 export const {
   detectLocation,
   getClientIP,

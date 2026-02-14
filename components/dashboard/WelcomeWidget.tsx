@@ -16,6 +16,7 @@ interface WelcomeWidgetProps {
   className?: string;
 }
 
+/** Renders a personalized time-aware welcome greeting on the dashboard. */
 export function WelcomeWidget({ userName, className = '' }: WelcomeWidgetProps) {
   const now = useMemo(() => new Date(), []);
   const greeting = useMemo(() => getGreeting(now.getHours()), [now]);

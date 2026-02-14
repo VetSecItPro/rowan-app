@@ -38,6 +38,7 @@ const rowanFeatures = [
   { icon: Heart, color: 'text-rose-400' },
 ];
 
+/** Displays a comparison table of Rowan vs. competing apps. */
 export function ComparisonSection() {
   const prefersReducedMotion = useReducedMotion();
 
@@ -114,7 +115,7 @@ export function ComparisonSection() {
                     >
                       <div className={`${app.size} rounded-xl bg-gray-700/60 border border-gray-600/40 flex flex-col items-center justify-center gap-1 p-2 shadow-lg`}>
                         <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
-                        <span className="text-[9px] sm:text-[10px] text-gray-500 text-center leading-tight whitespace-nowrap">
+                        <span className="text-[9px] sm:text-[10px] text-gray-400 text-center leading-tight whitespace-nowrap">
                           {app.label}
                         </span>
                       </div>
@@ -168,7 +169,7 @@ export function ComparisonSection() {
                 <span className="text-2xl" role="img" aria-label="Overwhelmed face">
                   😵
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-400">
                   5 apps, 5 logins, nothing synced
                 </span>
               </div>

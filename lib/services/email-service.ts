@@ -1216,7 +1216,7 @@ export async function sendSubscriptionCancelledEmail(data: SubscriptionCancelled
   }
 }
 
-// Export emailService object for compatibility
+/** Aggregated email service for sending task, event, message, and shopping notification emails via Resend. */
 export const emailService = {
   sendTaskAssignmentEmail,
   sendEventReminderEmail,

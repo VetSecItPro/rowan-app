@@ -58,6 +58,7 @@ interface UsePushNotificationsResult {
   unregister: () => Promise<boolean>;
 }
 
+/** Manages push notification registration, permissions, and token handling via Capacitor */
 export function usePushNotifications(
   options: UsePushNotificationsOptions
 ): UsePushNotificationsResult {

@@ -67,6 +67,7 @@ const sizeStyles = {
   },
 };
 
+/** Renders a goal achievement badge card with progress and unlock status. */
 export default function BadgeCard({
   badge,
   userBadge,
@@ -130,7 +131,7 @@ export default function BadgeCard({
         <p
           className={`
             ${sizing.description}
-            ${isEarned ? 'text-gray-300' : 'text-gray-500'}
+            ${isEarned ? 'text-gray-300' : 'text-gray-400'}
           `}
         >
           {badge.description}

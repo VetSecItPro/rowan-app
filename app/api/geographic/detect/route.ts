@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
  * Automatically updates CCPA status for California residents.
  */
 
+/** Detects the user's geographic location from their IP address */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -109,6 +110,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Manually sets a user's preferred geographic location */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

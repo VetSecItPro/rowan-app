@@ -53,6 +53,7 @@ export interface TasksHandlersReturn {
 // HOOK
 // =============================================
 
+/** Provides CRUD handlers for tasks including status toggling, assignment, and deletion */
 export function useTasksHandlers(deps: TasksHandlersDeps): TasksHandlersReturn {
   const {
     user,

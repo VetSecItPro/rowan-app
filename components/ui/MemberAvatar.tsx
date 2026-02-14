@@ -56,6 +56,7 @@ export interface MemberAvatarProps {
   showTooltip?: boolean;
 }
 
+/** Renders a space member avatar with initials fallback and online indicator. */
 export function MemberAvatar({
   name,
   size = 'md',
@@ -113,6 +114,7 @@ const OVERLAP_MAP = {
   lg: '-ml-2.5',
 } as const;
 
+/** Renders a stacked group of member avatars with overflow count. */
 export function MemberAvatarGroup({
   members,
   max = 3,

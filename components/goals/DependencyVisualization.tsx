@@ -91,6 +91,7 @@ const calculatePositions = (nodes: GoalNode[], mode: 'tree' | 'network') => {
   }
 };
 
+/** Renders a visual graph of goal dependency relationships. */
 export function DependencyVisualization({ spaceId, goals, className = '', onGoalClick }: DependencyVisualizationProps) {
   const [stats, setStats] = useState<GoalDependencyStats | null>(null);
   const [goalNodes, setGoalNodes] = useState<GoalNode[]>([]);

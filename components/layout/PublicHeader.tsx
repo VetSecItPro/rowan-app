@@ -19,6 +19,7 @@ const NAV_LINKS = [
   { label: 'Pricing', href: '/pricing' },
 ];
 
+/** Renders the public-facing header with logo and navigation links. */
 export function PublicHeader({ animated = false }: PublicHeaderProps) {
   const { user } = useAuth();
   const pathname = usePathname();

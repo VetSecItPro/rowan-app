@@ -11,6 +11,7 @@ interface PullToRefreshProps {
   disabled?: boolean;
 }
 
+/** Provides pull-to-refresh gesture handling for mobile content refresh. */
 export function PullToRefresh({ onRefresh, children, disabled = false }: PullToRefreshProps) {
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);

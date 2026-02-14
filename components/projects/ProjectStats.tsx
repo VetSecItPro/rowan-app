@@ -21,6 +21,7 @@ interface ProjectStatsProps {
   spaceId: string;
 }
 
+/** Displays aggregate project statistics across all active projects. */
 export default function ProjectStatsComponent({ spaceId }: ProjectStatsProps) {
   const [stats, setStats] = useState<ProjectStats | null>(null);
   const [loading, setLoading] = useState(true);

@@ -5,6 +5,7 @@ interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
   decorative?: boolean;
 }
 
+/** Renders a horizontal or vertical visual separator line. */
 export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
   ({ className = '', orientation = 'horizontal', decorative = true, ...props }, ref) => {
     return (

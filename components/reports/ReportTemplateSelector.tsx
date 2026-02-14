@@ -33,6 +33,7 @@ const categoryColors = {
   summary: 'bg-orange-900/20 text-orange-400'
 };
 
+/** Displays available report templates for selection. */
 export function ReportTemplateSelector({ templates, onSelectTemplate }: ReportTemplateSelectorProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');

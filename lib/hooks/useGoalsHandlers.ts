@@ -95,6 +95,7 @@ export interface UseGoalsHandlersReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Provides CRUD handlers for goals, milestones, and goal progress tracking */
 export function useGoalsHandlers(deps: UseGoalsHandlersDeps): UseGoalsHandlersReturn {
   const {
     goals,

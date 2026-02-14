@@ -56,6 +56,7 @@ export interface UseShoppingDataReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Loads and manages shopping lists and items with real-time sync and caching */
 export function useShoppingData(): UseShoppingDataReturn {
   const { currentSpace, user } = useAuthWithSpaces();
   const queryClient = useQueryClient();

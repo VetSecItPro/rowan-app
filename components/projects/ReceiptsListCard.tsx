@@ -11,6 +11,7 @@ interface ReceiptsListCardProps {
   onDelete?: (receiptId: string) => void;
 }
 
+/** Renders a card listing uploaded receipts for a project. */
 export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -187,7 +188,7 @@ export function ReceiptsListCard({ spaceId, onDelete }: ReceiptsListCardProps) {
                 </button>
 
                 {receipt.ocr_confidence && (
-                  <div className="mt-2 text-xs text-gray-500 text-center">
+                  <div className="mt-2 text-xs text-gray-400 text-center">
                     OCR Confidence: {receipt.ocr_confidence.toFixed(0)}%
                   </div>
                 )}

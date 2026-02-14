@@ -14,6 +14,7 @@ interface ShareListModalProps {
   onUpdateSharing: (listId: string, isPublic: boolean) => Promise<ShoppingList>;
 }
 
+/** Renders a modal for sharing a shopping list with space members. */
 export function ShareListModal({ isOpen, onClose, list, onUpdateSharing }: ShareListModalProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [shareUrl, setShareUrl] = useState('');

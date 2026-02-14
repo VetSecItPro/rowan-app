@@ -14,6 +14,7 @@ interface ExportButtonProps {
 type ExportType = 'monthly' | 'yearly' | 'custom' | 'category';
 type ExportFormat = 'csv' | 'pdf';
 
+/** Renders a button that exports expense data to CSV or PDF format. */
 export default function ExportButton({ spaceId }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [exportType, setExportType] = useState<ExportType>('monthly');
@@ -73,6 +74,7 @@ export default function ExportButton({ spaceId }: ExportButtonProps) {
           <div
             className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

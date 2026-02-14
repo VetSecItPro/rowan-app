@@ -15,6 +15,7 @@ interface CategorySuccessChartProps {
   data: Record<string, { completed: number; total: number; rate: number }>;
 }
 
+/** Renders a chart showing goal completion rates grouped by category. */
 export default function CategorySuccessChart({ data }: CategorySuccessChartProps) {
   const chartData = Object.entries(data).map(([category, stats]) => ({
     category: category.charAt(0).toUpperCase() + category.slice(1),

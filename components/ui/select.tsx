@@ -4,6 +4,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   onValueChange?: (value: string) => void;
 }
 
+/** Renders a styled select dropdown with dark mode support. */
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className = '', children, onValueChange, ...props }, ref) => {
     return (
@@ -28,6 +29,7 @@ interface SelectContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
+/** Renders the dropdown content container for a Select component. */
 export const SelectContent: React.FC<SelectContentProps> = ({ children, className = '', ...props }) => {
   return (
     <div
@@ -43,6 +45,7 @@ interface SelectItemProps extends React.OptionHTMLAttributes<HTMLOptionElement> 
   children: React.ReactNode;
 }
 
+/** Renders a single option item within a Select dropdown. */
 export const SelectItem = React.forwardRef<HTMLOptionElement, SelectItemProps>(
   ({ className = '', children, ...props }, ref) => {
     return (
@@ -63,6 +66,7 @@ interface SelectTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   children: React.ReactNode;
 }
 
+/** Renders the trigger button that opens a Select dropdown. */
 export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ className = '', children, ...props }, ref) => {
     return (
@@ -83,6 +87,7 @@ interface SelectValueProps extends React.HTMLAttributes<HTMLSpanElement> {
   placeholder?: string;
 }
 
+/** Renders the currently selected value display in a Select component. */
 export const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
   ({ className = '', placeholder, children, ...props }, ref) => {
     return (

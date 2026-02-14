@@ -10,6 +10,7 @@ const EmailChangeVerifySchema = z.object({
   token: z.string().min(1, 'Token is required')
 });
 
+/** Verifies a new email address with a confirmation token */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP
@@ -170,7 +171,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to check if a token is valid
+/** Checks the validity of a pending email change token */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

@@ -10,6 +10,7 @@ const ThirdPartyAnalyticsSchema = z.object({
   enabled: z.boolean(),
 });
 
+/** Updates the user's third-party analytics tracking preference */
 export async function POST(req: NextRequest) {
   try {
     // Rate limiting

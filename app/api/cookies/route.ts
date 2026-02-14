@@ -14,6 +14,7 @@ const CookiePreferencesSchema = z.object({
   }).strict(),
 }).strict();
 
+/** Retrieves current cookie consent preferences */
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
@@ -42,6 +43,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Updates cookie consent preferences */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting

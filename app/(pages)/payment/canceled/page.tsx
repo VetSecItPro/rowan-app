@@ -29,7 +29,7 @@ export default function PaymentCanceledPage() {
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-800"
         >
-          <XCircle className="h-10 w-10 text-gray-500" />
+          <XCircle className="h-10 w-10 text-gray-400" />
         </motion.div>
 
         {/* Title */}
@@ -115,7 +115,7 @@ export default function PaymentCanceledPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-6 text-xs text-gray-500"
+          className="mt-6 text-xs text-gray-400"
         >
           Questions? Contact us at{' '}
           <a href="mailto:contact@steelmotionllc.com" className="text-emerald-600 hover:underline">

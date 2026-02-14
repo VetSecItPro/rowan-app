@@ -11,6 +11,7 @@ interface VoiceRecorderProps {
   autoSendOnStop?: boolean; // If true, auto-send when recording stops (default: true)
 }
 
+/** Provides voice recording controls for sending audio messages. */
 export function VoiceRecorder({ onSendVoice, onCancel, autoSendOnStop = true }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);

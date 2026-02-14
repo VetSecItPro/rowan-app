@@ -48,6 +48,7 @@ const FEATURE_BADGE_COLORS: Record<FeatureType, string> = {
   general: 'bg-gray-500/20 text-gray-300',
 };
 
+/** Displays a confirmation prompt card for AI-suggested actions. */
 export default function ConfirmationCard({
   confirmation,
   onConfirm,

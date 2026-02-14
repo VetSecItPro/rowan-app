@@ -32,6 +32,7 @@ const getMoodEmoji = (mood: string) => {
   return emojis[mood] || '😊';
 };
 
+/** Displays a success animation and streak info after completing a check-in. */
 export function CheckInSuccess({ isOpen, onClose, mood, streak }: CheckInSuccessProps) {
   const [message, setMessage] = useState('');
 

@@ -31,6 +31,7 @@ const FEATURE_COLORS = {
   dashboard: { primary: 'purple', secondary: 'blue' },
 } as const;
 
+/** Renders an animated canvas background with particle effects. */
 export function SmartBackgroundCanvas({
   variant = 'subtle',
   feature = 'dashboard',

@@ -18,6 +18,7 @@ interface EnhancedDayViewProps {
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm (6-23)
 const HOUR_HEIGHT = 80; // pixels per hour
 
+/** Renders an enhanced hourly day view of calendar events with time slots. */
 export function EnhancedDayView({
   date,
   events,
@@ -323,7 +324,7 @@ export function EnhancedDayView({
           {/* Empty state */}
           {dayEvents.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center text-gray-500">
+              <div className="text-center text-gray-400">
                 <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p className="text-sm font-medium">No events scheduled</p>
                 <p className="text-xs mt-1">Press N to create a new event or Q for quick add</p>

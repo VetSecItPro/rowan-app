@@ -283,7 +283,7 @@ export default function SpacesDocumentationPage() {
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">Presence</h3>
                 <p className="text-sm text-gray-400">
-                  See who's online with real-time presence indicators and activity tracking
+                  See who&apos;s online with real-time presence indicators and activity tracking
                 </p>
               </div>
             </div>
@@ -396,7 +396,7 @@ export default function SpacesDocumentationPage() {
                   Perfect for Families
                 </h4>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Rowan's collaboration features are designed for families and small teams (up to 6 members).
+                  Rowan&apos;s collaboration features are designed for families and small teams (up to 6 members).
                   Simple, battery-efficient, and focused on what matters most - staying connected and organized together.
                 </p>
               </div>
@@ -465,16 +465,16 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Steps to Create a Space</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Click on the space selector in the header (shows your current space name)</li>
-                  <li>Select "Create New Space" from the dropdown menu</li>
-                  <li>Enter a name for your space (e.g., "Johnson Family", "Weekend Project")</li>
-                  <li>Click "Create" to finalize</li>
-                  <li>You'll automatically become the Owner of the new space</li>
+                  <li>Select &quot;Create New Space&quot; from the dropdown menu</li>
+                  <li>Enter a name for your space (e.g., &quot;Johnson Family&quot;, &quot;Weekend Project&quot;)</li>
+                  <li>Click &quot;Create&quot; to finalize</li>
+                  <li>You&apos;ll automatically become the Owner of the new space</li>
                 </ol>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Naming Best Practices</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Use descriptive names that identify the group or purpose</li>
-                  <li>Keep names short but meaningful (e.g., "Family", "Work Team", "Book Club")</li>
+                  <li>Keep names short but meaningful (e.g., &quot;Family&quot;, &quot;Work Team&quot;, &quot;Book Club&quot;)</li>
                   <li>You can always rename your space later from Space Settings</li>
                 </ul>
 
@@ -592,7 +592,7 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Space Persistence</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan remembers which space you were last using. When you return to the app, you'll automatically be in the same space you left. This makes it convenient to focus on one space at a time without repeatedly switching.
+                  Rowan remembers which space you were last using. When you return to the app, you&apos;ll automatically be in the same space you left. This makes it convenient to focus on one space at a time without repeatedly switching.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-teal-400 hover:underline text-sm font-medium">
@@ -620,10 +620,10 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Steps to Invite Someone</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings → Space Settings</li>
-                  <li>Click the "Invite Member" button</li>
-                  <li>Enter the person's email address</li>
+                  <li>Click the &quot;Invite Member&quot; button</li>
+                  <li>Enter the person&apos;s email address</li>
                   <li>Select their role (Admin or Member)</li>
-                  <li>Click "Send Invitation"</li>
+                  <li>Click &quot;Send Invitation&quot;</li>
                   <li>The invitee will receive an email with a secure link</li>
                 </ol>
 
@@ -659,29 +659,29 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  When someone invites you to their space, you'll receive an email with a special invitation link. This link is unique to you and expires after a set period for security.
+                  When someone invites you to their space, you&apos;ll receive an email with a special invitation link. This link is unique to you and expires after a set period for security.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Steps to Accept an Invitation</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Check your email for an invitation from Rowan</li>
-                  <li>Click the "Accept Invitation" button in the email</li>
-                  <li>If you're not logged in, you'll be prompted to sign in or create an account</li>
-                  <li>The invitation will be processed and you'll be added to the space</li>
-                  <li>You'll be redirected to the space dashboard</li>
+                  <li>Click the &quot;Accept Invitation&quot; button in the email</li>
+                  <li>If you&apos;re not logged in, you&apos;ll be prompted to sign in or create an account</li>
+                  <li>The invitation will be processed and you&apos;ll be added to the space</li>
+                  <li>You&apos;ll be redirected to the space dashboard</li>
                 </ol>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Important Requirements</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>You must use the same email address the invitation was sent to</li>
-                  <li>If you don't have a Rowan account, create one with that email</li>
+                  <li>If you don&apos;t have a Rowan account, create one with that email</li>
                   <li>The invitation link can only be used once</li>
                   <li>Links expire after the set expiration period (typically 7 days)</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">After Accepting</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Once you've accepted, you'll have immediate access to all the space's content based on your assigned role. You can switch between this new space and any other spaces you belong to using the space selector.
+                  Once you&apos;ve accepted, you&apos;ll have immediate access to all the space&apos;s content based on your assigned role. You can switch between this new space and any other spaces you belong to using the space selector.
                 </p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 mt-6 text-teal-400 hover:underline text-sm font-medium">
@@ -705,18 +705,18 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Viewing Pending Invitations</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings → Space Settings</li>
-                  <li>Look for the "Pending Invitations" section</li>
-                  <li>You'll see a list of all invitations that haven't been accepted yet</li>
+                  <li>Look for the &quot;Pending Invitations&quot; section</li>
+                  <li>You&apos;ll see a list of all invitations that haven&apos;t been accepted yet</li>
                   <li>Each invitation shows the email, assigned role, and expiration date</li>
                 </ol>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Resending an Invitation</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  If someone hasn't received their invitation or it got lost, you can resend it:
+                  If someone hasn&apos;t received their invitation or it got lost, you can resend it:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Find the invitation in the pending list</li>
-                  <li>Click the "Resend" button</li>
+                  <li>Click the &quot;Resend&quot; button</li>
                   <li>A new email will be sent with a fresh invitation link</li>
                   <li>The old link becomes invalid</li>
                 </ul>
@@ -727,7 +727,7 @@ export default function SpacesDocumentationPage() {
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Find the invitation in the pending list</li>
-                  <li>Click the "Cancel" or delete button</li>
+                  <li>Click the &quot;Cancel&quot; or delete button</li>
                   <li>The invitation link will be invalidated immediately</li>
                   <li>The person will not be able to join using that link</li>
                 </ul>
@@ -764,7 +764,7 @@ export default function SpacesDocumentationPage() {
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>The person cannot use the expired link</li>
-                  <li>They will see an "invitation expired" message</li>
+                  <li>They will see an &quot;invitation expired&quot; message</li>
                   <li>You can send a new invitation if still needed</li>
                 </ul>
 
@@ -801,7 +801,7 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  The member list shows everyone who belongs to your current space. You can see their names, roles, and online status at a glance, making it easy to know who's available and what permissions they have.
+                  The member list shows everyone who belongs to your current space. You can see their names, roles, and online status at a glance, making it easy to know who&apos;s available and what permissions they have.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Where to View Members</h3>
@@ -814,7 +814,7 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Member Information Displayed</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Avatar:</strong> Profile picture or initials</li>
-                  <li><strong>Name:</strong> Display name they've set in their profile</li>
+                  <li><strong>Name:</strong> Display name they&apos;ve set in their profile</li>
                   <li><strong>Role badge:</strong> Owner (crown), Admin (shield), or Member (checkmark)</li>
                   <li><strong>Presence indicator:</strong> Green dot (online) or gray dot (offline)</li>
                   <li><strong>Email:</strong> Their email address (visible to Owners and Admins)</li>
@@ -840,7 +840,7 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Understanding what each role can and cannot do helps you assign the right permissions to each member. Here's a detailed breakdown of responsibilities for each role.
+                  Understanding what each role can and cannot do helps you assign the right permissions to each member. Here&apos;s a detailed breakdown of responsibilities for each role.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Owner Responsibilities</h3>
@@ -875,7 +875,7 @@ export default function SpacesDocumentationPage() {
                   <li>Actively participating in shared tasks and activities</li>
                   <li>Keeping their profile and preferences up to date</li>
                   <li>Respecting shared content and other members</li>
-                  <li>Communicating through the space's messaging features</li>
+                  <li>Communicating through the space&apos;s messaging features</li>
                   <li>Notifying Admins or Owner if they need role changes</li>
                 </ul>
 
@@ -907,8 +907,8 @@ export default function SpacesDocumentationPage() {
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings → Space Settings</li>
                   <li>Find the member in the member list</li>
-                  <li>Click on their role or the "Edit" option</li>
-                  <li>Select "Admin" from the role options</li>
+                  <li>Click on their role or the &quot;Edit&quot; option</li>
+                  <li>Select &quot;Admin&quot; from the role options</li>
                   <li>Confirm the change</li>
                 </ol>
 
@@ -917,8 +917,8 @@ export default function SpacesDocumentationPage() {
                   <li>Only the Owner can demote Admins</li>
                   <li>Go to Settings → Space Settings</li>
                   <li>Find the Admin in the member list</li>
-                  <li>Click on their role or the "Edit" option</li>
-                  <li>Select "Member" from the role options</li>
+                  <li>Click on their role or the &quot;Edit&quot; option</li>
+                  <li>Select &quot;Member&quot; from the role options</li>
                   <li>Confirm the change</li>
                 </ol>
 
@@ -949,7 +949,7 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Sometimes you need to remove a member from your space. This might be because they're no longer part of your household, they've left a project, or for other reasons. Rowan provides safeguards to prevent accidental removals.
+                  Sometimes you need to remove a member from your space. This might be because they&apos;re no longer part of your household, they&apos;ve left a project, or for other reasons. Rowan provides safeguards to prevent accidental removals.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Who Can Remove Whom</h3>
@@ -963,7 +963,7 @@ export default function SpacesDocumentationPage() {
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings → Space Settings</li>
                   <li>Find the member you want to remove</li>
-                  <li>Click the "Remove" or trash icon next to their name</li>
+                  <li>Click the &quot;Remove&quot; or trash icon next to their name</li>
                   <li>Confirm the removal in the dialog that appears</li>
                   <li>The member is immediately removed from the space</li>
                 </ol>
@@ -979,7 +979,7 @@ export default function SpacesDocumentationPage() {
 
                 <div className="p-4 bg-red-900/30 border border-red-800 rounded-lg mt-6">
                   <p className="text-red-200 text-sm">
-                    <strong>Important:</strong> Member removal cannot be undone automatically. If you remove someone by mistake, you'll need to send them a new invitation to rejoin.
+                    <strong>Important:</strong> Member removal cannot be undone automatically. If you remove someone by mistake, you&apos;ll need to send them a new invitation to rejoin.
                   </p>
                 </div>
               </div>
@@ -1023,11 +1023,11 @@ export default function SpacesDocumentationPage() {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Where You'll See Presence</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Where You&apos;ll See Presence</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li><strong>Header avatars:</strong> Small dots next to member pictures</li>
                   <li><strong>Member list:</strong> Status indicators next to each name</li>
-                  <li><strong>Dashboard:</strong> Family activity widgets showing who's online</li>
+                  <li><strong>Dashboard:</strong> Family activity widgets showing who&apos;s online</li>
                   <li><strong>Messages:</strong> See if conversation partners are available</li>
                 </ul>
 
@@ -1060,14 +1060,14 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How Activity is Detected</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Activity is recorded when you interact with Rowan (click, scroll, type)</li>
-                  <li>A periodic heartbeat confirms you're still active</li>
+                  <li>A periodic heartbeat confirms you&apos;re still active</li>
                   <li>After 2 minutes of no activity, you appear offline</li>
                   <li>Opening Rowan immediately shows you as online</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Battery Efficiency</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Rowan's presence system is designed to minimize battery impact on mobile devices:
+                  Rowan&apos;s presence system is designed to minimize battery impact on mobile devices:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>No constant background polling</li>
@@ -1078,12 +1078,12 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Activity Privacy</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Presence only shows if you're online or offline - it doesn't reveal what you're doing in Rowan or track your specific actions. Space members see the same simple green/gray indicator.
+                  Presence only shows if you&apos;re online or offline - it doesn&apos;t reveal what you&apos;re doing in Rowan or track your specific actions. Space members see the same simple green/gray indicator.
                 </p>
 
                 <div className="p-4 bg-green-900/30 border border-green-800 rounded-lg mt-6">
                   <p className="text-green-200 text-sm">
-                    <strong>Tip:</strong> If you need uninterrupted focus time, simply close or background the Rowan app. You'll automatically appear offline after 2 minutes.
+                    <strong>Tip:</strong> If you need uninterrupted focus time, simply close or background the Rowan app. You&apos;ll automatically appear offline after 2 minutes.
                   </p>
                 </div>
               </div>
@@ -1102,7 +1102,7 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Everything in Rowan is designed for collaboration. When you're in a space with others, all features work together seamlessly to keep everyone on the same page.
+                  Everything in Rowan is designed for collaboration. When you&apos;re in a space with others, all features work together seamlessly to keep everyone on the same page.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Real-Time Updates</h3>
@@ -1126,7 +1126,7 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Working Together Efficiently</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Assign tasks to specific members for accountability</li>
-                  <li>Use mentions in messages to get someone's attention</li>
+                  <li>Use mentions in messages to get someone&apos;s attention</li>
                   <li>Check presence to know the best time to collaborate</li>
                   <li>Review activity history to catch up on changes</li>
                 </ul>
@@ -1146,7 +1146,7 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  While Rowan is designed for open collaboration within your space, we understand that sometimes you need privacy. Here's how your data and presence are protected.
+                  While Rowan is designed for open collaboration within your space, we understand that sometimes you need privacy. Here&apos;s how your data and presence are protected.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Privacy by Design</h3>
@@ -1159,18 +1159,18 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Controlling Your Visibility</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  While there's no explicit "invisible mode," you can control your presence naturally:
+                  While there&apos;s no explicit &quot;invisible mode,&quot; you can control your presence naturally:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Close Rowan to appear offline after 2 minutes</li>
                   <li>Switch to a different space if you want focused time</li>
-                  <li>Your presence doesn't reveal which features you're using</li>
+                  <li>Your presence doesn&apos;t reveal which features you&apos;re using</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Data Protection</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>All data is encrypted in transit and at rest</li>
-                  <li>Row-level security ensures you only see your space's data</li>
+                  <li>Row-level security ensures you only see your space&apos;s data</li>
                   <li>Regular security audits protect your information</li>
                   <li>You can export or delete your data at any time</li>
                 </ul>
@@ -1206,8 +1206,8 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">How to Access Space Settings</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Click on your profile avatar in the header</li>
-                  <li>Select "Settings" from the dropdown menu</li>
-                  <li>Navigate to "Space Settings" or "Manage Space"</li>
+                  <li>Select &quot;Settings&quot; from the dropdown menu</li>
+                  <li>Navigate to &quot;Space Settings&quot; or &quot;Manage Space&quot;</li>
                 </ol>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What You Can Manage</h3>
@@ -1241,21 +1241,21 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Space names help identify which space you're working in. You can change your space name at any time - it's visible to all members and appears in the space selector.
+                  Space names help identify which space you&apos;re working in. You can change your space name at any time - it&apos;s visible to all members and appears in the space selector.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Steps to Rename</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
                   <li>Go to Settings → Space Settings</li>
-                  <li>Find the "Space Name" or "Rename Space" option</li>
+                  <li>Find the &quot;Space Name&quot; or &quot;Rename Space&quot; option</li>
                   <li>Enter the new name</li>
-                  <li>Click "Save" or "Update"</li>
+                  <li>Click &quot;Save&quot; or &quot;Update&quot;</li>
                   <li>The new name appears everywhere immediately</li>
                 </ol>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Naming Tips</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Use names that clearly identify the group (e.g., "Smith Family")</li>
+                  <li>Use names that clearly identify the group (e.g., &quot;Smith Family&quot;)</li>
                   <li>Keep names short for better display in the selector</li>
                   <li>Avoid special characters that might cause display issues</li>
                   <li>Consider including the purpose if you have multiple spaces</li>
@@ -1286,10 +1286,10 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Steps to Leave a Space</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
-                  <li>Make sure you're in the space you want to leave</li>
+                  <li>Make sure you&apos;re in the space you want to leave</li>
                   <li>Go to Settings → Space Settings</li>
-                  <li>Scroll to the "Danger Zone" section</li>
-                  <li>Click "Leave Space"</li>
+                  <li>Scroll to the &quot;Danger Zone&quot; section</li>
+                  <li>Click &quot;Leave Space&quot;</li>
                   <li>Confirm your decision in the dialog</li>
                 </ol>
 
@@ -1297,14 +1297,14 @@ export default function SpacesDocumentationPage() {
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>You immediately lose access to the space and its content</li>
                   <li>Content you created remains in the space</li>
-                  <li>You're automatically switched to another space you belong to</li>
+                  <li>You&apos;re automatically switched to another space you belong to</li>
                   <li>Other members are not notified (communicate manually)</li>
                   <li>You can be re-invited if you want to return later</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Owner Restrictions</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Owners cannot leave their space directly. If you're the Owner and want to leave:
+                  Owners cannot leave their space directly. If you&apos;re the Owner and want to leave:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Transfer ownership to another member (feature coming soon)</li>
@@ -1313,7 +1313,7 @@ export default function SpacesDocumentationPage() {
 
                 <div className="p-4 bg-amber-900/30 border border-amber-800 rounded-lg mt-6">
                   <p className="text-amber-200 text-sm">
-                    <strong>Warning:</strong> Leaving a space cannot be undone by you. You'll need a new invitation from an Owner or Admin to rejoin.
+                    <strong>Warning:</strong> Leaving a space cannot be undone by you. You&apos;ll need a new invitation from an Owner or Admin to rejoin.
                   </p>
                 </div>
               </div>
@@ -1348,12 +1348,12 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Steps to Delete a Space</h3>
                 <ol className="list-decimal list-inside space-y-2 text-gray-400">
-                  <li>Ensure you're in the space you want to delete</li>
+                  <li>Ensure you&apos;re in the space you want to delete</li>
                   <li>Go to Settings → Space Settings</li>
-                  <li>Scroll to the "Danger Zone" section</li>
-                  <li>Click "Delete Space"</li>
+                  <li>Scroll to the &quot;Danger Zone&quot; section</li>
+                  <li>Click &quot;Delete Space&quot;</li>
                   <li>Type the space name to confirm you understand</li>
-                  <li>Click "Permanently Delete" to finalize</li>
+                  <li>Click &quot;Permanently Delete&quot; to finalize</li>
                 </ol>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">What Gets Deleted</h3>
@@ -1396,7 +1396,7 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Setting Up Your Family Space</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Name your space something meaningful (e.g., "The Johnson Family")</li>
+                  <li>Name your space something meaningful (e.g., &quot;The Johnson Family&quot;)</li>
                   <li>Make both parents/guardians Admins for shared management</li>
                   <li>Add children as Members - they can fully participate without admin access</li>
                   <li>Consider age-appropriate task assignments from the start</li>
@@ -1405,7 +1405,7 @@ export default function SpacesDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Daily Routines</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Use recurring tasks for daily chores and responsibilities</li>
-                  <li>Check the calendar each morning for the day's events</li>
+                  <li>Check the calendar each morning for the day&apos;s events</li>
                   <li>Use the shopping list throughout the week as needs arise</li>
                   <li>Plan meals together on weekends for the upcoming week</li>
                 </ul>
@@ -1428,7 +1428,7 @@ export default function SpacesDocumentationPage() {
 
                 <div className="p-4 bg-amber-900/30 border border-amber-800 rounded-lg mt-6">
                   <p className="text-amber-200 text-sm">
-                    <strong>Pro Tip:</strong> Have a weekly "family sync" where everyone reviews the calendar, updates tasks, and plans together. This builds good habits and keeps everyone aligned.
+                    <strong>Pro Tip:</strong> Have a weekly &quot;family sync&quot; where everyone reviews the calendar, updates tasks, and plans together. This builds good habits and keeps everyone aligned.
                   </p>
                 </div>
               </div>
@@ -1447,7 +1447,7 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  While Rowan is optimized for families, it also works well for small teams, roommates, or project groups. Here's how to organize your team effectively.
+                  While Rowan is optimized for families, it also works well for small teams, roommates, or project groups. Here&apos;s how to organize your team effectively.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Team Structure</h3>
@@ -1500,37 +1500,37 @@ export default function SpacesDocumentationPage() {
               </div>
               <div className="prose prose-gray prose-invert max-w-none">
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  Keeping your space secure protects your family or team's private information. Follow these guidelines to maintain a safe collaborative environment.
+                  Keeping your space secure protects your family or team&apos;s private information. Follow these guidelines to maintain a safe collaborative environment.
                 </p>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Invitation Security</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Only invite people you know and trust</li>
                   <li>Double-check email addresses before sending invitations</li>
-                  <li>Cancel unused invitations after they're no longer needed</li>
+                  <li>Cancel unused invitations after they&apos;re no longer needed</li>
                   <li>Never share invitation links in public forums or group chats</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Member Management</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Review member list periodically - remove people who shouldn't have access</li>
+                  <li>Review member list periodically - remove people who shouldn&apos;t have access</li>
                   <li>Be thoughtful about Admin promotions - only trust people who need the access</li>
                   <li>Remove members promptly when relationships change (roommate moves out, etc.)</li>
-                  <li>Monitor for unfamiliar members you don't recognize</li>
+                  <li>Monitor for unfamiliar members you don&apos;t recognize</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Account Security</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Use strong, unique passwords for your Rowan account</li>
-                  <li>Don't share your login credentials with others</li>
+                  <li>Don&apos;t share your login credentials with others</li>
                   <li>Log out when using shared devices</li>
-                  <li>Keep your email account secure (it's used for password recovery)</li>
+                  <li>Keep your email account secure (it&apos;s used for password recovery)</li>
                 </ul>
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Data Awareness</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
                   <li>Remember that all space members can see all space content</li>
-                  <li>Don't store sensitive information (passwords, SSNs) in Rowan</li>
+                  <li>Don&apos;t store sensitive information (passwords, SSNs) in Rowan</li>
                   <li>Be mindful of what you share in messages</li>
                   <li>Use your personal space for private items</li>
                 </ul>
@@ -1555,7 +1555,7 @@ export default function SpacesDocumentationPage() {
 
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Invitation Not Received</h3>
                 <p className="text-gray-400 leading-relaxed mb-2">
-                  If someone didn't receive their invitation email:
+                  If someone didn&apos;t receive their invitation email:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400 mb-4">
                   <li>Check their spam/junk folder</li>
@@ -1572,16 +1572,16 @@ export default function SpacesDocumentationPage() {
                 <ul className="list-disc list-inside space-y-2 text-gray-400 mb-4">
                   <li>The invitation may have expired - ask for a new one</li>
                   <li>The invitation may have been canceled - check with the sender</li>
-                  <li>Make sure you're using the same email the invitation was sent to</li>
+                  <li>Make sure you&apos;re using the same email the invitation was sent to</li>
                   <li>Try copying and pasting the link instead of clicking</li>
                 </ul>
 
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Can't See Other Members' Content</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Can&apos;t See Other Members&apos; Content</h3>
                 <p className="text-gray-400 leading-relaxed mb-2">
-                  If you can't see tasks, events, or messages from others:
+                  If you can&apos;t see tasks, events, or messages from others:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400 mb-4">
-                  <li>Make sure you're in the correct space (check the space selector)</li>
+                  <li>Make sure you&apos;re in the correct space (check the space selector)</li>
                   <li>Refresh the page to load the latest data</li>
                   <li>Check your internet connection</li>
                   <li>The content may be in a different space - try switching</li>
@@ -1598,12 +1598,12 @@ export default function SpacesDocumentationPage() {
                   <li>Refresh your page to get the latest presence data</li>
                 </ul>
 
-                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Can't Leave or Delete Space</h3>
+                <h3 className="text-lg font-semibold text-white mt-6 mb-3">Can&apos;t Leave or Delete Space</h3>
                 <p className="text-gray-400 leading-relaxed mb-2">
-                  If the leave or delete options aren't working:
+                  If the leave or delete options aren&apos;t working:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li>Owners can't leave - they must delete or transfer ownership</li>
+                  <li>Owners can&apos;t leave - they must delete or transfer ownership</li>
                   <li>For deletion, you must type the space name exactly to confirm</li>
                   <li>Make sure you have the right permissions for the action</li>
                   <li>If buttons are disabled, check for any error messages</li>
@@ -1611,7 +1611,7 @@ export default function SpacesDocumentationPage() {
 
                 <div className="p-4 bg-teal-900/30 border border-teal-800 rounded-lg mt-6">
                   <p className="text-teal-200 text-sm">
-                    <strong>Still stuck?</strong> Contact support through the Settings page or email us at support@rowanapp.com. Include details about what you're trying to do and any error messages you see.
+                    <strong>Still stuck?</strong> Contact support through the Settings page or email us at support@rowanapp.com. Include details about what you&apos;re trying to do and any error messages you see.
                   </p>
                 </div>
               </div>

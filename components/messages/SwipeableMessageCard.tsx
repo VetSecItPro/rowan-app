@@ -10,6 +10,7 @@ interface SwipeableMessageCardProps {
   children: React.ReactNode;
 }
 
+/** Renders a swipeable message card with reply and delete swipe actions. */
 export function SwipeableMessageCard({
   isOwn,
   onEdit,

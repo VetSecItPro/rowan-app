@@ -16,6 +16,7 @@ interface MentionInputProps {
   showToolbar?: boolean;
 }
 
+/** Renders a text input with @ mention autocomplete for space members. */
 export function MentionInput({
   value,
   onChange,

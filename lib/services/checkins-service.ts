@@ -44,6 +44,7 @@ export interface CheckInStats {
   };
 }
 
+/** Service for daily check-in CRUD, streak tracking, and mood statistics from the daily_checkins table. */
 export const checkInsService = {
   /**
    * Get all check-ins for a space (includes all members' check-ins)

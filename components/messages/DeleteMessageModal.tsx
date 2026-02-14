@@ -13,6 +13,7 @@ interface DeleteMessageModalProps {
   isDeleting?: boolean;
 }
 
+/** Displays a confirmation modal for deleting a message. */
 export function DeleteMessageModal({
   isOpen,
   onClose,
@@ -84,7 +85,7 @@ export function DeleteMessageModal({
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
               selectedMode === 'for_me'
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-800 text-gray-500'
+                : 'bg-gray-800 text-gray-400'
             }`}>
               <User className="w-5 h-5" />
             </div>
@@ -125,7 +126,7 @@ export function DeleteMessageModal({
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                 selectedMode === 'for_everyone'
                   ? 'bg-red-500 text-white'
-                  : 'bg-gray-800 text-gray-500'
+                  : 'bg-gray-800 text-gray-400'
               }`}>
                 <Users className="w-5 h-5" />
               </div>

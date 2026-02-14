@@ -25,6 +25,7 @@ interface ConfirmDialogProps {
   confirmLoading?: boolean;
 }
 
+/** Displays a confirmation dialog with customizable title, message, and action buttons. */
 export function ConfirmDialog({
   isOpen,
   onClose,

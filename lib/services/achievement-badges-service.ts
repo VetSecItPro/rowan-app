@@ -364,7 +364,7 @@ export function getAchievementLevel(points: number): { level: number; title: str
   };
 }
 
-// Export service object
+/** Aggregated service for badge management, evaluation, awarding, and display utilities. */
 export const achievementBadgesService = {
   getAllBadges,
   getBadgesByCategory,

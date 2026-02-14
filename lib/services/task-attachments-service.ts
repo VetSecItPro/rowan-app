@@ -16,6 +16,7 @@ export interface TaskAttachment {
   uploaded_at: string;
 }
 
+/** Service for uploading, fetching, and deleting file attachments on tasks via Supabase Storage. */
 export const taskAttachmentsService = {
   async uploadAttachment(taskId: string, file: File, userId: string): Promise<TaskAttachment> {
     const supabase = createClient();

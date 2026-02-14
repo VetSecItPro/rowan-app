@@ -73,6 +73,7 @@ export interface SavingsGoalProgress {
 
 // ==================== TEMPLATES ====================
 
+/** Pre-defined templates for linking budget categories to goal types (limits, savings, reductions). */
 export const BUDGET_GOAL_TEMPLATES: Record<string, BudgetGoalTemplate> = {
   monthly_budget_limit: {
     title: 'Stay Within Monthly Budget',

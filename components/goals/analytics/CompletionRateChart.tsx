@@ -9,6 +9,7 @@ interface CompletionRateChartProps {
   cancelled: number;
 }
 
+/** Renders a chart visualizing overall goal completion rate over time. */
 export default function CompletionRateChart({
   completed,
   active,

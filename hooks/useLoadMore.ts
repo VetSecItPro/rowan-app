@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 
 const DEFAULT_PAGE_SIZE = 20;
 
+/** Provides paginated loading of items with a configurable page size */
 export function useLoadMore<T>(items: T[], pageSize: number = DEFAULT_PAGE_SIZE) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
 

@@ -15,6 +15,7 @@ interface AttachmentsModalProps {
   userId: string;
 }
 
+/** Displays a modal for viewing and managing task file attachments. */
 export function AttachmentsModal({ isOpen, onClose, taskId, userId }: AttachmentsModalProps) {
   const [attachments, setAttachments] = useState<TaskAttachment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +106,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
 
   function getFileIcon(mimeType: string) {
     if (mimeType.startsWith('image/')) return <ImageIcon className="w-8 h-8 text-blue-500" />;
-    return <FileText className="w-8 h-8 text-gray-500" />;
+    return <FileText className="w-8 h-8 text-gray-400" />;
   }
 
   function formatFileSize(bytes: number) {
@@ -125,7 +126,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
     >
       <div className="space-y-4">
         {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading attachments...</div>
+            <div className="text-center py-8 text-gray-400">Loading attachments...</div>
           ) : (
             <>
               <label htmlFor="field-1" className="flex items-center justify-center gap-2 p-6 mb-4 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
@@ -153,7 +154,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
               )}
 
               {attachments.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">No attachments yet</div>
+                <div className="text-center py-8 text-gray-400">No attachments yet</div>
               ) : (
                 <div className="grid gap-3">
                   {attachments.map((attachment) => (
@@ -166,7 +167,7 @@ export function AttachmentsModal({ isOpen, onClose, taskId, userId }: Attachment
                         <h4 className="font-medium text-white truncate">
                           {attachment.file_name}
                         </h4>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-400">
                           {formatFileSize(attachment.file_size)} • {new Date(attachment.uploaded_at).toLocaleDateString()}
                         </p>
                       </div>

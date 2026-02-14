@@ -333,7 +333,7 @@ export default function LoginPage() {
                 <p className="text-gray-400 mb-4">
                   We sent a magic link to <strong className="text-white">{email}</strong>
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-400">
                   Click the link in your email to sign in instantly. The link expires in 15 minutes.
                 </p>
               </div>

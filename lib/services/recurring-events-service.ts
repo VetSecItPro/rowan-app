@@ -27,6 +27,7 @@ export interface RecurringEventInstance extends CalendarEvent {
   is_exception?: boolean; // True if this is a modified occurrence
 }
 
+/** Service for enhanced recurring event pattern parsing, instance generation, and exception handling. */
 export const recurringEventsService = {
   /**
    * Parse existing simple patterns into enhanced format

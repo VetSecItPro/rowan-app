@@ -22,6 +22,7 @@ interface ReportViewerProps {
   onClose: () => void;
 }
 
+/** Renders a full report view with charts, data, and export options. */
 export function ReportViewer({ report, onClose }: ReportViewerProps) {
   const [loading, setLoading] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);

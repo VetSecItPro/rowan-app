@@ -90,6 +90,7 @@ export interface UseShoppingHandlersReturn {
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
+/** Provides CRUD handlers for shopping lists and individual shopping items */
 export function useShoppingHandlers(deps: UseShoppingHandlersDeps): UseShoppingHandlersReturn {
   const {
     user,

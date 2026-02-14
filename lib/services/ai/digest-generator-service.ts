@@ -343,4 +343,5 @@ Generate the daily briefing JSON:`;
   }
 }
 
+/** Singleton instance for generating AI-powered activity digest summaries. */
 export const digestGeneratorService = new DigestGeneratorService();

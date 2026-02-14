@@ -56,8 +56,8 @@ function TaskListStep() {
                   {task.type === 'task' ? 'Task' : 'Chore'}
                 </span>
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-gray-500" />
-                  <span className="text-[10px] text-gray-500">{task.date}</span>
+                  <Calendar className="w-3 h-3 text-gray-400" />
+                  <span className="text-[10px] text-gray-400">{task.date}</span>
                 </div>
               </div>
             </div>
@@ -127,7 +127,7 @@ function CreateTaskStep() {
           <div className="w-5 h-5 rounded-md border-2 border-gray-600 flex-shrink-0" />
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
-            <span className="text-sm text-gray-500">Schedule dentist appt</span>
+            <span className="text-sm text-gray-400">Schedule dentist appt</span>
           </div>
         </div>
       </div>
@@ -200,7 +200,7 @@ function AssignPriorityStep() {
                 {member.initial}
               </span>
             </div>
-            <span className={`text-[10px] ${member.active ? 'text-blue-300' : 'text-gray-500'}`}>
+            <span className={`text-[10px] ${member.active ? 'text-blue-300' : 'text-gray-400'}`}>
               {member.name}
             </span>
           </div>
@@ -224,7 +224,7 @@ function AssignPriorityStep() {
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
               p.active
                 ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40 ring-1 ring-orange-500/20'
-                : 'bg-gray-700/60 text-gray-500 border border-gray-700'
+                : 'bg-gray-700/60 text-gray-400 border border-gray-700'
             }`}
           >
             <div className={`w-2 h-2 rounded-full ${p.dot}`} />
@@ -309,6 +309,7 @@ const steps: DemoStep[] = [
   { label: 'Complete with satisfaction', content: <CompleteTaskStep /> },
 ];
 
+/** Renders an animated tasks feature demonstration for the landing page. */
 export function TasksDemo({ className = '' }: { className?: string }) {
   return (
     <AnimatedFeatureDemo

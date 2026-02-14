@@ -27,6 +27,7 @@ interface CommentItemProps {
   currentUserId?: string;
 }
 
+/** Displays a single comment with author, timestamp, and reaction controls. */
 export default function CommentItem({
   comment,
   onDelete,

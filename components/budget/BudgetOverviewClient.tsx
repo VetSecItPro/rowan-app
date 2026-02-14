@@ -11,6 +11,7 @@ import { projectsService, type BudgetStats } from '@/lib/services/budgets-servic
 import { getBillStats, type BillStats } from '@/lib/services/bills-service';
 import Link from 'next/link';
 
+/** Renders the main budget overview page with income, expenses, and category breakdowns. */
 export default function BudgetOverviewClient({ spaceId }: { spaceId: string }) {
   const [budgetStats, setBudgetStats] = useState<BudgetStats>({
     monthlyBudget: 0,
@@ -191,7 +192,7 @@ export default function BudgetOverviewClient({ spaceId }: { spaceId: string }) {
                   }`}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-400 mt-2">
                 {spentPercentage}% of budget used
                 {budgetStats.pendingBills > 0 &&
                   ` · ${budgetStats.pendingBills} pending bill${budgetStats.pendingBills !== 1 ? 's' : ''}`}

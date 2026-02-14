@@ -129,7 +129,8 @@ export function useOnReconnect(callback: () => void): void {
   const { isOnline } = useNetworkStatus();
   const wasOfflineRef = useRef(false);
   const callbackRef = useRef(callback);
-  callbackRef.current = callback;
+  // Sync ref in effect to avoid writing refs during render
+  useEffect(() => { callbackRef.current = callback; });
 
   useEffect(() => {
     if (!isOnline) {

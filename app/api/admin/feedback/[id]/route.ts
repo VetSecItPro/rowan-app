@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 // Force dynamic rendering for admin authentication
 export const dynamic = 'force-dynamic';
 
+/** Updates a feedback submission's status or admin notes */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -78,6 +79,7 @@ export async function PATCH(
   }
 }
 
+/** Deletes a feedback submission */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

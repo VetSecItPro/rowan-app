@@ -14,6 +14,7 @@ interface TemplatePickerModalProps {
   spaceId: string;
 }
 
+/** Displays a modal for selecting from task templates. */
 export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: TemplatePickerModalProps) {
   const [templates, setTemplates] = useState<TaskTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,9 +62,9 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
           />
 
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading templates...</div>
+            <div className="text-center py-8 text-gray-400">Loading templates...</div>
           ) : filteredTemplates.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No templates found</div>
+            <div className="text-center py-8 text-gray-400">No templates found</div>
           ) : (
             <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3 max-h-96 overflow-y-auto">
               {filteredTemplates.map((template) => (
@@ -80,7 +81,7 @@ export function TemplatePickerModal({ isOpen, onClose, onSelect, spaceId }: Temp
                     <h3 className="text-base sm:text-sm font-medium text-white">{template.name}</h3>
                     <p className="text-sm sm:text-xs text-gray-400 truncate">{template.title}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500">Used {template.use_count} times</span>
+                      <span className="text-xs text-gray-400">Used {template.use_count} times</span>
                       {template.priority && (
                         <span className="text-xs px-2 py-0.5 bg-blue-900 text-blue-300 rounded">
                           {template.priority}

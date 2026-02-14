@@ -79,9 +79,13 @@ function ShareIcon() {
  * Respects 7-day dismiss cooldown and hides if already installed.
  */
 export default function PWAInstallPrompt() {
-  const [visible, setVisible] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // Detect platform via lazy initializers (avoids setState in effect)
+  const [isIOS] = useState(() => isIOSSafari());
+  const [isMobile] = useState(() => isMobileDevice());
+  // Compute initial visibility: show unless standalone or recently dismissed
+  const [visible, setVisible] = useState(() =>
+    typeof window !== 'undefined' ? !isStandalone() && !isDismissedRecently() : false
+  );
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   const dismiss = useCallback(() => {
@@ -106,23 +110,14 @@ export default function PWAInstallPrompt() {
     }
   }, []);
 
+  // Subscribe to the beforeinstallprompt browser event (external system).
   useEffect(() => {
-    if (isStandalone() || isDismissedRecently()) return;
-
-    const ios = isIOSSafari();
-    const mobile = isMobileDevice();
-    setIsIOS(ios);
-    setIsMobile(mobile);
-
     const onBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       deferredPromptRef.current = e as BeforeInstallPromptEvent;
     };
 
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
-
-    // Show immediately — no delay
-    setVisible(true);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
@@ -166,7 +161,7 @@ export default function PWAInstallPrompt() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={dismiss}
-              className="p-2 text-gray-500 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
+              className="p-2 text-gray-400 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
               aria-label="Dismiss install prompt"
             >
               <X className="w-4 h-4" />

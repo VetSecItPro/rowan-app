@@ -46,6 +46,7 @@ const HABIT_CATEGORIES = [
   { value: 'general', label: 'General', icon: '📋', color: 'bg-gray-500' },
 ];
 
+/** Renders a habit tracking interface with daily completion toggles. */
 export function HabitTracker({ spaceId }: HabitTrackerProps) {
   const { user } = useAuth();
   const [habits, setHabits] = useState<HabitWithData[]>([]);
@@ -226,7 +227,7 @@ export function HabitTracker({ spaceId }: HabitTrackerProps) {
 
         {/* Category Filter */}
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-500" />
+          <Filter className="w-4 h-4 text-gray-400" />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}

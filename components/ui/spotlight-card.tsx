@@ -8,6 +8,7 @@ interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
     spotlightColor?: string;
 }
 
+/** Renders a card with a spotlight hover effect that follows the cursor. */
 export function SpotlightCard({
     children,
     className = "",

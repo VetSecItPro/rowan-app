@@ -14,6 +14,7 @@ const EmailChangeRequestSchema = z.object({
   newEmail: z.string().email('Please enter a valid email address')
 });
 
+/** Initiates an email address change for the authenticated user */
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 attempts per hour per IP

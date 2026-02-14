@@ -201,7 +201,7 @@ function BenefitCard({ benefit }: { benefit: BenefitInfo }) {
         <Icon className="w-6 h-6 text-blue-400" />
       </div>
       <h4 className="text-sm font-semibold text-white mb-1">{benefit.title}</h4>
-      <p className="text-xs text-gray-500 leading-relaxed">{benefit.description}</p>
+      <p className="text-xs text-gray-400 leading-relaxed">{benefit.description}</p>
     </div>
   );
 }
@@ -216,15 +216,13 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function InstallPageClient() {
-  const [detectedPlatform, setDetectedPlatform] = useState<Platform>('other');
+  // Detect platform via lazy initializer (avoids setState in effect)
+  const [detectedPlatform] = useState<Platform>(() =>
+    typeof navigator !== 'undefined' ? detectPlatform(navigator.userAgent) : 'other'
+  );
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(
     null
   );
-
-  // Detect platform on mount
-  useEffect(() => {
-    setDetectedPlatform(detectPlatform(navigator.userAgent));
-  }, []);
 
   // Capture the beforeinstallprompt event (Chrome/Edge only)
   useEffect(() => {
@@ -317,7 +315,7 @@ export default function InstallPageClient() {
         <div className="pt-2 pb-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-300 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home

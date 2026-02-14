@@ -15,6 +15,7 @@ interface ForwardMessageModalProps {
   messagePreview: string;
 }
 
+/** Renders a modal for forwarding a message to another conversation. */
 export function ForwardMessageModal({
   isOpen,
   onClose,

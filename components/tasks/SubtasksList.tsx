@@ -11,6 +11,7 @@ interface SubtasksListProps {
   userId: string;
 }
 
+/** Renders a list of subtasks with completion toggles and add controls. */
 export function SubtasksList({ taskId, userId }: SubtasksListProps) {
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
@@ -64,7 +65,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
     ? Math.round((subtasks.filter(s => s.status === 'completed').length / subtasks.length) * 100)
     : 0;
 
-  if (loading) return <div className="text-sm text-gray-500">Loading subtasks...</div>;
+  if (loading) return <div className="text-sm text-gray-400">Loading subtasks...</div>;
 
   return (
     <div className="space-y-3">
@@ -106,7 +107,7 @@ export function SubtasksList({ taskId, userId }: SubtasksListProps) {
               >
                 {subtask.status === 'completed' && <Check className="w-3 h-3 text-white" />}
               </button>
-              <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-gray-400' : ''}`}>
+              <span className={`flex-1 text-sm ${subtask.status === 'completed' ? 'line-through text-gray-500' : ''}`}>
                 {subtask.title}
               </span>
             </div>

@@ -49,6 +49,7 @@ const iconComponents = {
   Activity,
 };
 
+/** Displays a timeline of activity history for a specific reminder. */
 export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelineProps) {
   const [activities, setActivities] = useState<ReminderActivity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +98,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
     return (
       <div className={`${className}`}>
         <div className="flex items-center gap-2 mb-3">
-          <Activity className="w-4 h-4 text-gray-500" />
+          <Activity className="w-4 h-4 text-gray-400" />
           <h3 className="text-sm font-semibold text-gray-300">Activity</h3>
         </div>
         <div className="space-y-2">
@@ -119,7 +120,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
     return (
       <div className={`${className}`}>
         <div className="flex items-center gap-2 mb-3">
-          <Activity className="w-4 h-4 text-gray-500" />
+          <Activity className="w-4 h-4 text-gray-400" />
           <h3 className="text-sm font-semibold text-gray-300">Activity</h3>
         </div>
         <p className="text-sm text-gray-400">No activity yet</p>
@@ -132,7 +133,7 @@ export function ActivityTimeline({ reminderId, className = '' }: ActivityTimelin
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-gray-500" />
+          <Activity className="w-4 h-4 text-gray-400" />
           <h3 className="text-sm font-semibold text-gray-300">
             Activity ({activities.length})
           </h3>

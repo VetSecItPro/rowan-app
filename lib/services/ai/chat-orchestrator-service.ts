@@ -597,4 +597,5 @@ class ChatOrchestratorService {
   }
 }
 
+/** Singleton instance for orchestrating AI chat conversations with tool execution. */
 export const chatOrchestratorService = new ChatOrchestratorService();

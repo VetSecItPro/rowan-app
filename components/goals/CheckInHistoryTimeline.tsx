@@ -20,6 +20,7 @@ const MOOD_CONFIG = {
   struggling: { emoji: '😟', color: 'text-red-600 bg-red-900/20', label: 'Struggling' },
 } as const;
 
+/** Displays a timeline of past goal check-ins with notes and progress. */
 export function CheckInHistoryTimeline({ goalId, isOpen, onClose }: CheckInHistoryTimelineProps) {
   const [checkIns, setCheckIns] = useState<GoalCheckIn[]>([]);
   const [checkInPhotos, setCheckInPhotos] = useState<Record<string, GoalCheckInPhoto[]>>({});

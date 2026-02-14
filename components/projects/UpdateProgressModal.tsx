@@ -128,6 +128,7 @@ function ProgressForm({
   );
 }
 
+/** Renders a modal for updating project completion progress. */
 export function UpdateProgressModal(props: UpdateProgressModalProps) {
   const { chore, isOpen } = props;
   const formKey = `${chore?.id ?? 'none'}-${isOpen ? 'open' : 'closed'}`;

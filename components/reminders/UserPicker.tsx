@@ -23,6 +23,7 @@ interface UserPickerProps {
   className?: string;
 }
 
+/** Renders a searchable user picker for assigning reminders to members. */
 export function UserPicker({
   spaceId,
   selectedUserId,
@@ -163,6 +164,7 @@ export function UserPicker({
           <div
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Dropdown Panel */}

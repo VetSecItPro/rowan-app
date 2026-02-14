@@ -25,6 +25,7 @@ export const dynamic = 'force-dynamic';
  * CSV format is compatible with Excel, Google Sheets, and other spreadsheet software
  */
 
+/** Exports user data in CSV format for GDPR data portability */
 export async function GET(request: NextRequest) {
   try {
     // SECURITY: Expensive operation rate limit — FIX-007

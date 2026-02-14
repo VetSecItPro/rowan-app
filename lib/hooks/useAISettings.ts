@@ -32,6 +32,7 @@ const NO_ACCESS_SETTINGS: AISettingsClient = {
   ai_onboarding_seen: true, // Prevents AIOnboardingGate from showing
 };
 
+/** Loads and persists user-level AI feature settings */
 export function useAISettings(enabled: boolean) {
   const [settings, setSettings] = useState<AISettingsClient>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);

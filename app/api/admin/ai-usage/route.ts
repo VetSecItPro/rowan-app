@@ -163,7 +163,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch tier info for top users via space_members -> spaces
-    let userTierMap: Record<string, string> = {};
+    const userTierMap: Record<string, string> = {};
     if (topUserIds.length > 0) {
       const { data: members } = await supabaseAdmin
         .from('space_members')

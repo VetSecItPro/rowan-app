@@ -81,6 +81,7 @@ const ALLOWED_MIME_TYPES = [
 // SERVICE FUNCTIONS
 // =============================================
 
+/** Service for uploading, fetching, and deleting file attachments on reminders. */
 export const reminderAttachmentsService = {
   /**
    * Get all attachments for a reminder

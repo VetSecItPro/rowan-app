@@ -14,6 +14,7 @@ interface SaveTemplateModalProps {
   list: ShoppingList;
 }
 
+/** Renders a modal for saving a shopping list as a reusable template. */
 export function SaveTemplateModal({ isOpen, onClose, onSave, list }: SaveTemplateModalProps) {
   const [name, setName] = useState(list.title);
   const [description, setDescription] = useState(list.description || '');

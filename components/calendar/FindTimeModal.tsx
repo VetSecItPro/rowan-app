@@ -15,6 +15,7 @@ interface FindTimeModalProps {
   onSelectTimeSlot: (slot: TimeSlot) => void;
 }
 
+/** Renders a modal for finding available time slots across participants. */
 export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelectTimeSlot }: FindTimeModalProps) {
   const [duration, setDuration] = useState(60); // Default 1 hour
   const [dateRange, setDateRange] = useState({
@@ -248,7 +249,7 @@ export function FindTimeModal({ isOpen, onClose, spaceId, participants, onSelect
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-400 text-lg mb-2">No available time slots found</p>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-400 text-sm">
                 Try adjusting the duration or date range
               </p>
             </div>

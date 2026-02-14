@@ -84,6 +84,7 @@ const MIGRATION_ITEMS: MigrationItem[] = [
 
 type MigrationStep = 'selection' | 'target' | 'confirmation' | 'progress' | 'complete';
 
+/** Renders a modal for migrating data between spaces. */
 export function MigrationModal({ isOpen, onClose, targetSpaces }: MigrationModalProps) {
   const [step, setStep] = useState<MigrationStep>('selection');
   const [selectedItems, setSelectedItems] = useState<MigrationItemType[]>(
@@ -196,7 +197,7 @@ export function MigrationModal({ isOpen, onClose, targetSpaces }: MigrationModal
                   <div className={`flex-shrink-0 mt-0.5 ${
                     selectedItems.includes(item.type)
                       ? 'text-purple-400'
-                      : 'text-gray-500'
+                      : 'text-gray-400'
                   }`}>
                     {item.icon}
                   </div>
@@ -280,7 +281,7 @@ export function MigrationModal({ isOpen, onClose, targetSpaces }: MigrationModal
                     <Users className={`w-5 h-5 ${
                       targetSpace?.id === space.id
                         ? 'text-blue-400'
-                        : 'text-gray-500'
+                        : 'text-gray-400'
                     }`} />
                     <div>
                       <h4 className={`font-medium ${

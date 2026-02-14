@@ -33,6 +33,7 @@ interface ExportSummary {
   total: number;
 }
 
+/** Displays a confirmation modal for permanently deleting a space. */
 export function DeleteSpaceModal({ isOpen, onClose, space, onSpaceDeleted }: DeleteSpaceModalProps) {
   const [step, setStep] = useState<'warning' | 'export' | 'confirm' | 'deleting'>('warning');
   const [exportSummary, setExportSummary] = useState<ExportSummary | null>(null);

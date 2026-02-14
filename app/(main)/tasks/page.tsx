@@ -64,7 +64,7 @@ export default function TasksPage() {
     setIsSearchTyping,
     statusFilter,
     setStatusFilter,
-    filters,
+    filters: _filters,
     setFilters,
     showFilters,
     enableDragDrop,
@@ -384,7 +384,7 @@ export default function TasksPage() {
                       <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-700">
                         <p className="text-sm text-gray-400">
                           Showing {paginatedItems.length} of {filteredItems.length} items
-                          <span className="ml-1 text-gray-500">({remainingItemsCount} more)</span>
+                          <span className="ml-1 text-gray-400">({remainingItemsCount} more)</span>
                         </p>
                         <div className="flex gap-3">
                           <button
@@ -427,7 +427,7 @@ export default function TasksPage() {
                       <div className="flex flex-col items-center gap-3 pt-4 border-t border-gray-700">
                         <p className="text-sm text-gray-400">
                           Showing {paginatedItems.length} of {filteredItems.length} items
-                          <span className="ml-1 text-gray-500">({remainingItemsCount} more)</span>
+                          <span className="ml-1 text-gray-400">({remainingItemsCount} more)</span>
                         </p>
                         <div className="flex gap-3">
                           <button

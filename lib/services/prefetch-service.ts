@@ -9,7 +9,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 import { QUERY_OPTIONS } from '@/lib/react-query/query-client';
 
-// Feature-specific query keys for prefetching
+/** React Query cache key builders for feature-specific data prefetching. */
 export const PREFETCH_KEYS = {
   tasks: (spaceId: string) => ['tasks', 'list', spaceId] as const,
   taskCategories: (spaceId: string) => ['tasks', 'categories', spaceId] as const,

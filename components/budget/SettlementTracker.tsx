@@ -28,6 +28,7 @@ interface SettlementTrackerProps {
   spaceId: string;
 }
 
+/** Tracks and displays expense settlement history between space members. */
 export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps) {
   const { user } = useAuth();
   const [splits, setSplits] = useState<ExpenseSplit[]>([]);
@@ -282,6 +283,7 @@ export function SettlementTracker({ expenseId, spaceId }: SettlementTrackerProps
           <div
             className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setShowNewSettlement(false)}
+            aria-hidden="true"
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">

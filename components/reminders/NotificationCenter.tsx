@@ -12,6 +12,7 @@ interface NotificationCenterProps {
   userId: string;
 }
 
+/** Displays reminder-specific notifications and alerts. */
 export function NotificationCenter({ userId }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<ReminderNotification[]>([]);
@@ -119,6 +120,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Panel with Glassmorphism */}
@@ -159,7 +161,7 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
                   <p className="text-gray-400 font-medium mb-1">
                     No notifications
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     We&apos;ll notify you when reminders are due
                   </p>
                 </div>

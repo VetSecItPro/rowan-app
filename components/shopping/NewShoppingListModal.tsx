@@ -313,7 +313,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
                     >
                       {item.checked && <Check className="w-3 h-3 text-white" />}
                     </button>
-                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-400' : 'text-gray-300'}`}>
+                    <span className={`flex-1 text-sm ${item.checked ? 'line-through text-gray-500' : 'text-gray-300'}`}>
                       {item.name}
                     </span>
                     <button
@@ -334,6 +334,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
   );
 }
 
+/** Renders a modal form for creating or editing a shopping list. */
 export function NewShoppingListModal(props: NewShoppingListModalProps) {
   const { editList, isOpen, spaceId } = props;
   const formKey = `${editList?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}-${spaceId}`;

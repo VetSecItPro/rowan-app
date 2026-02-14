@@ -26,7 +26,7 @@ export default function MainError({
           An unexpected error occurred. Your data is safe — try refreshing this page.
         </p>
         {error.digest && (
-          <p className="text-xs text-gray-500 mb-4 font-mono">
+          <p className="text-xs text-gray-400 mb-4 font-mono">
             Error ID: {error.digest}
           </p>
         )}

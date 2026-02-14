@@ -75,6 +75,7 @@ export interface CalendarHandlersReturn {
 // Hook
 // ---------------------------------------------------------------------------
 
+/** Provides CRUD event handlers for calendar events, RSVPs, and event proposals */
 export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandlersReturn {
   const {
     events,

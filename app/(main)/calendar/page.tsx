@@ -3,15 +3,13 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
-import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, List, X, RefreshCw, Archive } from 'lucide-react';
+import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, X, RefreshCw, Archive } from 'lucide-react';
 import nextDynamic from 'next/dynamic';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 import { EventCard } from '@/components/calendar/EventCard';
-import { ProposalsList } from '@/components/calendar/ProposalsList';
-import { MiniCalendar } from '@/components/calendar/MiniCalendar';
 import { QuickAddEvent } from '@/components/calendar/QuickAddEvent';
 
 // Phase 9: Unified Calendar View imports
@@ -19,10 +17,12 @@ import { UnifiedCalendarFilters } from '@/components/calendar/UnifiedCalendarFil
 import { UnifiedCalendarLegendCompact } from '@/components/calendar/UnifiedCalendarLegend';
 import { UnifiedCalendarItemCard } from '@/components/calendar/UnifiedCalendarItemCard';
 
-// Eagerly imported view components (rendered based on active view mode)
-import { EnhancedDayView } from '@/components/calendar/EnhancedDayView';
-import { EnhancedWeekView } from '@/components/calendar/EnhancedWeekView';
-import { WeatherBadge } from '@/components/calendar/WeatherBadge';
+// Lazy-load view components (only rendered based on active view mode)
+const EnhancedDayView = nextDynamic(() => import('@/components/calendar/EnhancedDayView').then(m => ({ default: m.EnhancedDayView })), { ssr: false });
+const EnhancedWeekView = nextDynamic(() => import('@/components/calendar/EnhancedWeekView').then(m => ({ default: m.EnhancedWeekView })), { ssr: false });
+const ProposalsList = nextDynamic(() => import('@/components/calendar/ProposalsList').then(m => ({ default: m.ProposalsList })), { ssr: false });
+const MiniCalendar = nextDynamic(() => import('@/components/calendar/MiniCalendar').then(m => ({ default: m.MiniCalendar })), { ssr: false });
+const WeatherBadge = nextDynamic(() => import('@/components/calendar/WeatherBadge').then(m => ({ default: m.WeatherBadge })), { ssr: false });
 
 // Lazy-load modals and dialogs (only rendered when opened)
 const NewEventModal = nextDynamic(() => import('@/components/calendar/NewEventModal').then(m => ({ default: m.NewEventModal })), { ssr: false });
@@ -597,7 +597,7 @@ export default function CalendarPage() {
                         ? 'bg-purple-600 text-white'
                         : canUseEventProposals
                           ? 'text-gray-400 hover:bg-gray-700'
-                          : 'text-gray-500 hover:bg-gray-800'
+                          : 'text-gray-400 hover:bg-gray-800'
                     }`}
                     title={canUseEventProposals ? "Proposal View (P)" : "Upgrade to Pro to use Event Proposals"}
                   >
@@ -878,7 +878,7 @@ export default function CalendarPage() {
                                   />
                                 ))}
                                 {totalItems > 3 && (
-                                  <span className="text-[8px] text-gray-500 ml-0.5">+{totalItems - 3}</span>
+                                  <span className="text-[8px] text-gray-400 ml-0.5">+{totalItems - 3}</span>
                                 )}
                               </div>
                             )}

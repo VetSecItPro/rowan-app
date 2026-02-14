@@ -56,7 +56,7 @@ const SessionsPanel = memo(function SessionsPanel() {
             <span className="text-sm font-medium text-gray-400">Total Sessions</span>
           </div>
           <p className="text-3xl font-bold text-white">{trafficMetrics.uniqueSessions}</p>
-          <p className="text-xs text-gray-500 mt-1">Last 30 days</p>
+          <p className="text-xs text-gray-400 mt-1">Last 30 days</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -65,7 +65,7 @@ const SessionsPanel = memo(function SessionsPanel() {
             <span className="text-sm font-medium text-gray-400">Pages per Session</span>
           </div>
           <p className="text-3xl font-bold text-white">{trafficMetrics.avgPagesPerSession}</p>
-          <p className="text-xs text-gray-500 mt-1">Average</p>
+          <p className="text-xs text-gray-400 mt-1">Average</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-5">
@@ -74,7 +74,7 @@ const SessionsPanel = memo(function SessionsPanel() {
             <span className="text-sm font-medium text-gray-400">Avg. Session Duration</span>
           </div>
           <p className="text-3xl font-bold text-white">--</p>
-          <p className="text-xs text-gray-500 mt-1">Coming soon</p>
+          <p className="text-xs text-gray-400 mt-1">Coming soon</p>
         </div>
       </div>
 
@@ -152,6 +152,7 @@ const SessionsPanel = memo(function SessionsPanel() {
   );
 });
 
+/** Displays user engagement metrics and activity patterns in the admin dashboard. */
 export const EngagementPanel = memo(function EngagementPanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('traffic');
 

@@ -13,6 +13,7 @@ interface PinnedMessagesProps {
   currentUserId?: string;
 }
 
+/** Displays a list of pinned messages in a conversation. */
 export function PinnedMessages({
   messages,
   onUnpin,

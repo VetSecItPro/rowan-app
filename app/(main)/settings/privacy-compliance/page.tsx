@@ -19,7 +19,6 @@ import { Toggle } from '@/components/ui/Toggle';
 import {
   Shield,
   Lock,
-  Cookie,
   Mail,
   Share2,
   AlertCircle,
@@ -219,62 +218,6 @@ export default function PrivacyCompliancePage() {
               </div>
             </div>
 
-            {/* Cookie Preferences */}
-            <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-                  <Cookie className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-white mb-1">Cookie Preferences</h2>
-                  <p className="text-sm text-gray-400">
-                    Manage which cookies and tracking technologies we can use.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-white">Analytics Cookies</p>
-                    <p className="text-xs text-gray-400 mt-1">Help us understand how you use our service</p>
-                  </div>
-                  <Toggle
-                    id="analytics-cookies"
-                    checked={preferences?.analytics_cookies_enabled || false}
-                    onChange={(checked) => handlePreferenceChange('analytics_cookies_enabled', checked)}
-                    disabled={saving}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-white">Performance Cookies</p>
-                    <p className="text-xs text-gray-400 mt-1">Improve site performance and user experience</p>
-                  </div>
-                  <Toggle
-                    id="performance-cookies"
-                    checked={preferences?.performance_cookies_enabled || false}
-                    onChange={(checked) => handlePreferenceChange('performance_cookies_enabled', checked)}
-                    disabled={saving}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-white">Advertising Cookies</p>
-                    <p className="text-xs text-gray-400 mt-1">Personalized advertising and recommendations</p>
-                  </div>
-                  <Toggle
-                    id="advertising-cookies"
-                    checked={preferences?.advertising_cookies_enabled || false}
-                    onChange={(checked) => handlePreferenceChange('advertising_cookies_enabled', checked)}
-                    disabled={saving}
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Data Sharing */}
             <div className="bg-gray-800/40 border border-gray-700/20 rounded-2xl p-6">
               <div className="flex items-start gap-4 mb-4">
@@ -355,7 +298,7 @@ export default function PrivacyCompliancePage() {
                             Version: {agreement.agreement_version} • Legal Basis: {agreement.legal_basis}
                           </p>
                           {agreement.consent_date && (
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               Consented: {new Date(agreement.consent_date).toLocaleDateString()}
                             </p>
                           )}

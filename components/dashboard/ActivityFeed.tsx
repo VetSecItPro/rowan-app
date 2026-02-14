@@ -14,6 +14,7 @@ interface ActivityFeedProps {
   limit?: number;
 }
 
+/** Displays a real-time activity feed of recent space actions on the dashboard. */
 export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,7 +148,7 @@ export function ActivityFeed({ spaceId, limit = 50 }: ActivityFeedProps) {
         <p className="text-gray-400 text-sm">
           No recent activity yet
         </p>
-        <p className="text-gray-500 text-xs mt-1">
+        <p className="text-gray-400 text-xs mt-1">
           Activity from your space will appear here
         </p>
       </div>

@@ -14,6 +14,7 @@ interface AttachmentListProps {
   refreshTrigger?: number; // Increment this to refresh the list
 }
 
+/** Renders a list of file attachments for a reminder. */
 export function AttachmentList({ reminderId, refreshTrigger }: AttachmentListProps) {
   const { user } = useAuth();
   const [attachments, setAttachments] = useState<ReminderAttachment[]>([]);

@@ -26,6 +26,7 @@ interface ProcessingState {
   message: string;
 }
 
+/** Provides camera/upload interface for scanning and extracting receipt data. */
 export function ReceiptScanner({
   onExpenseCreated,
   onReceiptProcessed,

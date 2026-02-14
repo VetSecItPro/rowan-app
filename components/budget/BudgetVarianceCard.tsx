@@ -322,6 +322,7 @@ function BudgetVarianceCardComponent({
           <div
             className="fixed inset-0 bg-black/80 z-40"
             onClick={() => setShowBudgetAdjust(false)}
+            aria-hidden="true"
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
@@ -401,4 +402,5 @@ function BudgetVarianceCardComponent({
   );
 }
 
+/** Displays budget vs. actual spending variance for a category. */
 export const BudgetVarianceCard = memo(BudgetVarianceCardComponent);

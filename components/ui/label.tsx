@@ -2,6 +2,7 @@ import React from 'react';
 
 type LabelProps = React.LabelHTMLAttributes<HTMLLabelElement>;
 
+/** Renders a styled form label element. */
 export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({ className = '', ...props }, ref) => (
     <label

@@ -21,6 +21,7 @@ interface CircularProgressProps {
   animationDuration?: number;
 }
 
+/** Renders an SVG circular progress indicator with percentage display. */
 export function CircularProgress({
   value,
   size = 120,
@@ -163,6 +164,7 @@ interface MultiRingProgressProps {
   strokeWidth?: number;
 }
 
+/** Renders multiple concentric circular progress rings for comparing metrics. */
 export function MultiRingProgress({
   rings,
   size = 150,
