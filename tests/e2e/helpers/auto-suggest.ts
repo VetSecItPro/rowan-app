@@ -114,7 +114,7 @@ export async function createTestIdSuggestion(
   if (fs.existsSync(SUGGESTIONS_FILE)) {
     try {
       suggestions = JSON.parse(fs.readFileSync(SUGGESTIONS_FILE, 'utf-8'));
-    } catch (error) {
+    } catch (_error) {
       suggestions = [];
     }
   }
@@ -281,7 +281,7 @@ export function getAllSuggestions(): TestIdSuggestion[] {
 
   try {
     return JSON.parse(fs.readFileSync(SUGGESTIONS_FILE, 'utf-8'));
-  } catch (error) {
+  } catch (_error) {
     return [];
   }
 }

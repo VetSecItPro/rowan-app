@@ -107,7 +107,7 @@ export async function getCurrentPosition(options?: PositionOptions): Promise<Loc
   }
 
   // Web API
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     navigator.geolocation.getCurrentPosition(
       (position) => resolve(webPositionToLocationData(position)),
       (error) => {

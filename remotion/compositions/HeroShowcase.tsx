@@ -272,7 +272,7 @@ function ShoppingScene({ frame, fps }: { frame: number; fps: number }) {
 
 // ─── Scene 4: AI Chat ────────────────────────────────────────────
 
-function AIChatScene({ frame, fps }: { frame: number; fps: number }) {
+function AIChatScene({ frame, fps: _fps }: { frame: number; fps: number }) {
   const userMsgOpacity = interpolate(frame, [6, 12], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const userMsgY = interpolate(frame, [6, 12], [12, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const dotsOpacity = interpolate(frame, [16, 20, 35, 38], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });

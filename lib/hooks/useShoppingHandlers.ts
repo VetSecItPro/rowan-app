@@ -8,7 +8,7 @@ import { calendarService } from '@/lib/services/calendar-service';
 import { remindersService } from '@/lib/services/reminders-service';
 import { QUERY_KEYS } from '@/lib/react-query/query-client';
 import { logger } from '@/lib/logger';
-import { showError, showSuccess, showWarning, showInfo } from '@/lib/utils/toast';
+import { showError, showSuccess, showInfo } from '@/lib/utils/toast';
 import type { StatusFilter, TimeFilter } from '@/lib/hooks/useShoppingData';
 import type { ConfirmDialogState } from '@/lib/hooks/useShoppingModals';
 

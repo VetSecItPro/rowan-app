@@ -23,7 +23,7 @@ import {
   Share2,
   Heart,
 } from 'lucide-react';
-import { Footer } from '@/components/layout/Footer';
+
 
 interface GuideSection {
   title: string;

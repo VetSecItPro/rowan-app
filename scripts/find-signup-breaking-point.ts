@@ -129,7 +129,7 @@ async function testConcurrentSignups(count: number): Promise<void> {
   // Cleanup
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   for (const result of results) {
-    const email = `breaking-point-test-${Date.now()}-user${result.userId}@test.rowan.test`;
+    const _email = `breaking-point-test-${Date.now()}-user${result.userId}@test.rowan.test`;
     const { data } = await supabase.auth.admin.listUsers();
     const user = data.users.find(u => u.email?.startsWith(`breaking-point-test-`));
     if (user) {

@@ -395,15 +395,6 @@ export function useChat(spaceId: string) {
 
       dispatch({ type: 'CONFIRM_ACTION', actionId });
 
-      // Create a placeholder assistant message for the confirmation result
-      const placeholderMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: '',
-        timestamp: new Date().toISOString(),
-        isStreaming: true,
-      };
-
       // We need to add the streaming assistant message manually
       // since CONFIRM_ACTION doesn't add one
       dispatch({ type: 'SEND_MESSAGE', message: '' });

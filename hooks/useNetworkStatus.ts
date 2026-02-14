@@ -41,7 +41,7 @@ export function useNetworkStatus(): UseNetworkStatusResult {
     connectionType: 'unknown',
     quality: 'good',
   });
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [_isInitialized, setIsInitialized] = useState(false);
 
   const refresh = useCallback(async () => {
     const newStatus = await getNetworkStatus();

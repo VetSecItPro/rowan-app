@@ -37,7 +37,7 @@ interface ExpenseSummary {
 
 export default function ExpensesPage() {
   // SECURITY: Check feature access FIRST
-  const { hasAccess, isLoading: gateLoading } = useFeatureGate('household');
+  const { hasAccess: _hasAccess, isLoading: _gateLoading } = useFeatureGate('household');
 
   const [activeTab, setActiveTab] = useState('scanner');
   const [recentExpenses] = useState<ExpenseSummary>({

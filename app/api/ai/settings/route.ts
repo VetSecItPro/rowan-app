@@ -11,7 +11,7 @@ import { getSettings, updateSettings } from '@/lib/services/ai/conversation-pers
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     if (!featureFlags.isAICompanionEnabled()) {
       return Response.json({ error: 'AI companion is not enabled' }, { status: 403 });

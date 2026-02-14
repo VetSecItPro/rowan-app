@@ -676,7 +676,6 @@ export async function getOverdueChores(
 
     if (error) throw error;
 
-    const now = new Date();
     const overdueChores: Array<{ choreId: string; userId: string; daysLate: number; dueDate: string }> = [];
 
     for (const chore of chores || []) {

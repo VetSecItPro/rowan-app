@@ -180,3 +180,10 @@ docs/CI-CD-SETUP.md
 .cleancode-audit.json
 .deps-reports/
 .db/
+
+# Launch readiness reports
+.launch-reports/
+
+# Root-level screenshots (session artifacts)
+dashboard-state.png
+session-state-screenshot.png

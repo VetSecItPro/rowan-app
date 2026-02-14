@@ -100,7 +100,7 @@ export function UpgradeModal({
   title: customTitle,
   description: customDescription,
 }: UpgradeModalProps) {
-  const subscription = useSubscriptionSafe();
+  const _subscription = useSubscriptionSafe();
 
   const featureInfo = feature ? FEATURE_MESSAGES[feature] : null;
   const title = customTitle || featureInfo?.title || 'Upgrade to Pro';

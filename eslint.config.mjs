@@ -56,6 +56,18 @@ const eslintConfig = [
       ],
     },
   },
+
+  // Allow console in test files, scripts, and utility .mjs files
+  {
+    files: [
+      "tests/**",
+      "scripts/**",
+      "check-*.mjs",
+    ],
+    rules: {
+      "no-console": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

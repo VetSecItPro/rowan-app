@@ -7,7 +7,6 @@ import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-sc
 import type { CreateChoreInput } from '@/lib/services/chores-service';
 import { pointsService } from '@/lib/services/rewards';
 import { logger } from '@/lib/logger';
-import type { TaskOrChore } from '@/lib/hooks/useTasksModals';
 import type { TasksDataReturn } from '@/lib/hooks/useTasksData';
 import type { TasksModalsReturn } from '@/lib/hooks/useTasksModals';
 

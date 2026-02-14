@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Rowan Design Audit Seed Script
  *
@@ -1351,7 +1350,7 @@ async function seedMessages(userId, spaceId) {
   console.log('\n💬 Seeding messages...');
 
   // Create a conversation
-  const { data: conversation, error: convError } = await supabase
+  const { data: _conversation, error: convError } = await supabase
     .from('conversations')
     .insert({
       space_id: spaceId,

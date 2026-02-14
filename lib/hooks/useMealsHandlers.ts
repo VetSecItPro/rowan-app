@@ -131,7 +131,7 @@ export function useMealsHandlers(deps: UseMealsHandlersDeps): UseMealsHandlersRe
     spaceId,
     meals,
     recipes,
-    stats,
+    stats: _stats,
     queryClient,
     refetchMeals,
     refetchRecipes,

@@ -8,6 +8,7 @@
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { isNative, isPluginAvailable } from './capacitor';
+import { logger } from '@/lib/logger';
 
 export interface PushNotificationToken {
   token: string;
@@ -93,7 +94,7 @@ export async function registerForPush(): Promise<PushNotificationToken | null> {
 
   // Web Push - would need service worker and VAPID key setup
   // For now, return null and handle web push separately
-  console.info('Web push registration requires service worker setup');
+  logger.info('Web push registration requires service worker setup');
   return null;
 }
 

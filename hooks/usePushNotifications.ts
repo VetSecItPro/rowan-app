@@ -14,7 +14,6 @@ import {
   requestPushPermissions,
   registerForPush,
   setupNotificationListeners,
-  type PushNotificationToken,
 } from '@/lib/native/push-notifications';
 import { isNative } from '@/lib/native';
 import { logger } from '@/lib/logger';

@@ -327,6 +327,7 @@ function FamilyMemberCard({ member, currentLocation, isSelected, onClick }: Fami
       {/* Avatar with status indicator */}
       <div className="relative">
         {member.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- dynamic avatar in map marker overlay
           <img
             src={member.avatar_url}
             alt={member.name}

@@ -287,7 +287,7 @@ describe('Tool Executor', () => {
       });
 
       expect(preview).toContain('dinner');
-      expect(preview).toContain('2026-02-10');
+      expect(preview).toContain('Feb 10, 2026');
     });
 
     it('should generate preview for create_expense', () => {
