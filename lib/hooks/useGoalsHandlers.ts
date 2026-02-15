@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { goalsService, Goal, Milestone, CreateGoalInput, CreateMilestoneInput, CreateCheckInInput } from '@/lib/services/goals-service';
 import { toast } from 'sonner';
+import { showSuccess, showError } from '@/lib/utils/toast';
 import { logger } from '@/lib/logger';
 import type { ViewMode } from '@/lib/hooks/useGoalsData';
 
@@ -118,6 +119,9 @@ export function useGoalsHandlers(deps: UseGoalsHandlersDeps): UseGoalsHandlersRe
     loadData,
   } = deps;
 
+  // Track pending deletion timeouts for undo support
+  const pendingDeletionRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
   const handleCreateGoal = useCallback(async (goalData: CreateGoalInput) => {
     try {
       if (editingGoal) {
@@ -208,25 +212,67 @@ export function useGoalsHandlers(deps: UseGoalsHandlersDeps): UseGoalsHandlersRe
     const { action, id } = confirmDialog;
     setConfirmDialog({ isOpen: false, action: 'delete-goal', id: '' });
 
-    // Optimistic update - remove from UI immediately
-    if (action === 'delete-goal') {
+    const isGoal = action === 'delete-goal';
+    const label = isGoal ? 'Goal' : 'Milestone';
+
+    // Save item data before removal for undo
+    let savedGoal: Goal | undefined;
+    let savedMilestone: Milestone | undefined;
+
+    if (isGoal) {
+      savedGoal = goals.find(g => g.id === id);
+      if (!savedGoal) return;
       setGoals(prev => prev.filter(goal => goal.id !== id));
-    } else if (action === 'delete-milestone') {
+    } else {
+      savedMilestone = milestones.find(m => m.id === id);
+      if (!savedMilestone) return;
       setMilestones(prev => prev.filter(milestone => milestone.id !== id));
     }
 
-    try {
-      if (action === 'delete-goal') {
-        await goalsService.deleteGoal(id);
-      } else if (action === 'delete-milestone') {
-        await goalsService.deleteMilestone(id);
+    // Clear any existing timeout for this item
+    const existingTimeout = pendingDeletionRef.current.get(id);
+    if (existingTimeout) clearTimeout(existingTimeout);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        if (isGoal) {
+          await goalsService.deleteGoal(id);
+        } else {
+          await goalsService.deleteMilestone(id);
+        }
+        pendingDeletionRef.current.delete(id);
+      } catch (error) {
+        logger.error(`Failed to ${action}:`, error, { component: 'page', action: 'execution' });
+        showError(`Failed to delete ${label.toLowerCase()}`);
+        // Revert optimistic update on error
+        if (isGoal && savedGoal) {
+          setGoals(prev => [savedGoal!, ...prev]);
+        } else if (savedMilestone) {
+          setMilestones(prev => [savedMilestone!, ...prev]);
+        }
+        pendingDeletionRef.current.delete(id);
       }
-    } catch (error) {
-      logger.error('Failed to ${action}:', error, { component: 'page', action: 'execution' });
-      // Revert optimistic update on error
-      loadData();
-    }
-  }, [confirmDialog, loadData, setConfirmDialog, setGoals, setMilestones]);
+    }, 5000);
+
+    pendingDeletionRef.current.set(id, timeoutId);
+
+    toast(`${label} deleted`, {
+      description: 'You have 5 seconds to undo this action.',
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          clearTimeout(timeoutId);
+          pendingDeletionRef.current.delete(id);
+          if (isGoal && savedGoal) {
+            setGoals(prev => [savedGoal!, ...prev]);
+          } else if (savedMilestone) {
+            setMilestones(prev => [savedMilestone!, ...prev]);
+          }
+          showSuccess(`${label} restored!`);
+        },
+      },
+    });
+  }, [confirmDialog, goals, milestones, setConfirmDialog, setGoals, setMilestones]);
 
   const handleToggleMilestone = useCallback(async (milestoneId: string, completed: boolean) => {
     // Mark as user action

@@ -290,7 +290,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                       {activity.user?.avatar_url ? (
                         <Image
                           src={activity.user.avatar_url}
-                          alt=""
+                          alt={activity.user?.full_name || 'User avatar'}
                           width={32}
                           height={32}
                           className="w-8 h-8 rounded-full object-cover"
@@ -324,7 +324,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => toggleComments(activity.id)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-gray-200 transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-800 rounded"
                         >
                           <MessageCircle className="h-3 w-3" />
                           {comments[activity.id]?.length || 0} Comments
@@ -339,7 +339,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                 {comment.user?.avatar_url ? (
                                   <Image
                                     src={comment.user.avatar_url}
-                                    alt=""
+                                    alt={comment.user?.full_name || 'User avatar'}
                                     width={24}
                                     height={24}
                                     className="w-6 h-6 rounded-full object-cover"
@@ -364,7 +364,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                       <button
                                         key={emoji}
                                         onClick={() => handleReaction(comment.id, emoji)}
-                                        className="w-5 h-5 p-0 text-xs hover:bg-gray-700 rounded transition-colors"
+                                        className="w-5 h-5 p-0 text-xs hover:bg-gray-700 rounded transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-800"
                                       >
                                         {emoji}
                                       </button>
@@ -380,7 +380,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                               {(user as { avatar_url?: string } | null)?.avatar_url ? (
                                 <Image
                                   src={(user as { avatar_url: string }).avatar_url}
-                                  alt=""
+                                  alt="Your avatar"
                                   width={24}
                                   height={24}
                                   className="w-6 h-6 rounded-full object-cover"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Smile, Target } from 'lucide-react';
+import { Smile, Target, Loader2 } from 'lucide-react';
 import { CreateGoalInput, Goal, GoalTemplate } from '@/lib/services/goals-service';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Modal } from '@/components/ui/Modal';
@@ -19,7 +19,7 @@ interface SpaceMember {
 interface NewGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (goal: CreateGoalInput) => void;
+  onSave: (goal: CreateGoalInput) => void | Promise<void>;
   editGoal?: Goal | null;
   spaceId: string;
   availableGoals?: Goal[]; // Goals that can be selected as dependencies
@@ -51,8 +51,9 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [customCategory, setCustomCategory] = useState<string>('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+   
   useEffect(() => {
     if (editGoal) {
       const category = editGoal.category || '';
@@ -120,7 +121,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
     }
     setShowEmojiPicker(false);
   }, [editGoal, selectedTemplate, spaceId, isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
@@ -154,22 +155,23 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
     return options;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Use custom category if "Other" is selected, otherwise use selected category
-    const finalCategory = selectedCategory === '📌 Other' ? customCategory : selectedCategory;
-
-    // Clean up the form data - don't send empty strings for dates or dependencies
-    const cleanedData: CreateGoalInput = {
-      ...formData,
-      category: finalCategory,
-      target_date: formData.target_date || undefined,
-      depends_on_goal_id: formData.depends_on_goal_id || undefined,
-    };
-
-    onSave(cleanedData);
-    onClose();
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      const finalCategory = selectedCategory === '📌 Other' ? customCategory : selectedCategory;
+      const cleanedData: CreateGoalInput = {
+        ...formData,
+        category: finalCategory,
+        target_date: formData.target_date || undefined,
+        depends_on_goal_id: formData.depends_on_goal_id || undefined,
+      };
+      await onSave(cleanedData);
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const footerContent = (
@@ -184,9 +186,19 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
       <button
         type="submit"
         form="new-goal-form"
-        className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-full transition-all shadow-lg shadow-indigo-500/25 font-medium"
+        disabled={isSaving}
+        className={`flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-full transition-all shadow-lg shadow-indigo-500/25 font-medium ${
+          isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:from-indigo-600 hover:to-indigo-700'
+        }`}
       >
-        {editGoal ? 'Update Goal' : 'Create Goal'}
+        {isSaving ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {editGoal ? 'Updating...' : 'Creating...'}
+          </span>
+        ) : (
+          editGoal ? 'Update Goal' : 'Create Goal'
+        )}
       </button>
     </div>
   );
@@ -210,6 +222,8 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
               <input
                 type="text"
                 required
+                aria-required="true"
+                autoFocus
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Save for dream vacation"
@@ -301,6 +315,7 @@ export function NewGoalModal({ isOpen, onClose, onSave, editGoal, spaceId, avail
               <input
                 type="text"
                 required
+                aria-required="true"
                 value={customCategory}
                 onChange={(e) => handleCustomCategoryChange(e.target.value)}
                 placeholder="Enter custom category name"

@@ -124,7 +124,7 @@ export function UserPicker({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-left flex items-center justify-between hover:bg-gray-800 transition-colors"
+        className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:border-transparent text-left flex items-center justify-between hover:bg-gray-800 transition-colors"
       >
         {selectedMember ? (
           <div className="flex items-center gap-3">

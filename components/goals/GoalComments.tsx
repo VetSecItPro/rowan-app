@@ -256,7 +256,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                           {user?.id === comment.user_id && (
                             <Popover>
                               <PopoverTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-800">
                                   <MoreVertical className="h-3 w-3" />
                                 </Button>
                               </PopoverTrigger>

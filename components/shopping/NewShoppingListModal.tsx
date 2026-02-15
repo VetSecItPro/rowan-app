@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Check, FileText } from 'lucide-react';
+import { Plus, Trash2, Check, FileText, Loader2 } from 'lucide-react';
 import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
@@ -11,7 +11,7 @@ import { Dropdown } from '@/components/ui/Dropdown';
 interface NewShoppingListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (list: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => void;
+  onSave: (list: CreateListInput & { store_name?: string; budget?: number; items?: { id?: string; name: string; quantity: number; assigned_to?: string }[] }) => void | Promise<void>;
   editList?: ShoppingList | null;
   spaceId: string;
   onUseTemplate?: () => void;
@@ -61,6 +61,7 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
   const [newItemName, setNewItemName] = useState('');
   const [spaceMembers, setSpaceMembers] = useState<SpaceMemberOption[]>([]);
   const [defaultAssignee, setDefaultAssignee] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Fetch space members
   useEffect(() => {
@@ -95,16 +96,22 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
     loadMembers();
   }, [spaceId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      ...formData,
-      items: items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, assigned_to: item.assigned_to })),
-    });
-    onClose();
-    // Reset form
-    setItems([]);
-    setNewItemName('');
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await onSave({
+        ...formData,
+        items: items.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, assigned_to: item.assigned_to })),
+      });
+      onClose();
+      // Reset form
+      setItems([]);
+      setNewItemName('');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddItem = () => {
@@ -155,10 +162,11 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
         type="submit"
         form="new-shopping-list-form"
         feature="shopping"
+        loading={isSaving}
         icon={editList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
         className="rounded-full px-4 sm:px-6"
       >
-        {editList ? 'Save Changes' : 'Create Shopping List'}
+        {isSaving ? (editList ? 'Saving...' : 'Creating...') : (editList ? 'Save Changes' : 'Create Shopping List')}
       </CTAButton>
     </div>
   );
@@ -205,6 +213,8 @@ function ShoppingListForm({ isOpen, onClose, onSave, editList, spaceId, onUseTem
             <input
               type="text"
               required
+              aria-required="true"
+              autoFocus
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Type a Title"

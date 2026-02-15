@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
-import { showError } from '@/lib/utils/toast';
+import { showError, showSuccess } from '@/lib/utils/toast';
+import { toast } from 'sonner';
 import { calendarService, CalendarEvent, CreateEventInput } from '@/lib/services/calendar-service';
 import type { EventTemplate } from '@/lib/services/calendar-service';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
@@ -78,7 +79,7 @@ export interface CalendarHandlersReturn {
 /** Provides CRUD event handlers for calendar events, RSVPs, and event proposals */
 export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandlersReturn {
   const {
-    events: _events,
+    events,
     setEvents,
     loadEvents,
     syncState,
@@ -93,6 +94,9 @@ export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandler
     setCurrentMonth,
     setViewMode: _setViewMode,
   } = deps;
+
+  // Track pending deletion timeouts for undo support
+  const pendingDeletionRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // ---------------------------------------------------------------------------
   // CRUD handlers
@@ -126,16 +130,44 @@ export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandler
     const eventId = confirmDialog.eventId;
     setConfirmDialog({ isOpen: false, eventId: '' });
 
+    // Save event data before removal for undo
+    const savedEvent = events.find(e => e.id === eventId);
+    if (!savedEvent) return;
+
     // Optimistic update
     setEvents(prev => prev.filter(event => event.id !== eventId));
 
-    try {
-      await calendarService.deleteEvent(eventId);
-    } catch (error) {
-      logger.error('Failed to delete event:', error, { component: 'useCalendarHandlers', action: 'execution' });
-      loadEvents();
-    }
-  }, [confirmDialog, loadEvents, setConfirmDialog, setEvents]);
+    // Clear any existing timeout for this item
+    const existingTimeout = pendingDeletionRef.current.get(eventId);
+    if (existingTimeout) clearTimeout(existingTimeout);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        await calendarService.deleteEvent(eventId);
+        pendingDeletionRef.current.delete(eventId);
+      } catch (error) {
+        logger.error('Failed to delete event:', error, { component: 'useCalendarHandlers', action: 'execution' });
+        showError('Failed to delete event');
+        setEvents(prev => [savedEvent, ...prev]);
+        pendingDeletionRef.current.delete(eventId);
+      }
+    }, 5000);
+
+    pendingDeletionRef.current.set(eventId, timeoutId);
+
+    toast('Event deleted', {
+      description: 'You have 5 seconds to undo this action.',
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          clearTimeout(timeoutId);
+          pendingDeletionRef.current.delete(eventId);
+          setEvents(prev => [savedEvent, ...prev]);
+          showSuccess('Event restored!');
+        },
+      },
+    });
+  }, [confirmDialog, events, setConfirmDialog, setEvents]);
 
   const handleStatusChange = useCallback(async (eventId: string, status: 'not-started' | 'in-progress' | 'completed') => {
     // Optimistic update
@@ -195,17 +227,47 @@ export function useCalendarHandlers(deps: CalendarHandlersDeps): CalendarHandler
     const nextStatus = states[(currentIndex + 1) % states.length];
 
     if (nextStatus === 'completed') {
+      // Save event data before removal for undo
+      const savedEvent = events.find(ev => ev.id === eventId);
+      if (!savedEvent) return;
+
       // Optimistic update - remove from UI
       setEvents(prev => prev.filter(event => event.id !== eventId));
 
-      calendarService.deleteEvent(eventId).catch(error => {
-        logger.error('Failed to auto-delete completed event:', error, { component: 'useCalendarHandlers', action: 'execution' });
-        loadEvents();
+      // Clear any existing timeout for this item
+      const existingTimeout = pendingDeletionRef.current.get(eventId);
+      if (existingTimeout) clearTimeout(existingTimeout);
+
+      const timeoutId = setTimeout(async () => {
+        try {
+          await calendarService.deleteEvent(eventId);
+          pendingDeletionRef.current.delete(eventId);
+        } catch (error) {
+          logger.error('Failed to auto-delete completed event:', error, { component: 'useCalendarHandlers', action: 'execution' });
+          showError('Failed to delete event');
+          setEvents(prev => [savedEvent, ...prev]);
+          pendingDeletionRef.current.delete(eventId);
+        }
+      }, 5000);
+
+      pendingDeletionRef.current.set(eventId, timeoutId);
+
+      toast('Event completed & removed', {
+        description: 'You have 5 seconds to undo this action.',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            clearTimeout(timeoutId);
+            pendingDeletionRef.current.delete(eventId);
+            setEvents(prev => [savedEvent, ...prev]);
+            showSuccess('Event restored!');
+          },
+        },
       });
     } else {
       handleStatusChange(eventId, nextStatus);
     }
-  }, [handleStatusChange, loadEvents, setEvents]);
+  }, [events, handleStatusChange, setEvents]);
 
   // ---------------------------------------------------------------------------
   // Unified item click

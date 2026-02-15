@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Smile, Image as ImageIcon, Paperclip, X } from 'lucide-react';
+import { Smile, Image as ImageIcon, Paperclip, X, Loader2 } from 'lucide-react';
 import { CreateMessageInput, Message } from '@/lib/services/messages-service';
 import { Modal } from '@/components/ui/Modal';
 import { showWarning } from '@/lib/utils/toast';
@@ -9,7 +9,7 @@ import { showWarning } from '@/lib/utils/toast';
 interface NewMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (message: CreateMessageInput) => void;
+  onSave: (message: CreateMessageInput) => void | Promise<void>;
   editMessage?: Message | null;
   spaceId: string;
   conversationId: string | null;
@@ -54,8 +54,9 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+   
   useEffect(() => {
     if (editMessage) {
       setContent(editMessage.content);
@@ -67,19 +68,25 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
     setAttachedFiles([]);
     setShowEmojiPicker(false);
   }, [editMessage, isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      space_id: spaceId,
-      conversation_id: conversationId,
-      content,
-    });
-    setContent('');
-    setAttachedImages([]);
-    setAttachedFiles([]);
-    onClose();
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await onSave({
+        space_id: spaceId,
+        conversation_id: conversationId,
+        content,
+      });
+      setContent('');
+      setAttachedImages([]);
+      setAttachedFiles([]);
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleEmojiClick = (emoji: string) => {
@@ -244,9 +251,19 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
         <button
           type="submit"
           form="new-message-form"
-          className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full hover:opacity-90 transition-all shadow-lg"
+          disabled={isSaving}
+          className={`px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full transition-all shadow-lg ${
+            isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+          }`}
         >
-          {editMessage ? 'Save Changes' : 'Send Message'}
+          {isSaving ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {editMessage ? 'Saving...' : 'Sending...'}
+            </span>
+          ) : (
+            editMessage ? 'Save Changes' : 'Send Message'
+          )}
         </button>
       </div>
     </div>
@@ -269,12 +286,22 @@ export function NewMessageModal({ isOpen, onClose, onSave, editMessage, spaceId,
             </label>
             <textarea
               required
+              aria-required="true"
+              autoFocus
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Type your message..."
               rows={6}
+              maxLength={2000}
               className="w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white resize-none"
             />
+            <p className={`text-xs mt-1 text-right ${
+              content.length > 2000 * 0.95 ? 'text-red-400' :
+              content.length > 2000 * 0.8 ? 'text-amber-400' :
+              'text-gray-500'
+            }`}>
+              {content.length}/2000
+            </p>
           </div>
 
           {/* Attached Images */}

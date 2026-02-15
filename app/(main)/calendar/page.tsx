@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Calendar as CalendarIcon, Search, Plus, CalendarDays, CalendarRange, CalendarClock, ChevronLeft, ChevronRight, Check, Users, MapPin, Eye, Edit, X, RefreshCw, Archive } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import nextDynamic from 'next/dynamic';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
@@ -1085,21 +1086,18 @@ export default function CalendarPage() {
 
                     if (upcomingEvents.length === 0) {
                       return (
-                        <div className="text-center py-12">
-                          <CalendarClock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                          <p className="text-gray-400 text-lg mb-2">No upcoming events</p>
-                          <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center gap-2"
-                          >
-                            <Plus className="w-5 h-5" />
-                            Create Event
-                          </button>
+                        <>
+                          <EmptyState
+                            feature="calendar"
+                            title="No upcoming events"
+                            description="Start planning your family's schedule"
+                            primaryAction={{ label: 'Create Event', onClick: () => setIsModalOpen(true) }}
+                          />
                           <AIContextualHint
                             featureKey="calendar"
                             prompt="Schedule a dentist appointment for Friday at 2pm"
                           />
-                        </div>
+                        </>
                       );
                     }
 
@@ -1425,28 +1423,24 @@ export default function CalendarPage() {
 
                   {/* Event List */}
                   {filteredEvents.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                      <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-4">
-                        <CalendarIcon className="w-8 h-8 text-purple-400" />
+                    statusFilter !== 'all' ? (
+                      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-4">
+                          <CalendarIcon className="w-8 h-8 text-purple-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-white mb-2">No {statusFilter} events</h3>
+                        <p className="text-sm text-gray-400 max-w-sm mb-6">
+                          Try switching filters to see other events.
+                        </p>
                       </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">
-                        {statusFilter === 'all' ? 'Your calendar is wide open!' : `No ${statusFilter} events`}
-                      </h3>
-                      <p className="text-sm text-gray-400 max-w-sm mb-6">
-                        {statusFilter === 'all'
-                          ? 'Add your first event to start planning ahead.'
-                          : 'Try switching filters to see other events.'}
-                      </p>
-                      {statusFilter === 'all' && (
-                        <button
-                          onClick={() => setIsModalOpen(true)}
-                          className="px-5 py-2.5 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-purple-600/20"
-                        >
-                          <Plus className="w-5 h-5" />
-                          Add Event
-                        </button>
-                      )}
-                    </div>
+                    ) : (
+                      <EmptyState
+                        feature="calendar"
+                        title="Your calendar is wide open!"
+                        description="Add your first event to start planning ahead."
+                        primaryAction={{ label: 'Add Event', onClick: () => setIsModalOpen(true) }}
+                      />
+                    )
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredEvents

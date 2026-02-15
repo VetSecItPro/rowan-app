@@ -411,6 +411,8 @@ export const NewEventModal = memo(function NewEventModal({ isOpen, onClose, onSa
               <input
                 type="text"
                 required
+                aria-required="true"
+                autoFocus
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Team meeting"

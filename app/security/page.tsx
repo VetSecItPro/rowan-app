@@ -31,7 +31,7 @@ export default function SecurityPage() {
 
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-10 h-10 text-purple-400" />
-            <h1 className="text-4xl font-bold text-white">Security</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Security</h1>
           </div>
           <p className="text-gray-400 mb-8">Your family's data deserves the highest level of protection</p>
 

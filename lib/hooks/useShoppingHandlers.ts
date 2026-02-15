@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { shoppingService, ShoppingList, CreateListInput } from '@/lib/services/shopping-service';
 import { shoppingIntegrationService } from '@/lib/services/shopping-integration-service';
@@ -9,6 +9,7 @@ import { remindersService } from '@/lib/services/reminders-service';
 import { QUERY_KEYS } from '@/lib/react-query/query-client';
 import { logger } from '@/lib/logger';
 import { showError, showSuccess, showInfo } from '@/lib/utils/toast';
+import { toast } from 'sonner';
 import type { StatusFilter, TimeFilter } from '@/lib/hooks/useShoppingData';
 import type { ConfirmDialogState } from '@/lib/hooks/useShoppingModals';
 
@@ -116,6 +117,9 @@ export function useShoppingHandlers(deps: UseShoppingHandlersDeps): UseShoppingH
 
   const queryClient = useQueryClient();
 
+  // Track pending deletion timeouts for undo support
+  const pendingDeletionRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
   // ─── List CRUD handlers ────────────────────────────────────────────────────
 
   const handleCreateList = useCallback(async (listData: CreateListData) => {
@@ -219,23 +223,53 @@ export function useShoppingHandlers(deps: UseShoppingHandlersDeps): UseShoppingH
     const listId = confirmDialog.listId;
     setConfirmDialog({ isOpen: false, listId: '' });
 
+    const listsKey = QUERY_KEYS.shopping.lists(spaceId || '');
+
+    // Save current data for undo
+    const previousLists = queryClient.getQueryData<ShoppingList[]>(listsKey);
+
     // Optimistic update via query cache
-    const previousLists = queryClient.getQueryData<ShoppingList[]>(QUERY_KEYS.shopping.lists(spaceId || ''));
     queryClient.setQueryData<ShoppingList[]>(
-      QUERY_KEYS.shopping.lists(spaceId || ''),
+      listsKey,
       (old) => (old || []).filter(list => list.id !== listId),
     );
 
-    try {
-      await shoppingService.deleteList(listId);
-      invalidateShopping();
-    } catch (error) {
-      logger.error('Failed to delete list:', error, { component: 'page', action: 'execution' });
-      // Revert on error
-      if (previousLists) {
-        queryClient.setQueryData(QUERY_KEYS.shopping.lists(spaceId || ''), previousLists);
+    // Clear any existing timeout for this item
+    const existingTimeout = pendingDeletionRef.current.get(listId);
+    if (existingTimeout) clearTimeout(existingTimeout);
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        await shoppingService.deleteList(listId);
+        pendingDeletionRef.current.delete(listId);
+        invalidateShopping();
+      } catch (error) {
+        logger.error('Failed to delete list:', error, { component: 'page', action: 'execution' });
+        showError('Failed to delete shopping list');
+        // Revert on error
+        if (previousLists) {
+          queryClient.setQueryData(listsKey, previousLists);
+        }
+        pendingDeletionRef.current.delete(listId);
       }
-    }
+    }, 5000);
+
+    pendingDeletionRef.current.set(listId, timeoutId);
+
+    toast('Shopping list deleted', {
+      description: 'You have 5 seconds to undo this action.',
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          clearTimeout(timeoutId);
+          pendingDeletionRef.current.delete(listId);
+          if (previousLists) {
+            queryClient.setQueryData(listsKey, previousLists);
+          }
+          showSuccess('Shopping list restored!');
+        },
+      },
+    });
   }, [confirmDialog, spaceId, queryClient, invalidateShopping, setConfirmDialog]);
 
   const handleCompleteList = useCallback(async (listId: string) => {

@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import nextDynamic from 'next/dynamic';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Paperclip, TrendingUp, X, Users } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
@@ -422,17 +423,12 @@ export default function MessagesPage() {
                   ))}
                 </div>
               ) : filteredMessages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                  <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
-                    <MessageCircle className="w-8 h-8 text-emerald-400" />
-                  </div>
-                  <p className="text-gray-300 font-medium mb-1">
-                    {emptyStateMessage.primary}
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    {emptyStateMessage.secondary}
-                  </p>
-                </div>
+                <EmptyState
+                  feature="messages"
+                  title={emptyStateMessage.primary}
+                  description={emptyStateMessage.secondary}
+                  className="h-full"
+                />
               ) : (
                 <>
                   {filteredMessages.map((message, index) => {

@@ -60,10 +60,13 @@ import { projectsOnlyService } from '@/lib/services/projects-service';
 import type { CreateProjectInput } from '@/lib/services/projects-service';
 
 import type { FeatureType } from '@/lib/types/chat';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface ToolExecutionContext {
   spaceId: string;
   userId: string;
+  /** Server-side Supabase client with the user's auth session (for RLS) */
+  supabase: SupabaseClient;
 }
 
 export interface ToolExecutionResult {
@@ -88,7 +91,7 @@ export async function executeTool(
   parameters: Record<string, unknown>,
   context: ToolExecutionContext
 ): Promise<ToolExecutionResult> {
-  const { spaceId, userId } = context;
+  const { spaceId, userId, supabase } = context;
 
   try {
     switch (toolName) {
@@ -103,7 +106,7 @@ export async function executeTool(
           status: parameters.status || 'pending',
           priority: parameters.priority || 'medium',
         });
-        const task = await tasksService.createTask(input);
+        const task = await tasksService.createTask(input, supabase);
         return {
           success: true,
           message: `Created task "${task.title}"${task.assigned_to ? ' assigned to a member' : ''}`,
@@ -118,7 +121,7 @@ export async function executeTool(
           return { success: false, message: 'Task ID is required', featureType: 'task' };
         }
         // tasksService.updateTask auto-sets completed_at when status is 'completed'
-        await tasksService.updateTask(taskId, { status: 'completed' });
+        await tasksService.updateTask(taskId, { status: 'completed' }, supabase);
         return {
           success: true,
           message: 'Task marked as completed',
@@ -132,7 +135,7 @@ export async function executeTool(
           status: parameters.status as string | undefined,
           priority: parameters.priority as string | undefined,
           assigned_to: parameters.assigned_to as string | undefined,
-        });
+        }, supabase);
         return {
           success: true,
           message: `Found ${tasks.length} task${tasks.length === 1 ? '' : 's'}`,
@@ -161,7 +164,7 @@ export async function executeTool(
           created_by: userId,
           status: parameters.status || 'pending',
         }));
-        const chore = await choresService.createChore(input);
+        const chore = await choresService.createChore(input, supabase);
         return {
           success: true,
           message: `Created chore "${chore.title}" (${chore.frequency})${chore.assigned_to ? ' assigned to a member' : ''}`,
@@ -176,7 +179,7 @@ export async function executeTool(
           return { success: false, message: 'Chore ID is required', featureType: 'chore' };
         }
         // choresService.updateChore auto-sets completed_at when status is 'completed'
-        await choresService.updateChore(choreId, { status: 'completed' });
+        await choresService.updateChore(choreId, { status: 'completed' }, supabase);
         return {
           success: true,
           message: 'Chore marked as completed',
@@ -193,7 +196,7 @@ export async function executeTool(
           ...parameters,
           space_id: spaceId,
         });
-        const event = await calendarService.createEvent(input);
+        const event = await calendarService.createEvent(input, supabase);
         return {
           success: true,
           message: `Created event "${event.title}"${event.start_time ? ` on ${formatDateForPreview(event.start_time)}` : ''}`,
@@ -209,7 +212,7 @@ export async function executeTool(
         }
         // Strip event_id from the update payload — it's not a column
         const { event_id: _, ...updateParams } = parameters;
-        await calendarService.updateEvent(eventId, updateParams);
+        await calendarService.updateEvent(eventId, updateParams, supabase);
         return {
           success: true,
           message: 'Event updated',
@@ -227,7 +230,7 @@ export async function executeTool(
           space_id: spaceId,
           created_by: userId,
         }));
-        const reminder = await remindersService.createReminder(input);
+        const reminder = await remindersService.createReminder(input, supabase);
         return {
           success: true,
           message: `Created reminder "${reminder.title}"`,
@@ -241,7 +244,7 @@ export async function executeTool(
         if (!reminderId) {
           return { success: false, message: 'Reminder ID is required', featureType: 'reminder' };
         }
-        await remindersService.updateReminder(reminderId, { status: 'completed' });
+        await remindersService.updateReminder(reminderId, { status: 'completed' }, supabase);
         return {
           success: true,
           message: 'Reminder completed',
@@ -258,7 +261,7 @@ export async function executeTool(
           ...parameters,
           space_id: spaceId,
         });
-        const list = await shoppingService.createList(input);
+        const list = await shoppingService.createList(input, supabase);
         return {
           success: true,
           message: `Created shopping list "${list.title}"`,
@@ -271,7 +274,7 @@ export async function executeTool(
         const input = stripNulls<CreateItemInput>(createShoppingItemSchema.parse({
           ...parameters,
         }));
-        const item = await shoppingService.createItem(input);
+        const item = await shoppingService.createItem(input, supabase);
         return {
           success: true,
           message: `Added "${item.name}" to shopping list`,
@@ -288,7 +291,7 @@ export async function executeTool(
           ...parameters,
           space_id: spaceId,
         }));
-        const meal = await mealsService.createMeal(input);
+        const meal = await mealsService.createMeal(input, supabase);
         return {
           success: true,
           message: `Planned ${meal.meal_type}${meal.name ? `: ${meal.name}` : ''} for ${formatDateForPreview(meal.scheduled_date)}`,
@@ -306,7 +309,7 @@ export async function executeTool(
           space_id: spaceId,
           created_by: userId,
         }));
-        const goal = await goalsService.createGoal(input);
+        const goal = await goalsService.createGoal(input, supabase);
         return {
           success: true,
           message: `Created goal "${goal.title}"`,
@@ -324,7 +327,7 @@ export async function executeTool(
         if (progress === undefined) {
           return { success: false, message: 'Progress value is required', featureType: 'goal' };
         }
-        await goalsService.updateGoal(goalId, { progress });
+        await goalsService.updateGoal(goalId, { progress }, supabase);
         return {
           success: true,
           message: `Updated goal progress to ${progress}%`,
@@ -341,7 +344,7 @@ export async function executeTool(
           ...parameters,
           space_id: spaceId,
         }));
-        const expense = await projectsService.createExpense(input);
+        const expense = await projectsService.createExpense(input, supabase);
         return {
           success: true,
           message: `Created expense "${expense.title}" — $${expense.amount}`,
@@ -359,7 +362,7 @@ export async function executeTool(
           space_id: spaceId,
           created_by: userId,
         }));
-        const project = await projectsOnlyService.createProject(input);
+        const project = await projectsOnlyService.createProject(input, supabase);
         return {
           success: true,
           message: `Created project "${project.name}"`,

@@ -228,8 +228,8 @@ export const shoppingService = {
    * @returns The newly created shopping item
    * @throws Error if database insert fails
    */
-  async createItem(input: CreateItemInput): Promise<ShoppingItem> {
-    const supabase = createClient();
+  async createItem(input: CreateItemInput, supabaseClient?: SupabaseClient): Promise<ShoppingItem> {
+    const supabase = supabaseClient ?? createClient();
 
     // Auto-categorize if no category provided
     const category = input.category || getCategoryForItem(input.name);

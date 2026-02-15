@@ -147,7 +147,7 @@ export function ErrorRetry({
           rounded-xl
           transition-all duration-200
           active:scale-[0.98]
-          focus:outline-none focus:ring-4 focus:ring-blue-500/30
+          focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30
           disabled:cursor-not-allowed
           touch-manipulation
         `}

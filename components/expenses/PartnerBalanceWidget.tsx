@@ -137,8 +137,8 @@ export function PartnerBalanceWidget({
                 ? 'bg-red-500 hover:bg-red-600 text-white'
                 : 'bg-green-500 hover:bg-green-600 text-white'
             }
-            hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              youOwe ? 'focus:ring-red-500' : 'focus:ring-green-500'
+            hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+              youOwe ? 'focus-visible:ring-red-500' : 'focus-visible:ring-green-500'
             }
           `}
         >

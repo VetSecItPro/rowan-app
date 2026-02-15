@@ -280,7 +280,7 @@ export default function ArticlesPageClient({ articles }: ArticlesPageClientProps
         {/* CTA Section */}
         <section className="py-16 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4">
               Ready to organize your family life?
             </h2>
             <p className="text-gray-400 mb-8 max-w-xl mx-auto">

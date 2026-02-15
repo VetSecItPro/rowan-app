@@ -119,7 +119,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
             aria-label="Task options"
             aria-expanded={showMenu}
             aria-haspopup="menu"
-            className="p-2 text-gray-400 hover:text-gray-300 rounded"
+            className="p-2 text-gray-400 hover:text-gray-300 rounded focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -165,7 +165,7 @@ const TaskCard = memo(function TaskCard({ task, onStatusChange, onEdit, onDelete
 
       {/* Description + Meta row */}
       {(task.description || task.due_date || task.category) && (
-        <div className="mt-1 ml-7 sm:ml-8 flex items-center gap-2 text-[11px] text-gray-400">
+        <div className="mt-1 ml-7 sm:ml-8 flex items-center gap-2 text-[11px] text-gray-300">
           {task.description && (
             <span className="line-clamp-2 flex-1">{task.description}</span>
           )}

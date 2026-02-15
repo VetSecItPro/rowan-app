@@ -169,7 +169,7 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
     const buttonClasses = cn(
       // Base styles
       'relative inline-flex items-center justify-center font-medium rounded-full transition-all duration-300',
-      'focus:outline-none focus:ring-2 focus:ring-offset-2',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
       'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
 
       // Size variants
@@ -183,21 +183,21 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
       // Variant styles
       {
         // Primary variant
-        'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl focus:ring-blue-500':
+        'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-blue-500':
           variant === 'primary' && currentFeature === 'tasks',
-        'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl focus:ring-purple-500':
+        'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-purple-500':
           variant === 'primary' && currentFeature === 'calendar',
-        'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl focus:ring-emerald-500':
+        'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-emerald-500':
           variant === 'primary' && (currentFeature === 'messages' || currentFeature === 'shopping'),
-        'bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl focus:ring-orange-500':
+        'bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-orange-500':
           variant === 'primary' && currentFeature === 'meals',
-        'bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl focus:ring-pink-500':
+        'bg-pink-600 hover:bg-pink-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-pink-500':
           variant === 'primary' && currentFeature === 'reminders',
-        'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl focus:ring-indigo-500':
+        'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-indigo-500':
           variant === 'primary' && currentFeature === 'goals',
-        'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl focus:ring-amber-500':
+        'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-amber-500':
           variant === 'primary' && (currentFeature === 'budget' || currentFeature === 'projects'),
-        'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl focus:ring-gray-500':
+        'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-gray-500':
           variant === 'primary' && currentFeature === 'dashboard',
 
         // Secondary variant
@@ -213,11 +213,11 @@ export const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>
           variant === 'outline',
 
         // Destructive variant
-        'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl focus:ring-red-500':
+        'bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-red-500':
           variant === 'destructive',
 
         // Success variant
-        'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl focus:ring-green-500':
+        'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl focus-visible:ring-green-500':
           variant === 'success',
       },
 

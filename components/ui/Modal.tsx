@@ -345,8 +345,8 @@ export function Modal({
                       rounded-full
                       ${headerGradient ? 'hover:bg-white/20 text-white' : 'hover:bg-gray-700 text-gray-400'}
                       transition-all
-                      focus:outline-none
-                      focus:ring-2 focus:ring-white/30
+                      focus-visible:outline-none
+                      focus-visible:ring-2 focus-visible:ring-white/30
                       active:scale-95
                     `}
                     aria-label="Close modal"

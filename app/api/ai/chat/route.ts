@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
           const events = chatOrchestratorService.processMessage({
             message: safeMessage,
             conversationId: activeConversationId,
-            context: { spaceId, userId: user.id },
+            context: { spaceId, userId: user.id, supabase },
             spaceContext,
             confirmAction,
           });

@@ -28,7 +28,7 @@ export const TASK_CATEGORIES = {
 interface NewTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (task: CreateTaskInput) => void;
+  onSave: (task: CreateTaskInput) => void | Promise<void>;
   editTask?: Task | null;
   spaceId?: string;
   userId?: string;
@@ -93,6 +93,7 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [dateError, setDateError] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [recurringData, setRecurringData] = useState({
@@ -109,64 +110,71 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate due date is not in the past
-    if (formData.due_date) {
-      const dueDate = new Date(formData.due_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    if (isSaving) return;
+    setIsSaving(true);
 
-      if (dueDate < today) {
-        setDateError('Due date is in the past');
+    try {
+      // Validate due date is not in the past
+      if (formData.due_date) {
+        const dueDate = new Date(formData.due_date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (dueDate < today) {
+          setDateError('Due date is in the past');
+          return;
+        }
+      }
+
+      // Clear any previous errors
+      setDateError('');
+
+      // Ensure we have a space ID before proceeding
+      if (!resolvedSpaceId) {
+        setDateError('Space creation required');
         return;
       }
-    }
 
-    // Clear any previous errors
-    setDateError('');
-
-    // Ensure we have a space ID before proceeding
-    if (!resolvedSpaceId) {
-      setDateError('Space creation required');
-      return;
-    }
-
-    // Handle recurring tasks
-    if (isRecurring && !editTask && userId) {
-      try {
-        await taskRecurrenceService.createRecurringTask({
-          space_id: resolvedSpaceId,
-          title: formData.title,
-          description: formData.description || undefined,
-          category: formData.category || undefined,
-          priority: formData.priority,
-          created_by: userId,
-          recurrence: {
-            pattern: recurringData.pattern,
-            interval: recurringData.interval,
-            days_of_week: recurringData.daysOfWeek,
-          },
-        });
-        onSave(formData); // Call onSave to refresh the task list
-        onClose();
-        return;
-      } catch (error) {
-        logger.error('Error creating recurring task:', error, { component: 'NewTaskModal', action: 'component_action' });
-        setDateError('Failed to create recurring task');
-        return;
+      // Handle recurring tasks
+      if (isRecurring && !editTask && userId) {
+        try {
+          await taskRecurrenceService.createRecurringTask({
+            space_id: resolvedSpaceId,
+            title: formData.title,
+            description: formData.description || undefined,
+            category: formData.category || undefined,
+            priority: formData.priority,
+            created_by: userId,
+            recurrence: {
+              pattern: recurringData.pattern,
+              interval: recurringData.interval,
+              days_of_week: recurringData.daysOfWeek,
+            },
+          });
+          await onSave(formData); // Call onSave to refresh the task list
+          onClose();
+          return;
+        } catch (error) {
+          logger.error('Error creating recurring task:', error, { component: 'NewTaskModal', action: 'component_action' });
+          setDateError('Failed to create recurring task');
+          return;
+        }
       }
+
+      // Handle regular tasks (create or edit)
+      const cleanedData: CreateTaskInput = {
+        ...formData,
+        description: formData.description || undefined,
+        category: formData.category || undefined,
+        due_date: formData.due_date || undefined,
+        assigned_to: formData.assigned_to || undefined,
+      };
+
+      await onSave(cleanedData);
+      onClose();
+    } finally {
+      setIsSaving(false);
     }
-
-    // Handle regular tasks (create or edit)
-    const cleanedData: CreateTaskInput = {
-      ...formData,
-      description: formData.description || undefined,
-      category: formData.category || undefined,
-      due_date: formData.due_date || undefined,
-      assigned_to: formData.assigned_to || undefined,
-    };
-
-    onSave(cleanedData);
-    onClose();
   };
 
   const footerContent = (
@@ -182,12 +190,19 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
         data-testid="task-submit-button"
         type="submit"
         form="new-task-form"
-        disabled={!!dateError}
+        disabled={!!dateError || isSaving}
         className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full transition-colors font-medium text-sm sm:text-base ${
-          dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-600 hover:to-blue-700'
+          dateError || isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-600 hover:to-blue-700'
         }`}
       >
-        {editTask ? 'Update Task' : 'Create Task'}
+        {isSaving ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {editTask ? 'Updating...' : 'Creating...'}
+          </span>
+        ) : (
+          editTask ? 'Update Task' : 'Create Task'
+        )}
       </button>
     </div>
   );
@@ -238,6 +253,8 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
                 data-testid="task-title-input"
                 type="text"
                 required
+                aria-required="true"
+                autoFocus
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Complete project report"
@@ -287,8 +304,16 @@ function TaskForm({ isOpen, onClose, onSave, editTask, spaceId, userId }: NewTas
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add details about this task..."
               rows={3}
+              maxLength={1000}
               className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"
             />
+            <p className={`text-xs mt-1 text-right ${
+              (formData.description?.length || 0) > 1000 * 0.95 ? 'text-red-400' :
+              (formData.description?.length || 0) > 1000 * 0.8 ? 'text-amber-400' :
+              'text-gray-500'
+            }`}>
+              {formData.description?.length || 0}/1000
+            </p>
           </div>
 
           {/* Priority & Status Row */}

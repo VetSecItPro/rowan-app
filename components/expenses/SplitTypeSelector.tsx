@@ -102,7 +102,7 @@ export function SplitTypeSelector({
                   : 'border-gray-600 bg-gray-800 hover:border-gray-500 hover:shadow-md'
               }
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-[0.98] hover-lift shimmer-emerald active-press'}
-              focus:outline-none focus:ring-2 ${colorClasses.ring}
+              focus-visible:outline-none focus-visible:ring-2 ${colorClasses.ring}
             `}
             aria-pressed={isSelected}
             aria-label={`${option.label}: ${option.description}`}

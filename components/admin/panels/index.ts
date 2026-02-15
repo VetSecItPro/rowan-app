@@ -17,5 +17,5 @@ export { NotificationsPanel } from './NotificationsPanel';
 export { HealthPanel } from './HealthPanel';
 export { ExportPanel } from './ExportPanel';
 export { ConversionFunnelPanel } from './ConversionFunnelPanel';
-export { FeedbackPanel } from './FeedbackPanel';
+
 export { AIUsagePanel } from './AIUsagePanel';

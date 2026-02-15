@@ -251,8 +251,16 @@ export function ApprovalModal({ isOpen, onClose, taskId, currentUserId, spaceId 
                             onChange={(e) => setReviewNote(e.target.value)}
                             placeholder="Add your review comments..."
                             rows={2}
+                            maxLength={500}
                             className="w-full px-3 py-2 text-sm border border-gray-600 rounded-lg bg-gray-800"
                           />
+                          <p className={`text-xs mt-1 text-right ${
+                            reviewNote.length > 500 * 0.95 ? 'text-red-400' :
+                            reviewNote.length > 500 * 0.8 ? 'text-amber-400' :
+                            'text-gray-500'
+                          }`}>
+                            {reviewNote.length}/500
+                          </p>
                         </div>
 
                         <div className="flex gap-2">

@@ -720,7 +720,7 @@ const UnifiedItemModalContent = memo(function UnifiedItemModalContent({
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setCalendarSync(!calendarSync)}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                           calendarSync ? 'bg-blue-600' : 'bg-gray-700'
                         }`}
                       >

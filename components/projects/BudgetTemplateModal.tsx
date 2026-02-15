@@ -142,7 +142,7 @@ export function BudgetTemplateModal({
                     <button
                       type="button"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="w-full px-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white text-left"
+                      className="w-full px-4 pr-12 py-3 bg-gray-900 border border-gray-600 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:border-amber-500 text-white text-left"
                     >
                       {householdFilter === 'all' ? 'All Templates' : householdLabels[householdFilter]}
                     </button>

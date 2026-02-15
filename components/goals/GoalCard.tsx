@@ -73,7 +73,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
         <button
           onClick={handleCheckboxClick}
           aria-label={`Toggle goal status: ${goalState === 'not-started' ? 'Not Started' : goalState === 'in-progress' ? 'In Progress' : 'Completed'}`}
-          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
+          className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
             goalState === 'completed'
               ? 'bg-green-500 border-green-500'
               : goalState === 'in-progress'
@@ -87,7 +87,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
 
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-semibold text-white line-clamp-2">{goal.title}</h3>
-          {goal.description && <p className="text-sm text-gray-400 break-words line-clamp-2 mt-0.5">{goal.description}</p>}
+          {goal.description && <p className="text-sm text-gray-300 break-words line-clamp-2 mt-0.5">{goal.description}</p>}
         </div>
 
         {/* Right actions row */}
@@ -95,7 +95,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
           {onTogglePin && (
             <button
               onClick={(e) => { e.stopPropagation(); onTogglePin(goal.id, !goal.is_pinned); }}
-              className={`transition-colors ${goal.is_pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}
+              className={`transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 rounded ${goal.is_pinned ? 'text-yellow-400' : 'text-gray-600 hover:text-gray-400'}`}
               title={goal.is_pinned ? 'Unpin goal' : 'Pin goal'}
               aria-label={goal.is_pinned ? `Unpin ${goal.title}` : `Pin ${goal.title}`}
             >
@@ -112,7 +112,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
                 const nextIndex = (currentIndex + 1) % priorities.length;
                 onPriorityChange(goal.id, priorities[nextIndex]);
               }}
-              className={`text-xs font-medium transition-colors ${priorityColors[goal.priority || ''] || 'text-gray-600 hover:text-gray-400'}`}
+              className={`text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 rounded ${priorityColors[goal.priority || ''] || 'text-gray-600 hover:text-gray-400'}`}
               title="Click to change priority"
               aria-label={`Change priority for ${goal.title}, currently ${goal.priority && goal.priority !== 'none' ? goal.priority.toUpperCase() : 'none'}`}
             >
@@ -128,7 +128,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
               aria-label="Goal options menu"
               aria-expanded={showMenu}
               aria-haspopup="menu"
-              className="text-gray-400 hover:text-gray-300 transition-colors"
+              className="text-gray-400 hover:text-gray-300 transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 rounded-lg"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -183,7 +183,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
       <div className="space-y-3">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">Progress</span>
+            <span className="text-sm text-gray-300">Progress</span>
             <span className={`text-sm font-bold ${getProgressTextColor()}`}>{goal.progress}%</span>
           </div>
           <div className="h-3 bg-gray-700/50 rounded-full overflow-hidden" role="progressbar" aria-valuenow={goal.progress} aria-valuemin={0} aria-valuemax={100} aria-label={`${goal.title} progress: ${goal.progress}%`}>
@@ -221,7 +221,7 @@ export const GoalCard = memo(function GoalCard({ goal, onEdit, onDelete, onCheck
               </div>
             )}
           </div>
-          {goal.target_date && <span className="text-xs text-gray-400">{formatDate(goal.target_date, 'MMM d, yyyy')}</span>}
+          {goal.target_date && <span className="text-xs text-gray-300">{formatDate(goal.target_date, 'MMM d, yyyy')}</span>}
         </div>
       </div>
     </div>

@@ -164,7 +164,7 @@ export function PushNotificationSettings({ spaceId, className }: PushNotificatio
             onClick={handleToggle}
             disabled={isLoading}
             className={cn(
-              'relative w-14 h-7 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+              'relative w-14 h-7 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500',
               isRegistered ? 'bg-blue-500' : 'bg-gray-600',
               isLoading && 'opacity-50 cursor-not-allowed'
             )}

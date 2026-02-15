@@ -39,7 +39,7 @@ export default function GoodbyePage() {
           </div>
 
           {/* Main Message */}
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4">
             Account Deletion Initiated
           </h1>
 

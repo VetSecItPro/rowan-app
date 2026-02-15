@@ -178,7 +178,7 @@ export function Dropdown({
           bg-gray-900
           border border-gray-600
           rounded-xl
-          focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+          focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent
           text-white
           disabled:opacity-50 disabled:cursor-not-allowed
           ${className}
@@ -208,7 +208,7 @@ export function Dropdown({
           bg-gray-900
           border border-gray-600
           rounded-xl
-          focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+          focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent
           text-white
           disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors
@@ -252,7 +252,7 @@ export function Dropdown({
                 w-full px-4 py-2 text-left text-sm
                 hover:bg-gray-700
                 focus:bg-gray-700
-                focus:outline-none
+                focus-visible:outline-none
                 transition-colors
                 ${option.value === value ? 'bg-indigo-900/30 text-indigo-400' : 'text-white'}
               `}

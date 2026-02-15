@@ -162,7 +162,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             <button
               type="button"
               onClick={() => setIsMealTypeOpen(!isMealTypeOpen)}
-              className="btn-touch w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white flex items-center justify-between transition-colors"
+              className="btn-touch w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-purple-500 text-white flex items-center justify-between transition-colors"
             >
               <div className="flex items-center gap-2">
                 {(() => {
@@ -207,7 +207,7 @@ export function NewMealModal({ isOpen, onClose, onSave, editMeal, spaceId, recip
             <button
               type="button"
               onClick={() => setIsRecipeSelectorOpen(!isRecipeSelectorOpen)}
-              className="btn-touch w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 text-white flex items-center justify-between transition-colors"
+              className="btn-touch w-full input-mobile bg-gray-900 border border-gray-600 rounded-lg focus-visible:ring-2 focus-visible:ring-purple-500 text-white flex items-center justify-between transition-colors"
             >
               <div className="flex items-center gap-2">
                 <ChefHat className="w-4 h-4 text-orange-500" />

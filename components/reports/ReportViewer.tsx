@@ -183,7 +183,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
           <button
             onClick={handleShare}
             disabled={loading}
-            className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-300 bg-gray-700 hover:bg-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 disabled:opacity-50"
           >
             <Share2 className="h-4 w-4 mr-1" />
             Share
@@ -193,7 +193,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
             <button
               onClick={handleDownload}
               disabled={loading}
-              className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex items-center px-3 py-2 border border-gray-600 shadow-sm text-sm font-medium rounded-full text-gray-300 bg-gray-700 hover:bg-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 disabled:opacity-50"
             >
               <Download className="h-4 w-4 mr-1" />
               {loading ? 'Downloading...' : 'Download PDF'}
@@ -324,7 +324,7 @@ export function ReportViewer({ report, onClose }: ReportViewerProps) {
                   />
                   <button
                     onClick={copyShareUrl}
-                    className="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-r-md hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   >
                     Copy
                   </button>
