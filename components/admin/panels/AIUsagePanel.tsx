@@ -189,8 +189,8 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
   const activeUsers = realtime?.active_users ?? data?.active_users_today ?? 0;
 
   // Budget health: estimate % of expected revenue consumed
-  // Assuming ~$12/user/mo for Pro, active users * $12 = expected revenue
-  const expectedMonthlyRevenue = Math.max(activeUsers * 12, 1);
+  // Assuming ~$18/user/mo for Pro, active users * $18 = expected revenue
+  const expectedMonthlyRevenue = Math.max(activeUsers * 18, 1);
   const projectedMonthlyCost = todayCost * 30;
   const budgetHealthPct = Math.min(
     Math.round((projectedMonthlyCost / expectedMonthlyRevenue) * 100),

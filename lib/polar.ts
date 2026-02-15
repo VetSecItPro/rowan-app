@@ -87,8 +87,8 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
   pro: {
     name: "Pro",
     description: "For growing families",
-    price: 12,
-    annualPrice: 120, // 2 months free ($144 → $120)
+    price: 18,
+    annualPrice: 180, // 2 months free ($216 → $180)
     trialDays: 14,
     features: [
       "Unlimited tasks",
@@ -106,8 +106,8 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
   family: {
     name: "Family",
     description: "For large families",
-    price: 18,
-    annualPrice: 180, // 2 months free ($216 → $180)
+    price: 29,
+    annualPrice: 290, // 2 months free ($348 → $290)
     trialDays: 14,
     features: [
       "Everything in Pro",

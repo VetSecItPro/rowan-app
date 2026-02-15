@@ -168,8 +168,8 @@ export function UpgradeModal({
         <div className="text-center">
           <p className="text-sm text-gray-400">
             {requiresFamily
-              ? 'Starting at $18/month'
-              : 'Starting at $12/month'}
+              ? 'Starting at $29/month'
+              : 'Starting at $18/month'}
           </p>
         </div>
       </div>

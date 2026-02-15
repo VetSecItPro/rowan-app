@@ -174,13 +174,13 @@ const guideSections: GuideSection[] = [
       },
       {
         title: 'Pro Plan Features',
-        description: 'Advanced features for individuals and couples - $12/month',
+        description: 'Advanced features for individuals and couples - $18/month',
         readTime: '5 min read',
         href: '#pro-features',
       },
       {
         title: 'Family Plan Features',
-        description: 'Everything in Pro plus family features for up to 6 members - $18/month',
+        description: 'Everything in Pro plus family features for up to 6 members - $29/month',
         readTime: '5 min read',
         href: '#family-features',
       },
@@ -277,7 +277,7 @@ export default function SubscriptionsDocumentationPage() {
                   <Crown className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
-                <p className="text-2xl font-bold text-white mb-2">$12<span className="text-sm font-normal text-gray-500">/month</span></p>
+                <p className="text-2xl font-bold text-white mb-2">$18<span className="text-sm font-normal text-gray-500">/month</span></p>
                 <p className="text-sm text-gray-400">
                   Advanced features for individuals and couples
                 </p>
@@ -289,7 +289,7 @@ export default function SubscriptionsDocumentationPage() {
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-1">Family</h3>
-                <p className="text-2xl font-bold text-white mb-2">$18<span className="text-sm font-normal text-gray-500">/month</span></p>
+                <p className="text-2xl font-bold text-white mb-2">$29<span className="text-sm font-normal text-gray-500">/month</span></p>
                 <p className="text-sm text-gray-400">
                   Everything in Pro + family features for up to 6 members
                 </p>
@@ -502,8 +502,8 @@ export default function SubscriptionsDocumentationPage() {
                   Annual Savings
                 </h4>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  Save up to 17% with annual billing! Pro is just $120/year (vs $144 monthly) and
-                  Family is $180/year (vs $216 monthly). Annual plans are charged once per year and
+                  Save ~17% with annual billing! Pro is just $180/year (vs $216 monthly) and
+                  Family is $290/year (vs $348 monthly). That&apos;s 2 months free! Annual plans are charged once per year and
                   include all the same features.
                 </p>
               </div>
@@ -534,8 +534,8 @@ export default function SubscriptionsDocumentationPage() {
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">The Three Plans</h3>
                 <ul className="list-disc list-inside space-y-3 text-gray-400">
                   <li><strong>Free ($0/month):</strong> Essential features for basic household organization. Tasks, shopping lists, calendar, and messaging for up to 2 people.</li>
-                  <li><strong>Pro ($12/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and advanced analytics.</li>
-                  <li><strong>Family ($18/month):</strong> Everything in Pro plus support for up to 6 household members, family-specific features, and additional storage.</li>
+                  <li><strong>Pro ($18/month):</strong> Our most popular plan. Everything in Free plus meal planning, goals, expense tracking, AI receipt scanning, and advanced analytics.</li>
+                  <li><strong>Family ($29/month):</strong> Everything in Pro plus support for up to 6 household members, family-specific features, and additional storage.</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Who Is Each Plan For?</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
@@ -634,10 +634,10 @@ export default function SubscriptionsDocumentationPage() {
                 </p>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Price Comparison</h3>
                 <ul className="list-disc list-inside space-y-2 text-gray-400">
-                  <li><strong>Pro Monthly:</strong> $12/month ($144/year total)</li>
-                  <li><strong>Pro Annual:</strong> $120/year ($9.92/month equivalent) - Save 17%</li>
-                  <li><strong>Family Monthly:</strong> $18/month ($216/year total)</li>
-                  <li><strong>Family Annual:</strong> $180/year ($14.92/month equivalent) - Save 17%</li>
+                  <li><strong>Pro Monthly:</strong> $18/month ($216/year total)</li>
+                  <li><strong>Pro Annual:</strong> $180/year ($15/month equivalent) - Save ~17% (2 months free)</li>
+                  <li><strong>Family Monthly:</strong> $29/month ($348/year total)</li>
+                  <li><strong>Family Annual:</strong> $290/year ($24.17/month equivalent) - Save ~17% (2 months free)</li>
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">When to Choose Each</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
@@ -1150,7 +1150,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  $12/month or $120/year (save 17% with annual). Both options include all Pro features with no restrictions.
+                  $18/month or $180/year (save ~17% with annual — 2 months free). Both options include all Pro features with no restrictions.
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
@@ -1186,7 +1186,7 @@ export default function SubscriptionsDocumentationPage() {
                 </ul>
                 <h3 className="text-lg font-semibold text-white mt-6 mb-3">Pricing</h3>
                 <p className="text-gray-400 leading-relaxed mb-4">
-                  $18/month or $180/year (save 17% with annual). That&apos;s less than $3/month per member for a family of 6!
+                  $29/month or $290/year (save ~17% with annual — 2 months free). That&apos;s less than $5/month per member for a family of 6!
                 </p>
                 <div className="p-4 bg-indigo-900/30 border border-indigo-800 rounded-lg mt-6">
                   <p className="text-indigo-200 text-sm">
