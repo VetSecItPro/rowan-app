@@ -152,8 +152,8 @@ export default function PricingPage() {
               tier="pro"
               title="Pro"
               description="Everything you need for household collaboration"
-              monthlyPrice={12}
-              annualPrice={120}
+              monthlyPrice={18}
+              annualPrice={180}
               period={period}
               features={[
                 'Unlimited tasks & calendar',
@@ -168,7 +168,7 @@ export default function PricingPage() {
                 '2 spaces',
                 '2 household members',
               ]}
-              cta="Upgrade to Pro"
+              cta="Sign Up to Pro"
               popular={true}
               loading={loading === 'pro'}
               disabled={loading !== null}
@@ -181,8 +181,8 @@ export default function PricingPage() {
               tier="family"
               title="Family"
               description="Complete family organization for up to 6 members"
-              monthlyPrice={18}
-              annualPrice={180}
+              monthlyPrice={29}
+              annualPrice={290}
               period={period}
               features={[
                 'Everything in Pro, plus:',
@@ -193,7 +193,7 @@ export default function PricingPage() {
                 'External integrations',
                 'Advanced analytics',
               ]}
-              cta="Upgrade to Family"
+              cta="Sign Up to Family"
               loading={loading === 'family'}
               disabled={loading !== null}
               showFoundingMember={!foundingMemberSoldOut}

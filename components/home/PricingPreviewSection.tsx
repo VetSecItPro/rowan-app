@@ -23,7 +23,7 @@ const tiers = [
   },
   {
     name: 'Pro',
-    price: '$12',
+    price: '$18',
     period: '/mo',
     description: 'Everything you need for your household',
     features: [
@@ -36,7 +36,7 @@ const tiers = [
   },
   {
     name: 'Family',
-    price: '$18',
+    price: '$29',
     period: '/mo',
     description: 'For larger families who need more',
     features: [
@@ -142,9 +142,9 @@ export function PricingPreviewSection({ onSignupClick }: PricingPreviewSectionPr
                     ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02]'
                     : 'bg-gray-700/50 hover:bg-gray-700 text-white hover:scale-[1.02]'
                 }`}
-                aria-label={`Start free trial for ${tier.name} plan`}
+                aria-label={`Sign up for ${tier.name} plan`}
               >
-                Start Free
+                {tier.name === 'Free' ? 'Start Free' : `Sign Up to ${tier.name}`}
               </button>
             </motion.div>
           ))}
