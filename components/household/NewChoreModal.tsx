@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { CreateChoreInput } from '@/lib/services/chores-service';
 import { Chore } from '@/lib/types';
 import { Modal } from '@/components/ui/Modal';
+import { Loader2 } from 'lucide-react';
 
 interface NewChoreModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (chore: CreateChoreInput) => void;
+  onSave: (chore: CreateChoreInput) => void | Promise<void>;
   editChore?: Chore | null;
   spaceId: string;
   userId: string;
@@ -26,21 +27,28 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
     due_date: '',
     created_by: userId,
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (editChore) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({ space_id: spaceId, title: editChore.title, description: editChore.description || '', frequency: editChore.frequency, status: editChore.status, due_date: editChore.due_date || '', created_by: userId });
     } else {
-       
+
       setFormData({ space_id: spaceId, title: '', description: '', frequency: 'weekly', status: 'pending', due_date: '', created_by: userId });
     }
   }, [editChore, spaceId, userId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
-    onClose();
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await onSave(formData);
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const footerContent = (
@@ -55,9 +63,19 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
       <button
         type="submit"
         form="new-chore-form"
-        className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full hover:from-amber-600 hover:to-amber-700 transition-colors font-medium"
+        disabled={isSaving}
+        className={`flex-1 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full transition-colors font-medium ${
+          isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:from-amber-600 hover:to-amber-700'
+        }`}
       >
-        {editChore ? 'Save' : 'Create'}
+        {isSaving ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {editChore ? 'Saving...' : 'Creating...'}
+          </span>
+        ) : (
+          editChore ? 'Save' : 'Create'
+        )}
       </button>
     </div>
   );
@@ -77,6 +95,8 @@ export function NewChoreModal({ isOpen, onClose, onSave, editChore, spaceId, use
           <input
             type="text"
             required
+            aria-required="true"
+            autoFocus
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-white"

@@ -15,7 +15,6 @@ import {
   RefreshCw,
   Monitor,
   ArrowLeft,
-  MessageSquare,
   Layers,
   Clock,
   UserPlus,
@@ -35,7 +34,6 @@ import {
   RetentionPanel,
   RevenuePanel,
   SystemPanel,
-  FeedbackPanel,
   AIUsagePanel,
 } from '@/components/admin/panels';
 import { ComparisonProvider } from '@/components/admin/ComparisonContext';
@@ -52,14 +50,14 @@ interface DashboardStats {
 
 interface ActivityItem {
   id: string;
-  type: 'user_signup' | 'feedback';
+  type: 'user_signup';
   title: string;
   description: string;
   timestamp: string;
   email?: string;
 }
 
-type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'ai' | 'feedback' | 'system';
+type TabId = 'overview' | 'users' | 'growth' | 'engagement' | 'retention' | 'revenue' | 'ai' | 'system';
 
 interface Tab {
   id: TabId;
@@ -77,7 +75,6 @@ const TABS: Tab[] = [
   { id: 'retention', label: 'Retention', icon: Activity, color: 'text-purple-500', description: 'DAU/MAU & cohorts' },
   { id: 'revenue', label: 'Revenue', icon: DollarSign, color: 'text-orange-500', description: 'Subscriptions & MRR' },
   { id: 'ai', label: 'AI Costs', icon: Bot, color: 'text-sky-500', description: 'AI usage & cost monitoring' },
-  { id: 'feedback', label: 'Feedback', icon: MessageSquare, color: 'text-amber-500', description: 'User feedback & bugs' },
   { id: 'system', label: 'System', icon: Settings, color: 'text-gray-400', description: 'Health & settings' },
 ];
 
@@ -231,7 +228,7 @@ function AdminDashboardContent() {
 
   // Get initial tab from URL or default to 'overview'
   const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'ai', 'feedback', 'system'];
+  const validTabs: TabId[] = ['overview', 'users', 'growth', 'engagement', 'retention', 'revenue', 'ai', 'system'];
   const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : 'overview';
 
   const [activeTab, setActiveTabState] = useState<TabId | null>(initialTab);
@@ -369,12 +366,6 @@ function AdminDashboardContent() {
           iconBg: 'bg-green-900/30',
           iconColor: 'text-green-400',
         };
-      case 'feedback':
-        return {
-          icon: MessageSquare,
-          iconBg: 'bg-amber-900/30',
-          iconColor: 'text-amber-400',
-        };
       default:
         return {
           icon: Activity,
@@ -401,8 +392,6 @@ function AdminDashboardContent() {
         return <RevenuePanel />;
       case 'ai':
         return <AIUsagePanel />;
-      case 'feedback':
-        return <FeedbackPanel />;
       case 'system':
         return <SystemPanel />;
       default:

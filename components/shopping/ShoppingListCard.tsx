@@ -127,14 +127,14 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
               <h3 className="text-base sm:text-base md:text-lg font-semibold text-white leading-tight">
                 {list.title}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-400 mt-0.5">
+              <p className="text-xs sm:text-sm text-gray-300 mt-0.5">
                 {checkedItems} of {totalItems} items • {list.store_name || 'No store set'}
               </p>
             </div>
           </div>
 
           {list.description && (
-            <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:ml-[76px] leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-300 mb-3 sm:ml-[76px] leading-relaxed">
               <span className="font-medium">Note:</span> {list.description}
             </p>
           )}
@@ -146,7 +146,7 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
                 <div key={category} className="space-y-1.5">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="text-base sm:text-lg">{getCategoryIcon(category as ShoppingCategory)}</span>
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wide">
+                    <span className="text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wide">
                       {getCategoryLabel(category as ShoppingCategory)}
                     </span>
                   </div>
@@ -317,12 +317,12 @@ export const ShoppingListCard = memo(function ShoppingListCard({ list, onEdit, o
         <div className="flex items-center gap-3">
           {list.budget && (
             <Tooltip content={`Budget: $${list.budget.toFixed(2)}`}>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-300">
                 💰 ${list.estimated_total?.toFixed(2) || '0.00'} / ${list.budget.toFixed(2)}
               </span>
             </Tooltip>
           )}
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-300">
             {formatTimestamp(list.created_at, 'MMM d, yyyy')}
           </span>
         </div>

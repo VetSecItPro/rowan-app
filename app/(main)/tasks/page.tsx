@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { CheckSquare, Search, Plus, Clock, CheckCircle2, AlertCircle, Home, FileText, TrendingUp, Minus, ChevronDown, X } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -337,34 +338,30 @@ export default function TasksPage() {
                     ))}
                   </div>
                 ) : filteredItems.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4">
-                      <CheckSquare className="w-8 h-8 text-blue-400" />
+                  searchQuery || statusFilter !== 'all' ? (
+                    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                      <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-4">
+                        <CheckSquare className="w-8 h-8 text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2">No matching items</h3>
+                      <p className="text-sm text-gray-400 max-w-sm mb-6">
+                        Try adjusting your filters to find what you&apos;re looking for.
+                      </p>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {searchQuery || statusFilter !== 'all' ? 'No matching items' : 'Ready to get organized?'}
-                    </h3>
-                    <p className="text-sm text-gray-400 max-w-sm mb-6">
-                      {searchQuery || statusFilter !== 'all'
-                        ? 'Try adjusting your filters to find what you\'re looking for.'
-                        : 'Create your first task to start conquering your to-do list.'}
-                    </p>
-                    {!searchQuery && statusFilter === 'all' && (
-                      <>
-                        <button
-                          onClick={() => openCreateModal('task')}
-                          className="px-5 py-2.5 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-blue-600/20"
-                        >
-                          <Plus className="w-4 h-4" />
-                          Add Task
-                        </button>
-                        <AIContextualHint
-                          featureKey="tasks"
-                          prompt="Add 'clean kitchen' to my tasks for today"
-                        />
-                      </>
-                    )}
-                  </div>
+                  ) : (
+                    <>
+                      <EmptyState
+                        feature="tasks"
+                        title="Ready to get organized?"
+                        description="Create your first task to start conquering your to-do list."
+                        primaryAction={{ label: 'Add Task', onClick: () => openCreateModal('task') }}
+                      />
+                      <AIContextualHint
+                        featureKey="tasks"
+                        prompt="Add 'clean kitchen' to my tasks for today"
+                      />
+                    </>
+                  )
                 ) : enableDragDrop && currentSpace ? (
                   /* Unified drag-and-drop for all items with scrollbar */
                   <div className="space-y-2">

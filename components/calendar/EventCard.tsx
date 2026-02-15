@@ -119,7 +119,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
                   event.status === 'completed' ? 'opacity-60' : ''
                 }`}>
                   {/* Mobile: Just icon and text */}
-                  <span className="sm:hidden text-gray-400">
+                  <span className="sm:hidden text-gray-300">
                     {getCategoryConfig().icon} {getCategoryConfig().label}
                   </span>
                   {/* Desktop: With background */}
@@ -128,7 +128,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
                   </span>
                 </span>
               </div>
-              <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 mt-1 text-xs sm:text-sm text-gray-400 flex-wrap ${
+              <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 mt-1 text-xs sm:text-sm text-gray-300 flex-wrap ${
                 event.status === 'completed' ? 'line-through opacity-60' : ''
               }`}>
                 <div className="flex items-center gap-1">
@@ -144,7 +144,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
           </div>
 
           {event.description && (
-            <p className={`text-sm sm:text-base text-gray-400 mt-2 sm:mt-3 ml-3 sm:ml-4 break-words line-clamp-2 ${
+            <p className={`text-sm sm:text-base text-gray-300 mt-2 sm:mt-3 ml-3 sm:ml-4 break-words line-clamp-2 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
               {event.description}
@@ -152,7 +152,7 @@ export const EventCard = memo(function EventCard({ event, onEdit, onDelete, onSt
           )}
 
           {event.location && (
-            <div className={`flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 ml-3 sm:ml-4 text-gray-400 ${
+            <div className={`flex items-center gap-1.5 sm:gap-2 mt-2 sm:mt-3 ml-3 sm:ml-4 text-gray-300 ${
               event.status === 'completed' ? 'line-through opacity-60' : ''
             }`}>
               <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />

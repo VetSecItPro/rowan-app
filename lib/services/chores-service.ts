@@ -179,8 +179,8 @@ export const choresService = {
    * @returns The updated chore
    * @throws Error if database update fails
    */
-  async updateChore(id: string, updates: UpdateChoreInput): Promise<Chore> {
-    const supabase = createClient();
+  async updateChore(id: string, updates: UpdateChoreInput, supabaseClient?: SupabaseClient): Promise<Chore> {
+    const supabase = supabaseClient ?? createClient();
     try {
       // Handle completed_at timestamp automatically
       const finalUpdates: UpdateChoreInput = { ...updates };

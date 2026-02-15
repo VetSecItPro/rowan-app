@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 interface ActivityItem {
   id: string;
-  type: 'user_signup' | 'feedback';
+  type: 'user_signup';
   title: string;
   description: string;
   timestamp: string;
@@ -22,15 +22,6 @@ interface ProfileRecord {
   email?: string;
   full_name?: string;
   created_at: string;
-}
-
-interface FeedbackSubmissionRecord {
-  id: string;
-  description?: string;
-  feedback_type?: string;
-  created_at: string;
-  user_id: string;
-  profiles: { email?: string; full_name?: string } | null;
 }
 
 export async function GET(request: NextRequest) {
@@ -62,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     const activities: ActivityItem[] = [];
 
-    // 1. Recent user signups from profiles table (using admin client to bypass RLS)
+    // Recent user signups from profiles table (using admin client to bypass RLS)
     const { data: recentUsers, error: usersError } = await supabaseAdmin
       .from('profiles')
       .select('id, email, full_name, created_at')
@@ -79,35 +70,6 @@ export async function GET(request: NextRequest) {
           description: user.full_name || user.email?.split('@')[0] || 'New user',
           timestamp: user.created_at,
           email: user.email,
-        });
-      });
-    }
-
-    // 2. Recent feedback submissions
-    const { data: feedbackSubmissions, error: submissionsError } = await supabaseAdmin
-      .from('feedback_submissions')
-      .select(`
-        id,
-        description,
-        feedback_type,
-        created_at,
-        user_id,
-        profiles!inner(email, full_name)
-      `)
-      .gte('created_at', cutoffIso)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (!submissionsError && feedbackSubmissions) {
-      (feedbackSubmissions as FeedbackSubmissionRecord[]).forEach((fb) => {
-        const profile = fb.profiles as unknown as { email?: string; full_name?: string } | null;
-        activities.push({
-          id: `submission-${fb.id}`,
-          type: 'feedback',
-          title: fb.feedback_type === 'bug' ? 'Bug report' : 'Feedback submitted',
-          description: fb.description?.slice(0, 50) || 'New feedback',
-          timestamp: fb.created_at,
-          email: profile?.email,
         });
       });
     }

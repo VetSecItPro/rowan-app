@@ -191,6 +191,7 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               </label>
               <input
                 type="text"
+                aria-required="true"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className={`w-full px-3 py-2 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -394,9 +395,17 @@ export function VendorModal({ isOpen, onClose, onSave, editVendor }: VendorModal
               value={formData.notes}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               rows={3}
+              maxLength={500}
               className="w-full px-3 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Any additional notes about this vendor..."
             />
+            <p className={`text-xs mt-1 text-right ${
+              (formData.notes?.length || 0) > 500 * 0.95 ? 'text-red-400' :
+              (formData.notes?.length || 0) > 500 * 0.8 ? 'text-amber-400' :
+              'text-gray-500'
+            }`}>
+              {formData.notes?.length || 0}/500
+            </p>
           </div>
 
       </form>

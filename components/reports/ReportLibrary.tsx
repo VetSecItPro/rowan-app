@@ -260,7 +260,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                 <div className="flex items-center gap-2 ml-4">
                   <button
                     onClick={() => onViewReport(report)}
-                    className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                   >
                     <Eye className="h-4 w-4 mr-1" />
                     View
@@ -270,7 +270,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                     <button
                       onClick={() => handleDownload(report)}
                       disabled={loading === report.id}
-                      className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                      className="inline-flex items-center px-3 py-1.5 border border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-300 bg-gray-700 hover:bg-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 disabled:opacity-50"
                     >
                       <Download className="h-4 w-4 mr-1" />
                       {loading === report.id ? 'Downloading...' : 'Download'}
@@ -280,7 +280,7 @@ export function ReportLibrary({ reports, onViewReport, onReportUpdated }: Report
                   <button
                     onClick={() => handleDelete(report)}
                     disabled={loading === report.id}
-                    className="inline-flex items-center px-3 py-1.5 border border-red-600 shadow-sm text-sm font-medium rounded-md text-red-400 bg-gray-700 hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                    className="inline-flex items-center px-3 py-1.5 border border-red-600 shadow-sm text-sm font-medium rounded-md text-red-400 bg-gray-700 hover:bg-red-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     Delete

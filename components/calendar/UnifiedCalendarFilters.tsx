@@ -53,8 +53,8 @@ const FilterButton = memo(function FilterButton({
               ? `${colors.bg} ${colors.border} ${colors.text}`
               : 'border-gray-700 text-gray-400'
           }
-          hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2
-          ${isActive ? 'focus:ring-purple-500' : 'focus:ring-gray-400'}
+          hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+          ${isActive ? 'focus-visible:ring-purple-500' : 'focus-visible:ring-gray-400'}
         `}
         aria-pressed={isActive}
         aria-label={tooltipText}

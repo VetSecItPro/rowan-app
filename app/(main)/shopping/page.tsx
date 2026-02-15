@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { ShoppingCart, Search, Plus, List, CheckCircle2, Clock, Package, X, TrendingUp } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { AIContextualHint } from '@/components/ai/AIContextualHint';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
@@ -301,33 +302,30 @@ export default function ShoppingPage() {
                 ))}
               </div>
             ) : filteredLists.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4">
-                  <ShoppingCart className="w-8 h-8 text-emerald-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {searchQuery || statusFilter !== 'active' ? 'No matching lists' : 'Time to stock up!'}
-                </h3>
-                <p className="text-sm text-gray-400 max-w-sm mb-6">
-                  {searchQuery || statusFilter !== 'active'
-                    ? 'Try adjusting your filters to find what you\'re looking for.'
-                    : 'Create your first shopping list to keep track of what you need.'}
-                </p>
-                {!searchQuery && statusFilter === 'active' && (
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button onClick={handleOpenNewListModal} className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-emerald-500/20">
-                      <Plus className="w-5 h-5" />
-                      Create Shopping List
-                    </button>
+              searchQuery || statusFilter !== 'active' ? (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4">
+                    <ShoppingCart className="w-8 h-8 text-emerald-400" />
                   </div>
-                )}
-                {!searchQuery && statusFilter === 'active' && (
+                  <h3 className="text-lg font-semibold text-white mb-2">No matching lists</h3>
+                  <p className="text-sm text-gray-400 max-w-sm mb-6">
+                    Try adjusting your filters to find what you&apos;re looking for.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <EmptyState
+                    feature="shopping"
+                    title="Time to stock up!"
+                    description="Create your first shopping list to keep track of what you need."
+                    primaryAction={{ label: 'Create Shopping List', onClick: handleOpenNewListModal }}
+                  />
                   <AIContextualHint
                     featureKey="shopping"
                     prompt="Add milk, eggs, and bread to my grocery list"
                   />
-                )}
-              </div>
+                </>
+              )
             ) : (
               <div className="min-h-[600px] max-h-[900px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                 {filteredLists.map((list) => (

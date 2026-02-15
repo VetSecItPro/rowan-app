@@ -156,6 +156,7 @@ export function NewConversationModal({
             placeholder="e.g., Weekend Plans, Family Chat"
             className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-400"
             required
+            aria-required="true"
             maxLength={100}
           />
         </div>
@@ -175,6 +176,13 @@ export function NewConversationModal({
               className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-400 resize-none"
               maxLength={500}
             />
+            <p className={`text-xs mt-1 text-right ${
+              description.length > 500 * 0.95 ? 'text-red-400' :
+              description.length > 500 * 0.8 ? 'text-amber-400' :
+              'text-gray-500'
+            }`}>
+              {description.length}/500
+            </p>
           </div>
         )}
       </form>

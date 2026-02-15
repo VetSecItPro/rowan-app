@@ -283,7 +283,7 @@ export function FamilyMapView({ spaceId, className }: FamilyMapViewProps) {
                 )}
               >
                 {member.avatar_url ? (
-                  <Image src={member.avatar_url} alt="" width={20} height={20} className="w-5 h-5 rounded-full" />
+                  <Image src={member.avatar_url} alt={member.name} width={20} height={20} className="w-5 h-5 rounded-full" />
                 ) : (
                   <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                     <span className="text-white text-xs font-medium">
@@ -305,7 +305,7 @@ export function FamilyMapView({ spaceId, className }: FamilyMapViewProps) {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               {selectedMember.avatar_url ? (
-                <Image src={selectedMember.avatar_url} alt="" width={40} height={40} className="w-10 h-10 rounded-full" />
+                <Image src={selectedMember.avatar_url} alt={selectedMember.name} width={40} height={40} className="w-10 h-10 rounded-full" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <span className="text-white font-semibold">

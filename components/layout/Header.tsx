@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { HamburgerMenu } from '@/components/navigation/HamburgerMenu';
 import { ComprehensiveNotificationCenter } from '@/components/notifications/ComprehensiveNotificationCenter';
-import { FeedbackButton } from '@/components/feedback/FeedbackButton';
+
 import { useAuth } from '@/lib/contexts/auth-context';
 import { useSpaces } from '@/lib/contexts/spaces-context';
 import { LogOut, User as UserIcon, ChevronDown, Trophy, Shield, UserPlus } from 'lucide-react';
@@ -122,7 +122,6 @@ export function Header() {
 
           {/* Right side navigation */}
           <div className="flex items-center gap-1 sm:gap-4">
-            <FeedbackButton />
             {/* Hidden on mobile — BottomNav Menu tab replaces it */}
             <div className="hidden md:block">
               <HamburgerMenu />

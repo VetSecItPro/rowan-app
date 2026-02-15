@@ -73,7 +73,7 @@ function LegalPageContent() {
             Back to Home
           </Link>
 
-          <h1 className="text-3xl font-bold text-white mb-6">Legal</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-6">Legal</h1>
 
           {/* Tab Navigation */}
           <div className="flex flex-wrap gap-2 mb-8 border-b border-gray-700 pb-4">

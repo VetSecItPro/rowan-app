@@ -4,6 +4,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Target, Search, Plus, CheckCircle2, TrendingUp, Award, LayoutGrid, List, Sparkles, MessageCircle, X } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { format } from 'date-fns';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
@@ -528,28 +529,24 @@ export default function GoalsPage() {
             ) : viewMode === 'goals' ? (
               /* Goals View */
               filteredGoals.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4">
-                    <Target className="w-8 h-8 text-indigo-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {searchQuery ? 'No matching goals' : 'Every journey starts with a goal'}
-                  </h3>
-                  <p className="text-sm text-gray-400 max-w-sm mb-6">
-                    {searchQuery ? 'Try adjusting your search to find what you\'re looking for.' : 'Set your first goal and start tracking your progress.'}
-                  </p>
-                  {!searchQuery && (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                      <button
-                        onClick={handleOpenGoalModal}
-                        className="px-5 py-2.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-indigo-600/20"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Set a Goal
-                      </button>
+                searchQuery ? (
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4">
+                      <Target className="w-8 h-8 text-indigo-400" />
                     </div>
-                  )}
-                </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">No matching goals</h3>
+                    <p className="text-sm text-gray-400 max-w-sm mb-6">
+                      Try adjusting your search to find what you&apos;re looking for.
+                    </p>
+                  </div>
+                ) : (
+                  <EmptyState
+                    feature="goals"
+                    title="Every journey starts with a goal"
+                    description="Set your first goal and start tracking your progress."
+                    primaryAction={{ label: 'Set a Goal', onClick: handleOpenGoalModal }}
+                  />
+                )
               ) : (
                 <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                   <SortableGoalsList
@@ -570,19 +567,24 @@ export default function GoalsPage() {
             ) : viewMode === 'milestones' ? (
               /* Milestones View */
               filteredMilestones.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4">
-                    <Award className="w-8 h-8 text-indigo-400" />
+                searchQuery ? (
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-4">
+                      <Award className="w-8 h-8 text-indigo-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">No matching milestones</h3>
+                    <p className="text-sm text-gray-400 max-w-sm mb-6">
+                      Try adjusting your search to find what you&apos;re looking for.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {searchQuery ? 'No matching milestones' : 'Break goals into milestones'}
-                  </h3>
-                  <p className="text-sm text-gray-400 max-w-sm mb-6">
-                    {searchQuery
-                      ? 'Try adjusting your search to find what you\'re looking for.'
-                      : 'Add milestones to your goals to track progress step by step.'}
-                  </p>
-                </div>
+                ) : (
+                  <EmptyState
+                    feature="goals"
+                    icon={Award}
+                    title="Break goals into milestones"
+                    description="Add milestones to your goals to track progress step by step."
+                  />
+                )
               ) : (
                 <div className="max-h-[600px] overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                   {filteredMilestones.map((milestone) => {

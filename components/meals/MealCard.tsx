@@ -45,7 +45,7 @@ function MealCardComponent({ meal, onEdit, onDelete }: MealCardProps) {
                   <CheckSquare className="w-4 h-4 text-green-400 flex-shrink-0" />
                 )}
               </div>
-              <p className="text-sm text-gray-400 capitalize">
+              <p className="text-sm text-gray-300 capitalize">
                 {meal.meal_type} • {formatTimestamp(meal.scheduled_date, 'MMM d, yyyy')}
                 {isPastMeal && <span className="ml-2 text-green-400 text-xs font-medium">• Completed</span>}
               </p>
@@ -66,10 +66,10 @@ function MealCardComponent({ meal, onEdit, onDelete }: MealCardProps) {
             </div>
           </div>
           {meal.recipe?.description && (
-            <p className="text-sm text-gray-400 mb-2 break-words line-clamp-2">{meal.recipe.description}</p>
+            <p className="text-sm text-gray-300 mb-2 break-words line-clamp-2">{meal.recipe.description}</p>
           )}
           {meal.notes && (
-            <p className="text-sm text-gray-400 italic break-words line-clamp-2">{meal.notes}</p>
+            <p className="text-sm text-gray-300 italic break-words line-clamp-2">{meal.notes}</p>
           )}
         </div>
         <div className="relative">

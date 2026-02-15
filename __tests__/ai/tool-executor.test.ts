@@ -93,6 +93,7 @@ vi.mock('@/lib/logger', () => ({
 const context: ToolExecutionContext = {
   spaceId: '00000000-0000-4000-8000-000000000001',
   userId: '00000000-0000-4000-8000-000000000002',
+  supabase: {} as import('@supabase/supabase-js').SupabaseClient,
 };
 
 describe('Tool Executor', () => {

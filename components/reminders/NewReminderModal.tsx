@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Smile, Sparkles } from 'lucide-react';
+import { Smile, Sparkles, Loader2 } from 'lucide-react';
 import { CreateReminderInput, Reminder } from '@/lib/services/reminders-service';
 import { UserPicker } from './UserPicker';
 import { TemplatePicker } from './TemplatePicker';
@@ -29,7 +29,7 @@ const getRepeatOptions = () => [
 interface NewReminderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (reminder: CreateReminderInput) => void;
+  onSave: (reminder: CreateReminderInput) => void | Promise<void>;
   editReminder?: Reminder | null;
   spaceId: string;
 }
@@ -53,6 +53,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
   const [dateError, setDateError] = useState<string>('');
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [attachmentRefreshTrigger, setAttachmentRefreshTrigger] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
 
   // Reset form when modal opens or when switching between edit/create modes
@@ -62,7 +63,7 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
     if (editReminder) {
       // Editing existing reminder - populate with existing data
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setFormData({
         space_id: spaceId,
         title: editReminder.title,
@@ -78,15 +79,15 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
 
       // Populate repeat days based on pattern
       if (editReminder.repeat_pattern === 'weekly' && editReminder.repeat_days) {
-         
+
         setSelectedWeekdays(editReminder.repeat_days);
       } else if (editReminder.repeat_pattern === 'monthly' && editReminder.repeat_days) {
-         
+
         setSelectedMonthDays(editReminder.repeat_days);
       }
     } else {
       // Creating new reminder - reset to clean state
-       
+
       setFormData({
         space_id: spaceId,
         title: '',
@@ -98,20 +99,20 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
         status: 'active',
         assigned_to: undefined,
       });
-       
+
       setSelectedWeekdays([]);
-       
+
       setSelectedMonthDays([]);
     }
 
     // Reset other form state
-     
+
     setDateError('');
-     
+
     setShowEmojiPicker(false);
-     
+
     setShowTemplatePicker(false);
-     
+
     setAttachmentRefreshTrigger(prev => prev + 1);
   }, [isOpen, editReminder, spaceId]);
 
@@ -141,43 +142,49 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
     setShowTemplatePicker(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
+    setIsSaving(true);
 
-    // Validate reminder time is not in the past
-    if (formData.reminder_time) {
-      const reminderDate = new Date(formData.reminder_time);
-      const now = new Date();
+    try {
+      // Validate reminder time is not in the past
+      if (formData.reminder_time) {
+        const reminderDate = new Date(formData.reminder_time);
+        const now = new Date();
 
-      if (reminderDate < now) {
-        setDateError('Reminder time cannot be in the past');
-        return;
+        if (reminderDate < now) {
+          setDateError('Reminder time cannot be in the past');
+          return;
+        }
       }
+
+      // Clear any previous errors
+      setDateError('');
+
+      // Prepare data with repeat_days based on pattern
+      const submissionData: CreateReminderInput = {
+        ...formData,
+        // Convert datetime-local format to ISO string for database
+        reminder_time: formData.reminder_time ? new Date(formData.reminder_time).toISOString() : undefined,
+      };
+
+      // Add repeat_days if applicable
+      if (formData.repeat_pattern === 'weekly' && selectedWeekdays.length > 0) {
+        submissionData.repeat_days = selectedWeekdays;
+      } else if (formData.repeat_pattern === 'monthly' && selectedMonthDays.length > 0) {
+        submissionData.repeat_days = selectedMonthDays;
+      } else if (formData.repeat_pattern === 'daily') {
+        submissionData.repeat_days = [];
+      } else if (!formData.repeat_pattern || formData.repeat_pattern === '') {
+        submissionData.repeat_days = [];
+      }
+
+      await onSave(submissionData);
+      onClose();
+    } finally {
+      setIsSaving(false);
     }
-
-    // Clear any previous errors
-    setDateError('');
-
-    // Prepare data with repeat_days based on pattern
-    const submissionData: CreateReminderInput = {
-      ...formData,
-      // Convert datetime-local format to ISO string for database
-      reminder_time: formData.reminder_time ? new Date(formData.reminder_time).toISOString() : undefined,
-    };
-
-    // Add repeat_days if applicable
-    if (formData.repeat_pattern === 'weekly' && selectedWeekdays.length > 0) {
-      submissionData.repeat_days = selectedWeekdays;
-    } else if (formData.repeat_pattern === 'monthly' && selectedMonthDays.length > 0) {
-      submissionData.repeat_days = selectedMonthDays;
-    } else if (formData.repeat_pattern === 'daily') {
-      submissionData.repeat_days = [];
-    } else if (!formData.repeat_pattern || formData.repeat_pattern === '') {
-      submissionData.repeat_days = [];
-    }
-
-    onSave(submissionData);
-    onClose();
   };
 
   const getTitle = () => {
@@ -198,12 +205,19 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
       <button
         type="submit"
         form="new-reminder-form"
-        disabled={!!dateError}
+        disabled={!!dateError || isSaving}
         className={`flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-full transition-all font-medium ${
-          dateError ? 'opacity-50 cursor-not-allowed' : 'hover:from-pink-600 hover:to-pink-700'
+          dateError || isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:from-pink-600 hover:to-pink-700'
         }`}
       >
-        {editReminder ? 'Save Changes' : 'Create Reminder'}
+        {isSaving ? (
+          <span className="flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {editReminder ? 'Saving...' : 'Creating...'}
+          </span>
+        ) : (
+          editReminder ? 'Save Changes' : 'Create Reminder'
+        )}
       </button>
     </div>
   ) : null;
@@ -247,6 +261,8 @@ export function NewReminderModal({ isOpen, onClose, onSave, editReminder, spaceI
               <input
                 type="text"
                 required
+                aria-required="true"
+                autoFocus
                 value={formData.title}
                 id="field-1"
               onChange={(e) =>  setFormData({ ...formData, title: e.target.value })}

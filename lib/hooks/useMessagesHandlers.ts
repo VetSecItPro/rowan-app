@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, CreateConversationInput, DeleteMessageMode } from '@/lib/services/messages-service';
 import { mentionsService } from '@/lib/services/mentions-service';
 import { fileUploadService } from '@/lib/services/file-upload-service';
 import { toast } from 'sonner';
+import { showSuccess } from '@/lib/utils/toast';
 import { logger } from '@/lib/logger';
 import type { MessagesDataReturn } from '@/lib/hooks/useMessagesData';
 import type { MessagesModalsReturn } from '@/lib/hooks/useMessagesModals';
@@ -132,6 +133,9 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
     openForwardModal,
     startEditingTitle,
   } = deps;
+
+  // Track pending deletion timeouts for undo support
+  const pendingDeletionRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // Handle create/edit message (from modal)
   const handleCreateMessage = useCallback(async (messageData: CreateMessageInput) => {
@@ -436,36 +440,72 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
   const handleDeleteConversation = useCallback(async (conversationIdToDelete: string) => {
     if (!currentSpace || !user) return;
 
+    // Save conversation and current state for undo
+    const savedConversation = conversations.find(c => c.id === conversationIdToDelete);
+    if (!savedConversation) return;
+
+    const wasActiveConversation = conversationIdToDelete === conversationId;
+    const previousMessages = wasActiveConversation ? [...messages] : [];
+    const previousConversationId = conversationId;
+
+    // Optimistic removal from UI
     setConversations(prev => prev.filter(conv => conv.id !== conversationIdToDelete));
 
-    if (conversationIdToDelete === conversationId) {
+    if (wasActiveConversation) {
       const remainingConversations = conversations.filter(c => c.id !== conversationIdToDelete);
       if (remainingConversations.length > 0) {
         setConversationId(remainingConversations[0].id);
-        setMessages([]);
+        // Load messages for the new active conversation
+        messagesService.getMessages(remainingConversations[0].id).then(messagesData => {
+          setMessages(messagesData);
+        }).catch(() => {
+          setMessages([]);
+        });
       } else {
         setConversationId(null);
         setMessages([]);
       }
     }
 
-    try {
-      await messagesService.deleteConversation(conversationIdToDelete);
+    // Clear any existing timeout for this item
+    const existingTimeout = pendingDeletionRef.current.get(conversationIdToDelete);
+    if (existingTimeout) clearTimeout(existingTimeout);
 
-      if (conversationIdToDelete === conversationId && conversations.filter(c => c.id !== conversationIdToDelete).length > 0) {
-        const newActiveConversation = conversations.filter(c => c.id !== conversationIdToDelete)[0];
-        const messagesData = await messagesService.getMessages(newActiveConversation.id);
-        setMessages(messagesData);
+    const timeoutId = setTimeout(async () => {
+      try {
+        await messagesService.deleteConversation(conversationIdToDelete);
+        pendingDeletionRef.current.delete(conversationIdToDelete);
+      } catch (error) {
+        logger.error('Failed to delete conversation:', error, { component: 'page', action: 'service_call' });
+        toast.error('Failed to delete conversation');
+        // Revert on error
+        const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
+        setConversations(conversationsData);
+        pendingDeletionRef.current.delete(conversationIdToDelete);
       }
+    }, 5000);
 
-      toast.success('Conversation deleted');
-    } catch (error) {
-      logger.error('Failed to delete conversation:', error, { component: 'page', action: 'service_call' });
-      toast.error('Failed to delete conversation');
-      const conversationsData = await messagesService.getConversationsList(currentSpace.id, user.id);
-      setConversations(conversationsData);
-    }
-  }, [currentSpace, user, conversationId, conversations, setConversations, setConversationId, setMessages]);
+    pendingDeletionRef.current.set(conversationIdToDelete, timeoutId);
+
+    toast('Conversation deleted', {
+      description: 'You have 5 seconds to undo this action.',
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          clearTimeout(timeoutId);
+          pendingDeletionRef.current.delete(conversationIdToDelete);
+          // Restore conversation to list
+          setConversations(prev => [savedConversation, ...prev]);
+          // If it was the active conversation, restore it
+          if (wasActiveConversation) {
+            setConversationId(previousConversationId);
+            setMessages(previousMessages);
+          }
+          showSuccess('Conversation restored!');
+        },
+      },
+    });
+  }, [currentSpace, user, conversationId, conversations, messages, setConversations, setConversationId, setMessages]);
 
   // Handle renaming a conversation from sidebar
   const handleRenameConversationFromSidebar = useCallback(async (conversationIdToRename: string, newTitle: string) => {

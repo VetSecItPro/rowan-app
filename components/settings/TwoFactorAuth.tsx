@@ -317,7 +317,7 @@ export function TwoFactorAuth({ onStatusChange }: TwoFactorAuthProps) {
                 </p>
 
                 {qrCode ? (
-                  <div className="bg-white p-4 rounded-xl border border-gray-700 text-center">
+                  <div className="p-4 rounded-xl border border-gray-700 text-center" style={{ backgroundColor: '#ffffff' }}>
                     <Image
                       src={qrCode}
                       alt="2FA QR Code"

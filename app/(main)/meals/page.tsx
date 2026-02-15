@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { memo } from 'react';
 import { UtensilsCrossed, Search, Plus, Calendar as CalendarIcon, BookOpen, TrendingUp, ShoppingBag, ChevronLeft, ChevronRight, LayoutGrid, List, ChefHat, X, CheckSquare } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { CollapsibleStatsGrid } from '@/components/ui/CollapsibleStatsGrid';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import Link from 'next/link';
@@ -541,28 +542,25 @@ export default function MealsPage() {
               ) : viewMode === 'recipes' ? (
               /* Recipes View */
               filteredRecipes.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
-                    <ChefHat className="w-8 h-8 text-orange-400" />
+                searchQuery ? (
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
+                      <ChefHat className="w-8 h-8 text-orange-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">No matching recipes</h3>
+                    <p className="text-sm text-gray-400 max-w-sm mb-6">
+                      Try adjusting your search to find what you&apos;re looking for.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {searchQuery ? 'No matching recipes' : 'Your recipe collection awaits'}
-                  </h3>
-                  <p className="text-sm text-gray-400 max-w-sm mb-6">
-                    {searchQuery
-                      ? 'Try adjusting your search to find what you\'re looking for.'
-                      : 'Save your favorite recipes to quickly plan meals and generate shopping lists.'}
-                  </p>
-                  {!searchQuery && (
-                    <button
-                      onClick={handleOpenRecipeModal}
-                      className="px-5 py-2.5 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-orange-600/20"
-                    >
-                      <ChefHat className="w-4 h-4" />
-                      Add Recipe
-                    </button>
-                  )}
-                </div>
+                ) : (
+                  <EmptyState
+                    feature="meals"
+                    icon={ChefHat}
+                    title="Your recipe collection awaits"
+                    description="Save your favorite recipes to quickly plan meals and generate shopping lists."
+                    primaryAction={{ label: 'Add Recipe', onClick: handleOpenRecipeModal }}
+                  />
+                )
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                   {filteredRecipes.map((recipe) => (
@@ -772,28 +770,24 @@ export default function MealsPage() {
             ) : (
               /* List View */
               filteredMeals.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
-                    <UtensilsCrossed className="w-8 h-8 text-orange-400" />
+                searchQuery ? (
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4">
+                      <UtensilsCrossed className="w-8 h-8 text-orange-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">No matching meals</h3>
+                    <p className="text-sm text-gray-400 max-w-sm mb-6">
+                      Try adjusting your search to find what you&apos;re looking for.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    {searchQuery ? 'No matching meals' : 'Plan your week of meals'}
-                  </h3>
-                  <p className="text-sm text-gray-400 max-w-sm mb-6">
-                    {searchQuery
-                      ? 'Try adjusting your search to find what you\'re looking for.'
-                      : 'Plan meals ahead of time to eat healthier and reduce stress.'}
-                  </p>
-                  {!searchQuery && (
-                    <button
-                      onClick={handleOpenMealModal}
-                      className="px-5 py-2.5 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors inline-flex items-center gap-2 text-sm font-medium shadow-lg shadow-orange-600/20"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Plan a Meal
-                    </button>
-                  )}
-                </div>
+                ) : (
+                  <EmptyState
+                    feature="meals"
+                    title="Plan your week of meals"
+                    description="Plan meals ahead of time to eat healthier and reduce stress."
+                    primaryAction={{ label: 'Plan a Meal', onClick: handleOpenMealModal }}
+                  />
+                )
               ) : (
                 <div className="space-y-4">
                   {filteredMeals.map((meal) => {

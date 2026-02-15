@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { tasksService } from '@/lib/services/tasks-service';
 import { taskTemplatesService } from '@/lib/services/task-templates-service';
 import { choresService, type UpdateChoreInput } from '@/lib/services/chores-service';
@@ -7,6 +7,8 @@ import type { CreateTaskInput, UpdateTaskInput } from '@/lib/validations/task-sc
 import type { CreateChoreInput } from '@/lib/services/chores-service';
 import { pointsService } from '@/lib/services/rewards';
 import { logger } from '@/lib/logger';
+import { toast } from 'sonner';
+import { showSuccess, showError } from '@/lib/utils/toast';
 import type { TasksDataReturn } from '@/lib/hooks/useTasksData';
 import type { TasksModalsReturn } from '@/lib/hooks/useTasksModals';
 
@@ -71,6 +73,9 @@ export function useTasksHandlers(deps: TasksHandlersDeps): TasksHandlersReturn {
     closeTemplatePicker,
     clearSelectedTaskIds,
   } = deps;
+
+  // Track pending deletion timeouts for undo support
+  const pendingDeletionRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   const handleSaveItem = useCallback(async (itemData: CreateTaskInput | CreateChoreInput): Promise<void | { id: string }> => {
     try {
@@ -245,26 +250,95 @@ export function useTasksHandlers(deps: TasksHandlersDeps): TasksHandlersReturn {
   }, [refreshChores, refreshTasks, setChores, setTasks, spaceId, tasks, user]);
 
   const handleDeleteItem = useCallback(async (itemId: string, type?: 'task' | 'chore') => {
-    try {
-      if (type === 'chore') {
-        setChoreLoading(true);
-        await choresService.deleteChore(itemId);
-        setChoreLoading(false);
-      } else {
-        setTasks(prev => prev.filter(task => task.id !== itemId));
-        await tasksService.deleteTask(itemId);
-      }
-    } catch (error) {
-      logger.error(`Failed to delete ${type || 'task'}`, error, { component: 'page', action: 'delete_item', itemId, type });
+    const isChore = type === 'chore';
+    const label = isChore ? 'Chore' : 'Task';
 
-      if (type === 'chore') {
-        setChoreLoading(false);
-        refreshChores();
-      } else {
-        refreshTasks();
-      }
+    if (isChore) {
+      // Save chore data before removal (we need deps.chores but it's not in deps,
+      // so we read from the current state via a ref-like pattern)
+      // For chores, we use setChores to capture and restore
+      let savedChore: Chore | undefined;
+
+      setChores(prev => {
+        savedChore = prev.find(c => c.id === itemId);
+        return prev.filter(c => c.id !== itemId);
+      });
+
+      if (!savedChore) return;
+
+      const capturedChore = savedChore;
+
+      // Clear any existing timeout for this item
+      const existingTimeout = pendingDeletionRef.current.get(itemId);
+      if (existingTimeout) clearTimeout(existingTimeout);
+
+      const timeoutId = setTimeout(async () => {
+        try {
+          await choresService.deleteChore(itemId);
+          pendingDeletionRef.current.delete(itemId);
+          refreshChores();
+        } catch (error) {
+          logger.error('Failed to delete chore', error, { component: 'page', action: 'delete_item', itemId });
+          showError('Failed to delete chore');
+          setChores(prev => [capturedChore, ...prev]);
+          pendingDeletionRef.current.delete(itemId);
+        }
+      }, 5000);
+
+      pendingDeletionRef.current.set(itemId, timeoutId);
+
+      toast(`${label} deleted`, {
+        description: 'You have 5 seconds to undo this action.',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            clearTimeout(timeoutId);
+            pendingDeletionRef.current.delete(itemId);
+            setChores(prev => [capturedChore, ...prev]);
+            showSuccess(`${label} restored!`);
+          },
+        },
+      });
+    } else {
+      // Save task data before removal
+      const savedTask = tasks.find(t => t.id === itemId);
+      if (!savedTask) return;
+
+      // Optimistic removal
+      setTasks(prev => prev.filter(task => task.id !== itemId));
+
+      // Clear any existing timeout for this item
+      const existingTimeout = pendingDeletionRef.current.get(itemId);
+      if (existingTimeout) clearTimeout(existingTimeout);
+
+      const timeoutId = setTimeout(async () => {
+        try {
+          await tasksService.deleteTask(itemId);
+          pendingDeletionRef.current.delete(itemId);
+        } catch (error) {
+          logger.error('Failed to delete task', error, { component: 'page', action: 'delete_item', itemId });
+          showError('Failed to delete task');
+          setTasks(prev => [savedTask, ...prev]);
+          pendingDeletionRef.current.delete(itemId);
+        }
+      }, 5000);
+
+      pendingDeletionRef.current.set(itemId, timeoutId);
+
+      toast(`${label} deleted`, {
+        description: 'You have 5 seconds to undo this action.',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            clearTimeout(timeoutId);
+            pendingDeletionRef.current.delete(itemId);
+            setTasks(prev => [savedTask, ...prev]);
+            showSuccess(`${label} restored!`);
+          },
+        },
+      });
     }
-  }, [refreshChores, refreshTasks, setChoreLoading, setTasks]);
+  }, [tasks, refreshChores, setChores, setTasks]);
 
   const handleSaveAsTemplate = useCallback(async (item: Task & { type?: 'task' | 'chore' }) => {
     if (item.type !== 'task' || !currentSpace || !user) return;

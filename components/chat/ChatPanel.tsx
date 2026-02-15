@@ -131,10 +131,7 @@ export default function ChatPanel({
           <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
             <Bot className="w-4 h-4 text-white" />
           </div>
-          <div>
-            <h2 className="text-sm font-semibold text-white">Rowan</h2>
-            <p className="text-xs text-gray-400">Rowan AI</p>
-          </div>
+          <h2 className="text-sm font-semibold text-white">Rowan AI</h2>
         </div>
 
         <div className="flex items-center gap-1">

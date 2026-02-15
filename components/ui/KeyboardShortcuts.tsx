@@ -166,7 +166,7 @@ export function KeyboardShortcuts() {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
                 aria-label="Close keyboard shortcuts"
               >
                 <X className="w-4 h-4" />
