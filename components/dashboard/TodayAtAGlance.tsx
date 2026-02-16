@@ -4,7 +4,6 @@ import { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import {
-  Calendar,
   AlertCircle,
   Sun,
   Clock

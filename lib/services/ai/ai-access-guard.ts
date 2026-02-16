@@ -50,7 +50,7 @@ export async function validateAIAccess(
   let featureAccess: Awaited<ReturnType<typeof canAccessFeature>>;
   try {
     featureAccess = await canAccessFeature(userId, 'canUseAI', supabase);
-  } catch (error) {
+  } catch {
     // DB error fetching subscription — DO NOT return 403.
     // Return 500 so the client retries instead of showing "upgrade" to a paying user.
     return {

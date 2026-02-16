@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
 import { useAuth } from './useAuth';
+import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 
 /**
@@ -25,10 +25,7 @@ export function useAdmin() {
       }
 
       try {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
+        const supabase = createClient();
 
         // Use RPC call to is_admin() function which has SECURITY DEFINER
         // This bypasses RLS and checks admin_users table securely
