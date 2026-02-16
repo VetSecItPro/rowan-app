@@ -24,16 +24,11 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
   } = useAuthWithSpaces();
   const [retrying, setRetrying] = useState(false);
 
-  // Auth pages are no longer wrapped with this component, but guard just in case
+  // Not authenticated — render children (login page, public content, etc.)
+  // During auth loading, isAuthenticated is false so this also passes through —
+  // the Header handles its own loading skeleton to avoid a Login button flash
   if (!isAuthenticated) {
     return <>{children}</>;
-  }
-
-  // Only show loading skeleton during initial auth load, not while spaces are loading
-  // This allows authenticated users (E2E tests with stored sessions) to see page content immediately
-  if (authLoading) {
-    logger.info('AppWithOnboarding: Showing auth loading', { component: 'AppWithOnboarding' });
-    return <DashboardSkeleton />;
   }
 
   // Allow page to render while spaces load in background (authenticated users can see feature gates immediately)
