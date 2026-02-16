@@ -19,3 +19,6 @@ export { ExportPanel } from './ExportPanel';
 export { ConversionFunnelPanel } from './ConversionFunnelPanel';
 
 export { AIUsagePanel } from './AIUsagePanel';
+export { AuditTrailPanel } from './AuditTrailPanel';
+export { CustomerSuccessPanel } from './CustomerSuccessPanel';
+export { ExecutiveSummaryPanel } from './ExecutiveSummaryPanel';

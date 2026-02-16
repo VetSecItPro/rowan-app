@@ -10,17 +10,22 @@ import {
   Activity,
   RefreshCw,
   ArrowUpRight,
+  HeartPulse,
+  AlertTriangle,
+  Clock,
 } from 'lucide-react';
 import { useComparison } from '@/components/admin/ComparisonContext';
 import { DrillDownModal } from '@/components/admin/DrillDownModal';
 import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
+import { getBenchmarkLevel, getBenchmarkColor, getBenchmarkBgColor } from '@/lib/constants/benchmarks';
 
-type SubTab = 'dau-mau' | 'cohorts' | 'churn';
+type SubTab = 'dau-mau' | 'cohorts' | 'churn' | 'lifecycle';
 
 const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'dau-mau', label: 'DAU / MAU', icon: Activity },
   { id: 'cohorts', label: 'Cohorts', icon: Calendar },
   { id: 'churn', label: 'Churn', icon: TrendingDown },
+  { id: 'lifecycle', label: 'Lifecycle', icon: HeartPulse },
 ];
 
 interface RetentionData {
@@ -46,6 +51,44 @@ interface RetentionData {
   lastUpdated: string;
 }
 
+interface BusinessMetrics {
+  nrr?: number;
+  scorecard?: {
+    mrr?: number;
+    churnRate?: number;
+    dauMauRatio?: number;
+  };
+  ltv?: number;
+  cac?: number;
+  mrrWaterfall?: {
+    month: string;
+    startingMrr: number;
+    newMrr: number;
+    expansionMrr: number;
+    contractionMrr: number;
+    churnedMrr: number;
+    endingMrr: number;
+  }[];
+  revenueByCohort?: {
+    cohortMonth: string;
+    users: number;
+    currentMrr: number;
+  }[];
+}
+
+interface LifecycleData {
+  resurrectionRate: number;
+  medianTimeToValueHours: number;
+  atRiskCount: number;
+  atRiskUsers: {
+    userId: string;
+    email: string;
+    name: string | null;
+    lastActiveAt: string;
+    daysSinceActive: number;
+  }[];
+}
+
 // Hook to fetch retention data
 function useRetentionData(range: string = '30d', compareEnabled: boolean = false) {
   return useQuery<RetentionData & { previousPeriod?: { dau: number; wau: number; mau: number; stickiness: number; dauTrend: { date: string; count: number }[] } }>({
@@ -64,10 +107,27 @@ function useRetentionData(range: string = '30d', compareEnabled: boolean = false
   });
 }
 
+// Hook to fetch business metrics
+function useBusinessMetrics() {
+  return useQuery<BusinessMetrics>({
+    queryKey: ['admin-business-metrics'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/business-metrics');
+      if (!response.ok) throw new Error('Failed');
+      return (await response.json()).metrics;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// ---------------------------------------------------------------------------
 // DAU/MAU Panel
+// ---------------------------------------------------------------------------
+
 const DauMauPanel = memo(function DauMauPanel() {
   const { compareEnabled } = useComparison();
   const { data, isLoading, refetch, isFetching } = useRetentionData('30d', compareEnabled);
+  const { data: businessData } = useBusinessMetrics();
 
   // Drill-down state
   const [drillDown, setDrillDown] = useState<{
@@ -139,13 +199,17 @@ const DauMauPanel = memo(function DauMauPanel() {
   const dauTrend = data?.dauTrend || [];
   const prevPeriod = data?.previousPeriod;
 
+  // NRR data
+  const nrr = businessData?.nrr || 0;
+  const nrrLevel = getBenchmarkLevel('nrr', nrr);
+
   // Get last 7 days for weekly chart
   const weeklyData = dauTrend.slice(-7);
 
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div
           className="bg-blue-600 rounded-xl p-5 text-white cursor-pointer hover:bg-blue-500 transition-colors"
           onClick={() => openDrillDown('dau')}
@@ -223,6 +287,22 @@ const DauMauPanel = memo(function DauMauPanel() {
               <p className="text-green-200 text-xs mt-1">{stickinessLabel}</p>
             </div>
             <TrendingDown className="w-10 h-10 text-green-200 rotate-180" />
+          </div>
+        </div>
+
+        {/* NRR Card */}
+        <div className={`rounded-xl p-5 text-white ${getBenchmarkBgColor(nrrLevel)} border border-gray-700`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-300">Net Revenue Retention</p>
+              <p className={`text-4xl font-bold mt-2 ${getBenchmarkColor(nrrLevel)}`}>
+                {nrr > 0 ? `${nrr}%` : '--'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                {nrr > 0 ? `Benchmark: ${nrrLevel}` : 'Awaiting data'}
+              </p>
+            </div>
+            <ArrowUpRight className={`w-10 h-10 ${getBenchmarkColor(nrrLevel)}`} />
           </div>
         </div>
       </div>
@@ -306,7 +386,10 @@ const DauMauPanel = memo(function DauMauPanel() {
   );
 });
 
+// ---------------------------------------------------------------------------
 // Cohorts Panel
+// ---------------------------------------------------------------------------
+
 const CohortsPanel = memo(function CohortsPanel() {
   const { data, isLoading, refetch, isFetching } = useRetentionData();
 
@@ -429,7 +512,10 @@ const CohortsPanel = memo(function CohortsPanel() {
   );
 });
 
+// ---------------------------------------------------------------------------
 // Churn Panel
+// ---------------------------------------------------------------------------
+
 const ChurnPanel = memo(function ChurnPanel() {
   const { data, isLoading, refetch, isFetching } = useRetentionData();
 
@@ -542,6 +628,128 @@ const ChurnPanel = memo(function ChurnPanel() {
   );
 });
 
+// ---------------------------------------------------------------------------
+// Lifecycle Panel
+// ---------------------------------------------------------------------------
+
+const LifecyclePanel = memo(function LifecyclePanel() {
+  const { data, isLoading } = useQuery<LifecycleData>({
+    queryKey: ['admin-user-lifecycle'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/user-lifecycle');
+      if (!response.ok) throw new Error('Failed to fetch lifecycle data');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+        <span className="ml-3 text-sm text-gray-400">Loading lifecycle data...</span>
+      </div>
+    );
+  }
+
+  const resurrectionRate = data?.resurrectionRate ?? 0;
+  const medianTtv = data?.medianTimeToValueHours ?? 0;
+  const atRiskCount = data?.atRiskCount ?? 0;
+  const atRiskUsers = data?.atRiskUsers ?? [];
+
+  return (
+    <div className="space-y-6">
+      {/* Key Lifecycle Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <HeartPulse className="w-4 h-4 text-purple-500" />
+            <span className="text-sm font-medium text-gray-400">Resurrection Rate</span>
+          </div>
+          <p className="text-3xl font-bold text-white">
+            {resurrectionRate > 0 ? `${resurrectionRate}%` : '--'}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">Churned users who returned</p>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="w-4 h-4 text-cyan-500" />
+            <span className="text-sm font-medium text-gray-400">Time-to-Value</span>
+          </div>
+          <p className="text-3xl font-bold text-white">
+            {medianTtv > 0 ? `${medianTtv.toFixed(1)}h` : '--'}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">Median hours to first key action</p>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="w-4 h-4 text-orange-500" />
+            <span className="text-sm font-medium text-gray-400">At-Risk Users</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{atRiskCount}</p>
+          <p className="text-xs text-gray-400 mt-1">Inactive 14-30 days</p>
+        </div>
+      </div>
+
+      {/* At-Risk Users List */}
+      {atRiskUsers.length > 0 && (
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle className="w-5 h-5 text-orange-500" />
+            <h3 className="text-sm font-semibold text-white">At-Risk Users (Top 10)</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-400">
+                  <th className="pb-3 pr-4">User</th>
+                  <th className="pb-3 px-2 text-center">Last Active</th>
+                  <th className="pb-3 px-2 text-center">Days Inactive</th>
+                </tr>
+              </thead>
+              <tbody className="text-white">
+                {atRiskUsers.slice(0, 10).map((user) => (
+                  <tr key={user.userId} className="border-t border-gray-700">
+                    <td className="py-3 pr-4 truncate max-w-[200px]">
+                      {user.name || user.email}
+                    </td>
+                    <td className="py-3 px-2 text-center text-gray-400 text-xs">
+                      {new Date(user.lastActiveAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        user.daysSinceActive >= 25 ? 'bg-red-900/20 text-red-400' :
+                        user.daysSinceActive >= 20 ? 'bg-orange-900/20 text-orange-400' :
+                        'bg-yellow-900/20 text-yellow-400'
+                      }`}>
+                        {user.daysSinceActive}d
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Industry Benchmark */}
+      <div className="p-4 bg-purple-900/20 rounded-lg">
+        <p className="text-sm text-purple-300">
+          <strong>Industry benchmark:</strong> Target &lt;5% monthly churn for family apps.
+          Resurrection campaigns can recover 5-15% of churned users with timely re-engagement emails.
+        </p>
+      </div>
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Main Export
+// ---------------------------------------------------------------------------
+
 /** Displays user retention cohort analysis and churn metrics. */
 export const RetentionPanel = memo(function RetentionPanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('dau-mau');
@@ -575,6 +783,7 @@ export const RetentionPanel = memo(function RetentionPanel() {
         {activeSubTab === 'dau-mau' && <DauMauPanel />}
         {activeSubTab === 'cohorts' && <CohortsPanel />}
         {activeSubTab === 'churn' && <ChurnPanel />}
+        {activeSubTab === 'lifecycle' && <LifecyclePanel />}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
@@ -9,6 +9,7 @@ import {
   Eye,
   Activity,
   AlertCircle,
+  AlertTriangle,
   CheckCircle,
   Clock,
   ArrowUpRight,
@@ -17,6 +18,7 @@ import {
 import { useComparison } from '@/components/admin/ComparisonContext';
 import { DrillDownModal } from '@/components/admin/DrillDownModal';
 import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
+import { getBenchmarkLevel, getBenchmarkColor, getBenchmarkBgColor } from '@/lib/constants/benchmarks';
 
 interface DashboardStats {
   users: {
@@ -220,7 +222,70 @@ export const OverviewPanel = memo(function OverviewPanel() {
     gcTime: 10 * 60 * 1000,
   });
 
+  // Fetch business metrics for scorecard
+  const { data: businessData } = useQuery({
+    queryKey: ['admin-business-metrics'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/business-metrics');
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      return data.metrics;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
+
+  // Generate alerts from business data
+  const alerts = useMemo(() => {
+    if (!businessData?.scorecard) return [];
+    const items: { message: string; severity: 'warning' | 'critical' }[] = [];
+    const sc = businessData.scorecard;
+    if (sc.churnRate > 8) items.push({ message: `Churn rate at ${sc.churnRate}% — above 8% threshold`, severity: 'critical' });
+    else if (sc.churnRate > 5) items.push({ message: `Churn rate at ${sc.churnRate}% — monitor closely`, severity: 'warning' });
+    if (sc.dauMauRatio < 8) items.push({ message: `DAU/MAU ratio at ${sc.dauMauRatio}% — engagement is low`, severity: 'warning' });
+    if (sc.mrrGrowthRate < 0) items.push({ message: `MRR declining at ${sc.mrrGrowthRate}%`, severity: 'critical' });
+    return items;
+  }, [businessData]);
+
   const isLoading = statsLoading || analyticsLoading;
+
+  // Build scorecard items from business data
+  const scorecardItems = useMemo(() => {
+    if (!businessData?.scorecard) return [];
+    const sc = businessData.scorecard;
+    return [
+      {
+        label: 'MRR',
+        value: `$${(sc.mrr ?? 0).toFixed(2)}`,
+        level: getBenchmarkLevel('mrrGrowth', sc.mrrGrowthRate ?? 0),
+      },
+      {
+        label: 'MRR Growth',
+        value: `${sc.mrrGrowthRate ?? 0}%`,
+        level: getBenchmarkLevel('mrrGrowth', sc.mrrGrowthRate ?? 0),
+      },
+      {
+        label: 'Churn Rate',
+        value: `${sc.churnRate ?? 0}%`,
+        level: getBenchmarkLevel('churn', sc.churnRate ?? 0),
+      },
+      {
+        label: 'DAU/MAU',
+        value: `${sc.dauMauRatio ?? 0}%`,
+        level: getBenchmarkLevel('dauMau', sc.dauMauRatio ?? 0),
+      },
+      {
+        label: 'NRR',
+        value: `${sc.nrr ?? 0}%`,
+        level: getBenchmarkLevel('nrr', sc.nrr ?? 0),
+      },
+      {
+        label: 'Activation Rate',
+        value: `${sc.activationRate ?? 0}%`,
+        level: getBenchmarkLevel('activationRate', sc.activationRate ?? 0),
+      },
+    ];
+  }, [businessData]);
 
   // Open drill-down for a specific KPI metric
   const openDrillDown = useCallback((metric: string) => {
@@ -298,6 +363,34 @@ export const OverviewPanel = memo(function OverviewPanel() {
     <div className="space-y-6">
       {/* Health Status */}
       <HealthStatus status="healthy" uptime={99.9} />
+
+      {/* Business Health Scorecard */}
+      {scorecardItems.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-gray-300 mb-3">Business Scorecard</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {scorecardItems.map((item) => (
+              <div key={item.label} className={`${getBenchmarkBgColor(item.level)} rounded-lg p-3 text-center`}>
+                <p className="text-xs text-gray-400">{item.label}</p>
+                <p className={`text-xl font-bold ${getBenchmarkColor(item.level)}`}>{item.value}</p>
+                <p className="text-xs text-gray-500">{item.level}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Anomaly Alerts */}
+      {alerts.length > 0 && (
+        <div className="space-y-2">
+          {alerts.map((alert, i) => (
+            <div key={i} className={`flex items-center gap-3 p-3 rounded-lg ${alert.severity === 'warning' ? 'bg-yellow-900/20' : 'bg-red-900/20'}`}>
+              <AlertTriangle className={`w-4 h-4 flex-shrink-0 ${alert.severity === 'warning' ? 'text-yellow-400' : 'text-red-400'}`} />
+              <p className={`text-sm ${alert.severity === 'warning' ? 'text-yellow-300' : 'text-red-300'}`}>{alert.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Primary KPIs */}
       <div>

@@ -1,21 +1,22 @@
 'use client';
 
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
-import { GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight, Target, TrendingUp } from 'lucide-react';
 import { NotificationsPanel } from './NotificationsPanel';
 import { ConversionFunnelPanel } from './ConversionFunnelPanel';
 import { useComparison } from '@/components/admin/ComparisonContext';
 import { DrillDownModal } from '@/components/admin/DrillDownModal';
 import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
-type SubTab = 'acquisition' | 'funnel' | 'signups';
+type SubTab = 'acquisition' | 'funnel' | 'signups' | 'activation';
 
 const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'acquisition', label: 'Acquisition', icon: Sparkles },
   { id: 'funnel', label: 'Funnel', icon: GitBranch },
   { id: 'signups', label: 'Signups', icon: Mail },
+  { id: 'activation', label: 'Activation', icon: Target },
 ];
 
 interface AcquisitionData {
@@ -352,6 +353,116 @@ const SignupsPanel = memo(function SignupsPanel() {
   return <NotificationsPanel />;
 });
 
+// Activation Funnel Panel
+const ActivationFunnelPanel = memo(function ActivationFunnelPanel() {
+  const { data: lifecycleData, isLoading } = useQuery({
+    queryKey: ['admin-user-lifecycle'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/user-lifecycle');
+      if (!response.ok) throw new Error('Failed to fetch');
+      return (await response.json()).lifecycle;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: _businessMetrics } = useQuery({
+    queryKey: ['admin-business-metrics'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/business-metrics');
+      if (!response.ok) throw new Error('Failed to fetch');
+      return (await response.json()).metrics;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const funnelSteps = useMemo(() => {
+    if (!lifecycleData) return [];
+    const s = lifecycleData.stages;
+    const total = lifecycleData.total;
+    const activated = s.activated + s.engaged + s.power_user;
+    const engaged = s.engaged + s.power_user;
+    return [
+      { label: 'Signed Up', count: total, pct: 100 },
+      { label: 'Created Space', count: activated, pct: total > 0 ? Math.round((activated / total) * 100) : 0 },
+      { label: 'Engaged (7d)', count: engaged, pct: total > 0 ? Math.round((engaged / total) * 100) : 0 },
+      { label: 'Power User', count: s.power_user, pct: total > 0 ? Math.round((s.power_user / total) * 100) : 0 },
+    ];
+  }, [lifecycleData]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+        <span className="ml-3 text-sm text-gray-400">Loading activation data...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Funnel Visualization */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-300 mb-4">Activation Funnel</h3>
+        <div className="space-y-3">
+          {funnelSteps.map((step, i) => (
+            <div key={i}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm text-gray-300">{step.label}</span>
+                <span className="text-sm font-medium text-white">{step.count} ({step.pct}%)</span>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-3">
+                <div
+                  className="h-3 rounded-full bg-green-500 transition-all duration-500"
+                  style={{ width: `${step.pct}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CAC Card */}
+      <div className="bg-gray-800 rounded-lg p-5 border border-green-500/20">
+        <div className="flex items-start justify-between mb-3">
+          <h4 className="text-sm font-semibold text-white">Customer Acquisition Cost</h4>
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 rounded-md">
+            <TrendingUp className="w-3 h-3 text-green-400" />
+            <span className="text-xs font-medium text-green-400">Organic</span>
+          </div>
+        </div>
+
+        <div className="flex items-baseline gap-2 mb-3">
+          <p className="text-3xl font-bold text-green-400">$0</p>
+          <span className="text-sm text-gray-400">CAC</span>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">Total Signups</span>
+            <span className="font-medium text-white">{lifecycleData?.total || 0}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">Acquisition Method</span>
+            <span className="font-medium text-green-400">100% Organic</span>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-gray-700">
+          <p className="text-xs text-gray-400">
+            Infinite ROI — all growth is organic. CAC tracking will activate when paid campaigns are configured.
+          </p>
+        </div>
+      </div>
+
+      {/* Viral Metrics Placeholder */}
+      <div className="bg-gray-800 rounded-lg p-5">
+        <h4 className="text-sm font-semibold text-white mb-2">Viral Coefficient (K-factor)</h4>
+        <p className="text-sm text-gray-400">K-factor tracking available when invite system is used</p>
+      </div>
+    </div>
+  );
+});
+
 /** Renders user growth metrics, signup trends, and acquisition data. */
 export const GrowthPanel = memo(function GrowthPanel() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('funnel');
@@ -385,6 +496,7 @@ export const GrowthPanel = memo(function GrowthPanel() {
         {activeSubTab === 'acquisition' && <AcquisitionPanel />}
         {activeSubTab === 'funnel' && <ConversionFunnelPanel />}
         {activeSubTab === 'signups' && <SignupsPanel />}
+        {activeSubTab === 'activation' && <ActivationFunnelPanel />}
       </div>
     </div>
   );

@@ -1,31 +1,202 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, memo, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Eye, Layers, Clock, MousePointer, RefreshCw } from 'lucide-react';
+import { adminFetch } from '@/lib/providers/query-client-provider';
+import { Eye, Layers, Clock, MousePointer, RefreshCw, Grid3X3 } from 'lucide-react';
 import { AnalyticsPanel } from './AnalyticsPanel';
 import { FeatureUsagePanel } from './FeatureUsagePanel';
 
-type SubTab = 'traffic' | 'features' | 'sessions';
+type SubTab = 'traffic' | 'features' | 'sessions' | 'adoption';
 
 const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'traffic', label: 'Traffic', icon: Eye },
   { id: 'features', label: 'Features', icon: Layers },
   { id: 'sessions', label: 'Sessions', icon: Clock },
+  { id: 'adoption', label: 'Adoption', icon: Grid3X3 },
 ];
 
+// ---------------------------------------------------------------------------
+// Adoption Panel — Feature Adoption Matrix
+// ---------------------------------------------------------------------------
+
+interface EngagementScoreData {
+  avgScore: number;
+  distribution: { label: string; count: number; pct: number }[];
+  features: {
+    feature: string;
+    triedItPct: number;
+    weeklyActivePct: number;
+    dailyActivePct: number;
+  }[];
+  sessions?: {
+    avgDurationMinutes: number;
+  };
+}
+
+const AdoptionPanel = memo(function AdoptionPanel() {
+  const { data, isLoading } = useQuery<EngagementScoreData>({
+    queryKey: ['admin-engagement-scores'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/engagement-scores');
+      if (!response.ok) throw new Error('Failed');
+      return (await response.json()).engagement;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const features = data?.features;
+  const sortedFeatures = useMemo(() => {
+    if (!features) return [];
+    return [...features].sort((a, b) => b.triedItPct - a.triedItPct);
+  }, [features]);
+
+  const getCellColor = (pct: number) => {
+    if (pct > 30) return 'text-green-400 bg-green-900/20';
+    if (pct >= 15) return 'text-yellow-400 bg-yellow-900/20';
+    return 'text-red-400 bg-red-900/20';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+        <span className="ml-3 text-sm text-gray-400">Loading adoption data...</span>
+      </div>
+    );
+  }
+
+  const avgScore = data?.avgScore ?? 0;
+  const distribution = data?.distribution ?? [];
+
+  return (
+    <div className="space-y-6">
+      {/* Top Row — Score + Distribution */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Average Engagement Score */}
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <Grid3X3 className="w-4 h-4 text-cyan-500" />
+            <span className="text-sm font-medium text-gray-400">Average Engagement Score</span>
+          </div>
+          <p className="text-4xl font-bold text-white">{avgScore.toFixed(1)}</p>
+          <p className="text-xs text-gray-400 mt-1">Across all active users</p>
+        </div>
+
+        {/* Score Distribution */}
+        <div className="bg-gray-800 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-medium text-gray-400">Score Distribution</span>
+          </div>
+          {distribution.length > 0 ? (
+            <div className="space-y-2">
+              {distribution.map((seg) => (
+                <div key={seg.label} className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400 w-20 shrink-0">{seg.label}</span>
+                  <div className="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
+                    <div
+                      className="h-4 bg-cyan-500 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.max(seg.pct, 2)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-300 w-12 text-right">{seg.pct}%</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 text-center py-4">No distribution data available</p>
+          )}
+        </div>
+      </div>
+
+      {/* Feature Adoption Matrix */}
+      <div className="bg-gray-800 rounded-lg p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Grid3X3 className="w-5 h-5 text-cyan-500" />
+          <h3 className="text-lg font-semibold text-white">Feature Adoption Matrix</h3>
+        </div>
+
+        {sortedFeatures.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-400">
+                  <th className="pb-3 pr-4">Feature</th>
+                  <th className="pb-3 px-2 text-center">Tried It (%)</th>
+                  <th className="pb-3 px-2 text-center">Weekly Active (%)</th>
+                  <th className="pb-3 px-2 text-center">Daily Active (%)</th>
+                </tr>
+              </thead>
+              <tbody className="text-white">
+                {sortedFeatures.map((feat) => (
+                  <tr key={feat.feature} className="border-t border-gray-700">
+                    <td className="py-3 pr-4 font-medium capitalize">
+                      {feat.feature.replace(/_/g, ' ')}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${getCellColor(feat.triedItPct)}`}>
+                        {feat.triedItPct}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${getCellColor(feat.weeklyActivePct)}`}>
+                        {feat.weeklyActivePct}%
+                      </span>
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${getCellColor(feat.dailyActivePct)}`}>
+                        {feat.dailyActivePct}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="py-8 text-center text-gray-400">
+            <Grid3X3 className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+            <p>No feature adoption data yet</p>
+            <p className="text-xs mt-1">Data will appear as users interact with features</p>
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center gap-4 text-xs text-gray-400">
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-900/40 inline-block" /> &gt;30% — Strong</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-yellow-900/40 inline-block" /> 15-30% — Moderate</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-900/40 inline-block" /> &lt;15% — Low</span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
 // Sessions Panel - shows session-level analytics
+// ---------------------------------------------------------------------------
+
 const SessionsPanel = memo(function SessionsPanel() {
   const { data: analyticsData, isLoading, refetch } = useQuery({
     queryKey: ['admin-analytics', '30d'],
     queryFn: async () => {
-      const response = await fetch('/api/admin/analytics?range=30d');
+      const response = await adminFetch('/api/admin/analytics?range=30d');
       if (!response.ok) throw new Error('Failed to fetch analytics');
       const result = await response.json();
       return result.analytics;
     },
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+  });
+
+  // Fetch engagement-scores for session duration
+  const { data: engagementData } = useQuery<EngagementScoreData>({
+    queryKey: ['admin-engagement-scores'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/engagement-scores');
+      if (!response.ok) throw new Error('Failed');
+      return (await response.json()).engagement;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   if (isLoading) {
@@ -45,6 +216,9 @@ const SessionsPanel = memo(function SessionsPanel() {
 
   const hourlyActivity = analyticsData?.hourlyActivity || [];
   const maxHourly = Math.max(...hourlyActivity, 1);
+
+  const avgDuration = engagementData?.sessions?.avgDurationMinutes;
+  const hasDuration = avgDuration !== undefined && avgDuration > 0;
 
   return (
     <div className="space-y-6">
@@ -73,8 +247,12 @@ const SessionsPanel = memo(function SessionsPanel() {
             <Clock className="w-4 h-4 text-purple-500" />
             <span className="text-sm font-medium text-gray-400">Avg. Session Duration</span>
           </div>
-          <p className="text-3xl font-bold text-white">--</p>
-          <p className="text-xs text-gray-400 mt-1">Coming soon</p>
+          <p className="text-3xl font-bold text-white">
+            {hasDuration ? `${avgDuration.toFixed(1)} min` : '--'}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {hasDuration ? 'From engagement data' : 'Insufficient data'}
+          </p>
         </div>
       </div>
 
@@ -185,6 +363,7 @@ export const EngagementPanel = memo(function EngagementPanel() {
         {activeSubTab === 'traffic' && <AnalyticsPanel />}
         {activeSubTab === 'features' && <FeatureUsagePanel />}
         {activeSubTab === 'sessions' && <SessionsPanel />}
+        {activeSubTab === 'adoption' && <AdoptionPanel />}
       </div>
     </div>
   );
