@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Check, FileText, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Check, FileText } from 'lucide-react';
 import { CreateListInput, ShoppingList } from '@/lib/services/shopping-service';
 import { Modal } from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
