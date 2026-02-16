@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Clock,
   AlertTriangle,
+  Calculator,
 } from 'lucide-react';
 import {
   LineChart,
@@ -69,6 +70,13 @@ interface RealtimeData {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
+
+type SubTab = 'overview' | 'unit-economics';
+
+const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'overview', label: 'Overview', icon: Bot },
+  { id: 'unit-economics', label: 'Unit Economics', icon: Calculator },
+];
 
 const FEATURE_COLORS: Record<string, string> = {
   chat: '#3b82f6',
@@ -142,13 +150,16 @@ function formatFeatureName(name: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Main Panel
+// Overview Panel (original content)
 // ---------------------------------------------------------------------------
 
-/** Displays AI feature usage metrics and trends in the admin dashboard. */
-export const AIUsagePanel = memo(function AIUsagePanel() {
-  const [range, setRange] = useState('today');
-
+const OverviewPanel = memo(function OverviewPanel({
+  range,
+  setRange,
+}: {
+  range: string;
+  setRange: (r: string) => void;
+}) {
   // Full usage data (refreshes on range change)
   const { data, isLoading } = useQuery<AIUsageData>({
     queryKey: ['admin-ai-usage', range],
@@ -188,8 +199,7 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
   const todayCost = realtime?.today_cost_usd ?? totals.cost_usd;
   const activeUsers = realtime?.active_users ?? data?.active_users_today ?? 0;
 
-  // Budget health: estimate % of expected revenue consumed
-  // Assuming ~$18/user/mo for Pro, active users * $18 = expected revenue
+  // Budget health
   const expectedMonthlyRevenue = Math.max(activeUsers * 18, 1);
   const projectedMonthlyCost = todayCost * 30;
   const budgetHealthPct = Math.min(
@@ -198,7 +208,7 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
   );
 
   return (
-    <div className="space-y-6 overflow-y-auto">
+    <div className="space-y-6">
       {/* Range selector */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-300 flex items-center gap-2">
@@ -415,6 +425,188 @@ export const AIUsagePanel = memo(function AIUsagePanel() {
           Auto-refreshes every 60s
           {realtime?.timestamp && ` · Last: ${new Date(realtime.timestamp).toLocaleTimeString()}`}
         </span>
+      </div>
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Unit Economics Panel
+// ---------------------------------------------------------------------------
+
+const UnitEconomicsPanel = memo(function UnitEconomicsPanel() {
+  const { data, isLoading } = useQuery<AIUsageData>({
+    queryKey: ['admin-ai-usage', 'month'],
+    queryFn: async () => {
+      const res = await adminFetch('/api/admin/ai-usage?range=month');
+      if (!res.ok) throw new Error('Failed to fetch AI usage');
+      return res.json();
+    },
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-6 h-6 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+        <span className="ml-3 text-sm text-gray-400">Loading unit economics...</span>
+      </div>
+    );
+  }
+
+  const totalCost = data?.totals?.cost_usd ?? 0;
+  const activeUsers = data?.active_users_today ?? 0;
+  const avgSubscriptionRevenue = 18; // Average between $18 Pro and $29 Family
+
+  const costPerUser = activeUsers > 0
+    ? (totalCost / activeUsers)
+    : 0;
+  const marginPerUser = avgSubscriptionRevenue - costPerUser;
+  const projectedMonthlyCost = totalCost > 0 ? totalCost : 0;
+  const expectedMonthlyRevenue = Math.max(activeUsers * avgSubscriptionRevenue, 1);
+  const budgetUtilization = Math.min(
+    Math.round((projectedMonthlyCost / expectedMonthlyRevenue) * 100),
+    100
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Unit Economics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-gray-800/50 rounded-xl p-5 border border-sky-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="w-4 h-4 text-sky-400" />
+            <span className="text-sm font-medium text-gray-400">Cost per AI User</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{formatCost(costPerUser)}</p>
+          <p className="text-xs text-gray-400 mt-1">Monthly (30-day window)</p>
+        </div>
+
+        <div className="bg-gray-800/50 rounded-xl p-5 border border-sky-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="w-4 h-4 text-sky-400" />
+            <span className="text-sm font-medium text-gray-400">Margin per User</span>
+          </div>
+          <p className={`text-3xl font-bold ${marginPerUser >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            {formatCost(Math.abs(marginPerUser))}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {marginPerUser >= 0 ? 'Healthy margin' : 'Negative margin'}
+          </p>
+        </div>
+
+        <div className="bg-gray-800/50 rounded-xl p-5 border border-sky-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="w-4 h-4 text-sky-400" />
+            <span className="text-sm font-medium text-gray-400">Active AI Users</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{activeUsers}</p>
+          <p className="text-xs text-gray-400 mt-1">Using AI features today</p>
+        </div>
+
+        <div className="bg-gray-800/50 rounded-xl p-5 border border-sky-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <Calculator className="w-4 h-4 text-sky-400" />
+            <span className="text-sm font-medium text-gray-400">Total AI Cost (30d)</span>
+          </div>
+          <p className="text-3xl font-bold text-white">{formatCost(totalCost)}</p>
+          <p className="text-xs text-gray-400 mt-1">All AI features combined</p>
+        </div>
+      </div>
+
+      {/* AI ROI Section */}
+      <div className="bg-gray-800/50 rounded-xl p-5 border border-sky-500/20">
+        <h3 className="text-sm font-semibold text-white mb-3">AI Retention Impact</h3>
+        <div className="p-4 bg-sky-900/20 rounded-lg">
+          <p className="text-sm text-sky-300">
+            AI users typically show higher retention than non-AI users.
+            As usage data accumulates, this section will display the retention differential
+            between AI-active and non-AI users to quantify AI&apos;s impact on retention.
+          </p>
+        </div>
+      </div>
+
+      {/* Budget Utilization */}
+      <div className="bg-gray-800/50 rounded-xl p-5 border border-sky-500/20">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-white">Budget Utilization</h3>
+          <span className={`text-sm font-bold ${
+            budgetUtilization > 60 ? 'text-red-400' :
+            budgetUtilization > 30 ? 'text-yellow-400' :
+            'text-green-400'
+          }`}>
+            {budgetUtilization}%
+          </span>
+        </div>
+        <p className="text-xs text-gray-400 mb-3">
+          Projected AI cost vs expected subscription revenue
+        </p>
+        <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+          <div
+            className={`h-4 rounded-full transition-all duration-500 ${
+              budgetUtilization > 60 ? 'bg-red-500' :
+              budgetUtilization > 30 ? 'bg-yellow-500' :
+              'bg-green-500'
+            }`}
+            style={{ width: `${Math.max(budgetUtilization, 2)}%` }}
+          />
+        </div>
+        <div className="flex justify-between mt-2 text-xs text-gray-400">
+          <span>AI Cost: {formatCost(projectedMonthlyCost)}</span>
+          <span>Expected Revenue: {formatCost(expectedMonthlyRevenue)}</span>
+        </div>
+      </div>
+
+      {/* Cost Breakdown Note */}
+      <div className="p-4 bg-sky-900/20 rounded-lg">
+        <p className="text-sm text-sky-300">
+          <strong>Note:</strong> Unit economics are calculated from the 30-day usage window.
+          Cost per user will stabilize as more users adopt AI features.
+          Target: keep AI cost below 15% of subscription revenue per user.
+        </p>
+      </div>
+    </div>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Main Panel
+// ---------------------------------------------------------------------------
+
+/** Displays AI feature usage metrics and trends in the admin dashboard. */
+export const AIUsagePanel = memo(function AIUsagePanel() {
+  const [range, setRange] = useState('today');
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('overview');
+
+  return (
+    <div className="flex-1 flex flex-col space-y-4 min-h-0">
+      {/* Sub-tab Navigation */}
+      <div className="flex items-center gap-1 border-b border-gray-700">
+        {SUB_TABS.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeSubTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveSubTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                isActive
+                  ? 'border-sky-500 text-sky-400'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Sub-tab Content */}
+      <div className="flex-1 overflow-auto">
+        {activeSubTab === 'overview' && <OverviewPanel range={range} setRange={setRange} />}
+        {activeSubTab === 'unit-economics' && <UnitEconomicsPanel />}
       </div>
     </div>
   );

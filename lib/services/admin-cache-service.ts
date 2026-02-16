@@ -27,6 +27,11 @@ const CACHE_TTL = {
   betaStats: 300,          // 5 minutes for beta stats
   notificationStats: 300,  // 5 minutes for notification stats
   subscriptionAnalytics: 600, // 10 minutes for subscription metrics (revenue data)
+  businessMetrics: 600,      // 10 minutes for business scorecard / unit economics
+  userLifecycle: 600,        // 10 minutes for lifecycle stages / space analytics
+  engagementScores: 900,     // 15 minutes for engagement scores (expensive computation)
+  auditTrail: 120,           // 2 minutes for audit logs (more real-time)
+  adminGoals: 300,           // 5 minutes for OKR goals
 } as const;
 
 interface CacheOptions {
@@ -137,4 +142,9 @@ export const ADMIN_CACHE_KEYS = {
   dailyRevenue: (days: number) => `subscriptions:revenue:${days}d`,
   retention: (range: string) => `retention:${range}`,
   acquisition: (range: string) => `acquisition:${range}`,
+  businessMetrics: 'business:metrics',
+  userLifecycle: 'user:lifecycle',
+  engagementScores: 'engagement:scores',
+  auditTrail: (page: number, filter: string) => `audit:trail:${page}:${filter}`,
+  adminGoals: 'admin:goals',
 } as const;
