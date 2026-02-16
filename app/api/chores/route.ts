@@ -219,6 +219,7 @@ export async function POST(req: NextRequest) {
       due_date: validatedData.due_date ?? undefined,
       notes: validatedData.notes ?? undefined,
       sort_order: validatedData.sort_order ?? undefined,
+      category: validatedData.category ?? undefined,
     }, supabase);
 
     return NextResponse.json({

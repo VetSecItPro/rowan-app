@@ -1,11 +1,16 @@
 import { z } from 'zod';
 import { sanitizePlainText } from '@/lib/sanitize';
 
-// Project status enum
-const projectStatusEnum = z.enum(['planning', 'active', 'on-hold', 'completed', 'archived']);
+// Project status enum — matches DB CHECK constraint and project-tracking-service.ts
+// NOTE: DB uses 'in-progress' (hyphenated), NOT 'active' or 'in_progress'
+const projectStatusEnum = z.enum(['planning', 'in-progress', 'on-hold', 'completed', 'cancelled']);
 const projectPriorityEnum = z.enum(['low', 'medium', 'high', 'urgent']);
 
 // Base project schema
+// NOTE: Field names must match DB columns exactly.
+// - `target_date` (not `end_date`) maps to DB column
+// - `budget_amount` (not `budget`) maps to DB column
+// - `color`, `icon`, `assigned_to` do NOT exist as DB columns — removed
 export const projectBaseSchema = z.object({
   space_id: z.string().uuid('Invalid space ID'),
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters').trim(),
@@ -16,13 +21,12 @@ export const projectBaseSchema = z.object({
   start_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
     .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format'),
-  end_date: z.string().optional().nullable()
+  target_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
     .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format'),
-  budget: z.number().min(0).max(99999999.99).optional().nullable(),
-  color: z.string().regex(/^(red|blue|green|yellow|purple|pink|indigo|gray|orange|teal|cyan|emerald|amber)$/, 'Invalid color').optional().nullable(),
-  icon: z.string().max(50).optional().nullable(),
-  assigned_to: z.array(z.string().uuid()).optional().nullable(),
+  budget_amount: z.number().min(0).max(99999999.99).optional().nullable(),
+  location: z.string().max(200).optional().nullable()
+    .transform(val => val === '' ? null : val),
   tags: z.array(z.string().max(50)).max(20).optional().nullable(),
 });
 
@@ -42,6 +46,7 @@ export function validateAndSanitizeProject(data: unknown): z.infer<typeof create
     ...parsed,
     name: sanitizePlainText(parsed.name),
     description: parsed.description ? sanitizePlainText(parsed.description) : null,
+    location: parsed.location ? sanitizePlainText(parsed.location) : null,
   };
 }
 

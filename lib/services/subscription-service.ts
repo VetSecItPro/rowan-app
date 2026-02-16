@@ -3,148 +3,259 @@
  * Handles all subscription-related business logic
  *
  * IMPORTANT: Server-side only - contains sensitive operations
- * OPTIMIZATION: Redis caching for subscription lookups (5-minute TTL)
+ * OPTIMIZATION: Redis caching for subscription lookups (2-minute TTL)
+ *
+ * BULLETPROOF TIER ENFORCEMENT:
+ * - DB errors throw (never silently degrade to 'free')
+ * - Only successful query results are cached
+ * - Retry with fresh client on first failure
+ * - Detailed logging at every decision point
  */
 
 import { createClient } from '../supabase/server';
 import type { SubscriptionTier, SubscriptionStatus, Subscription } from '../types';
 import { logger } from '@/lib/logger';
-import { cacheAside, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
+import { getCache, setCache, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
 import * as Sentry from '@sentry/nextjs';
+
+const SUBSCRIPTION_COLUMNS = 'id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, is_founding_member, founding_member_number, founding_member_locked_price_id, subscription_started_at, subscription_ends_at, created_at, updated_at';
+
+/**
+ * Fetch subscription directly from DB (no cache).
+ * Throws on DB error — never silently returns null for errors.
+ */
+async function fetchSubscriptionFromDB(
+  userId: string,
+  supabaseClient?: Awaited<ReturnType<typeof createClient>>
+): Promise<Subscription | null> {
+  const supabase = supabaseClient || await createClient();
+
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .select(SUBSCRIPTION_COLUMNS)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) {
+    // THROW on DB error — do NOT silently return null.
+    // This prevents paying users from being treated as 'free'.
+    throw new Error(`Subscription query failed for user ${userId}: ${error.message} (code: ${error.code})`);
+  }
+
+  return data;
+}
 
 /**
  * Get user's current subscription
- * OPTIMIZATION: Cached in Redis for 5 minutes to reduce DB lookups
+ *
+ * BULLETPROOF STRATEGY:
+ * 1. Check Redis cache first
+ * 2. On cache miss, query DB with the provided authenticated client
+ * 3. If DB query fails, retry once with a fresh server client
+ * 4. Only cache SUCCESSFUL results (never cache errors)
+ * 5. If all attempts fail, THROW — let the API route return 500 instead of 403
  *
  * @param userId - The user ID to fetch subscription for
- * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
+ * @param supabaseClient - Optional pre-authenticated Supabase client
  */
 export async function getUserSubscription(
   userId: string,
   supabaseClient?: Awaited<ReturnType<typeof createClient>>
 ): Promise<Subscription | null> {
-  // Disable caching in test environment to prevent stale data
   const isTest = process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST === 'true';
   const cacheKey = cacheKeys.subscription(userId);
-
   const startTime = Date.now();
-  let cacheHit = false;
 
-  const result = await cacheAside<Subscription | null>(
-    cacheKey,
-    async () => {
-      // Cache miss - track in Sentry
-      cacheHit = false;
-
-      const dbQueryStart = Date.now();
-
-      // Use provided client (from API route) or create new one
-      // Using the API route's client eliminates JWT refresh race conditions under concurrent load
-      const supabase = supabaseClient || await createClient();
-
-      const { data, error} = await supabase
-        .from('subscriptions')
-        .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, is_founding_member, founding_member_number, founding_member_locked_price_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      const dbQueryDuration = Date.now() - dbQueryStart;
-
-      // Track database query performance in Sentry
-      if (!isTest) {
-        Sentry.addBreadcrumb({
-          category: 'database',
-          message: 'Subscription database query',
-          level: error ? 'error' : 'info',
-          data: {
-            duration_ms: dbQueryDuration,
-            success: !error,
-            tier: data?.tier || 'unknown',
-            using_provided_client: !!supabaseClient,
-          },
-        });
-
-        if (!error) {
-          Sentry.setMeasurement('subscription_db_query_duration', dbQueryDuration, 'millisecond');
-        }
-      }
-
-      if (error) {
-        logger.error('Error fetching subscription:', error, {
+  // 1. Try cache first (skip in test)
+  if (!isTest) {
+    try {
+      const cached = await getCache<Subscription>(cacheKey);
+      if (cached !== null) {
+        logger.info('[Subscription] Cache hit', {
           component: 'lib-subscription-service',
-          action: 'service_call',
+          action: 'cache_hit',
           userId,
-          usingProvidedClient: !!supabaseClient,
-          duration_ms: dbQueryDuration,
+          tier: cached.tier,
         });
 
-        // Capture error in Sentry
         if (!isTest) {
-          Sentry.captureException(error, {
-            tags: {
-              component: 'subscription-service',
-              operation: 'get-user-subscription',
-            },
-            contexts: {
-              subscription: {
-                user_id: userId,
-                using_provided_client: !!supabaseClient,
-                duration_ms: dbQueryDuration,
-              },
-            },
+          Sentry.addBreadcrumb({
+            category: 'cache',
+            message: 'Subscription cache hit',
+            level: 'info',
+            data: { tier: cached.tier, duration_ms: Date.now() - startTime },
           });
         }
 
-        return null;
+        return cached;
+      }
+    } catch {
+      // Cache read failed — continue to DB
+    }
+  }
+
+  // 2. Query DB — with retry on failure
+  let data: Subscription | null = null;
+  let attempt = 0;
+  const maxAttempts = 2;
+
+  while (attempt < maxAttempts) {
+    attempt++;
+    const dbQueryStart = Date.now();
+
+    try {
+      // First attempt: use provided client. Second attempt: fresh client.
+      const clientToUse = attempt === 1 ? supabaseClient : undefined;
+      data = await fetchSubscriptionFromDB(userId, clientToUse);
+
+      const dbQueryDuration = Date.now() - dbQueryStart;
+
+      logger.info('[Subscription] DB query success', {
+        component: 'lib-subscription-service',
+        action: 'db_query_success',
+        userId,
+        attempt,
+        tier: data?.tier || 'no-subscription',
+        status: data?.status || 'no-subscription',
+        duration_ms: dbQueryDuration,
+        usedProvidedClient: attempt === 1 && !!supabaseClient,
+      });
+
+      if (!isTest) {
+        Sentry.addBreadcrumb({
+          category: 'database',
+          message: `Subscription DB query success (attempt ${attempt})`,
+          level: 'info',
+          data: {
+            duration_ms: dbQueryDuration,
+            tier: data?.tier || 'no-subscription',
+            using_provided_client: attempt === 1 && !!supabaseClient,
+          },
+        });
+        Sentry.setMeasurement('subscription_db_query_duration', dbQueryDuration, 'millisecond');
       }
 
-      return data;
-    },
-    isTest ? 0 : CACHE_TTL.MEDIUM, // No cache in tests, 5 minutes in prod
-    () => { cacheHit = true; } // Callback when cache hit occurs
-  );
+      break; // Success — exit retry loop
 
-  const totalDuration = Date.now() - startTime;
+    } catch (error) {
+      const dbQueryDuration = Date.now() - dbQueryStart;
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
-  // Track cache hit rate and total duration in Sentry
-  if (!isTest) {
-    Sentry.addBreadcrumb({
-      category: 'cache',
-      message: cacheHit ? 'Subscription cache hit' : 'Subscription cache miss',
-      level: 'info',
-      data: {
-        cache_hit: cacheHit,
-        total_duration_ms: totalDuration,
-        tier: result?.tier || 'null',
-      },
-    });
+      logger.error(`[Subscription] DB query failed (attempt ${attempt}/${maxAttempts})`, error, {
+        component: 'lib-subscription-service',
+        action: 'db_query_error',
+        userId,
+        attempt,
+        maxAttempts,
+        duration_ms: dbQueryDuration,
+        usedProvidedClient: attempt === 1 && !!supabaseClient,
+      });
 
-    Sentry.setMeasurement('subscription_service_duration', totalDuration, 'millisecond');
-    Sentry.setContext('subscription_cache', {
-      cache_hit: cacheHit,
-      duration_ms: totalDuration,
-      tier: result?.tier || 'null',
+      if (!isTest) {
+        Sentry.captureException(error, {
+          tags: {
+            component: 'subscription-service',
+            operation: 'get-user-subscription',
+            attempt: String(attempt),
+          },
+          contexts: {
+            subscription: {
+              user_id: userId,
+              using_provided_client: attempt === 1 && !!supabaseClient,
+              duration_ms: dbQueryDuration,
+            },
+          },
+        });
+      }
+
+      // If this was the last attempt, THROW — do NOT degrade to 'free'
+      if (attempt >= maxAttempts) {
+        throw new Error(
+          `[CRITICAL] Failed to fetch subscription after ${maxAttempts} attempts for user ${userId}. ` +
+          `Last error: ${errorMessage}. ` +
+          `This user may be a paying customer — returning 500 instead of incorrectly blocking access.`
+        );
+      }
+
+      // Otherwise, retry with fresh client
+      logger.warn('[Subscription] Retrying with fresh Supabase client...', {
+        component: 'lib-subscription-service',
+        action: 'retry',
+        userId,
+      });
+    }
+  }
+
+  // 3. Cache successful result (only non-null subscriptions)
+  if (data && !isTest) {
+    setCache(cacheKey, data, CACHE_TTL.SHORT).catch(() => {
+      // Cache write failed — not critical
     });
   }
 
-  return result;
+  const totalDuration = Date.now() - startTime;
+
+  if (!isTest) {
+    Sentry.setMeasurement('subscription_service_duration', totalDuration, 'millisecond');
+    Sentry.setContext('subscription_result', {
+      cache_hit: false,
+      duration_ms: totalDuration,
+      tier: data?.tier || 'no-subscription',
+      status: data?.status || 'no-subscription',
+      attempts: attempt,
+    });
+  }
+
+  return data;
 }
 
 /**
  * Get user's subscription tier
  *
+ * BULLETPROOF: If getUserSubscription throws (DB error), this propagates the error
+ * up to the API route, which returns 500 — NOT 403. A paying customer should never
+ * be told to "upgrade" because of a transient infrastructure error.
+ *
  * @param userId - The user ID to fetch tier for
- * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
+ * @param supabaseClient - Optional pre-authenticated Supabase client
  */
 export async function getUserTier(
   userId: string,
   supabaseClient?: Awaited<ReturnType<typeof createClient>>
 ): Promise<SubscriptionTier> {
+  // getUserSubscription THROWS on DB error (never silently returns null for errors)
+  // If it returns null, it genuinely means no subscription row exists → free tier
   const subscription = await getUserSubscription(userId, supabaseClient);
 
-  if (!subscription || subscription.status !== 'active') {
+  if (!subscription) {
+    logger.info('[Subscription] No subscription found — user is on free tier', {
+      component: 'lib-subscription-service',
+      action: 'tier_resolution',
+      userId,
+      resolvedTier: 'free',
+    });
     return 'free';
   }
+
+  if (subscription.status !== 'active') {
+    logger.info('[Subscription] Subscription is not active', {
+      component: 'lib-subscription-service',
+      action: 'tier_resolution',
+      userId,
+      tier: subscription.tier,
+      status: subscription.status,
+      resolvedTier: 'free',
+    });
+    return 'free';
+  }
+
+  logger.info('[Subscription] Tier resolved successfully', {
+    component: 'lib-subscription-service',
+    action: 'tier_resolution',
+    userId,
+    resolvedTier: subscription.tier,
+    status: subscription.status,
+  });
 
   return subscription.tier;
 }

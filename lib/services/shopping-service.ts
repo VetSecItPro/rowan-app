@@ -79,7 +79,15 @@ export interface CreateListWithItemsInput extends CreateListInput {
   items?: CreateItemInput[];
 }
 
-export interface UpdateListInput extends Partial<CreateListInput> {
+export interface UpdateListInput {
+  space_id?: string;
+  title?: string;
+  description?: string;
+  status?: 'active' | 'completed' | 'archived';
+  store_name?: string | null;
+  estimated_total?: number | null;
+  actual_total?: number | null;
+  budget?: number | null;
   items?: CreateItemInput[];
 }
 
@@ -238,7 +246,7 @@ export const shoppingService = {
       .from('shopping_items')
       .insert([{
         ...input,
-        quantity: input.quantity || 1,
+        quantity: String(input.quantity || 1),
         category,
         checked: false,
       }])
@@ -519,7 +527,7 @@ export const shoppingService = {
       const itemRows = items.map((item: TemplateItemInput) => ({
         list_id: list.id,
         name: item.name,
-        quantity: item.quantity || 1,
+        quantity: String(item.quantity || 1),
         category: item.category || getCategoryForItem(item.name),
         checked: false,
       }));

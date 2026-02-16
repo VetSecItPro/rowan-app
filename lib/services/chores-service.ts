@@ -21,6 +21,7 @@ export interface CreateChoreInput {
   sort_order?: number;
   created_by: string;
   point_value?: number; // Points awarded for completing this chore (default: 10)
+  category?: string;
 }
 
 export interface UpdateChoreInput {
@@ -31,6 +32,11 @@ export interface UpdateChoreInput {
   status?: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed';
   due_date?: string;
   completed_at?: string | null;
+  notes?: string | null;
+  sort_order?: number;
+  calendar_sync?: boolean;
+  category?: string | null;
+  point_value?: number;
 }
 
 export interface ChoreQueryOptions {

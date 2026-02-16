@@ -22,7 +22,7 @@ interface GeneralReminderEmailProps {
   reminderType: 'personal' | 'shared' | 'recurring' | 'important';
   dueDate?: string;
   dueTime?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   category?: string;
   spaceId: string;
   reminderId: string;
@@ -37,7 +37,7 @@ const GeneralReminderEmail = ({
   reminderType = 'personal',
   dueDate,
   dueTime,
-  priority = 'normal',
+  priority = 'medium',
   category,
   spaceId,
   reminderId,
@@ -46,14 +46,14 @@ const GeneralReminderEmail = ({
 }: GeneralReminderEmailProps) => {
   const priorityColors = {
     low: '#10b981',
-    normal: '#6366f1',
+    medium: '#6366f1',
     high: '#f59e0b',
     urgent: '#ef4444'
   };
 
   const priorityLabels = {
     low: 'Low Priority',
-    normal: 'Normal Priority',
+    medium: 'Medium Priority',
     high: 'High Priority',
     urgent: 'Urgent'
   };

@@ -283,7 +283,7 @@ describe('Tool Executor', () => {
     it('should generate preview for plan_meal', () => {
       const preview = getToolCallPreview('plan_meal', {
         meal_type: 'dinner',
-        recipe_name: 'Pasta',
+        name: 'Pasta',
         scheduled_date: '2026-02-10',
       });
 

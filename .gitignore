@@ -185,5 +185,8 @@ docs/CI-CD-SETUP.md
 .launch-reports/
 
 # Root-level screenshots (session artifacts)
-dashboard-state.png
+dashboard-*.png
 session-state-screenshot.png
+
+# Debug API routes (never ship)
+app/api/debug/

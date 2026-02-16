@@ -21,6 +21,9 @@ export const choreBaseSchema = z.object({
   notes: z.string().max(1000, 'Notes must be less than 1000 characters').trim().optional().nullable()
     .transform(val => val === '' ? null : val),
   sort_order: z.number().int().min(0).optional().nullable(),
+  category: z.string().max(100).trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
+  point_value: z.number().int().min(0).max(10000).optional(),
 });
 
 // Create chore schema

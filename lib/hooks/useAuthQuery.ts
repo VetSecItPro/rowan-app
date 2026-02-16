@@ -158,7 +158,7 @@ export function useUpdateProfile() {
       // Use request deduplication for rapid profile updates
       return deduplicatedRequests.updateProfile(user.id, async () => {
         const { data, error } = await supabase
-          .from('user_profiles')
+          .from('users')
           .update({
             ...updates,
             updated_at: new Date().toISOString(),

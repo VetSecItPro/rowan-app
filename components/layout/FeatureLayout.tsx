@@ -6,6 +6,7 @@ import { Breadcrumb } from './Breadcrumb';
 import { Footer } from '@/components/navigation/Footer';
 import { SmartBackgroundCanvas } from '@/components/ui/SmartBackgroundCanvas';
 import { useFeatureTracking, type FeatureName } from '@/lib/hooks/useFeatureTracking';
+import { useLayoutHandlesFooter } from '@/lib/contexts/layout-context';
 
 interface FeatureLayoutProps {
   children: ReactNode;
@@ -33,6 +34,7 @@ export function FeatureLayout({
   hideFooterOnMobile = true
 }: FeatureLayoutProps) {
   const pathname = usePathname();
+  const layoutHandlesFooter = useLayoutHandlesFooter();
 
   // Auto-detect feature from pathname
   const currentFeature = useMemo(() => {
@@ -105,10 +107,12 @@ export function FeatureLayout({
     >
       <Breadcrumb items={breadcrumbItems} />
       <main className="flex-1">{children}</main>
-      {/* Hide footer on mobile for chat-style interfaces like Messages */}
-      <div className={hideFooterOnMobile ? 'hidden md:block' : ''}>
-        <Footer />
-      </div>
+      {/* Footer: skip when the main app layout renders its own */}
+      {!layoutHandlesFooter && (
+        <div className={hideFooterOnMobile ? 'hidden md:block' : ''}>
+          <Footer />
+        </div>
+      )}
     </SmartBackgroundCanvas>
   );
 }

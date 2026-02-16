@@ -322,7 +322,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: tasks } = await supabase
         .from('tasks')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.tasks = tasks || [];
     }
 
@@ -340,7 +340,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: expenses } = await supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.expenses = expenses || [];
     }
 
@@ -349,7 +349,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: events } = await supabase
         .from('calendar_events')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.calendar = events || [];
     }
 
@@ -368,7 +368,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: reminders } = await supabase
         .from('reminders')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.reminders = reminders || [];
     }
 
@@ -377,7 +377,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: goals } = await supabase
         .from('goals')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.goals = goals || [];
     }
 
@@ -386,7 +386,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: shopping } = await supabase
         .from('shopping_lists')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.shopping = shopping || [];
     }
 
@@ -395,7 +395,7 @@ async function collectUserData(supabase: SupabaseClient, userId: string, include
       const { data: meals } = await supabase
         .from('meals')
         .select('*')
-        .eq('user_id', userId);
+        .eq('created_by', userId);
       data.meals = meals || [];
     }
 

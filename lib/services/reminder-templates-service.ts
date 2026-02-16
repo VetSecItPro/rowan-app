@@ -194,7 +194,7 @@ export const reminderTemplatesService = {
     // Security: Verify user is member of space
     const { data: membership, error: membershipError } = await supabase
       .from('space_members')
-      .select('id')
+      .select('space_id')
       .eq('space_id', validated.space_id)
       .eq('user_id', validated.created_by)
       .single();

@@ -10,12 +10,13 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 
 const ShoppingListUpdateSchema = z.object({
-  name: z.string().min(1).max(200).optional(),
+  title: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).optional(),
-  color: z.string().max(50).optional(),
-  icon: z.string().max(50).optional(),
-  is_shared: z.boolean().optional(),
-  sort_order: z.number().int().optional(),
+  status: z.enum(['active', 'completed', 'archived']).optional(),
+  store_name: z.string().max(200).optional().nullable(),
+  estimated_total: z.number().min(0).optional().nullable(),
+  actual_total: z.number().min(0).optional().nullable(),
+  budget: z.number().min(0).optional().nullable(),
 }).strict();
 
 /**

@@ -192,9 +192,12 @@ export async function executeTool(
       // CALENDAR EVENTS
       // ═══════════════════════════════════════
       case 'create_event': {
+        // Map recurrence_pattern to is_recurring boolean for the DB
+        const recurrencePattern = parameters.recurrence_pattern as string | undefined;
         const input = createCalendarEventSchema.parse({
           ...parameters,
           space_id: spaceId,
+          is_recurring: recurrencePattern ? recurrencePattern !== 'none' : false,
         });
         const event = await calendarService.createEvent(input, supabase);
         return {
@@ -225,10 +228,13 @@ export async function executeTool(
       // REMINDERS
       // ═══════════════════════════════════════
       case 'create_reminder': {
+        // Map recurrence_pattern to is_recurring boolean for the DB
+        const reminderRecurrence = parameters.recurrence_pattern as string | undefined;
         const input = stripNulls<CreateReminderInput>(createReminderSchema.parse({
           ...parameters,
           space_id: spaceId,
           created_by: userId,
+          is_recurring: reminderRecurrence ? reminderRecurrence !== 'none' : false,
         }));
         const reminder = await remindersService.createReminder(input, supabase);
         return {
@@ -287,10 +293,11 @@ export async function executeTool(
       // MEALS
       // ═══════════════════════════════════════
       case 'plan_meal': {
-        const input = stripNulls<CreateMealInput>(createMealSchema.parse({
+        const parsed = createMealSchema.parse({
           ...parameters,
           space_id: spaceId,
-        }));
+        });
+        const input = stripNulls<CreateMealInput>(parsed);
         const meal = await mealsService.createMeal(input, supabase);
         return {
           success: true,
@@ -465,7 +472,7 @@ export function getToolCallPreview(toolName: string, parameters: Record<string, 
     case 'update_event':
       return 'Update event';
     case 'create_reminder':
-      return `Create reminder: "${parameters.title}"${parameters.due_date ? ` for ${formatDateForPreview(String(parameters.due_date))}` : ''}`;
+      return `Create reminder: "${parameters.title}"${parameters.reminder_time ? ` for ${formatDateForPreview(String(parameters.reminder_time))}` : ''}`;
     case 'complete_reminder':
       return 'Mark reminder as completed';
     case 'create_shopping_list':
@@ -473,7 +480,7 @@ export function getToolCallPreview(toolName: string, parameters: Record<string, 
     case 'add_shopping_item':
       return `Add "${parameters.name}"${parameters.quantity ? ` (${parameters.quantity})` : ''} to shopping list`;
     case 'plan_meal':
-      return `Plan ${parameters.meal_type}: ${parameters.recipe_name || 'meal'} for ${formatDateForPreview(String(parameters.scheduled_date))}`;
+      return `Plan ${parameters.meal_type}: ${parameters.name || 'meal'} for ${formatDateForPreview(String(parameters.scheduled_date))}`;
     case 'create_goal':
       return `Create goal: "${parameters.title}"${parameters.target_date ? ` by ${formatDateForPreview(String(parameters.target_date))}` : ''}`;
     case 'update_goal_progress':

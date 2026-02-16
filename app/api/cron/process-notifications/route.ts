@@ -197,7 +197,7 @@ async function sendInstantNotification(userId: string, notification: Notificatio
           taskTitle: notificationData.title || 'Untitled Task',
           taskDescription: notificationData.description || '',
           dueDate: notificationData.dueDate || '',
-          priority: (notificationData.priority || 'normal') as 'high' | 'low' | 'normal' | 'urgent',
+          priority: (notificationData.priority || 'medium') as 'high' | 'low' | 'medium' | 'urgent',
           spaceId: notificationData.spaceId || '',
           taskId: notificationData.taskId || '',
           spaceName: notificationData.spaceName || 'Unknown Space'
@@ -274,7 +274,7 @@ async function sendInstantNotification(userId: string, notification: Notificatio
           reminderType: (notificationData.reminderType || 'personal') as 'personal' | 'shared' | 'recurring',
           dueDate: notificationData.dueDate || '',
           dueTime: notificationData.dueTime || '',
-          priority: (notificationData.priority || 'normal') as 'high' | 'low' | 'normal' | 'urgent',
+          priority: (notificationData.priority || 'medium') as 'high' | 'low' | 'medium' | 'urgent',
           category: notificationData.category || '',
           spaceId: notificationData.spaceId || '',
           reminderId: notificationData.reminderId || '',

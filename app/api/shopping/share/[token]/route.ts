@@ -61,7 +61,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
     // Must be public to be accessible
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
-      .select('id, title, description, created_by, is_public, share_read_only, share_token')
+      .select('id, title, description, created_by, is_public, share_token')
       .eq('share_token', validatedToken)
       .eq('is_public', true)
       .single();
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ token: st
     // Get shopping items for this list
     const { data: items, error: itemsError } = await supabase
       .from('shopping_items')
-      .select('id, name, quantity, unit, category, is_checked, list_id, notes')
+      .select('id, name, quantity, unit, category, checked, is_purchased, list_id, notes')
       .eq('list_id', shoppingList.id)
       .order('category', { ascending: true })
       .order('name', { ascending: true });
@@ -192,10 +192,10 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ token: 
 
     const supabase = await createClient();
 
-    // Verify the list is public, not read-only, and get list ID
+    // Verify the list is public and get list ID
     const { data: shoppingList, error: listError } = await supabase
       .from('shopping_lists')
-      .select('id, share_read_only')
+      .select('id')
       .eq('share_token', validatedToken)
       .eq('is_public', true)
       .single();
@@ -204,14 +204,6 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ token: 
       return NextResponse.json(
         { error: 'Shopping list not found or not public' },
         { status: 404 }
-      );
-    }
-
-    // Check if list is shared as read-only
-    if (shoppingList.share_read_only) {
-      return NextResponse.json(
-        { error: 'This shopping list is shared as read-only. You cannot modify items.' },
-        { status: 403 }
       );
     }
 

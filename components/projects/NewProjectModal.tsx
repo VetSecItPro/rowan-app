@@ -53,7 +53,7 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
         space_id: spaceId,
         name: editProject.name,
         description: editProject.description || '',
-        status: editProject.status as 'planning' | 'in_progress' | 'completed' | 'on_hold',
+        status: editProject.status as 'planning' | 'in-progress' | 'completed' | 'on-hold' | 'cancelled',
         start_date: formatDateForInput(editProject.start_date),
         target_date: formatDateForInput(editProject.estimated_completion_date),
         budget_amount: editProject.estimated_budget || undefined,
@@ -244,13 +244,14 @@ export function NewProjectModal({ isOpen, onClose, onSave, editProject, spaceId 
           </label>
           <select
             value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planning' | 'in_progress' | 'completed' | 'on_hold' })}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planning' | 'in-progress' | 'completed' | 'on-hold' | 'cancelled' })}
             className="w-full pl-1 pr-1 py-2 border border-gray-600 rounded-lg bg-gray-900 text-white relative z-[70]"
           >
             <option value="planning">Planning</option>
-            <option value="in_progress">In Progress</option>
+            <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
-            <option value="on_hold">On Hold</option>
+            <option value="on-hold">On Hold</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
 

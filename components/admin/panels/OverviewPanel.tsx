@@ -355,28 +355,6 @@ export const OverviewPanel = memo(function OverviewPanel() {
         </div>
       </div>
 
-      {/* Beta Program Status */}
-      <div className="bg-purple-600 rounded-xl p-5 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">Beta Program</h3>
-            <p className="text-purple-100 text-sm mt-1">Limited to 100 users</p>
-          </div>
-          <div className="text-right">
-            <p className="text-3xl font-bold">{safeStats.betaUsers || 0}/100</p>
-            <p className="text-purple-100 text-sm">slots filled</p>
-          </div>
-        </div>
-        <div className="mt-4">
-          <div className="w-full bg-purple-400/30 rounded-full h-2">
-            <div
-              className="h-2 rounded-full bg-white transition-all duration-500"
-              style={{ width: `${Math.min((safeStats.betaUsers || 0), 100)}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Last Updated */}
       <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
         <Clock className="w-3 h-3" />

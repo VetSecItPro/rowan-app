@@ -261,7 +261,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
             const nextEvent = d.nextEvent as { title: string; start_time: string } | null;
             const nextReminder = d.nextReminder as { title: string; reminder_time: string } | null;
             const lastMessage = d.lastMessage as { content: string; sender_id: string; created_at: string } | null;
-            const nextMealData = d.nextMeal as { meal_type?: string; scheduled_date: string; recipe_name?: string } | null;
+            const nextMealData = d.nextMeal as { meal_type?: string; scheduled_date: string; name?: string } | null;
             const topGoal = d.topGoal as { title: string; progress: number } | null;
 
             // Combine tasks + chores
@@ -343,7 +343,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     mealsToday: meals.mealsToday || 0,
                     missingIngredients: 0,
                     nextMeal: nextMealData ? {
-                        title: nextMealData.recipe_name || nextMealData.meal_type || 'Meal',
+                        title: nextMealData.name || nextMealData.meal_type || 'Meal',
                         scheduled_date: nextMealData.scheduled_date,
                         meal_type: nextMealData.meal_type,
                     } : null,
@@ -448,15 +448,65 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                 .subscribe();
             channels.push(messagesChannel);
 
-            const shoppingChannel = supabase
-                .channel(`dashboard_shopping:${spaceId}`)
+            // Listen to shopping_lists (has space_id) for list-level changes
+            const shoppingListsChannel = supabase
+                .channel(`dashboard_shopping_lists:${spaceId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'shopping_lists',
+                    filter: `space_id=eq.${spaceId}`,
+                }, () => { loadAllStats(); })
+                .subscribe();
+            channels.push(shoppingListsChannel);
+
+            // Listen to shopping_items for item-level changes
+            // Note: shopping_items doesn't have space_id directly, RLS handles security
+            const shoppingItemsChannel = supabase
+                .channel(`dashboard_shopping_items:${spaceId}`)
                 .on('postgres_changes', {
                     event: '*',
                     schema: 'public',
                     table: 'shopping_items',
                 }, () => { loadAllStats(); })
                 .subscribe();
-            channels.push(shoppingChannel);
+            channels.push(shoppingItemsChannel);
+
+            // Meals — auto-update when AI or user creates/modifies meals
+            const mealsChannel = supabase
+                .channel(`dashboard_meals:${spaceId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'meals',
+                    filter: `space_id=eq.${spaceId}`,
+                }, () => { loadAllStats(); })
+                .subscribe();
+            channels.push(mealsChannel);
+
+            // Goals — auto-update when AI or user creates/modifies goals
+            const goalsChannel = supabase
+                .channel(`dashboard_goals:${spaceId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'goals',
+                    filter: `space_id=eq.${spaceId}`,
+                }, () => { loadAllStats(); })
+                .subscribe();
+            channels.push(goalsChannel);
+
+            // Chores — auto-update when chores change
+            const choresChannel = supabase
+                .channel(`dashboard_chores:${spaceId}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'chores',
+                    filter: `space_id=eq.${spaceId}`,
+                }, () => { loadAllStats(); })
+                .subscribe();
+            channels.push(choresChannel);
         }
 
         return () => {

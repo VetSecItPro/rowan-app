@@ -14,21 +14,25 @@ import type { SubscriptionTier, UsageType } from '../types';
 /**
  * Check if user can access a boolean feature (tier-based)
  *
+ * BULLETPROOF: If tier resolution fails (DB error), this throws rather than
+ * returning { allowed: false } — so the API route returns 500 instead of 403.
+ * A paying user should never see "upgrade to unlock" because of infra issues.
+ *
  * @param userId - The user ID to check
  * @param feature - The feature to check access for
- * @param supabaseClient - Optional pre-authenticated Supabase client (avoids JWT refresh race conditions)
+ * @param supabaseClient - Optional pre-authenticated Supabase client
  */
 export async function canAccessFeature(
   userId: string,
   feature: 'canUploadPhotos' | 'canUseMealPlanning' | 'canUseReminders' | 'canUseGoals' | 'canUseHousehold' | 'canUseAI' | 'canUseIntegrations' | 'canUseEventProposals',
   supabaseClient?: Awaited<ReturnType<typeof createClient>>
 ): Promise<{ allowed: boolean; reason?: string; tier?: SubscriptionTier }> {
+  // getUserTier throws on DB error — let it propagate
   const tier = await getUserTier(userId, supabaseClient);
   const limits = getFeatureLimits(tier);
   const allowed = limits[feature] === true;
 
   if (!allowed) {
-    // Determine required tier for upgrade message
     const familyOnlyFeatures = ['canUseIntegrations'];
     const requiredTier = familyOnlyFeatures.includes(feature) ? 'Family' : 'Pro';
     return {

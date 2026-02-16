@@ -354,11 +354,12 @@ async function fetchDigestData(
   const todayEnd = new Date(todayStart);
   todayEnd.setHours(23, 59, 59, 999);
 
-  // Fetch today's events
+  // Fetch today's events from the main events table (not calendar_events which is lightweight countdown links)
   const { data: events } = await supabaseAdmin
-    .from('calendar_events')
+    .from('events')
     .select('id, title, start_time, end_time, location, all_day')
     .eq('space_id', spaceId)
+    .is('deleted_at', null)
     .gte('start_time', todayStart.toISOString())
     .lte('start_time', todayEnd.toISOString())
     .order('start_time', { ascending: true })
@@ -387,18 +388,18 @@ async function fetchDigestData(
 
   // Fetch today's meals
   const { data: meals } = await supabaseAdmin
-    .from('meal_entries')
-    .select('id, meal_type, recipe_name')
+    .from('meals')
+    .select('id, meal_type, name')
     .eq('space_id', spaceId)
     .eq('scheduled_date', todayStart.toISOString().split('T')[0])
     .order('meal_type', { ascending: true });
 
-  // Fetch reminders due today
+  // Fetch reminders due today (DB column is 'completed', not 'is_complete')
   const { data: reminders } = await supabaseAdmin
     .from('reminders')
     .select('id, title, reminder_time')
     .eq('space_id', spaceId)
-    .eq('is_complete', false)
+    .eq('completed', false)
     .gte('reminder_time', todayStart.toISOString())
     .lte('reminder_time', todayEnd.toISOString())
     .order('reminder_time', { ascending: true })
@@ -416,19 +417,19 @@ async function fetchDigestData(
     tasksDue: (tasksDue || []).map((t) => ({
       id: t.id,
       title: t.title,
-      priority: t.priority as 'low' | 'normal' | 'high' | 'urgent',
+      priority: t.priority as 'low' | 'medium' | 'high' | 'urgent',
       due_date: t.due_date,
     })),
     overdueTasks: (overdueTasks || []).map((t) => ({
       id: t.id,
       title: t.title,
-      priority: t.priority as 'low' | 'normal' | 'high' | 'urgent',
+      priority: t.priority as 'low' | 'medium' | 'high' | 'urgent',
       due_date: t.due_date,
     })),
     meals: (meals || []).map((m) => ({
       id: m.id,
       meal_type: m.meal_type as 'breakfast' | 'lunch' | 'dinner' | 'snack',
-      recipe_name: m.recipe_name,
+      name: m.name,
     })),
     reminders: (reminders || []).map((r) => ({
       id: r.id,
