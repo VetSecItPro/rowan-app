@@ -274,7 +274,7 @@ const OverviewPanel = memo(function OverviewPanel({
               Cost Trend
             </h4>
             <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={data!.daily_trend}>
+              <LineChart data={data?.daily_trend ?? []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
                   dataKey="date"
@@ -304,7 +304,7 @@ const OverviewPanel = memo(function OverviewPanel({
               Cost by Feature
             </h4>
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={data!.cost_by_feature}>
+              <BarChart data={data?.cost_by_feature ?? []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
                   dataKey="feature"
@@ -321,7 +321,7 @@ const OverviewPanel = memo(function OverviewPanel({
                   labelFormatter={(label) => formatFeatureName(String(label))}
                 />
                 <Bar dataKey="cost" radius={[4, 4, 0, 0]}>
-                  {data!.cost_by_feature.map((entry) => (
+                  {(data?.cost_by_feature ?? []).map((entry) => (
                     <Cell key={entry.feature} fill={FEATURE_COLORS[entry.feature] ?? '#6b7280'} />
                   ))}
                 </Bar>
@@ -340,7 +340,7 @@ const OverviewPanel = memo(function OverviewPanel({
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
                 <Pie
-                  data={data!.cost_by_tier}
+                  data={data?.cost_by_tier ?? []}
                   dataKey="cost"
                   nameKey="tier"
                   cx="50%"
@@ -352,7 +352,7 @@ const OverviewPanel = memo(function OverviewPanel({
                     `${name ?? ''}: $${(value ?? 0).toFixed(3)}`
                   }
                 >
-                  {data!.cost_by_tier.map((entry) => (
+                  {(data?.cost_by_tier ?? []).map((entry) => (
                     <Cell key={entry.tier} fill={TIER_COLORS[entry.tier] ?? '#6b7280'} />
                   ))}
                 </Pie>

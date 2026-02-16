@@ -248,7 +248,7 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
                 <span className="text-sm font-medium text-white">Subscription Tiers</span>
               </div>
               <div className="space-y-3">
-                {metrics.tierDistribution.map((tier) => (
+                {(metrics.tierDistribution ?? []).map((tier) => (
                   <div key={tier.tier} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-300">{tier.tier}</span>
@@ -282,34 +282,34 @@ export const SubscriptionsPanel = memo(function SubscriptionsPanel() {
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-400">
-                    {metrics.recentEvents.created}
+                    {metrics.recentEvents?.created ?? 0}
                   </p>
                   <p className="text-xs text-gray-400">New</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-red-400">
-                    {metrics.recentEvents.cancelled}
+                    {metrics.recentEvents?.cancelled ?? 0}
                   </p>
                   <p className="text-xs text-gray-400">Cancelled</p>
                 </div>
                 <div className="text-center">
-                  <p className={`text-2xl font-bold ${metrics.netGrowth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {metrics.netGrowth >= 0 ? '+' : ''}{metrics.netGrowth}
+                  <p className={`text-2xl font-bold ${(metrics.netGrowth ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {(metrics.netGrowth ?? 0) >= 0 ? '+' : ''}{metrics.netGrowth ?? 0}
                   </p>
                   <p className="text-xs text-gray-400">Net</p>
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-700 grid grid-cols-3 gap-3 text-center">
                 <div>
-                  <p className="text-sm font-medium text-blue-400">{metrics.recentEvents.upgraded}</p>
+                  <p className="text-sm font-medium text-blue-400">{metrics.recentEvents?.upgraded ?? 0}</p>
                   <p className="text-xs text-gray-400">Upgraded</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-orange-400">{metrics.recentEvents.downgraded}</p>
+                  <p className="text-sm font-medium text-orange-400">{metrics.recentEvents?.downgraded ?? 0}</p>
                   <p className="text-xs text-gray-400">Downgraded</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-yellow-400">{metrics.recentEvents.paymentFailed}</p>
+                  <p className="text-sm font-medium text-yellow-400">{metrics.recentEvents?.paymentFailed ?? 0}</p>
                   <p className="text-xs text-gray-400">Failed</p>
                 </div>
               </div>

@@ -55,7 +55,7 @@ export function SpendingInsightsCard({ spaceId }: SpendingInsightsCardProps) {
   }
 
   const { current_period, trends, top_categories, budget_variances } = insights;
-  const maxTrendValue = Math.max(...trends.map(t => t.total_spent), 1);
+  const maxTrendValue = trends.length > 0 ? Math.max(...trends.map(t => t.total_spent), 1) : 1;
 
   return (
     <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
