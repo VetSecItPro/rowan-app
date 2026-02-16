@@ -50,17 +50,19 @@ export function calculateCostUsd(inputTokens: number, outputTokens: number): num
   return Math.round((inputCost + outputCost) * 1_000_000) / 1_000_000; // 6 decimal places
 }
 
-/** Per-user daily token budgets */
+/** Per-user daily token budgets
+ * Input budgets account for ~9K tokens of tool-definition overhead per request
+ * (42 function declarations sent with every Gemini call). */
 const TOKEN_BUDGETS: Record<string, AITokenBudget> = {
   pro: {
-    daily_input_tokens: 150_000,
-    daily_output_tokens: 60_000,
+    daily_input_tokens: 300_000,
+    daily_output_tokens: 80_000,
     daily_voice_seconds: 600,
     daily_conversations: 50,
   },
   family: {
-    daily_input_tokens: 150_000,
-    daily_output_tokens: 60_000,
+    daily_input_tokens: 300_000,
+    daily_output_tokens: 80_000,
     daily_voice_seconds: 1_800,
     daily_conversations: 100,
   },
@@ -68,8 +70,8 @@ const TOKEN_BUDGETS: Record<string, AITokenBudget> = {
 
 /** Per-space daily token caps (hard limit shared across all users in a space) */
 const SPACE_TOKEN_BUDGETS: AITokenBudget = {
-  daily_input_tokens: 400_000,
-  daily_output_tokens: 160_000,
+  daily_input_tokens: 800_000,
+  daily_output_tokens: 200_000,
   daily_voice_seconds: 3_600,
   daily_conversations: 300,
 };
