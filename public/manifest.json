@@ -66,36 +66,7 @@
       "url": "/calendar"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/dashboard-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Rowan Dashboard - Mobile"
-    },
-    {
-      "src": "/screenshots/tasks-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Task Management - Mobile"
-    },
-    {
-      "src": "/screenshots/dashboard-desktop.png",
-      "sizes": "1280x800",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Rowan Dashboard - Desktop"
-    },
-    {
-      "src": "/screenshots/calendar-desktop.png",
-      "sizes": "1280x800",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Family Calendar - Desktop"
-    }
-  ],
+  "screenshots": [],
   "related_applications": [],
   "prefer_related_applications": false
 }

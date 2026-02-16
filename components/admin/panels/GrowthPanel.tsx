@@ -111,7 +111,7 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
         break;
     }
 
-    if (chartData.length > 0) {
+    if ((chartData?.length ?? 0) > 0) {
       setDrillDown({ isOpen: true, title, metric, data: chartData, previousData: previousChartData, color });
     }
   }, [data, compareEnabled]);

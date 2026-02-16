@@ -88,7 +88,7 @@ const AdoptionPanel = memo(function AdoptionPanel() {
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm font-medium text-gray-400">Score Distribution</span>
           </div>
-          {distribution.length > 0 ? (
+          {(distribution?.length ?? 0) > 0 ? (
             <div className="space-y-2">
               {distribution.map((seg) => (
                 <div key={seg.label} className="flex items-center gap-3">
