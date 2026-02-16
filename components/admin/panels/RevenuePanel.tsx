@@ -659,7 +659,7 @@ const ConversionsPanel = memo(function ConversionsPanel() {
           <div className="p-4 bg-gray-700 rounded-lg border border-gray-600">
             <p className="text-sm text-gray-400">LTV</p>
             <p className="text-2xl font-bold text-white mt-1">
-              {totalSubscribers > 0 ? formatCurrency(metrics?.arpu || 0 * 12) : '--'}
+              {totalSubscribers > 0 ? formatCurrency((metrics?.arpu ?? 0) * 12) : '--'}
             </p>
             <p className="text-xs text-gray-400 mt-1">Estimated (ARPU x 12)</p>
           </div>

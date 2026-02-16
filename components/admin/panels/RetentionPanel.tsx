@@ -344,7 +344,7 @@ const DauMauPanel = memo(function DauMauPanel() {
         {(weeklyData?.length ?? 0) > 0 ? (
           <div className="h-32 flex items-end gap-2">
             {weeklyData.map((day, i) => {
-              const maxCount = Math.max(...weeklyData.map(d => d.count), 1);
+              const maxCount = weeklyData.length > 0 ? Math.max(...weeklyData.map(d => d.count), 1) : 1;
               const height = (day.count / maxCount) * 100;
               const date = new Date(day.date);
               const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });

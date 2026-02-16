@@ -215,7 +215,7 @@ const SessionsPanel = memo(function SessionsPanel() {
   };
 
   const hourlyActivity = analyticsData?.hourlyActivity || [];
-  const maxHourly = Math.max(...hourlyActivity, 1);
+  const maxHourly = hourlyActivity.length > 0 ? Math.max(...hourlyActivity, 1) : 1;
 
   const avgDuration = engagementData?.sessions?.avgDurationMinutes;
   const hasDuration = avgDuration !== undefined && avgDuration > 0;

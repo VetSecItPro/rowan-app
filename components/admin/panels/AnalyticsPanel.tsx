@@ -216,13 +216,14 @@ const HorizontalBarChart = memo(function HorizontalBarChart({
   };
 
   const slicedData = data.slice(0, maxItems);
-  const maxValue = Math.max(...slicedData.map(d => d[valueKey] as number), 1);
 
   if (slicedData.length === 0) {
     return (
       <div className="text-sm text-gray-400 text-center py-4">No data</div>
     );
   }
+
+  const maxValue = Math.max(...slicedData.map(d => d[valueKey] as number), 1);
 
   return (
     <div className="space-y-2">

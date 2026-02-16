@@ -77,6 +77,7 @@ export function ProposalsList({ spaceId, onApproveProposal, onRejectProposal, on
       return b.available - a.available;
     });
 
+    if (voteSummaries.length === 0) return;
     const bestSlotIndex = voteSummaries[0].index;
 
     try {

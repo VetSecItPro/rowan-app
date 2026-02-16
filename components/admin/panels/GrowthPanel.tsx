@@ -301,7 +301,7 @@ const AcquisitionPanel = memo(function AcquisitionPanel() {
           <h4 className="text-sm font-semibold text-white mb-4">Daily Acquisition Trend</h4>
           <div className="h-32 flex items-end gap-1">
             {dailyTrend.slice(-14).map((day, i) => {
-              const maxVisitors = Math.max(...dailyTrend.map(d => d.visitors), 1);
+              const maxVisitors = dailyTrend.length > 0 ? Math.max(...dailyTrend.map(d => d.visitors), 1) : 1;
               const height = (day.visitors / maxVisitors) * 100;
 
               return (
