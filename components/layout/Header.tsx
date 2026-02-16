@@ -26,10 +26,11 @@ const COLOR_THEMES = {
 
 /** Renders the main app header with navigation, notifications, and user menu. */
 export function Header() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
   const { currentSpace } = useSpaces();
   const { data: isAdmin } = useAdminStatus(user?.id);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -97,9 +98,10 @@ export function Header() {
   }, [isDropdownOpen, mounted]);
 
   const handleSignOut = async () => {
-    await signOut();
+    setIsSigningOut(true);
     setIsDropdownOpen(false);
-    router.push('/login');
+    await signOut();
+    router.push('/');
   };
 
   return (
@@ -150,7 +152,13 @@ export function Header() {
             )}
 
             {/* User menu */}
-            {user ? (
+            {authLoading || isSigningOut ? (
+              // Skeleton placeholder while auth loads or signing out — prevents Login button flash
+              <div className="flex items-center gap-2">
+                <div className="w-24 h-8 bg-gray-700 rounded-full animate-pulse hidden md:block" />
+                <div className="w-20 h-8 bg-gray-700 rounded-full animate-pulse" />
+              </div>
+            ) : user ? (
               <>
                 {/* Dashboard button - desktop only */}
                 <Link
