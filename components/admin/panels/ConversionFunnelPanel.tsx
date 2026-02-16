@@ -92,8 +92,8 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
     );
   }
 
-  // Default/fallback data if API hasn't been implemented yet
-  const funnel = data || {
+  // Merge API data with safe defaults for missing fields
+  const raw = data || {
     steps: [
       { id: 'requests', label: 'Beta Requests', count: 0, icon: Mail, color: 'blue', description: 'Submitted email for beta access' },
       { id: 'codes', label: 'Codes Sent', count: 0, icon: Key, color: 'purple', description: 'Received invite code via email' },
@@ -107,6 +107,19 @@ export const ConversionFunnelPanel = memo(function ConversionFunnelPanel() {
     },
     recentConversions: [],
     lastUpdated: new Date().toISOString(),
+  };
+
+  // API returns notificationToSignup/signupToActive — normalize to component's field names
+  const apiRates = raw.conversionRates as Record<string, number>;
+  const funnel = {
+    steps: raw.steps ?? [],
+    conversionRates: {
+      requestToCode: apiRates?.requestToCode ?? apiRates?.notificationToSignup ?? 0,
+      codeToSignup: apiRates?.codeToSignup ?? apiRates?.signupToActive ?? 0,
+      overallConversion: apiRates?.overallConversion ?? 0,
+    },
+    recentConversions: raw.recentConversions ?? [],
+    lastUpdated: raw.lastUpdated ?? new Date().toISOString(),
   };
 
   const stepIcons = {
