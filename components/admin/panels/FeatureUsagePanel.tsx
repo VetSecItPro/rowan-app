@@ -154,31 +154,31 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
       <div className="overflow-x-auto">
       <div className="grid grid-cols-7 gap-2 flex-shrink-0 min-w-[600px]">
         <div className="bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-white">{formatNumber(data.totals.totalPageViews)}</p>
+          <p className="text-lg font-bold text-white">{formatNumber(data?.totals?.totalPageViews ?? 0)}</p>
           <p className="text-xs text-gray-400">Views</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-white">{formatNumber(data.totals.totalUniqueUsers)}</p>
+          <p className="text-lg font-bold text-white">{formatNumber(data?.totals?.totalUniqueUsers ?? 0)}</p>
           <p className="text-xs text-gray-400">Users</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-white">{formatNumber(data.totals.totalActions)}</p>
+          <p className="text-lg font-bold text-white">{formatNumber(data?.totals?.totalActions ?? 0)}</p>
           <p className="text-xs text-gray-400">Actions</p>
         </div>
         <div className="bg-amber-900/20 rounded-lg p-2 text-center border border-amber-800">
-          <p className="text-lg font-bold text-amber-400">{data.summary.length}</p>
+          <p className="text-lg font-bold text-amber-400">{data?.summary?.length ?? 0}</p>
           <p className="text-xs text-amber-400">Features</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-blue-400">{formatNumber(data.totals.deviceBreakdown.mobile)}</p>
+          <p className="text-lg font-bold text-blue-400">{formatNumber(data?.totals?.deviceBreakdown?.mobile ?? 0)}</p>
           <p className="text-xs text-gray-400">Mobile</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-purple-400">{formatNumber(data.totals.deviceBreakdown.desktop)}</p>
+          <p className="text-lg font-bold text-purple-400">{formatNumber(data?.totals?.deviceBreakdown?.desktop ?? 0)}</p>
           <p className="text-xs text-gray-400">Desktop</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-2 text-center">
-          <p className="text-lg font-bold text-green-400">{formatNumber(data.totals.deviceBreakdown.tablet)}</p>
+          <p className="text-lg font-bold text-green-400">{formatNumber(data?.totals?.deviceBreakdown?.tablet ?? 0)}</p>
           <p className="text-xs text-gray-400">Tablet</p>
         </div>
       </div>
@@ -198,7 +198,7 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {data.summary.map((feature) => (
+              {(data?.summary ?? []).map((feature) => (
                 <tr key={feature.feature} className="hover:bg-gray-800/50">
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export const FeatureUsagePanel = memo(function FeatureUsagePanel() {
               ))}
             </tbody>
           </table>
-          {data.summary.length === 0 && (
+          {(data?.summary?.length ?? 0) === 0 && (
             <div className="p-8 text-center text-gray-400">
               <Layers className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>No feature usage data yet</p>

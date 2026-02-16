@@ -336,7 +336,7 @@ export const OverviewPanel = memo(function OverviewPanel() {
         break;
     }
 
-    if (data.length > 0) {
+    if ((data?.length ?? 0) > 0) {
       setDrillDown({ isOpen: true, title, metric, data, previousData, color });
     }
   }, [analyticsData, compareEnabled]);

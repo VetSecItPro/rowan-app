@@ -178,7 +178,7 @@ const DauMauPanel = memo(function DauMauPanel() {
         break;
     }
 
-    if (chartData.length > 0) {
+    if ((chartData?.length ?? 0) > 0) {
       setDrillDown({ isOpen: true, title, metric, data: chartData, previousData: previousChartData, color });
     }
   }, [data, compareEnabled]);
@@ -341,7 +341,7 @@ const DauMauPanel = memo(function DauMauPanel() {
             <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
-        {weeklyData.length > 0 ? (
+        {(weeklyData?.length ?? 0) > 0 ? (
           <div className="h-32 flex items-end gap-2">
             {weeklyData.map((day, i) => {
               const maxCount = Math.max(...weeklyData.map(d => d.count), 1);

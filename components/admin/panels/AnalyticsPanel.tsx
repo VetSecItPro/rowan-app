@@ -446,7 +446,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
         break;
     }
 
-    if (chartData.length > 0) {
+    if ((chartData?.length ?? 0) > 0) {
       setDrillDown({ isOpen: true, title, metric, data: chartData, previousData: previousChartData, color });
     }
   }, [analyticsData, compareEnabled]);
@@ -620,25 +620,25 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <p className="text-2xl font-bold text-white">
-              {data.summary.totalBetaRequests}
+              {data?.summary?.totalBetaRequests ?? 0}
             </p>
             <p className="text-xs text-gray-400">Beta Requests</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-white">
-              {data.summary.activeBetaUsers}
+              {data?.summary?.activeBetaUsers ?? 0}
             </p>
             <p className="text-xs text-gray-400">Active Users</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-white">
-              {data.betaMetrics.approvalRate}%
+              {data?.betaMetrics?.approvalRate ?? 0}%
             </p>
             <p className="text-xs text-gray-400">Approval Rate</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-white">
-              {data.betaMetrics.conversionRate}%
+              {data?.betaMetrics?.conversionRate ?? 0}%
             </p>
             <p className="text-xs text-gray-400">Conversion Rate</p>
           </div>
