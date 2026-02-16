@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Verify user is in the space
     const { data: membership, error: memberError } = await supabase
       .from('space_members')
-      .select('id')
+      .select('space_id')
       .eq('space_id', chore.space_id)
       .eq('user_id', user.id)
       .single();

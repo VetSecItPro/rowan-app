@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    const { space_id, recipe_name, notes } = body;
+    const { space_id, name, notes } = body;
 
     // Verify user has access to this space
     try {
@@ -175,13 +175,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Create meal using service with sanitized inputs
-    // Note: Zod schema uses "recipe_name" but DB column is "name" (migration 20251012000002)
     const meal = await mealsService.createMeal({
       space_id: body.space_id,
       meal_type: body.meal_type,
       scheduled_date: body.scheduled_date,
       recipe_id: body.recipe_id || undefined,
-      name: recipe_name ? sanitizePlainText(recipe_name) : (body.name || undefined),
+      name: name ? sanitizePlainText(name) : undefined,
       notes: notes ? sanitizePlainText(notes) : undefined,
     }, supabase);
 

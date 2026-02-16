@@ -337,11 +337,25 @@ export interface Message {
 export interface ShoppingList {
   id: string;
   space_id: string;
-  name: string;
+  title: string;
   description?: string;
+  status?: 'active' | 'completed' | 'archived';
+  store?: string;
+  store_name?: string;
+  estimated_total?: number;
+  actual_total?: number;
+  budget?: number;
+  meal_ids?: unknown[];
+  is_public?: boolean;
+  share_token?: string;
+  shared_at?: string;
+  auto_generated?: boolean;
+  last_modified_by?: string;
+  last_modified_at?: string;
   created_by?: string;
   created_at: string;
   updated_at: string;
+  completed_at?: string;
 }
 
 export interface ShoppingItem {
@@ -349,10 +363,19 @@ export interface ShoppingItem {
   list_id: string;
   name: string;
   quantity?: string;
+  unit?: string;
   category?: string;
   is_purchased: boolean;
+  checked: boolean;
   added_by?: string;
   purchased_by?: string;
+  assigned_to?: string;
+  recipe_id?: string;
+  recipe_source_id?: string;
+  notes?: string;
+  sort_order?: number;
+  estimated_price?: number;
+  actual_price?: number;
   created_at: string;
   updated_at: string;
 }

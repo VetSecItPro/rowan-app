@@ -10,9 +10,13 @@ const expenseCategoryEnum = z.enum([
   'travel', 'home', 'other'
 ]);
 const paymentMethodEnum = z.enum(['cash', 'credit', 'debit', 'bank_transfer', 'check', 'other']);
-const recurringTypeEnum = z.enum(['none', 'weekly', 'biweekly', 'monthly', 'quarterly', 'yearly']);
+const recurringFrequencyEnum = z.enum(['weekly', 'biweekly', 'monthly', 'quarterly', 'yearly']);
 
 // Base expense schema
+// NOTE: Field names must match DB columns exactly.
+// - `paid_by` is uuid in DB (foreign key to users)
+// - `recurring` is boolean in DB; recurrence type goes in `recurring_frequency`
+// - `receipt_id` is uuid FK in DB (not a URL)
 export const expenseBaseSchema = z.object({
   space_id: z.string().uuid('Invalid space ID'),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters').trim(),
@@ -26,15 +30,21 @@ export const expenseBaseSchema = z.object({
   ]).refine(val => typeof val === 'number' && val >= 0, 'Amount must be a positive number'),
   category: expenseCategoryEnum.optional().nullable(),
   payment_method: paymentMethodEnum.optional().nullable(),
-  paid_by: z.string().max(100).trim().optional().nullable(),
+  paid_by: z.string().uuid('Invalid user ID').optional().nullable(),
   status: expenseStatusEnum.default('pending'),
+  date: z.string().optional().nullable()
+    .transform(val => val === '' ? null : val),
   due_date: z.string().optional().nullable()
     .transform(val => val === '' ? null : val)
     .refine(val => val === null || z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format'),
-  recurring: recurringTypeEnum.default('none'),
+  recurring: z.boolean().default(false),
+  recurring_frequency: recurringFrequencyEnum.optional().nullable(),
+  description: z.string().max(2000, 'Description must be less than 2000 characters').trim().optional().nullable()
+    .transform(val => val === '' ? null : val),
   notes: z.string().max(1000, 'Notes must be less than 1000 characters').trim().optional().nullable()
     .transform(val => val === '' ? null : val),
-  receipt_url: z.string().url().optional().nullable(),
+  project_id: z.string().uuid('Invalid project ID').optional().nullable(),
+  split_type: z.string().max(50).optional().nullable(),
 });
 
 // Create expense schema
@@ -50,7 +60,7 @@ export function validateAndSanitizeExpense(data: unknown): z.infer<typeof create
   return {
     ...parsed,
     title: sanitizePlainText(parsed.title),
-    paid_by: parsed.paid_by ? sanitizePlainText(parsed.paid_by) : null,
+    description: parsed.description ? sanitizePlainText(parsed.description) : null,
     notes: parsed.notes ? sanitizePlainText(parsed.notes) : null,
   };
 }

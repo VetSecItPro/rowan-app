@@ -19,7 +19,7 @@ export const mealBaseSchema = z.object({
   scheduled_date: z.string()
     .refine(val => z.string().datetime().safeParse(val).success || z.string().regex(/^\d{4}-\d{2}-\d{2}$/).safeParse(val).success, 'Invalid date format'),
   recipe_id: z.string().uuid().optional().nullable(),
-  recipe_name: z.string().max(200, 'Recipe name must be less than 200 characters').trim().optional().nullable()
+  name: z.string().max(200, 'Name must be less than 200 characters').trim().optional().nullable()
     .transform(val => val === '' ? null : val),
   notes: z.string().max(1000, 'Notes must be less than 1000 characters').trim().optional().nullable()
     .transform(val => val === '' ? null : val),
@@ -42,7 +42,7 @@ export function validateAndSanitizeMeal(data: unknown): z.infer<typeof createMea
 
   return {
     ...parsed,
-    recipe_name: parsed.recipe_name ? sanitizePlainText(parsed.recipe_name) : null,
+    name: parsed.name ? sanitizePlainText(parsed.name) : null,
     notes: parsed.notes ? sanitizePlainText(parsed.notes) : null,
   };
 }

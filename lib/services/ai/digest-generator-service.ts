@@ -21,14 +21,14 @@ export interface DigestEvent {
 export interface DigestTask {
   id: string;
   title: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   due_date?: string;
 }
 
 export interface DigestMeal {
   id: string;
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  recipe_name: string;
+  name: string;
 }
 
 export interface DigestReminder {
@@ -239,7 +239,7 @@ Generate the daily briefing JSON:`;
       sections.push('🍽️ TODAY\'S MEALS:');
       input.meals.forEach((meal) => {
         const mealLabel = meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1);
-        sections.push(`  - ${mealLabel}: ${meal.recipe_name}`);
+        sections.push(`  - ${mealLabel}: ${meal.name}`);
       });
       sections.push('');
     }

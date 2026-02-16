@@ -7,10 +7,14 @@ export interface CreateProjectInput {
   space_id: string;
   name: string;
   description?: string;
-  status?: 'planning' | 'in_progress' | 'completed' | 'on_hold';
+  status?: 'planning' | 'in-progress' | 'completed' | 'on-hold' | 'cancelled';
   start_date?: string;
   target_date?: string;
   budget_amount?: number;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  location?: string;
+  tags?: string[];
+  created_by?: string;
 }
 
 export interface ProjectStats {

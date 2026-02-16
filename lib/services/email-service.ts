@@ -106,7 +106,7 @@ export interface TaskAssignmentData {
   taskTitle: string;
   taskDescription?: string;
   dueDate?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   spaceId: string;
   taskId: string;
   spaceName: string;
@@ -183,7 +183,7 @@ export interface GeneralReminderData {
   reminderType: 'personal' | 'shared' | 'recurring' | 'important';
   dueDate?: string;
   dueTime?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   category?: string;
   spaceId: string;
   reminderId: string;
@@ -246,19 +246,19 @@ export interface DailyDigestData {
   tasksDue: Array<{
     id: string;
     title: string;
-    priority: 'low' | 'normal' | 'high' | 'urgent';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
     due_date?: string;
   }>;
   overdueTasks: Array<{
     id: string;
     title: string;
-    priority: 'low' | 'normal' | 'high' | 'urgent';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
     due_date?: string;
   }>;
   meals: Array<{
     id: string;
     meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-    recipe_name: string;
+    name: string;
   }>;
   reminders: Array<{
     id: string;
@@ -286,19 +286,19 @@ export interface AIDailyDigestData {
   tasksDue: Array<{
     id: string;
     title: string;
-    priority: 'low' | 'normal' | 'high' | 'urgent';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
     due_date?: string;
   }>;
   overdueTasks: Array<{
     id: string;
     title: string;
-    priority: 'low' | 'normal' | 'high' | 'urgent';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
     due_date?: string;
   }>;
   meals: Array<{
     id: string;
     meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-    recipe_name: string;
+    name: string;
   }>;
   reminders: Array<{
     id: string;

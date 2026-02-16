@@ -26,7 +26,6 @@ export const updateShoppingListSchema = z.object({
     .transform(sanitizePlainText)
     .optional(),
   is_public: z.boolean().optional(),
-  share_read_only: z.boolean().optional(),
 });
 
 // Shopping item schema
@@ -37,9 +36,9 @@ export const createShoppingItemSchema = z.object({
     .max(255, 'Item name must be less than 255 characters')
     .trim()
     .transform(sanitizePlainText),
-  quantity: z.string()
-    .max(50, 'Quantity must be less than 50 characters')
-    .trim()
+  quantity: z.union([z.string(), z.number()])
+    .transform((val) => (typeof val === 'number' ? String(val) : val))
+    .pipe(z.string().max(50, 'Quantity must be less than 50 characters').trim())
     .optional()
     .nullable(),
   category: z.string()
@@ -63,9 +62,9 @@ export const updateShoppingItemSchema = z.object({
     .trim()
     .transform(sanitizePlainText)
     .optional(),
-  quantity: z.string()
-    .max(50, 'Quantity must be less than 50 characters')
-    .trim()
+  quantity: z.union([z.string(), z.number()])
+    .transform((val) => (typeof val === 'number' ? String(val) : val))
+    .pipe(z.string().max(50, 'Quantity must be less than 50 characters').trim())
     .optional()
     .nullable(),
   category: z.string()

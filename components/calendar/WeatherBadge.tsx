@@ -170,8 +170,8 @@ export function WeatherBadge({ eventTime, location, display = 'full' }: WeatherB
         <span className="font-semibold text-white">{tempF}°F</span>
         <span className="text-gray-400 text-xs">feels {feelsLikeF}°</span>
         <span className="text-gray-400 text-xs capitalize">{weather.description}</span>
-        <span className="text-gray-400 text-xs">💧{weather.humidity}%</span>
-        <span className="text-gray-400 text-xs">💨{windMph}mph</span>
+        <span className="text-gray-400 text-xs">💧 {weather.humidity}%</span>
+        <span className="text-gray-400 text-xs">💨 {windMph}mph</span>
         {alert && (
           <span title={alert.title}>
             <AlertTriangle

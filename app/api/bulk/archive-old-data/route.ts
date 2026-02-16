@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to this space
     const { data: membership } = await supabase
       .from('space_members')
-      .select('id')
+      .select('space_id')
       .eq('space_id', spaceId)
       .eq('user_id', user.id)
       .single();

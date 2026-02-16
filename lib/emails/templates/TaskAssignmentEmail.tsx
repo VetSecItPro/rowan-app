@@ -21,7 +21,7 @@ interface TaskAssignmentEmailProps {
   taskTitle: string;
   taskDescription?: string;
   dueDate?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   spaceId: string;
   taskId: string;
   spaceName: string;
@@ -33,21 +33,21 @@ const TaskAssignmentEmail = ({
   taskTitle = 'New Task Assignment',
   taskDescription,
   dueDate,
-  priority = 'normal',
+  priority = 'medium',
   spaceId,
   taskId,
   spaceName = 'Your Space',
 }: TaskAssignmentEmailProps) => {
   const priorityColors = {
     low: '#10B981',
-    normal: '#6366F1',
+    medium: '#6366F1',
     high: '#F59E0B',
     urgent: '#EF4444'
   };
 
   const priorityLabels = {
     low: 'Low Priority',
-    normal: 'Normal Priority',
+    medium: 'Medium Priority',
     high: 'High Priority',
     urgent: 'Urgent'
   };

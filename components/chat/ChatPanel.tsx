@@ -222,7 +222,7 @@ export default function ChatPanel({
 
   if (persistent) {
     return (
-      <div className="flex flex-col h-screen sticky top-0 bg-gray-900 border-l border-gray-700/50">
+      <div className="flex flex-col h-full bg-gray-900 border border-gray-700/30 rounded-xl overflow-hidden">
         {panelContent}
       </div>
     );

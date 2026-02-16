@@ -6,6 +6,8 @@ import { sanitizePlainText } from '@/lib/sanitize';
 const invitationRoleEnum = z.enum(['member', 'admin']);
 
 // Base space schema
+// Note: Only includes fields that exist as actual DB columns on the `spaces` table.
+// `icon`, `color`, and `timezone` were removed — they do not exist in the database.
 export const spaceBaseSchema = z.object({
   name: z.string()
     .min(1, 'Name is required')
@@ -13,9 +15,6 @@ export const spaceBaseSchema = z.object({
     .trim(),
   description: z.string().max(500, 'Description must be less than 500 characters').trim().optional().nullable()
     .transform(val => val === '' ? null : val),
-  icon: z.string().max(50).optional().nullable(),
-  color: z.string().regex(/^(red|blue|green|yellow|purple|pink|indigo|gray|orange|teal|cyan|emerald|amber)$/, 'Invalid color').optional().nullable(),
-  timezone: z.string().max(50).optional().nullable(),
   settings: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 

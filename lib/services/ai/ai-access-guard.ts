@@ -29,11 +29,15 @@ export interface AIAccessResult {
 /**
  * Validate that a user has AI access (subscription tier + budget).
  *
+ * BULLETPROOF STRATEGY:
+ * - If tier check fails due to DB error, return 500 (not 403)
+ * - A paying user should NEVER see "upgrade to unlock" due to infra issues
+ * - Budget check failures are lenient (allow through)
+ *
  * @param supabase - Authenticated Supabase client from the API route
  * @param userId - The authenticated user's ID
  * @param spaceId - The space ID for per-space budget checks
  * @param checkBudgetToo - Whether to also check token budget (default: true).
- *   Set to false for non-token-consuming routes like settings GET.
  */
 export async function validateAIAccess(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -41,8 +45,21 @@ export async function validateAIAccess(
   spaceId?: string,
   checkBudgetToo: boolean = true
 ): Promise<AIAccessResult> {
-  // 1. Check subscription tier (pass the route's authenticated client to avoid JWT race conditions)
-  const featureAccess = await canAccessFeature(userId, 'canUseAI', supabase);
+  // 1. Check subscription tier
+  // canAccessFeature THROWS on DB errors — catch and return 500, not 403
+  let featureAccess: Awaited<ReturnType<typeof canAccessFeature>>;
+  try {
+    featureAccess = await canAccessFeature(userId, 'canUseAI', supabase);
+  } catch (error) {
+    // DB error fetching subscription — DO NOT return 403.
+    // Return 500 so the client retries instead of showing "upgrade" to a paying user.
+    return {
+      allowed: false,
+      tier: 'free', // placeholder — we don't actually know the tier
+      reason: 'Unable to verify subscription status. Please try again.',
+      statusCode: 500,
+    };
+  }
 
   if (!featureAccess.allowed) {
     return {

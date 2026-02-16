@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       .from('shopping_lists')
       .insert({
         space_id: spaceId,
-        name: finalListName,
+        title: finalListName,
         description: `Generated from ${recipes.length} recipe${recipes.length > 1 ? 's' : ''}`,
         created_by: user.id,
         meal_ids: mealIds,

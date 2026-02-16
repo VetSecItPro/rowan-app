@@ -27,14 +27,14 @@ interface CalendarEvent {
 interface Task {
   id: string;
   title: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
   due_date?: string;
 }
 
 interface Meal {
   id: string;
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  recipe_name: string;
+  name: string;
 }
 
 interface Reminder {
@@ -76,7 +76,7 @@ const DailyDigestEmail = ({
 
   const priorityColors: Record<string, string> = {
     low: '#10B981',
-    normal: '#6366F1',
+    medium: '#6366F1',
     high: '#F59E0B',
     urgent: '#EF4444'
   };
@@ -158,7 +158,7 @@ const DailyDigestEmail = ({
                         <div key={task.id} style={overdueItem}>
                           <span style={{
                             ...priorityDot,
-                            backgroundColor: priorityColors[task.priority] || priorityColors.normal
+                            backgroundColor: priorityColors[task.priority] || priorityColors.medium
                           }} />
                           <span style={overdueTitle}>{task.title}</span>
                         </div>
@@ -214,7 +214,7 @@ const DailyDigestEmail = ({
                         <div key={task.id} style={listItem}>
                           <span style={{
                             ...priorityDot,
-                            backgroundColor: priorityColors[task.priority] || priorityColors.normal
+                            backgroundColor: priorityColors[task.priority] || priorityColors.medium
                           }} />
                           <span style={taskTitle}>{task.title}</span>
                         </div>
@@ -241,7 +241,7 @@ const DailyDigestEmail = ({
                           <span style={mealEmoji}>{mealEmojis[meal.meal_type] || '🍴'}</span>
                           <div style={mealDetails}>
                             <span style={mealType}>{meal.meal_type.charAt(0).toUpperCase() + meal.meal_type.slice(1)}</span>
-                            <span style={mealName}>{meal.recipe_name}</span>
+                            <span style={mealName}>{meal.name}</span>
                           </div>
                         </div>
                       ))}

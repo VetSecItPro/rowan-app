@@ -68,12 +68,8 @@ const createTask: FunctionDeclaration = {
         description: 'Whether to sync this task to the calendar as an event',
       },
       tags: {
-        type: SchemaType.ARRAY,
-        description: 'Tags or labels to attach to the task for filtering',
-        items: {
-          type: SchemaType.STRING,
-          description: 'A single tag value',
-        },
+        type: SchemaType.STRING,
+        description: 'Comma-separated tags or labels for filtering (e.g. "grocery, urgent, school")',
       },
     },
     required: ['title'],
@@ -171,6 +167,10 @@ const createChore: FunctionDeclaration = {
         type: SchemaType.STRING,
         description: 'Extra notes or instructions for the chore',
       },
+      category: {
+        type: SchemaType.STRING,
+        description: 'Category for the chore (e.g. "kitchen", "bathroom", "yard", "laundry")',
+      },
     },
     required: ['title', 'frequency'],
   },
@@ -231,15 +231,21 @@ const createEvent: FunctionDeclaration = {
         type: SchemaType.BOOLEAN,
         description: 'Whether this is an all-day event (no specific start/end times)',
       },
-      recurrence: {
+      recurrence_pattern: {
         type: SchemaType.STRING,
         format: 'enum',
         enum: ['none', 'daily', 'weekly', 'monthly', 'yearly'],
         description: 'Recurrence pattern for the event. Defaults to none.',
       },
-      reminder_minutes: {
-        type: SchemaType.INTEGER,
-        description: 'Number of minutes before the event to send a reminder notification',
+      category: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['work', 'personal', 'family', 'health', 'social'],
+        description: 'Category of the event',
+      },
+      custom_color: {
+        type: SchemaType.STRING,
+        description: 'Custom hex color for the event (e.g. "#8b5cf6")',
       },
     },
     required: ['title', 'start_time'],
@@ -301,9 +307,9 @@ const createReminder: FunctionDeclaration = {
         type: SchemaType.STRING,
         description: 'What the reminder is about',
       },
-      due_date: {
+      reminder_time: {
         type: SchemaType.STRING,
-        description: 'When the reminder is due in ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)',
+        description: 'When the reminder should fire, in ISO 8601 format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)',
       },
       priority: {
         type: SchemaType.STRING,
@@ -311,7 +317,7 @@ const createReminder: FunctionDeclaration = {
         enum: ['low', 'medium', 'high', 'urgent'],
         description: 'Priority level of the reminder',
       },
-      recurrence: {
+      recurrence_pattern: {
         type: SchemaType.STRING,
         format: 'enum',
         enum: ['none', 'daily', 'weekly', 'biweekly', 'monthly', 'yearly'],
@@ -325,9 +331,11 @@ const createReminder: FunctionDeclaration = {
         type: SchemaType.STRING,
         description: 'Additional details about the reminder',
       },
-      notification_time: {
+      category: {
         type: SchemaType.STRING,
-        description: 'Specific time to send the notification in ISO 8601 format',
+        format: 'enum',
+        enum: ['bills', 'health', 'work', 'personal', 'household'],
+        description: 'Category of the reminder',
       },
     },
     required: ['title'],
@@ -431,7 +439,7 @@ const planMeal: FunctionDeclaration = {
         type: SchemaType.STRING,
         description: 'The date for this meal in ISO 8601 format (YYYY-MM-DD)',
       },
-      recipe_name: {
+      name: {
         type: SchemaType.STRING,
         description: 'Name of the recipe or dish being planned',
       },
@@ -469,7 +477,7 @@ const createGoal: FunctionDeclaration = {
         type: SchemaType.STRING,
         description: 'A detailed description of what the goal entails',
       },
-      goal_type: {
+      category: {
         type: SchemaType.STRING,
         format: 'enum',
         enum: ['personal', 'family', 'health', 'financial', 'career', 'education', 'other'],
@@ -482,12 +490,6 @@ const createGoal: FunctionDeclaration = {
       assigned_to: {
         type: SchemaType.STRING,
         description: 'User ID of the space member this goal is assigned to',
-      },
-      reminder_frequency: {
-        type: SchemaType.STRING,
-        format: 'enum',
-        enum: ['daily', 'weekly', 'monthly', 'none'],
-        description: 'How often to send progress reminders. Defaults to none.',
       },
     },
     required: ['title'],
@@ -606,7 +608,7 @@ const createProject: FunctionDeclaration = {
       status: {
         type: SchemaType.STRING,
         format: 'enum',
-        enum: ['planning', 'active', 'on-hold', 'completed', 'archived'],
+        enum: ['planning', 'in-progress', 'on-hold', 'completed', 'cancelled'],
         description: 'Current status of the project. Defaults to planning.',
       },
       priority: {
@@ -619,9 +621,13 @@ const createProject: FunctionDeclaration = {
         type: SchemaType.STRING,
         description: 'Project start date in ISO 8601 format (YYYY-MM-DD)',
       },
-      end_date: {
+      target_date: {
         type: SchemaType.STRING,
         description: 'Target end date in ISO 8601 format (YYYY-MM-DD)',
+      },
+      budget_amount: {
+        type: SchemaType.NUMBER,
+        description: 'Budget amount for the project',
       },
     },
     required: ['name'],

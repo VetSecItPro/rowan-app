@@ -1,10 +1,22 @@
 import { z } from 'zod';
 import { sanitizePlainText } from '@/lib/sanitize';
 
-// Calendar event recurrence enum
-const recurrenceTypeEnum = z.enum(['none', 'daily', 'weekly', 'monthly', 'yearly']);
+/**
+ * Calendar Event Validation Schemas
+ *
+ * Maps to the `events` table in the database. Field names must match DB columns:
+ * - is_recurring (boolean) + recurrence_pattern (text) -- NOT "recurrence"
+ * - custom_color (text) -- NOT "color"
+ * - all_day (boolean)
+ *
+ * Fields that do NOT exist in the DB and are intentionally excluded:
+ * - recurrence_end_date, reminder_minutes, attendees
+ */
 
-// Base calendar event schema
+// Recurrence pattern values stored in the recurrence_pattern column
+const recurrencePatternEnum = z.enum(['none', 'daily', 'weekly', 'monthly', 'yearly']);
+
+// Base calendar event schema - field names match DB columns
 export const calendarEventBaseSchema = z.object({
   space_id: z.string().uuid('Invalid space ID'),
   title: z.string()
@@ -25,17 +37,28 @@ export const calendarEventBaseSchema = z.object({
     z.string().optional()
   ),
   all_day: z.boolean().default(false),
-  recurrence: recurrenceTypeEnum.default('none'),
-  recurrence_end_date: z.preprocess(
-    (val) => (val === '' || val === null) ? undefined : val,
-    z.string().optional()
+  // DB columns: is_recurring (boolean) + recurrence_pattern (text)
+  is_recurring: z.boolean().default(false),
+  recurrence_pattern: z.preprocess(
+    (val) => (val === '' || val === null || val === 'none') ? undefined : val,
+    recurrencePatternEnum.optional()
   ),
-  color: z.preprocess(
+  custom_color: z.preprocess(
     (val) => (val === '' || val === null) ? undefined : val,
     z.string().max(50).optional()
   ),
-  reminder_minutes: z.number().int().min(0).max(10080).optional(), // max 1 week
-  attendees: z.array(z.string().uuid()).optional(),
+  event_type: z.preprocess(
+    (val) => (val === '' || val === null) ? undefined : val,
+    z.string().optional()
+  ),
+  category: z.preprocess(
+    (val) => (val === '' || val === null) ? undefined : val,
+    z.enum(['work', 'personal', 'family', 'health', 'social']).optional()
+  ),
+  assigned_to: z.preprocess(
+    (val) => (val === '' || val === null) ? undefined : val,
+    z.string().uuid().optional()
+  ),
 });
 
 // Create calendar event schema

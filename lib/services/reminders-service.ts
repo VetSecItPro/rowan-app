@@ -307,7 +307,7 @@ export const remindersService = {
     // Security: Validate user has access to this space
     const { data: membership, error: memberError } = await supabase
       .from('space_members')
-      .select('id')
+      .select('space_id')
       .eq('space_id', spaceId)
       .eq('user_id', userId)
       .single();

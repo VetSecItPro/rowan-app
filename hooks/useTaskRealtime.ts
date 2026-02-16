@@ -21,7 +21,7 @@ interface UseTaskRealtimeOptions {
 type SubtaskRecord = {
   id: string;
   title: string;
-  completed: boolean;
+  status: 'pending' | 'in_progress' | 'completed' | 'blocked';
   sort_order: number | null;
   parent_task_id: string;
   created_at: string;
@@ -353,11 +353,11 @@ export function useSubtaskRealtime(taskId: string) {
     async function loadSubtasks() {
       try {
         const { data, error } = await supabase
-          .from('task_subtasks')
+          .from('subtasks')
           .select(`
             id,
             title,
-            completed,
+            status,
             sort_order,
             parent_task_id,
             created_at,
@@ -382,7 +382,7 @@ export function useSubtaskRealtime(taskId: string) {
         {
           event: '*',
           schema: 'public',
-          table: 'task_subtasks',
+          table: 'subtasks',
           filter: `parent_task_id=eq.${taskId}`,
         },
         () => {

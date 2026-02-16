@@ -91,7 +91,7 @@ export const reminderActivityService = {
 
     const { data: membership, error: memberError } = await supabase
       .from('space_members')
-      .select('id')
+      .select('space_id')
       .eq('space_id', reminder.space_id)
       .eq('user_id', validated.user_id)
       .single();
@@ -186,7 +186,7 @@ export const reminderActivityService = {
     }
 
     const { data, error } = await supabase
-      .from('reminder_activity')
+      .from('reminder_activities')
       .select(`
         *,
         user:user_id (
