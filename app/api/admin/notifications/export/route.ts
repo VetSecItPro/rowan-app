@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     // Build query
     let query = supabaseAdmin
       .from('launch_notifications')
-      .select('*')
+      .select('id, name, email, source, referrer, ip_address, user_agent, subscribed, created_at, unsubscribed_at')
       .order('created_at', { ascending: false });
 
     // If specific IDs are provided, filter by them

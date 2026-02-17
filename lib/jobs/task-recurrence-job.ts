@@ -16,7 +16,7 @@ export async function generateRecurringTasks() {
     // Get all active recurring templates
     const { data: templates, error } = await supabase
       .from('tasks')
-      .select('*')
+      .select('id, space_id, title, description, category, priority, assigned_to, created_by, created_at, recurrence_pattern, recurrence_interval, recurrence_days_of_week, recurrence_day_of_month, recurrence_month, recurrence_end_date, recurrence_end_count, recurrence_exceptions')
       .eq('is_recurrence_template', true)
       .eq('status', 'active');
 

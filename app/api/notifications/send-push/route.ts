@@ -241,7 +241,7 @@ async function sendPushToUser(
     // Get user's active push subscriptions
     const { data: subscriptions, error: fetchError } = await supabase
       .from('push_subscriptions')
-      .select('*')
+      .select('id, endpoint, p256dh, auth, is_active, user_id')
       .eq('user_id', userId)
       .eq('is_active', true);
 

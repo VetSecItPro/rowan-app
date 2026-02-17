@@ -6,6 +6,7 @@
  */
 
 import type { SubscriptionTier, SubscriptionPeriod } from './types/subscription';
+import { logger } from '@/lib/logger';
 
 // Polar SDK - dynamically imported to prevent build errors when not installed
 // SDK v0.42+ uses different method signatures than earlier versions
@@ -44,12 +45,11 @@ export async function getPolarClient(): Promise<PolarClient | null> {
 
   try {
     // Dynamic import for optional dependency
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sdk = await import("@polar-sh/sdk") as any;
+    const sdk = await import("@polar-sh/sdk") as unknown as { Polar: new (options: { accessToken: string }) => PolarClient };
     const Polar = sdk.Polar;
     _polarClient = new Polar({
       accessToken: process.env.POLAR_ACCESS_TOKEN,
-    }) as unknown as PolarClient;
+    });
     return _polarClient;
   } catch {
     // SDK not installed — optional dependency
@@ -186,7 +186,7 @@ export async function createCheckoutUrl(
 ): Promise<string | null> {
   const polar = await getPolarClient();
   if (!polar) {
-    console.error("Polar client not initialized");
+    logger.error("Polar client not initialized", new Error("Polar client not initialized"), { component: 'polar', action: 'create_checkout' });
     return null;
   }
 
@@ -201,7 +201,7 @@ export async function createCheckoutUrl(
 
     return checkout.url;
   } catch (error) {
-    console.error("Failed to create Polar checkout:", error);
+    logger.error("Failed to create Polar checkout", error instanceof Error ? error : new Error(String(error)), { component: 'polar', action: 'create_checkout' });
     return null;
   }
 }
@@ -210,7 +210,7 @@ export async function createCheckoutUrl(
 export async function createCustomerPortalUrl(customerId: string): Promise<string | null> {
   const polar = await getPolarClient();
   if (!polar) {
-    console.error("Polar client not initialized");
+    logger.error("Polar client not initialized", new Error("Polar client not initialized"), { component: 'polar', action: 'create_customer_portal' });
     return null;
   }
 
@@ -221,7 +221,7 @@ export async function createCustomerPortalUrl(customerId: string): Promise<strin
 
     return session.customerPortalUrl;
   } catch (error) {
-    console.error("Failed to create Polar customer portal session:", error);
+    logger.error("Failed to create Polar customer portal session", error instanceof Error ? error : new Error(String(error)), { component: 'polar', action: 'create_customer_portal' });
     return null;
   }
 }
@@ -233,7 +233,7 @@ export async function cancelSubscription(
 ): Promise<boolean> {
   const polar = await getPolarClient();
   if (!polar) {
-    console.error("Polar client not initialized");
+    logger.error("Polar client not initialized", new Error("Polar client not initialized"), { component: 'polar', action: 'cancel_subscription' });
     return false;
   }
 
@@ -247,7 +247,7 @@ export async function cancelSubscription(
     });
     return true;
   } catch (error) {
-    console.error("Failed to cancel Polar subscription:", error);
+    logger.error("Failed to cancel Polar subscription", error instanceof Error ? error : new Error(String(error)), { component: 'polar', action: 'cancel_subscription' });
     return false;
   }
 }

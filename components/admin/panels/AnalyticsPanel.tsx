@@ -82,6 +82,15 @@ interface AnalyticsData {
   userGrowth: Array<{ date: string; users: number }>;
 }
 
+interface PreviousPeriodData {
+  summary?: {
+    totalPageViews?: number;
+    uniqueVisitors?: number;
+  };
+  trafficTrends?: Array<{ date: string; pageViews: number }>;
+  userGrowth?: Array<{ date: string; users: number }>;
+}
+
 // Metric Card Component
 const MetricCard = memo(function MetricCard({
   title,
@@ -376,8 +385,7 @@ export const AnalyticsPanel = memo(function AnalyticsPanel() {
     userGrowth: [],
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: analyticsData, isLoading, refetch } = useQuery<AnalyticsData & { previousPeriod?: any }>({
+  const { data: analyticsData, isLoading, refetch } = useQuery<AnalyticsData & { previousPeriod?: PreviousPeriodData }>({
     queryKey: ['admin-analytics', timeRange, compareEnabled ? 'compare' : 'no-compare'],
     queryFn: async () => {
       const url = compareEnabled

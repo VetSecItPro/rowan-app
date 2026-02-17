@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Check if user already has an active deletion request
     const { data: existingRequest } = await supabase
       .from('account_deletion_requests')
-      .select('*')
+      .select('id')
       .eq('user_id', userId)
       .eq('deletion_completed', false)
       .is('cancelled_at', null)
@@ -179,7 +179,7 @@ export async function DELETE(request: NextRequest) {
     // Find active deletion request
     const { data: deletionRequest, error: findError } = await supabase
       .from('account_deletion_requests')
-      .select('*')
+      .select('id, user_id, scheduled_deletion_date, deletion_completed, cancelled_at, reminder_sent_7_days, reminder_sent_1_day')
       .eq('user_id', userId)
       .eq('deletion_completed', false)
       .is('cancelled_at', null)
@@ -285,7 +285,7 @@ export async function GET() {
     // Get active deletion request
     const { data: deletionRequest, error } = await supabase
       .from('account_deletion_requests')
-      .select('*')
+      .select('id, user_id, scheduled_deletion_date, deletion_completed, cancelled_at, reminder_sent_7_days, reminder_sent_1_day')
       .eq('user_id', userId)
       .eq('deletion_completed', false)
       .is('cancelled_at', null)

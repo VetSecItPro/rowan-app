@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
     // Build query
     let query = supabase
       .from('monetization_logs')
-      .select('*', { count: 'exact' })
+      .select('id, timestamp, level, event, user_id, tier, period, amount, currency, polar_customer_id, polar_subscription_id, polar_session_id, polar_event_id, trigger_source, error_message', { count: 'exact' })
       .order('timestamp', { ascending: false })
       .range(validatedParams.offset, validatedParams.offset + validatedParams.limit - 1);
 
@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
     // Build query for export (max 10000 rows)
     let query = supabase
       .from('monetization_logs')
-      .select('*')
+      .select('timestamp, level, event, user_id, tier, period, amount, currency, polar_customer_id, polar_subscription_id, polar_session_id, polar_event_id, trigger_source, error_message')
       .order('timestamp', { ascending: false })
       .limit(10000);
 

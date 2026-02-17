@@ -58,7 +58,7 @@ export async function GET(request: Request) {
     // Build query for connections due for sync
     let query = supabase
       .from('calendar_connections')
-      .select('*')
+      .select('id, user_id, space_id, provider, sync_status, sync_enabled, next_sync_at, last_sync_at')
       .eq('sync_enabled', true)
       .in('sync_status', ['active', 'error']) // Include error status to retry
       .lte('next_sync_at', new Date().toISOString());

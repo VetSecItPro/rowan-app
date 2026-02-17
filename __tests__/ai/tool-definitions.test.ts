@@ -118,8 +118,7 @@ describe('Tool Definitions', () => {
       const decl = getToolDeclaration('create_task');
       const priorityProp = decl!.parameters?.properties?.priority;
       expect(priorityProp).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const enumValues = (priorityProp as any)?.enum;
+      const enumValues = (priorityProp as { enum?: string[] })?.enum;
       expect(enumValues).toBeDefined();
       expect(enumValues).toContain('low');
       expect(enumValues).toContain('medium');
@@ -131,8 +130,7 @@ describe('Tool Definitions', () => {
       const decl = getToolDeclaration('plan_meal');
       const mealTypeProp = decl!.parameters?.properties?.meal_type;
       expect(mealTypeProp).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const enumValues = (mealTypeProp as any)?.enum;
+      const enumValues = (mealTypeProp as { enum?: string[] })?.enum;
       expect(enumValues).toBeDefined();
       expect(enumValues).toContain('breakfast');
       expect(enumValues).toContain('lunch');
@@ -143,8 +141,7 @@ describe('Tool Definitions', () => {
       const decl = getToolDeclaration('create_chore');
       const freqProp = decl!.parameters?.properties?.frequency;
       expect(freqProp).toBeDefined();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const enumValues = (freqProp as any)?.enum;
+      const enumValues = (freqProp as { enum?: string[] })?.enum;
       expect(enumValues).toBeDefined();
       expect(enumValues).toContain('daily');
       expect(enumValues).toContain('weekly');

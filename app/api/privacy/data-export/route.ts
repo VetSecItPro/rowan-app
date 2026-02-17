@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     // Check for existing pending/processing exports
     const { data: existingExport } = await supabase
       .from('data_export_requests')
-      .select('*')
+      .select('id, status, created_at')
       .eq('user_id', userId)
       .in('status', ['pending', 'processing'])
       .order('created_at', { ascending: false })
@@ -147,7 +147,7 @@ export async function GET() {
     // Get latest export request
     const { data: exportRequest, error } = await supabase
       .from('data_export_requests')
-      .select('*')
+      .select('id, status, file_url, expires_at, file_size_bytes, export_format, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1);

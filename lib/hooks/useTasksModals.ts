@@ -12,6 +12,27 @@ export type TaskOrChore = Task & {
   sort_order: number;
 };
 
+/** Minimal input type accepted by openEditModal and openDetailsModal.
+ * Covers both Task/Chore (from service layer) and UnifiedItem (from DraggableItemList). */
+export type TaskOrChoreInput = {
+  id: string;
+  title: string;
+  type?: 'task' | 'chore';
+  status?: string;
+  priority?: string;
+  description?: string;
+  due_date?: string;
+  assigned_to?: string;
+  sort_order?: number;
+  frequency?: string;
+  category?: string;
+  notes?: string;
+  space_id?: string;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 // =============================================
 // MODALS RETURN INTERFACE
 // =============================================
@@ -34,11 +55,9 @@ export interface TasksModalsReturn {
 
   // Modal actions
   openCreateModal: (type: 'task' | 'chore') => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  openEditModal: (item: any) => void;
+  openEditModal: (item: TaskOrChoreInput) => void;
   closeUnifiedModal: () => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  openDetailsModal: (item: any) => void;
+  openDetailsModal: (item: TaskOrChoreInput) => void;
   closeDetailsModal: () => void;
   openTemplatePicker: () => void;
   closeTemplatePicker: () => void;
@@ -73,8 +92,7 @@ export function useTasksModals(): TasksModalsReturn {
     setIsUnifiedModalOpen(true);
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const openEditModal = useCallback((item: any) => {
+  const openEditModal = useCallback((item: TaskOrChoreInput) => {
     setEditingItem({ ...item, type: item.type || 'task' } as TaskOrChore);
     setIsUnifiedModalOpen(true);
   }, []);
@@ -84,8 +102,7 @@ export function useTasksModals(): TasksModalsReturn {
     setEditingItem(null);
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const openDetailsModal = useCallback((item: any) => {
+  const openDetailsModal = useCallback((item: TaskOrChoreInput) => {
     setSelectedItem({ ...item, type: item.type || 'task' } as TaskOrChore);
     setIsDetailsModalOpen(true);
   }, []);
