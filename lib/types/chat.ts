@@ -7,12 +7,12 @@
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 // The types of events that can stream from the server
-export type ChatStreamEventType = 'text' | 'tool_call' | 'confirmation' | 'result' | 'error' | 'done' | 'conversation_id';
+export type ChatStreamEventType = 'text' | 'tool_call' | 'result' | 'error' | 'done' | 'conversation_id';
 
 // A single streamed event from the server
 export interface ChatStreamEvent {
   type: ChatStreamEventType;
-  data: string | ToolCallEvent | ConfirmationEvent | ResultEvent | ErrorEvent;
+  data: string | ToolCallEvent | ResultEvent | ErrorEvent;
 }
 
 // When the AI wants to call a tool (service method)
@@ -22,16 +22,7 @@ export interface ToolCallEvent {
   parameters: Record<string, unknown>;
 }
 
-// When the AI needs user confirmation before executing
-export interface ConfirmationEvent {
-  id: string;
-  toolName: string;
-  parameters: Record<string, unknown>;
-  previewText: string;
-  featureType: FeatureType;
-}
-
-// After a tool executes successfully
+// After a tool executes
 export interface ResultEvent {
   id: string;
   toolName: string;
@@ -87,8 +78,6 @@ export interface ChatMessage {
   timestamp: string;
   // Tool call data (when assistant wants to execute an action)
   toolCalls?: ToolCallEvent[];
-  // Pending confirmation (when awaiting user confirm/deny)
-  confirmation?: ConfirmationEvent;
   // Result of executed action
   result?: ResultEvent;
   // Whether this message is currently streaming
@@ -106,27 +95,11 @@ export interface ChatConversation {
   updatedAt: string;
 }
 
-// Pending action awaiting user confirmation
-export interface PendingAction {
-  id: string;
-  toolName: string;
-  parameters: Record<string, unknown>;
-  previewText: string;
-  featureType: FeatureType;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'editing';
-}
-
 // Chat input sent to the API
 export interface ChatRequest {
   message: string;
   conversationId: string;
   spaceId: string;
-  // When user confirms or cancels a pending action
-  confirmAction?: {
-    actionId: string;
-    confirmed: boolean;
-    editedParameters?: Record<string, unknown>;
-  };
 }
 
 // State shape for the useChat hook
@@ -135,7 +108,6 @@ export interface ChatState {
   conversationId: string;
   isLoading: boolean;
   isStreaming: boolean;
-  pendingAction: PendingAction | null;
   error: string | null;
 }
 

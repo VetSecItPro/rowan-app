@@ -263,14 +263,25 @@ export function useAuthStateChange() {
 
   const handleAuthStateChange = useCallback((event: AuthChangeEvent, session: Session | null) => {
     switch (event) {
+      case 'INITIAL_SESSION':
+        // Session restored from cookies after page load — seed the cache so
+        // useAuthSession immediately reflects the authenticated state.
+        if (session) {
+          queryClient.setQueryData(QUERY_KEYS.auth.session(), session);
+        }
+        break;
       case 'SIGNED_IN':
         // Clear ALL persistent caches first — prevents cross-user data leakage
-        // when a different user logs in on the same browser. Then invalidate
-        // to refetch fresh data for the new user.
+        // when a different user logs in on the same browser.
         queryClient.clear();
         clearPersistedCache();
         clearAllAppStorage();
-        queryClient.invalidateQueries({ queryKey: ['auth'] });
+        // Seed the session cache with the new session so auth is immediately
+        // available. Without this, clear() empties the cache and invalidateQueries()
+        // has nothing to refetch, leaving the dashboard stuck in a loading state.
+        if (session) {
+          queryClient.setQueryData(QUERY_KEYS.auth.session(), session);
+        }
         break;
       case 'SIGNED_OUT':
         // Flag signout to prevent beforeunload from re-saving stale cache

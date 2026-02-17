@@ -50,10 +50,8 @@ export default function ChatPanel({
     conversationId,
     isLoading,
     isStreaming,
-    pendingAction,
     error,
     sendMessage,
-    confirmAction,
     clearChat,
     stopStreaming,
     clearError,
@@ -97,10 +95,6 @@ export default function ChatPanel({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
-
-  const handleConfirm = (actionId: string, confirmed: boolean) => {
-    confirmAction(actionId, confirmed);
-  };
 
   const handleRetry = useCallback(() => {
     if (lastUserMessageRef.current) {
@@ -188,7 +182,6 @@ export default function ChatPanel({
               key={msg.id}
               message={msg}
               conversationId={conversationId}
-              onConfirm={handleConfirm}
               onFeedback={handleFeedback}
             />
           ))}
@@ -212,7 +205,7 @@ export default function ChatPanel({
         onStop={stopStreaming}
         isLoading={isLoading}
         isStreaming={isStreaming}
-        disabled={!!pendingAction}
+        disabled={false}
         voiceEnabled={voiceEnabled}
       />
     </>

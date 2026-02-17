@@ -70,10 +70,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { message, conversationId, spaceId, confirmAction, voiceDurationSeconds } = parsed;
+    const { message, conversationId, spaceId, voiceDurationSeconds } = parsed;
 
-    // Require non-empty message unless this is a confirmation action
-    if (!message && !confirmAction) {
+    if (!message) {
       return new Response(
         JSON.stringify({ error: 'Message cannot be empty' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
@@ -176,7 +175,6 @@ export async function POST(req: NextRequest) {
             conversationId: activeConversationId,
             context: { spaceId, userId: user.id, supabase },
             spaceContext,
-            confirmAction,
           });
 
           for await (const event of events) {

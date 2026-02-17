@@ -4,13 +4,15 @@
  * Coordinates the conversation flow between the user, Gemini model, and
  * Rowan service layer. Handles:
  * - Streaming text responses
- * - Function calling (tool execution)
- * - Confirmation flow for write operations
+ * - Function calling (tool auto-execution)
  * - Conversation history management (in-memory, session-scoped)
  *
  * ARCHITECTURE:
  *   User -> API Route -> ChatOrchestrator -> Gemini (w/ tools) -> ToolExecutor -> Services
- *                                         ^  confirmation loop  v
+ *
+ * All tools auto-execute immediately. Results are sent back to Gemini for
+ * a natural-language follow-up. No confirmation step — all Rowan actions
+ * are low-stakes and easily reversible (add/edit/delete tasks, meals, etc.).
  */
 
 import {
@@ -23,7 +25,6 @@ import { logger } from '@/lib/logger';
 import { TOOL_DECLARATIONS } from './tool-definitions';
 import {
   executeTool,
-  getToolCallPreview,
   type ToolExecutionContext,
 } from './tool-executor';
 import {
@@ -33,8 +34,6 @@ import {
 } from './system-prompt';
 import type {
   ChatStreamEvent,
-  ConfirmationEvent,
-  FeatureType,
 } from '@/lib/types/chat';
 
 // ---------------------------------------------------------------------------
@@ -74,9 +73,6 @@ async function withRetry<T>(
 // Configuration
 // ---------------------------------------------------------------------------
 
-/** Read-only tools that execute without user confirmation */
-const AUTO_EXECUTE_TOOLS = new Set(['list_tasks']);
-
 /**
  * SECURITY: Detect if AI output contains system prompt fragments.
  * Returns true if leakage is suspected.
@@ -115,40 +111,15 @@ const MAX_HISTORY_ENTRIES = 60;
 // In-memory stores (session-scoped, acceptable for MVP)
 // ---------------------------------------------------------------------------
 
-interface PendingActionData {
-  toolName: string;
-  parameters: Record<string, unknown>;
-  conversationId: string;
-}
-
 /** Conversation history: conversationId -> Gemini Content[] */
 const historyCache = new LRUCache<string, Content[]>({
   max: 100,
   ttl: 30 * 60 * 1000, // 30 minutes
 });
 
-/** Pending actions awaiting confirmation: actionId -> action data */
-const pendingActionsCache = new LRUCache<string, PendingActionData>({
-  max: 200,
-  ttl: 10 * 60 * 1000, // 10 minutes
-});
-
 // ---------------------------------------------------------------------------
 // Helper
 // ---------------------------------------------------------------------------
-
-function featureTypeFromToolName(toolName: string): FeatureType {
-  if (toolName.includes('task')) return 'task';
-  if (toolName.includes('chore')) return 'chore';
-  if (toolName.includes('event')) return 'event';
-  if (toolName.includes('reminder')) return 'reminder';
-  if (toolName.includes('shopping')) return 'shopping';
-  if (toolName.includes('meal')) return 'meal';
-  if (toolName.includes('goal')) return 'goal';
-  if (toolName.includes('expense')) return 'expense';
-  if (toolName.includes('project')) return 'project';
-  return 'general';
-}
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -159,11 +130,6 @@ export interface ProcessMessageParams {
   conversationId: string;
   context: ToolExecutionContext;
   spaceContext?: SpaceContext;
-  confirmAction?: {
-    actionId: string;
-    confirmed: boolean;
-    editedParameters?: Record<string, unknown>;
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -206,30 +172,17 @@ class ChatOrchestratorService {
    * Process a user message and yield streaming events.
    *
    * Flow:
-   * 1. If `confirmAction` is set, handle the confirmation/cancellation
-   * 2. Otherwise, send the message to Gemini with function-calling tools
-   * 3. If Gemini returns text -> stream it
-   * 4. If Gemini returns a function call:
-   *    a. Read-only tools -> auto-execute, send result back, stream follow-up
-   *    b. Write tools -> yield confirmation event, await user decision
+   * 1. Send the message to Gemini with function-calling tools
+   * 2. If Gemini returns text -> stream it
+   * 3. If Gemini returns function calls -> auto-execute, send results back,
+   *    stream natural-language follow-up
    */
   async *processMessage(
     params: ProcessMessageParams
   ): AsyncGenerator<ChatStreamEvent> {
-    const { message, conversationId, context, spaceContext, confirmAction } =
-      params;
+    const { message, conversationId, context, spaceContext } = params;
 
     try {
-      // -- Confirmation flow -----------------------------------------------
-      if (confirmAction) {
-        yield* this.handleConfirmation(
-          conversationId,
-          confirmAction,
-          context
-        );
-        return;
-      }
-
       // -- Build system prompt ---------------------------------------------
       const systemPrompt = spaceContext
         ? buildSystemPrompt(spaceContext)
@@ -331,10 +284,8 @@ class ChatOrchestratorService {
   /**
    * Process function calls returned by Gemini.
    *
-   * - Auto-execute read-only tools (e.g. list_tasks) and send the result
-   *   back to Gemini for a natural-language summary.
-   * - For write tools, store a pending action and yield a confirmation
-   *   event so the client can show an approval card.
+   * All tools auto-execute immediately. Results are sent back to Gemini
+   * for a natural-language follow-up summary.
    */
   private async *handleFunctionCalls(
     functionCalls: Array<{ name: string; args: Record<string, unknown> }>,
@@ -343,7 +294,7 @@ class ChatOrchestratorService {
       ReturnType<GoogleGenerativeAI['getGenerativeModel']>['startChat']
     >,
     context: ToolExecutionContext,
-    conversationId: string
+    _conversationId: string
   ): AsyncGenerator<ChatStreamEvent> {
     // Record model's function call in history
     history.push({
@@ -353,240 +304,56 @@ class ChatOrchestratorService {
       })),
     });
 
-    // Separate auto-execute (read-only) from confirmation-required (write) tools
-    const autoExecute = functionCalls.filter((fc) => AUTO_EXECUTE_TOOLS.has(fc.name));
-    const needsConfirmation = functionCalls.filter((fc) => !AUTO_EXECUTE_TOOLS.has(fc.name));
+    const responseParts: Part[] = [];
 
-    // -- Auto-execute all read-only tools ---------------------------------
-    if (autoExecute.length > 0) {
-      const responseParts: Part[] = [];
-
-      for (const fc of autoExecute) {
-        yield {
-          type: 'tool_call',
-          data: {
-            id: crypto.randomUUID(),
-            toolName: fc.name,
-            parameters: fc.args,
-          },
-        };
-
-        const toolResult = await executeTool(fc.name, fc.args, context);
-
-        responseParts.push({
-          functionResponse: {
-            name: fc.name,
-            response: toolResult as unknown as object,
-          },
-        });
-
-        yield {
-          type: 'result',
-          data: {
-            id: crypto.randomUUID(),
-            toolName: fc.name,
-            success: toolResult.success,
-            data: toolResult.data,
-            message: toolResult.message,
-          },
-        };
-      }
-
-      // Send all results back to Gemini for a natural-language summary
-      const followUp = await withRetry(() => chat.sendMessageStream(responseParts));
-      let followUpText = '';
-      for await (const chunk of followUp.stream) {
-        const parts = chunk.candidates?.[0]?.content?.parts ?? [];
-        for (const part of parts) {
-          if ('text' in part && part.text) {
-            followUpText += part.text;
-            yield { type: 'text', data: part.text };
-          }
-        }
-      }
-
-      history.push({ role: 'function', parts: responseParts });
-      if (followUpText) {
-        history.push({ role: 'model', parts: [{ text: followUpText }] });
-      }
-    }
-
-    // -- Queue all write tools for confirmation ---------------------------
-    for (const fc of needsConfirmation) {
-      const actionId = crypto.randomUUID();
-      const preview = getToolCallPreview(fc.name, fc.args);
-
-      pendingActionsCache.set(actionId, {
-        toolName: fc.name,
-        parameters: fc.args,
-        conversationId,
-      });
-
-      const confirmationEvent: ConfirmationEvent = {
-        id: actionId,
-        toolName: fc.name,
-        parameters: fc.args,
-        previewText: preview,
-        featureType: featureTypeFromToolName(fc.name),
-      };
-
-      yield { type: 'confirmation', data: confirmationEvent };
-    }
-  }
-
-  // -- Confirmation handler ------------------------------------------------
-
-  /**
-   * Handle user confirmation or cancellation of a pending action.
-   *
-   * On confirm: execute the tool, send the result back to Gemini, stream
-   * the natural-language follow-up.
-   * On cancel: record cancellation, respond with acknowledgement.
-   */
-  private async *handleConfirmation(
-    conversationId: string,
-    confirmAction: {
-      actionId: string;
-      confirmed: boolean;
-      editedParameters?: Record<string, unknown>;
-    },
-    context: ToolExecutionContext
-  ): AsyncGenerator<ChatStreamEvent> {
-    const pending = pendingActionsCache.get(confirmAction.actionId);
-
-    if (!pending) {
+    for (const fc of functionCalls) {
       yield {
-        type: 'error',
+        type: 'tool_call',
         data: {
-          message: 'This action has expired. Please try again.',
-          retryable: true,
+          id: crypto.randomUUID(),
+          toolName: fc.name,
+          parameters: fc.args,
         },
       };
-      yield { type: 'done', data: '' };
-      return;
-    }
 
-    pendingActionsCache.delete(confirmAction.actionId);
-    const history = this.getHistory(conversationId);
+      const toolResult = await executeTool(fc.name, fc.args, context);
 
-    // -- Cancelled ---------------------------------------------------------
-    if (!confirmAction.confirmed) {
-      history.push({
-        role: 'function',
-        parts: [
-          {
-            functionResponse: {
-              name: pending.toolName,
-              response: {
-                cancelled: true,
-                message: 'User cancelled this action',
-              },
-            },
-          },
-        ],
-      });
-      history.push({
-        role: 'model',
-        parts: [{ text: 'No problem, I cancelled that action.' }],
-      });
-      this.saveHistory(conversationId, history);
-
-      yield { type: 'text', data: 'No problem, I cancelled that action.' };
-      yield { type: 'done', data: '' };
-      return;
-    }
-
-    // -- Confirmed: execute tool -------------------------------------------
-    const finalParams = confirmAction.editedParameters
-      ? { ...pending.parameters, ...confirmAction.editedParameters }
-      : pending.parameters;
-
-    const toolResult = await executeTool(
-      pending.toolName,
-      finalParams,
-      context
-    );
-
-    yield {
-      type: 'result',
-      data: {
-        id: confirmAction.actionId,
-        toolName: pending.toolName,
-        success: toolResult.success,
-        data: toolResult.data,
-        message: toolResult.message,
-      },
-    };
-
-    // -- Get natural-language follow-up from Gemini -----------------------
-    try {
-      const genAI = this.getClient();
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-        tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 256,
+      responseParts.push({
+        functionResponse: {
+          name: fc.name,
+          response: toolResult as unknown as object,
         },
       });
 
-      // History should end with model's function call; we send the response
-      const chat = model.startChat({ history });
-      const responseParts: Part[] = [
-        {
-          functionResponse: {
-            name: pending.toolName,
-            response: toolResult as unknown as object,
-          },
+      yield {
+        type: 'result',
+        data: {
+          id: crypto.randomUUID(),
+          toolName: fc.name,
+          success: toolResult.success,
+          data: toolResult.data,
+          message: toolResult.message,
         },
-      ];
+      };
+    }
 
-      const followUp = await withRetry(() => chat.sendMessageStream(responseParts));
-      let followUpText = '';
-      for await (const chunk of followUp.stream) {
-        const parts = chunk.candidates?.[0]?.content?.parts ?? [];
-        for (const part of parts) {
-          if ('text' in part && part.text) {
-            followUpText += part.text;
-            yield { type: 'text', data: part.text };
-          }
+    // Send all results back to Gemini for a natural-language follow-up
+    const followUp = await withRetry(() => chat.sendMessageStream(responseParts));
+    let followUpText = '';
+    for await (const chunk of followUp.stream) {
+      const parts = chunk.candidates?.[0]?.content?.parts ?? [];
+      for (const part of parts) {
+        if ('text' in part && part.text) {
+          followUpText += part.text;
+          yield { type: 'text', data: part.text };
         }
       }
-
-      // Update history
-      history.push({ role: 'function', parts: responseParts });
-      if (followUpText) {
-        history.push({ role: 'model', parts: [{ text: followUpText }] });
-      }
-    } catch (_followUpError) {
-      logger.warn('[ChatOrchestrator] Follow-up response failed', {
-        component: 'ai-chat-orchestrator',
-        action: 'confirmation_followup',
-      });
-
-      // Fallback: show the tool result message directly
-      const fallbackText = toolResult.success
-        ? toolResult.message
-        : `Sorry, that didn't work: ${toolResult.message}`;
-      yield { type: 'text', data: fallbackText };
-
-      // Still record in history
-      history.push({
-        role: 'function',
-        parts: [
-          {
-            functionResponse: {
-              name: pending.toolName,
-              response: toolResult as unknown as object,
-            },
-          },
-        ],
-      });
-      history.push({ role: 'model', parts: [{ text: fallbackText }] });
     }
 
-    this.saveHistory(conversationId, history);
-    yield { type: 'done', data: '' };
+    history.push({ role: 'function', parts: responseParts });
+    if (followUpText) {
+      history.push({ role: 'model', parts: [{ text: followUpText }] });
+    }
   }
 
   // -- Utilities -----------------------------------------------------------

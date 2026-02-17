@@ -5,7 +5,6 @@
  * - Markdown-rendered assistant text
  * - Feature-colored tool results
  * - Typing indicator while streaming
- * - Inline confirmation cards
  */
 
 'use client';
@@ -14,19 +13,17 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, User, ThumbsUp, ThumbsDown } from 'lucide-react';
 import type { ChatMessage as ChatMessageType } from '@/lib/types/chat';
-import ConfirmationCard from './ConfirmationCard';
 import MarkdownMessage from './MarkdownMessage';
 import TypingIndicator from './TypingIndicator';
 
 interface ChatMessageProps {
   message: ChatMessageType;
   conversationId?: string;
-  onConfirm?: (actionId: string, confirmed: boolean) => void;
   onFeedback?: (messageId: string, feedback: 'positive' | 'negative') => void;
 }
 
 /** Displays a single AI chat message with markdown rendering and action buttons. */
-export default function ChatMessage({ message, conversationId: _conversationId, onConfirm, onFeedback }: ChatMessageProps) {
+export default function ChatMessage({ message, conversationId: _conversationId, onFeedback }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const [localFeedback, setLocalFeedback] = useState<'positive' | 'negative' | null>(message.feedback ?? null);
 
@@ -88,16 +85,6 @@ export default function ChatMessage({ message, conversationId: _conversationId, 
           <div className="bg-gray-700/80 rounded-2xl rounded-bl-md px-4 py-3">
             <TypingIndicator />
           </div>
-        )}
-
-        {/* Confirmation card */}
-        {message.confirmation && onConfirm && (
-          <ConfirmationCard
-            confirmation={message.confirmation}
-            onConfirm={(confirmed) =>
-              onConfirm(message.confirmation!.id, confirmed)
-            }
-          />
         )}
 
         {/* Result badge */}
