@@ -16,9 +16,7 @@ import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import type {
   ChatMessage,
   ChatStreamEvent,
-  PendingAction,
   ToolCallEvent,
-  ConfirmationEvent,
   ResultEvent,
   ErrorEvent,
   ChatState,
@@ -33,12 +31,9 @@ type ChatAction =
   | { type: 'SET_CONVERSATION_ID'; conversationId: string }
   | { type: 'STREAM_TEXT'; text: string }
   | { type: 'TOOL_CALL'; event: ToolCallEvent }
-  | { type: 'CONFIRMATION'; event: ConfirmationEvent }
   | { type: 'RESULT'; event: ResultEvent }
   | { type: 'ERROR'; event: ErrorEvent }
   | { type: 'DONE' }
-  | { type: 'CONFIRM_ACTION'; actionId: string }
-  | { type: 'CANCEL_ACTION'; actionId: string }
   | { type: 'CLEAR_ERROR' }
   | { type: 'CLEAR_CHAT'; conversationId: string };
 
@@ -48,7 +43,6 @@ function createInitialState(conversationId: string): ChatState {
     conversationId,
     isLoading: false,
     isStreaming: false,
-    pendingAction: null,
     error: null,
   };
 }
@@ -105,26 +99,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, messages };
     }
 
-    case 'CONFIRMATION': {
-      const pendingAction: PendingAction = {
-        id: action.event.id,
-        toolName: action.event.toolName,
-        parameters: action.event.parameters,
-        previewText: action.event.previewText,
-        featureType: action.event.featureType,
-        status: 'pending',
-      };
-      const messages = [...state.messages];
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg?.role === 'assistant') {
-        messages[messages.length - 1] = {
-          ...lastMsg,
-          confirmation: action.event,
-        };
-      }
-      return { ...state, messages, pendingAction };
-    }
-
     case 'RESULT': {
       const messages = [...state.messages];
       const lastMsg = messages[messages.length - 1];
@@ -161,21 +135,6 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         isStreaming: false,
       };
     }
-
-    case 'CONFIRM_ACTION':
-      return {
-        ...state,
-        pendingAction: state.pendingAction
-          ? { ...state.pendingAction, status: 'confirmed' }
-          : null,
-        isLoading: true,
-      };
-
-    case 'CANCEL_ACTION':
-      return {
-        ...state,
-        pendingAction: null,
-      };
 
     case 'CLEAR_ERROR':
       return { ...state, error: null };
@@ -274,12 +233,6 @@ export function useChat(spaceId: string) {
         case 'tool_call':
           dispatch({ type: 'TOOL_CALL', event: event.data as ToolCallEvent });
           break;
-        case 'confirmation':
-          dispatch({
-            type: 'CONFIRMATION',
-            event: event.data as ConfirmationEvent,
-          });
-          break;
         case 'result':
           dispatch({ type: 'RESULT', event: event.data as ResultEvent });
           break;
@@ -369,77 +322,6 @@ export function useChat(spaceId: string) {
   );
 
   /**
-   * Confirm or cancel a pending action.
-   */
-  const confirmAction = useCallback(
-    async (
-      actionId: string,
-      confirmed: boolean,
-      editedParameters?: Record<string, unknown>
-    ) => {
-      if (!confirmed) {
-        dispatch({ type: 'CANCEL_ACTION', actionId });
-
-        // Add a cancel acknowledgement message
-        dispatch({
-          type: 'SEND_MESSAGE',
-          message: confirmed ? '' : '',
-        });
-        dispatch({
-          type: 'STREAM_TEXT',
-          text: 'No problem, I cancelled that action.',
-        });
-        dispatch({ type: 'DONE' });
-        return;
-      }
-
-      dispatch({ type: 'CONFIRM_ACTION', actionId });
-
-      // We need to add the streaming assistant message manually
-      // since CONFIRM_ACTION doesn't add one
-      dispatch({ type: 'SEND_MESSAGE', message: '' });
-
-      try {
-        const response = await csrfFetch('/api/ai/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: '', // Empty for confirmation
-            conversationId: conversationIdRef.current,
-            spaceId,
-            confirmAction: { actionId, confirmed, editedParameters },
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          const is429 = response.status === 429;
-          dispatch({
-            type: 'ERROR',
-            event: {
-              message: is429
-                ? (errorData?.error ?? 'Daily AI limit reached.')
-                : 'Failed to process confirmation',
-              retryable: response.status >= 500,
-            },
-          });
-          dispatch({ type: 'DONE' });
-          return;
-        }
-
-        await processStream(response);
-      } catch {
-        dispatch({
-          type: 'ERROR',
-          event: { message: 'Connection lost. Please try again.', retryable: true },
-        });
-        dispatch({ type: 'DONE' });
-      }
-    },
-    [spaceId, processStream]
-  );
-
-  /**
    * Clear the chat and start a new conversation.
    */
   const clearChat = useCallback(() => {
@@ -465,12 +347,10 @@ export function useChat(spaceId: string) {
     conversationId: state.conversationId,
     isLoading: state.isLoading,
     isStreaming: state.isStreaming,
-    pendingAction: state.pendingAction,
     error: state.error,
 
     // Actions
     sendMessage,
-    confirmAction,
     clearChat,
     stopStreaming,
     clearError: () => dispatch({ type: 'CLEAR_ERROR' }),

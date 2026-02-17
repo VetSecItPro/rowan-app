@@ -60,10 +60,8 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
     messages,
     isLoading,
     isStreaming,
-    pendingAction,
     error,
     sendMessage,
-    confirmAction,
     stopStreaming,
     clearError,
     suggestions,
@@ -201,7 +199,6 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
                 key={msg.id}
                 message={msg}
                 conversationId={conversationId}
-                onConfirm={pendingAction ? confirmAction : undefined}
                 onFeedback={handleFeedback}
               />
             ))}
@@ -239,7 +236,7 @@ export function AIDashboard({ onSwitchToTraditional }: AIDashboardProps) {
           onStop={stopStreaming}
           isLoading={isLoading}
           isStreaming={isStreaming}
-          disabled={!!pendingAction}
+          disabled={false}
           placeholder="Ask Rowan anything..."
           voiceEnabled={voiceEnabled}
         />

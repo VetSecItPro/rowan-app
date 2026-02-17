@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { LogIn, Mail, Lock, Eye, EyeOff, Sparkles, ArrowLeft, CheckCircle } from 'lucide-react';
@@ -43,6 +44,7 @@ export default function LoginPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [isProcessingCallback, setIsProcessingCallback] = useState(false);
   const { signIn } = useAuth();
+  const router = useRouter();
   const { params } = useValidatedSearchParams(LoginParamsSchema);
 
   // Handle Supabase auth callback (magic link, OAuth, etc.)
@@ -93,8 +95,9 @@ export default function LoginPage() {
           const redirectTo = urlParams.get('redirectTo') || '/dashboard';
           const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
 
-          // Redirect to dashboard
-          window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
+          const target = isInternalRedirect ? redirectTo : '/dashboard';
+          router.push(target);
+          router.refresh();
           return;
         }
 
@@ -182,13 +185,14 @@ export default function LoginPage() {
         setError('Invalid email or password. Please try again.');
         setIsLoading(false);
       } else {
-        // Login successful - redirect immediately
-        // NOTE: Deletion check moved to dashboard page to prevent login redirect failures
-        // Check for redirect parameter (e.g., from invitation signup flow)
+        // Login successful — use client-side navigation to preserve in-memory session.
+        // window.location.href destroys the Supabase client, forcing a cookie-based
+        // session restore that can race and leave the dashboard stuck loading.
         const redirectTo = params?.redirect ? decodeURIComponent(params.redirect) : '/dashboard';
-        // Validate redirect is internal (security: prevent open redirect)
         const isInternalRedirect = redirectTo.startsWith('/') && !redirectTo.startsWith('//');
-        window.location.href = isInternalRedirect ? redirectTo : '/dashboard';
+        const target = isInternalRedirect ? redirectTo : '/dashboard';
+        router.push(target);
+        router.refresh();
       }
     } catch {
       setError('An unexpected error occurred. Please try again.');

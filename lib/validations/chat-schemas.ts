@@ -16,11 +16,6 @@ export const chatMessageSchema = z.object({
     z.string().uuid('Invalid conversation ID'),
   ]),
   spaceId: z.string().uuid('Invalid space ID'),
-  confirmAction: z.object({
-    actionId: z.string().uuid('Invalid action ID'),
-    confirmed: z.boolean(),
-    editedParameters: z.record(z.string(), z.unknown()).optional(),
-  }).optional(),
   // Voice input duration tracking (Web Speech API — client-side, no API cost)
   voiceDurationSeconds: z.number().int().min(0).max(300).optional(),
 });
@@ -34,13 +29,6 @@ export function validateAndSanitizeChatMessage(data: unknown): z.infer<typeof ch
   };
 }
 
-// Schema for tool call confirmation response
-export const toolConfirmationSchema = z.object({
-  actionId: z.string().uuid('Invalid action ID'),
-  confirmed: z.boolean(),
-  editedParameters: z.record(z.string(), z.unknown()).optional(),
-});
-
 // Schema for validating tool call parameters before execution
 export const toolCallParametersSchema = z.object({
   toolName: z.string().min(1).max(100),
@@ -49,5 +37,4 @@ export const toolCallParametersSchema = z.object({
 
 // Type exports
 export type ChatMessageInput = z.infer<typeof chatMessageSchema>;
-export type ToolConfirmationInput = z.infer<typeof toolConfirmationSchema>;
 export type ToolCallParameters = z.infer<typeof toolCallParametersSchema>;

@@ -22,7 +22,7 @@ import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useCanAccessAI } from '@/lib/hooks/useCanAccessAI';
 import { useAISettings } from '@/lib/hooks/useAISettings';
 import { FEATURE_FLAGS } from '@/lib/constants/feature-flags';
-import type { ChatMessage, PendingAction } from '@/lib/types/chat';
+import type { ChatMessage } from '@/lib/types/chat';
 import type { SubscriptionTier } from '@/lib/types';
 import type { AISuggestion } from '@/lib/services/ai/suggestion-service';
 import type { BriefingOutput } from '@/lib/services/ai/briefing-service';
@@ -55,10 +55,8 @@ interface ChatContextValue {
   conversationId: string;
   isLoading: boolean;
   isStreaming: boolean;
-  pendingAction: PendingAction | null;
   error: string | null;
   sendMessage: (text: string, voiceDurationSeconds?: number) => void;
-  confirmAction: (actionId: string, confirmed: boolean) => void;
   clearChat: () => void;
   stopStreaming: () => void;
   clearError: () => void;
@@ -175,10 +173,8 @@ export function ChatProvider({ children }: ChatProviderProps) {
     conversationId: chat.conversationId,
     isLoading: chat.isLoading,
     isStreaming: chat.isStreaming,
-    pendingAction: chat.pendingAction,
     error: chat.error,
     sendMessage: chat.sendMessage,
-    confirmAction: chat.confirmAction,
     clearChat: chat.clearChat,
     stopStreaming: chat.stopStreaming,
     clearError: chat.clearError,
