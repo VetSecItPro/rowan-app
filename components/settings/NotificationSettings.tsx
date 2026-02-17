@@ -273,7 +273,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
 
         const { data, error: fetchError } = await supabase
           .from('user_notification_preferences')
-          .select('*')
+          .select('id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone')
           .eq('user_id', user.id)
           .maybeSingle();
 

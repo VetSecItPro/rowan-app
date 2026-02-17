@@ -103,7 +103,7 @@ export default function RecurringBillsCalendar({ spaceId }: RecurringBillsCalend
       // Get all recurring expenses for the space
       const { data, error } = await supabase
         .from('expenses')
-        .select('*')
+        .select('id, date, amount, description, category, recurring_frequency, payment_method, is_recurring')
         .eq('space_id', spaceId)
         .eq('is_recurring', true)
         .order('date', { ascending: true });

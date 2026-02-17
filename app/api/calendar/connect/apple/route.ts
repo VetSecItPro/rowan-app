@@ -254,7 +254,7 @@ export async function GET(request: NextRequest) {
     // Get all Apple Calendar connections for this space
     const { data: connections, error } = await supabase
       .from('calendar_connections')
-      .select('*')
+      .select('id, provider, provider_account_id, sync_status, sync_direction, last_sync_at, last_error_message, created_at')
       .eq('space_id', spaceId)
       .eq('provider', 'apple')
       .order('created_at', { ascending: false });

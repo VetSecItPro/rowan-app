@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
         // Fetch aggregated daily data
         const { data: dailyData, error: dailyError } = await supabaseAdmin
           .from('feature_usage_daily')
-          .select('*')
+          .select('date, feature, page_views, unique_users, total_actions, device_mobile, device_desktop, device_tablet')
           .gte('date', startDate.toISOString().split('T')[0])
           .order('date', { ascending: true });
 

@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     // Find the export request
     const { data: exportRequest, error: exportError } = await supabase
       .from('data_export_requests')
-      .select('*')
+      .select('id, user_id, status, file_url, expires_at')
       .eq('user_id', userId)
       .eq('status', 'completed')
       .like('file_url', `%${file.replace(/%/g, '\\%').replace(/_/g, '\\_')}`)

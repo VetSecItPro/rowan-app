@@ -941,31 +941,43 @@ export async function sendAIDailyDigestEmail(data: AIDailyDigestData): Promise<E
  * @param data - The email data (type safety enforced at call site)
  * @returns Result object indicating success or failure
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
+type EmailData =
+  | TaskAssignmentData
+  | EventReminderData
+  | NewMessageData
+  | ShoppingListData
+  | MealReminderData
+  | GeneralReminderData
+  | SpaceInvitationData
+  | PasswordResetData
+  | MagicLinkData
+  | EmailVerificationData
+  | EmailChangeData;
+
+async function sendEmailByType(type: string, data: EmailData): Promise<EmailResult> {
   switch (type) {
     case 'task':
-      return sendTaskAssignmentEmail(data);
+      return sendTaskAssignmentEmail(data as TaskAssignmentData);
     case 'event':
-      return sendEventReminderEmail(data);
+      return sendEventReminderEmail(data as EventReminderData);
     case 'message':
-      return sendNewMessageEmail(data);
+      return sendNewMessageEmail(data as NewMessageData);
     case 'shopping':
-      return sendShoppingListEmail(data);
+      return sendShoppingListEmail(data as ShoppingListData);
     case 'meal':
-      return sendMealReminderEmail(data);
+      return sendMealReminderEmail(data as MealReminderData);
     case 'reminder':
-      return sendGeneralReminderEmail(data);
+      return sendGeneralReminderEmail(data as GeneralReminderData);
     case 'invitation':
-      return sendSpaceInvitationEmail(data);
+      return sendSpaceInvitationEmail(data as SpaceInvitationData);
     case 'password-reset':
-      return sendPasswordResetEmail(data);
+      return sendPasswordResetEmail(data as PasswordResetData);
     case 'magic-link':
-      return sendMagicLinkEmail(data);
+      return sendMagicLinkEmail(data as MagicLinkData);
     case 'email-verification':
-      return sendEmailVerificationEmail(data);
+      return sendEmailVerificationEmail(data as EmailVerificationData);
     case 'email-change':
-      return sendEmailChangeEmail(data);
+      return sendEmailChangeEmail(data as EmailChangeData);
     default:
       return { success: false, error: 'Unknown email type' };
   }
@@ -982,8 +994,7 @@ async function sendEmailByType(type: string, data: any): Promise<EmailResult> {
  */
 export async function sendBatchEmails(emails: Array<{
   type: 'task' | 'event' | 'message' | 'shopping' | 'meal' | 'reminder' | 'invitation' | 'password-reset' | 'magic-link' | 'email-verification' | 'email-change';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: EmailData;
 }>): Promise<{ success: number; failed: number; results: EmailResult[] }> {
   const results: EmailResult[] = [];
   let success = 0;

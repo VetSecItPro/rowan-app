@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
     // Verify the connection exists and belongs to this user
     const { data: connection, error: connectionError } = await supabase
       .from('calendar_connections')
-      .select('*')
+      .select('id, space_id, user_id, sync_status, oauth_state_nonce, oauth_state_created_at')
       .eq('id', oauthState.connection_id)
       .eq('user_id', user.id)
       .single();

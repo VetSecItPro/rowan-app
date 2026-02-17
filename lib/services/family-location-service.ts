@@ -966,8 +966,11 @@ export async function getGeofenceEvents(
       return [];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (data ?? []).map((event: any) => ({
+    type GeofenceEventRow = GeofenceEvent & {
+      users: { name: string; avatar_url: string | null } | null;
+      family_places: FamilyPlace | null;
+    };
+    return (data ?? []).map((event: GeofenceEventRow) => ({
       ...event,
       user: event.users as { name: string; avatar_url: string | null },
       place: event.family_places as FamilyPlace,

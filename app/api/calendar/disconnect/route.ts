@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // Get the connection
     const { data: connection, error: connectionError } = await supabase
       .from('calendar_connections')
-      .select('*')
+      .select('id, space_id, user_id, provider')
       .eq('id', validatedData.connection_id)
       .single();
 

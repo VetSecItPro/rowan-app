@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     // Get existing list first to verify access
     const { data: existingList, error: fetchError } = await supabase
       .from('shopping_lists')
-      .select('*')
+      .select('id, space_id, is_public, share_token, shared_at')
       .eq('id', listId)
       .single();
 
@@ -117,7 +117,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       .from('shopping_lists')
       .update(updateData)
       .eq('id', listId)
-      .select('*')
+      .select('id, title, space_id, is_public, share_token, shared_at, updated_at')
       .single();
 
     if (updateError) {

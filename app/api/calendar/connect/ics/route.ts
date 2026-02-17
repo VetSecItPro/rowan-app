@@ -249,7 +249,7 @@ export async function GET(request: NextRequest) {
     // Get all ICS connections for this space
     const { data: connections, error } = await supabase
       .from('calendar_connections')
-      .select('*')
+      .select('id, provider, provider_account_id, sync_status, sync_direction, last_sync_at, last_error_message, created_at, ics_url, ics_name')
       .eq('space_id', spaceId)
       .eq('provider', 'ics')
       .order('created_at', { ascending: false });

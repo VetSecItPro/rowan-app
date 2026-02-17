@@ -54,7 +54,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Get the chore
     const { data: chore, error: choreError } = await supabase
       .from('chores')
-      .select('*')
+      .select('id, title, space_id, status, due_date, point_value, late_penalty_enabled, late_penalty_points, grace_period_hours')
       .eq('id', choreId)
       .single();
 
