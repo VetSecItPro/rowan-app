@@ -127,8 +127,8 @@ export const choresService = {
    * @returns The chore or null if not found
    * @throws Error if database query fails
    */
-  async getChoreById(id: string): Promise<Chore | null> {
-    const supabase = createClient();
+  async getChoreById(id: string, supabaseClient?: SupabaseClient): Promise<Chore | null> {
+    const supabase = supabaseClient ?? createClient();
     try {
       const { data, error } = await supabase
         .from('chores')
@@ -224,8 +224,8 @@ export const choresService = {
    * @param id - The chore identifier
    * @throws Error if database delete fails
    */
-  async deleteChore(id: string): Promise<void> {
-    const supabase = createClient();
+  async deleteChore(id: string, supabaseClient?: SupabaseClient): Promise<void> {
+    const supabase = supabaseClient ?? createClient();
     try {
       const { error } = await supabase
         .from('chores')
@@ -423,7 +423,8 @@ export const choresService = {
    */
   async completeChoreWithRewards(
     choreId: string,
-    userId: string
+    userId: string,
+    supabaseClient?: SupabaseClient
   ): Promise<{
     chore: Chore;
     pointsAwarded: number;
@@ -432,7 +433,7 @@ export const choresService = {
     transaction: PointTransaction;
   }> {
     // Get the chore first
-    const chore = await this.getChoreById(choreId);
+    const chore = await this.getChoreById(choreId, supabaseClient);
     if (!chore) {
       throw new Error('Chore not found');
     }
@@ -445,7 +446,7 @@ export const choresService = {
     const updatedChore = await this.updateChore(choreId, {
       status: 'completed',
       completed_at: new Date().toISOString(),
-    });
+    }, supabaseClient);
 
     // Get point value from chore (falls back to default if not set)
     const choreWithPoints = chore as Chore & { point_value?: number };

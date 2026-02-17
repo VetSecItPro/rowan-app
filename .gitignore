@@ -184,6 +184,13 @@ docs/CI-CD-SETUP.md
 # Launch readiness reports
 .launch-reports/
 
+# Compliance documentation (confidential enterprise docs)
+.compliance-docs-reports/
+
+# Documentation generation reports
+.docs-reports/
+.docs-audit.json
+
 # Root-level screenshots (session artifacts)
 dashboard-*.png
 session-state-screenshot.png
