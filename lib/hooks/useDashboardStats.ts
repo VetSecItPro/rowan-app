@@ -514,7 +514,11 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                 supabase.removeChannel(channel);
             });
         };
-    }, [currentSpace, loadAllStats]);
+    // loadAllStats intentionally excluded — it's called directly and its deps
+    // (user, authLoading) are already listed. Including the callback ref causes
+    // Strict Mode double-renders to race setLoading(true) vs setLoading(false).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentSpace, user, authLoading]);
 
     return { stats, loading, refreshStats: loadAllStats };
 }

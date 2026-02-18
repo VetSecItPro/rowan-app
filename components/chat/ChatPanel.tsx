@@ -244,7 +244,7 @@ export default function ChatPanel({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[420px] flex flex-col bg-gray-900 border-l border-gray-700/50 shadow-2xl"
+            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[520px] flex flex-col bg-gray-900 border-l border-gray-700/50 shadow-2xl"
           >
             {panelContent}
           </motion.div>
