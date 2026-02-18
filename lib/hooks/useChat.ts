@@ -29,10 +29,10 @@ import type {
 const STORAGE_KEY_MESSAGES = 'rowan-chat-messages';
 const STORAGE_KEY_CONVERSATION_ID = 'rowan-chat-conversation-id';
 
-/** Load persisted messages from sessionStorage, filtering out any streaming messages. */
+/** Load persisted messages from localStorage, filtering out any streaming messages. */
 function loadPersistedMessages(): ChatMessage[] {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY_MESSAGES);
+    const raw = localStorage.getItem(STORAGE_KEY_MESSAGES);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ChatMessage[];
     if (!Array.isArray(parsed) || parsed.length === 0) return [];
@@ -43,47 +43,47 @@ function loadPersistedMessages(): ChatMessage[] {
   }
 }
 
-/** Load persisted conversationId from sessionStorage. */
+/** Load persisted conversationId from localStorage. */
 function loadPersistedConversationId(): string {
   try {
-    return sessionStorage.getItem(STORAGE_KEY_CONVERSATION_ID) ?? 'new';
+    return localStorage.getItem(STORAGE_KEY_CONVERSATION_ID) ?? 'new';
   } catch {
     return 'new';
   }
 }
 
-/** Save messages to sessionStorage (non-streaming only). */
+/** Save messages to localStorage (non-streaming only). */
 function persistMessages(messages: ChatMessage[]): void {
   try {
     const toSave = messages.filter((m) => !m.isStreaming);
     if (toSave.length === 0) {
-      sessionStorage.removeItem(STORAGE_KEY_MESSAGES);
+      localStorage.removeItem(STORAGE_KEY_MESSAGES);
       return;
     }
-    sessionStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(toSave));
+    localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(toSave));
   } catch {
     // Storage full or unavailable — silently ignore
   }
 }
 
-/** Save conversationId to sessionStorage. */
+/** Save conversationId to localStorage. */
 function persistConversationId(conversationId: string): void {
   try {
     if (conversationId === 'new') {
-      sessionStorage.removeItem(STORAGE_KEY_CONVERSATION_ID);
+      localStorage.removeItem(STORAGE_KEY_CONVERSATION_ID);
       return;
     }
-    sessionStorage.setItem(STORAGE_KEY_CONVERSATION_ID, conversationId);
+    localStorage.setItem(STORAGE_KEY_CONVERSATION_ID, conversationId);
   } catch {
     // Silently ignore
   }
 }
 
-/** Clear all chat data from sessionStorage. */
+/** Clear all chat data from localStorage. */
 function clearPersistedChat(): void {
   try {
-    sessionStorage.removeItem(STORAGE_KEY_MESSAGES);
-    sessionStorage.removeItem(STORAGE_KEY_CONVERSATION_ID);
+    localStorage.removeItem(STORAGE_KEY_MESSAGES);
+    localStorage.removeItem(STORAGE_KEY_CONVERSATION_ID);
   } catch {
     // Silently ignore
   }
@@ -274,7 +274,7 @@ async function* parseSSEStream(
 
 /** Manages AI chat conversations including message streaming, history, and conversation lifecycle */
 export function useChat(spaceId: string) {
-  // Hydrate from sessionStorage on first render
+  // Hydrate from localStorage on first render
   const persistedConvId = useRef(loadPersistedConversationId());
   const conversationIdRef = useRef(persistedConvId.current);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -288,7 +288,7 @@ export function useChat(spaceId: string) {
     return initial;
   });
 
-  // Persist messages to sessionStorage when they change (debounced)
+  // Persist messages to localStorage when they change (debounced)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
