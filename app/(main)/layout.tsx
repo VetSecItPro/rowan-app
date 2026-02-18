@@ -32,20 +32,22 @@ export default function MainLayout({ children }: { children: ReactNode }) {
                 <Header />
                 <div
                   id="main-content"
-                  className="flex-1 min-h-0 overflow-auto flex flex-col pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0"
+                  className="flex-1 min-h-0 overflow-auto pb-[calc(72px+env(safe-area-inset-bottom))] md:pb-0"
                 >
-                  {/* Content area — right margin reserves space for fixed chat panel on desktop */}
-                  <main className="flex-1 min-w-0 flex flex-col lg:mr-[336px]">
-                    {children}
-                  </main>
-                  {/* Footer spans full width */}
+                  {/* Content + chat panel side by side */}
+                  <div className="flex min-h-full">
+                    <main className="flex-1 min-w-0 flex flex-col">
+                      {children}
+                    </main>
+                    {/* Chat panel: sticky sidebar in content flow */}
+                    <DesktopChatPanel />
+                  </div>
+                  {/* Footer spans full width like header */}
                   <div className="hidden md:block">
                     <Footer />
                   </div>
                 </div>
               </div>
-              {/* Fixed chat panel — positioned between header and viewport bottom */}
-              <DesktopChatPanel />
             </div>
             <BottomNav />
             <ChatFAB />

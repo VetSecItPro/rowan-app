@@ -270,19 +270,30 @@ export function useAuthStateChange() {
           queryClient.setQueryData(QUERY_KEYS.auth.session(), session);
         }
         break;
-      case 'SIGNED_IN':
-        // Clear ALL persistent caches first — prevents cross-user data leakage
-        // when a different user logs in on the same browser.
-        queryClient.clear();
-        clearPersistedCache();
-        clearAllAppStorage();
-        // Seed the session cache with the new session so auth is immediately
-        // available. Without this, clear() empties the cache and invalidateQueries()
-        // has nothing to refetch, leaving the dashboard stuck in a loading state.
+      case 'SIGNED_IN': {
+        // Supabase fires SIGNED_IN both on explicit login AND on page-refresh
+        // session recovery. We must distinguish:
+        //   - Same user (session recovery): just seed session, keep caches intact
+        //   - Different user (actual login switch): clear all caches to prevent
+        //     cross-user data leakage
+        const existingSession = queryClient.getQueryData<Session>(QUERY_KEYS.auth.session());
+        const previousUserId = existingSession?.user?.id;
+        const newUserId = session?.user?.id;
+        const isUserSwitch = previousUserId && newUserId && previousUserId !== newUserId;
+
+        if (isUserSwitch) {
+          // Different user logged in — full cache purge for security
+          queryClient.clear();
+          clearPersistedCache();
+          clearAllAppStorage();
+        }
+
+        // Seed (or re-seed) the session in the React Query cache
         if (session) {
           queryClient.setQueryData(QUERY_KEYS.auth.session(), session);
         }
         break;
+      }
       case 'SIGNED_OUT':
         // Flag signout to prevent beforeunload from re-saving stale cache
         markSigningOut();

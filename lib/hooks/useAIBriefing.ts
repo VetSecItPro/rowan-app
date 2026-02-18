@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { BriefingOutput } from '@/lib/services/ai/briefing-service';
 
 const DISMISSED_KEY = 'rowan_briefing_dismissed';
@@ -39,6 +39,8 @@ export function useAIBriefing(spaceId: string | undefined): UseAIBriefingReturn 
   const [briefing, setBriefing] = useState<BriefingOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  // Prevent duplicate/retry fetches (Strict Mode, context re-renders, 429s)
+  const fetchedRef = useRef<string | null>(null);
 
   useEffect(() => {
     setIsDismissed(isDismissedToday());
@@ -46,6 +48,9 @@ export function useAIBriefing(spaceId: string | undefined): UseAIBriefingReturn 
 
   useEffect(() => {
     if (!spaceId || isDismissed || !isMorningWindow()) return;
+    // Only fetch once per spaceId per component lifecycle
+    if (fetchedRef.current === spaceId) return;
+    fetchedRef.current = spaceId;
 
     let cancelled = false;
 

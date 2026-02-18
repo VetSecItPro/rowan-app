@@ -80,7 +80,7 @@ export interface UseShoppingHandlersReturn {
   handleSaveTemplate: (name: string, description: string) => Promise<void>;
   handleScheduleTripSubmit: (eventData: ScheduleTripEventData) => Promise<void>;
   handleCreateTask: (list: ShoppingList) => Promise<void>;
-  handleAddFrequentItem: (itemName: string, category: string) => Promise<void>;
+
   handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClearSearch: () => void;
   handleTotalListsClick: () => void;
@@ -528,38 +528,6 @@ export function useShoppingHandlers(deps: UseShoppingHandlersDeps): UseShoppingH
     }
   }, [currentSpace, user?.id]);
 
-  // ─── Frequent items handler ────────────────────────────────────────────────
-
-  const handleAddFrequentItem = useCallback(async (itemName: string, category: string) => {
-    if (!spaceId) return;
-
-    try {
-      // Find the first active list or create a "Quick Add" list
-      let targetList = lists.find(l => l.status === 'active');
-
-      if (!targetList) {
-        // Create a new "Quick Add" list
-        targetList = await shoppingService.createList({
-          space_id: spaceId,
-          title: 'Quick Add List',
-          description: 'Items added from frequent suggestions',
-        });
-      }
-
-      // Add the item to the list
-      await shoppingService.createItem({
-        list_id: targetList.id,
-        name: itemName,
-        quantity: 1,
-        category,
-      });
-
-      invalidateShopping();
-    } catch (error) {
-      logger.error('Failed to add frequent item:', error, { component: 'page', action: 'execution' });
-    }
-  }, [spaceId, lists, invalidateShopping]);
-
   // ─── Search handlers ───────────────────────────────────────────────────────
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -614,7 +582,6 @@ export function useShoppingHandlers(deps: UseShoppingHandlersDeps): UseShoppingH
     handleSaveTemplate,
     handleScheduleTripSubmit,
     handleCreateTask,
-    handleAddFrequentItem,
     handleSearchChange,
     handleClearSearch,
     handleTotalListsClick,

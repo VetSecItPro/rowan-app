@@ -834,9 +834,8 @@ export const CheckInSection = memo(function CheckInSection({
     <motion.div
       variants={scaleIn}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:min-h-[600px]"
+      animate="visible"
+      className="grid grid-cols-1 lg:grid-cols-2 gap-6"
     >
       {/* Left: Daily Check-In */}
       <div

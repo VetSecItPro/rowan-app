@@ -18,7 +18,6 @@ import {
   LazySaveTemplateModal,
   LazyShoppingTemplatePickerModal,
   LazyScheduleTripModal,
-  LazyFrequentItemsPanel,
   LazyConfirmDialog,
 } from '@/lib/utils/lazy-components';
 
@@ -70,7 +69,7 @@ export default function ShoppingPage() {
     handleCreateList, handleDeleteList, handleConfirmDelete, handleCompleteList,
     handleToggleItem, handleUpdateQuantity, handleSelectTemplate,
     handleSaveTemplate, handleScheduleTripSubmit, handleCreateTask,
-    handleAddFrequentItem, handleSearchChange, handleClearSearch,
+    handleSearchChange, handleClearSearch,
     handleTotalListsClick, handleActiveListsClick, handleItemsThisWeekClick,
     handleCompletedListsClick,
   } = handlers;
@@ -185,16 +184,6 @@ export default function ShoppingPage() {
             </button>
           </CollapsibleStatsGrid>
 
-          {/* Frequent Items Panel - Hidden on mobile */}
-          {currentSpace && lists.length > 0 && (
-            <div className="hidden sm:block">
-              <LazyFrequentItemsPanel
-                spaceId={currentSpace.id}
-                onAddItem={handleAddFrequentItem}
-              />
-            </div>
-          )}
-
           {/* Search Bar - No outer container on mobile */}
           <div className={`apple-search-container shopping-search group ${isSearchTyping ? 'apple-search-typing' : ''}`}>
             <Search className="apple-search-icon" />
@@ -224,24 +213,22 @@ export default function ShoppingPage() {
           {/* Shopping Lists */}
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 sm:p-5 md:p-6">
             {/* Header with Month Badge and Status Filter */}
-            <div className="flex flex-col gap-4 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                  <h2 className="text-lg sm:text-xl font-bold text-white">
-                    {timeFilter === 'week' ? 'This Week\'s Lists' : 'All Shopping Lists'} ({filteredLists.length})
-                  </h2>
-                  <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-emerald-900/30 border border-emerald-700 text-emerald-300 text-xs sm:text-sm font-medium rounded-full">
-                    {timeFilter === 'week' ? 'This Week' : format(new Date(), 'MMM yyyy')}
-                  </span>
-                </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h2 className="text-lg sm:text-xl font-bold text-white">
+                  {timeFilter === 'week' ? 'This Week\'s Lists' : 'All Shopping Lists'} ({filteredLists.length})
+                </h2>
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-emerald-900/30 border border-emerald-700 text-emerald-300 text-xs sm:text-sm font-medium rounded-full">
+                  {timeFilter === 'week' ? 'This Week' : format(new Date(), 'MMM yyyy')}
+                </span>
               </div>
 
               {/* Status Filter - Compact Segmented Buttons */}
-              <div className="w-full sm:w-auto">
-                <div className="bg-gray-900/80 rounded-full p-1 flex w-full sm:w-auto gap-0.5">
+              <div className="flex-shrink-0">
+                <div className="bg-gray-900/80 border border-emerald-700/50 rounded-full p-0.5 flex gap-0.5">
                   <button
                     onClick={() => { data.setStatusFilter('all'); data.setTimeFilter('all'); }}
-                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
+                    className={`flex-1 sm:flex-none px-3 py-1 text-[11px] font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'all' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
                         : 'text-gray-400 hover:text-gray-200'
@@ -251,7 +238,7 @@ export default function ShoppingPage() {
                   </button>
                   <button
                     onClick={() => { data.setTimeFilter('week'); data.setStatusFilter('all'); }}
-                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
+                    className={`flex-1 sm:flex-none px-3 py-1 text-[11px] font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       timeFilter === 'week'
                         ? 'bg-emerald-500 text-white shadow-sm'
                         : 'text-gray-400 hover:text-gray-200'
@@ -261,7 +248,7 @@ export default function ShoppingPage() {
                   </button>
                   <button
                     onClick={() => { data.setStatusFilter('active'); data.setTimeFilter('all'); }}
-                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
+                    className={`flex-1 sm:flex-none px-3 py-1 text-[11px] font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'active' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
                         : 'text-gray-400 hover:text-gray-200'
@@ -271,7 +258,7 @@ export default function ShoppingPage() {
                   </button>
                   <button
                     onClick={() => { data.setStatusFilter('completed'); data.setTimeFilter('all'); }}
-                    className={`flex-1 sm:flex-none px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
+                    className={`flex-1 sm:flex-none px-3 py-1 text-[11px] font-medium rounded-full transition-all whitespace-nowrap active:scale-[0.97] ${
                       statusFilter === 'completed' && timeFilter === 'all'
                         ? 'bg-emerald-500 text-white shadow-sm'
                         : 'text-gray-400 hover:text-gray-200'

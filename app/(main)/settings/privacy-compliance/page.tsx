@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import {
@@ -30,7 +29,6 @@ import {
 
 export default function PrivacyCompliancePage() {
   const { user } = useAuth();
-  const router = useRouter();
 
   const [preferences, setPreferences] = useState<PrivacyPreferences | null>(null);
   const [ccpaPreference, setCCPAPreference] = useState<CCPAPreference | null>(null);
@@ -64,15 +62,14 @@ export default function PrivacyCompliancePage() {
     setLoading(false);
   }, [user]);
 
+  // Auth redirect removed — middleware handles server-side auth protection.
+  // Client-side redirect raced with Supabase session recovery causing loops.
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
+    if (!user) return;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
-  }, [user, router, loadData]);
+  }, [user, loadData]);
 
   const handlePreferenceChange = async (key: keyof PrivacyPreferences, value: boolean) => {
     if (!user || !preferences) return;
