@@ -1746,7 +1746,7 @@ export async function executeTool(
       case 'get_household_summary': {
         // Fetch multiple data sources in parallel for a comprehensive overview
         const [tasks, chores, goals, events, budgetStats, expenses] = await Promise.all([
-          tasksService.getTasks(spaceId, { status: 'pending' }, supabase).catch(() => []),
+          tasksService.getTasks(spaceId, { status: ['pending', 'in-progress', 'in_progress', 'blocked', 'on-hold'] }, supabase).catch(() => []),
           choresService.getChores(spaceId, { status: 'pending' }, supabase).catch(() => []),
           goalsService.getGoals(spaceId, supabase).catch(() => []),
           calendarService.getEvents(spaceId, false, supabase).catch(() => []),
@@ -1768,7 +1768,13 @@ export async function executeTool(
           success: true,
           message: 'Household overview',
           data: {
-            tasks: { pending: tasks.length, overdue: overdueTasks.length },
+            tasks: {
+              total_open: tasks.length,
+              pending: tasks.filter(t => t.status === 'pending').length,
+              in_progress: tasks.filter(t => t.status === 'in-progress' || (t.status as string) === 'in_progress').length,
+              blocked: tasks.filter(t => t.status === 'blocked' || t.status === 'on-hold').length,
+              overdue: overdueTasks.length,
+            },
             chores: { pending: chores.length },
             goals: { active: activeGoals.length, total: goals.length },
             events: { upcoming_7_days: upcomingEvents.length },
@@ -2882,6 +2888,120 @@ export async function executeTool(
           success: true,
           message: 'Penalty settings updated.',
           featureType: 'reward',
+        };
+      }
+
+      // ═══════════════════════════════════════
+      // BATCH / BULK COMPLETION
+      // ═══════════════════════════════════════
+
+      case 'batch_complete_tasks': {
+        const taskIds = parameters.task_ids;
+        if (!Array.isArray(taskIds) || taskIds.length === 0) {
+          return { success: false, message: 'No task IDs provided', featureType: 'task' };
+        }
+        const results = await tasksService.updateTasksBatch(
+          taskIds.map(id => String(id)),
+          { status: 'completed' },
+        );
+        return {
+          success: true,
+          message: `Completed ${results.length} tasks`,
+          data: { completed_count: results.length },
+          featureType: 'task',
+        };
+      }
+
+      case 'batch_complete_chores': {
+        const choreIds = parameters.chore_ids;
+        const choreUserId = (parameters.user_id as string) || userId;
+        if (!Array.isArray(choreIds) || choreIds.length === 0) {
+          return { success: false, message: 'No chore IDs provided', featureType: 'chore' };
+        }
+        let completed = 0;
+        let totalPoints = 0;
+        for (const id of choreIds) {
+          try {
+            const result = await choresService.completeChoreWithRewards(String(id), String(choreUserId), supabase);
+            if (result) {
+              completed++;
+              totalPoints += result.pointsAwarded || 0;
+            }
+          } catch {
+            // Skip individual failures, continue with rest
+          }
+        }
+        return {
+          success: true,
+          message: `Completed ${completed} chores${totalPoints > 0 ? `, earned ${totalPoints} points` : ''}`,
+          data: { completed_count: completed, points_earned: totalPoints },
+          featureType: 'chore',
+        };
+      }
+
+      case 'batch_complete_reminders': {
+        const reminderIds = parameters.reminder_ids;
+        if (!Array.isArray(reminderIds) || reminderIds.length === 0) {
+          return { success: false, message: 'No reminder IDs provided', featureType: 'reminder' };
+        }
+        let remindersCompleted = 0;
+        for (const id of reminderIds) {
+          try {
+            await remindersService.updateReminder(String(id), { status: 'completed' }, supabase);
+            remindersCompleted++;
+          } catch {
+            // Skip individual failures
+          }
+        }
+        return {
+          success: true,
+          message: `Completed ${remindersCompleted} reminders`,
+          data: { completed_count: remindersCompleted },
+          featureType: 'reminder',
+        };
+      }
+
+      case 'batch_check_shopping_items': {
+        const itemIds = parameters.item_ids;
+        if (!Array.isArray(itemIds) || itemIds.length === 0) {
+          return { success: false, message: 'No item IDs provided', featureType: 'shopping' };
+        }
+        let checked = 0;
+        for (const id of itemIds) {
+          try {
+            await shoppingService.toggleItem(String(id), true);
+            checked++;
+          } catch {
+            // Skip individual failures
+          }
+        }
+        return {
+          success: true,
+          message: `Checked off ${checked} items`,
+          data: { checked_count: checked },
+          featureType: 'shopping',
+        };
+      }
+
+      case 'batch_complete_goals': {
+        const goalIds = parameters.goal_ids;
+        if (!Array.isArray(goalIds) || goalIds.length === 0) {
+          return { success: false, message: 'No goal IDs provided', featureType: 'goal' };
+        }
+        let goalsCompleted = 0;
+        for (const id of goalIds) {
+          try {
+            await goalsService.updateGoal(String(id), { status: 'completed', progress: 100 }, supabase);
+            goalsCompleted++;
+          } catch {
+            // Skip individual failures
+          }
+        }
+        return {
+          success: true,
+          message: `Completed ${goalsCompleted} goals`,
+          data: { completed_count: goalsCompleted },
+          featureType: 'goal',
         };
       }
 
