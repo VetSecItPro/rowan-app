@@ -4023,6 +4023,109 @@ const updatePenaltySettings: FunctionDeclaration = {
 };
 
 // ---------------------------------------------------------------------------
+// Batch / Bulk Completion
+// ---------------------------------------------------------------------------
+
+/** Complete multiple tasks at once */
+const batchCompleteTasks: FunctionDeclaration = {
+  name: 'batch_complete_tasks',
+  description:
+    'Complete multiple tasks at once. Use this when the user wants to mark all or many tasks as done. First call list_tasks to get the IDs, then pass them all here.',
+  parameters: {
+    type: SchemaType.OBJECT,
+    description: 'Parameters for batch completing tasks',
+    properties: {
+      task_ids: {
+        type: SchemaType.ARRAY,
+        description: 'Array of task IDs to mark as completed',
+        items: { type: SchemaType.STRING },
+      },
+    },
+    required: ['task_ids'],
+  },
+};
+
+/** Complete multiple chores at once */
+const batchCompleteChores: FunctionDeclaration = {
+  name: 'batch_complete_chores',
+  description:
+    'Complete multiple chores at once with reward points. Use this when the user wants to mark all or many chores as done. First call list_chores to get the IDs, then pass them all here.',
+  parameters: {
+    type: SchemaType.OBJECT,
+    description: 'Parameters for batch completing chores',
+    properties: {
+      chore_ids: {
+        type: SchemaType.ARRAY,
+        description: 'Array of chore IDs to mark as completed',
+        items: { type: SchemaType.STRING },
+      },
+      user_id: {
+        type: SchemaType.STRING,
+        description: 'The user completing the chores (for reward points)',
+      },
+    },
+    required: ['chore_ids', 'user_id'],
+  },
+};
+
+/** Complete multiple reminders at once */
+const batchCompleteReminders: FunctionDeclaration = {
+  name: 'batch_complete_reminders',
+  description:
+    'Complete multiple reminders at once. Use this when the user wants to mark all or many reminders as done. First call list_reminders to get the IDs, then pass them all here.',
+  parameters: {
+    type: SchemaType.OBJECT,
+    description: 'Parameters for batch completing reminders',
+    properties: {
+      reminder_ids: {
+        type: SchemaType.ARRAY,
+        description: 'Array of reminder IDs to mark as completed',
+        items: { type: SchemaType.STRING },
+      },
+    },
+    required: ['reminder_ids'],
+  },
+};
+
+/** Check off multiple shopping items at once */
+const batchCheckShoppingItems: FunctionDeclaration = {
+  name: 'batch_check_shopping_items',
+  description:
+    'Check off multiple shopping items at once. Use this when the user wants to mark all or many items as purchased. First call list_shopping_items to get the IDs, then pass them all here.',
+  parameters: {
+    type: SchemaType.OBJECT,
+    description: 'Parameters for batch checking shopping items',
+    properties: {
+      item_ids: {
+        type: SchemaType.ARRAY,
+        description: 'Array of shopping item IDs to check off',
+        items: { type: SchemaType.STRING },
+      },
+    },
+    required: ['item_ids'],
+  },
+};
+
+/** Complete multiple goals at once */
+const batchCompleteGoals: FunctionDeclaration = {
+  name: 'batch_complete_goals',
+  description:
+    'Complete multiple goals at once. Use this when the user wants to mark all or many goals as done. First call list_goals to get the IDs, then pass them all here.',
+  parameters: {
+    type: SchemaType.OBJECT,
+    description: 'Parameters for batch completing goals',
+    properties: {
+      goal_ids: {
+        type: SchemaType.ARRAY,
+        description: 'Array of goal IDs to mark as completed',
+        items: { type: SchemaType.STRING },
+      },
+    },
+    required: ['goal_ids'],
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -4206,6 +4309,12 @@ export const TOOL_DECLARATIONS: FunctionDeclaration[] = [
   updatePenaltySettings,
   // Household Summary
   getHouseholdSummary,
+  // Batch / Bulk Completion
+  batchCompleteTasks,
+  batchCompleteChores,
+  batchCompleteReminders,
+  batchCheckShoppingItems,
+  batchCompleteGoals,
 ];
 
 /**
@@ -4388,6 +4497,12 @@ export const TOOL_NAMES = {
   UPDATE_PENALTY_SETTINGS: 'update_penalty_settings',
   // Household Summary
   GET_HOUSEHOLD_SUMMARY: 'get_household_summary',
+  // Batch / Bulk Completion
+  BATCH_COMPLETE_TASKS: 'batch_complete_tasks',
+  BATCH_COMPLETE_CHORES: 'batch_complete_chores',
+  BATCH_COMPLETE_REMINDERS: 'batch_complete_reminders',
+  BATCH_CHECK_SHOPPING_ITEMS: 'batch_check_shopping_items',
+  BATCH_COMPLETE_GOALS: 'batch_complete_goals',
 } as const;
 
 /**

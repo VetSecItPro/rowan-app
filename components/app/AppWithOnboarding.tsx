@@ -24,9 +24,12 @@ export function AppWithOnboarding({ children }: AppWithOnboardingProps) {
   } = useAuthWithSpaces();
   const [retrying, setRetrying] = useState(false);
 
+  // Show skeleton during initial auth load — prevents spinner/blank dashboard
+  if (authLoading) {
+    return <DashboardSkeleton />;
+  }
+
   // Not authenticated — render children (login page, public content, etc.)
-  // During auth loading, isAuthenticated is false so this also passes through —
-  // the Header handles its own loading skeleton to avoid a Login button flash
   if (!isAuthenticated) {
     return <>{children}</>;
   }

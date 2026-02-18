@@ -11,7 +11,7 @@
 
 'use client';
 
-import { useCallback, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import type {
   ChatMessage,
@@ -21,6 +21,73 @@ import type {
   ErrorEvent,
   ChatState,
 } from '@/lib/types/chat';
+
+// ---------------------------------------------------------------------------
+// Session storage persistence
+// ---------------------------------------------------------------------------
+
+const STORAGE_KEY_MESSAGES = 'rowan-chat-messages';
+const STORAGE_KEY_CONVERSATION_ID = 'rowan-chat-conversation-id';
+
+/** Load persisted messages from sessionStorage, filtering out any streaming messages. */
+function loadPersistedMessages(): ChatMessage[] {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY_MESSAGES);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ChatMessage[];
+    if (!Array.isArray(parsed) || parsed.length === 0) return [];
+    // Filter out any messages that were mid-stream when the page closed
+    return parsed.filter((m) => !m.isStreaming);
+  } catch {
+    return [];
+  }
+}
+
+/** Load persisted conversationId from sessionStorage. */
+function loadPersistedConversationId(): string {
+  try {
+    return sessionStorage.getItem(STORAGE_KEY_CONVERSATION_ID) ?? 'new';
+  } catch {
+    return 'new';
+  }
+}
+
+/** Save messages to sessionStorage (non-streaming only). */
+function persistMessages(messages: ChatMessage[]): void {
+  try {
+    const toSave = messages.filter((m) => !m.isStreaming);
+    if (toSave.length === 0) {
+      sessionStorage.removeItem(STORAGE_KEY_MESSAGES);
+      return;
+    }
+    sessionStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(toSave));
+  } catch {
+    // Storage full or unavailable — silently ignore
+  }
+}
+
+/** Save conversationId to sessionStorage. */
+function persistConversationId(conversationId: string): void {
+  try {
+    if (conversationId === 'new') {
+      sessionStorage.removeItem(STORAGE_KEY_CONVERSATION_ID);
+      return;
+    }
+    sessionStorage.setItem(STORAGE_KEY_CONVERSATION_ID, conversationId);
+  } catch {
+    // Silently ignore
+  }
+}
+
+/** Clear all chat data from sessionStorage. */
+function clearPersistedChat(): void {
+  try {
+    sessionStorage.removeItem(STORAGE_KEY_MESSAGES);
+    sessionStorage.removeItem(STORAGE_KEY_CONVERSATION_ID);
+  } catch {
+    // Silently ignore
+  }
+}
 
 // ---------------------------------------------------------------------------
 // State management
@@ -207,14 +274,36 @@ async function* parseSSEStream(
 
 /** Manages AI chat conversations including message streaming, history, and conversation lifecycle */
 export function useChat(spaceId: string) {
-  const conversationIdRef = useRef('new');
+  // Hydrate from sessionStorage on first render
+  const persistedConvId = useRef(loadPersistedConversationId());
+  const conversationIdRef = useRef(persistedConvId.current);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const [state, dispatch] = useReducer(
-    chatReducer,
-    conversationIdRef.current,
-    createInitialState
-  );
+  const [state, dispatch] = useReducer(chatReducer, null, () => {
+    const savedMessages = loadPersistedMessages();
+    const initial = createInitialState(persistedConvId.current);
+    if (savedMessages.length > 0) {
+      return { ...initial, messages: savedMessages };
+    }
+    return initial;
+  });
+
+  // Persist messages to sessionStorage when they change (debounced)
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    persistTimerRef.current = setTimeout(() => {
+      persistMessages(state.messages);
+    }, 300);
+    return () => {
+      if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    };
+  }, [state.messages]);
+
+  // Persist conversationId when it changes
+  useEffect(() => {
+    persistConversationId(state.conversationId);
+  }, [state.conversationId]);
 
   /**
    * Process an SSE stream from the API, dispatching each event to the reducer.
@@ -327,6 +416,7 @@ export function useChat(spaceId: string) {
   const clearChat = useCallback(() => {
     abortControllerRef.current?.abort();
     conversationIdRef.current = 'new';
+    clearPersistedChat();
     dispatch({
       type: 'CLEAR_CHAT',
       conversationId: 'new',

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Activity } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { useAuthWithSpaces } from '@/lib/hooks/useAuthWithSpaces';
 import { useDashboardMode } from '@/lib/hooks/useDashboardMode';
 import { useDashboardStats } from '@/lib/hooks/useDashboardStats';
@@ -57,6 +57,17 @@ export default function DashboardPage() {
   }, [hasInviteParam, router]);
 
   const { stats, loading: statsLoading, refreshStats } = useDashboardStats(user, currentSpace, authLoading);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefreshCards = async () => {
+    setRefreshing(true);
+    try {
+      await refreshStats();
+    } finally {
+      // Brief minimum animation so the user sees it spin
+      setTimeout(() => setRefreshing(false), 600);
+    }
+  };
 
   // Auth protection — redirect to login if not authenticated
   useEffect(() => {
@@ -97,8 +108,19 @@ export default function DashboardPage() {
           <div className="min-h-screen p-4 sm:p-6 md:p-8 lg:p-5">
             <h1 className="sr-only">Dashboard</h1>
             <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4">
-              {/* Welcome Greeting */}
-              <WelcomeWidget userName={user?.name ?? undefined} />
+              {/* Welcome Greeting + Refresh */}
+              <div className="flex items-center justify-between">
+                <WelcomeWidget userName={user?.name ?? undefined} />
+                <button
+                  onClick={handleRefreshCards}
+                  disabled={refreshing || statsLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-800/60 border border-gray-700/40 text-gray-400 hover:text-white hover:bg-gray-700/60 hover:border-gray-600/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-xs sm:text-sm"
+                  title="Refresh dashboard cards"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                  <span>Refresh Dashboard</span>
+                </button>
+              </div>
 
               {/* Today at a Glance */}
               {spaceId && <TodayAtAGlance spaceId={spaceId} />}
@@ -106,11 +128,6 @@ export default function DashboardPage() {
               {/* 8 Feature Stat Cards */}
               <StatCardGrid stats={stats} loading={statsLoading} />
 
-              {/* Real-time indicator */}
-              <div className="flex items-center justify-end gap-2 text-xs sm:text-sm text-gray-400 -mt-2">
-                <Activity className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 animate-pulse" />
-                <span>Real-time updates</span>
-              </div>
 
               {/* Countdown Widget */}
               {spaceId && (

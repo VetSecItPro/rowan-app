@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
 import {
+  Activity,
   Bot,
   DollarSign,
   Users,
@@ -65,6 +66,13 @@ interface RealtimeData {
   today_output_tokens: number;
   active_users: number;
   timestamp: string;
+}
+
+interface RateLimitData {
+  rpm: number;
+  rpd: number;
+  rpmLimit: number;
+  rpdLimit: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -133,6 +141,46 @@ const CostCard = memo(function CostCard({
   );
 });
 
+const RateLimitGauge = memo(function RateLimitGauge({
+  label,
+  current,
+  limit,
+}: {
+  label: string;
+  current: number;
+  limit: number;
+}) {
+  const pct = limit > 0 ? Math.min(Math.round((current / limit) * 100), 100) : 0;
+  const barColor =
+    pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-yellow-500' : 'bg-green-500';
+  const textColor =
+    pct > 90 ? 'text-red-400' : pct > 70 ? 'text-yellow-400' : 'text-green-400';
+
+  return (
+    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <p className="text-xs font-medium text-gray-400">{label}</p>
+          <p className="text-2xl font-bold text-white mt-1">
+            {current.toLocaleString()}{' '}
+            <span className="text-sm font-normal text-gray-400">/ {limit.toLocaleString()}</span>
+          </p>
+        </div>
+        <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <Activity className="w-5 h-5 text-white" />
+        </div>
+      </div>
+      <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+        <div
+          className={`h-2 rounded-full transition-all duration-500 ${barColor}`}
+          style={{ width: `${Math.max(pct, 1)}%` }}
+        />
+      </div>
+      <p className={`text-xs mt-1 ${textColor}`}>{pct}% utilized</p>
+    </div>
+  );
+});
+
 function formatCost(cost: number): string {
   if (cost < 0.01) return `$${cost.toFixed(4)}`;
   if (cost < 1) return `$${cost.toFixed(3)}`;
@@ -184,6 +232,19 @@ const OverviewPanel = memo(function OverviewPanel({
     staleTime: 30 * 1000,
     gcTime: 60 * 1000,
     refetchInterval: 60 * 1000,
+  });
+
+  // Rate limit polling (15s)
+  const { data: rateLimits } = useQuery<RateLimitData>({
+    queryKey: ['admin-ai-rate-limits'],
+    queryFn: async () => {
+      const res = await adminFetch('/api/admin/ai-usage/rate-limits');
+      if (!res.ok) throw new Error('Failed to fetch rate limits');
+      return res.json();
+    },
+    staleTime: 10 * 1000,
+    gcTime: 30 * 1000,
+    refetchInterval: 15 * 1000,
   });
 
   if (isLoading) {
@@ -263,6 +324,22 @@ const OverviewPanel = memo(function OverviewPanel({
           color={budgetHealthPct > 50 ? 'bg-amber-600' : 'bg-cyan-600'}
         />
       </div>
+
+      {/* Rate Limit Gauges */}
+      {rateLimits && (
+        <div className="grid grid-cols-2 gap-3">
+          <RateLimitGauge
+            label="Requests / Minute"
+            current={rateLimits.rpm}
+            limit={rateLimits.rpmLimit}
+          />
+          <RateLimitGauge
+            label="Requests / Day"
+            current={rateLimits.rpd}
+            limit={rateLimits.rpdLimit}
+          />
+        </div>
+      )}
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
