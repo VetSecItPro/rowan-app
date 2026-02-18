@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import nextDynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Tooltip } from '@/components/shared/Tooltip';
@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Activity,
+  Scale,
 } from 'lucide-react';
 import type { DailyCheckIn } from '@/lib/services/checkins-service';
 
@@ -35,6 +36,11 @@ const ActivityFeed = nextDynamic(
 const CheckInSuccess = nextDynamic(
   () => import('@/components/checkins/CheckInSuccess').then(mod => ({ default: mod.CheckInSuccess })),
   { ssr: false }
+);
+
+const HouseholdBalance = nextDynamic(
+  () => import('@/components/household-balance/HouseholdBalance').then(mod => ({ default: mod.HouseholdBalance })),
+  { loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" />, ssr: false }
 );
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -829,6 +835,7 @@ export const CheckInSection = memo(function CheckInSection({
   spaceId,
 }: CheckInSectionProps) {
   const checkIn = useCheckIn({ spaceId, userId });
+  const [rightPanelTab, setRightPanelTab] = useState<'activity' | 'balance'>('activity');
 
   return (
     <motion.div
@@ -988,15 +995,46 @@ export const CheckInSection = memo(function CheckInSection({
         )}
       </div>
 
-      {/* Right: Activity Feed */}
+      {/* Right: Activity Feed / Household Balance */}
       <div className="group bg-gradient-to-br from-slate-900/30 via-gray-900/20 to-stone-900/10 rounded-xl xl:rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-[0_20px_50px_rgba(148,163,184,0.3)] border border-gray-500/20 hover:border-gray-400/50 transition-all duration-300 flex flex-col">
-        <div className="flex items-center gap-2 mb-4 flex-shrink-0">
-          <Activity className="w-5 h-5 text-purple-400" />
-          <h2 className="text-lg sm:text-xl font-bold text-white">Recent Activity</h2>
+        {/* Tab Toggle */}
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
+          <div className="flex items-center gap-0.5 p-0.5 bg-gray-800/50 rounded-full border border-gray-700">
+            <button
+              onClick={() => setRightPanelTab('activity')}
+              className={`px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all text-xs font-medium ${
+                rightPanelTab === 'activity'
+                  ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Activity className="w-3 h-3" />
+              <span>Activity</span>
+            </button>
+            <button
+              onClick={() => setRightPanelTab('balance')}
+              className={`px-2.5 py-1 rounded-full flex items-center justify-center gap-1 transition-all text-xs font-medium ${
+                rightPanelTab === 'balance'
+                  ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Scale className="w-3 h-3" />
+              <span>Balance</span>
+            </button>
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto min-h-0 -mx-2 px-2 custom-scrollbar">
-          <ActivityFeed spaceId={spaceId} limit={50} />
-        </div>
+
+        {/* Tab Content */}
+        {rightPanelTab === 'activity' ? (
+          <div className="flex-1 overflow-y-auto min-h-0 -mx-2 px-2 custom-scrollbar">
+            <ActivityFeed spaceId={spaceId} limit={50} />
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <HouseholdBalance spaceId={spaceId} userId={userId} />
+          </div>
+        )}
       </div>
 
       {/* Check-In Success Modal */}

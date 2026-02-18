@@ -4,12 +4,16 @@ import { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
 import {
-  AlertCircle,
   Sun,
-  Clock
+  Clock,
+  CalendarDays,
+  CheckSquare,
+  Bell,
+  UtensilsCrossed,
+  AlertCircle
 } from 'lucide-react';
 import { WeatherBadge } from '@/components/calendar/WeatherBadge';
-import { format, isToday, isPast, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { format, isToday, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { calendarService, type CalendarEvent } from '@/lib/services/calendar-service';
 import { tasksService } from '@/lib/services/tasks-service';
 import { remindersService, type Reminder } from '@/lib/services/reminders-service';
@@ -27,8 +31,6 @@ interface TodayData {
   tasks: Task[];
   meals: Meal[];
   reminders: Reminder[];
-  overdueTasks: Task[];
-  overdueReminders: Reminder[];
 }
 
 // Animation variants
@@ -61,19 +63,15 @@ const PriorityBadge = memo(function PriorityBadge({ priority }: { priority?: str
   );
 });
 
-// Task item component (used in OverdueSection)
-const TaskItem = memo(function TaskItem({ task, isOverdue }: { task: Task; isOverdue?: boolean }) {
+// Task item component
+const TaskItem = memo(function TaskItem({ task }: { task: Task }) {
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
-      }`}>
+    <div className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors">
       <PriorityBadge priority={task.priority} />
-      <p className={`text-sm flex-1 truncate ${isOverdue
-        ? 'text-red-400'
-        : 'text-gray-200'
-        }`}>
+      <p className="text-sm flex-1 truncate text-gray-200">
         {task.title}
       </p>
-      {task.due_date && (
+      {task.due_date && task.due_date.includes('T') && (
         <span className="text-xs text-gray-400">
           {format(parseISO(task.due_date), 'h:mm a')}
         </span>
@@ -82,21 +80,17 @@ const TaskItem = memo(function TaskItem({ task, isOverdue }: { task: Task; isOve
   );
 });
 
-// Reminder item component (used in OverdueSection)
-const ReminderItem = memo(function ReminderItem({ reminder, isOverdue }: { reminder: Reminder; isOverdue?: boolean }) {
+// Reminder item component
+const ReminderItem = memo(function ReminderItem({ reminder }: { reminder: Reminder }) {
   const remindAt = reminder.remind_at || reminder.reminder_time;
 
   return (
-    <div className={`flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors ${isOverdue ? 'border-l-2 border-red-500' : ''
-      }`}>
+    <div className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-gray-700/50 transition-colors">
       {reminder.emoji && <span className="text-sm">{reminder.emoji}</span>}
-      <p className={`text-sm flex-1 truncate ${isOverdue
-        ? 'text-red-400'
-        : 'text-gray-200'
-        }`}>
+      <p className="text-sm flex-1 truncate text-gray-200">
         {reminder.title}
       </p>
-      {remindAt && (
+      {remindAt && remindAt.includes('T') && (
         <span className="text-xs text-gray-400">
           {format(parseISO(remindAt), 'h:mm a')}
         </span>
@@ -105,47 +99,112 @@ const ReminderItem = memo(function ReminderItem({ reminder, isOverdue }: { remin
   );
 });
 
-// Overdue section
-const OverdueSection = memo(function OverdueSection({
+// Today summary section — shows today's items across all features
+const TodaySection = memo(function TodaySection({
+  events,
   tasks,
-  reminders
+  reminders,
+  meals
 }: {
+  events: CalendarEvent[];
   tasks: Task[];
   reminders: Reminder[];
+  meals: Meal[];
 }) {
-  const totalOverdue = tasks.length + reminders.length;
-
-  if (totalOverdue === 0) return null;
-
   return (
-    <motion.div
-      variants={itemVariants}
-      className="bg-red-900/20 border border-red-800 rounded-lg p-3"
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <AlertCircle className="w-4 h-4 text-red-400" />
-        <h4 className="text-sm font-semibold text-red-300">
-          Overdue ({totalOverdue})
-        </h4>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {tasks.slice(0, 3).map(task => (
-          <TaskItem key={task.id} task={task} isOverdue />
-        ))}
-        {reminders.slice(0, 3).map(reminder => (
-          <ReminderItem key={reminder.id} reminder={reminder} isOverdue />
-        ))}
-        {totalOverdue > 6 && (
-          <p className="text-xs text-red-400 col-span-full">
-            +{totalOverdue - 6} more overdue items
-          </p>
-        )}
-      </div>
+    <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Events today */}
+      {events.length > 0 && (
+        <div className="bg-purple-900/15 border border-purple-800/40 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <CalendarDays className="w-4 h-4 text-purple-400" />
+            <h4 className="text-sm font-semibold text-purple-300">
+              Events ({events.length})
+            </h4>
+          </div>
+          <div className="space-y-1">
+            {events.slice(0, 3).map(event => (
+              <div key={event.id} className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-gray-700/50 transition-colors">
+                <p className="text-sm text-gray-200 flex-1 truncate">{event.title}</p>
+                <span className="text-xs text-gray-400 flex-shrink-0">
+                  {format(parseISO(event.start_time), 'h:mm a')}
+                </span>
+              </div>
+            ))}
+            {events.length > 3 && (
+              <p className="text-xs text-purple-400 px-2">+{events.length - 3} more</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tasks due today */}
+      {tasks.length > 0 && (
+        <div className="bg-blue-900/15 border border-blue-800/40 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckSquare className="w-4 h-4 text-blue-400" />
+            <h4 className="text-sm font-semibold text-blue-300">
+              Tasks Due ({tasks.length})
+            </h4>
+          </div>
+          <div className="space-y-1">
+            {tasks.slice(0, 3).map(task => (
+              <TaskItem key={task.id} task={task} />
+            ))}
+            {tasks.length > 3 && (
+              <p className="text-xs text-blue-400 px-2">+{tasks.length - 3} more</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Reminders today */}
+      {reminders.length > 0 && (
+        <div className="bg-pink-900/15 border border-pink-800/40 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Bell className="w-4 h-4 text-pink-400" />
+            <h4 className="text-sm font-semibold text-pink-300">
+              Reminders ({reminders.length})
+            </h4>
+          </div>
+          <div className="space-y-1">
+            {reminders.slice(0, 3).map(reminder => (
+              <ReminderItem key={reminder.id} reminder={reminder} />
+            ))}
+            {reminders.length > 3 && (
+              <p className="text-xs text-pink-400 px-2">+{reminders.length - 3} more</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Meals today */}
+      {meals.length > 0 && (
+        <div className="bg-orange-900/15 border border-orange-800/40 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <UtensilsCrossed className="w-4 h-4 text-orange-400" />
+            <h4 className="text-sm font-semibold text-orange-300">
+              Meals ({meals.length})
+            </h4>
+          </div>
+          <div className="space-y-1">
+            {meals.slice(0, 3).map(meal => (
+              <div key={meal.id} className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-gray-700/50 transition-colors">
+                <p className="text-sm text-gray-200 flex-1 truncate">{meal.name || meal.recipe?.name || 'Untitled meal'}</p>
+                <span className="text-xs text-gray-400 capitalize flex-shrink-0">{meal.meal_type}</span>
+              </div>
+            ))}
+            {meals.length > 3 && (
+              <p className="text-xs text-orange-400 px-2">+{meals.length - 3} more</p>
+            )}
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 });
 
-/** Displays a summary of today's events, tasks, and reminders. */
+/** Displays a daily summary of today's events, tasks, reminders, and meals. */
 export const TodayAtAGlance = memo(function TodayAtAGlance({
   spaceId,
   className = ''
@@ -190,13 +249,6 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
           return dueDate === todayStr;
         });
 
-        // Filter overdue tasks
-        const overdueTasks = allTasks.filter(task => {
-          if (!task.due_date || task.status === 'completed') return false;
-          const dueDate = parseISO(task.due_date);
-          return isPast(dueDate) && !isToday(dueDate);
-        });
-
         // Filter meals for today
         const todayMeals = allMeals.filter(meal => {
           const mealDate = meal.scheduled_date.split('T')[0];
@@ -206,7 +258,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
           return (order[a.meal_type] || 4) - (order[b.meal_type] || 4);
         });
 
-        // Filter active reminders for today (use remind_at field, not reminder_time)
+        // Filter active reminders for today
         const todayReminders = allReminders.filter(reminder => {
           if (reminder.completed) return false;
           const remindAt = reminder.remind_at || reminder.reminder_time;
@@ -215,22 +267,11 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
           return reminderDate === todayStr;
         });
 
-        // Filter overdue reminders
-        const overdueReminders = allReminders.filter(reminder => {
-          if (reminder.completed) return false;
-          const remindAt = reminder.remind_at || reminder.reminder_time;
-          if (!remindAt) return false;
-          const reminderTime = parseISO(remindAt);
-          return isPast(reminderTime) && !isToday(reminderTime);
-        });
-
         setData({
           events: todayEvents,
           tasks: todayTasks,
           meals: todayMeals,
           reminders: todayReminders,
-          overdueTasks,
-          overdueReminders
         });
       } catch (err) {
         logger.error('Error fetching today data:', err, { component: 'TodayAtAGlance', action: 'component_action' });
@@ -281,7 +322,7 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
 
   if (!data) return null;
 
-  const hasOverdue = data.overdueTasks.length > 0 || data.overdueReminders.length > 0;
+  const hasTodayItems = data.events.length > 0 || data.tasks.length > 0 || data.reminders.length > 0 || data.meals.length > 0;
 
   return (
     <motion.div
@@ -321,19 +362,21 @@ export const TodayAtAGlance = memo(function TodayAtAGlance({
         </div>
       </div>
 
-      {/* Content — Overdue items only */}
+      {/* Content — Today's daily summary */}
       <div className="p-4 sm:p-6">
-        {!hasOverdue ? (
+        {hasTodayItems ? (
+          <TodaySection
+            events={data.events}
+            tasks={data.tasks}
+            reminders={data.reminders}
+            meals={data.meals}
+          />
+        ) : (
           <div className="text-center py-4">
             <p className="text-sm text-gray-400">
-              Nothing overdue — you&apos;re all caught up!
+              Nothing scheduled today — enjoy your free time!
             </p>
           </div>
-        ) : (
-          <OverdueSection
-            tasks={data.overdueTasks}
-            reminders={data.overdueReminders}
-          />
         )}
       </div>
     </motion.div>
