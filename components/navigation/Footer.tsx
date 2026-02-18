@@ -30,8 +30,8 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Links - Centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-6">
+          {/* Links */}
+          <div className="flex items-center gap-6">
             <Link
               href="/legal"
               className="text-sm text-gray-400 hover:text-white transition-colors"
@@ -45,9 +45,6 @@ export function Footer() {
               Docs
             </Link>
           </div>
-
-          {/* Spacer for the floating feedback button */}
-          <div className="w-32 sm:w-40" />
         </div>
       </div>
     </footer>

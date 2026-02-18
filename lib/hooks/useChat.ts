@@ -111,6 +111,7 @@ function createInitialState(conversationId: string): ChatState {
     isLoading: false,
     isStreaming: false,
     error: null,
+    lastToolAction: 0,
   };
 }
 
@@ -189,6 +190,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'DONE': {
       const messages = [...state.messages];
       const lastMsg = messages[messages.length - 1];
+      const hadToolCalls = !!(lastMsg?.toolCalls && lastMsg.toolCalls.length > 0);
       if (lastMsg?.role === 'assistant' && lastMsg.isStreaming) {
         messages[messages.length - 1] = {
           ...lastMsg,
@@ -200,6 +202,8 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         messages,
         isLoading: false,
         isStreaming: false,
+        // Signal dashboard refresh only when tools actually executed
+        lastToolAction: hadToolCalls ? Date.now() : state.lastToolAction,
       };
     }
 
@@ -438,6 +442,7 @@ export function useChat(spaceId: string) {
     isLoading: state.isLoading,
     isStreaming: state.isStreaming,
     error: state.error,
+    lastToolAction: state.lastToolAction,
 
     // Actions
     sendMessage,

@@ -21,7 +21,7 @@ export function DesktopChatPanel() {
   if (!isDesktop || !ctx?.enabled || !ctx.spaceId) return null;
 
   return (
-    <aside className="hidden lg:block fixed top-[80px] right-3 bottom-3 w-[320px] z-30">
+    <aside className="hidden lg:block sticky top-0 self-start w-[400px] h-[calc(100dvh-80px)] flex-shrink-0 p-3 pl-0 z-30">
       <ChatPanel
         spaceId={ctx.spaceId}
         isOpen={true}

@@ -71,6 +71,9 @@ interface ChatContextValue {
 
   // New assistant message handler (for unread tracking)
   handleNewAssistantMessage: () => void;
+
+  /** Timestamp updated whenever an AI tool action completes (for dashboard auto-refresh). */
+  lastToolAction: number;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -189,6 +192,9 @@ export function ChatProvider({ children }: ChatProviderProps) {
 
     // Unread
     handleNewAssistantMessage,
+
+    // Tool action tracking (for dashboard auto-refresh)
+    lastToolAction: chat.lastToolAction,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

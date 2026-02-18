@@ -109,6 +109,8 @@ export interface ChatState {
   isLoading: boolean;
   isStreaming: boolean;
   error: string | null;
+  /** Timestamp updated whenever an AI tool action completes (for dashboard auto-refresh). */
+  lastToolAction: number;
 }
 
 // Space member info passed to AI for context

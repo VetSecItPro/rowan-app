@@ -59,11 +59,7 @@ export default function RestoreAccountPage() {
   useEffect(() => {
     if (authLoading) return;
 
-    if (!user) {
-      // Not logged in - redirect to login
-      router.push('/login');
-      return;
-    }
+    if (!user) return;
 
     // User is logged in, check deletion status
     // eslint-disable-next-line react-hooks/set-state-in-effect -- async status fetch updates component state

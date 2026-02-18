@@ -53,7 +53,9 @@ export function formatDateString(dateString: string, formatStr: string = 'MMM d,
  * formatTimestamp('2025-10-09T14:30:00Z', 'PPp') // "Oct 9, 2025, 9:30 AM" (EST)
  */
 export function formatTimestamp(timestamp: string, formatStr: string): string {
-  return format(new Date(timestamp), formatStr);
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
+  return format(date, formatStr);
 }
 
 /**
@@ -64,7 +66,9 @@ export function formatTimestamp(timestamp: string, formatStr: string): string {
  * @returns Formatted datetime string (e.g., "Oct 9, 2025, 9:30 AM")
  */
 export function formatDateTime(timestamp: string): string {
-  return format(new Date(timestamp), 'PPp');
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
+  return format(date, 'PPp');
 }
 
 /**

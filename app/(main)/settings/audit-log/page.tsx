@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { FeatureLayout } from '@/components/layout/FeatureLayout';
 import { useAuth } from '@/lib/contexts/auth-context';
 import { getUserAuditLog, getUserAuditStats, AuditLogEntry, ActionCategory } from '@/lib/services/audit-log-service';
@@ -54,7 +53,6 @@ const CATEGORY_COLORS: Record<ActionCategory, string> = {
 
 export default function AuditLogPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
   const [stats, setStats] = useState<AuditStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,15 +86,14 @@ export default function AuditLogPage() {
     }
   }, [user]);
 
+  // Auth redirect removed — middleware handles server-side auth protection.
+  // Client-side redirect raced with Supabase session recovery causing loops.
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
+    if (!user) return;
 
     loadAuditLog();
     loadStats();
-  }, [loadAuditLog, loadStats, router, user]);
+  }, [loadAuditLog, loadStats, user]);
 
   const getActionIcon = (action: string) => {
     const Icon = ACTION_ICONS[action] || Activity;

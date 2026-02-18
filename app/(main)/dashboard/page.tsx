@@ -16,10 +16,10 @@ import { WelcomeWidget } from '@/components/dashboard/WelcomeWidget';
 import { TodayAtAGlance } from '@/components/dashboard/TodayAtAGlance';
 import { StatCardGrid } from '@/components/dashboard/StatCardGrid';
 import { CheckInSection } from '@/components/dashboard/CheckInSection';
-import { RewardsSection } from '@/components/dashboard/RewardsSection';
 import { CreateSpaceModal } from '@/components/spaces/CreateSpaceModal';
 import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
 
 // Lazy-load below-fold heavy components
@@ -57,7 +57,18 @@ export default function DashboardPage() {
   }, [hasInviteParam, router]);
 
   const { stats, loading: statsLoading, refreshStats } = useDashboardStats(user, currentSpace, authLoading);
+  const chatCtx = useChatContextSafe();
   const [refreshing, setRefreshing] = useState(false);
+
+  // Auto-refresh dashboard stats when Rowan AI completes a tool action
+  const lastToolAction = chatCtx?.lastToolAction ?? 0;
+  useEffect(() => {
+    if (lastToolAction > 0) {
+      // Short delay to ensure DB transaction is fully committed
+      const timer = setTimeout(() => refreshStats(), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [lastToolAction, refreshStats]);
 
   const handleRefreshCards = async () => {
     setRefreshing(true);
@@ -69,14 +80,11 @@ export default function DashboardPage() {
     }
   };
 
-  // Auth protection — redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, authLoading, router]);
-
-  // Loading state while checking authentication and loading spaces
+  // Auth protection: Middleware handles server-side redirects for unauthenticated users.
+  // The loading guard below prevents rendering any dashboard content without a user.
+  // A client-side router.push('/login') was removed here because it raced with
+  // Supabase's session recovery (_recoverAndRefresh), causing redirect loops when
+  // the auth token in localStorage was briefly unavailable during hydration.
   if (authLoading || spacesLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
@@ -144,8 +152,6 @@ export default function DashboardPage() {
               {/* Daily Check-In & Activity Feed */}
               {spaceId && <CheckInSection userId={user.id} spaceId={spaceId} />}
 
-              {/* Rewards Section — Points & Leaderboard */}
-              {spaceId && <RewardsSection userId={user.id} spaceId={spaceId} />}
             </div>
           </div>
 
