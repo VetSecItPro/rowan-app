@@ -496,6 +496,7 @@ export const reminderNotificationsService = {
   async getPreferences(userId: string): Promise<NotificationPreferences | null> {
     const supabase = createClient();
 
+    // nosemgrep: supabase-missing-space-id-filter — user-scoped preferences, filtered by user_id
     const query = supabase
       .from('user_notification_preferences')
       .select('id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone, timezone, created_at, updated_at')
@@ -532,7 +533,7 @@ export const reminderNotificationsService = {
     const existing = await this.getPreferences(userId);
 
     if (existing) {
-      // Update existing preferences
+      // nosemgrep: supabase-missing-space-id-filter — update scoped by .eq('id', existing.id)
       const { data, error } = await supabase
         .from('user_notification_preferences')
         .update({
@@ -550,7 +551,7 @@ export const reminderNotificationsService = {
 
       return data;
     } else {
-      // Create new preferences
+      // nosemgrep: supabase-missing-space-id-filter — space_id included in insert payload
       const { data, error } = await supabase
         .from('user_notification_preferences')
         .insert({
