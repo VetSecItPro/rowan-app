@@ -228,7 +228,7 @@ async function tryUiLogin(
   }
 }
 
-// Payment test cards (Polar uses Stripe under the hood)
+// Payment test cards (standard test card numbers)
 export const TEST_CARDS = {
   success: '4242424242424242',
   declined: '4000000000000002',

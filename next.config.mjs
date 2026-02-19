@@ -223,9 +223,13 @@ const sentryWebpackPluginOptions = {
       enabled: true,
     },
 
-    // Disable automatic instrumentation of error pages to prevent Next.js 15 Html component issues
+    // Disable ALL automatic page/route instrumentation — this project is App Router only.
+    // Sentry's auto-instrumentation generates Pages Router files (_document.js, _app.js, _error.js)
+    // that reference missing webpack chunks, crashing the build during "Collecting page data".
     autoInstrumentServerFunctions: false,
     autoInstrumentMiddleware: false,
+    autoInstrumentAppDirectory: false,
+    excludeServerRoutes: [/.*/],
 
     // Tree-shake Sentry logger statements to reduce bundle size
     treeshake: {

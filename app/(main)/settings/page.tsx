@@ -95,6 +95,7 @@ export default function SettingsPage() {
   const [showDeleteSpaceModal, setShowDeleteSpaceModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [invitationRefreshKey, setInvitationRefreshKey] = useState(0);
 
   // Update URL when tab changes
   useEffect(() => {
@@ -187,6 +188,7 @@ export default function SettingsPage() {
                         onShowDeleteSpaceModal={handleShowDeleteSpaceModal}
                         onShowExportModal={handleShowExportModal}
                         onShowDeleteAccountModal={handleShowDeleteAccountModal}
+                        invitationRefreshKey={invitationRefreshKey}
                       />
                     )}
                     {activeTab === 'subscription' && <SubscriptionSettings />}
@@ -249,6 +251,7 @@ export default function SettingsPage() {
         <InvitePartnerModal
           isOpen={showInviteModal}
           onClose={handleInviteModalClose}
+          onInviteSent={() => setInvitationRefreshKey(k => k + 1)}
           spaceId={spaceId}
           spaceName={currentSpace.name}
         />

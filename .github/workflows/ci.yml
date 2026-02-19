@@ -30,7 +30,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
-        continue-on-error: true
       - run: pnpm type-check
 
   # ─── Security scanning ───
@@ -48,7 +47,6 @@ jobs:
 
       - name: Dependency audit
         run: pnpm audit --audit-level=high
-        continue-on-error: true
 
       - name: Secret pattern scan
         run: |
@@ -69,7 +67,6 @@ jobs:
           config: >-
             p/owasp-top-ten
             p/nextjs
-        continue-on-error: true
 
   # ─── Production build + bundle analysis ───
   build:

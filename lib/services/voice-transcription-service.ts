@@ -77,7 +77,7 @@ export const voiceTranscriptionService = {
 
     const { data, error } = await supabase
       .from('voice_transcriptions')
-      .select('transcription, confidence, language, duration, wordCount, keywords')
+      .select('transcription, confidence, language, audio_duration, word_count, keywords')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -87,7 +87,14 @@ export const voiceTranscriptionService = {
       throw new Error('Failed to fetch transcription history');
     }
 
-    return data || [];
+    return (data || []).map(row => ({
+      transcription: row.transcription,
+      confidence: row.confidence,
+      language: row.language,
+      duration: row.audio_duration,
+      wordCount: row.word_count,
+      keywords: row.keywords,
+    }));
   },
 
   /**
@@ -98,7 +105,7 @@ export const voiceTranscriptionService = {
 
     const { data, error } = await supabase
       .from('voice_transcriptions')
-      .select('transcription, confidence, language, duration, wordCount, keywords')
+      .select('transcription, confidence, language, audio_duration, word_count, keywords')
       .eq('user_id', userId)
       .textSearch('transcription', query)
       .order('created_at', { ascending: false });
@@ -108,7 +115,14 @@ export const voiceTranscriptionService = {
       throw new Error('Failed to search transcriptions');
     }
 
-    return data || [];
+    return (data || []).map(row => ({
+      transcription: row.transcription,
+      confidence: row.confidence,
+      language: row.language,
+      duration: row.audio_duration,
+      wordCount: row.word_count,
+      keywords: row.keywords,
+    }));
   },
 
   /**

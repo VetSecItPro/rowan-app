@@ -53,7 +53,7 @@ export default function ShoppingPage() {
 
   // ─── Destructure for clean JSX access ──────────────────────────────────────
   const {
-    currentSpace, lists, stats, loading, refetchLists,
+    currentSpace, lists: _lists, stats, loading, refetchLists,
     searchQuery, isSearchTyping, statusFilter, timeFilter, filteredLists,
   } = data;
 
