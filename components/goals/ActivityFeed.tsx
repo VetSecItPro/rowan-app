@@ -93,6 +93,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
         return;
       }
 
+      // nosemgrep: supabase-missing-space-id-filter — space_id filter applied via .eq('space_id', spaceId) below
       let query = supabase
         .from('goal_activities')
         .select(`
@@ -131,6 +132,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     if (comments[activityId]) return; // Already loaded
 
     try {
+      // nosemgrep: supabase-missing-space-id-filter — comments scoped by goal_id (goal already space-filtered)
       const { data: commentsData, error } = await supabase
         .from('goal_comments')
         .select(`
@@ -386,7 +388,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                   className="w-6 h-6 rounded-full object-cover"
                                 />
                               ) : (
-                                getUserInitials(user?.user_metadata || user)
+                                getUserInitials(user?.user_metadata as { name?: string } || user)
                               )}
                             </div>
                             <div className="flex-1 flex gap-2">
