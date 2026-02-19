@@ -75,6 +75,7 @@ export const voiceTranscriptionService = {
   async getTranscriptionHistory(userId: string, limit: number = 50): Promise<VoiceTranscriptionResult[]> {
     const supabase = createClient();
 
+    // nosemgrep: supabase-missing-space-id-filter — voice_transcriptions is user-scoped (no space_id column)
     const { data, error } = await supabase
       .from('voice_transcriptions')
       .select('transcription, confidence, language, audio_duration, word_count, keywords')
@@ -103,6 +104,7 @@ export const voiceTranscriptionService = {
   async searchTranscriptions(userId: string, query: string): Promise<VoiceTranscriptionResult[]> {
     const supabase = createClient();
 
+    // nosemgrep: supabase-missing-space-id-filter — voice_transcriptions is user-scoped (no space_id column)
     const { data, error } = await supabase
       .from('voice_transcriptions')
       .select('transcription, confidence, language, audio_duration, word_count, keywords')

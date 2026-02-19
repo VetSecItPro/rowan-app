@@ -111,6 +111,7 @@ export async function getMonthVariance(spaceId: string, date: Date): Promise<Mon
 
   // Get all budget categories for the space
   // budget_categories stores per-category allocations (category_name, allocated_amount)
+  // nosemgrep: supabase-missing-space-id-filter — space_id filter is on next line
   const { data: budgetCategories, error } = await supabase
     .from('budget_categories')
     .select('id, space_id, category_name, allocated_amount')
