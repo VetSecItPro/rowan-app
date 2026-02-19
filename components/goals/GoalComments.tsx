@@ -190,7 +190,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
           <Avatar className="h-8 w-8">
             <AvatarImage src={user?.user_metadata?.avatar_url} />
             <AvatarFallback>
-              {user?.user_metadata?.full_name?.split(' ').map((n: string) => n[0]).join('') ||
+              {user?.user_metadata?.name?.split(' ').map((n: string) => n[0]).join('') ||
                user?.email?.[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -236,7 +236,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={comment.user?.avatar_url} />
                       <AvatarFallback>
-                        {comment.user?.full_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                        {comment.user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                       </AvatarFallback>
                     </Avatar>
 
@@ -245,7 +245,7 @@ export function GoalComments({ goalId, className }: GoalCommentsProps) {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium">
-                              {comment.user?.full_name}
+                              {comment.user?.name}
                             </p>
                             <span className="text-xs text-gray-400">
                               {formatDistanceToNow(new Date(comment.created_at))} ago

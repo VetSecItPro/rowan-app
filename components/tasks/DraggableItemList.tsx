@@ -97,16 +97,14 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
 
   const isOverdue = item.due_date && new Date(item.due_date) < new Date() && item.status !== 'completed';
 
-  // Handle status rotation - 5-step cycle
+  // Handle status rotation - 4-step cycle
   const handleStatusClick = () => {
-    let newStatus: 'pending' | 'in-progress' | 'blocked' | 'on-hold' | 'completed' = 'pending';
+    let newStatus: 'pending' | 'in-progress' | 'blocked' | 'completed' = 'pending';
     if (item.status === 'pending') {
       newStatus = 'in-progress';
     } else if (item.status === 'in-progress') {
       newStatus = 'blocked';
     } else if (item.status === 'blocked') {
-      newStatus = 'on-hold';
-    } else if (item.status === 'on-hold') {
       newStatus = 'completed';
     } else if (item.status === 'completed') {
       newStatus = 'pending';
@@ -121,7 +119,7 @@ function SortableItem({ item, onStatusChange, onEdit, onDelete, onViewDetails }:
       return 'bg-amber-500 border-2 border-amber-500 hover:bg-amber-600';
     } else if (item.status === 'blocked') {
       return 'bg-red-500 border-2 border-red-500 hover:bg-red-600';
-    } else if (item.status === 'on-hold') {
+    } else if (item.status === 'on-hold' || item.status === 'on_hold') {
       return 'bg-purple-500 border-2 border-purple-500 hover:bg-purple-600';
     } else {
       return 'border-2 border-gray-600 bg-transparent hover:border-amber-400';

@@ -329,7 +329,7 @@ function main() {
   // Process in order of priority
   const directories = [
     'middleware.ts',
-    'lib/stripe',
+    'lib/polar',
     'lib/middleware',
     'app/api',
     'lib/services',

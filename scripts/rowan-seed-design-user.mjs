@@ -49,8 +49,8 @@ const DESIGN_USER = {
     tier: 'pro',
     status: 'active',
     period: 'monthly',
-    stripe_customer_id: 'cus_design_audit_001',
-    stripe_subscription_id: 'sub_design_audit_001'
+    polar_customer_id: 'cus_design_audit_001',
+    polar_subscription_id: 'sub_design_audit_001'
   }
 };
 
@@ -228,8 +228,8 @@ async function createSubscription(userId) {
     tier: DESIGN_USER.subscription.tier,
     status: DESIGN_USER.subscription.status,
     period: DESIGN_USER.subscription.period,
-    stripe_customer_id: DESIGN_USER.subscription.stripe_customer_id,
-    stripe_subscription_id: DESIGN_USER.subscription.stripe_subscription_id,
+    polar_customer_id: DESIGN_USER.subscription.polar_customer_id,
+    polar_subscription_id: DESIGN_USER.subscription.polar_subscription_id,
     subscription_started_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     subscription_ends_at: new Date(Date.now() + 335 * 24 * 60 * 60 * 1000).toISOString()
   };

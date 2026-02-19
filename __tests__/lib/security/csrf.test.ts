@@ -60,7 +60,6 @@ describe('requiresCsrfProtection', () => {
 describe('isCsrfExempt', () => {
   it('should exempt webhook routes', () => {
     expect(isCsrfExempt('/api/webhooks/polar')).toBe(true);
-    expect(isCsrfExempt('/api/webhooks/stripe')).toBe(true);
   });
 
   it('should exempt cron routes', () => {

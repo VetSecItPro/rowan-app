@@ -43,6 +43,7 @@ interface ProfileTabProps {
   onShowDeleteSpaceModal: () => void;
   onShowExportModal: () => void;
   onShowDeleteAccountModal: () => void;
+  invitationRefreshKey?: number;
 }
 
 /** Renders the profile settings tab with avatar, name, and bio editing. */
@@ -52,6 +53,7 @@ export const ProfileTab = memo(function ProfileTab({
   onShowDeleteSpaceModal,
   onShowExportModal,
   onShowDeleteAccountModal,
+  invitationRefreshKey,
 }: ProfileTabProps) {
   const { user, currentSpace, spaces, switchSpace, refreshSpaces, refreshProfile } = useAuthWithSpaces();
   const spaceId = currentSpace?.id;
@@ -117,6 +119,13 @@ export const ProfileTab = memo(function ProfileTab({
       Promise.all([fetchSpaceMembers(), fetchPendingInvitations()]);
     }
   }, [spaceId, fetchSpaceMembers, fetchPendingInvitations]);
+
+  // Refetch pending invitations when a new invitation is sent
+  useEffect(() => {
+    if (invitationRefreshKey && invitationRefreshKey > 0) {
+      fetchPendingInvitations();
+    }
+  }, [invitationRefreshKey, fetchPendingInvitations]);
 
   const validateProfileImage = (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {

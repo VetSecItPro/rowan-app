@@ -197,3 +197,6 @@ session-state-screenshot.png
 
 # Debug API routes (never ship)
 app/api/debug/
+
+# Screenshots (temporary)
+household-balance-*.png

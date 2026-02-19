@@ -75,9 +75,10 @@ export const voiceTranscriptionService = {
   async getTranscriptionHistory(userId: string, limit: number = 50): Promise<VoiceTranscriptionResult[]> {
     const supabase = createClient();
 
+    // nosemgrep: supabase-missing-space-id-filter — voice_transcriptions is user-scoped (no space_id column)
     const { data, error } = await supabase
       .from('voice_transcriptions')
-      .select('transcription, confidence, language, duration, wordCount, keywords')
+      .select('transcription, confidence, language, audio_duration, word_count, keywords')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -87,7 +88,14 @@ export const voiceTranscriptionService = {
       throw new Error('Failed to fetch transcription history');
     }
 
-    return data || [];
+    return (data || []).map((row: { transcription: string; confidence: number; language: string; audio_duration: number; word_count: number; keywords: string[] }) => ({
+      transcription: row.transcription,
+      confidence: row.confidence,
+      language: row.language,
+      duration: row.audio_duration,
+      wordCount: row.word_count,
+      keywords: row.keywords,
+    }));
   },
 
   /**
@@ -96,9 +104,10 @@ export const voiceTranscriptionService = {
   async searchTranscriptions(userId: string, query: string): Promise<VoiceTranscriptionResult[]> {
     const supabase = createClient();
 
+    // nosemgrep: supabase-missing-space-id-filter — voice_transcriptions is user-scoped (no space_id column)
     const { data, error } = await supabase
       .from('voice_transcriptions')
-      .select('transcription, confidence, language, duration, wordCount, keywords')
+      .select('transcription, confidence, language, audio_duration, word_count, keywords')
       .eq('user_id', userId)
       .textSearch('transcription', query)
       .order('created_at', { ascending: false });
@@ -108,7 +117,14 @@ export const voiceTranscriptionService = {
       throw new Error('Failed to search transcriptions');
     }
 
-    return data || [];
+    return (data || []).map((row: { transcription: string; confidence: number; language: string; audio_duration: number; word_count: number; keywords: string[] }) => ({
+      transcription: row.transcription,
+      confidence: row.confidence,
+      language: row.language,
+      duration: row.audio_duration,
+      wordCount: row.word_count,
+      keywords: row.keywords,
+    }));
   },
 
   /**

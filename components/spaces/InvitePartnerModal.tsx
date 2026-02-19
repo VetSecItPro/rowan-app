@@ -10,12 +10,13 @@ import { Modal } from '@/components/ui/Modal';
 interface InvitePartnerModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onInviteSent?: () => void;
   spaceId: string;
   spaceName: string;
 }
 
 /** Renders a modal for inviting a partner to join the space via email. */
-export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: InvitePartnerModalProps) {
+export function InvitePartnerModal({ isOpen, onClose, onInviteSent, spaceId, spaceName }: InvitePartnerModalProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'member' | 'admin'>('member');
   const [loading, setLoading] = useState(false);
@@ -78,6 +79,7 @@ export function InvitePartnerModal({ isOpen, onClose, spaceId, spaceName }: Invi
         });
       }
       setInvitationUrl(result.data.invitation_url);
+      onInviteSent?.();
     } catch (error) {
       logger.error('Error sending invitation:', error, { component: 'InvitePartnerModal', action: 'component_action' });
       toast.error(error instanceof Error ? error.message : 'Failed to send invitation');

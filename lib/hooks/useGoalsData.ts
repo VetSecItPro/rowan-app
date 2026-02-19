@@ -171,9 +171,9 @@ export function useGoalsData(): UseGoalsDataReturn {
   }, [milestones, searchQuery]);
 
   const stats = useMemo<GoalsStats>(() => {
-    const active = goals.filter(g => g.status === 'active').length;
+    const active = goals.filter(g => g.status === 'active' || g.status === 'in_progress').length;
     const completed = goals.filter(g => g.status === 'completed').length;
-    const inProgress = goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length;
+    const inProgress = goals.filter(g => (g.status === 'active' || g.status === 'in_progress') && g.progress > 0 && g.progress < 100).length;
     const milestonesReached = milestones.filter(m => m.completed).length;
 
     return { active, completed, inProgress, milestonesReached };

@@ -111,7 +111,7 @@ export default function LoginPage() {
     };
 
     handleAuthCallback();
-  }, []);
+  }, [router]);
 
   // Smooth fade-in animation on mount
   useEffect(() => {

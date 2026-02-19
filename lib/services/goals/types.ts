@@ -84,7 +84,7 @@ export interface Goal {
   title: string;
   description?: string;
   category?: string;
-  status: 'active' | 'completed' | 'paused' | 'cancelled';
+  status: 'active' | 'in_progress' | 'completed' | 'paused' | 'cancelled';
   progress: number;
   visibility?: 'private' | 'shared';
   template_id?: string;
@@ -112,7 +112,7 @@ export interface CreateGoalInput {
   title: string;
   description?: string;
   category?: string;
-  status?: 'active' | 'completed' | 'paused' | 'cancelled';
+  status?: 'active' | 'in_progress' | 'completed' | 'paused' | 'cancelled';
   progress?: number;
   visibility?: 'private' | 'shared';
   template_id?: string;
@@ -262,7 +262,7 @@ export interface GoalActivity {
   // Populated relations
   user?: {
     id: string;
-    full_name: string;
+    name: string;
     avatar_url?: string;
   };
   goal?: Goal;
@@ -285,7 +285,7 @@ export interface GoalComment {
   // Populated relations
   user?: {
     id: string;
-    full_name: string;
+    name: string;
     avatar_url?: string;
   };
   replies?: GoalComment[];

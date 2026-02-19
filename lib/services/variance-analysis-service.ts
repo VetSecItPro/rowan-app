@@ -108,18 +108,18 @@ export async function getMonthVariance(spaceId: string, date: Date): Promise<Mon
 
   const monthStart = startOfMonth(date);
   const monthEnd = endOfMonth(date);
-  const monthKey = format(date, 'yyyy-MM');
 
-  // Get all budgets for the month
-  const { data: budgets, error } = await supabase
-    .from('budgets')
-    .select('id, space_id, category, amount, month')
-    .eq('space_id', spaceId)
-    .eq('month', monthKey);
+  // Get all budget categories for the space
+  // budget_categories stores per-category allocations (category_name, allocated_amount)
+  // nosemgrep: supabase-missing-space-id-filter — space_id filter is on next line
+  const { data: budgetCategories, error } = await supabase
+    .from('budget_categories')
+    .select('id, space_id, category_name, allocated_amount')
+    .eq('space_id', spaceId);
 
   if (error) throw error;
 
-  if (!budgets || budgets.length === 0) {
+  if (!budgetCategories || budgetCategories.length === 0) {
     return {
       month: format(date, 'MMMM yyyy'),
       total_budgeted: 0,
@@ -132,11 +132,11 @@ export async function getMonthVariance(spaceId: string, date: Date): Promise<Mon
 
   // Calculate variance for each category
   const categoryVariances = await Promise.all(
-    budgets.map((budget: { category: string; amount: number }) =>
+    budgetCategories.map((bc: { category_name: string; allocated_amount: number }) =>
       calculateCategoryVariance(
         spaceId,
-        budget.category,
-        budget.amount,
+        bc.category_name,
+        bc.allocated_amount,
         monthStart,
         monthEnd
       )

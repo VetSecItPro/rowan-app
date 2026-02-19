@@ -52,6 +52,8 @@ interface NotificationPreferences {
   digest_enabled: boolean;
   digest_time: string | null;
   digest_timezone: string;
+  // General timezone
+  timezone: string;
 }
 
 const defaultPreferences: Omit<NotificationPreferences, 'id' | 'user_id' | 'space_id'> = {
@@ -71,7 +73,8 @@ const defaultPreferences: Omit<NotificationPreferences, 'id' | 'user_id' | 'spac
   quiet_hours_end: null,
   digest_enabled: false,
   digest_time: '07:00',
-  digest_timezone: 'America/Chicago'
+  digest_timezone: 'America/Chicago',
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Chicago'
 };
 
 // Toggle component
@@ -271,11 +274,17 @@ export const NotificationSettings = memo(function NotificationSettings() {
         setError(null);
         const supabase = createClient();
 
-        const { data, error: fetchError } = await supabase
+        // nosemgrep: supabase-missing-space-id-filter — space_id filter applied conditionally below
+        let query = supabase
           .from('user_notification_preferences')
-          .select('id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone')
-          .eq('user_id', user.id)
-          .maybeSingle();
+          .select('id, user_id, space_id, email_enabled, email_due_reminders, email_assignments, email_mentions, email_comments, in_app_enabled, in_app_due_reminders, in_app_assignments, in_app_mentions, in_app_comments, notification_frequency, quiet_hours_enabled, quiet_hours_start, quiet_hours_end, digest_enabled, digest_time, digest_timezone, timezone')
+          .eq('user_id', user.id);
+
+        if (currentSpace?.id) {
+          query = query.eq('space_id', currentSpace.id);
+        }
+
+        const { data, error: fetchError } = await query.maybeSingle();
 
         if (fetchError) throw fetchError;
 
@@ -289,6 +298,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
             ...defaultPreferences
           };
 
+          // nosemgrep: supabase-missing-space-id-filter — space_id included in newPrefs object above
           const { data: created, error: createError } = await supabase
             .from('user_notification_preferences')
             .insert(newPrefs)
@@ -403,6 +413,7 @@ export const NotificationSettings = memo(function NotificationSettings() {
       setError(null);
       const supabase = createClient();
 
+      // nosemgrep: supabase-missing-space-id-filter — update scoped by .eq('id', preferences.id) below
       const { error: updateError } = await supabase
         .from('user_notification_preferences')
         .update({
