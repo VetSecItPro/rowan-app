@@ -1,0 +1,2 @@
+-- Already applied to production DB. Stub file for migration tracking.
+-- Applied via Supabase MCP/Dashboard before local tracking was established.
