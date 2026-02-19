@@ -36,16 +36,24 @@ jobs:
         run: |
           npx supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_ID }}
 
-          # Mark ALL existing migration files as "applied" so supabase db push
-          # only applies genuinely NEW migrations (ones not yet in the database).
-          # Most migrations predate schema_migrations tracking and were applied
-          # directly via MCP or the Supabase dashboard.
-          ALL_VERSIONS=$(ls supabase/migrations/*.sql \
+          # Mark ALL local migration files as "applied" so supabase db push
+          # only applies genuinely NEW migrations.
+          LOCAL_VERSIONS=$(ls supabase/migrations/*.sql \
             | sed 's|.*/||; s|_.*||' \
             | sort -u \
             | tr '\n' ' ')
-          echo "Repairing ${ALL_VERSIONS// / } as applied..."
-          npx supabase migration repair --status applied $ALL_VERSIONS || true
+          echo "Marking local versions as applied..."
+          npx supabase migration repair --status applied $LOCAL_VERSIONS || true
+
+          # Also handle any remote-only versions (applied via MCP/Dashboard)
+          # by marking them as reverted so db push ignores them
+          REMOTE_ONLY=$(npx supabase db push --linked --dry-run 2>&1 \
+            | grep -oE 'repair --status reverted [0-9 ]+' \
+            | sed 's/repair --status reverted //' || true)
+          if [ -n "$REMOTE_ONLY" ]; then
+            echo "Marking remote-only versions as reverted: $REMOTE_ONLY"
+            npx supabase migration repair --status reverted $REMOTE_ONLY || true
+          fi
 
           npx supabase db push --linked
         env:
