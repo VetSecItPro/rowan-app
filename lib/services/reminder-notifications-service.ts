@@ -241,7 +241,7 @@ export const reminderNotificationsService = {
 
     // Handle email and push notifications based on frequency and quiet hours
     if (prefs) {
-      const digestFrequency = prefs.digest_frequency || 'realtime';
+      const digestFrequency = prefs.notification_frequency || 'realtime';
       const inQuietHours = await this.isInQuietHours(validated.user_id, spaceId);
 
       // Map digest frequency to notification frequency

@@ -26,9 +26,9 @@ type ActivityData = Partial<{
 
 type AuthUser = {
   email?: string | null;
-  full_name?: string | null;
+  name?: string | null;
   user_metadata?: {
-    full_name?: string | null;
+    name?: string | null;
   };
 };
 
@@ -97,7 +97,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
         .from('goal_activities')
         .select(`
           *,
-          users!goal_activities_user_id_fkey(id, email, full_name, avatar_url),
+          users!goal_activities_user_id_fkey(id, email, name, avatar_url),
           goals!goal_activities_goal_id_fkey(id, title),
           goal_milestones!goal_activities_milestone_id_fkey(id, title),
           goal_check_ins!goal_activities_check_in_id_fkey(id, progress_percentage, mood)
@@ -135,7 +135,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
         .from('goal_comments')
         .select(`
           *,
-          users!goal_comments_user_id_fkey(id, email, full_name, avatar_url)
+          users!goal_comments_user_id_fkey(id, email, name, avatar_url)
         `)
         .eq('goal_id', activityId) // This might need adjustment based on your schema
         .order('created_at', { ascending: true });
@@ -239,8 +239,8 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
     return metadata;
   };
 
-  const getUserInitials = (user: AuthUser | null) => {
-    const fullName = user?.full_name || user?.user_metadata?.full_name;
+  const getUserInitials = (user: { name?: string; email?: string; user_metadata?: { name?: string } } | null) => {
+    const fullName = user?.name || user?.user_metadata?.name;
     if (fullName) {
       return fullName.split(' ').map((n) => n[0]).join('');
     }
@@ -290,7 +290,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                       {activity.user?.avatar_url ? (
                         <Image
                           src={activity.user.avatar_url}
-                          alt={activity.user?.full_name || 'User avatar'}
+                          alt={activity.user?.name || 'User avatar'}
                           width={32}
                           height={32}
                           className="w-8 h-8 rounded-full object-cover"
@@ -305,7 +305,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                         {getActivityIcon(activity.activity_type)}
                         <p className="text-sm">
                           <span className="font-medium">
-                            {activity.user?.full_name}
+                            {activity.user?.name}
                           </span>
                           {' '}
                           <span className="text-gray-400">
@@ -339,7 +339,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                                 {comment.user?.avatar_url ? (
                                   <Image
                                     src={comment.user.avatar_url}
-                                    alt={comment.user?.full_name || 'User avatar'}
+                                    alt={comment.user?.name || 'User avatar'}
                                     width={24}
                                     height={24}
                                     className="w-6 h-6 rounded-full object-cover"
@@ -351,7 +351,7 @@ export function ActivityFeed({ spaceId, goalId, className = '' }: ActivityFeedPr
                               <div className="flex-1">
                                 <div className="bg-gray-800 rounded-lg px-3 py-2">
                                   <p className="text-xs font-medium mb-1">
-                                    {comment.user?.full_name}
+                                    {comment.user?.name}
                                   </p>
                                   <p className="text-sm">{comment.content}</p>
                                 </div>

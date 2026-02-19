@@ -88,7 +88,7 @@ export const voiceTranscriptionService = {
       throw new Error('Failed to fetch transcription history');
     }
 
-    return (data || []).map(row => ({
+    return (data || []).map((row: { transcription: string; confidence: number; language: string; audio_duration: number; word_count: number; keywords: string[] }) => ({
       transcription: row.transcription,
       confidence: row.confidence,
       language: row.language,
@@ -117,7 +117,7 @@ export const voiceTranscriptionService = {
       throw new Error('Failed to search transcriptions');
     }
 
-    return (data || []).map(row => ({
+    return (data || []).map((row: { transcription: string; confidence: number; language: string; audio_duration: number; word_count: number; keywords: string[] }) => ({
       transcription: row.transcription,
       confidence: row.confidence,
       language: row.language,
