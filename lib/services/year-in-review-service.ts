@@ -190,61 +190,63 @@ export class YearInReviewService {
     yearStart: Date,
     yearEnd: Date
   ): Promise<OverviewStats> {
-    // Get completed tasks count
-    const { count: tasksCompleted } = await supabase
-      .from('tasks')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .eq('status', 'completed')
-      .gte('completed_at', yearStart.toISOString())
-      .lte('completed_at', yearEnd.toISOString());
+    // Run all independent queries in parallel
+    const [tasksResult, goalsResult, expensesResult, activeDaysResult, totalGoalsResult] = await Promise.all([
+      // Get completed tasks count
+      supabase
+        .from('tasks')
+        .select('id', { count: 'exact' })
+        .eq('space_id', spaceId)
+        .eq('status', 'completed')
+        .gte('completed_at', yearStart.toISOString())
+        .lte('completed_at', yearEnd.toISOString()),
+      // Get achieved goals count
+      supabase
+        .from('goals')
+        .select('id', { count: 'exact' })
+        .eq('space_id', spaceId)
+        .eq('status', 'completed')
+        .gte('completed_at', yearStart.toISOString())
+        .lte('completed_at', yearEnd.toISOString()),
+      // Get total expenses
+      supabase
+        .from('expenses')
+        .select('amount')
+        .eq('space_id', spaceId)
+        .gte('created_at', yearStart.toISOString())
+        .lte('created_at', yearEnd.toISOString()),
+      // Calculate active days (days with any activity)
+      supabase
+        .from('tasks')
+        .select('created_at')
+        .eq('space_id', spaceId)
+        .gte('created_at', yearStart.toISOString())
+        .lte('created_at', yearEnd.toISOString()),
+      // Calculate goal completion rate
+      supabase
+        .from('goals')
+        .select('id', { count: 'exact' })
+        .eq('space_id', spaceId)
+        .gte('created_at', yearStart.toISOString())
+        .lte('created_at', yearEnd.toISOString()),
+    ]);
 
-    // Get achieved goals count
-    const { count: goalsAchieved } = await supabase
-      .from('goals')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .eq('status', 'completed')
-      .gte('completed_at', yearStart.toISOString())
-      .lte('completed_at', yearEnd.toISOString());
-
-    // Get total expenses
-    const { data: expensesData } = await supabase
-      .from('expenses')
-      .select('amount')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-
-    const totalExpenses = expensesData?.reduce((sum: number, expense: Expense) => sum + Number(expense.amount), 0) || 0;
+    const tasksCompleted = tasksResult.count;
+    const goalsAchieved = goalsResult.count;
+    const totalExpenses = expensesResult.data?.reduce((sum: number, expense: Expense) => sum + Number(expense.amount), 0) || 0;
 
     // Get badges earned (simplified - would need actual badges table)
     const badgesEarned = Math.floor((tasksCompleted || 0) / 10); // Placeholder logic
 
-    // Calculate active days (days with any activity)
-    const { data: activeDaysData } = await supabase
-      .from('tasks')
-      .select('created_at')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-
     const uniqueDays = new Set(
-      activeDaysData?.map((task: Task) => format(new Date(task.created_at), 'yyyy-MM-dd'))
+      activeDaysResult.data?.map((task: Task) => format(new Date(task.created_at), 'yyyy-MM-dd'))
     );
     const activeDays = uniqueDays.size;
 
     const daysInYear = Math.ceil((yearEnd.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
     const averageTasksPerDay = (tasksCompleted || 0) / daysInYear;
 
-    // Calculate goal completion rate
-    const { count: totalGoals } = await supabase
-      .from('goals')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-
+    const totalGoals = totalGoalsResult.count;
     const goalCompletionRate = totalGoals ? ((goalsAchieved || 0) / totalGoals) * 100 : 0;
 
     return {

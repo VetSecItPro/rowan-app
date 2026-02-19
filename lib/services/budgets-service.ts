@@ -288,23 +288,30 @@ export const projectsService = {
   async getBudgetStats(spaceId: string, supabaseClient?: SupabaseClient): Promise<BudgetStats> {
     try {
       const supabase = getSupabaseClient(supabaseClient);
-      const [budget, expenses] = await Promise.all([
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+
+      const [budget, monthExpensesResult, pendingResult] = await Promise.all([
         this.getBudget(spaceId, supabase),
-        this.getExpenses(spaceId, supabase),
+        // Only fetch current month expenses (paid + pending) instead of all expenses
+        supabase
+          .from('expenses')
+          .select('amount, status')
+          .eq('space_id', spaceId)
+          .gte('created_at', monthStart)
+          .in('status', ['paid', 'pending']),
+        // Count pending bills across all time
+        supabase
+          .from('expenses')
+          .select('id', { count: 'exact', head: true })
+          .eq('space_id', spaceId)
+          .eq('status', 'pending'),
       ]);
 
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      // Filter to current month only
-      const thisMonthExpenses = expenses.filter(e =>
-        new Date(e.created_at) >= monthStart
-      );
-
       // Include both paid and pending - pending is committed money
-      const spentThisMonth = thisMonthExpenses
-        .filter(e => e.status === 'paid' || e.status === 'pending')
-        .reduce((sum, e) => sum + e.amount, 0);
+      const spentThisMonth = monthExpensesResult.data?.reduce(
+        (sum: number, e: { amount: number }) => sum + e.amount,
+        0
+      ) || 0;
 
       const monthlyBudget = budget?.monthly_budget || 0;
 
@@ -312,7 +319,7 @@ export const projectsService = {
         monthlyBudget,
         spentThisMonth,
         remaining: monthlyBudget - spentThisMonth, // Can be negative if over budget
-        pendingBills: expenses.filter(e => e.status === 'pending').length,
+        pendingBills: pendingResult.count ?? 0,
       };
     } catch (error) {
       logger.error('getBudgetStats error:', error, { component: 'lib-budgets-service', action: 'service_call' });

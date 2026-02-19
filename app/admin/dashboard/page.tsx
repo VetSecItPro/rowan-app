@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, memo, useCallback, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -28,20 +29,25 @@ import {
   Link as LinkIcon,
   type LucideIcon
 } from 'lucide-react';
-// Import content panels for tabbed management console
-import {
-  UsersPanel,
-  OverviewPanel,
-  GrowthPanel,
-  EngagementPanel,
-  RetentionPanel,
-  RevenuePanel,
-  SystemPanel,
-  AIUsagePanel,
-  AuditTrailPanel,
-  CustomerSuccessPanel,
-  ExecutiveSummaryPanel,
-} from '@/components/admin/panels';
+// Dynamically import content panels — only one shows at a time based on activeTab.
+// ssr: false keeps all panel code (including recharts in AIUsagePanel) out of the
+// initial bundle and loads it on-demand in its own chunk.
+const panelLoader = () => (
+  <div className="flex items-center justify-center py-12">
+    <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+  </div>
+);
+const UsersPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.UsersPanel })), { ssr: false, loading: panelLoader });
+const OverviewPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.OverviewPanel })), { ssr: false, loading: panelLoader });
+const GrowthPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.GrowthPanel })), { ssr: false, loading: panelLoader });
+const EngagementPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.EngagementPanel })), { ssr: false, loading: panelLoader });
+const RetentionPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.RetentionPanel })), { ssr: false, loading: panelLoader });
+const RevenuePanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.RevenuePanel })), { ssr: false, loading: panelLoader });
+const SystemPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.SystemPanel })), { ssr: false, loading: panelLoader });
+const AIUsagePanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.AIUsagePanel })), { ssr: false, loading: panelLoader });
+const AuditTrailPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.AuditTrailPanel })), { ssr: false, loading: panelLoader });
+const CustomerSuccessPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.CustomerSuccessPanel })), { ssr: false, loading: panelLoader });
+const ExecutiveSummaryPanel = dynamic(() => import('@/components/admin/panels').then(m => ({ default: m.ExecutiveSummaryPanel })), { ssr: false, loading: panelLoader });
 import { ComparisonProvider } from '@/components/admin/ComparisonContext';
 import { ComparisonToggle } from '@/components/admin/ComparisonToggle';
 import { DrillDownModal } from '@/components/admin/DrillDownModal';

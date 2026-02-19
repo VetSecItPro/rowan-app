@@ -157,50 +157,70 @@ export async function getUserAuditStats(userId: string): Promise<{
 }> {
   try {
     const supabase = createClient();
-
-    // Get total count
-    const { count: total } = await supabase
-      .from('user_audit_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-
-    // Get count by category
-    const categories: ActionCategory[] = ['data_access', 'account', 'security', 'compliance'];
-    const by_category: Record<ActionCategory, number> = {
-      data_access: 0,
-      account: 0,
-      security: 0,
-      compliance: 0,
-    };
-
-    for (const category of categories) {
-      const { count } = await supabase
-        .from('user_audit_log')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('action_category', category);
-
-      by_category[category] = count || 0;
-    }
-
-    // Get recent actions (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const { count: recent_actions } = await supabase
-      .from('user_audit_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .gte('timestamp', thirtyDaysAgo.toISOString());
+    // Run all 7 queries in parallel instead of sequentially
+    const [
+      totalResult,
+      dataAccessResult,
+      accountResult,
+      securityResult,
+      complianceResult,
+      recentActionsResult,
+      actionsResult,
+    ] = await Promise.all([
+      // Total count
+      supabase
+        .from('user_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId),
+      // Count by category: data_access
+      supabase
+        .from('user_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('action_category', 'data_access'),
+      // Count by category: account
+      supabase
+        .from('user_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('action_category', 'account'),
+      // Count by category: security
+      supabase
+        .from('user_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('action_category', 'security'),
+      // Count by category: compliance
+      supabase
+        .from('user_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('action_category', 'compliance'),
+      // Recent actions (last 30 days)
+      supabase
+        .from('user_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('timestamp', thirtyDaysAgo.toISOString()),
+      // Most common action
+      supabase
+        .from('user_audit_log')
+        .select('action')
+        .eq('user_id', userId),
+    ]);
 
-    // Get most common action
-    const { data: actions } = await supabase
-      .from('user_audit_log')
-      .select('action')
-      .eq('user_id', userId);
+    const by_category: Record<ActionCategory, number> = {
+      data_access: dataAccessResult.count || 0,
+      account: accountResult.count || 0,
+      security: securityResult.count || 0,
+      compliance: complianceResult.count || 0,
+    };
 
     const actionCounts: Record<string, number> = {};
-    (actions || []).forEach((entry: { action: string }) => {
+    (actionsResult.data || []).forEach((entry: { action: string }) => {
       actionCounts[entry.action] = (actionCounts[entry.action] || 0) + 1;
     });
 
@@ -211,9 +231,9 @@ export async function getUserAuditStats(userId: string): Promise<{
     return {
       success: true,
       stats: {
-        total: total || 0,
+        total: totalResult.count || 0,
         by_category,
-        recent_actions: recent_actions || 0,
+        recent_actions: recentActionsResult.count || 0,
         most_common_action,
       },
     };

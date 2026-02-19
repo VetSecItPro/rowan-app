@@ -115,11 +115,11 @@ export async function getBadgeProgress(
   spaceId: string
 ): Promise<Array<AchievementBadge & { progress: BadgeProgress }>> {
   try {
-    // Get all badges
-    const allBadges = await getAllBadges();
-
-    // Get earned badges
-    const earnedBadges = await getUserBadges(userId, spaceId);
+    // Get all badges and earned badges in parallel
+    const [allBadges, earnedBadges] = await Promise.all([
+      getAllBadges(),
+      getUserBadges(userId, spaceId),
+    ]);
     const earnedBadgeIds = new Set(earnedBadges.map((ub) => ub.badge_id));
 
     // Filter to unearn badges and calculate progress
@@ -593,8 +593,10 @@ export async function checkAndAwardBadges(
   spaceId: string
 ): Promise<UserBadge[]> {
   try {
-    const allBadges = await getAllBadges();
-    const earnedBadges = await getUserBadges(userId, spaceId);
+    const [allBadges, earnedBadges] = await Promise.all([
+      getAllBadges(),
+      getUserBadges(userId, spaceId),
+    ]);
     const earnedBadgeIds = new Set(earnedBadges.map((ub) => ub.badge_id));
 
     const newlyEarned: UserBadge[] = [];

@@ -160,8 +160,17 @@ export async function GET(request: NextRequest) {
       query = query.lte('timestamp', validatedParams.endDate);
     }
 
-    // Execute query
-    const { data: logs, error, count } = await query;
+    // Execute main query and summary query in parallel
+    const [logsResult, summaryResult] = await Promise.all([
+      query,
+      supabase
+        .from('monetization_error_summary')
+        .select('error_type, count, first_seen, last_seen')
+        .limit(100),
+    ]);
+
+    const { data: logs, error, count } = logsResult;
+    const { data: errorSummary } = summaryResult;
 
     if (error) {
       logger.error('[ADMIN_LOGS] Query error:', error, { component: 'api-route', action: 'api_request' });
@@ -173,11 +182,6 @@ export async function GET(request: NextRequest) {
 
     // Get error stats from in-memory tracker
     const errorStats = getErrorStats();
-
-    // Get summary stats
-    const { data: errorSummary } = await supabase
-      .from('monetization_error_summary')
-      .select('*');
 
     return NextResponse.json({
       success: true,

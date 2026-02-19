@@ -13,6 +13,10 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
+// ─── Stable Framer Motion Config ────────────────────────────────────────────
+
+const CARD_VIEWPORT = { once: true, amount: 0.2, margin: '-50px' } as const;
+
 // ─── Animation Variants ─────────────────────────────────────────────────────
 
 const mobileCardAnimation = {
@@ -170,7 +174,7 @@ export const StatCard = memo(function StatCard({
       variants={mobileCardAnimation}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.2, margin: '-50px' }}
+      viewport={CARD_VIEWPORT}
       custom={index}
       className="h-full"
     >

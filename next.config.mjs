@@ -35,7 +35,7 @@ const nextConfig = {
     return 'build-' + Date.now();
   },
   // Prevent webpack from bundling packages that need native Node.js fs access
-  serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
+  serverExternalPackages: ['isomorphic-dompurify', 'jsdom', 'openai', '@google/generative-ai', 'ical.js', 'web-push', 'sharp'],
   experimental: {
     // Re-enabled: hang was caused by duplicate node_modules folders, not this feature
     optimizePackageImports: [

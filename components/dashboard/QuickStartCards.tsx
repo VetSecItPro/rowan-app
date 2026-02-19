@@ -59,6 +59,8 @@ const CARDS: QuickStartCard[] = [
   },
 ];
 
+const CONTAINER_VIEWPORT = { once: true, margin: '-40px' } as const;
+
 const containerVariants = {
   hidden: {},
   visible: {
@@ -96,7 +98,7 @@ export function QuickStartCards() {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
+        viewport={CONTAINER_VIEWPORT}
         className="grid grid-cols-1 sm:grid-cols-2 gap-3"
       >
         {CARDS.map((card) => {

@@ -14,6 +14,9 @@ import {
   AlertTriangle,
   Calculator,
 } from 'lucide-react';
+// recharts is acceptable here — this entire panel is lazy-loaded via next/dynamic
+// in app/admin/dashboard/page.tsx (PERF-BUNDLE-003), so recharts ends up in its
+// own async chunk and does not bloat the initial page bundle.
 import {
   LineChart,
   Line,
