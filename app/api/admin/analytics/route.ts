@@ -94,16 +94,13 @@ export async function GET(req: NextRequest) {
         const previousStart = new Date(startDate.getTime() - rangeDays * 24 * 60 * 60 * 1000);
 
         // Fetch comprehensive analytics data in parallel
+        // PERF-DB-006: Removed 4 redundant feature_events queries (device, browser,
+        // top pages, hourly). All breakdowns are derived from the main featureEvents result.
         const [
           launchNotificationsResult,
           usersResult,
-          // Feature events for traffic analytics
           featureEventsResult,
           featureEventsTotalResult,
-          deviceBreakdownResult,
-          browserBreakdownResult,
-          topPagesResult,
-          hourlyActivityResult,
         ] = await Promise.allSettled([
           // Launch notifications over time
           supabaseAdmin
@@ -121,7 +118,7 @@ export async function GET(req: NextRequest) {
             .order('created_at', { ascending: true })
             .limit(10000),
 
-          // Feature events for page view tracking
+          // Feature events for page view tracking + all breakdowns
           supabaseAdmin
             .from('feature_events')
             .select('feature, action, device_type, browser, os, session_id, created_at')
@@ -133,50 +130,15 @@ export async function GET(req: NextRequest) {
           supabaseAdmin
             .from('feature_events')
             .select('*', { count: 'exact', head: true }),
-
-          // Device type breakdown
-          supabaseAdmin
-            .from('feature_events')
-            .select('device_type')
-            .gte('created_at', startDate.toISOString())
-            .not('device_type', 'is', null)
-            .limit(50000),
-
-          // Browser breakdown
-          supabaseAdmin
-            .from('feature_events')
-            .select('browser, os')
-            .gte('created_at', startDate.toISOString())
-            .not('browser', 'is', null)
-            .limit(50000),
-
-          // Top pages (features)
-          supabaseAdmin
-            .from('feature_events')
-            .select('feature')
-            .eq('action', 'page_view')
-            .gte('created_at', startDate.toISOString())
-            .limit(50000),
-
-          // Hourly activity pattern
-          supabaseAdmin
-            .from('feature_events')
-            .select('created_at')
-            .gte('created_at', startDate.toISOString())
-            .limit(50000),
         ]);
 
         // Process results
         const launchNotifications = launchNotificationsResult.status === 'fulfilled' ? (launchNotificationsResult.value.data || []) : [];
         const userRegistrations = usersResult.status === 'fulfilled' ? (usersResult.value.data || []) : [];
 
-        // Process feature events data
+        // Process feature events data — all breakdowns derived from this single query
         const featureEvents = featureEventsResult.status === 'fulfilled' ? (featureEventsResult.value.data || []) : [];
         const totalEventsAllTime = featureEventsTotalResult.status === 'fulfilled' ? (featureEventsTotalResult.value.count || 0) : 0;
-        const deviceEvents = deviceBreakdownResult.status === 'fulfilled' ? (deviceBreakdownResult.value.data || []) : [];
-        const browserEvents = browserBreakdownResult.status === 'fulfilled' ? (browserBreakdownResult.value.data || []) : [];
-        const pageViewEvents = topPagesResult.status === 'fulfilled' ? (topPagesResult.value.data || []) : [];
-        const hourlyEvents = hourlyActivityResult.status === 'fulfilled' ? (hourlyActivityResult.value.data || []) : [];
 
         // Define type for feature events
         type FeatureEvent = {
@@ -195,60 +157,68 @@ export async function GET(req: NextRequest) {
         // For unique users, we count by session since feature_events doesn't have user_id in this query
         const uniqueUsers = uniqueSessions;
 
-        // Device breakdown
+        // Derive device, browser, OS, page, and hourly breakdowns from featureEvents
+        // (PERF-DB-006: single query instead of 4 separate ones)
         const deviceCounts: Record<string, number> = {};
-        deviceEvents.forEach((e: { device_type: string }) => {
-          const device = e.device_type || 'unknown';
-          deviceCounts[device] = (deviceCounts[device] || 0) + 1;
-        });
-        const deviceBreakdown = Object.entries(deviceCounts).map(([device, count]) => ({
-          device: device.charAt(0).toUpperCase() + device.slice(1),
-          count,
-          percentage: deviceEvents.length > 0 ? Math.round((count / deviceEvents.length) * 100) : 0,
-        })).sort((a, b) => b.count - a.count);
-
-        // Browser breakdown
         const browserCounts: Record<string, number> = {};
-        browserEvents.forEach((e: { browser: string }) => {
-          const browser = e.browser || 'unknown';
-          browserCounts[browser] = (browserCounts[browser] || 0) + 1;
-        });
-        const browserBreakdown = Object.entries(browserCounts).map(([browser, count]) => ({
-          browser: browser.charAt(0).toUpperCase() + browser.slice(1),
-          count,
-          percentage: browserEvents.length > 0 ? Math.round((count / browserEvents.length) * 100) : 0,
-        })).sort((a, b) => b.count - a.count);
-
-        // OS breakdown
         const osCounts: Record<string, number> = {};
-        browserEvents.forEach((e: { os: string }) => {
-          const os = e.os || 'unknown';
-          osCounts[os] = (osCounts[os] || 0) + 1;
-        });
-        const osBreakdown = Object.entries(osCounts).map(([os, count]) => ({
-          os: os.charAt(0).toUpperCase() + os.slice(1),
-          count,
-          percentage: browserEvents.length > 0 ? Math.round((count / browserEvents.length) * 100) : 0,
-        })).sort((a, b) => b.count - a.count);
-
-        // Top pages
         const pageCounts: Record<string, number> = {};
-        pageViewEvents.forEach((e: { feature: string }) => {
-          const page = e.feature || 'unknown';
-          pageCounts[page] = (pageCounts[page] || 0) + 1;
-        });
-        const topPages = Object.entries(pageCounts).map(([page, views]) => ({
-          page: page.charAt(0).toUpperCase() + page.slice(1),
-          views,
-          percentage: pageViewEvents.length > 0 ? Math.round((views / pageViewEvents.length) * 100) : 0,
-        })).sort((a, b) => b.views - a.views).slice(0, 10);
-
-        // Hourly activity pattern (0-23 hours)
         const hourlyActivity: number[] = new Array(24).fill(0);
-        hourlyEvents.forEach((e: { created_at: string }) => {
+        let deviceEventsCount = 0;
+        let browserEventsCount = 0;
+        let pageViewEventsCount = 0;
+
+        featureEvents.forEach((e: FeatureEvent) => {
+          // Device breakdown (only for events with device_type)
+          if (e.device_type) {
+            const device = e.device_type;
+            deviceCounts[device] = (deviceCounts[device] || 0) + 1;
+            deviceEventsCount++;
+          }
+
+          // Browser + OS breakdown (only for events with browser)
+          if (e.browser) {
+            browserCounts[e.browser] = (browserCounts[e.browser] || 0) + 1;
+            browserEventsCount++;
+            const os = e.os || 'unknown';
+            osCounts[os] = (osCounts[os] || 0) + 1;
+          }
+
+          // Top pages (page_view actions only)
+          if (e.action === 'page_view') {
+            const page = e.feature || 'unknown';
+            pageCounts[page] = (pageCounts[page] || 0) + 1;
+            pageViewEventsCount++;
+          }
+
+          // Hourly activity
           const hour = new Date(e.created_at).getHours();
           hourlyActivity[hour]++;
         });
+
+        const deviceBreakdown = Object.entries(deviceCounts).map(([device, count]) => ({
+          device: device.charAt(0).toUpperCase() + device.slice(1),
+          count,
+          percentage: deviceEventsCount > 0 ? Math.round((count / deviceEventsCount) * 100) : 0,
+        })).sort((a, b) => b.count - a.count);
+
+        const browserBreakdown = Object.entries(browserCounts).map(([browser, count]) => ({
+          browser: browser.charAt(0).toUpperCase() + browser.slice(1),
+          count,
+          percentage: browserEventsCount > 0 ? Math.round((count / browserEventsCount) * 100) : 0,
+        })).sort((a, b) => b.count - a.count);
+
+        const osBreakdown = Object.entries(osCounts).map(([os, count]) => ({
+          os: os.charAt(0).toUpperCase() + os.slice(1),
+          count,
+          percentage: browserEventsCount > 0 ? Math.round((count / browserEventsCount) * 100) : 0,
+        })).sort((a, b) => b.count - a.count);
+
+        const topPages = Object.entries(pageCounts).map(([page, views]) => ({
+          page: page.charAt(0).toUpperCase() + page.slice(1),
+          views,
+          percentage: pageViewEventsCount > 0 ? Math.round((views / pageViewEventsCount) * 100) : 0,
+        })).sort((a, b) => b.views - a.views).slice(0, 10);
 
         // Daily page views for chart
         const dailyPageViews: Record<string, number> = {};

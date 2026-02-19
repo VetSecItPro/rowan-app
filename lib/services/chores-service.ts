@@ -398,19 +398,24 @@ export const choresService = {
    * @returns Statistics including total, completed this week, my chores, and partner chores
    */
   async getChoreStats(spaceId: string, currentUserId: string): Promise<ChoreStats> {
-    const chores = await this.getChores(spaceId);
-    const now = new Date();
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const supabase = createClient();
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [totalResult, completedResult, myResult, partnerResult] = await Promise.all([
+      supabase.from('chores').select('id', { count: 'exact', head: true }).eq('space_id', spaceId),
+      supabase.from('chores').select('id', { count: 'exact', head: true })
+        .eq('space_id', spaceId).eq('status', 'completed').gte('completed_at', weekAgo),
+      supabase.from('chores').select('id', { count: 'exact', head: true })
+        .eq('space_id', spaceId).eq('status', 'pending').eq('assigned_to', currentUserId),
+      supabase.from('chores').select('id', { count: 'exact', head: true })
+        .eq('space_id', spaceId).eq('status', 'pending').neq('assigned_to', currentUserId),
+    ]);
 
     return {
-      total: chores.length,
-      completedThisWeek: chores.filter(c =>
-        c.status === 'completed' &&
-        c.completed_at &&
-        new Date(c.completed_at) >= weekAgo
-      ).length,
-      myChores: chores.filter(c => c.assigned_to === currentUserId && c.status === 'pending').length,
-      partnerChores: chores.filter(c => c.assigned_to !== currentUserId && c.status === 'pending').length,
+      total: totalResult.count ?? 0,
+      completedThisWeek: completedResult.count ?? 0,
+      myChores: myResult.count ?? 0,
+      partnerChores: partnerResult.count ?? 0,
     };
   },
 

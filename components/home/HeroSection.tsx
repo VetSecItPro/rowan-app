@@ -1,11 +1,12 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { useRef } from 'react';
 import { MagneticButton } from '@/components/ui/magnetic-button';
-import { Player } from '@remotion/player';
+const Player = dynamic(() => import('@remotion/player').then(m => ({ default: m.Player })), { ssr: false });
 import { HeroShowcase } from '@/remotion/compositions/HeroShowcase';
 
 interface HeroSectionProps {

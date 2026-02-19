@@ -8,8 +8,9 @@
 
 'use client';
 
+import dynamic from 'next/dynamic';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Player } from '@remotion/player';
+const Player = dynamic(() => import('@remotion/player').then(m => ({ default: m.Player })), { ssr: false });
 import {
   CheckSquare,
   Calendar,

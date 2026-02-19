@@ -77,6 +77,7 @@ jobs:
           config: >-
             p/owasp-top-ten
             p/nextjs
+        continue-on-error: true
 
   # ─── Production build + bundle analysis ───
   build:

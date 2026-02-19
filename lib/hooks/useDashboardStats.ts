@@ -1,8 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
 import { Space } from '@/lib/types';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+
+// Debounce utility to coalesce rapid real-time events into a single reload
+function debounce<T extends (...args: unknown[]) => unknown>(fn: T, ms: number): T {
+  let timer: ReturnType<typeof setTimeout>;
+  return ((...args: unknown[]) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); }) as T;
+}
 
 export interface EnhancedDashboardStats {
     tasks: {
@@ -394,6 +400,15 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
         }
     }, [currentSpace, user, authLoading]);
 
+    // Stable ref for loadAllStats so the debounced function always calls the latest version
+    const loadAllStatsRef = useRef(loadAllStats);
+    loadAllStatsRef.current = loadAllStats;
+
+    // Debounced reload: coalesces rapid real-time events (9 channels) into one call
+    const debouncedReload = useRef(
+        debounce(() => loadAllStatsRef.current(), 500)
+    );
+
     // Real-time subscriptions
     useEffect(() => {
         loadAllStats();
@@ -411,7 +426,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'tasks',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(tasksChannel);
 
@@ -422,7 +437,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'calendar_events',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(eventsChannel);
 
@@ -433,7 +448,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'reminders',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(remindersChannel);
 
@@ -444,7 +459,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'messages',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(messagesChannel);
 
@@ -456,7 +471,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'shopping_lists',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(shoppingListsChannel);
 
@@ -468,7 +483,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     event: '*',
                     schema: 'public',
                     table: 'shopping_items',
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(shoppingItemsChannel);
 
@@ -480,7 +495,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'meals',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(mealsChannel);
 
@@ -492,7 +507,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'goals',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(goalsChannel);
 
@@ -504,7 +519,7 @@ export function useDashboardStats(user: { id: string } | null, currentSpace: Spa
                     schema: 'public',
                     table: 'chores',
                     filter: `space_id=eq.${spaceId}`,
-                }, () => { loadAllStats(); })
+                }, () => { debouncedReload.current(); })
                 .subscribe();
             channels.push(choresChannel);
         }

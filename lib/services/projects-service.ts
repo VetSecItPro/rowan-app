@@ -165,15 +165,29 @@ export const projectsOnlyService = {
    */
   async getProjectStats(spaceId: string): Promise<ProjectStats> {
     try {
-      const projects = await this.getProjects(spaceId);
+      const supabase = createClient();
+
+      const [totalResult, planningResult, inProgressResult, completedResult, onHoldResult, budgetResult] = await Promise.all([
+        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('space_id', spaceId),
+        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).eq('status', 'planning'),
+        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).eq('status', 'in-progress'),
+        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).eq('status', 'completed'),
+        supabase.from('projects').select('id', { count: 'exact', head: true }).eq('space_id', spaceId).eq('status', 'on-hold'),
+        supabase.from('projects').select('budget_amount').eq('space_id', spaceId),
+      ]);
+
+      const totalBudget = budgetResult.data?.reduce(
+        (sum: number, p: { budget_amount?: number | null }) => sum + (p.budget_amount || 0),
+        0
+      ) || 0;
 
       return {
-        total: projects.length,
-        planning: projects.filter(p => p.status === 'planning').length,
-        inProgress: projects.filter(p => p.status === 'in-progress').length,
-        completed: projects.filter(p => p.status === 'completed').length,
-        onHold: projects.filter(p => p.status === 'on-hold').length,
-        totalBudget: projects.reduce((sum, p) => sum + ((p as { budget_amount?: number }).budget_amount || p.estimated_budget || 0), 0),
+        total: totalResult.count ?? 0,
+        planning: planningResult.count ?? 0,
+        inProgress: inProgressResult.count ?? 0,
+        completed: completedResult.count ?? 0,
+        onHold: onHoldResult.count ?? 0,
+        totalBudget,
       };
     } catch (error) {
       logger.error('getProjectStats error:', error, { component: 'lib-projects-service', action: 'service_call' });

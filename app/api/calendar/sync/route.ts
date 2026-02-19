@@ -240,13 +240,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get sync history
-    const { data: syncLogs, error: logsError } = await supabase
-      .from('calendar_sync_logs')
-      .select('*')
-      .eq('connection_id', connectionId)
-      .order('started_at', { ascending: false })
-      .limit(limit);
+    // Get sync history and pending conflicts count in parallel
+    const [syncLogsResult, conflictsResult] = await Promise.all([
+      supabase
+        .from('calendar_sync_logs')
+        .select('id, connection_id, sync_type, status, started_at, completed_at, events_created, events_updated, events_deleted, conflicts_detected, error_message')
+        .eq('connection_id', connectionId)
+        .order('started_at', { ascending: false })
+        .limit(limit),
+      supabase
+        .from('calendar_sync_conflicts')
+        .select('id', { count: 'exact', head: true })
+        .eq('connection_id', connectionId)
+        .eq('resolution_status', 'detected'),
+    ]);
+
+    const { data: syncLogs, error: logsError } = syncLogsResult;
+    const { count: conflictsCount } = conflictsResult;
 
     if (logsError) {
       return NextResponse.json(
@@ -254,13 +264,6 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    // Get pending conflicts count
-    const { count: conflictsCount } = await supabase
-      .from('calendar_sync_conflicts')
-      .select('id', { count: 'exact', head: true })
-      .eq('connection_id', connectionId)
-      .eq('resolution_status', 'detected');
 
     return NextResponse.json({
       success: true,

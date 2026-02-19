@@ -179,30 +179,33 @@ async function trackImmediate(event: TrackingEvent): Promise<void> {
 }
 
 // PERF: Periodic flush prevents queue from growing unbounded — FIX-035
-if (typeof window !== 'undefined') {
-  setInterval(() => {
+// Guard against duplicate intervals on HMR reloads
+let _flushIntervalId: ReturnType<typeof setInterval> | null = null;
+
+function handleBeforeUnload(): void {
+  if (eventQueue.length > 0 && isAnalyticsConsented()) {
+    const data = JSON.stringify({ events: eventQueue });
+    navigator.sendBeacon('/api/analytics/track', data);
+  }
+}
+
+function handleVisibilityChange(): void {
+  if (document.visibilityState === 'hidden' && eventQueue.length > 0 && isAnalyticsConsented()) {
+    const data = JSON.stringify({ events: eventQueue });
+    navigator.sendBeacon('/api/analytics/track', data);
+    eventQueue.length = 0;
+  }
+}
+
+if (typeof window !== 'undefined' && !_flushIntervalId) {
+  _flushIntervalId = setInterval(() => {
     if (eventQueue.length > 0 && isAnalyticsConsented()) {
       flushEvents();
     }
   }, 30000); // Flush every 30 seconds
-}
 
-// Flush on page unload (only fires if queue has events, which requires consent)
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', () => {
-    if (eventQueue.length > 0 && isAnalyticsConsented()) {
-      const data = JSON.stringify({ events: eventQueue });
-      navigator.sendBeacon('/api/analytics/track', data);
-    }
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden' && eventQueue.length > 0 && isAnalyticsConsented()) {
-      const data = JSON.stringify({ events: eventQueue });
-      navigator.sendBeacon('/api/analytics/track', data);
-      eventQueue.length = 0;
-    }
-  });
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 }
 
 /**

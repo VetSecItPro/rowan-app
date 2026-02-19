@@ -173,14 +173,12 @@ export const goalService = {
           // Trigger badge checking in the background (don't await to avoid blocking)
           checkAndAwardBadges(user.id, data.space_id).catch((error) => logger.error('Caught error', error, { component: 'lib-goals-service', action: 'service_call' }));
 
-          // Get user name and space info for notifications
-          const [{ data: userData }, { data: spaceData }] = await Promise.all([
+          // Get user name, space info, and space members in parallel
+          const [{ data: userData }, { data: spaceData }, spaceMembers] = await Promise.all([
             supabase.from('users').select('name').eq('id', user.id).single(),
-            supabase.from('spaces').select('name').eq('id', data.space_id).single()
+            supabase.from('spaces').select('name').eq('id', data.space_id).single(),
+            enhancedNotificationService.getSpaceMembers(data.space_id),
           ]);
-
-          // Get space members to notify
-          const spaceMembers = await enhancedNotificationService.getSpaceMembers(data.space_id);
 
           // Send goal completion notifications
           if (spaceMembers.length > 0) {
