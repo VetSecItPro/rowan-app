@@ -10,6 +10,7 @@ import { getSpaceStorageUsage } from '@/lib/services/storage-service';
 import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
+import { withDynamicDataCache } from '@/lib/utils/cache-headers';
 
 /** Returns storage usage statistics for a space */
 export async function GET(request: NextRequest) {
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
-    return NextResponse.json({ usage: result.data }, { status: 200 });
+    return withDynamicDataCache(NextResponse.json({ usage: result.data }, { status: 200 }));
   } catch (error) {
     logger.error('Error in storage usage API:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

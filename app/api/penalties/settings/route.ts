@@ -13,6 +13,7 @@ import { getSpacePenaltySettings, updateSpacePenaltySettings } from '@/lib/servi
 import { z } from 'zod';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 const settingsSchema = z.object({
   spaceId: z.string().uuid(),
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
 
     const settings = await getSpacePenaltySettings(spaceId);
 
-    return NextResponse.json({ settings });
+    return withUserDataCache(NextResponse.json({ settings }));
   } catch (error) {
     logger.error('Failed to get penalty settings', error instanceof Error ? error : undefined);
     return NextResponse.json(

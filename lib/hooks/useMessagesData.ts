@@ -48,6 +48,7 @@ export interface MessagesDataReturn {
   // Typing
   typingUsers: TypingIndicatorType[];
   typingTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  channelRef: React.MutableRefObject<RealtimeChannel | null>;
 
   // Refs
   imageInputRef: React.RefObject<HTMLInputElement | null>;
@@ -58,6 +59,13 @@ export interface MessagesDataReturn {
   getDateLabel: (date: Date) => string;
   shouldShowDateSeparator: (currentMessage: Message, previousMessage: Message | null) => boolean;
   emptyStateMessage: { primary: string; secondary: string };
+
+  // Pagination
+  hasMore: boolean;
+  loadingOlder: boolean;
+  loadOlderMessages: () => Promise<void>;
+  setHasMore: React.Dispatch<React.SetStateAction<boolean>>;
+  nextCursorRef: React.MutableRefObject<string | null>;
 
   // Actions
   loadMessages: () => Promise<void>;
@@ -81,6 +89,10 @@ export function useMessagesData(): MessagesDataReturn {
   const [typingUsers, setTypingUsers] = useState<TypingIndicatorType[]>([]);
   const [pinnedMessages, setPinnedMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const nextCursorRef = useRef<string | null>(null);
 
   const [stats, setStats] = useState<MessageStats>({
     thisWeek: 0,
@@ -132,6 +144,25 @@ export function useMessagesData(): MessagesDataReturn {
     return !isSameDay(currentDate, previousDate);
   }, []);
 
+  // Load older messages (cursor-based pagination)
+  const loadOlderMessages = useCallback(async () => {
+    if (!conversationId || !hasMore || loadingOlder) return;
+    const cursor = nextCursorRef.current;
+    if (!cursor) return;
+
+    try {
+      setLoadingOlder(true);
+      const result = await messagesService.getMessages(conversationId, { before: cursor });
+      setMessages(prev => [...result.messages, ...prev]);
+      setHasMore(result.hasMore);
+      nextCursorRef.current = result.nextCursor;
+    } catch (error) {
+      logger.error('Failed to load older messages:', error, { component: 'page', action: 'service_call' });
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [conversationId, hasMore, loadingOlder]);
+
   // Auto-scroll to bottom
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -162,13 +193,15 @@ export function useMessagesData(): MessagesDataReturn {
 
       setConversationId(defaultConversation.id);
 
-      const [messagesData, statsData, pinnedData, conversationsData] = await Promise.all([
+      const [paginatedMessages, statsData, pinnedData, conversationsData] = await Promise.all([
         messagesService.getMessages(defaultConversation.id),
         messagesService.getMessageStats(currentSpace.id),
         messagesService.getPinnedMessages(defaultConversation.id),
         messagesService.getConversationsList(currentSpace.id, user.id),
       ]);
-      setMessages(messagesData);
+      setMessages(paginatedMessages.messages);
+      setHasMore(paginatedMessages.hasMore);
+      nextCursorRef.current = paginatedMessages.nextCursor;
       setStats(statsData);
       setPinnedMessages(pinnedData);
       setConversations(conversationsData);
@@ -189,6 +222,9 @@ export function useMessagesData(): MessagesDataReturn {
     if (!conversationId || !user) {
       return;
     }
+
+    // Track per-user typing expiry timers so we can clear them on cleanup
+    const typingTimers = new Map<string, NodeJS.Timeout>();
 
     const channel = messagesService.subscribeToMessages(conversationId, {
       onInsert: (newMessage) => {
@@ -215,11 +251,37 @@ export function useMessagesData(): MessagesDataReturn {
       onDelete: (messageId) => {
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
       },
+      onTyping: (userId) => {
+        if (userId === user.id) return; // Ignore own typing events
+        // Clear previous expiry timer for this user
+        const existing = typingTimers.get(userId);
+        if (existing) clearTimeout(existing);
+        // Add user to typing list (deduplicated)
+        setTypingUsers((prev) => {
+          if (prev.some((t) => t.user_id === userId)) return prev;
+          return [...prev, { id: '', conversation_id: conversationId!, user_id: userId, last_typed_at: new Date().toISOString(), created_at: '' }];
+        });
+        // Auto-expire after 4 seconds if no follow-up broadcast
+        typingTimers.set(userId, setTimeout(() => {
+          setTypingUsers((prev) => prev.filter((t) => t.user_id !== userId));
+          typingTimers.delete(userId);
+        }, 4000));
+      },
+      onStopTyping: (userId) => {
+        const existing = typingTimers.get(userId);
+        if (existing) clearTimeout(existing);
+        typingTimers.delete(userId);
+        setTypingUsers((prev) => prev.filter((t) => t.user_id !== userId));
+      },
     });
 
     channelRef.current = channel;
 
     return () => {
+      // Clear all typing expiry timers
+      typingTimers.forEach((timer) => clearTimeout(timer));
+      typingTimers.clear();
+      setTypingUsers([]);
       if (channelRef.current) {
         messagesService.unsubscribe(channelRef.current);
         channelRef.current = null;
@@ -227,41 +289,19 @@ export function useMessagesData(): MessagesDataReturn {
     };
   }, [conversationId, user, scrollToBottom]);
 
-  // Poll for typing users
+  // Cleanup typing indicator broadcast on unmount
   useEffect(() => {
-    if (!conversationId || !user) return;
-
-    const pollInterval = setInterval(async () => {
-      try {
-        const typingData = await messagesService.getTypingUsers(conversationId, user.id);
-        setTypingUsers(typingData);
-      } catch (error) {
-        logger.error('Failed to fetch typing users:', error, { component: 'page', action: 'service_call' });
-      }
-    }, 2000);
-
-    messagesService.getTypingUsers(conversationId, user.id)
-      .then(setTypingUsers)
-      .catch((error) => logger.error('Failed to fetch typing users', error, { component: 'page', action: 'service_call' }));
-
-    return () => {
-      clearInterval(pollInterval);
-    };
-  }, [conversationId, user]);
-
-  // Cleanup typing indicator on unmount
-  useEffect(() => {
-    // Capture ref value inside effect so cleanup uses the correct timer ID
     const currentTimeout = typingTimeoutRef.current;
     return () => {
-      if (conversationId && user && currentTimeout) {
+      if (currentTimeout) {
         clearTimeout(currentTimeout);
-        messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
-          logger.error('Failed to cleanup typing indicator:', error, { component: 'page', action: 'service_call' });
-        });
+      }
+      // Broadcast stop-typing so other clients remove us immediately
+      if (channelRef.current && user) {
+        messagesService.broadcastStopTyping(channelRef.current, user.id);
       }
     };
-  }, [conversationId, user]);
+  }, [user]);
 
   return {
     currentSpace,
@@ -286,12 +326,18 @@ export function useMessagesData(): MessagesDataReturn {
     setPinnedMessages,
     typingUsers,
     typingTimeoutRef,
+    channelRef,
     imageInputRef,
     fileInputRef,
     messagesEndRef,
     getDateLabel,
     shouldShowDateSeparator,
     emptyStateMessage,
+    hasMore,
+    loadingOlder,
+    loadOlderMessages,
+    setHasMore,
+    nextCursorRef,
     loadMessages,
     scrollToBottom,
   };

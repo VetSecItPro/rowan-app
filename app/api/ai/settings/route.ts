@@ -4,12 +4,12 @@
  * Manage AI companion user settings (enabled, voice, suggestions, etc.)
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { getSettings, updateSettings } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
-import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
+import { withDynamicDataCache } from '@/lib/utils/cache-headers';
 
 export async function GET(_req: NextRequest) {
   try {
@@ -23,14 +23,8 @@ export async function GET(_req: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // AI access check (tier only, no budget check for reading settings)
-    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
-    if (!aiAccess.allowed) {
-      return buildAIAccessDeniedResponse(aiAccess);
-    }
-
     const settings = await getSettings(supabase, user.id);
-    return Response.json({ data: settings });
+    return withDynamicDataCache(NextResponse.json({ data: settings }));
   } catch (error) {
     logger.error('[API] /api/ai/settings GET error:', error, {
       component: 'api-route',
@@ -50,12 +44,6 @@ export async function PUT(req: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // AI access check (tier only, no budget check for settings)
-    const aiAccess = await validateAIAccess(supabase, user.id, undefined, false);
-    if (!aiAccess.allowed) {
-      return buildAIAccessDeniedResponse(aiAccess);
     }
 
     const body = await req.json();

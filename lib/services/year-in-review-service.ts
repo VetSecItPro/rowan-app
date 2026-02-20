@@ -3,11 +3,13 @@
  *
  * Aggregates annual statistics and generates comprehensive yearly summaries
  * for users including tasks, goals, expenses, achievements, and insights.
+ *
+ * PERF-DB-004: Refactored from ~100 per-month/per-metric queries down to
+ * 3 bulk fetches (tasks, goals, expenses) with pure in-memory aggregation.
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { startOfYear, endOfYear, format, eachMonthOfInterval, startOfMonth, endOfMonth } from 'date-fns';
-import type { Task, Expense } from '@/lib/types';
+import { startOfYear, endOfYear, format, eachMonthOfInterval, getDay } from 'date-fns';
 
 // =====================================================
 // TYPES AND INTERFACES
@@ -130,471 +132,452 @@ export interface ProductivityMetrics {
 }
 
 // =====================================================
+// INTERNAL ROW TYPES (only columns we SELECT)
+// =====================================================
+
+interface TaskRow {
+  id: string;
+  status: string;
+  category: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+interface GoalRow {
+  id: string;
+  status: string;
+  category: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+interface ExpenseRow {
+  id: string;
+  amount: number;
+  category: string | null;
+  created_at: string;
+}
+
+// Day-of-week names indexed by getDay() (0 = Sunday)
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// =====================================================
 // YEAR IN REVIEW SERVICE
 // =====================================================
 
 /** Generates comprehensive year-in-review statistics across tasks, goals, budgets, and more. */
 export class YearInReviewService {
   /**
-   * Generate comprehensive year in review for a user and space
+   * Generate comprehensive year in review for a user and space.
+   *
+   * Fetches 3 bulk datasets (tasks, goals, expenses) in parallel,
+   * then derives all stats purely in memory — zero additional DB queries.
    */
   async generateYearInReview(
     supabase: Awaited<ReturnType<typeof createClient>>,
-    userId: string,
+    _userId: string,
     spaceId: string,
     year: number = new Date().getFullYear()
   ): Promise<YearInReviewData> {
     const yearStart = startOfYear(new Date(year, 0, 1));
     const yearEnd = endOfYear(new Date(year, 0, 1));
 
-    // Fetch all data in parallel for efficiency
-    const [
-      overview,
-      monthlyData,
-      achievements,
-      insights,
-      topCategories,
-      goalsSummary,
-      expensesSummary,
-      productivity
-    ] = await Promise.all([
-      this.calculateOverviewStats(supabase, spaceId, yearStart, yearEnd),
-      this.calculateMonthlyBreakdown(supabase, spaceId, year),
-      this.generateAchievementSummary(supabase, userId, spaceId, yearStart, yearEnd),
-      this.generatePersonalInsights(supabase, spaceId, yearStart, yearEnd),
-      this.getTopCategories(supabase, spaceId, yearStart, yearEnd),
-      this.generateGoalsSummary(supabase, spaceId, yearStart, yearEnd),
-      this.generateExpensesSummary(supabase, spaceId, yearStart, yearEnd),
-      this.calculateProductivityMetrics(supabase, spaceId, yearStart, yearEnd)
+    // ── 3 bulk fetches (the ONLY DB queries) ──
+    const [tasks, goals, expenses] = await Promise.all([
+      this.fetchTasks(supabase, spaceId, yearStart, yearEnd),
+      this.fetchGoals(supabase, spaceId, yearStart, yearEnd),
+      this.fetchExpenses(supabase, spaceId, yearStart, yearEnd),
     ]);
+
+    // ── Pure in-memory derivation ──
+    const completedTasks = tasks.filter(t => t.status === 'completed' && t.completed_at);
+    const completedGoals = goals.filter(g => g.status === 'completed' && g.completed_at);
+    const monthlyBreakdown = this.deriveMonthlyBreakdown(year, completedTasks, completedGoals, expenses, tasks);
 
     return {
       year,
-      overview,
-      monthlyBreakdown: monthlyData,
-      achievements,
-      insights,
-      topCategories,
-      goals: goalsSummary,
-      expenses: expensesSummary,
-      productivity
+      overview: this.deriveOverview(tasks, completedTasks, goals, completedGoals, expenses, yearStart, yearEnd),
+      monthlyBreakdown,
+      achievements: this.deriveAchievements(completedTasks.length, completedGoals.length, yearStart),
+      insights: this.deriveInsights(monthlyBreakdown, tasks, expenses),
+      topCategories: this.deriveTopCategories(tasks),
+      goals: this.deriveGoalsSummary(goals, completedGoals, year),
+      expenses: this.deriveExpensesSummary(expenses, year),
+      productivity: this.deriveProductivity(completedTasks, yearStart, yearEnd, year),
     };
   }
 
-  /**
-   * Calculate overview statistics for the year
-   */
-  private async calculateOverviewStats(
+  // =====================================================
+  // DATA FETCHING (3 queries total)
+  // =====================================================
+
+  private async fetchTasks(
     supabase: Awaited<ReturnType<typeof createClient>>,
     spaceId: string,
     yearStart: Date,
-    yearEnd: Date
-  ): Promise<OverviewStats> {
-    // Run all independent queries in parallel
-    const [tasksResult, goalsResult, expensesResult, activeDaysResult, totalGoalsResult] = await Promise.all([
-      // Get completed tasks count
-      supabase
-        .from('tasks')
-        .select('id', { count: 'exact' })
-        .eq('space_id', spaceId)
-        .eq('status', 'completed')
-        .gte('completed_at', yearStart.toISOString())
-        .lte('completed_at', yearEnd.toISOString()),
-      // Get achieved goals count
-      supabase
-        .from('goals')
-        .select('id', { count: 'exact' })
-        .eq('space_id', spaceId)
-        .eq('status', 'completed')
-        .gte('completed_at', yearStart.toISOString())
-        .lte('completed_at', yearEnd.toISOString()),
-      // Get total expenses
-      supabase
-        .from('expenses')
-        .select('amount')
-        .eq('space_id', spaceId)
-        .gte('created_at', yearStart.toISOString())
-        .lte('created_at', yearEnd.toISOString()),
-      // Calculate active days (days with any activity)
-      supabase
-        .from('tasks')
-        .select('created_at')
-        .eq('space_id', spaceId)
-        .gte('created_at', yearStart.toISOString())
-        .lte('created_at', yearEnd.toISOString()),
-      // Calculate goal completion rate
-      supabase
-        .from('goals')
-        .select('id', { count: 'exact' })
-        .eq('space_id', spaceId)
-        .gte('created_at', yearStart.toISOString())
-        .lte('created_at', yearEnd.toISOString()),
-    ]);
+    yearEnd: Date,
+  ): Promise<TaskRow[]> {
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('id, status, category, created_at, completed_at')
+      .eq('space_id', spaceId)
+      .gte('created_at', yearStart.toISOString())
+      .lte('created_at', yearEnd.toISOString());
+    if (error) throw error;
+    return data || [];
+  }
 
-    const tasksCompleted = tasksResult.count;
-    const goalsAchieved = goalsResult.count;
-    const totalExpenses = expensesResult.data?.reduce((sum: number, expense: Expense) => sum + Number(expense.amount), 0) || 0;
+  private async fetchGoals(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    spaceId: string,
+    yearStart: Date,
+    yearEnd: Date,
+  ): Promise<GoalRow[]> {
+    const { data, error } = await supabase
+      .from('goals')
+      .select('id, status, category, created_at, completed_at')
+      .eq('space_id', spaceId)
+      .gte('created_at', yearStart.toISOString())
+      .lte('created_at', yearEnd.toISOString());
+    if (error) throw error;
+    return data || [];
+  }
 
-    // Get badges earned (simplified - would need actual badges table)
-    const badgesEarned = Math.floor((tasksCompleted || 0) / 10); // Placeholder logic
+  private async fetchExpenses(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    spaceId: string,
+    yearStart: Date,
+    yearEnd: Date,
+  ): Promise<ExpenseRow[]> {
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('id, amount, category, created_at')
+      .eq('space_id', spaceId)
+      .gte('created_at', yearStart.toISOString())
+      .lte('created_at', yearEnd.toISOString());
+    if (error) throw error;
+    return data || [];
+  }
 
-    const uniqueDays = new Set(
-      activeDaysResult.data?.map((task: Task) => format(new Date(task.created_at), 'yyyy-MM-dd'))
+  // =====================================================
+  // PURE DERIVATION FUNCTIONS (zero DB queries)
+  // =====================================================
+
+  private deriveOverview(
+    allTasks: TaskRow[],
+    completedTasks: TaskRow[],
+    allGoals: GoalRow[],
+    completedGoals: GoalRow[],
+    expenses: ExpenseRow[],
+    yearStart: Date,
+    yearEnd: Date,
+  ): OverviewStats {
+    const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+    const uniqueActiveDays = new Set(
+      allTasks.map(t => format(new Date(t.created_at), 'yyyy-MM-dd'))
     );
-    const activeDays = uniqueDays.size;
-
     const daysInYear = Math.ceil((yearEnd.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
-    const averageTasksPerDay = (tasksCompleted || 0) / daysInYear;
-
-    const totalGoals = totalGoalsResult.count;
-    const goalCompletionRate = totalGoals ? ((goalsAchieved || 0) / totalGoals) * 100 : 0;
 
     return {
-      tasksCompleted: tasksCompleted || 0,
-      goalsAchieved: goalsAchieved || 0,
+      tasksCompleted: completedTasks.length,
+      goalsAchieved: completedGoals.length,
       totalExpenses,
-      badgesEarned,
-      activeDays,
-      totalSavings: 0, // Would need budget data
-      averageTasksPerDay,
-      goalCompletionRate
+      badgesEarned: Math.floor(completedTasks.length / 10),
+      activeDays: uniqueActiveDays.size,
+      totalSavings: 0,
+      averageTasksPerDay: completedTasks.length / daysInYear,
+      goalCompletionRate: allGoals.length
+        ? (completedGoals.length / allGoals.length) * 100
+        : 0,
     };
   }
 
-  /**
-   * Calculate monthly breakdown of activity
-   */
-  private async calculateMonthlyBreakdown(
-    supabase: Awaited<ReturnType<typeof createClient>>,
-    spaceId: string,
-    year: number
-  ): Promise<MonthlyStats[]> {
+  private deriveMonthlyBreakdown(
+    year: number,
+    completedTasks: TaskRow[],
+    completedGoals: GoalRow[],
+    expenses: ExpenseRow[],
+    allTasks: TaskRow[],
+  ): MonthlyStats[] {
     const months = eachMonthOfInterval({
       start: startOfYear(new Date(year, 0, 1)),
-      end: endOfYear(new Date(year, 0, 1))
+      end: endOfYear(new Date(year, 0, 1)),
     });
 
-    const monthlyStats = await Promise.all(
-      months.map(async (month) => {
-        const monthStart = startOfMonth(month);
-        const monthEnd = endOfMonth(month);
+    // Pre-bucket items by month key for O(n) aggregation
+    const tasksByMonth = this.bucketByMonth(completedTasks, r => r.completed_at!);
+    const goalsByMonth = this.bucketByMonth(completedGoals, r => r.completed_at!);
+    const expensesByMonth = this.bucketByMonth(expenses, r => r.created_at);
+    const allTasksByMonth = this.bucketByMonth(allTasks, r => r.created_at);
 
-        // Tasks completed this month
-        const { count: tasksCompleted } = await supabase
-          .from('tasks')
-          .select('id', { count: 'exact' })
-          .eq('space_id', spaceId)
-          .eq('status', 'completed')
-          .gte('completed_at', monthStart.toISOString())
-          .lte('completed_at', monthEnd.toISOString());
+    return months.map(month => {
+      const key = format(month, 'yyyy-MM');
+      const monthTasks = tasksByMonth.get(key) || [];
+      const monthGoals = goalsByMonth.get(key) || [];
+      const monthExpenses = expensesByMonth.get(key) || [];
+      const monthAllTasks = allTasksByMonth.get(key) || [];
 
-        // Goals achieved this month
-        const { count: goalsAchieved } = await supabase
-          .from('goals')
-          .select('id', { count: 'exact' })
-          .eq('space_id', spaceId)
-          .eq('status', 'completed')
-          .gte('completed_at', monthStart.toISOString())
-          .lte('completed_at', monthEnd.toISOString());
+      const uniqueDays = new Set(
+        monthAllTasks.map(t => format(new Date(t.created_at), 'yyyy-MM-dd'))
+      );
 
-        // Expenses this month
-        const { data: expensesData } = await supabase
-          .from('expenses')
-          .select('amount')
-          .eq('space_id', spaceId)
-          .gte('created_at', monthStart.toISOString())
-          .lte('created_at', monthEnd.toISOString());
-
-        const expensesAmount = expensesData?.reduce((sum: number, expense: Expense) => sum + Number(expense.amount), 0) || 0;
-
-        // Active days this month
-        const { data: activeDaysData } = await supabase
-          .from('tasks')
-          .select('created_at')
-          .eq('space_id', spaceId)
-          .gte('created_at', monthStart.toISOString())
-          .lte('created_at', monthEnd.toISOString());
-
-        const uniqueDays = new Set(
-          activeDaysData?.map((task: Task) => format(new Date(task.created_at), 'yyyy-MM-dd'))
-        );
-
-        return {
-          month: format(month, 'yyyy-MM'),
-          monthName: format(month, 'MMMM'),
-          tasksCompleted: tasksCompleted || 0,
-          goalsAchieved: goalsAchieved || 0,
-          expensesAmount,
-          badgesEarned: Math.floor((tasksCompleted || 0) / 5), // Placeholder
-          activeDays: uniqueDays.size
-        };
-      })
-    );
-
-    return monthlyStats;
+      return {
+        month: key,
+        monthName: format(month, 'MMMM'),
+        tasksCompleted: monthTasks.length,
+        goalsAchieved: monthGoals.length,
+        expensesAmount: monthExpenses.reduce((sum, e) => sum + Number((e as ExpenseRow).amount), 0),
+        badgesEarned: Math.floor(monthTasks.length / 5),
+        activeDays: uniqueDays.size,
+      };
+    });
   }
 
-  /**
-   * Generate achievement summary including badges and milestones
-   */
-  private async generateAchievementSummary(
-    supabase: Awaited<ReturnType<typeof createClient>>,
-    userId: string,
-    spaceId: string,
+  private deriveAchievements(
+    tasksCompleted: number,
+    goalsAchieved: number,
     yearStart: Date,
-    yearEnd: Date
-  ): Promise<AchievementSummary> {
-    // This would integrate with the actual badges system
-    // For now, generating sample achievements based on activity
+  ): AchievementSummary {
+    const badgesEarned: AchievementSummary['badgesEarned'] = [];
 
-    const { count: tasksCompleted } = await supabase
-      .from('tasks')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .eq('status', 'completed')
-      .gte('completed_at', yearStart.toISOString())
-      .lte('completed_at', yearEnd.toISOString());
-
-    const { count: goalsAchieved } = await supabase
-      .from('goals')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .eq('status', 'completed')
-      .gte('completed_at', yearStart.toISOString())
-      .lte('completed_at', yearEnd.toISOString());
-
-    // Generate sample badges based on achievements
-    const badgesEarned = [];
-    if ((tasksCompleted || 0) >= 100) {
+    if (tasksCompleted >= 100) {
       badgesEarned.push({
         id: 'task-master-100',
         type: 'achievement',
         title: 'Task Master',
         description: 'Completed 100+ tasks this year',
         earnedAt: new Date().toISOString(),
-        icon: '🏆'
+        icon: '🏆',
       });
     }
-
-    if ((goalsAchieved || 0) >= 10) {
+    if (goalsAchieved >= 10) {
       badgesEarned.push({
         id: 'goal-crusher-10',
         type: 'achievement',
         title: 'Goal Crusher',
         description: 'Achieved 10+ goals this year',
         earnedAt: new Date().toISOString(),
-        icon: '🎯'
+        icon: '🎯',
       });
     }
 
     const milestones = [
-      {
-        title: 'First Goal Completed',
-        description: 'Completed your first goal of the year',
-        achievedAt: yearStart.toISOString(),
-        value: 1,
-        type: 'goals' as const
-      },
-      {
-        title: 'Century Club',
-        description: 'Completed 100 tasks',
-        achievedAt: new Date().toISOString(),
-        value: 100,
-        type: 'tasks' as const
-      }
-    ].filter(milestone => {
-      if (milestone.type === 'tasks') return (tasksCompleted || 0) >= milestone.value;
-      if (milestone.type === 'goals') return (goalsAchieved || 0) >= milestone.value;
+      { title: 'First Goal Completed', description: 'Completed your first goal of the year', achievedAt: yearStart.toISOString(), value: 1, type: 'goals' as const },
+      { title: 'Century Club', description: 'Completed 100 tasks', achievedAt: new Date().toISOString(), value: 100, type: 'tasks' as const },
+    ].filter(m => {
+      if (m.type === 'tasks') return tasksCompleted >= m.value;
+      if (m.type === 'goals') return goalsAchieved >= m.value;
       return false;
     });
-
-    const personalRecords = [
-      {
-        title: 'Tasks Completed',
-        value: tasksCompleted || 0,
-        unit: 'tasks',
-        description: 'Total tasks completed this year'
-      },
-      {
-        title: 'Goals Achieved',
-        value: goalsAchieved || 0,
-        unit: 'goals',
-        description: 'Total goals achieved this year'
-      }
-    ];
 
     return {
       badgesEarned,
       milestones,
-      personalRecords
+      personalRecords: [
+        { title: 'Tasks Completed', value: tasksCompleted, unit: 'tasks', description: 'Total tasks completed this year' },
+        { title: 'Goals Achieved', value: goalsAchieved, unit: 'goals', description: 'Total goals achieved this year' },
+      ],
     };
   }
 
-  /**
-   * Generate personal insights and patterns
-   */
-  private async generatePersonalInsights(
-    supabase: Awaited<ReturnType<typeof createClient>>,
-    spaceId: string,
-    yearStart: Date,
-    yearEnd: Date
-  ): Promise<PersonalInsights> {
-    // Get most productive month
-    const monthlyData = await this.calculateMonthlyBreakdown(supabase, spaceId, yearStart.getFullYear());
-    const mostProductiveMonth = monthlyData.reduce((max, month) =>
-      month.tasksCompleted > max.tasksCompleted ? month : max
+  private deriveInsights(
+    monthlyBreakdown: MonthlyStats[],
+    tasks: TaskRow[],
+    expenses: ExpenseRow[],
+  ): PersonalInsights {
+    // Most productive month
+    const mostProductiveMonth = monthlyBreakdown.reduce((max, m) =>
+      m.tasksCompleted > max.tasksCompleted ? m : max
     ).monthName;
 
-    // Get favorite task category
-    const { data: taskCategories } = await supabase
-      .from('tasks')
-      .select('category')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
+    // Favorite task category
+    const categoryCounts: Record<string, number> = {};
+    for (const t of tasks) {
+      const cat = t.category || 'general';
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    }
+    const favoriteTaskCategory = Object.entries(categoryCounts)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'general';
 
-    const categoryCount = taskCategories?.reduce((acc: Record<string, number>, task: { category?: string | null }) => {
-      const cat = task.category || 'general';
-      acc[cat] = (acc[cat] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>) || {};
-
-    const favoriteTaskCategory = Object.keys(categoryCount).reduce((a, b) =>
-      categoryCount[a] > categoryCount[b] ? a : b, 'general'
-    );
-
-    // Calculate average goal completion time (simplified)
-    const averageGoalCompletionTime = 30; // days - would need actual calculation
+    // Top spending category
+    const expenseCategorySums: Record<string, number> = {};
+    for (const e of expenses) {
+      const cat = e.category || 'other';
+      expenseCategorySums[cat] = (expenseCategorySums[cat] || 0) + Number(e.amount);
+    }
+    const topSpendingCategory = Object.entries(expenseCategorySums)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'none';
 
     return {
       mostProductiveMonth,
       favoriteTaskCategory,
-      averageGoalCompletionTime,
-      topSpendingCategory: 'groceries', // Would need actual calculation
-      longestStreak: 7, // Would need streak calculation
-      totalTimeWorked: 2400, // hours - would need time tracking
+      averageGoalCompletionTime: 30,
+      topSpendingCategory,
+      longestStreak: 7,
+      totalTimeWorked: 2400,
       improvementAreas: ['time management', 'goal setting'],
-      strengths: ['task completion', 'consistency']
+      strengths: ['task completion', 'consistency'],
     };
   }
 
-  // Placeholder methods for additional data
-  private async getTasksForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
-    const { data } = await supabase
-      .from('tasks')
-      .select('id, space_id, title, description, category, priority, status, due_date, assigned_to, created_by, estimated_hours, calendar_sync, quick_note, tags, color, sort_order, is_snoozed, snoozed_until, snoozed_by, snooze_count, is_recurring, recurrence_pattern, recurrence_interval, recurrence_days_of_week, recurrence_day_of_month, recurrence_month, recurrence_end_date, recurrence_end_count, parent_recurrence_id, is_recurrence_template, recurrence_exceptions, recurrence_metadata, archived, archived_at, created_at, updated_at, completed_at')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-    return data || [];
+  private deriveTopCategories(tasks: TaskRow[]): CategoryStats[] {
+    const counts: Record<string, number> = {};
+    for (const t of tasks) {
+      const cat = t.category || 'general';
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+
+    const total = tasks.length || 1;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([category, count]) => ({
+        category,
+        count,
+        percentage: Math.round((count / total) * 100),
+      }));
   }
 
-  private async getGoalsForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
-    const { data } = await supabase
-      .from('goals')
-      .select('id, space_id, title, description, category, target_date, status, created_by, created_at, updated_at, completed_at, progress, current_amount, target_amount')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-    return data || [];
-  }
+  private deriveGoalsSummary(
+    allGoals: GoalRow[],
+    completedGoals: GoalRow[],
+    year: number,
+  ): GoalsSummary {
+    // Category stats
+    const categoryCounts: Record<string, number> = {};
+    for (const g of allGoals) {
+      const cat = g.category || 'general';
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    }
+    const totalForPct = allGoals.length || 1;
+    const topGoalCategories = Object.entries(categoryCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([category, count]) => ({ category, count, percentage: Math.round((count / totalForPct) * 100) }));
 
-  private async getExpensesForYear(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date) {
-    const { data } = await supabase
-      .from('expenses')
-      .select('id, space_id, title, amount, category, date, due_date, paid_by, description, notes, project_id, status, payment_method, paid_at, recurring, is_recurring, recurring_frequency, split_type, created_by, created_at, updated_at')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-    return data || [];
-  }
-
-  private async getBadgesForYear(userId: string, yearStart: Date, yearEnd: Date) {
-    void userId;
-    void yearStart;
-    void yearEnd;
-    // Would integrate with actual badges system
-    return [];
-  }
-
-  private async getTopCategories(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<CategoryStats[]> {
-    void supabase;
-    void spaceId;
-    void yearStart;
-    void yearEnd;
-    // Placeholder - would aggregate categories across all entities
-    return [
-      { category: 'work', count: 45, percentage: 35 },
-      { category: 'personal', count: 30, percentage: 23 },
-      { category: 'health', count: 25, percentage: 19 }
-    ];
-  }
-
-  private async generateGoalsSummary(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<GoalsSummary> {
-    const { count: totalGoals } = await supabase
-      .from('goals')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
-
-    const { count: completedGoals } = await supabase
-      .from('goals')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .eq('status', 'completed')
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
+    // Monthly trends
+    const months = eachMonthOfInterval({
+      start: startOfYear(new Date(year, 0, 1)),
+      end: endOfYear(new Date(year, 0, 1)),
+    });
+    const createdByMonth = this.bucketByMonth(allGoals, g => g.created_at);
+    const completedByMonth = this.bucketByMonth(completedGoals, g => g.completed_at!);
+    const monthlyGoalTrends = months.map(m => {
+      const key = format(m, 'yyyy-MM');
+      return { month: key, created: createdByMonth.get(key)?.length || 0, completed: completedByMonth.get(key)?.length || 0 };
+    });
 
     return {
-      totalGoals: totalGoals || 0,
-      completedGoals: completedGoals || 0,
-      inProgressGoals: (totalGoals || 0) - (completedGoals || 0),
-      completionRate: totalGoals ? ((completedGoals || 0) / totalGoals) * 100 : 0,
+      totalGoals: allGoals.length,
+      completedGoals: completedGoals.length,
+      inProgressGoals: allGoals.length - completedGoals.length,
+      completionRate: allGoals.length ? (completedGoals.length / allGoals.length) * 100 : 0,
       averageCompletionTime: 30,
-      topGoalCategories: [],
-      monthlyGoalTrends: []
+      topGoalCategories,
+      monthlyGoalTrends,
     };
   }
 
-  private async generateExpensesSummary(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<ExpensesSummary> {
-    const { data: expenses } = await supabase
-      .from('expenses')
-      .select('amount')
-      .eq('space_id', spaceId)
-      .gte('created_at', yearStart.toISOString())
-      .lte('created_at', yearEnd.toISOString());
+  private deriveExpensesSummary(expenses: ExpenseRow[], year: number): ExpensesSummary {
+    const totalAmount = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
-    const totalAmount = expenses?.reduce((sum: number, expense: Expense) => sum + Number(expense.amount), 0) || 0;
+    // Category stats
+    const catSums: Record<string, { count: number; total: number }> = {};
+    for (const e of expenses) {
+      const cat = e.category || 'other';
+      const entry = catSums[cat] || { count: 0, total: 0 };
+      entry.count++;
+      entry.total += Number(e.amount);
+      catSums[cat] = entry;
+    }
+    const totalForPct = expenses.length || 1;
+    const topCategories = Object.entries(catSums)
+      .sort((a, b) => b[1].total - a[1].total)
+      .slice(0, 5)
+      .map(([category, { count, total }]) => ({ category, count, percentage: Math.round((count / totalForPct) * 100), totalValue: total }));
+
+    // Monthly trends
+    const months = eachMonthOfInterval({
+      start: startOfYear(new Date(year, 0, 1)),
+      end: endOfYear(new Date(year, 0, 1)),
+    });
+    const byMonth = this.bucketByMonth(expenses, e => e.created_at);
+    const monthlyTrends = months.map(m => {
+      const key = format(m, 'yyyy-MM');
+      const items = byMonth.get(key) || [];
+      return {
+        month: key,
+        amount: items.reduce((s, e) => s + Number((e as ExpenseRow).amount), 0),
+        transactions: items.length,
+      };
+    });
 
     return {
       totalAmount,
-      totalTransactions: expenses?.length || 0,
+      totalTransactions: expenses.length,
       averagePerMonth: totalAmount / 12,
-      topCategories: [],
-      monthlyTrends: [],
-      savingsVsBudget: 0
+      topCategories,
+      monthlyTrends,
+      savingsVsBudget: 0,
     };
   }
 
-  private async calculateProductivityMetrics(supabase: Awaited<ReturnType<typeof createClient>>, spaceId: string, yearStart: Date, yearEnd: Date): Promise<ProductivityMetrics> {
-    const { count: totalTasks } = await supabase
-      .from('tasks')
-      .select('id', { count: 'exact' })
-      .eq('space_id', spaceId)
-      .eq('status', 'completed')
-      .gte('completed_at', yearStart.toISOString())
-      .lte('completed_at', yearEnd.toISOString());
-
+  private deriveProductivity(
+    completedTasks: TaskRow[],
+    yearStart: Date,
+    yearEnd: Date,
+    year: number,
+  ): ProductivityMetrics {
     const daysInYear = Math.ceil((yearEnd.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
 
+    // Day-of-week distribution
+    const dayCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
+    for (const t of completedTasks) {
+      const d = new Date(t.completed_at!);
+      dayCounts[getDay(d)]++;
+    }
+    const mostProductiveDayIdx = dayCounts.indexOf(Math.max(...dayCounts));
+    const weekdayCount = dayCounts[1] + dayCounts[2] + dayCounts[3] + dayCounts[4] + dayCounts[5];
+    const weekendCount = dayCounts[0] + dayCounts[6];
+    const total = weekdayCount + weekendCount || 1;
+
+    // Monthly productivity scores
+    const months = eachMonthOfInterval({
+      start: startOfYear(new Date(year, 0, 1)),
+      end: endOfYear(new Date(year, 0, 1)),
+    });
+    const byMonth = this.bucketByMonth(completedTasks, t => t.completed_at!);
+    const monthlyProductivity = months.map(m => {
+      const key = format(m, 'yyyy-MM');
+      return { month: key, score: byMonth.get(key)?.length || 0 };
+    });
+
     return {
-      averageTasksPerDay: (totalTasks || 0) / daysInYear,
-      mostProductiveDay: 'Tuesday',
-      mostProductiveHour: 10,
-      weekdayVsWeekend: { weekday: 75, weekend: 25 },
-      monthlyProductivity: []
+      averageTasksPerDay: completedTasks.length / daysInYear,
+      mostProductiveDay: DAY_NAMES[mostProductiveDayIdx],
+      mostProductiveHour: 10, // Would need hour-level data to compute accurately
+      weekdayVsWeekend: {
+        weekday: Math.round((weekdayCount / total) * 100),
+        weekend: Math.round((weekendCount / total) * 100),
+      },
+      monthlyProductivity,
     };
+  }
+
+  // =====================================================
+  // UTILITY
+  // =====================================================
+
+  /** Bucket rows by yyyy-MM key derived from a date field. O(n) single pass. */
+  private bucketByMonth<T>(rows: T[], getDate: (row: T) => string): Map<string, T[]> {
+    const map = new Map<string, T[]>();
+    for (const row of rows) {
+      const key = getDate(row).slice(0, 7); // 'yyyy-MM' from ISO string
+      const bucket = map.get(key);
+      if (bucket) bucket.push(row);
+      else map.set(key, [row]);
+    }
+    return map;
   }
 }
 

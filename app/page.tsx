@@ -15,6 +15,8 @@ const HeroSection = dynamic(() => import('@/components/home/HeroSection').then(m
 const PainPointsSection = dynamic(() => import('@/components/home/PainPointsSection').then(m => ({ default: m.PainPointsSection })), { ssr: false, loading: SectionSkeleton });
 const HowItWorksSection = dynamic(() => import('@/components/home/HowItWorksSection').then(m => ({ default: m.HowItWorksSection })), { ssr: false, loading: SectionSkeleton });
 const FeatureShowcase = dynamic(() => import('@/components/home/FeatureShowcase').then(m => ({ default: m.FeatureShowcase })), { ssr: false, loading: SectionSkeleton });
+const HouseholdBalanceTeaser = dynamic(() => import('@/components/home/HouseholdBalanceTeaser').then(m => ({ default: m.HouseholdBalanceTeaser })), { ssr: false, loading: SectionSkeleton });
+const AICompanionTeaser = dynamic(() => import('@/components/home/AICompanionTeaser').then(m => ({ default: m.AICompanionTeaser })), { ssr: false, loading: SectionSkeleton });
 const TrustSecuritySection = dynamic(() => import('@/components/home/TrustSecuritySection').then(m => ({ default: m.TrustSecuritySection })), { ssr: false, loading: SectionSkeleton });
 const PricingPreviewSection = dynamic(() => import('@/components/home/PricingPreviewSection').then(m => ({ default: m.PricingPreviewSection })), { ssr: false, loading: SectionSkeleton });
 const FAQSection = dynamic(() => import('@/components/home/FAQSection').then(m => ({ default: m.FAQSection })), { ssr: false, loading: SectionSkeleton });
@@ -78,6 +80,10 @@ export default function HomePage() {
         <HowItWorksSection />
 
         <FeatureShowcase />
+
+        <HouseholdBalanceTeaser />
+
+        <AICompanionTeaser />
 
         <TrustSecuritySection />
 

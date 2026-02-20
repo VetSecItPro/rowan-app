@@ -1,8 +1,31 @@
 import Link from 'next/link';
-import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart, Receipt, FolderOpen, CreditCard, Gift } from 'lucide-react';
+import { CheckSquare, Calendar, Bell, MessageSquare, ShoppingBag, UtensilsCrossed, Home, Target, ArrowLeft, Heart, Receipt, FolderOpen, CreditCard, Gift, Bot, Scale } from 'lucide-react';
 import { DocSearchGrid } from './DocSearchGrid';
 
 const features = [
+  // AI & Intelligence
+  {
+    id: 'ai-companion',
+    name: 'Rowan AI Companion',
+    description: 'Your personal household assistant — manage tasks, meals, and more through conversation',
+    icon: Bot,
+    color: 'from-blue-500 to-purple-600',
+    hoverBorder: 'hover:border-blue-500',
+    hoverShadow: 'hover:shadow-blue-500/50',
+    href: '/settings/documentation/ai-companion',
+    available: true,
+  },
+  {
+    id: 'household-balance',
+    name: 'Household Balance',
+    description: 'See who does what — fairness tracking for tasks and chores across your household',
+    icon: Scale,
+    color: 'from-teal-500 to-cyan-600',
+    hoverBorder: 'hover:border-teal-500',
+    hoverShadow: 'hover:shadow-teal-500/50',
+    href: '/settings/documentation/household-balance',
+    available: true,
+  },
   // Core Daily Features
   {
     id: 'tasks',

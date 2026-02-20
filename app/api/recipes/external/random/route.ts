@@ -12,6 +12,7 @@ import { logger } from '@/lib/logger';
 import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { withPublicDataCache } from '@/lib/utils/cache-headers';
 
 // Query parameter validation schema
 const QueryParamsSchema = z.object({
@@ -141,7 +142,7 @@ export async function GET(request: NextRequest) {
       new Map(recipes.map((recipe) => [recipe.id, recipe])).values()
     );
 
-    return NextResponse.json(uniqueRecipes);
+    return withPublicDataCache(NextResponse.json(uniqueRecipes));
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {

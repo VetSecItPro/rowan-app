@@ -4,13 +4,14 @@
  * List conversation history for the current user in a space.
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifySpaceAccess } from '@/lib/services/authorization-service';
 import { logger } from '@/lib/logger';
 import { listConversations } from '@/lib/services/ai/conversation-persistence-service';
 import { featureFlags } from '@/lib/constants/feature-flags';
 import { validateAIAccess, buildAIAccessDeniedResponse } from '@/lib/services/ai/ai-access-guard';
+import { withDynamicDataCache } from '@/lib/utils/cache-headers';
 
 export async function GET(req: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
     const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') ?? '0'), 0);
 
     const conversations = await listConversations(supabase, spaceId, limit, offset);
-    return Response.json({ data: conversations });
+    return withDynamicDataCache(NextResponse.json({ data: conversations }));
   } catch (error) {
     logger.error('[API] /api/ai/conversations GET error:', error, {
       component: 'api-route',

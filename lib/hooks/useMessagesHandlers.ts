@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, MutableRefObject } from 'react';
 import { messagesService, Message, MessageWithReplies, CreateMessageInput, CreateConversationInput, DeleteMessageMode } from '@/lib/services/messages-service';
 import { mentionsService } from '@/lib/services/mentions-service';
 import { fileUploadService } from '@/lib/services/file-upload-service';
@@ -31,9 +31,14 @@ export interface MessagesHandlersDeps {
   pinnedMessages: MessagesDataReturn['pinnedMessages'];
   setPinnedMessages: MessagesDataReturn['setPinnedMessages'];
   typingTimeoutRef: MessagesDataReturn['typingTimeoutRef'];
+  channelRef: MessagesDataReturn['channelRef'];
   fileInputRef: MessagesDataReturn['fileInputRef'];
   scrollToBottom: MessagesDataReturn['scrollToBottom'];
   loadMessages: MessagesDataReturn['loadMessages'];
+
+  // Pagination state setters (for conversation switching)
+  setHasMore: (hasMore: boolean) => void;
+  nextCursorRef: MutableRefObject<string | null>;
 
   // From modals hook
   editingMessage: MessagesModalsReturn['editingMessage'];
@@ -111,9 +116,12 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
     setIsSending,
     setPinnedMessages,
     typingTimeoutRef,
+    channelRef,
     fileInputRef,
     scrollToBottom,
     loadMessages,
+    setHasMore,
+    nextCursorRef,
     editingMessage,
     confirmDialog,
     forwardingMessage,
@@ -252,14 +260,14 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
       return;
     }
 
-    // Remove typing indicator
+    // Remove typing indicator via broadcast
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = null;
     }
-    messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
-      logger.error('Failed to remove typing indicator:', error, { component: 'page', action: 'service_call' });
-    });
+    if (channelRef.current) {
+      messagesService.broadcastStopTyping(channelRef.current, user.id);
+    }
 
     // Create optimistic message
     const tempId = `temp-${crypto.randomUUID()}`;
@@ -325,7 +333,7 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
     } finally {
       setTimeout(() => setIsSending(false), 300);
     }
-  }, [messageInput, isSending, conversationId, currentSpace, user, scrollToBottom, typingTimeoutRef, setMessages, setMessageInput, setIsSending]);
+  }, [messageInput, isSending, conversationId, currentSpace, user, scrollToBottom, typingTimeoutRef, channelRef, setMessages, setMessageInput, setIsSending]);
 
   // Handle emoji click
   const handleEmojiClick = useCallback((emoji: string) => {
@@ -333,28 +341,24 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
     closeEmojiPicker();
   }, [setMessageInput, closeEmojiPicker]);
 
-  // Handle message input change with typing indicator
+  // Handle message input change with typing indicator (broadcast-based)
   const handleMessageInputChange = useCallback((value: string) => {
     setMessageInput(value);
 
-    if (conversationId && user) {
+    if (conversationId && user && channelRef.current) {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
 
-      messagesService.updateTypingIndicator(conversationId, user.id).catch((error) => {
-        logger.error('Failed to update typing indicator:', error, { component: 'page', action: 'service_call' });
-      });
+      messagesService.broadcastTyping(channelRef.current, user.id);
 
       typingTimeoutRef.current = setTimeout(() => {
-        if (conversationId && user) {
-          messagesService.removeTypingIndicator(conversationId, user.id).catch((error) => {
-            logger.error('Failed to remove typing indicator:', error, { component: 'page', action: 'service_call' });
-          });
+        if (channelRef.current && user) {
+          messagesService.broadcastStopTyping(channelRef.current, user.id);
         }
       }, 3000);
     }
-  }, [conversationId, user, setMessageInput, typingTimeoutRef]);
+  }, [conversationId, user, setMessageInput, typingTimeoutRef, channelRef]);
 
   // Handle file click
   const handleFileClick = useCallback(() => {
@@ -411,12 +415,14 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
     try {
       setConversationId(selectedConversationId);
 
-      const [messagesData, pinnedData] = await Promise.all([
+      const [paginatedMessages, pinnedData] = await Promise.all([
         messagesService.getMessages(selectedConversationId),
         messagesService.getPinnedMessages(selectedConversationId),
       ]);
 
-      setMessages(messagesData);
+      setMessages(paginatedMessages.messages);
+      setHasMore(paginatedMessages.hasMore);
+      nextCursorRef.current = paginatedMessages.nextCursor;
       setPinnedMessages(pinnedData);
       setShowConversationSidebar(false);
 
@@ -434,7 +440,7 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
       logger.error('Failed to load conversation:', error, { component: 'page', action: 'service_call' });
       toast.error('Failed to load conversation');
     }
-  }, [currentSpace, setConversationId, setMessages, setPinnedMessages, setShowConversationSidebar, setStats]);
+  }, [currentSpace, setConversationId, setMessages, setPinnedMessages, setShowConversationSidebar, setStats, setHasMore, nextCursorRef]);
 
   // Handle deleting a conversation
   const handleDeleteConversation = useCallback(async (conversationIdToDelete: string) => {
@@ -456,10 +462,14 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
       if (remainingConversations.length > 0) {
         setConversationId(remainingConversations[0].id);
         // Load messages for the new active conversation
-        messagesService.getMessages(remainingConversations[0].id).then(messagesData => {
-          setMessages(messagesData);
+        messagesService.getMessages(remainingConversations[0].id).then(result => {
+          setMessages(result.messages);
+          setHasMore(result.hasMore);
+          nextCursorRef.current = result.nextCursor;
         }).catch(() => {
           setMessages([]);
+          setHasMore(false);
+          nextCursorRef.current = null;
         });
       } else {
         setConversationId(null);
@@ -505,7 +515,7 @@ export function useMessagesHandlers(deps: MessagesHandlersDeps): MessagesHandler
         },
       },
     });
-  }, [currentSpace, user, conversationId, conversations, messages, setConversations, setConversationId, setMessages]);
+  }, [currentSpace, user, conversationId, conversations, messages, setConversations, setConversationId, setMessages, setHasMore, nextCursorRef]);
 
   // Handle renaming a conversation from sidebar
   const handleRenameConversationFromSidebar = useCallback(async (conversationIdToRename: string, newTitle: string) => {

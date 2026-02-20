@@ -6,9 +6,6 @@
  * Uses localStorage as the primary guard (survives remounts, navigation,
  * and API failures). Also persists to the server via AI settings so it
  * syncs across devices.
- *
- * SAFETY: If the server returns 403 (user has no AI access), the gate
- * silently renders nothing — no modal, no retries, no console spam.
  */
 
 import { useState, useEffect } from 'react';
@@ -39,7 +36,7 @@ function markOnboardingSeen(): void {
 export function AIOnboardingGate() {
   const chatCtx = useChatContextSafe();
   const enabled = FEATURE_FLAGS.AI_COMPANION && !!chatCtx?.canAccessAI;
-  const { settings, isLoading, noAccess, updateSetting } = useAISettings(enabled);
+  const { settings, isLoading, updateSetting } = useAISettings(enabled);
   const [showModal, setShowModal] = useState(false);
   const [dismissed, setDismissed] = useState(() => isOnboardingSeen());
 
@@ -56,11 +53,11 @@ export function AIOnboardingGate() {
 
   // Show modal when settings are loaded and onboarding hasn't been seen
   useEffect(() => {
-    if (!isLoading && enabled && !noAccess && !settings.ai_onboarding_seen && !dismissed) {
+    if (!isLoading && enabled && !settings.ai_onboarding_seen && !dismissed) {
       const timer = setTimeout(() => setShowModal(true), 800);
       return () => clearTimeout(timer);
     }
-  }, [isLoading, enabled, noAccess, settings.ai_onboarding_seen, dismissed]);
+  }, [isLoading, enabled, settings.ai_onboarding_seen, dismissed]);
 
   const markSeen = () => {
     setDismissed(true);
@@ -79,9 +76,9 @@ export function AIOnboardingGate() {
     chatCtx?.openChat();
   };
 
-  // Don't render anything if: not enabled, still loading, no AI access,
+  // Don't render anything if: not enabled, still loading,
   // onboarding already seen, or already dismissed
-  if (!enabled || isLoading || noAccess || settings.ai_onboarding_seen || dismissed) {
+  if (!enabled || isLoading || settings.ai_onboarding_seen || dismissed) {
     return null;
   }
 

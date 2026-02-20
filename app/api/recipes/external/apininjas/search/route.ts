@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 import { sanitizePlainText } from '@/lib/sanitize';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { withPublicDataCache } from '@/lib/utils/cache-headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,7 +105,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json(recipes);
+    return withPublicDataCache(NextResponse.json(recipes));
   } catch (error) {
     logger.error('API Ninjas search API error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

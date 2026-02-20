@@ -1529,13 +1529,14 @@ export async function executeTool(
         if (!conversationId) {
           return { success: false, message: 'Conversation ID is required. Use list_conversations first to find the right conversation.', featureType: 'message' };
         }
-        const messages = await messagesService.getMessages(conversationId, supabase);
+        const result = await messagesService.getMessages(conversationId, { limit: 20 }, supabase);
         return {
           success: true,
-          message: `Found ${messages.length} message${messages.length === 1 ? '' : 's'}`,
+          message: `Found ${result.messages.length} message${result.messages.length === 1 ? '' : 's'}${result.hasMore ? ' (more available)' : ''}`,
           data: {
-            count: messages.length,
-            messages: messages.slice(0, 20).map(m => ({
+            count: result.messages.length,
+            hasMore: result.hasMore,
+            messages: result.messages.map(m => ({
               id: m.id,
               content: m.content,
               sender_id: m.sender_id,
