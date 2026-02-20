@@ -11,6 +11,7 @@ import { KeyboardShortcuts } from "@/components/ui/KeyboardShortcuts";
 import { Toaster } from 'sonner';
 import { AppQueryProvider } from '@/lib/providers/query-client-provider';
 import { MotionProvider } from '@/components/providers/MotionProvider';
+import VisitorTracker from '@/components/analytics/VisitorTracker';
 
 // Optimized font loading with Next.js font module
 // Automatically self-hosted, preloaded, and optimized
@@ -101,6 +102,7 @@ export default function RootLayout({
               <AuthProvider>
                 <SpacesProvider>
                   <ClientErrorBoundary>
+                    <VisitorTracker />
                     <NetworkStatus />
                     <KeyboardShortcuts />
                     {children}

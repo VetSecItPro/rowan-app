@@ -32,6 +32,7 @@ const CACHE_TTL = {
   engagementScores: 900,     // 15 minutes for engagement scores (expensive computation)
   auditTrail: 120,           // 2 minutes for audit logs (more real-time)
   adminGoals: 300,           // 5 minutes for OKR goals
+  visitorAnalytics: 900,     // 15 minutes for visitor analytics (expensive aggregation)
 } as const;
 
 interface CacheOptions {
@@ -155,4 +156,5 @@ export const ADMIN_CACHE_KEYS = {
   engagementScores: 'engagement:scores',
   auditTrail: (page: number, filter: string) => `audit:trail:${page}:${filter}`,
   adminGoals: 'admin:goals',
+  visitorAnalytics: (range: string) => `visitor-analytics:${range}`,
 } as const;

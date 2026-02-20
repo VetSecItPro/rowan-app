@@ -7,6 +7,7 @@ import {
   Users,
   TrendingUp,
   Eye,
+  Globe,
   Activity,
   AlertCircle,
   AlertTriangle,
@@ -235,6 +236,19 @@ export const OverviewPanel = memo(function OverviewPanel() {
     gcTime: 15 * 60 * 1000,
   });
 
+  // Fetch real visitor analytics from site_visits
+  const { data: visitorData } = useQuery({
+    queryKey: ['admin-visitor-analytics', '30d'],
+    queryFn: async () => {
+      const response = await adminFetch('/api/admin/visitor-analytics?range=30d');
+      if (!response.ok) throw new Error('Failed to fetch visitor analytics');
+      const result = await response.json();
+      return result.visitorAnalytics as { uniqueVisitors: number; totalPageViews: number; signupConversionRate: number };
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+  });
+
   // Generate alerts from business data
   const alerts = useMemo(() => {
     if (!businessData?.scorecard) return [];
@@ -409,12 +423,9 @@ export const OverviewPanel = memo(function OverviewPanel() {
             onClick={() => openDrillDown('users')}
           />
           <KPICard
-            title="Page Views"
-            value={analytics.trafficMetrics?.totalPageViews || 0}
-            previousValue={compareEnabled && analyticsData?.previousPeriod?.summary?.totalPageViews !== undefined
-              ? analyticsData.previousPeriod.summary.totalPageViews
-              : undefined}
-            icon={Eye}
+            title="Site Visitors"
+            value={visitorData?.uniqueVisitors ?? analytics.trafficMetrics?.totalPageViews ?? 0}
+            icon={Globe}
             color="cyan"
             onClick={() => openDrillDown('pageViews')}
           />
