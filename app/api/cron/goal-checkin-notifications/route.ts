@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       notificationsSent: result.notificationsSent,
       emailsSent: result.emailsSent,
       remindersScheduled: result.remindersScheduled,
-      errors: result.errors,
+      errorCount: result.errors.length,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

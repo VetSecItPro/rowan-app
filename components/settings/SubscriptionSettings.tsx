@@ -27,7 +27,8 @@ import {
   CreditCard,
   Receipt,
   CalendarClock,
-  ExternalLink
+  ExternalLink,
+  ArrowDownCircle
 } from 'lucide-react';
 import { useSubscriptionSafe } from '@/lib/contexts/subscription-context';
 import type { FeatureLimits } from '@/lib/types';
@@ -157,7 +158,7 @@ export function SubscriptionSettings() {
     setBillingError(null);
 
     try {
-      const response = await csrfFetch('/api/polar/customer-portal', {
+      const response = await csrfFetch('/api/polar/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -532,6 +533,51 @@ export function SubscriptionSettings() {
           </p>
         </div>
       </motion.div>
+
+      {/* Downgrade Option - Only for Family users */}
+      {tier === 'family' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="bg-gray-800 rounded-2xl border border-gray-700 p-6 shadow-sm"
+        >
+          <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <ArrowDownCircle className="h-5 w-5 text-gray-400" />
+            Change Plan
+          </h3>
+          <p className="text-sm text-gray-400 mb-4">
+            Need fewer features? You can switch to the Pro plan ($18/mo). Changes take effect at your next billing cycle.
+          </p>
+
+          <div className="p-4 rounded-xl bg-amber-900/10 border border-amber-800/50 mb-4">
+            <p className="text-xs font-medium text-amber-400 mb-2 flex items-center gap-1.5">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Switching to Pro means you&apos;ll lose:
+            </p>
+            <ul className="text-xs text-gray-400 space-y-1 ml-5">
+              <li>AI-powered features (Rowan AI assistant)</li>
+              <li>External integrations</li>
+              <li>Reduced to 2 spaces (from 3)</li>
+              <li>Reduced to 2 household members (from 6)</li>
+              <li>Reduced to 2GB storage (from 5GB)</li>
+            </ul>
+          </div>
+
+          <button
+            onClick={handleManageBilling}
+            disabled={isBillingLoading}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-600 text-sm font-medium text-gray-300 hover:bg-gray-700/50 hover:border-gray-500 transition-all disabled:opacity-50"
+          >
+            {isBillingLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ExternalLink className="h-4 w-4" />
+            )}
+            Change Plan in Billing Portal
+          </button>
+        </motion.div>
+      )}
 
       {/* Need Help Section */}
       <motion.div

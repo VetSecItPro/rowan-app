@@ -9,7 +9,6 @@ import { checkAndAwardBadges } from '../achievement-service';
 import { enhancedNotificationService } from '../enhanced-notification-service';
 import { logger } from '@/lib/logger';
 import { getAppUrl } from '@/lib/utils/app-url';
-import { goalService } from './goal-service';
 import type {
   Milestone,
   CreateMilestoneInput,
@@ -157,17 +156,14 @@ export const milestoneService = {
    * @returns Array of milestones sorted by creation date descending
    */
   async getAllMilestones(spaceId: string): Promise<Milestone[]> {
-    const goals = await goalService.getGoals(spaceId);
-    const allMilestones: Milestone[] = [];
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('goal_milestones')
+      .select('*, goal:goals!goal_id!inner(space_id)')
+      .eq('goal.space_id', spaceId)
+      .order('created_at', { ascending: false });
 
-    goals.forEach(goal => {
-      if (goal.milestones) {
-        allMilestones.push(...goal.milestones);
-      }
-    });
-
-    return allMilestones.sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    if (error) throw error;
+    return (data || []) as Milestone[];
   },
 };

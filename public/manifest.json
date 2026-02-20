@@ -66,7 +66,36 @@
       "url": "/calendar"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Rowan Dashboard on mobile"
+    },
+    {
+      "src": "/screenshots/tasks-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Rowan Tasks on mobile"
+    },
+    {
+      "src": "/screenshots/dashboard-desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Rowan Dashboard on desktop"
+    },
+    {
+      "src": "/screenshots/calendar-desktop.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Rowan Calendar on desktop"
+    }
+  ],
   "related_applications": [],
   "prefer_related_applications": false
 }

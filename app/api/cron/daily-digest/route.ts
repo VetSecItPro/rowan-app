@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       success: result.success,
       emailsSent: result.emailsSent,
       usersProcessed: result.usersProcessed,
-      errors: result.errors,
+      errorCount: result.errors.length,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

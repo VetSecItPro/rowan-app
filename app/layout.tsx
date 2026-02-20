@@ -59,13 +59,13 @@ export const metadata: Metadata = {
     title: 'Rowan - Your Life, Organized',
     description: 'Collaborative life management for couples and families. Tasks, meals, budgets, goals, calendar, and more.',
     siteName: 'Rowan',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Rowan App' }],
+    // OG image auto-generated from app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Rowan - Your Life, Organized',
     description: 'Collaborative life management for couples and families',
-    images: ['/og-image.png'],
+    // Twitter image auto-generated from app/opengraph-image.tsx
   },
 };
 

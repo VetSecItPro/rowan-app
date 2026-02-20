@@ -19,7 +19,6 @@ import type {
   AddCollaboratorInput,
   GoalTemplate,
   GoalStats,
-  Milestone,
 } from './types';
 
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
@@ -552,23 +551,30 @@ export const goalService = {
     return cacheAside(
       cacheKey,
       async () => {
-        const goals = await this.getGoals(spaceId);
+        const supabase = getSupabaseClient();
 
-        // Count completed milestones across all goals
-        let completedMilestones = 0;
-        goals.forEach(goal => {
-          if (goal.milestones) {
-            completedMilestones += goal.milestones.filter((m: Milestone) => m.completed).length;
-          }
-        });
+        // Fetch only status + progress (no milestones, no assignee) and milestone count in parallel
+        const [goalsResult, milestonesResult] = await Promise.all([
+          supabase
+            .from('goals')
+            .select('status, progress')
+            .eq('space_id', spaceId),
+          supabase
+            .from('goal_milestones')
+            .select('id, goal:goals!goal_id!inner(space_id)')
+            .eq('goal.space_id', spaceId)
+            .eq('completed', true),
+        ]);
 
-        // Total "completed" achievements = finished goals + finished milestones
+        if (goalsResult.error) throw goalsResult.error;
+
+        const goals = goalsResult.data || [];
+        const completedMilestones = milestonesResult.data?.length || 0;
         const completedGoals = goals.filter(g => g.status === 'completed').length;
-        const totalCompleted = completedGoals + completedMilestones;
 
         return {
           active: goals.filter(g => g.status === 'active').length,
-          completed: totalCompleted,
+          completed: completedGoals + completedMilestones,
           inProgress: goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
           milestonesReached: completedMilestones,
         };

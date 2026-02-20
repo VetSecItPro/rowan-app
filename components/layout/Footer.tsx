@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Github, Linkedin } from 'lucide-react';
 
 const footerColumns = [
   {
@@ -15,12 +16,13 @@ const footerColumns = [
     links: [
       { label: 'Articles', href: '/articles' },
       { label: 'Help Center', href: '/articles' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About', href: '/articles' },
+      { label: 'About', href: '/about' },
       { label: 'Security', href: '/security' },
     ],
   },
@@ -58,6 +60,26 @@ export function Footer() {
             <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
               One app for your entire household. Tasks, calendar, meals, budget, and more.
             </p>
+            <div className="flex items-center gap-3 mt-4">
+              <a
+                href="https://www.linkedin.com/in/vetsecitpro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-blue-400 transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a
+                href="https://github.com/VetSecItPro/rowan-app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-white transition-colors"
+                aria-label="GitHub"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+            </div>
           </div>
 
           {/* Link columns */}

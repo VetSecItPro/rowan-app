@@ -18,7 +18,7 @@ import { logger } from '@/lib/logger';
 import { getCache, setCache, cacheKeys, CACHE_TTL, deleteCache } from '@/lib/cache';
 import * as Sentry from '@sentry/nextjs';
 
-const SUBSCRIPTION_COLUMNS = 'id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, is_founding_member, founding_member_number, founding_member_locked_price_id, subscription_started_at, subscription_ends_at, created_at, updated_at';
+const SUBSCRIPTION_COLUMNS = 'id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, is_founding_member, founding_member_number, founding_member_locked_price_id, trial_started_at, trial_ends_at, subscription_started_at, subscription_ends_at, created_at, updated_at';
 
 /**
  * Fetch subscription directly from DB (no cache).
@@ -249,6 +249,23 @@ export async function getUserTier(
     return 'free';
   }
 
+  // Check if user is on an expired trial (no Polar subscription = trial-only user)
+  if (
+    subscription.trial_ends_at &&
+    !subscription.polar_subscription_id &&
+    new Date(subscription.trial_ends_at) < new Date()
+  ) {
+    logger.info('[Subscription] Trial expired — downgrading to free', {
+      component: 'lib-subscription-service',
+      action: 'tier_resolution',
+      userId,
+      tier: subscription.tier,
+      trialEndsAt: subscription.trial_ends_at,
+      resolvedTier: 'free',
+    });
+    return 'free';
+  }
+
   logger.info('[Subscription] Tier resolved successfully', {
     component: 'lib-subscription-service',
     action: 'tier_resolution',
@@ -453,9 +470,13 @@ export async function getSubscriptionStatus(
   isCanceled: boolean;
   expiresAt: Date | null;
   daysUntilExpiration: number | null;
+  isInTrial: boolean;
+  trialDaysRemaining: number | null;
+  trialEndsAt: string | null;
 }> {
   const subscription = await getUserSubscription(userId, supabaseClient);
   const expirationDate = await getSubscriptionExpirationDate(userId);
+  const resolvedTier = await getUserTier(userId, supabaseClient);
 
   let daysUntilExpiration: number | null = null;
   if (expirationDate) {
@@ -465,13 +486,30 @@ export async function getSubscriptionStatus(
     );
   }
 
+  // Trial detection: has trial_ends_at, no Polar subscription, trial not expired
+  const isInTrial = !!(
+    subscription?.trial_ends_at &&
+    !subscription.polar_subscription_id &&
+    new Date(subscription.trial_ends_at) > new Date()
+  );
+
+  let trialDaysRemaining: number | null = null;
+  if (isInTrial && subscription?.trial_ends_at) {
+    trialDaysRemaining = Math.ceil(
+      (new Date(subscription.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+  }
+
   return {
-    tier: subscription?.tier || 'free',
+    tier: resolvedTier,
     status: subscription?.status || 'active',
     isActive: subscription?.status === 'active',
     isPastDue: subscription?.status === 'past_due',
     isCanceled: subscription?.status === 'canceled',
     expiresAt: expirationDate,
     daysUntilExpiration,
+    isInTrial,
+    trialDaysRemaining,
+    trialEndsAt: subscription?.trial_ends_at || null,
   };
 }

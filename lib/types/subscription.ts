@@ -46,6 +46,10 @@ export interface Subscription {
   founding_member_number: number | null;
   founding_member_locked_price_id: string | null;
 
+  // Trial
+  trial_started_at: string | null;
+  trial_ends_at: string | null;
+
   // Timestamps
   subscription_started_at: string | null;
   subscription_ends_at: string | null;

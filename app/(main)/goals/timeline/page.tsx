@@ -135,9 +135,9 @@ export default function GoalsTimelinePage() {
           });
         }
 
-        // Load milestones
+        // Use milestones already embedded in goal data (from the join in getGoals)
         try {
-          const milestones = await goalsService.getAllMilestones(goal.id);
+          const milestones = goal.milestones || [];
           for (const milestone of milestones) {
             if (milestone.completed && milestone.completed_at) {
               events.push({

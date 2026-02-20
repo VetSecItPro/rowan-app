@@ -590,9 +590,9 @@ export async function checkBudget(
   };
 }
 
-/** Get the token budget for a tier */
+/** Get the token budget for a tier. Only pro/family have AI access; fallback to pro as safety net. */
 export function getTokenBudget(tier: string): AITokenBudget {
-  return TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.free;
+  return TOKEN_BUDGETS[tier] ?? TOKEN_BUDGETS.pro;
 }
 
 // ---------------------------------------------------------------------------
