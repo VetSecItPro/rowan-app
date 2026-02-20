@@ -36,40 +36,6 @@ const CONVERSATIONS: MockMessage[][] = [
 const CONVO_DURATION = 5000; // 5s per conversation
 
 // ---------------------------------------------------------------------------
-// Voice Wave Visualizer
-// ---------------------------------------------------------------------------
-
-function VoiceWave({ reduced }: { reduced: boolean | null }) {
-  return (
-    <div className="flex items-center gap-[3px] h-5">
-      {[0, 1, 2, 3, 4].map((i) => (
-        reduced ? (
-          <div
-            key={i}
-            className="w-[3px] rounded-full bg-blue-400"
-            style={{ height: 8 + i * 2 }}
-          />
-        ) : (
-          <motion.div
-            key={i}
-            className="w-[3px] rounded-full bg-blue-400"
-            animate={{
-              height: [6, 14 + i * 2, 8, 16 - i, 6],
-            }}
-            transition={{
-              duration: 1.2,
-              repeat: Infinity,
-              delay: i * 0.12,
-              ease: 'easeInOut',
-            }}
-          />
-        )
-      ))}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -143,15 +109,6 @@ export function AICompanionTeaser() {
               Create tasks, check your calendar, plan meals, and manage your household
               , all through natural conversation. Available on every plan.
             </p>
-
-            {/* Voice wave */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-blue-400" />
-              </div>
-              <VoiceWave reduced={prefersReducedMotion} />
-              <span className="text-xs text-gray-400">Voice commands supported</span>
-            </div>
 
             <Link
               href="/signup"

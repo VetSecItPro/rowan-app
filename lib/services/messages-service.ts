@@ -14,6 +14,18 @@ import { sanitizePlainText, sanitizeUrl } from '@/lib/sanitize';
  */
 const DEFAULT_MAX_LIMIT = 500;
 
+/** Number of messages to fetch per page in cursor-based pagination */
+const MESSAGES_PAGE_SIZE = 50;
+
+/** Columns selected for message reads (avoids select('*')) */
+const MESSAGE_COLUMNS = 'id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users';
+
+export interface PaginatedMessages {
+  messages: Message[];
+  hasMore: boolean;
+  nextCursor: string | null;
+}
+
 const getSupabaseClient = (supabase?: SupabaseClient) => supabase ?? createClient();
 
 interface MessageWriteOptions {
@@ -82,6 +94,8 @@ export interface MessageSubscriptionCallbacks {
   onInsert?: (message: Message) => void;
   onUpdate?: (message: Message) => void;
   onDelete?: (messageId: string) => void;
+  onTyping?: (userId: string) => void;
+  onStopTyping?: (userId: string) => void;
 }
 
 export interface Conversation {
@@ -153,22 +167,48 @@ export const messagesService = {
   },
 
   /**
-   * Retrieves all messages for a conversation.
+   * Retrieves paginated messages for a conversation using cursor-based pagination.
+   * Returns newest messages first (reversed to chronological order for display).
    * @param conversationId - The conversation identifier
+   * @param options - Pagination options: limit (default 50), before (cursor timestamp)
    * @param supabaseClient - Optional Supabase client for server-side usage
-   * @returns Array of messages sorted by creation time (oldest first)
+   * @returns Paginated result with messages (oldest-first), hasMore flag, and nextCursor
    * @throws Error if database query fails
    */
-  async getMessages(conversationId: string, supabaseClient?: SupabaseClient): Promise<Message[]> {
+  async getMessages(
+    conversationId: string,
+    options?: { limit?: number; before?: string },
+    supabaseClient?: SupabaseClient,
+  ): Promise<PaginatedMessages> {
     const supabase = getSupabaseClient(supabaseClient);
-    const { data, error } = await supabase
-      .from('messages')
-      .select('id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true });
+    const limit = Math.min(options?.limit ?? MESSAGES_PAGE_SIZE, DEFAULT_MAX_LIMIT);
 
+    let query = supabase
+      .from('messages')
+      .select(MESSAGE_COLUMNS)
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: false })
+      .limit(limit + 1); // fetch 1 extra to detect hasMore
+
+    if (options?.before) {
+      query = query.lt('created_at', options.before);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
-    return data || [];
+
+    const rows = data || [];
+    const hasMore = rows.length > limit;
+    if (hasMore) rows.pop();
+
+    // Reverse to chronological order (oldest first) for display
+    rows.reverse();
+
+    return {
+      messages: rows,
+      hasMore,
+      nextCursor: rows.length > 0 ? rows[0].created_at : null,
+    };
   },
 
   /**
@@ -203,7 +243,7 @@ export const messagesService = {
     const supabase = getSupabaseClient(supabaseClient);
     const { data, error } = await supabase
       .from('messages')
-      .select('id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users')
+      .select(MESSAGE_COLUMNS)
       .eq('id', id)
       .single();
 
@@ -449,7 +489,7 @@ export const messagesService = {
     // Return the updated message
     const { data: updatedMessage, error: refetchError } = await supabase
       .from('messages')
-      .select('id, space_id, conversation_id, sender_id, content, read, read_at, attachments, parent_message_id, thread_reply_count, is_pinned, pinned_at, pinned_by, created_at, updated_at, deleted_at, deleted_for_everyone, deleted_by, deleted_for_users')
+      .select(MESSAGE_COLUMNS)
       .eq('id', id)
       .single();
 
@@ -793,12 +833,23 @@ export const messagesService = {
     if (error) throw error;
   },
 
+  /** Broadcasts a typing event via real-time channel (no DB write). */
+  broadcastTyping(channel: RealtimeChannel, userId: string): void {
+    channel.send({ type: 'broadcast', event: 'typing', payload: { userId } });
+  },
+
+  /** Broadcasts a stop-typing event via real-time channel (no DB write). */
+  broadcastStopTyping(channel: RealtimeChannel, userId: string): void {
+    channel.send({ type: 'broadcast', event: 'stop_typing', payload: { userId } });
+  },
+
   /**
    * Retrieves active typing indicators (last 10 seconds), excluding current user.
    * @param conversationId - The conversation identifier
    * @param currentUserId - Optional user ID to exclude from results
    * @returns Array of active typing indicators
    * @throws Error if database query fails
+   * @deprecated Use broadcastTyping/broadcastStopTyping instead of DB-backed polling
    */
   async getTypingUsers(conversationId: string, currentUserId?: string): Promise<TypingIndicator[]> {
     const supabase = createClient();
@@ -876,6 +927,24 @@ export const messagesService = {
         (payload: RealtimePostgresChangesPayload<Message>) => {
           if (callbacks.onDelete) {
             callbacks.onDelete((payload.old as Message).id);
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'typing' },
+        (payload: { payload?: { userId?: string } }) => {
+          if (callbacks.onTyping && payload.payload?.userId) {
+            callbacks.onTyping(payload.payload.userId);
+          }
+        }
+      )
+      .on(
+        'broadcast',
+        { event: 'stop_typing' },
+        (payload: { payload?: { userId?: string } }) => {
+          if (callbacks.onStopTyping && payload.payload?.userId) {
+            callbacks.onStopTyping(payload.payload.userId);
           }
         }
       )

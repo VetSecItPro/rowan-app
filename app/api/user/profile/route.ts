@@ -7,6 +7,7 @@ import { setSentryUser } from '@/lib/sentry-utils';
 import { logger } from '@/lib/logger';
 import DOMPurify from 'isomorphic-dompurify';
 import { validateCsrfRequest } from '@/lib/security/csrf-validation';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 // SECURITY: Strip all HTML tags from text input - only allow plain text for names
 function stripHtml(input: string): string {
@@ -351,10 +352,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      user: userProfile,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        user: userProfile,
+      })
+    );
 
   } catch (error) {
     Sentry.captureException(error, {

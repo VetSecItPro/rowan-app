@@ -3,6 +3,7 @@
 // Force dynamic rendering to prevent useContext errors during static generation
 export const dynamic = 'force-dynamic';
 
+import { useRef, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
 import { MessageCircle, Search, Mail, Clock, MessageSquare, Smile, Paperclip, TrendingUp, X, Users } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -73,9 +74,12 @@ export default function MessagesPage() {
     pinnedMessages: data.pinnedMessages,
     setPinnedMessages: data.setPinnedMessages,
     typingTimeoutRef: data.typingTimeoutRef,
+    channelRef: data.channelRef,
     fileInputRef: data.fileInputRef,
     scrollToBottom: data.scrollToBottom,
     loadMessages: data.loadMessages,
+    setHasMore: data.setHasMore,
+    nextCursorRef: data.nextCursorRef,
     // From modals hook
     editingMessage: modals.editingMessage,
     confirmDialog: modals.confirmDialog,
@@ -107,6 +111,7 @@ export default function MessagesPage() {
     messageInput, isSending, pinnedMessages, typingUsers,
     imageInputRef, fileInputRef, messagesEndRef,
     getDateLabel, shouldShowDateSeparator, emptyStateMessage,
+    hasMore, loadingOlder, loadOlderMessages,
   } = data;
 
   const {
@@ -130,6 +135,41 @@ export default function MessagesPage() {
     handleSendVoice, handleEditConversationTitle,
     handleSaveConversationTitle, handleCancelEdit: _handleCancelEdit, handleTitleKeyDown,
   } = handlers;
+
+  // =============================================
+  // LOAD-MORE OBSERVER
+  // =============================================
+
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Observe sentinel at top of message list to trigger loading older messages
+  useEffect(() => {
+    const sentinel = loadMoreSentinelRef.current;
+    if (!sentinel || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !loadingOlder) {
+          // Save scroll position before prepending older messages
+          const container = scrollContainerRef.current;
+          const prevScrollHeight = container?.scrollHeight ?? 0;
+
+          loadOlderMessages().then(() => {
+            // Restore scroll position after older messages are prepended
+            if (container) {
+              const newScrollHeight = container.scrollHeight;
+              container.scrollTop = newScrollHeight - prevScrollHeight;
+            }
+          });
+        }
+      },
+      { root: scrollContainerRef.current, threshold: 0.1 },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadingOlder, loadOlderMessages]);
 
   // =============================================
   // JSX
@@ -395,7 +435,7 @@ export default function MessagesPage() {
             )}
 
             {/* Messages Area - Dark WhatsApp Style */}
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 py-2 space-y-1 relative bg-[#0b141a]"
+            <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 py-2 space-y-1 relative bg-[#0b141a]"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
               }}
@@ -431,6 +471,18 @@ export default function MessagesPage() {
                 />
               ) : (
                 <>
+                  {/* Sentinel for loading older messages */}
+                  {hasMore && (
+                    <div ref={loadMoreSentinelRef} className="flex justify-center py-2">
+                      {loadingOlder && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/60 text-gray-400 text-xs">
+                          <div className="w-3 h-3 border-2 border-gray-500 border-t-gray-300 rounded-full animate-spin" />
+                          Loading older messages...
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {filteredMessages.map((message, index) => {
                     const previousMessage = index > 0 ? filteredMessages[index - 1] : null;
                     const showDateSeparator = shouldShowDateSeparator(message, previousMessage);

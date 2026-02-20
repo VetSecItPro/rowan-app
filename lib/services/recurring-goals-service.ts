@@ -701,31 +701,55 @@ export const recurringGoalsService = {
       // Get all habit templates for the space
       const habits = await this.getHabitTemplates(spaceId);
 
-      // Get today's entries and current streaks for all habits
-      const results = await Promise.all(
-        habits.map(async (template) => {
-          try {
-            const [entries, streaks] = await Promise.all([
-              this.getHabitEntries(template.id, today, today),
-              this.getHabitStreaks(template.id),
-            ]);
+      if (habits.length === 0) return [];
 
-            return {
-              template,
-              entry: entries[0],
-              streak: streaks[0],
-            };
-          } catch (error) {
-            logger.error('Error loading data for habit ${template.title}, using fallback:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
-            // Return template with no entry/streak data on error
-            return {
-              template,
-            };
-          }
-        })
-      );
+      // Filter out fallback template IDs (they won't exist in DB)
+      const realTemplateIds = habits
+        .filter((h) => !h.id.startsWith('00000000-'))
+        .map((h) => h.id);
 
-      return results;
+      // Batch fetch: 2 queries instead of 2N
+      const [allEntries, allStreaks] = await Promise.all([
+        realTemplateIds.length > 0
+          ? supabase
+              .from('habit_entries')
+              .select('id, template_id, user_id, entry_date, completed, completion_value, notes, mood, completed_at, reminder_sent, created_at, updated_at')
+              .in('template_id', realTemplateIds)
+              .eq('user_id', user.id)
+              .eq('entry_date', today)
+              .then(({ data, error }: { data: unknown[] | null; error: unknown }) => {
+                if (error) logger.error('Batch habit entries fetch error:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
+                return data || [];
+              })
+          : Promise.resolve([]),
+        realTemplateIds.length > 0
+          ? supabase
+              .from('habit_streaks')
+              .select('id, template_id, user_id, streak_type, streak_count, start_date, end_date, is_active, created_at, updated_at')
+              .in('template_id', realTemplateIds)
+              .eq('user_id', user.id)
+              .then(({ data, error }: { data: unknown[] | null; error: unknown }) => {
+                if (error) logger.error('Batch habit streaks fetch error:', error, { component: 'lib-recurring-goals-service', action: 'service_call' });
+                return data || [];
+              })
+          : Promise.resolve([]),
+      ]);
+
+      // Index by template_id for O(1) lookup
+      const entriesByTemplate = new Map<string, HabitEntry>();
+      for (const entry of allEntries) {
+        entriesByTemplate.set(entry.template_id, entry as HabitEntry);
+      }
+      const streaksByTemplate = new Map<string, HabitStreak>();
+      for (const streak of allStreaks) {
+        streaksByTemplate.set(streak.template_id, streak as HabitStreak);
+      }
+
+      return habits.map((template) => ({
+        template,
+        entry: entriesByTemplate.get(template.id),
+        streak: streaksByTemplate.get(template.id),
+      }));
     } catch (error) {
       logger.error('Error loading today\'s habits, using fallback data:', error, { component: 'recurring-goals-service', action: 'service_call' });
       // Get fallback habit templates and return them without entries/streaks

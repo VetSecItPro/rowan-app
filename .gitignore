@@ -200,3 +200,6 @@ app/api/debug/
 
 # Screenshots (temporary)
 household-balance-*.png
+
+# Performance audit reports
+.perf/

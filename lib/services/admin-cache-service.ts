@@ -87,10 +87,18 @@ export async function invalidateAdminCache(): Promise<void> {
   if (!redis) return;
 
   try {
-    // Get all admin cache keys
-    const keys = await redis.keys(`${CACHE_PREFIX}*`);
-    if (keys.length > 0) {
-      await redis.del(...keys);
+    // Use SCAN instead of KEYS to avoid blocking Redis with O(n)
+    const allKeys: string[] = [];
+    let cursor = 0;
+    do {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Upstash Redis scan returns [string | number, string[]]
+      const [nextCursor, batch]: [any, string[]] = await redis.scan(cursor, { match: `${CACHE_PREFIX}*`, count: 100 });
+      cursor = Number(nextCursor);
+      allKeys.push(...batch);
+    } while (cursor !== 0);
+
+    if (allKeys.length > 0) {
+      await redis.del(...allKeys);
     }
   } catch (error) {
     logger.warn('Redis admin cache invalidation failed:', { component: 'lib-admin-cache-service', error: error });

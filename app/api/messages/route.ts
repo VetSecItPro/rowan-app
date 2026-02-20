@@ -24,6 +24,8 @@ const isSafeHttpUrl = (value: string): boolean => {
 // Zod schemas for validation
 const GetMessagesQuerySchema = z.object({
   conversation_id: z.string().uuid('Invalid conversation ID format'),
+  limit: z.coerce.number().int().min(1).max(200).optional(),
+  before: z.string().datetime().optional(),
 });
 
 const CreateMessageSchema = z.object({
@@ -70,6 +72,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const queryParams = {
       conversation_id: searchParams.get('conversation_id') || '',
+      ...(searchParams.get('limit') && { limit: searchParams.get('limit') }),
+      ...(searchParams.get('before') && { before: searchParams.get('before') }),
     };
 
     const validationResult = GetMessagesQuerySchema.safeParse(queryParams);
@@ -80,7 +84,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { conversation_id: conversationId } = validationResult.data;
+    const { conversation_id: conversationId, limit, before } = validationResult.data;
 
     // SECURITY FIX (VULN-IDOR-001): Verify space access before returning messages.
     // Look up the conversation's space_id and check that the caller is a member.
@@ -106,14 +110,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get messages from service
-    const messages = await messagesService.getMessages(conversationId, supabase);
+    // Get messages from service (cursor-based pagination)
+    const result = await messagesService.getMessages(
+      conversationId,
+      { limit, before },
+      supabase,
+    );
 
     // Use shorter cache for real-time messaging data
     return withDynamicDataCache(
       NextResponse.json({
         success: true,
-        data: messages,
+        data: result.messages,
+        hasMore: result.hasMore,
+        nextCursor: result.nextCursor,
       })
     );
   } catch (error) {

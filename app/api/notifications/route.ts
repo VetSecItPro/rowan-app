@@ -16,6 +16,7 @@ import { extractIP } from '@/lib/ratelimit-fallback';
 import * as Sentry from '@sentry/nextjs';
 import { setSentryUser } from '@/lib/sentry-utils';
 import { z } from 'zod';
+import { withDynamicDataCache } from '@/lib/utils/cache-headers';
 
 // Validation schemas
 const getNotificationsSchema = z.object({
@@ -116,11 +117,13 @@ export async function GET(req: NextRequest) {
     // Get unread count
     const unreadCount = await notificationsService.getUnreadCount(user.id);
 
-    return NextResponse.json({
-      success: true,
-      data: notifications,
-      unread_count: unreadCount,
-    });
+    return withDynamicDataCache(
+      NextResponse.json({
+        success: true,
+        data: notifications,
+        unread_count: unreadCount,
+      })
+    );
   } catch (error) {
     Sentry.captureException(error, {
       tags: { endpoint: '/api/notifications', method: 'GET' },

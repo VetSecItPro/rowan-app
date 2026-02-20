@@ -4,6 +4,7 @@ import { checkGeneralRateLimit } from '@/lib/ratelimit';
 import { extractIP } from '@/lib/ratelimit-fallback';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 const UpdateMemberRoleSchema = z.object({
   user_id: z.string().uuid(),
@@ -121,10 +122,12 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      success: true,
-      data: transformedMembers,
-    });
+    return withUserDataCache(
+      NextResponse.json({
+        success: true,
+        data: transformedMembers,
+      })
+    );
   } catch (error) {
     logger.error('[API] /api/spaces/members error:', error, { component: 'api-route', action: 'api_request' });
     return NextResponse.json(

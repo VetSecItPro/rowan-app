@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 import { getUserPenalties, getPenaltyStats, getOverdueChores } from '@/lib/services/rewards/late-penalty-service';
 import { canAccessFeature } from '@/lib/services/feature-access-service';
 import { buildUpgradeResponse } from '@/lib/middleware/subscription-check';
+import { withUserDataCache } from '@/lib/utils/cache-headers';
 
 /**
  * GET /api/penalties
@@ -85,13 +86,13 @@ export async function GET(request: NextRequest) {
     // Return overdue chores list
     if (overdue) {
       const overdueChores = await getOverdueChores(spaceId);
-      return NextResponse.json({ overdue: overdueChores });
+      return withUserDataCache(NextResponse.json({ overdue: overdueChores }));
     }
 
     // Return stats
     if (stats) {
       const penaltyStats = await getPenaltyStats(spaceId, period || 'month');
-      return NextResponse.json({ stats: penaltyStats });
+      return withUserDataCache(NextResponse.json({ stats: penaltyStats }));
     }
 
     // Return user penalties
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
       limit: 50,
     });
 
-    return NextResponse.json({ penalties });
+    return withUserDataCache(NextResponse.json({ penalties }));
   } catch (error) {
     logger.error('Failed to get penalties', error instanceof Error ? error : undefined);
     return NextResponse.json(
