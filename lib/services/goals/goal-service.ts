@@ -570,12 +570,12 @@ export const goalService = {
 
         const goals = goalsResult.data || [];
         const completedMilestones = milestonesResult.data?.length || 0;
-        const completedGoals = goals.filter(g => g.status === 'completed').length;
+        const completedGoals = goals.filter((g: { status: string; progress: number }) => g.status === 'completed').length;
 
         return {
-          active: goals.filter(g => g.status === 'active').length,
+          active: goals.filter((g: { status: string; progress: number }) => g.status === 'active').length,
           completed: completedGoals + completedMilestones,
-          inProgress: goals.filter(g => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
+          inProgress: goals.filter((g: { status: string; progress: number }) => g.status === 'active' && g.progress > 0 && g.progress < 100).length,
           milestonesReached: completedMilestones,
         };
       },
