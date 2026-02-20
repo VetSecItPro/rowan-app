@@ -3,16 +3,17 @@
 import { useState, memo, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { adminFetch } from '@/lib/providers/query-client-provider';
-import { GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight, Target, TrendingUp } from 'lucide-react';
+import { GitBranch, Mail, Sparkles, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight, Target, TrendingUp, Globe, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { NotificationsPanel } from './NotificationsPanel';
 import { ConversionFunnelPanel } from './ConversionFunnelPanel';
 import { useComparison } from '@/components/admin/ComparisonContext';
 import { DrillDownModal } from '@/components/admin/DrillDownModal';
 import { DrillDownChart, type DrillDownDataPoint } from '@/components/admin/DrillDownChart';
 
-type SubTab = 'acquisition' | 'funnel' | 'signups' | 'activation';
+type SubTab = 'traffic' | 'acquisition' | 'funnel' | 'signups' | 'activation';
 
 const SUB_TABS: { id: SubTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'traffic', label: 'Traffic', icon: Globe },
   { id: 'acquisition', label: 'Acquisition', icon: Sparkles },
   { id: 'funnel', label: 'Funnel', icon: GitBranch },
   { id: 'signups', label: 'Signups', icon: Mail },
@@ -463,9 +464,378 @@ const ActivationFunnelPanel = memo(function ActivationFunnelPanel() {
   );
 });
 
+// ─── Traffic Panel ───────────────────────────────────────────────────────────
+
+interface VisitorAnalyticsData {
+  uniqueVisitors: number;
+  totalPageViews: number;
+  pagesPerVisit: number;
+  topPages: { path: string; views: number; uniqueVisitors: number }[];
+  topReferrers: { referrer: string; count: number; percentage: number }[];
+  topUtmSources: { source: string; count: number; percentage: number }[];
+  deviceBreakdown: { type: string; count: number; percentage: number }[];
+  countryBreakdown: { country: string; count: number; percentage: number }[];
+  dailyTrend: { date: string; uniqueVisitors: number; pageViews: number }[];
+  signupConversionRate: number;
+  totalSignups: number;
+  previousPeriod?: {
+    uniqueVisitors: number;
+    totalPageViews: number;
+    totalSignups: number;
+    dailyTrend: { date: string; uniqueVisitors: number; pageViews: number }[];
+  };
+  lastUpdated: string;
+}
+
+function useVisitorAnalytics(range: string = '30d', compareEnabled: boolean = false) {
+  return useQuery<VisitorAnalyticsData>({
+    queryKey: ['admin-visitor-analytics', range, compareEnabled ? 'compare' : 'no-compare'],
+    queryFn: async () => {
+      const url = compareEnabled
+        ? `/api/admin/visitor-analytics?range=${range}&compare=true`
+        : `/api/admin/visitor-analytics?range=${range}`;
+      const response = await adminFetch(url);
+      if (!response.ok) throw new Error('Failed to fetch visitor analytics');
+      const result = await response.json();
+      return result.visitorAnalytics;
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+const DEVICE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  desktop: Monitor,
+  mobile: Smartphone,
+  tablet: Tablet,
+};
+
+const TrafficPanel = memo(function TrafficPanel() {
+  const [range, setRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const { compareEnabled } = useComparison();
+  const { data, isLoading, refetch, isFetching } = useVisitorAnalytics(range, compareEnabled);
+
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{
+    isOpen: boolean;
+    title: string;
+    metric: string;
+    data: DrillDownDataPoint[];
+    previousData?: DrillDownDataPoint[];
+    color?: string;
+  }>({ isOpen: false, title: '', metric: '', data: [] });
+
+  const openDrillDown = useCallback((metric: string) => {
+    if (!data) return;
+    const dailyTrend = data.dailyTrend || [];
+    const prevDailyTrend = data.previousPeriod?.dailyTrend;
+
+    let chartData: DrillDownDataPoint[] = [];
+    let previousChartData: DrillDownDataPoint[] | undefined;
+    let title = '';
+    let color = '#8b5cf6';
+
+    switch (metric) {
+      case 'visitors':
+        chartData = dailyTrend.map(d => ({ date: d.date, value: d.uniqueVisitors }));
+        if (compareEnabled && prevDailyTrend) {
+          previousChartData = prevDailyTrend.map(d => ({ date: d.date, value: d.uniqueVisitors }));
+        }
+        title = 'Unique Visitors — Daily Trend';
+        color = '#8b5cf6';
+        break;
+      case 'pageviews':
+        chartData = dailyTrend.map(d => ({ date: d.date, value: d.pageViews }));
+        if (compareEnabled && prevDailyTrend) {
+          previousChartData = prevDailyTrend.map(d => ({ date: d.date, value: d.pageViews }));
+        }
+        title = 'Page Views — Daily Trend';
+        color = '#3b82f6';
+        break;
+    }
+
+    if ((chartData?.length ?? 0) > 0) {
+      setDrillDown({ isOpen: true, title, metric, data: chartData, previousData: previousChartData, color });
+    }
+  }, [data, compareEnabled]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const uniqueVisitors = data?.uniqueVisitors || 0;
+  const totalPageViews = data?.totalPageViews || 0;
+  const pagesPerVisit = data?.pagesPerVisit || 0;
+  const conversionRate = data?.signupConversionRate || 0;
+  const totalSignups = data?.totalSignups || 0;
+  const prevPeriod = data?.previousPeriod;
+  const topPages = data?.topPages || [];
+  const topReferrers = data?.topReferrers || [];
+  const topUtmSources = (data?.topUtmSources || []).filter(s => s.source !== 'none');
+  const deviceBreakdown = data?.deviceBreakdown || [];
+  const countryBreakdown = data?.countryBreakdown || [];
+  const dailyTrend = data?.dailyTrend || [];
+
+  // Compute trend percentages when comparison data available
+  const visitorTrend = prevPeriod && prevPeriod.uniqueVisitors > 0
+    ? Math.round(((uniqueVisitors - prevPeriod.uniqueVisitors) / prevPeriod.uniqueVisitors) * 100)
+    : undefined;
+  const pageViewTrend = prevPeriod && prevPeriod.totalPageViews > 0
+    ? Math.round(((totalPageViews - prevPeriod.totalPageViews) / prevPeriod.totalPageViews) * 100)
+    : undefined;
+
+  return (
+    <div className="space-y-6">
+      {/* Range Selector and Refresh */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
+          {(['7d', '30d', '90d'] as const).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                range === r
+                  ? 'bg-gray-700 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              {r === '7d' ? '7 Days' : r === '30d' ? '30 Days' : '90 Days'}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+        >
+          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div
+          className="bg-purple-600 rounded-xl p-5 text-white cursor-pointer hover:bg-purple-500 transition-colors"
+          onClick={() => openDrillDown('visitors')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('visitors'); }}
+        >
+          <p className="text-purple-100 text-sm">Unique Visitors</p>
+          <p className="text-3xl font-bold mt-2">{uniqueVisitors.toLocaleString()}</p>
+          {visitorTrend !== undefined && (
+            <div className={`flex items-center gap-1 mt-1 ${visitorTrend >= 0 ? 'text-green-200' : 'text-red-200'}`}>
+              {visitorTrend >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              <span className="text-xs">{Math.abs(visitorTrend)}% vs prev</span>
+            </div>
+          )}
+        </div>
+
+        <div
+          className="bg-gray-800 rounded-xl p-5 cursor-pointer hover:bg-gray-750 transition-colors"
+          onClick={() => openDrillDown('pageviews')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openDrillDown('pageviews'); }}
+        >
+          <p className="text-sm font-medium text-gray-400">Page Views</p>
+          <p className="text-2xl font-bold text-white mt-1">{totalPageViews.toLocaleString()}</p>
+          {pageViewTrend !== undefined && (
+            <div className={`flex items-center gap-1 mt-1 ${pageViewTrend >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {pageViewTrend >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              <span className="text-xs">{Math.abs(pageViewTrend)}%</span>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-gray-800 rounded-xl p-5">
+          <p className="text-sm font-medium text-gray-400">Pages / Visit</p>
+          <p className="text-2xl font-bold text-white mt-1">{pagesPerVisit}</p>
+        </div>
+
+        <div className="bg-gray-800 rounded-xl p-5">
+          <p className="text-sm font-medium text-gray-400">Conversion Rate</p>
+          <p className="text-2xl font-bold text-white mt-1">
+            {conversionRate > 0 ? `${conversionRate}%` : '--'}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">{totalSignups} signups</p>
+        </div>
+      </div>
+
+      {/* Daily Trend Bar Chart */}
+      {dailyTrend.length > 0 && (
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Daily Visitors</h4>
+          <div className="h-32 flex items-end gap-1">
+            {dailyTrend.slice(-14).map((day, i) => {
+              const maxVisitors = Math.max(...dailyTrend.slice(-14).map(d => d.uniqueVisitors), 1);
+              const height = (day.uniqueVisitors / maxVisitors) * 100;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1" title={`${day.date}: ${day.uniqueVisitors} visitors, ${day.pageViews} views`}>
+                  <div
+                    className="w-full bg-purple-500 rounded-t transition-all duration-300 hover:bg-purple-400"
+                    style={{ height: `${Math.max(height, 4)}%` }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-gray-400">
+            <span>{dailyTrend.length > 14 ? dailyTrend[dailyTrend.length - 14]?.date : dailyTrend[0]?.date}</span>
+            <span>{dailyTrend[dailyTrend.length - 1]?.date}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Top Referrers and UTM Sources */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Top Referrers</h4>
+          {topReferrers.length > 0 ? (
+            <div className="space-y-3">
+              {topReferrers.slice(0, 8).map((ref, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ExternalLink className="w-3 h-3 text-gray-400" />
+                    <span className="text-sm text-gray-300 truncate max-w-[180px]">{ref.referrer}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-white">{ref.count}</span>
+                    <span className="text-xs text-gray-400">({ref.percentage}%)</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">No referrer data yet</p>
+          )}
+        </div>
+
+        {topUtmSources.length > 0 ? (
+          <div className="bg-gray-800 rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-white mb-4">UTM Sources</h4>
+            <div className="space-y-3">
+              {topUtmSources.slice(0, 8).map((utm, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300 truncate max-w-[180px]">{utm.source}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-white">{utm.count}</span>
+                    <span className="text-xs text-gray-400">({utm.percentage}%)</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gray-800 rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-white mb-4">UTM Sources</h4>
+            <p className="text-sm text-gray-400 italic">
+              No UTM data yet. Add <code className="text-purple-400">?utm_source=reddit</code> to your shared links to track campaigns.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Top Pages */}
+      {topPages.length > 0 && (
+        <div className="bg-gray-800 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-white mb-4">Top Pages</h4>
+          <div className="space-y-3">
+            {topPages.map((page, idx) => (
+              <div key={idx} className="flex items-center justify-between">
+                <span className="text-sm text-gray-300 font-mono truncate max-w-[250px]">{page.path}</span>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-white">{page.views} <span className="text-gray-400 text-xs">views</span></span>
+                  <span className="text-sm text-gray-400">{page.uniqueVisitors} <span className="text-xs">unique</span></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Device & Country Breakdown */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {deviceBreakdown.length > 0 && (
+          <div className="bg-gray-800 rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-white mb-4">Device Breakdown</h4>
+            <div className="space-y-3">
+              {deviceBreakdown.map((device, idx) => {
+                const DeviceIcon = DEVICE_ICONS[device.type] || Monitor;
+                return (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DeviceIcon className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-300 capitalize">{device.type}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 bg-gray-700 rounded-full h-2">
+                        <div className="h-2 rounded-full bg-purple-500" style={{ width: `${device.percentage}%` }} />
+                      </div>
+                      <span className="text-sm font-medium text-white w-10 text-right">{device.percentage}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {countryBreakdown.length > 0 && (
+          <div className="bg-gray-800 rounded-lg p-5">
+            <h4 className="text-sm font-semibold text-white mb-4">Top Countries</h4>
+            <div className="space-y-3">
+              {countryBreakdown.slice(0, 8).map((c, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">{c.country}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-white">{c.count}</span>
+                    <span className="text-xs text-gray-400">({c.percentage}%)</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {uniqueVisitors === 0 && (
+        <div className="p-4 bg-purple-900/20 rounded-lg">
+          <p className="text-sm text-purple-300">
+            <strong>Getting started:</strong> Visitor tracking is now active. Data will appear as people visit your site.
+            Share links with UTM parameters to track where traffic comes from:
+          </p>
+          <code className="text-xs text-purple-400 mt-2 block">
+            rowanapp.com?utm_source=reddit&utm_medium=social&utm_campaign=launch
+          </code>
+        </div>
+      )}
+
+      {/* Drill-Down Modal */}
+      <DrillDownModal
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown(prev => ({ ...prev, isOpen: false }))}
+        title={drillDown.title}
+        subtitle={`Last ${range === '7d' ? '7' : range === '30d' ? '30' : '90'} days`}
+      >
+        <DrillDownChart
+          data={drillDown.data}
+          previousData={drillDown.previousData}
+          metric={drillDown.metric}
+          color={drillDown.color}
+        />
+      </DrillDownModal>
+    </div>
+  );
+});
+
 /** Renders user growth metrics, signup trends, and acquisition data. */
 export const GrowthPanel = memo(function GrowthPanel() {
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('funnel');
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('traffic');
 
   return (
     <div className="flex-1 flex flex-col space-y-4 min-h-0">
@@ -493,6 +863,7 @@ export const GrowthPanel = memo(function GrowthPanel() {
 
       {/* Sub-tab Content */}
       <div className="flex-1 overflow-auto">
+        {activeSubTab === 'traffic' && <TrafficPanel />}
         {activeSubTab === 'acquisition' && <AcquisitionPanel />}
         {activeSubTab === 'funnel' && <ConversionFunnelPanel />}
         {activeSubTab === 'signups' && <SignupsPanel />}
