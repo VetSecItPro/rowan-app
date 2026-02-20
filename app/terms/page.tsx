@@ -30,7 +30,7 @@ export default function TermsPage() {
           </Link>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">Terms of Service</h1>
-          <p className="text-gray-400 mb-8">Last updated: January 2026</p>
+          <p className="text-gray-400 mb-8">Last updated: February 2026</p>
 
           <div className="prose prose-invert max-w-none">
             <section className="mb-8">
@@ -53,53 +53,6 @@ export default function TermsPage() {
                 <li>Shopping lists and meal planning</li>
                 <li>Household task management</li>
                 <li>Goals and milestone tracking</li>
-              </ul>
-            </section>
-
-            <section className="mb-8 p-6 bg-amber-900/20 rounded-lg border border-amber-800">
-              <h2 className="text-2xl font-semibold text-white mb-4">Beta Program Terms</h2>
-              <p className="text-gray-300 mb-4">
-                <strong>Rowan is currently in beta.</strong> By participating in our beta program, you acknowledge and agree to the following:
-              </p>
-
-              <h3 className="text-xl font-semibold text-white mb-3 mt-6">Beta Status Disclaimer</h3>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li>The service is provided in a pre-release state and may contain bugs, errors, or incomplete features</li>
-                <li>Features may be added, modified, or removed without notice</li>
-                <li>The service may experience unexpected downtime or performance issues</li>
-                <li>Data formats or structures may change, potentially requiring migration</li>
-                <li>We make no guarantees regarding uptime, data retention, or feature availability during beta</li>
-              </ul>
-
-              <h3 className="text-xl font-semibold text-white mb-3 mt-6">Feedback and Improvements</h3>
-              <p className="text-gray-300 mb-4">
-                As a beta user, you may provide feedback, suggestions, or bug reports. By doing so:
-              </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li>You grant us a non-exclusive, perpetual, royalty-free license to use, modify, and incorporate your feedback into the service</li>
-                <li>You will not be entitled to any compensation for feedback or suggestions</li>
-                <li>We are not obligated to implement any feedback or suggestions</li>
-              </ul>
-
-              <h3 className="text-xl font-semibold text-white mb-3 mt-6">Data During Beta</h3>
-              <p className="text-gray-300 mb-4">
-                While we take reasonable precautions to protect your data:
-              </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li>We recommend maintaining your own backups of important information</li>
-                <li>Data migration between beta versions may occasionally result in data transformation</li>
-                <li>We will provide reasonable notice before any planned data migrations</li>
-                <li>Your data rights under our Privacy Policy remain fully in effect during beta</li>
-              </ul>
-
-              <h3 className="text-xl font-semibold text-white mb-3 mt-6">Transition to General Availability</h3>
-              <p className="text-gray-300 mb-4">
-                When Rowan transitions from beta to general availability:
-              </p>
-              <ul className="list-disc list-inside text-gray-300 space-y-2 mb-4">
-                <li>We will notify you of any changes to terms, pricing, or features</li>
-                <li>Your account and data will be preserved unless you choose to delete them</li>
-                <li>You may be offered special pricing or benefits as a beta participant</li>
               </ul>
             </section>
 

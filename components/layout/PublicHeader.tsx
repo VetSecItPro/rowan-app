@@ -16,6 +16,7 @@ interface PublicHeaderProps {
 const NAV_LINKS = [
   { label: 'Features', href: '/#features' },
   { label: 'Articles', href: '/articles' },
+  { label: 'About', href: '/about' },
   { label: 'Pricing', href: '/pricing' },
 ];
 

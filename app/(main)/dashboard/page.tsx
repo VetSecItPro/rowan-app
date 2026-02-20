@@ -21,6 +21,7 @@ import { InvitePartnerModal } from '@/components/spaces/InvitePartnerModal';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { useChatContextSafe } from '@/lib/contexts/chat-context';
 import PageErrorBoundary from '@/components/shared/PageErrorBoundary';
+import { AIOnboardingModal } from '@/components/ai/AIOnboardingModal';
 
 // Lazy-load below-fold heavy components
 const CountdownWidget = nextDynamic(
@@ -31,6 +32,16 @@ const CountdownWidget = nextDynamic(
 const AIDashboard = nextDynamic(
   () => import('@/components/dashboard/AIDashboard').then(mod => ({ default: mod.AIDashboard })),
   { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-64" /> }
+);
+
+const InviteHouseholdPrompt = nextDynamic(
+  () => import('@/components/dashboard/InviteHouseholdPrompt').then(mod => ({ default: mod.InviteHouseholdPrompt })),
+  { ssr: false, loading: () => null }
+);
+
+const OnboardingWidget = nextDynamic(
+  () => import('@/components/dashboard/OnboardingWidget').then(mod => ({ default: mod.OnboardingWidget })),
+  { ssr: false, loading: () => <div className="animate-pulse bg-gray-800 rounded-lg h-32" /> }
 );
 
 // ─── Dashboard Page ──────────────────────────────────────────────────────────
@@ -59,6 +70,8 @@ export default function DashboardPage() {
   const { stats, loading: statsLoading, refreshStats } = useDashboardStats(user, currentSpace, authLoading);
   const chatCtx = useChatContextSafe();
   const [refreshing, setRefreshing] = useState(false);
+  const [memberCount, setMemberCount] = useState<number>(0);
+  const [showAIOnboarding, setShowAIOnboarding] = useState(false);
 
   // Auto-refresh dashboard stats when Rowan AI completes a tool action
   const lastToolAction = chatCtx?.lastToolAction ?? 0;
@@ -69,6 +82,43 @@ export default function DashboardPage() {
       return () => clearTimeout(timer);
     }
   }, [lastToolAction, refreshStats]);
+
+  // Fetch space member count for invite prompt
+  useEffect(() => {
+    if (!spaceId) return;
+
+    const fetchMemberCount = async () => {
+      try {
+        const response = await fetch(`/api/spaces/members?space_id=${spaceId}`);
+        const result = await response.json();
+        if (result.success && result.data) {
+          setMemberCount(result.data.length);
+        }
+      } catch (error) {
+        // Silently fail - invite prompt just won't show
+        console.error('Failed to fetch member count:', error);
+      }
+    };
+
+    fetchMemberCount();
+  }, [spaceId]);
+
+  // Show AI onboarding modal on first visit
+  useEffect(() => {
+    // Only show if user is authenticated and we have a space
+    if (!user || !spaceId) return;
+
+    // Check if user has seen the AI onboarding modal
+    const hasSeenOnboarding = localStorage.getItem('rowan_ai_onboarding_seen');
+
+    if (!hasSeenOnboarding) {
+      // Delay slightly to let the dashboard load first
+      const timer = setTimeout(() => {
+        setShowAIOnboarding(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [user, spaceId]);
 
   const handleRefreshCards = async () => {
     setRefreshing(true);
@@ -130,6 +180,12 @@ export default function DashboardPage() {
                 </button>
               </div>
 
+              {/* Onboarding Widget - only shows for new users who haven't completed 3 steps */}
+              <OnboardingWidget />
+
+              {/* Invite Household Prompt - only shows for single-member spaces */}
+              {spaceId && <InviteHouseholdPrompt memberCount={memberCount} />}
+
               {/* Today at a Glance */}
               {spaceId && <TodayAtAGlance spaceId={spaceId} />}
 
@@ -173,6 +229,20 @@ export default function DashboardPage() {
               spaceName={currentSpace?.name || ''}
             />
           )}
+
+          {/* AI Onboarding Modal - shown once on first visit */}
+          <AIOnboardingModal
+            isOpen={showAIOnboarding}
+            onClose={() => {
+              setShowAIOnboarding(false);
+              localStorage.setItem('rowan_ai_onboarding_seen', 'true');
+            }}
+            onOpenChat={() => {
+              setShowAIOnboarding(false);
+              localStorage.setItem('rowan_ai_onboarding_seen', 'true');
+              chatCtx?.openChat();
+            }}
+          />
         </PullToRefresh>
       </FeatureLayout>
     </PageErrorBoundary>
