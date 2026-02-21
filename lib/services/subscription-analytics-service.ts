@@ -10,6 +10,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { POLAR_PLANS } from '@/lib/polar';
 import { logger } from '@/lib/logger';
 
@@ -116,7 +117,7 @@ interface SubscriptionEventRow {
  * Calculate MRR for a subscription based on tier and period
  */
 function calculateMRR(tier: string, period: string): number {
-  if (tier === 'free' || !tier) return 0;
+  if (tier === 'free' || tier === 'owner' || !tier) return 0;
 
   const tierKey = tier as 'pro' | 'family';
   if (!POLAR_PLANS[tierKey]) return 0;
@@ -138,12 +139,11 @@ function calculateMRR(tier: string, period: string): number {
  * Get comprehensive subscription analytics
  */
 export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
-  const supabase = await createClient();
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  // Fetch all active subscriptions
-  const { data: subscriptions, error: subError } = await supabase
+  // Use supabaseAdmin to bypass RLS — this is an admin-only function that needs to see ALL subscriptions
+  const { data: subscriptions, error: subError } = await supabaseAdmin
     .from('subscriptions')
     .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
     .in('status', ['active', 'past_due']);
@@ -154,7 +154,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
   }
 
   // Fetch subscription events for this month
-  const { data: events, error: eventsError } = await supabase
+  const { data: events, error: eventsError } = await supabaseAdmin
     .from('subscription_events')
     .select('id, user_id, event_type, from_tier, to_tier, trigger_source, metadata, created_at')
     .gte('created_at', startOfMonth.toISOString());
@@ -163,19 +163,19 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     logger.error('Error fetching subscription events:', eventsError, { component: 'lib-subscription-analytics-service', action: 'service_call' });
   }
 
-  // Fetch total users
-  const { count: totalUsersCount } = await supabase
-    .from('users')
-    .select('id', { count: 'exact', head: true });
+  // Fetch total REAL users from auth.users (public.users has stale/orphaned rows)
+  const { data: authUsersData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000, page: 1 });
+  const totalUsersCount = authUsersData?.users?.length ?? 0;
 
   const activeSubscriptions: SubscriptionRow[] = subscriptions || [];
   const subscriptionEvents: SubscriptionEventRow[] = events || [];
 
-  // Calculate metrics
+  // Calculate metrics — exclude free and owner tiers from paid subscriber counts
+  const paidSubscriptions = activeSubscriptions.filter(s => s.tier !== 'free' && s.tier !== 'owner');
   const proSubs = activeSubscriptions.filter(s => s.tier === 'pro');
   const familySubs = activeSubscriptions.filter(s => s.tier === 'family');
 
-  // Calculate MRR
+  // Calculate MRR (calculateMRR already returns 0 for free/owner)
   let mrr = 0;
   activeSubscriptions.forEach(sub => {
     mrr += calculateMRR(sub.tier, sub.period);
@@ -185,7 +185,7 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
   mrr = Math.round(mrr * 100) / 100;
   const arr = Math.round(mrr * 12 * 100) / 100;
 
-  const totalSubscribers = activeSubscriptions.length;
+  const totalSubscribers = paidSubscriptions.length;
   const arpu = totalSubscribers > 0 ? Math.round((mrr / totalSubscribers) * 100) / 100 : 0;
 
   // Tier distribution
@@ -242,9 +242,13 @@ export async function getSubscriptionMetrics(): Promise<SubscriptionMetrics> {
     ? Math.round((cancellationsThisMonth / totalSubscribers) * 10000) / 100
     : 0;
 
-  // Free users calculation
-  const totalUsers = totalUsersCount || 0;
-  const freeUsers = totalUsers - totalSubscribers;
+  // Free users: count subscriptions on free tier + users without any subscription
+  // Note: public.users table may have stale rows, so derive from auth user count minus paid/owner
+  const freeTierSubs = activeSubscriptions.filter(s => s.tier === 'free').length;
+  const totalUsers = totalUsersCount;
+  // Users without any subscription row are also free users
+  const usersWithoutSubscription = Math.max(0, totalUsers - activeSubscriptions.length);
+  const freeUsers = freeTierSubs + usersWithoutSubscription;
 
   // Conversion rate (new paid / total free users who could convert)
   const conversionRate = freeUsers > 0
@@ -280,10 +284,9 @@ export async function getSubscriptionEvents(options: {
   startDate?: Date;
   endDate?: Date;
 }): Promise<{ events: SubscriptionEvent[]; total: number }> {
-  const supabase = await createClient();
   const { limit = 50, offset = 0, eventType, startDate, endDate } = options;
 
-  let query = supabase
+  let query = supabaseAdmin
     .from('subscription_events')
     .select('id, user_id, event_type, from_tier, to_tier, trigger_source, metadata, created_at, users!inner(email)', { count: 'exact' });
 
@@ -328,19 +331,18 @@ export async function getSubscriptionEvents(options: {
  * Get daily revenue data for charts
  */
 export async function getDailyRevenueData(days: number = 30): Promise<DailyRevenueData[]> {
-  const supabase = await createClient();
   const now = new Date();
   const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
   // Fetch subscription events for the period
-  const { data: events } = await supabase
+  const { data: events } = await supabaseAdmin
     .from('subscription_events')
     .select('id, user_id, event_type, from_tier, to_tier, trigger_source, metadata, created_at')
     .gte('created_at', startDate.toISOString())
     .order('created_at', { ascending: true });
 
   // Fetch current subscriptions for MRR calculation
-  const { data: subscriptions } = await supabase
+  const { data: subscriptions } = await supabaseAdmin
     .from('subscriptions')
     .select('id, user_id, tier, status, period, polar_customer_id, polar_subscription_id, subscription_started_at, subscription_ends_at, created_at, updated_at')
     .in('status', ['active', 'past_due']);

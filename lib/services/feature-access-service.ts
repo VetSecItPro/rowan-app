@@ -218,6 +218,7 @@ export async function shouldPromptUpgrade(
     free: 0,
     pro: 1,
     family: 2,
+    owner: 3,
   };
 
   const hasAccess = tierHierarchy[tier] >= tierHierarchy[requiredTier];

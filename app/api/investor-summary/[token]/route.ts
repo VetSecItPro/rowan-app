@@ -124,6 +124,7 @@ async function fetchBusinessMetrics() {
     pro: { monthly: 18, annual: 16 },
     family: { monthly: 29, annual: 27 },
     free: { monthly: 0, annual: 0 },
+    owner: { monthly: 0, annual: 0 },
   } as const;
 
   const getUserMrr = (tier: string, period: string): number => {
@@ -277,7 +278,7 @@ async function fetchBusinessMetrics() {
     const startDate = sub.subscription_started_at
       ? new Date(sub.subscription_started_at)
       : new Date(sub.created_at);
-    return startDate <= thirtyDaysAgo && sub.tier !== 'free';
+    return startDate <= thirtyDaysAgo && sub.tier !== 'free' && sub.tier !== 'owner';
   });
 
   let startingMrr = 0;

@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { AIUserSettingsUpdate } from '@/lib/types/ai';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 
 /** Client-side subset of AI settings (we only need the toggles, not DB metadata) */
 type AISettingsClient = Required<AIUserSettingsUpdate>;
@@ -58,7 +59,7 @@ export function useAISettings(enabled: boolean) {
     setSettings((prev) => ({ ...prev, ...update }));
 
     try {
-      const res = await fetch('/api/ai/settings', {
+      const res = await csrfFetch('/api/ai/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(update),

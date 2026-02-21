@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { isAndroid, isNative } from '@/lib/native/capacitor';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   startBackgroundLocation,
   stopBackgroundLocation,
@@ -79,7 +80,7 @@ export function useBackgroundLocation({
     if (!currentSpaceId) return;
 
     try {
-      await fetch('/api/location/update', {
+      await csrfFetch('/api/location/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

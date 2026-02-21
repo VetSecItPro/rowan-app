@@ -136,6 +136,48 @@ export const FEATURE_LIMITS: Record<SubscriptionTier, FeatureLimits> = {
     // Storage
     storageGB: 5,
   },
+
+  owner: {
+    // Task limits — unlimited
+    maxActiveTasks: -1,
+    dailyTaskCreation: -1,
+
+    // Calendar
+    canCreateCalendar: true,
+
+    // Shopping lists — unlimited
+    maxShoppingLists: -1,
+    maxShoppingItems: -1,
+    dailyShoppingUpdates: -1,
+
+    // Messages — unlimited
+    messageHistoryDays: -1,
+    dailyMessages: -1,
+
+    // Quick actions — unlimited
+    dailyQuickActions: -1,
+
+    // Feature access — everything enabled
+    canUploadPhotos: true,
+    canUseMealPlanning: true,
+    canUseReminders: true,
+    canUseGoals: true,
+    canUseHousehold: true,
+    canUseLocation: true,
+    canUseAI: true,
+    canUseIntegrations: true,
+    canUseEventProposals: true,
+
+    // Performance
+    realtimeSyncDelay: 0,
+
+    // Users and spaces — unlimited
+    maxUsers: -1,
+    maxSpaces: -1,
+
+    // Storage — unlimited
+    storageGB: -1,
+  },
 };
 
 /**

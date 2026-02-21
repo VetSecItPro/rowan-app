@@ -92,6 +92,18 @@ const TIER_DETAILS = {
       '5GB storage',
     ],
   },
+  owner: {
+    name: 'Owner',
+    color: 'amber',
+    gradient: 'from-amber-500 to-yellow-500',
+    features: [
+      'All Family features',
+      'Full AI access',
+      'Unlimited storage',
+      'Unlimited spaces & members',
+      'Admin dashboard access',
+    ],
+  },
 };
 
 /** Renders subscription plan management with upgrade/downgrade options. */
@@ -235,7 +247,7 @@ export function SubscriptionSettings() {
             </div>
           </div>
 
-          {tier !== 'family' && (
+          {tier !== 'family' && tier !== 'owner' && (
             <Link
               href="/pricing"
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
