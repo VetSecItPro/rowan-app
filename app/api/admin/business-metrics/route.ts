@@ -30,6 +30,7 @@ const TIER_PRICES = {
   pro: { monthly: 18, annual: 16 },
   family: { monthly: 29, annual: 27 },
   free: { monthly: 0, annual: 0 },
+  owner: { monthly: 0, annual: 0 },
 } as const;
 
 /**
@@ -472,7 +473,7 @@ function computeNrr(
     const startDate = sub.subscription_started_at
       ? new Date(sub.subscription_started_at)
       : new Date(sub.created_at);
-    return startDate <= thirtyDaysAgo && sub.tier !== 'free';
+    return startDate <= thirtyDaysAgo && sub.tier !== 'free' && sub.tier !== 'owner';
   });
 
   if (existingPayingUsers.length === 0) return 100;
@@ -582,7 +583,7 @@ function buildRevenueByCohort(
   const cohortMap: Record<string, { users: Set<string>; mrr: number }> = {};
 
   for (const sub of subs) {
-    if (sub.status !== 'active' || sub.tier === 'free') continue;
+    if (sub.status !== 'active' || sub.tier === 'free' || sub.tier === 'owner') continue;
 
     const cohortMonth = toMonthKey(new Date(sub.created_at));
     if (!cohortMap[cohortMonth]) {

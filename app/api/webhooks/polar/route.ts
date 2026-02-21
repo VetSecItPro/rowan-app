@@ -320,6 +320,23 @@ export async function POST(request: NextRequest) {
           // If claimResult is null, founding member spots are full - not an error
         }
 
+        // GUARD: Never overwrite 'owner' tier from webhook events
+        {
+          const { data: currentSub } = await supabaseAdmin
+            .from('subscriptions')
+            .select('tier')
+            .eq('user_id', subscription.user_id)
+            .single();
+
+          if (currentSub?.tier === 'owner') {
+            logger.info('Skipping tier update — user is on owner tier', {
+              component: 'PolarWebhook',
+              userId: subscription.user_id,
+            });
+            break;
+          }
+        }
+
         // Update subscription with founding member info
         const updateData: Record<string, unknown> = {
           polar_subscription_id: subscriptionId,
@@ -451,6 +468,15 @@ export async function POST(request: NextRequest) {
           .select('user_id, tier, subscription_ends_at')
           .eq('polar_customer_id', customerId)
           .single();
+
+        // GUARD: Never downgrade owner tier
+        if (currentSub?.tier === 'owner') {
+          logger.info('Skipping cancel — user is on owner tier', {
+            component: 'PolarWebhook',
+            userId: currentSub.user_id,
+          });
+          break;
+        }
 
         // Update to free tier
         const { error } = await supabaseAdmin

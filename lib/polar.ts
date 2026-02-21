@@ -118,6 +118,19 @@ export const POLAR_PLANS: Record<SubscriptionTier, PolarPlanDefinition> = {
       "External integrations",
     ],
   },
+  owner: {
+    name: "Owner",
+    description: "Platform owner — full access, excluded from revenue",
+    price: 0,
+    annualPrice: 0,
+    trialDays: 0,
+    features: [
+      "Everything unlocked",
+      "Unlimited users & spaces",
+      "Unlimited storage",
+      "Not purchasable — admin-assigned only",
+    ],
+  },
 };
 
 // Map Polar product ID to subscription tier
@@ -137,7 +150,7 @@ export function getPlanFromProductId(productId: string): SubscriptionTier {
 
 // Get the appropriate product ID based on plan and billing interval
 export function getProductId(plan: SubscriptionTier, interval: SubscriptionPeriod): string | null {
-  if (plan === "free") return null;
+  if (plan === "free" || plan === "owner") return null;
 
   if (plan === "pro") {
     return interval === "annual"

@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { csrfFetch } from '@/lib/utils/csrf-fetch';
 import {
   MapPin,
   Users,
@@ -110,7 +111,7 @@ export default function LocationPageClient({ spaceId }: { spaceId: string }) {
         return;
       }
 
-      const response = await fetch('/api/location/emergency', {
+      const response = await csrfFetch('/api/location/emergency', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

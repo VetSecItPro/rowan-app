@@ -110,6 +110,7 @@ export const CSRF_EXEMPT_ROUTES = [
   '/api/auth/callback',
   '/api/calendar/callback/',
   '/api/analytics/track',
+  '/api/analytics/visit', // Public beacon endpoint (sendBeacon has no CSRF headers)
   '/api/notifications/track-dismissal',
   // Public endpoints that don't change state
   '/api/health',

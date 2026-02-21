@@ -55,21 +55,22 @@ const UserListPanel = memo(function UserListPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
   const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = useQuery({
-    queryKey: ['admin-users', timeRange],
+    queryKey: ['admin-users'],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/users?range=${timeRange}`);
+      // Fetch all users (API supports page/limit params, use high limit to get all)
+      const response = await adminFetch('/api/admin/users?page=1&limit=100');
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
-      return data.users || [];
+      return { users: data.users || [], total: data.pagination?.total ?? 0 };
     },
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
-  const users: User[] = useMemo(() => usersData || [], [usersData]);
+  const users: User[] = useMemo(() => usersData?.users || [], [usersData]);
+  const totalUsers = usersData?.total ?? users.length;
 
   const fetchData = useCallback(() => {
     refetchUsers();
@@ -110,33 +111,15 @@ const UserListPanel = memo(function UserListPanel() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium px-3 py-1.5 rounded-lg bg-indigo-900/30 text-indigo-400">
-            Users ({users.length})
+            {totalUsers} Users
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Time Range Filter */}
-          <div className="flex items-center gap-1 bg-gray-700 rounded-lg p-0.5">
-            {(['7d', '30d', '90d', 'all'] as const).map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-2 py-1 text-xs font-medium rounded-md transition-colors ${
-                  timeRange === range
-                    ? 'bg-gray-600 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {range === '7d' ? '7d' : range === '30d' ? '30d' : range === '90d' ? '90d' : 'All'}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={fetchData}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          onClick={fetchData}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:bg-gray-700 rounded-lg transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Search and Filter */}
@@ -178,7 +161,7 @@ const UserListPanel = memo(function UserListPanel() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {filteredUsers.slice(0, 10).map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-800/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -209,9 +192,9 @@ const UserListPanel = memo(function UserListPanel() {
                 <p>No users found</p>
               </div>
             )}
-            {filteredUsers.length > 10 && (
+            {filteredUsers.length > 0 && filteredUsers.length < totalUsers && (
               <div className="p-3 text-center text-sm text-gray-400 border-t border-gray-700">
-                Showing 10 of {filteredUsers.length} users
+                Showing {filteredUsers.length} of {totalUsers} users (filtered)
               </div>
             )}
           </div>

@@ -13,7 +13,7 @@
 /**
  * Subscription tier levels
  */
-export type SubscriptionTier = 'free' | 'pro' | 'family';
+export type SubscriptionTier = 'free' | 'pro' | 'family' | 'owner';
 
 /**
  * Subscription status

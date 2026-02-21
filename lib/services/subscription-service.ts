@@ -249,6 +249,11 @@ export async function getUserTier(
     return 'free';
   }
 
+  // Owner tier is never downgraded — no trial or payment required
+  if (subscription.tier === 'owner') {
+    return 'owner';
+  }
+
   // Check if user is on an expired trial (no Polar subscription = trial-only user)
   if (
     subscription.trial_ends_at &&
@@ -294,11 +299,12 @@ export async function hasTierAccess(
 ): Promise<boolean> {
   const userTier = await getUserTier(userId);
 
-  // Tier hierarchy: free < pro < family
+  // Tier hierarchy: free < pro < family < owner
   const tierHierarchy: Record<SubscriptionTier, number> = {
     free: 0,
     pro: 1,
     family: 2,
+    owner: 3,
   };
 
   return tierHierarchy[userTier] >= tierHierarchy[requiredTier];
