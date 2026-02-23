@@ -202,3 +202,7 @@ household-balance-*.png
 
 # Performance audit reports
 .perf/
+.test-ship-state.json
+.test-ship-history.json
+.test-ship-quarantine.json
+.test-audit.json

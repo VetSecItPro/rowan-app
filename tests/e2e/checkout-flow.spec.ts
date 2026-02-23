@@ -21,17 +21,20 @@ test.describe('Authenticated Checkout Flow', () => {
     });
 
     // Should redirect to Polar Checkout - wait for URL change or Polar-specific element
-    await page.waitForURL(/checkout\.polar\.sh|polar|signup/i, { timeout: 10000 }).catch(async () => {
-      // If no redirect, check if we stayed on pricing (test environment limitation)
-      const url = page.url();
+    // In E2E environment, Polar redirect may fail or redirect to signup - accept valid outcomes
+    const urlChanged = await page.waitForURL(/checkout\.polar\.sh|polar|signup/i, { timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
+
+    const url = page.url();
+    if (!urlChanged) {
+      // If URL didn't change to Polar/signup, verify we got an expected fallback
       if (url.includes('/pricing') || url.includes('/signup')) {
-        // In E2E test environment, Polar redirect may fail or redirect to signup
-        // Just verify we're on a valid page (pricing or signup) - that's enough for E2E
         const pageTitle = await page.textContent('h1');
         expect(pageTitle).toBeTruthy();
       } else {
         throw new Error(`Expected Polar/signup redirect, got: ${url}`);
       }
-    });
+    }
   });
 });

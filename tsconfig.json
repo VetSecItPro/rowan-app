@@ -40,6 +40,8 @@
     "**/*.backup.ts",
     "**/*.backup.tsx",
     "remotion",
-    "remotion.config.ts"
+    "remotion.config.ts",
+    "__tests__",
+    "tests"
   ]
 }

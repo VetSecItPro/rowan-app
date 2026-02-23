@@ -43,20 +43,20 @@ test.describe('Monetization Features', () => {
 
       // Get a CSRF token for API calls (with retry for session hydration)
       let csrfToken = '';
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 2; i++) {
         const csrfResponse = await page.request.get('/api/csrf/token', { timeout: 30000 });
         if (csrfResponse.ok()) {
           const csrfPayload = await csrfResponse.json();
           csrfToken = csrfPayload.token as string;
           break;
         }
-        if (i < 2) await page.waitForTimeout(2000 * (i + 1));
+        if (i < 1) await page.waitForTimeout(2000);
       }
       expect(csrfToken).toBeTruthy();
 
-      // Get space ID with progressive backoff (space provisioning trigger can lag 5-10s)
+      // Get space ID with single retry (space provisioning trigger can lag)
       let spaceId: string | undefined;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 2; i++) {
         const spacesResponse = await page.request.get('/api/spaces', { timeout: 30000 });
         if (spacesResponse.ok()) {
           const spacesResult = await spacesResponse.json();
@@ -64,7 +64,7 @@ test.describe('Monetization Features', () => {
           spaceId = Array.isArray(spaces) ? spaces[0]?.id : undefined;
           if (spaceId) break;
         }
-        if (i < 4) await page.waitForTimeout(3000 * (i + 1));
+        if (i < 1) await page.waitForTimeout(5000);
       }
       expect(spaceId).toBeTruthy();
 
@@ -73,15 +73,12 @@ test.describe('Monetization Features', () => {
       let hitLimit = false;
       for (let i = 0; i < 15; i++) {
         // Fetch fresh CSRF token before each mutation (middleware rotates after each POST)
-        let token: string;
-        try {
-          const freshCsrf = await page.request.get('/api/csrf/token', { timeout: 30000 });
-          const freshPayload = await freshCsrf.json();
-          token = freshPayload.token as string;
-        } catch {
-          // CSRF fetch failed (timeout/network) — skip this iteration
-          continue;
+        const freshCsrf = await page.request.get('/api/csrf/token', { timeout: 30000 });
+        if (!freshCsrf.ok()) {
+          throw new Error(`CSRF token fetch failed: ${freshCsrf.status()}`);
         }
+        const freshPayload = await freshCsrf.json();
+        const token = freshPayload.token as string;
 
         const response = await page.request.post('/api/tasks', {
           data: {
@@ -96,35 +93,20 @@ test.describe('Monetization Features', () => {
         });
 
         if (response.status() === 429) {
-          // 429 from either usage limit or rate limiter — both are valid enforcement
+          // 429 from usage limit — feature gating is working
           hitLimit = true;
           break;
         }
 
-        // 403 can happen if CSRF token was stale or rate-limited — skip gracefully
-        if (response.status() === 403) {
-          continue;
-        }
-
-        // Task should have been created successfully (or usage check failed silently)
-        // If we get 2xx, continue creating
+        // Task should have been created successfully
         if (!response.ok()) {
-          // Non-429, non-403, non-2xx = unexpected error — log but don't fail
-          const body = await response.text();
-          console.warn(`Task creation unexpected response: ${response.status()} ${body}`);
-          continue;
+          const body = await response.text().catch(() => '(unreadable)');
+          throw new Error(`Task creation failed: ${response.status()} ${body}`);
         }
       }
 
-      // If we didn't hit a 429, the usage check may be silently failing
-      // in the test environment. Log it but don't fail the test — the
-      // feature gating tests below cover the core monetization UX.
-      if (!hitLimit) {
-        console.warn(
-          'Task limit test: did not receive 429 after 15 tasks. ' +
-          'Usage check may be failing silently in test env (see API catch block).'
-        );
-      }
+      // Usage limit should have been enforced
+      expect(hitLimit).toBeTruthy();
 
       // Verify the tasks page loads correctly regardless
       await page.goto('/tasks');
@@ -226,16 +208,19 @@ test.describe('Monetization Features', () => {
       await upgradeButton.click();
 
       // Should redirect to Polar Checkout - wait for URL change or verify payment flow initiated
-      await page.waitForURL(/checkout\.polar\.sh|polar|login|signup/i, { timeout: 10000 }).catch(async () => {
-        const url = page.url();
+      const urlChanged = await page.waitForURL(/checkout\.polar\.sh|polar|login|signup/i, { timeout: 10000 })
+        .then(() => true)
+        .catch(() => false);
+
+      const url = page.url();
+      if (!urlChanged) {
+        // In test environment, Polar redirect may not happen
         if (url.includes('/pricing') || url.includes('/login') || url.includes('/signup')) {
-          // In test environment, Polar redirect may not happen, or unauthenticated user
-          // gets redirected to login — verify we're still on a valid page
           await expect(page.getByText(/upgrade|payment|checkout|sign in|sign up|log in/i).first()).toBeVisible();
         } else {
           throw new Error(`Expected Polar redirect, got: ${url}`);
         }
-      });
+      }
     });
   });
 
@@ -349,9 +334,8 @@ test.describe('Monetization Features', () => {
         timeout: 30000,
       });
 
-      // Should reject invalid signature (400) or webhook secret not configured (500)
-      // 403 if CSRF blocks it, 429 if rate limited
-      expect([400, 401, 403, 429, 500]).toContain(response.status());
+      // Should reject invalid signature or webhook secret not configured
+      expect([400, 401, 500]).toContain(response.status());
     });
   });
 
@@ -388,25 +372,20 @@ test.describe('Security Checks', () => {
   test('API routes require authentication', async ({ request }) => {
     test.setTimeout(90000);
 
-    // Test subscription status without auth
-    // Note: 500 is also acceptable as it means the request was rejected (server-side auth check)
-    // This can happen when Supabase client fails to initialize without session cookies
-    // 429 is acceptable when rate limited from parallel test execution
-    // 200 can occur if the API returns a default "free" subscription for unauthenticated users
+    // Test subscription status without auth - should reject or return free tier
     const statusResponse = await request.get('/api/subscriptions', { timeout: 30000 });
-    expect([200, 401, 403, 429, 500]).toContain(statusResponse.status());
+    expect([200, 401, 403]).toContain(statusResponse.status());
 
-    // Test checkout session creation without auth
-    // Note: 403 is expected when CSRF validation fails (no token provided)
+    // Test checkout session creation without auth - should be rejected
     const checkoutResponse = await request.post('/api/polar/checkout', {
       data: { plan: 'pro', billingInterval: 'monthly' },
       timeout: 30000,
     });
-    expect([401, 403, 429, 500]).toContain(checkoutResponse.status());
+    expect([401, 403]).toContain(checkoutResponse.status());
 
-    // Test customer portal access without auth (used for subscription management)
+    // Test customer portal access without auth - should be rejected
     const portalResponse = await request.post('/api/polar/portal', { timeout: 30000 });
-    expect([401, 403, 429, 500]).toContain(portalResponse.status());
+    expect([401, 403]).toContain(portalResponse.status());
   });
 
   test('invalid input is rejected with proper errors', async ({ request }) => {
@@ -436,8 +415,8 @@ test.describe('Security Checks', () => {
       },
       timeout: 30000,
     });
-    // Should reject - missing webhook signature headers (400, 401, 403, 429, or 500 if not configured)
-    expect([400, 401, 403, 429, 500]).toContain(noSigResponse.status());
+    // Should reject - missing webhook signature headers
+    expect([400, 401, 500]).toContain(noSigResponse.status());
 
     // Test with invalid signature — use header names the route actually checks
     const invalidSigResponse = await request.post('/api/webhooks/polar', {
@@ -451,7 +430,7 @@ test.describe('Security Checks', () => {
       },
       timeout: 30000,
     });
-    // Should reject invalid signature (400, 401, 403 CSRF, 429, or 500 if webhook secret not configured)
-    expect([400, 401, 403, 429, 500]).toContain(invalidSigResponse.status());
+    // Should reject invalid signature
+    expect([400, 401, 500]).toContain(invalidSigResponse.status());
   });
 });
