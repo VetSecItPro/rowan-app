@@ -930,7 +930,12 @@ const listShoppingLists: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for listing shopping lists',
-    properties: {},
+    properties: {
+      include_checked: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include already-checked (purchased) items. Defaults to true.',
+      },
+    },
     required: [],
   },
 };
@@ -1213,7 +1218,14 @@ const listGoals: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for listing goals',
-    properties: {},
+    properties: {
+      status: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['active', 'completed', 'all'],
+        description: 'Filter goals by status. Defaults to all.',
+      },
+    },
     required: [],
   },
 };
@@ -1454,7 +1466,19 @@ const listExpenses: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for listing expenses',
-    properties: {},
+    properties: {
+      category: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: [
+          'groceries', 'utilities', 'rent', 'mortgage', 'transportation',
+          'entertainment', 'dining', 'healthcare', 'insurance', 'subscriptions',
+          'education', 'childcare', 'pets', 'clothing', 'personal',
+          'gifts', 'travel', 'home', 'other',
+        ],
+        description: 'Filter expenses by category',
+      },
+    },
     required: [],
   },
 };
@@ -1607,7 +1631,14 @@ const listProjects: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for listing projects',
-    properties: {},
+    properties: {
+      status: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['planning', 'in-progress', 'on-hold', 'completed', 'cancelled', 'all'],
+        description: 'Filter projects by status. Defaults to all.',
+      },
+    },
     required: [],
   },
 };
@@ -1714,7 +1745,12 @@ const listConversations: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for listing conversations',
-    properties: {},
+    properties: {
+      include_archived: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include archived conversations. Defaults to false.',
+      },
+    },
     required: [],
   },
 };
@@ -1767,7 +1803,14 @@ const listRewards: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for listing rewards',
-    properties: {},
+    properties: {
+      category: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['privileges', 'treats', 'activities', 'screen_time', 'money', 'other', 'all'],
+        description: 'Filter rewards by category. Defaults to all.',
+      },
+    },
     required: [],
   },
 };
@@ -1783,8 +1826,13 @@ const getBudget: FunctionDeclaration = {
     'Get the current monthly budget configuration. Use this when a user asks about their budget, monthly limit, or budget settings.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting budget',
+    properties: {
+      month: {
+        type: SchemaType.STRING,
+        description: 'Month to get budget for in YYYY-MM format. Defaults to the current month.',
+      },
+    },
     required: [],
   },
 };
@@ -1796,8 +1844,13 @@ const getBudgetStats: FunctionDeclaration = {
     'Get budget statistics for the current month — how much has been spent, how much remains, and how many pending bills. Use this when a user asks "how much have I spent?", "what\'s left in my budget?", or wants a financial overview.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting budget stats',
+    properties: {
+      month: {
+        type: SchemaType.STRING,
+        description: 'Month to get stats for in YYYY-MM format. Defaults to the current month.',
+      },
+    },
     required: [],
   },
 };
@@ -3004,7 +3057,12 @@ const getGoalStats: FunctionDeclaration = {
   parameters: {
     type: SchemaType.OBJECT,
     description: 'Parameters for getting goal stats',
-    properties: {},
+    properties: {
+      include_milestones: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include milestone breakdown in the stats. Defaults to true.',
+      },
+    },
     required: [],
   },
 };
@@ -3020,8 +3078,13 @@ const getHouseholdSummary: FunctionDeclaration = {
     'Get a comprehensive overview of the household — pending tasks, active goals, budget status, upcoming events, chore stats, and shopping lists. Use this when a user asks "what\'s going on?", "give me an overview", "how are we doing?", or wants a general status update.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting household summary',
+    properties: {
+      include_completed: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include completed items in the summary. Defaults to false.',
+      },
+    },
     required: [],
   },
 };
@@ -3209,8 +3272,15 @@ const getChoreStats: FunctionDeclaration = {
     'Get chore statistics — total chores, completed this week, my chores vs partner chores. Use when a user asks "how are chores going?" or wants a chore summary.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting chore stats',
+    properties: {
+      period: {
+        type: SchemaType.STRING,
+        format: 'enum',
+        enum: ['week', 'month', 'all'],
+        description: 'Time period for chore statistics. Defaults to week.',
+      },
+    },
     required: [],
   },
 };
@@ -3560,8 +3630,13 @@ const getProjectStats: FunctionDeclaration = {
     'Get overall project statistics — total projects, active vs completed, budget totals, over/under budget counts.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting project stats',
+    properties: {
+      include_budget_breakdown: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include detailed budget breakdown per project. Defaults to false.',
+      },
+    },
     required: [],
   },
 };
@@ -3577,8 +3652,13 @@ const listVendors: FunctionDeclaration = {
     'List all vendors/contractors/service providers saved for the household. Use when a user asks about their contractors, vendors, or service providers.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for listing vendors',
+    properties: {
+      trade: {
+        type: SchemaType.STRING,
+        description: 'Filter vendors by trade or specialty (e.g. "plumber", "electrician")',
+      },
+    },
     required: [],
   },
 };
@@ -3700,8 +3780,13 @@ const listRecurringPatterns: FunctionDeclaration = {
     'List detected recurring expense patterns (subscriptions, regular bills, etc.). Shows auto-detected patterns from expense history.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for listing recurring patterns',
+    properties: {
+      confirmed_only: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to return only confirmed patterns. Defaults to false (returns all detected patterns).',
+      },
+    },
     required: [],
   },
 };
@@ -3753,8 +3838,13 @@ const getPartnerBalance: FunctionDeclaration = {
     'Get the expense balance between household partners — who owes whom and how much. Use when a user asks "who owes what?" or "what\'s our balance?".',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting partner balance',
+    properties: {
+      include_settled: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include already-settled balances in the history. Defaults to false.',
+      },
+    },
     required: [],
   },
 };
@@ -3978,8 +4068,13 @@ const getPenaltySettings: FunctionDeclaration = {
     'Get the household late penalty settings — default penalty points, grace period, progressive penalties, etc.',
   parameters: {
     type: SchemaType.OBJECT,
-    description: 'No parameters needed',
-    properties: {},
+    description: 'Parameters for getting penalty settings',
+    properties: {
+      include_defaults: {
+        type: SchemaType.BOOLEAN,
+        description: 'Whether to include default/system penalty settings alongside custom ones. Defaults to true.',
+      },
+    },
     required: [],
   },
 };

@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import '@testing-library/jest-dom';
 
 // Mock Supabase client for unit tests
 vi.mock('@/lib/supabase/client', () => ({
@@ -32,6 +33,11 @@ vi.mock('next/navigation', () => ({
   }),
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => '/',
+}));
+
+// Mock isomorphic-dompurify to avoid jsdom hanging during dynamic import
+vi.mock('isomorphic-dompurify', () => ({
+  default: null,
 }));
 
 // Mock environment variables

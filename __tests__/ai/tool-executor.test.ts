@@ -116,7 +116,7 @@ describe('Tool Executor', () => {
       const result = await executeTool('complete_task', { task_id: 'task-1' }, context);
 
       expect(result.success).toBe(true);
-      expect(tasksService.updateTask).toHaveBeenCalledWith('task-1', { status: 'completed' });
+      expect(tasksService.updateTask).toHaveBeenCalledWith('task-1', { status: 'completed' }, context.supabase);
     });
 
     it('should route list_tasks to tasksService.getTasks', async () => {
@@ -124,7 +124,11 @@ describe('Tool Executor', () => {
       const result = await executeTool('list_tasks', {}, context);
 
       expect(result.success).toBe(true);
-      expect(tasksService.getTasks).toHaveBeenCalledWith(context.spaceId, expect.any(Object));
+      expect(tasksService.getTasks).toHaveBeenCalledWith(
+        context.spaceId,
+        expect.objectContaining({ status: undefined }),
+        context.supabase
+      );
     });
 
     it('should route create_chore to choresService.createChore', async () => {
@@ -168,7 +172,7 @@ describe('Tool Executor', () => {
 
     it('should route create_project to projectsOnlyService.createProject', async () => {
       const { projectsOnlyService } = await import('@/lib/services/projects-service');
-      const result = await executeTool('create_project', { name: 'Kitchen Remodel', start_date: null, end_date: null }, context);
+      const result = await executeTool('create_project', { name: 'Kitchen Remodel', start_date: null, target_date: null }, context);
 
       expect(result.success).toBe(true);
       expect(result.featureType).toBe('project');
@@ -212,9 +216,11 @@ describe('Tool Executor', () => {
       const { tasksService } = await import('@/lib/services/tasks-service');
       await executeTool('list_tasks', { status: 'pending' }, context);
 
-      expect(tasksService.getTasks).toHaveBeenCalledWith(context.spaceId, expect.objectContaining({
-        status: 'pending',
-      }));
+      expect(tasksService.getTasks).toHaveBeenCalledWith(
+        context.spaceId,
+        expect.objectContaining({ status: 'pending' }),
+        context.supabase
+      );
     });
   });
 

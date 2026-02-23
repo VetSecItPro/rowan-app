@@ -6,20 +6,21 @@ const SMOKE_USER = TEST_USERS.pro;
 
 async function getCsrfToken(page: import('@playwright/test').Page): Promise<string> {
   // Retry CSRF token fetch — dev server may be slow under concurrent load
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const response = await page.request.get('/api/csrf/token', { timeout: 30000 });
       if (response.ok()) {
         const payload = await response.json();
         return payload.token as string;
       }
-    } catch {
-      // Timeout or network error — retry
+    } catch (error) {
+      // Timeout or network error — log and retry
+      console.warn(`CSRF token fetch attempt ${attempt + 1} failed:`, error instanceof Error ? error.message : String(error));
     }
-    // Wait before retry with exponential backoff
-    if (attempt < 2) await page.waitForTimeout(2000 * (attempt + 1));
+    // Wait before retry (fixed 2s, not exponential)
+    if (attempt < 1) await page.waitForTimeout(2000);
   }
-  throw new Error('Failed to fetch CSRF token after 3 attempts');
+  throw new Error('Failed to fetch CSRF token after 2 attempts');
 }
 
 /**
@@ -41,8 +42,8 @@ async function getPrimarySpaceId(page: import('@playwright/test').Page): Promise
   await page.goto('/dashboard', { waitUntil: 'domcontentloaded', timeout: 30000 });
 
   // Retry — the first API call after auth setup may fail while session hydrates.
-  // Space provisioning trigger runs async and can lag 5-10s under CI load.
-  for (let attempt = 0; attempt < 5; attempt++) {
+  // Space provisioning trigger runs async and can lag under CI load.
+  for (let attempt = 0; attempt < 2; attempt++) {
     const response = await page.request.get('/api/spaces', { timeout: 30000 });
     if (response.ok()) {
       const result = await response.json();
@@ -54,9 +55,9 @@ async function getPrimarySpaceId(page: import('@playwright/test').Page): Promise
       const body = await response.text().catch(() => '(unreadable)');
       console.warn(`[Smoke] /api/spaces returned ${response.status()} (attempt ${attempt + 1}): ${body.substring(0, 200)}`);
     }
-    if (attempt < 4) await page.waitForTimeout(3000 * (attempt + 1));
+    if (attempt < 1) await page.waitForTimeout(5000);
   }
-  throw new Error('Failed to get primary space ID after 5 attempts');
+  throw new Error('Failed to get primary space ID after 2 attempts');
 }
 
 test.describe('Smoke Flow', () => {
@@ -112,8 +113,6 @@ test.describe('Smoke Flow', () => {
     await expect(page.locator(`text=${updatedTaskTitle}`).first()).toBeVisible({ timeout: 10000 });
 
     // Reminders: create + update
-    // Under CI concurrent load, CSRF token rotation or rate limiting can cause 403/429.
-    // Use the same soft-failure pattern as shopping/bulk/export calls below.
     const reminderTitle = `Smoke Reminder ${Date.now()}`;
     const reminderCreate = await page.request.post('/api/reminders', {
       data: {
@@ -126,22 +125,18 @@ test.describe('Smoke Flow', () => {
     });
     if (!reminderCreate.ok()) {
       const body = await reminderCreate.text().catch(() => '(unreadable)');
-      console.warn(`Reminder create returned ${reminderCreate.status()} — may be rate limited or CSRF issue: ${body.substring(0, 200)}`);
-      // Accept 403 (CSRF) or 429 (rate limit) as non-fatal in CI
-      expect([200, 201, 403, 429]).toContain(reminderCreate.status());
-    } else {
-      const reminderData = await reminderCreate.json();
-      const reminderId = reminderData.data?.id as string;
-      if (reminderId) {
-        const reminderUpdate = await page.request.patch(`/api/reminders/${reminderId}`, {
-          data: { title: `${reminderTitle} Updated` },
-          headers: await freshHeaders(page),
-          timeout: 30000,
-        });
-        if (!reminderUpdate.ok()) {
-          console.warn(`Reminder update returned ${reminderUpdate.status()} — may be rate limited`);
-        }
-      }
+      throw new Error(`Reminder create failed: ${reminderCreate.status()} ${body}`);
+    }
+    const reminderData = await reminderCreate.json();
+    const reminderId = reminderData.data?.id as string;
+    const reminderUpdate = await page.request.patch(`/api/reminders/${reminderId}`, {
+      data: { title: `${reminderTitle} Updated` },
+      headers: await freshHeaders(page),
+      timeout: 30000,
+    });
+    if (!reminderUpdate.ok()) {
+      const body = await reminderUpdate.text().catch(() => '(unreadable)');
+      throw new Error(`Reminder update failed: ${reminderUpdate.status()} ${body}`);
     }
 
     await page.goto('/reminders');
@@ -205,24 +200,15 @@ test.describe('Smoke Flow', () => {
 
     await page.goto('/shopping');
     await page.waitForLoadState('networkidle').catch(() => {});
-    // Shopping list UI may not render the newly created list due to React Query
-    // cache timing or default tab filters. API create/share already verified above.
-    // Use soft check: log warning if list not found instead of hard failing.
-    const listFound = await page.locator(`text=${listTitle}`).first().isVisible({ timeout: 10000 }).catch(() => false);
-    if (!listFound) {
-      console.warn(`Shopping list "${listTitle}" not visible on /shopping — API create succeeded, UI rendering may lag`);
-    }
+    // Shopping list should be visible on the page
+    await expect(page.locator(`text=${listTitle}`).first()).toBeVisible({ timeout: 10000 });
 
-    // Bulk delete + archive (non-critical smoke endpoints)
-    // These may fail under load (429 rate limit) or if endpoints have changed.
-    // Use soft assertions with error logging.
+    // Bulk delete + archive (smoke test endpoints)
     const bulkDeleteCount = await page.request.get(
       `/api/bulk/delete-expenses?space_id=${spaceId}&start_date=2000-01-01&end_date=2000-01-02`,
       { timeout: 30000 },
     );
-    if (!bulkDeleteCount.ok()) {
-      console.warn(`Bulk delete count returned ${bulkDeleteCount.status()} — may be rate limited`);
-    }
+    expect(bulkDeleteCount.ok()).toBeTruthy();
 
     const bulkDelete = await page.request.post('/api/bulk/delete-expenses', {
       data: {
@@ -235,9 +221,7 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    if (!bulkDelete.ok()) {
-      console.warn(`Bulk delete returned ${bulkDelete.status()} — may be rate limited`);
-    }
+    expect(bulkDelete.ok()).toBeTruthy();
 
     const bulkArchive = await page.request.post('/api/bulk/archive-old-data', {
       data: {
@@ -248,41 +232,26 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
-    if (!bulkArchive.ok()) {
-      console.warn(`Bulk archive returned ${bulkArchive.status()} — may be rate limited`);
-    }
+    expect(bulkArchive.ok()).toBeTruthy();
 
     // Data export: JSON/CSV/PDF
-    // May fail under load (429 rate limit) — log warnings but don't hard fail
     const jsonExport = await page.request.get('/api/user/export-data', { timeout: 30000 });
-    if (jsonExport.ok()) {
-      expect(jsonExport.headers()['content-type']).toContain('application/json');
-    } else {
-      console.warn(`JSON export returned ${jsonExport.status()} — may be rate limited`);
-      expect([200, 429]).toContain(jsonExport.status());
-    }
+    expect(jsonExport.ok()).toBeTruthy();
+    expect(jsonExport.headers()['content-type']).toContain('application/json');
 
     // Note: type=all returns JSON with all CSVs bundled; use type=tasks for actual CSV response
     const csvExport = await page.request.get('/api/user/export-data-csv?type=tasks', { timeout: 30000 });
+    // 404 = no data available is acceptable for new test user
+    expect([200, 404]).toContain(csvExport.status());
     if (csvExport.ok()) {
       expect(csvExport.headers()['content-type']).toContain('text/csv');
-    } else {
-      console.warn(`CSV export returned ${csvExport.status()} — may be rate limited or no data`);
-      // 404 = no data available, 429 = rate limited — both acceptable in test env
-      expect([200, 404, 429]).toContain(csvExport.status());
     }
 
     const pdfExport = await page.request.get('/api/user/export-data-pdf?type=all', { timeout: 30000 });
-    if (pdfExport.ok()) {
-      expect(pdfExport.headers()['content-type']).toContain('application/pdf');
-    } else {
-      console.warn(`PDF export returned ${pdfExport.status()} — may be rate limited`);
-      expect([200, 429]).toContain(pdfExport.status());
-    }
+    expect(pdfExport.ok()).toBeTruthy();
+    expect(pdfExport.headers()['content-type']).toContain('application/pdf');
 
     // Admin notification export
-    // Admin login may be rate limited after many API calls in this test.
-    // It also needs CSRF token and may return 429 under load.
     const adminLogin = await page.request.post('/api/admin/auth/login', {
       data: {
         email: SMOKE_USER.email,
@@ -291,23 +260,14 @@ test.describe('Smoke Flow', () => {
       headers: await freshHeaders(page),
       timeout: 30000,
     });
+    expect(adminLogin.ok()).toBeTruthy();
 
-    if (adminLogin.ok()) {
-      const adminExport = await page.request.post('/api/admin/notifications/export', {
-        data: { includeAll: true, format: 'csv' },
-        headers: await freshHeaders(page),
-        timeout: 30000,
-      });
-      if (adminExport.ok()) {
-        expect(adminExport.headers()['content-type']).toContain('text/csv');
-      } else {
-        console.warn(`Admin export returned ${adminExport.status()}`);
-        expect([200, 429]).toContain(adminExport.status());
-      }
-    } else {
-      // Admin login may fail due to rate limiting or CSRF — not a core smoke failure
-      console.warn(`Admin login returned ${adminLogin.status()} — may be rate limited`);
-      expect([200, 403, 429]).toContain(adminLogin.status());
-    }
+    const adminExport = await page.request.post('/api/admin/notifications/export', {
+      data: { includeAll: true, format: 'csv' },
+      headers: await freshHeaders(page),
+      timeout: 30000,
+    });
+    expect(adminExport.ok()).toBeTruthy();
+    expect(adminExport.headers()['content-type']).toContain('text/csv');
   });
 });

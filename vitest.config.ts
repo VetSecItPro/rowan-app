@@ -1,11 +1,13 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     globals: true,
     environment: 'node',
-    include: ['__tests__/**/*.test.ts'],
+    include: ['__tests__/**/*.test.ts', '__tests__/**/*.test.tsx'],
     exclude: ['tests/e2e/**', 'node_modules/**'],
     setupFiles: ['./vitest.setup.ts'],
     coverage: {
@@ -19,6 +21,7 @@ export default defineConfig({
         'tests/**',
         '**/*.d.ts',
         '**/*.test.ts',
+        '**/*.test.tsx',
         '**/*.spec.ts',
         'lib/types.ts',
         'app/**/layout.tsx',
