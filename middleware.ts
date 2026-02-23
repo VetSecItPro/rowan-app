@@ -36,6 +36,20 @@ const SESSION_COOKIE_MAX_AGE = 90 * 24 * 60 * 60; // 7776000 seconds
  */
 const EMAIL_VERIFICATION_CUTOFF = new Date('2026-01-04T00:00:00Z');
 
+// Bot blocking — return 403 before any serverless work (saves Supabase + auth calls)
+const BLOCKED_BOTS = [
+  'GPTBot', 'ChatGPT-User', 'CCBot', 'ClaudeBot', 'anthropic-ai',
+  'PerplexityBot', 'Bytespider', 'meta-externalagent', 'FacebookBot',
+  'facebookexternalhit', 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot',
+  'PetalBot', 'Amazonbot', 'YouBot', 'Applebot-Extended', 'cohere-ai',
+  'Google-Extended',
+];
+
+function isBlockedBot(ua: string): boolean {
+  const lower = ua.toLowerCase();
+  return BLOCKED_BOTS.some((bot) => lower.includes(bot.toLowerCase()));
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -58,6 +72,12 @@ export async function middleware(req: NextRequest) {
     pathname.endsWith('.webp')
   ) {
     return NextResponse.next();
+  }
+
+  // SECURITY: Block aggressive bots before any Supabase/auth processing
+  const userAgent = req.headers.get('user-agent') ?? '';
+  if (userAgent && isBlockedBot(userAgent)) {
+    return new NextResponse('Forbidden', { status: 403 });
   }
 
   // SECURITY: Request body size limits for API routes (API-009)
